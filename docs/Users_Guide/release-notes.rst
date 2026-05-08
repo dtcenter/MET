@@ -17,7 +17,7 @@ MET Version 13.0.0-beta2 Release Notes (20260508)
 
      * **Support @value notation and multiple vertical levels for UGRID NetCDF files**
        (`#3254 <https://github.com/dtcenter/MET/issues/3254>`_).
-     * **Enhance Gen-Ens-Prod to support the ensemble agreement scale (EAS) algorithm for calculating probabilities**
+     * **Enhance Gen-Ens-Prod to support the Ensemble Agreement Scale (EAS) algorithm for calculating probabilities**
        (`#3294 <https://github.com/dtcenter/MET/issues/3294>`_).
      * Refine Regrid-Data-Plane to print warnings about missing fields rather than erroring out
        (`#3336 <https://github.com/dtcenter/MET/issues/3336>`_).
