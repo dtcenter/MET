@@ -9,38 +9,98 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 13.0.0-beta2 Release Notes (20260508)
+-------------------------------------------------
+
+  .. dropdown:: Enhancements
+
+
+     * **Support @value notation and multiple vertical levels for UGRID NetCDF files**
+       (`#3254 <https://github.com/dtcenter/MET/issues/3254>`_).
+     * **Enhance Gen-Ens-Prod to support the ensemble agreement scale (EAS) algorithm for calculating probabilities**
+       (`#3294 <https://github.com/dtcenter/MET/issues/3294>`_).
+     * Refine Regrid-Data-Plane to print warnings about missing fields rather than erroring out
+       (`#3336 <https://github.com/dtcenter/MET/issues/3336>`_).
+     * Improve the Python embedding handling of gridded data attributes since JSON does not serialize user defined objects like "cartopy.crs.LambertConformal"
+       (`#3373 <https://github.com/dtcenter/MET/issues/3373>`_).
+
+  .. dropdown:: Bugfixes
+
+     * Fix ASCII2NC to handle a wider range of NDBC bad data values
+       (`#3342 <https://github.com/dtcenter/MET/issues/3342>`_).
+     * Fix support for the "file_type" option in the PCP-Combine "sum" command
+       (`#3353 <https://github.com/dtcenter/MET/issues/3353>`_).
+     * Fix OpenMP 4.5 compilation errors from the GNU 8.5.0 compiler
+       (`#3359 <https://github.com/dtcenter/MET/issues/3359>`_).
+     * Fix Grid-Stat to correct the timing information of the SEEPS data written to the NetCDF matched pairs output file
+       (`#3362 <https://github.com/dtcenter/MET/issues/3362>`_).
+     * Fix TC-RMW to run on BEST tracks (and enhance TC-RMW to more flexibly match track points to gridded data)
+       (`#3370 <https://github.com/dtcenter/MET/issues/3370>`_).
+     * Fix NetCDF CF convention support to "false_easting" and "false_northing" for lambert conformal projections
+       (`#3374 <https://github.com/dtcenter/MET/issues/3374>`_).
+
+  .. dropdown:: Repository, build, and test
+
+     * Update MET's development environment to better support RRFS GRIB2 files
+       (`#3337 <https://github.com/dtcenter/MET/issues/3337>`_).
+     * Update MET's compilation script to support upgraded versions of the dependent libraries
+       (`#3377 <https://github.com/dtcenter/MET/issues/3377>`_).
+
+  .. dropdown:: METbaseimage testing environment
+
+     * Update METbaseimage to use Python version 3.14
+       (`#61 <https://github.com/dtcenter/METbaseimage/issues/61>`_).
+
 MET Version 13.0.0-beta1 Release Notes (20260205)
 -------------------------------------------------
 
   .. dropdown:: Enhancements
 
-     * Minimize the use of temporary files in Stat-Analysis (`#2698 <https://github.com/dtcenter/MET/issues/2698>`_).
-     * Resolve runtime differences for different GNU/Intel optimization levels for PBL heights in PB2NC (`#3110 <https://github.com/dtcenter/MET/issues/3110>`_).
-     * **Enhance Grid-Diag to compute mutual information** (`#3171 <https://github.com/dtcenter/MET/issues/3171>`_).
-     * Enhance MET Python embedding and grid specification strings to support LAEA grids (`#3230 <https://github.com/dtcenter/MET/issues/3230>`_).
-     * Resolve several SonarQube Reliability issues in MET's develop branch (`#3253 <https://github.com/dtcenter/MET/issues/3253>`_).
-     * Refine handling of missing data for orographic corrections (`#3270 <https://github.com/dtcenter/MET/issues/3270>`_).
-     * Enhance the MET tools to return consistent exit codes (`#3278 <https://github.com/dtcenter/MET/issues/3278>`_).
-     * Enhance the "GEOG_MATCH" interpolation method to print a WARNING about missing topography and land/sea mask inputs (`#3285 <https://github.com/dtcenter/MET/issues/3285>`_).
-     * Enhance Point2Grid to make the default output value configurable (`#3297 <https://github.com/dtcenter/MET/issues/3297>`_).
-     * **Refine the logic for setting the default masking "FULL" grid in the MET tools** (`#3298 <https://github.com/dtcenter/MET/issues/3298>`_).
-     * Enhance PB2NC and IODA2NC to set the "quality_mark_thresh" configuration option as an actual threshold (`#3307 <https://github.com/dtcenter/MET/issues/3307>`_).
+     * Minimize the use of temporary files in Stat-Analysis
+       (`#2698 <https://github.com/dtcenter/MET/issues/2698>`_).
+     * Resolve runtime differences for different GNU/Intel optimization levels for PBL heights in PB2NC
+       (`#3110 <https://github.com/dtcenter/MET/issues/3110>`_).
+     * **Enhance Grid-Diag to compute mutual information**
+       (`#3171 <https://github.com/dtcenter/MET/issues/3171>`_).
+     * Enhance MET Python embedding and grid specification strings to support LAEA grids
+       (`#3230 <https://github.com/dtcenter/MET/issues/3230>`_).
+     * Resolve several SonarQube Reliability issues in MET's develop branch
+       (`#3253 <https://github.com/dtcenter/MET/issues/3253>`_).
+     * Refine handling of missing data for orographic corrections
+       (`#3270 <https://github.com/dtcenter/MET/issues/3270>`_).
+     * Enhance the MET tools to return consistent exit codes
+       (`#3278 <https://github.com/dtcenter/MET/issues/3278>`_).
+     * Enhance the "GEOG_MATCH" interpolation method to print a WARNING about missing topography and land/sea mask inputs
+       (`#3285 <https://github.com/dtcenter/MET/issues/3285>`_).
+     * Enhance Point2Grid to make the default output value configurable
+       (`#3297 <https://github.com/dtcenter/MET/issues/3297>`_).
+     * **Refine the logic for setting the default masking "FULL" grid in the MET tools**
+       (`#3298 <https://github.com/dtcenter/MET/issues/3298>`_).
+     * Enhance PB2NC and IODA2NC to set the "quality_mark_thresh" configuration option as an actual threshold
+       (`#3307 <https://github.com/dtcenter/MET/issues/3307>`_).
 
   .. dropdown:: Bugfixes
 
-     * Fix the logic to apply "set_attr_grid" before "ShiftRight" (`#3255 <https://github.com/dtcenter/MET/issues/3255>`_).
-     * Fix ASCII2NC hang when run with an empty input file (`#3266 <https://github.com/dtcenter/MET/issues/3266>`_).
-     * Fix support for the "set_attr_grid" config option when defining the verification domain (`#3293 <https://github.com/dtcenter/MET/issues/3293>`_).
-     * Fix dependency checks and compile flag defaults in compile_MET_all.sh (`#3317 <https://github.com/dtcenter/MET/issues/3317>`_).
+     * Fix the logic to apply "set_attr_grid" before "ShiftRight"
+       (`#3255 <https://github.com/dtcenter/MET/issues/3255>`_).
+     * Fix ASCII2NC hang when run with an empty input file
+       (`#3266 <https://github.com/dtcenter/MET/issues/3266>`_).
+     * Fix support for the "set_attr_grid" config option when defining the verification domain
+       (`#3293 <https://github.com/dtcenter/MET/issues/3293>`_).
+     * Fix dependency checks and compile flag defaults in compile_MET_all.sh
+       (`#3317 <https://github.com/dtcenter/MET/issues/3317>`_).
 
   .. dropdown:: Repository, build, and test
 
-     * Deprecate and remove the "--enable-mode-graphics" configuration option and corresponding "plot_mode_field" utility (`#3322 <https://github.com/dtcenter/MET/issues/3322>`_).
+     * Deprecate and remove the "--enable-mode-graphics" configuration option and corresponding "plot_mode_field" utility
+       (`#3322 <https://github.com/dtcenter/MET/issues/3322>`_).
 
   .. dropdown:: METbaseimage testing environment
 
-     * Replace deprecated pip install arguments (`METbaseimage #47 <https://github.com/dtcenter/METbaseimage/issues/47>`_).
-     * Create new hardened and streamlined base image for METviewer (`METbaseimage #52 <https://github.com/dtcenter/METbaseimage/issues/52>`_).
+     * Replace deprecated pip install arguments
+       (`METbaseimage #47 <https://github.com/dtcenter/METbaseimage/issues/47>`_).
+     * Create new hardened and streamlined base image for METviewer
+       (`METbaseimage #52 <https://github.com/dtcenter/METbaseimage/issues/52>`_).
 
 MET Upgrade Instructions
 ========================
@@ -105,6 +165,15 @@ MET Version 13.0.0 Upgrade Instructions
 
      * The new "output_flag" entry is a dictionary specifying the desired output types.
 
+   * Gen-Ens-Prod configuration file
+
+     * The "eas_prob" dictionary is added to configure the Ensemble Agreement Scale (EAS) algorithm.
+
+     * The "ensemble_flag.eas" and "ensemble_flag.eas_width" entries are added to enable the
+       writing of EAS output fields.
+
+.. dropdown:: Output format changes - NONE
+
 .. dropdown:: Output format changes - NONE
 
    MET version 13.0.0 adds or modifies the following output file formats:
@@ -117,6 +186,11 @@ MET Version 13.0.0 Upgrade Instructions
      * Existing histogram variables are modified to include the "mask" dimension.
 
      * New information theory variables are added for "entropy", "joint_entropy", and "mutual_information".
+
+   * Gen-Ens-Prod output format
+
+     * Adds new output variables with names include "EAS" and "EAS_WIDTH" for the Ensemble
+       Agreement Scale algorithm.
 
 .. dropdown:: Output data changes - NONE
 
