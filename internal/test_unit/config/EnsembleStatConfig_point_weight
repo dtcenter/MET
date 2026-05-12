@@ -133,9 +133,9 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid  = [];
+   grid  = [ ${MASK_GRID} ];
    poly  = [];
-   sid   = [ "${CONFIG_DIR}/SID_CONUS_ADPSFC_ELEV.txt" ];
+   sid   = [ ${MASK_SID} ];
    llpnt = [];
 }
 

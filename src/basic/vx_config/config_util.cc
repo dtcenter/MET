@@ -2455,6 +2455,7 @@ PointWeightType parse_conf_point_weight_flag(Dictionary *dict) {
    // Convert integer to enumerated GridWeightType
         if(v == conf_const.lookup_int(conf_val_none)) t = PointWeightType::None;
    else if(v == conf_const.lookup_int(conf_val_sid))  t = PointWeightType::SID;
+   else if(v == conf_const.lookup_int(conf_val_kde))  t = PointWeightType::KDE;
    else {
       mlog << Error << "\n" << method_name
            << "Unexpected config file value of " << v << " for \""

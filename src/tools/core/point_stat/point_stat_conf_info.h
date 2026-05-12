@@ -240,6 +240,8 @@ class PointStatConfInfo {
       std::map<ConcatString,MaskSID>     mask_sid_map;
 
       PointWeightType point_weight_flag;    // Point weighting flag
+      double kde_ref_angle;                 // KDE reference angle
+      bool write_weights;                   // Write weights to output file
 
       ConcatString tmp_dir;                 // Directory for temporary files
       ConcatString output_prefix;           // String to customize output file name

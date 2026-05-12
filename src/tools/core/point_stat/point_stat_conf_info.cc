@@ -72,6 +72,8 @@ void PointStatConfInfo::clear() {
    mask_area_map.clear();
    mask_sid_map.clear();
    point_weight_flag = PointWeightType::None;
+   kde_ref_angle = bad_data_double;
+   write_weights = false;
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
@@ -156,6 +158,12 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
    // Conf: point_weight_flag
    point_weight_flag = parse_conf_point_weight_flag(&conf);
+
+   // Conf: kde_ref_angle
+   kde_ref_angle = conf.lookup_double(conf_key_kde_ref_angle);
+
+   // Conf: write_weights
+   write_weights = conf.lookup_bool(conf_key_write_weights);
 
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
