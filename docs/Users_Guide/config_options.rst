@@ -2769,9 +2769,39 @@ methods are planned for future versions:
 * SID to use the weights defined by the station ID masking configuration option,
   "mask.sid".
 
+* KDE to apply a kernel density estimator to compute weights based on observation
+  density to avoid the impact of oversampling from data rich regions.
+
 .. code-block:: none
 
   point_weight_flag = NONE;
+
+kde_ref_angle
+-------------
+
+The "kde_ref_angle" entry defines the reference angle used when computing the
+weights for "point_weight_flag = KDE". This reference angle is defined in degrees
+with a default value of 0.75. As described in :ref:`Haiden et al., 2012 <Haiden-2012>`,
+an increase of this parameter increases the weights of data-sparse regions in global
+or continental-scale averages.
+
+.. code-block:: none
+
+  kde_ref_angle = 0.75;
+
+write_weights
+-------------
+
+When "point_weight_flag = KDE", described above, weights are computed once
+using the location of all point observations used for any verification task.
+The "write_weights" entry is a boolean that can be set to TRUE or FALSE (default).
+If TRUE, the computed weights are written to an output ASCII file. That file
+can be used to set the "mask.sid" station ID masking file option with
+"point_weight_flag = SID" in future runs.
+
+.. code-block:: none
+
+  write_weights = FALSE;
 
 hss_ec_value
 ------------
