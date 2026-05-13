@@ -824,7 +824,10 @@ void PairBase::set_point_weight(const PointWeightInfo &info) {
    }
    // Apply the KDE point weight type
    else if(info.type() == PointWeightType::KDE) {
-     
+
+      // Compute weights, if needed
+      info.compute_kde_weights();
+
       mlog << Debug(4)
            << "Applying KDE point weights.\n";
 

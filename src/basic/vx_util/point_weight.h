@@ -29,10 +29,11 @@ enum class PointWeightType {
 //
 // Struct to store point location information
 //
-struct LatLonWgt {
-   double lat;
-   double lon;
-   double wgt;
+struct SIDWeight {
+   std::string SID;
+   double Lat;
+   double Lon;
+   double Wgt;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -43,8 +44,6 @@ struct LatLonWgt {
 
 class PointWeightInfo {
 
-   void init_from_scratch();
-
    void assign(const PointWeightInfo &);
 
    // Point weighting type 
@@ -53,11 +52,14 @@ class PointWeightInfo {
    // KDE Reference Angle
    double KDERefAngle;
 
+   // Mapping of SID name to location and weight values
+   std::vector<SIDWeight> SIDWeights;
+
+   // Keep track of whether the weights have already been computed
+   bool WeightsComputed;
+
    // Write weights to output file
    bool WriteWeights;
-
-   // Mapping of SID name to location and weight values
-   std::map<std::string,LatLonWgt> SIDWgtMap;
 
    public:
 
@@ -79,7 +81,7 @@ class PointWeightInfo {
       bool need_sid() const;
       void add_sid(const std::string &, double, double);
       bool has_sid(const std::string &, double &) const;
-      void compute_weights();
+      void compute_kde_weights();
 };
 
 ////////////////////////////////////////////////////////////////////////

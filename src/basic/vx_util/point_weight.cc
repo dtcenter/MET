@@ -24,7 +24,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 PointWeightInfo::PointWeightInfo() {
-   init_from_scratch();
+   clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -36,9 +36,6 @@ PointWeightInfo::~PointWeightInfo() {
 ////////////////////////////////////////////////////////////////////////
 
 PointWeightInfo::PointWeightInfo(const PointWeightInfo &m) {
-
-   init_from_scratch();
-
    assign(m);
 }
 
@@ -55,20 +52,12 @@ PointWeightInfo & PointWeightInfo::operator=(const PointWeightInfo &m) noexcept 
 
 ////////////////////////////////////////////////////////////////////////
 
-void PointWeightInfo::init_from_scratch() {
-
-   clear();
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void PointWeightInfo::clear() {
    Type = PointWeightType::None;
    KDERefAngle = bad_data_double;
+   SIDWeights.clear();
+   WeightsComputed = false;
    WriteWeights = false;
-   SIDWgtMap.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -76,8 +65,9 @@ void PointWeightInfo::clear() {
 void PointWeightInfo::assign(const PointWeightInfo & m) {
    Type = m.Type;
    KDERefAngle = m.KDERefAngle;
+   SIDWeights = m.SIDWeights;
+   WeightsComputed = m.WeightsComputed;
    WriteWeights = m.WriteWeights;
-   SIDWgtMap = m.SIDWgtMap;
 
    return;
 }
@@ -85,40 +75,107 @@ void PointWeightInfo::assign(const PointWeightInfo & m) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void PointWeightInfo::add_sid(const string &sid, double lat, double lon) {
+   bool found = false;
 
-   // Add unique SID strings and initialize weights to bad data
-   if(!SIDWgtMap.count(sid)) {
-      SIDWgtMap[sid] = { lat, lon, bad_data_double };
+   // Check for existing entry
+   for(auto it=SIDWeights.begin(); it != SIDWeights.end(); ++it) {
+      if(it->SID == sid) {
+         found = true;
+         break;
+      }
+   }
+
+   // Add unique station ids
+   if(!found) {
+      SIDWeight e = {sid, lat, lon, bad_data_double};
+      SIDWeights.emplace_back(e);
+      WeightsComputed = false;
    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool PointWeightInfo::has_sid(const string &sid, double &wgt) const {
+   const char *method_name = "PointWeightInfo()::has_sid() -> ";
    bool found = false;
 
-   if(SIDWgtMap.count(sid) == 0) {
-      wgt = bad_data_double;
-   }
-   else {
-      found = true;
-      wgt = SIDWgtMap.at(sid).wgt;
+   // Check that the weights have been computed
+   if(!WeightsComputed) {
+      mlog << Warning << "\n" << method_name
+           << "Accessing point weights before computing them!\n\n";
    }
 
+   // Search for a matching entry
+   for(auto it=SIDWeights.begin(); it != SIDWeights.end(); ++it) {
+      if(it->SID == sid) {
+         found = true;
+         wgt = it->Wgt;
+         break;
+      }
+   }
+
+   // Return bad data for no match
+   if(!found) wgt = bad_data_double;
+ 
    return found;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//
+// Reference:
+//    Haiden, T., M.J. Rodwell, D.S. Richardson, A. Okagaki, T. Robinson, T. Hewson, 2012:
+//    Intercomparison of Global Model Precipitation Forecast Skill in 2010/11
+//    Using the SEEPS Score. Monthly Weather Review, 140, 2720-2733.
+//    doi.org/10.1175/MWR-D-11-00301.1
+//
+///////////////////////////////////////////////////////////////////////////////
 
-void PointWeightInfo::compute_weights() {
+void PointWeightInfo::compute_kde_weights() {
 
-   // Compute KDE weights
-   if(Type == PointWeightType::KDE) {
+   // Check for no work to do
+   if(Type != PointWeightType::KDE || WeightsComputed) return;
 
+   // Store sums for the weights 
+   vector<double> dist_sum((int) SIDWeights.size(), 0.0);
 
-// JHG
-   }
+   // Define e constant
+   const double e = exp(1.0);
 
+#pragma omp declare reduction(vec_double_plus : vector<double> :          \
+                              transform(omp_out.begin(), omp_out.end(),   \
+                                         omp_in.begin(), omp_out.begin(), \
+                                        plus<double>()))                  \
+                    initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
+
+#pragma omp parallel default (none) \
+   shared(SIDWeights, KDERefAngle, dist_sum, e)
+   {
+
+      // Compute the sums of the pairwise distances
+#pragma omp for reduction(vec_double_plus: dist_sum) \
+                collapse(2)
+      for(int i=0; i<SIDWeights.size(); i++) {
+         for(int j=i; j<SIDWeights.size(); j++) {
+            double dlat  = SIDWeights[i].Lat - SIDWeights[j].Lat;
+            double dlon  = SIDWeights[i].Lon - SIDWeights[j].Lon;
+            double ang   = sqrt(dlat*dlat + dlon*dlon);
+            double exp   = ang/KDERefAngle;
+            double p     = pow(e, -exp*exp);
+            dist_sum[i] += p;
+            dist_sum[j] += p;
+         }
+      }
+
+      // Store inverse distance weights
+#pragma omp for schedule(static)
+      for(int i=0; i<SIDWeights.size(); i++) {
+         SIDWeights[i].Wgt = 1/dist_sum[i];
+      }
+
+   } // End omp parallel
+
+   // Note that the weights have been computed
+   WeightsComputed = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
