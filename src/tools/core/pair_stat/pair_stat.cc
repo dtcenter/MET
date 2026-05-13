@@ -686,6 +686,8 @@ static void process_ioda_pairs(const ConcatString &file_name) {
       }
    }
 
+   // JHG HERE
+
    mlog << Debug(3) << "Keeping " << n_keep << " of " << n_read
         << " IODA pairs from \"" << file_name << "\".\n";
  

@@ -1142,10 +1142,10 @@ static void process_point_obs(int i_nc) {
                   obs_qty_str.c_str(), obs_arr,
                   grid, var_name.c_str())) {
 
-               // Update point_weight_flag KDE locations for any obs used
-               if(conf_info.point_weight_info.type == PointWeightType::KDE) {
-                  conf_info.point_weight_info.add(
-                     hdr_sid_str, hdr_arr[1], hdr_arr[2]);
+               // Update point weight locations
+               if(conf_info.point_weight_info.need_location()) {
+                  conf_info.point_weight_info.add_location(
+                      hdr_sid_str, hdr_arr[1], hdr_arr[2]);
                }
             }
          }

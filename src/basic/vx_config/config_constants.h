@@ -528,7 +528,8 @@ struct PointWeightInfo {
    PointWeightInfo &operator=(const PointWeightInfo &a) noexcept;
 
    void clear();
-   void add(const std::string &, double, double);
+   bool need_location() const { return type == PointWeightType::KDE; }
+   void add_location(const std::string &, double, double);
    void compute_weights();
 };
 

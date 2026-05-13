@@ -1360,7 +1360,7 @@ void PointWeightInfo::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void PointWeightInfo::add(const string &sid, double lat, double lon) {
+void PointWeightInfo::add_location(const string &sid, double lat, double lon) {
 
    // Only add unique locations
    if(!sid_wgt_map.count(sid)) {
