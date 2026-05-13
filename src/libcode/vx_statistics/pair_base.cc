@@ -787,13 +787,12 @@ void PairBase::calc_obs_summary(){
 ////////////////////////////////////////////////////////////////////////
 
 void PairBase::set_point_weight(const PointWeightInfo &info) {
-
    const char *method_name = "PairBase::set_point_weight() -> ";
 
-   if(!IsPointVx || info.type == PointWeightType::None) return;
+   if(!IsPointVx || info.type() == PointWeightType::None) return;
 
    // Apply the SID point weight type
-   if(info.type == PointWeightType::SID &&
+   if(info.type() == PointWeightType::SID &&
       mask_sid_ptr != nullptr) {
 
       mlog << Debug(4)
@@ -818,7 +817,27 @@ void PairBase::set_point_weight(const PointWeightInfo &info) {
          }
          else {
             mlog << Warning << "\n" << method_name
-                 << "no match found for station id: "
+                 << "no point weight SID match found for station id: "
+                 << sid_sa[i_obs] << "\n\n";
+         }
+      }
+   }
+   // Apply the KDE point weight type
+   else if(info.type() == PointWeightType::KDE) {
+     
+      mlog << Debug(4)
+           << "Applying KDE point weights.\n";
+
+      // Loop through the point observations
+      for(int i_obs=0; i_obs<n_obs; i_obs++) {
+
+         double wgt; 
+         if(info.has_sid(sid_sa[i_obs], wgt)) {
+            wgt_na.set(i_obs, wgt);
+         }
+         else {
+            mlog << Warning << "\n" << method_name
+                 << "no point weight KDE match found for station id: "
                  << sid_sa[i_obs] << "\n\n";
          }
       }

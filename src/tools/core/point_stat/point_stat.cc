@@ -966,9 +966,9 @@ static void process_obs_file(int i_nc) {
                   hdr_ut, obs_qty_str.c_str(), obs_arr,
                   grid, var_name.c_str())) {
 
-               // Update point weight locations
-               if(conf_info.point_weight_info.need_location()) {
-                  conf_info.point_weight_info.add_location(
+               // Update point weight station id locations
+               if(conf_info.point_weight_info.need_sid()) {
+                  conf_info.point_weight_info.add_sid(
                      hdr_sid_str, hdr_arr[1], hdr_arr[2]);
                }
             }

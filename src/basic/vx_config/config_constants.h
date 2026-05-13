@@ -497,45 +497,6 @@ enum class GridWeightType {
 ////////////////////////////////////////////////////////////////////////
 
 //
-// Enumeration for point_weight_flag configuration parameter
-//
-
-enum class PointWeightType {
-   None, // Apply no point weighting
-   SID,  // Apply station ID weighting
-   KDE   // Apply kernel density estimation weighting
-};
-
-//
-// Struct to store point_weight_flag KDE location information
-//
-
-struct LatLonWgt {
-   double lat;
-   double lon;
-   double wgt;
-};
-
-struct PointWeightInfo {
-   PointWeightType type;
-   double kde_ref_angle;
-   bool write_weights;
-   std::map<std::string,LatLonWgt> sid_wgt_map;
-
-   PointWeightInfo() { clear(); }
-   ~PointWeightInfo() { clear(); }
-   PointWeightInfo(PointWeightInfo const &i) { *this = i; }
-   PointWeightInfo &operator=(const PointWeightInfo &a) noexcept;
-
-   void clear();
-   bool need_location() const { return type == PointWeightType::KDE; }
-   void add_location(const std::string &, double, double);
-   void compute_weights();
-};
-
-////////////////////////////////////////////////////////////////////////
-
-//
 // Enumeration for grid_decomp_flag configuration parameter
 //
 
