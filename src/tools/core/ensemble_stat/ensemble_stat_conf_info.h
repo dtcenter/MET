@@ -237,10 +237,7 @@ class EnsembleStatConfInfo {
       gsl_rng *rng_ptr;                     // GSL random number generator (allocated)
 
       GridWeightType  grid_weight_flag;     // Grid weighting flag
-      PointWeightType point_weight_flag;    // Point weighting flag
-      double kde_ref_angle;                 // KDE reference angle
-      bool write_weights;                   // Write weights to output file
-
+      PointWeightInfo point_weight_info;    // Point weighting information
 
       ConcatString   output_prefix;         // String to customize output file name
       ConcatString   version;               // Config file version

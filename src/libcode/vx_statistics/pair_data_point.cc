@@ -518,7 +518,7 @@ void VxPairDataPoint::set_size(int types, int masks, int interps) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::add_point_obs(const float *hdr_arr,
+bool VxPairDataPoint::add_point_obs(const float *hdr_arr,
                                     const char *hdr_typ_str,
                                     const char *hdr_sid_str,
                                     unixtime hdr_ut,
@@ -526,6 +526,7 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
                                     const float *obs_arr,
                                     const Grid &gr,
                                     const char *var_name) {
+   bool obs_used = false;
 
    // Increment the number of tries count
    n_try++;
@@ -538,38 +539,38 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
    }
 
    // Check the station ID
-   if(!is_keeper_sid(pnt_obs_str.c_str(), hdr_sid_str)) return;
+   if(!is_keeper_sid(pnt_obs_str.c_str(), hdr_sid_str)) return obs_used;
 
    // Check observation variable
-   if(!is_keeper_var(pnt_obs_str.c_str(), var_name, nint(obs_arr[1]))) return;
+   if(!is_keeper_var(pnt_obs_str.c_str(), var_name, nint(obs_arr[1]))) return obs_used;
 
    // Check observation quality
-   if(!is_keeper_qty(pnt_obs_str.c_str(), obs_qty)) return;
+   if(!is_keeper_qty(pnt_obs_str.c_str(), obs_qty)) return obs_used;
 
    // Check valid time
-   if(!is_keeper_vld(pnt_obs_str.c_str(), hdr_ut)) return;
+   if(!is_keeper_vld(pnt_obs_str.c_str(), hdr_ut)) return obs_used;
 
    // Check observation value
    double orig_obs_v = obs_arr[4];
-   if(!is_keeper_obs(pnt_obs_str.c_str(), orig_obs_v)) return;
+   if(!is_keeper_obs(pnt_obs_str.c_str(), orig_obs_v)) return obs_used;
 
    // Check location
    double hdr_lat = hdr_arr[0];
    double hdr_lon = hdr_arr[1];
    double obs_x;
    double obs_y;
-   if(!is_keeper_grd(pnt_obs_str.c_str(), gr, hdr_lat, hdr_lon, obs_x, obs_y)) return;
+   if(!is_keeper_grd(pnt_obs_str.c_str(), gr, hdr_lat, hdr_lon, obs_x, obs_y)) return obs_used;
 
    // Check topo
    double hdr_elv = hdr_arr[2];
    double topo_elv = bad_data_double;
    if(!is_keeper_topo(pnt_obs_str.c_str(), gr, obs_x, obs_y,
-                      hdr_typ_str, hdr_elv, topo_elv)) return;
+                      hdr_typ_str, hdr_elv, topo_elv)) return obs_used;
 
    // Check level
    double obs_lvl = obs_arr[2];
    double obs_hgt = obs_arr[3];
-   if(!is_keeper_lvl(pnt_obs_str.c_str(), hdr_typ_str, obs_lvl, obs_hgt)) return;
+   if(!is_keeper_lvl(pnt_obs_str.c_str(), hdr_typ_str, obs_lvl, obs_hgt)) return obs_used;
 
    // Set flags
    bool precip_flag = fcst_info->is_precipitation() &&
@@ -665,14 +666,16 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
             // Add the forecast, climatological, and observation data
             // Weight is from the nearest grid point
             int n = three_to_one(i_msg_typ, i_mask, i_interp);
-            if(!pd[n].add_point_pair(hdr_typ_str, hdr_sid_str,
-                         hdr_lat, hdr_lon, hdr_elv,
-                         obs_x, obs_y,
-                         bad_data_int, hdr_ut,
-                         obs_lvl, obs_hgt,
-                         fcst_v, obs_v, obs_qty,
-                         cpi, default_weight)) {
-
+            if(pd[n].add_point_pair(hdr_typ_str, hdr_sid_str,
+                        hdr_lat, hdr_lon, hdr_elv,
+                        obs_x, obs_y,
+                        bad_data_int, hdr_ut,
+                        obs_lvl, obs_hgt,
+                        fcst_v, obs_v, obs_qty,
+                        cpi, default_weight)) {
+               obs_used = true;
+            }
+            else {
                if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                   mlog << Debug(REJECT_DEBUG_LEVEL)
                        << "For " << fcst_info->magic_str() << " versus "
@@ -711,7 +714,7 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
       } // end for i_mask
    } // end for i_msg_typ
 
-   return;
+   return obs_used;
 }
 
 ////////////////////////////////////////////////////////////////////////

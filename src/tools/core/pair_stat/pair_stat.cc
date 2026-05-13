@@ -24,6 +24,7 @@
 //                                   climo support
 //   002    09/25/25  Halley Gotway  MET #3186 Censoring and conversion
 //   003    01/27/26  Halley Gotway  MET #3298 Add the FULL grid, if needed
+//   004    05/12/26  Halley Gotway  MET #3335 Add point_weight_flag = KDE option
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -126,7 +127,7 @@ int met_main(int argc, char *argv[]) {
    for(int i=0; i<conf_info.get_n_vx(); i++) {
       conf_info.vx_opt[i].vx_pd.calc_obs_summary();
       conf_info.vx_opt[i].vx_pd.print_obs_summary();
-      conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_flag);
+      conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_info);
    }
 
    // Compute the scores and write them out

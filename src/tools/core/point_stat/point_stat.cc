@@ -202,15 +202,13 @@ int met_main(int argc, char *argv[]) {
    process_fcst_climo_files();
 
    // Process each observation netCDF file
-   for(i=0; i<obs_file.n(); i++) {
-      process_obs_file(i);
-   }
+   for(i=0; i<obs_file.n(); i++) process_obs_file(i);
 
    // Process observation summaries and point weights
    for(i=0; i<conf_info.get_n_vx(); i++) {
       conf_info.vx_opt[i].vx_pd.calc_obs_summary();
       conf_info.vx_opt[i].vx_pd.print_obs_summary();
-      conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_flag);
+      conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_info);
    }
 
    // Compute the scores and write them out
@@ -963,10 +961,17 @@ static void process_obs_file(int i_nc) {
             if(conf_info.vx_opt[j].vx_pd.fcst_dpa.n_planes() == 0) continue;
 
             // Attempt to add the observation to the conf_info.vx_pd object
-            conf_info.vx_opt[j].vx_pd.add_point_obs(
-                    hdr_arr, hdr_typ_str.c_str(), hdr_sid_str.c_str(),
-                    hdr_ut, obs_qty_str.c_str(), obs_arr,
-                    grid, var_name.c_str());
+            if(conf_info.vx_opt[j].vx_pd.add_point_obs(
+                  hdr_arr, hdr_typ_str.c_str(), hdr_sid_str.c_str(),
+                  hdr_ut, obs_qty_str.c_str(), obs_arr,
+                  grid, var_name.c_str())) {
+
+               // Update point_weight_flag KDE locations for any obs used
+               if(conf_info.point_weight_info.type == PointWeightType::KDE) {
+                  conf_info.point_weight_info.add(
+                     hdr_sid_str, hdr_arr[1], hdr_arr[2]);
+               }
+            }
          }
 
          met_point_obs->set_grib_code_or_var_index(obs_arr, org_grib_code);

@@ -76,9 +76,7 @@ void EnsembleStatConfInfo::clear() {
    mask_area_map.clear();
    mask_sid_map.clear();
    grid_weight_flag = GridWeightType::None;
-   point_weight_flag = PointWeightType::None;
-   kde_ref_angle = bad_data_double;
-   write_weights = false;
+   point_weight_info.clear();
    output_prefix.clear();
    version.clear();
 
@@ -160,14 +158,8 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Conf: grid_weight_flag
    grid_weight_flag = parse_conf_grid_weight_flag(&conf);
 
-   // Conf: point_weight_flag
-   point_weight_flag = parse_conf_point_weight_flag(&conf);
-
-   // Conf: kde_ref_angle
-   kde_ref_angle = conf.lookup_double(conf_key_kde_ref_angle);
-
-   // Conf: write_weights
-   write_weights = conf.lookup_bool(conf_key_write_weights);
+   // Conf: point_weight_info
+   point_weight_info = parse_conf_point_weight(&conf);
 
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);

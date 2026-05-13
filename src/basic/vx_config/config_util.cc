@@ -1339,6 +1339,37 @@ map<ConcatString,StringArray> parse_conf_string_map(
 
 ///////////////////////////////////////////////////////////////////////////////
 
+PointWeightInfo &PointWeightInfo::operator=(const PointWeightInfo &a) noexcept {
+   if(this != &a) {
+      type = a.type;
+      kde_ref_angle = a.kde_ref_angle;
+      write_weights = a.write_weights;
+      sid_wgt_map = a.sid_wgt_map;
+   }
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void PointWeightInfo::clear() {
+   type = PointWeightType::None;
+   kde_ref_angle = bad_data_double;
+   write_weights = false;
+   sid_wgt_map.clear();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void PointWeightInfo::add(const string &sid, double lat, double lon) {
+
+   // Only add unique locations
+   if(!sid_wgt_map.count(sid)) {
+      sid_wgt_map[sid] = { lat, lon, bad_data_double };
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 TimeSummaryInfo &TimeSummaryInfo::operator=(const TimeSummaryInfo &a) noexcept {
    if(this != &a) {
       flag = a.flag;
@@ -2438,10 +2469,9 @@ GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-PointWeightType parse_conf_point_weight_flag(Dictionary *dict) {
-   PointWeightType t = PointWeightType::None;
-   int v;
-   const char *method_name = "parse_conf_point_weight_flag() -> ";
+PointWeightInfo parse_conf_point_weight(Dictionary *dict) {
+   PointWeightInfo info;
+   const char *method_name = "parse_conf_point_weight() -> ";
 
    if(!dict) {
       mlog << Error << "\n" << method_name
@@ -2449,13 +2479,15 @@ PointWeightType parse_conf_point_weight_flag(Dictionary *dict) {
       exit(1);
    }
 
+   // Conf: point_weight_flag
+
    // Get the integer flag value for the current entry
-   v = dict->lookup_int(conf_key_point_weight_flag);
+   int v = dict->lookup_int(conf_key_point_weight_flag);
 
    // Convert integer to enumerated GridWeightType
-        if(v == conf_const.lookup_int(conf_val_none)) t = PointWeightType::None;
-   else if(v == conf_const.lookup_int(conf_val_sid))  t = PointWeightType::SID;
-   else if(v == conf_const.lookup_int(conf_val_kde))  t = PointWeightType::KDE;
+        if(v == conf_const.lookup_int(conf_val_none)) info.type = PointWeightType::None;
+   else if(v == conf_const.lookup_int(conf_val_sid))  info.type = PointWeightType::SID;
+   else if(v == conf_const.lookup_int(conf_val_kde))  info.type = PointWeightType::KDE;
    else {
       mlog << Error << "\n" << method_name
            << "Unexpected config file value of " << v << " for \""
@@ -2463,7 +2495,13 @@ PointWeightType parse_conf_point_weight_flag(Dictionary *dict) {
       exit(1);
    }
 
-   return t;
+   // Conf: kde_ref_angle
+   info.kde_ref_angle = dict->lookup_double(conf_key_kde_ref_angle);
+
+   // Conf: write_weights
+   info.write_weights = dict->lookup_bool(conf_key_write_weights);
+
+   return info;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

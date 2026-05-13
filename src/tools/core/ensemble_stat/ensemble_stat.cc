@@ -856,7 +856,7 @@ static void process_point_vx() {
    for(int i=0; i<conf_info.get_n_vx(); i++) {
       conf_info.vx_opt[i].vx_pd.calc_obs_summary();
       conf_info.vx_opt[i].vx_pd.print_obs_summary();
-      conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_flag);
+      conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_info);
    }
 
    // Loop through each of the fields to be verified
@@ -1136,11 +1136,18 @@ static void process_point_obs(int i_nc) {
          for(int j=0; j<conf_info.get_n_vx(); j++) {
 
             // Attempt to add the observation to the vx_pd object
-            conf_info.vx_opt[j].vx_pd.add_point_obs(
-                    hdr_arr, hdr_typ_arr, hdr_typ_str.c_str(),
-                    hdr_sid_str.c_str(), hdr_ut,
-                    obs_qty_str.c_str(), obs_arr,
-                    grid, var_name.c_str());
+            if(conf_info.vx_opt[j].vx_pd.add_point_obs(
+                  hdr_arr, hdr_typ_arr, hdr_typ_str.c_str(),
+                  hdr_sid_str.c_str(), hdr_ut,
+                  obs_qty_str.c_str(), obs_arr,
+                  grid, var_name.c_str())) {
+
+               // Update point_weight_flag KDE locations for any obs used
+               if(conf_info.point_weight_info.type == PointWeightType::KDE) {
+                  conf_info.point_weight_info.add(
+                     hdr_sid_str, hdr_arr[1], hdr_arr[2]);
+               }
+            }
          }
       }
    } // end for i_start

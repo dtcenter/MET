@@ -506,6 +506,32 @@ enum class PointWeightType {
    KDE   // Apply kernel density estimation weighting
 };
 
+//
+// Struct to store point_weight_flag KDE location information
+//
+
+struct LatLonWgt {
+   double lat;
+   double lon;
+   double wgt;
+};
+
+struct PointWeightInfo {
+   PointWeightType type;
+   double kde_ref_angle;
+   bool write_weights;
+   std::map<std::string,LatLonWgt> sid_wgt_map;
+
+   PointWeightInfo() { clear(); }
+   ~PointWeightInfo() { clear(); }
+   PointWeightInfo(PointWeightInfo const &i) { *this = i; }
+   PointWeightInfo &operator=(const PointWeightInfo &a) noexcept;
+
+   void clear();
+   void add(const std::string &, double, double);
+   void compute_weights();
+};
+
 ////////////////////////////////////////////////////////////////////////
 
 //

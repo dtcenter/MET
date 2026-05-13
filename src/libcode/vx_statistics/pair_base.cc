@@ -786,14 +786,14 @@ void PairBase::calc_obs_summary(){
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_point_weight(const PointWeightType wgt_flag) {
+void PairBase::set_point_weight(const PointWeightInfo &info) {
 
    const char *method_name = "PairBase::set_point_weight() -> ";
 
-   if(!IsPointVx || wgt_flag == PointWeightType::None) return;
+   if(!IsPointVx || info.type == PointWeightType::None) return;
 
    // Apply the SID point weight type
-   if(wgt_flag == PointWeightType::SID &&
+   if(info.type == PointWeightType::SID &&
       mask_sid_ptr != nullptr) {
 
       mlog << Debug(4)
@@ -1576,14 +1576,14 @@ void VxPairBase::calc_obs_summary() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::set_point_weight(const PointWeightType wgt_flag) {
+void VxPairBase::set_point_weight(const PointWeightInfo &info) {
 
    if(n_vx == 0) {
       mlog << Warning << "\nVxPairBase::set_point_weight() -> "
            << "set_size() has not been called yet!\n\n";
    }
 
-   for(auto &x : pb_ptr) x->set_point_weight(wgt_flag);
+   for(auto &x : pb_ptr) x->set_point_weight(info);
 
    return;
 }
