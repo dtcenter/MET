@@ -786,7 +786,7 @@ void PairBase::calc_obs_summary(){
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_point_weight(const PointWeightInfo &info) {
+void PairBase::set_point_weight(PointWeightInfo &info) {
    const char *method_name = "PairBase::set_point_weight() -> ";
 
    if(!IsPointVx || info.type() == PointWeightType::None) return;
@@ -1598,7 +1598,7 @@ void VxPairBase::calc_obs_summary() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::set_point_weight(const PointWeightInfo &info) {
+void VxPairBase::set_point_weight(PointWeightInfo &info) {
 
    if(n_vx == 0) {
       mlog << Warning << "\nVxPairBase::set_point_weight() -> "
