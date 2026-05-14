@@ -182,8 +182,8 @@ void PointWeightInfo::compute_kde_weights() {
       mlog << Debug(7) << "Computed KDE weights for " << n()
            << " observation locations:\n";
       for(int i=0; i<SIDWeights.size(); i++) {
-         mlog << Debug(7) << "  [" << i+1 << "] " << SIDWeights[i].SID
-              << " (" << SIDWeights[i].Lat << ", " << -1.0*SIDWeights[i].Lon
+         mlog << Debug(7) << " [" << i+1 << "] " << SIDWeights[i].SID
+              << " (" << SIDWeights[i].Lat << ", " << SIDWeights[i].Lon
               << ") " << SIDWeights[i].Wgt << "\n";
       }
    }
