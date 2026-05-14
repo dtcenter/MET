@@ -171,7 +171,7 @@
       <pair><name>DESC</name>          <value>SID_WEIGHT</value></pair>
       <pair><name>POINT_WEIGHT</name>  <value>SID</value></pair>
       <pair><name>MASK_GRID</name>     <value></value></pair>
-      <pair><name>MASK_SID</name>      <value>"&CONFIG_DIR;/SID_CONUS_ADPUPA_ELEV.txt"</value></pair>
+      <pair><name>MASK_SID</name>      <value>"&CONFIG_DIR;/SID_CONUS_ADPSFC_ELEV.txt"</value></pair>
     </env>
     <param> \
       6 \
