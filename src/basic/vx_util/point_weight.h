@@ -82,6 +82,7 @@ class PointWeightInfo {
       void add_sid(const std::string &, double, double);
       bool has_sid(const std::string &, double &) const;
       void compute_kde_weights();
+      int n() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -93,6 +94,7 @@ inline PointWeightType PointWeightInfo::type() const { return Type; }
 inline double PointWeightInfo::kde_ref_angle() const { return KDERefAngle; }
 inline bool PointWeightInfo::write_weights() const { return WriteWeights; }
 inline bool PointWeightInfo::need_sid() const { return Type == PointWeightType::KDE; }
+inline int PointWeightInfo::n() const { return (int) SIDWeights.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 

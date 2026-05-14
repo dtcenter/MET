@@ -969,7 +969,7 @@ static void process_obs_file(int i_nc) {
                // Update point weight station id locations
                if(conf_info.point_weight_info.need_sid()) {
                   conf_info.point_weight_info.add_sid(
-                     hdr_sid_str, hdr_arr[1], hdr_arr[2]);
+                     hdr_sid_str, hdr_arr[0], hdr_arr[1]);
                }
             }
          }

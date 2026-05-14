@@ -135,6 +135,9 @@ void PointWeightInfo::compute_kde_weights() {
    // Check for no work to do
    if(Type != PointWeightType::KDE || WeightsComputed) return;
 
+   mlog << Debug(3) << "Computing KDE point weights using " << n()
+        << " observation locations.\n";
+
    // Store sums for the weights 
    vector<double> dist_sum((int) SIDWeights.size(), 0.0);
 
@@ -173,6 +176,17 @@ void PointWeightInfo::compute_kde_weights() {
       }
 
    } // End omp parallel
+
+   // Dump weights for high verbosity
+   if(mlog.verbosity_level() >= 7) {
+      mlog << Debug(7) << "Computed KDE weights for " << n()
+           << " observation locations:\n";
+      for(int i=0; i<SIDWeights.size(); i++) {
+         mlog << Debug(7) << "  [" << i+1 << "] " << SIDWeights[i].SID
+              << " (" << SIDWeights[i].Lat << ", " << -1.0*SIDWeights[i].Lon
+              << ") " << SIDWeights[i].Wgt << "\n";
+      }
+   }
 
    // Note that the weights have been computed
    WeightsComputed = true;

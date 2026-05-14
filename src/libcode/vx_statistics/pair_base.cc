@@ -829,7 +829,8 @@ void PairBase::set_point_weight(PointWeightInfo &info) {
       info.compute_kde_weights();
 
       mlog << Debug(4)
-           << "Applying KDE point weights.\n";
+           << "Applying KDE point weights computed using "
+           << info.n() << " observation locations.\n";
 
       // Loop through the point observations
       for(int i_obs=0; i_obs<n_obs; i_obs++) {
@@ -840,7 +841,7 @@ void PairBase::set_point_weight(PointWeightInfo &info) {
          }
          else {
             mlog << Warning << "\n" << method_name
-                 << "no point weight KDE match found for station id: "
+                 << "no KDE point weight match found for station id: "
                  << sid_sa[i_obs] << "\n\n";
          }
       }
