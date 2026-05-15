@@ -1932,13 +1932,16 @@ static void setup_txt_files() {
    int  n_prob;
    int  max_col;
    int  max_n_ens;
-   ConcatString tmp_str;
+   ConcatString base_name;
 
    // Check to see if the text files have already been set up
    if(stat_at.nrows() > 0 || stat_at.ncols() > 0) return;
 
    // Create output file names for the stat file and optional text files
-   build_outfile_name(ens_valid_ut, "", tmp_str);
+   build_outfile_name(ens_valid_ut, "", base_name);
+
+   // Store the output point weight file information
+   conf_info.point_weight_info.set_weight_file_prefix(base_name);
 
    /////////////////////////////////////////////////////////////////////
    //
@@ -1977,7 +1980,7 @@ static void setup_txt_files() {
    stat_out = (ofstream *) nullptr;
 
    // Build the file name
-   stat_file << tmp_str << stat_file_ext;
+   stat_file << base_name << stat_file_ext;
 
    // Create the output STAT file
    open_txt_file(stat_out, stat_file.c_str());
@@ -2011,7 +2014,7 @@ static void setup_txt_files() {
          txt_out[i] = (ofstream *) nullptr;
 
          // Build the file name
-         txt_file[i] << tmp_str << "_" << txt_file_abbr[i]
+         txt_file[i] << base_name << "_" << txt_file_abbr[i]
                      << txt_file_ext;
 
          // Create the output text file
@@ -2863,6 +2866,9 @@ static void add_var_att_local(VarInfo *info, NcVar *nc_var, bool is_int,
 ////////////////////////////////////////////////////////////////////////
 
 static void finish_txt_files() {
+
+   // Write the point weight file
+   conf_info.point_weight_info.write_weights();
 
    // Write out the contents of the STAT AsciiTable and
    // close the STAT output files

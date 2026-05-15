@@ -257,6 +257,9 @@ static void setup_txt_files() {
    // Create output file names for the stat file and optional text files
    ConcatString base_name(build_outfile_name(""));
 
+   // Store the output point weight file information
+   conf_info.point_weight_info.set_weight_file_prefix(base_name);
+
    /////////////////////////////////////////////////////////////////////
    //
    // Setup the output STAT file
@@ -1464,6 +1467,9 @@ static void do_pct(const PairStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 static void finish_txt_files() {
+
+   // Write the point weight file
+   conf_info.point_weight_info.write_weights();
 
    // Write out the contents of the STAT AsciiTable and
    // close the STAT output files

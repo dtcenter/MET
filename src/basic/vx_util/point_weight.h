@@ -60,6 +60,7 @@ class PointWeightInfo {
 
    // Write weights to output file
    bool WriteWeights;
+   std::string WeightFilePrefix;
 
    public:
 
@@ -73,16 +74,19 @@ class PointWeightInfo {
       void set_type(PointWeightType);
       void set_kde_ref_angle(double);
       void set_write_weights(bool);
+      void set_weight_file_prefix(const std::string &);
 
-      PointWeightType type() const;
-      double kde_ref_angle() const;
-      bool write_weights() const; 
+      PointWeightType get_type() const;
+      double get_kde_ref_angle() const;
+      bool get_write_weights() const;
+
+      int n_stn() const;
 
       bool need_sid() const;
       void add_sid(const std::string &, double, double);
       bool has_sid(const std::string &, double &) const;
       void compute_kde_weights();
-      int n_stn() const;
+      void write_weights() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -90,11 +94,12 @@ class PointWeightInfo {
 inline void PointWeightInfo::set_type(PointWeightType t) { Type = t; }
 inline void PointWeightInfo::set_kde_ref_angle(double a) { KDERefAngle = a; }
 inline void PointWeightInfo::set_write_weights(bool b) { WriteWeights = b; }
-inline PointWeightType PointWeightInfo::type() const { return Type; }
-inline double PointWeightInfo::kde_ref_angle() const { return KDERefAngle; }
-inline bool PointWeightInfo::write_weights() const { return WriteWeights; }
-inline bool PointWeightInfo::need_sid() const { return Type == PointWeightType::KDE; }
+inline void PointWeightInfo::set_weight_file_prefix(const std::string &s) { WeightFilePrefix = s; }
+inline PointWeightType PointWeightInfo::get_type() const { return Type; }
+inline double PointWeightInfo::get_kde_ref_angle() const { return KDERefAngle; }
+inline bool PointWeightInfo::get_write_weights() const { return WriteWeights; }
 inline int PointWeightInfo::n_stn() const { return (int) SIDWeights.size(); }
+inline bool PointWeightInfo::need_sid() const { return Type == PointWeightType::KDE; }
 
 ////////////////////////////////////////////////////////////////////////
 

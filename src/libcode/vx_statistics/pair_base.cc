@@ -789,10 +789,10 @@ void PairBase::calc_obs_summary(){
 void PairBase::set_point_weight(PointWeightInfo &info) {
    const char *method_name = "PairBase::set_point_weight() -> ";
 
-   if(!IsPointVx || info.type() == PointWeightType::None) return;
+   if(!IsPointVx || info.get_type() == PointWeightType::None) return;
 
    // Apply the SID point weight type
-   if(info.type() == PointWeightType::SID &&
+   if(info.get_type() == PointWeightType::SID &&
       mask_sid_ptr != nullptr) {
 
       mlog << Debug(4)
@@ -823,14 +823,14 @@ void PairBase::set_point_weight(PointWeightInfo &info) {
       }
    }
    // Apply the KDE point weight type
-   else if(info.type() == PointWeightType::KDE) {
+   else if(info.get_type() == PointWeightType::KDE) {
 
       // Compute weights, if needed
       info.compute_kde_weights();
 
       mlog << Debug(4)
            << "Applying KDE point weights computed using "
-           << info.n() << " observation locations.\n";
+           << info.n_stn() << " observation locations.\n";
 
       // Loop through the point observations
       for(int i_obs=0; i_obs<n_obs; i_obs++) {

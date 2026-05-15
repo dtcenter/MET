@@ -8,6 +8,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
+
 #include "vx_util.h"
 
 #include "config_file.h"
@@ -58,6 +60,7 @@ void PointWeightInfo::clear() {
    SIDWeights.clear();
    WeightsComputed = false;
    WriteWeights = false;
+   WeightFilePrefix.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -68,6 +71,7 @@ void PointWeightInfo::assign(const PointWeightInfo & m) {
    SIDWeights = m.SIDWeights;
    WeightsComputed = m.WeightsComputed;
    WriteWeights = m.WriteWeights;
+   WeightFilePrefix = m.WeightFilePrefix;
 
    return;
 }
@@ -135,7 +139,7 @@ void PointWeightInfo::compute_kde_weights() {
    // Check for no work to do
    if(Type != PointWeightType::KDE || WeightsComputed) return;
 
-   mlog << Debug(3) << "Computing KDE point weights using " << n()
+   mlog << Debug(3) << "Computing KDE point weights using " << n_stn()
         << " observation locations.\n";
 
    // Store sums for the weights 
@@ -177,9 +181,9 @@ void PointWeightInfo::compute_kde_weights() {
 
    // Dump weights for high verbosity
    if(mlog.verbosity_level() >= 7) {
-      mlog << Debug(7) << "Computed KDE weights for " << n()
+      mlog << Debug(7) << "Computed KDE weights for " << n_stn()
            << " observation locations:\n";
-      for(int i=0; i<n_stn()); i++) {
+      for(int i=0; i<n_stn(); i++) {
          mlog << Debug(7) << " [" << i+1 << "] " << SIDWeights[i].SID
               << " (" << SIDWeights[i].Lat << ", " << -1.0*SIDWeights[i].Lon
               << ") " << SIDWeights[i].Wgt << "\n";
@@ -191,14 +195,57 @@ void PointWeightInfo::compute_kde_weights() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+void PointWeightInfo::write_weights() const {
+   const char *method_name = "PointWeightInfo()::write_weights() -> ";
+
+   if(!WriteWeights || Type == PointWeightType::None) return;
+
+   // Check for empty string
+   if(WeightFilePrefix.empty()) {
+      mlog << Error << "\n" << method_name
+           << "the weight file prefix has not been set!\n\n";
+      exit(1);
+   }
+
+   // Construct the output file name
+   ConcatString file_name(WeightFilePrefix);
+   ConcatString type_str(conf_val_none);
+        if(Type == PointWeightType::SID) type_str = conf_val_sid;
+   else if(Type == PointWeightType::KDE) type_str = conf_val_kde;
+   file_name << "_" << type_str << "_point_weights.txt";
+
+   // Open the output file
+   ofstream out(file_name.c_str());
+   if(!out) {
+      mlog << Error << "\n" << method_name
+           << "can't open the output file \"" << file_name
+           << "\" for writing!\n\n";
+      exit(1);
+   }
+
+   // List the output file
+   mlog << Debug(1) << "Point weight file: " << file_name << "\n";
+
+   // Write the weights
+   out << type_str << "_POINT_WEIGHTS\n";
+   for(int i=0; i<n_stn(); i++) {
+      out << SIDWeights[i].SID << "(" << SIDWeights[i].Wgt << ")\n";
+   }
+
+   // Close the output file
+   out.close();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 //
 // Utility functions
 //
 ///////////////////////////////////////////////////////////////////////////////
  
 PointWeightInfo parse_conf_point_weight(Dictionary *dict) {
-   PointWeightInfo info;
    const char *method_name = "parse_conf_point_weight() -> ";
+   PointWeightInfo info;
    
    if(!dict) {
       mlog << Error << "\n" << method_name
