@@ -139,7 +139,7 @@ void PointWeightInfo::compute_kde_weights() {
         << " observation locations.\n";
 
    // Store sums for the weights 
-   vector<double> dist_sum((int) SIDWeights.size(), 0.0);
+   vector<double> p_sum(n_stn(), 0.0);
 
    // Define e constant
    const double e = exp(1.0);
@@ -151,29 +151,27 @@ void PointWeightInfo::compute_kde_weights() {
                     initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
 
 #pragma omp parallel default (none) \
-   shared(SIDWeights, KDERefAngle, dist_sum, e)
+   shared(SIDWeights, KDERefAngle, p_sum, e)
    {
 
       // Compute the sums of the pairwise distances
-#pragma omp for reduction(vec_double_plus: dist_sum) \
+#pragma omp for reduction(vec_double_plus: p_sum) \
                 collapse(2)
-      for(int i=0; i<SIDWeights.size(); i++) {
-         for(int j=i; j<SIDWeights.size(); j++) {
-            double dlat  = SIDWeights[i].Lat - SIDWeights[j].Lat;
-            double dlon  = SIDWeights[i].Lon - SIDWeights[j].Lon;
-            double ang   = sqrt(dlat*dlat + dlon*dlon);
-            double exp   = ang/KDERefAngle;
-            double p     = pow(e, -exp*exp);
-            dist_sum[i] += p;
-            dist_sum[j] += p;
+      for(int i=0; i<n_stn(); i++) {
+         for(int j=i+1; j<n_stn(); j++) {
+            double dlat = SIDWeights[i].Lat - SIDWeights[j].Lat;
+            double dlon = SIDWeights[i].Lon - SIDWeights[j].Lon;
+            double ang  = sqrt(dlat*dlat + dlon*dlon);
+            double exp  = ang/KDERefAngle;
+            double p    = pow(e, -exp*exp);
+            p_sum[i]   += p;
+            p_sum[j]   += p;
          }
       }
 
-      // Store inverse distance weights
+      // Compute weights as the inverse of the p sums
 #pragma omp for schedule(static)
-      for(int i=0; i<SIDWeights.size(); i++) {
-         SIDWeights[i].Wgt = 1/dist_sum[i];
-      }
+      for(int i=0; i<n_stn(); i++) SIDWeights[i].Wgt = 1.0/p_sum[i];
 
    } // End omp parallel
 
@@ -181,9 +179,9 @@ void PointWeightInfo::compute_kde_weights() {
    if(mlog.verbosity_level() >= 7) {
       mlog << Debug(7) << "Computed KDE weights for " << n()
            << " observation locations:\n";
-      for(int i=0; i<SIDWeights.size(); i++) {
+      for(int i=0; i<n_stn()); i++) {
          mlog << Debug(7) << " [" << i+1 << "] " << SIDWeights[i].SID
-              << " (" << SIDWeights[i].Lat << ", " << SIDWeights[i].Lon
+              << " (" << SIDWeights[i].Lat << ", " << -1.0*SIDWeights[i].Lon
               << ") " << SIDWeights[i].Wgt << "\n";
       }
    }
