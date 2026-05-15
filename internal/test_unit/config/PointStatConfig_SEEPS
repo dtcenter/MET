@@ -40,6 +40,9 @@ wind_thresh = [ NA ];
 wind_logic  = UNION;
 eclv_points = 0.05;
 
+duplicate_flag = NONE;
+rank_corr_flag = FALSE;
+
 cat_thresh   = [ >0.254, >0.635, >1.270, >2.540 ];
 message_type = "ADPSFC";
 
@@ -107,6 +110,14 @@ hira = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// Threshold for SEEPS p1 (Probability of being dry)
+//
+seeps_p1_thresh = ${SEEPS_P1_THRESH};
+seeps_point_climo_name = "${SEEPS_POINT_CLIMO_NAME}";
+
+////////////////////////////////////////////////////////////////////////////////
+
 output_flag = {
    fho    = BOTH;
    ctc    = BOTH;
@@ -133,17 +144,12 @@ output_flag = {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Threshold for SEEPS p1 (Probability of being dry)
-
-seeps_p1_thresh = ${SEEPS_P1_THRESH};
-seeps_point_climo_name = "${SEEPS_POINT_CLIMO_NAME}";
-
-////////////////////////////////////////////////////////////////////////////////
-
-duplicate_flag = NONE;
-rank_corr_flag = FALSE;
 
 point_weight_flag = NONE;
+kde_ref_angle     = 0.75;
+write_weights     = FALSE;
+ 
+////////////////////////////////////////////////////////////////////////////////
 
 tmp_dir       = "/tmp";
 output_prefix = "${OUTPUT_PREFIX}";

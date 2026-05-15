@@ -45,6 +45,10 @@ sid_exc       = [];
 obs_quality_inc  = [];
 obs_quality_exc  = [];
 
+duplicate_flag = NONE;
+obs_summary    = NEAREST;
+rank_corr_flag = TRUE;
+
 fcst = {
 
    field = [
@@ -121,6 +125,13 @@ hira = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// Threshold for SEEPS p1 (Probability of being dry)
+//
+seeps_p1_thresh = NA;
+
+////////////////////////////////////////////////////////////////////////////////
+
 output_flag = {
    fho    = NONE;
    ctc    = NONE;
@@ -147,17 +158,12 @@ output_flag = {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Threshold for SEEPS p1 (Probability of being dry)
-
-seeps_p1_thresh = NA;
-
-////////////////////////////////////////////////////////////////////////////////
-
-duplicate_flag = NONE;
-obs_summary    = NEAREST;
-rank_corr_flag = TRUE;
 
 point_weight_flag = NONE;
+kde_ref_angle     = 0.75;
+write_weights     = FALSE;
+ 
+////////////////////////////////////////////////////////////////////////////////
 
 tmp_dir       = "/tmp";
 output_prefix = "${OUTPUT_PREFIX}";
