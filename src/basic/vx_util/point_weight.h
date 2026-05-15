@@ -84,6 +84,8 @@ class PointWeightInfo {
 
       bool need_sid() const;
       void add_sid(const std::string &, double, double);
+      void add_wgt(const std::string &, double);
+      bool has_sid(const std::string &) const;
       bool has_sid(const std::string &, double &) const;
       void compute_kde_weights();
       void write_weights() const;

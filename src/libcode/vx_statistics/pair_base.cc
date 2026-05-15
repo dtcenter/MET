@@ -814,6 +814,9 @@ void PairBase::set_point_weight(PointWeightInfo &info) {
          double wgt; 
          if(mask_sid_ptr->has_sid(sid_sa[i_obs], wgt)) {
             wgt_na.set(i_obs, wgt);
+
+            // Store the pre-computed SID weights
+            info.add_wgt(sid_sa[i_obs], wgt);
          }
          else {
             mlog << Warning << "\n" << method_name

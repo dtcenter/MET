@@ -79,22 +79,42 @@ void PointWeightInfo::assign(const PointWeightInfo & m) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void PointWeightInfo::add_sid(const string &sid, double lat, double lon) {
+
+   // Add unique station id locations with which to compute weights
+   if(!has_sid(sid)) {
+      SIDWeight e = {sid, lat, lon, bad_data_double};
+      SIDWeights.emplace_back(e);
+      WeightsComputed = false;
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void PointWeightInfo::add_wgt(const string &sid, double wgt) {
+
+   // Add pre-computed weights for unique station ids
+   if(!has_sid(sid)) {
+      SIDWeight e = {sid, bad_data_double, bad_data_double, wgt};
+      SIDWeights.emplace_back(e);
+      WeightsComputed = true;
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool PointWeightInfo::has_sid(const string &sid) const {
+   const char *method_name = "PointWeightInfo()::has_sid() -> ";
    bool found = false;
 
-   // Check for existing entry
-   for(auto it=SIDWeights.begin(); it != SIDWeights.end(); ++it) {
-      if(it->SID == sid) {
+   // Search for a matching entry
+   for(const auto &e : SIDWeights) {
+      if(e.SID == sid) {
          found = true;
          break;
       }
    }
 
-   // Add unique station ids
-   if(!found) {
-      SIDWeight e = {sid, lat, lon, bad_data_double};
-      SIDWeights.emplace_back(e);
-      WeightsComputed = false;
-   }
+   return found;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,10 +130,10 @@ bool PointWeightInfo::has_sid(const string &sid, double &wgt) const {
    }
 
    // Search for a matching entry
-   for(auto it=SIDWeights.begin(); it != SIDWeights.end(); ++it) {
-      if(it->SID == sid) {
+   for(const auto &e : SIDWeights) {
+      if(e.SID == sid) {
          found = true;
-         wgt = it->Wgt;
+         wgt = e.Wgt;
          break;
       }
    }

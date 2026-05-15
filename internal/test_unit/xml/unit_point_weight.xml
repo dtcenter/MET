@@ -55,6 +55,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_weight/point_stat_SID_WEIGHT_150000L_20120409_120000V.stat</stat>
+      <exist>&OUTPUT_DIR;/point_weight/point_stat_SID_WEIGHT_150000L_20120409_120000V_SID_point_weights.txt</exist>
     </output>
   </test>
 
@@ -75,6 +76,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_weight/point_stat_KDE_WEIGHT_150000L_20120409_120000V.stat</stat>
+      <exist>&OUTPUT_DIR;/point_weight/point_stat_KDE_WEIGHT_150000L_20120409_120000V_KDE_point_weights.txt</exist>
     </output>
   </test>
 

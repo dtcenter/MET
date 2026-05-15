@@ -1,0 +1,506 @@
+DEBUG 1: Start point_stat V13.0.0 by johnhg(6088) at 2026-05-15 18:01:14Z with command: /d1/personal/johnhg/METplus/development/METplus-13.0/rc1/MET-feature_3335_point_weight_flag/internal/test_unit/../../share/met/../../bin/point_stat /d1/projects/MET/MET_test_data/unit_test/model_data/grib2/sref_mn/sref_mean_2012040821_F015.grib2 /d1/personal/johnhg/METplus/development/METplus-13.0/rc1/MET-feature_3335_point_weight_flag/internal/test_unit/../../test_output/pb2nc/gdas1.20120409.t12z.prepbufr.nc /d1/personal/johnhg/METplus/development/METplus-13.0/rc1/MET-feature_3335_point_weight_flag/internal/test_unit/config/PointStatConfig_point_weight -outdir /d1/personal/johnhg/METplus/development/METplus-13.0/rc1/MET-feature_3335_point_weight_flag/internal/test_unit/../../test_output/point_weight -v 7 -log run.log 
+DEBUG 2: Defaulting unset OMP_NUM_THREADS to use 1 of 40 available threads. Recommend setting OMP_NUM_THREADS for faster runtimes.
+DEBUG 2: OpenMP running on 1 thread(s).
+DEBUG 1: Default Config File: /d1/personal/johnhg/METplus/development/METplus-13.0/rc1/MET-feature_3335_point_weight_flag/share/met/config/PointStatConfig_default
+DEBUG 1: User Config File: /d1/personal/johnhg/METplus/development/METplus-13.0/rc1/MET-feature_3335_point_weight_flag/internal/test_unit/config/PointStatConfig_point_weight
+DEBUG 4: Met2dDataFileFactory::new_met_2d_data_file() -> created new Met2dDataFile object of type "FileType_Gb2".
+DEBUG 4: Switching the GRIB2 radius of the earth value of 6371.23 km to 6371.2 km for internal consistency.
+DEBUG 4: 
+DEBUG 4: Lambert Conformal Grid Data:
+DEBUG 4:    hemisphere: N
+DEBUG 4:   scale_lat_1: 25
+DEBUG 4:   scale_lat_2: 25
+DEBUG 4:       lat_pin: 12.19
+DEBUG 4:       lon_pin: 133.459
+DEBUG 4:         x_pin: 0
+DEBUG 4:         y_pin: 0
+DEBUG 4:    lon_orient: 95
+DEBUG 4:          d_km: 40.635
+DEBUG 4:          r_km: 6371.2
+DEBUG 4:            nx: 185
+DEBUG 4:            ny: 129
+DEBUG 4:     so2_angle: 0
+DEBUG 4: 
+DEBUG 4: MetGrib2DataFile::read_grib2_record_list() - processed 70 records from GRIB2 file: /d1/projects/MET/MET_test_data/unit_test/model_data/grib2/sref_mn/sref_mean_2012040821_F015.grib2
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb1".
+DEBUG 3: 
+DEBUG 3: Multiple GRIB2 table entries match lookup criteria (parm_name = TMP):
+DEBUG 3:   parm_name: TMP, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 0, index_c = 0
+DEBUG 3:   parm_name: TMP, index_a = 0, grib2_mtab = 1, grib2_cntr = 7, grib2_ltab = 1, index_b = 0, index_c = 0
+DEBUG 3: Using the first match found:   parm_name: TMP, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 0, index_c = 0
+DEBUG 3: 
+DEBUG 5: Parsed forecast field:
+DEBUG 5: Parsed observation field:
+DEBUG 5: Parsed thresholds:
+DEBUG 5: Matched pair filter columns:     (nul)
+DEBUG 5: Matched pair filter thresholds:  NA
+DEBUG 5: Forecast categorical thresholds: >273,>283
+DEBUG 5: Observed categorical thresholds: >273,>283
+DEBUG 5: Forecast continuous thresholds:  NA
+DEBUG 5: Observed continuous thresholds:  NA
+DEBUG 5: Continuous threshold logic:      UNION
+DEBUG 5: Forecast wind speed thresholds:  NA
+DEBUG 5: Observed wind speed thresholds:  NA
+DEBUG 5: Wind speed threshold logic:      UNION
+DEBUG 4: ClimoCDFInfo::set_cdf_ta() -> Since "cdf_bins" = 1, no climatology CDF bins will be applied.
+DEBUG 4: parse_conf_sid_list() -> Station ID "sid_inc" list contains 0 entries.
+DEBUG 4: parse_conf_sid_list() -> Station ID "sid_exc" list contains 0 entries.
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb1".
+DEBUG 5: Parsed forecast field:
+DEBUG 5: Parsed observation field:
+DEBUG 5: Parsed thresholds:
+DEBUG 5: Matched pair filter columns:     (nul)
+DEBUG 5: Matched pair filter thresholds:  NA
+DEBUG 5: Forecast categorical thresholds: >5
+DEBUG 5: Observed categorical thresholds: >5
+DEBUG 5: Forecast continuous thresholds:  NA
+DEBUG 5: Observed continuous thresholds:  NA
+DEBUG 5: Continuous threshold logic:      UNION
+DEBUG 5: Forecast wind speed thresholds:  NA
+DEBUG 5: Observed wind speed thresholds:  NA
+DEBUG 5: Wind speed threshold logic:      UNION
+DEBUG 4: ClimoCDFInfo::set_cdf_ta() -> Since "cdf_bins" = 1, no climatology CDF bins will be applied.
+DEBUG 4: parse_conf_sid_list() -> Station ID "sid_inc" list contains 0 entries.
+DEBUG 4: parse_conf_sid_list() -> Station ID "sid_exc" list contains 0 entries.
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb1".
+DEBUG 5: Parsed forecast field:
+DEBUG 5: Parsed observation field:
+DEBUG 5: Parsed thresholds:
+DEBUG 5: Matched pair filter columns:     (nul)
+DEBUG 5: Matched pair filter thresholds:  NA
+DEBUG 5: Forecast categorical thresholds: >5
+DEBUG 5: Observed categorical thresholds: >5
+DEBUG 5: Forecast continuous thresholds:  NA
+DEBUG 5: Observed continuous thresholds:  NA
+DEBUG 5: Continuous threshold logic:      UNION
+DEBUG 5: Forecast wind speed thresholds:  NA
+DEBUG 5: Observed wind speed thresholds:  NA
+DEBUG 5: Wind speed threshold logic:      UNION
+DEBUG 4: ClimoCDFInfo::set_cdf_ta() -> Since "cdf_bins" = 1, no climatology CDF bins will be applied.
+DEBUG 4: parse_conf_sid_list() -> Station ID "sid_inc" list contains 0 entries.
+DEBUG 4: parse_conf_sid_list() -> Station ID "sid_exc" list contains 0 entries.
+DEBUG 3: U-wind field array entry 2 matches V-wind field array entry 3.
+DEBUG 3: V-wind field array entry 3 matches U-wind field array entry 2.
+DEBUG 1: Forecast File: /d1/projects/MET/MET_test_data/unit_test/model_data/grib2/sref_mn/sref_mean_2012040821_F015.grib2
+DEBUG 1: Observation File: /d1/personal/johnhg/METplus/development/METplus-13.0/rc1/MET-feature_3335_point_weight_flag/internal/test_unit/../../test_output/pb2nc/gdas1.20120409.t12z.prepbufr.nc
+DEBUG 3: MetGrib2DataFile::data_plane_array() -> Found exact match for "TMP/P850" in GRIB2 record 39 field 1 of GRIB2 file "/d1/projects/MET/MET_test_data/unit_test/model_data/grib2/sref_mn/sref_mean_2012040821_F015.grib2"
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: 256.3
+DEBUG 4:       plane max: 294.4
+DEBUG 4:       scan mode: 64
+DEBUG 4:      valid time: 20120409_120000
+DEBUG 4:       lead time: 150000
+DEBUG 4:       init time: 20120408_210000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lambert Conformal
+DEBUG 4:    Nx: 185
+DEBUG 4:    Ny: 129
+DEBUG 4:    Lat_LL: 12.190
+DEBUG 4:    Lon_LL: 133.459
+DEBUG 4:    Lon_orient: 95.000
+DEBUG 4:    Alpha: 406.820
+DEBUG 4:    Cone: 0.423
+DEBUG 4:    Bx: 104.0012
+DEBUG 4:    By: 356.7313
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: 256.3
+DEBUG 4:    plane max: 294.4
+DEBUG 4:    valid time: 20120409_120000
+DEBUG 4:    lead time: 150000
+DEBUG 4:    init time: 20120408_210000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 2: Reading data for TMP/P850.
+DEBUG 2: Using the forecast grid as the verification grid
+DEBUG 3: Grid Definition: Projection: Lambert Conformal Nx: 185 Ny: 129 Lat_LL: 12.190 Lon_LL: 133.459 Lon_orient: 95.000 Alpha: 406.820 Cone: 0.423 Bx: 104.0012 By: 356.7313
+DEBUG 2: Processing masking regions.
+DEBUG 3: Processing grid mask: FULL
+DEBUG 4: parse_grid_mask() -> parsing grid mask "FULL"
+DEBUG 2: For TMP/P850, found 1 forecast levels, 0 forecast climatology mean and 0 standard deviation level(s), and 0 observation climatology mean and 0 standard deviation level(s).
+DEBUG 3: MetGrib2DataFile::data_plane_array() -> Found exact match for "UGRD/P850" in GRIB2 record 4 field 1 of GRIB2 file "/d1/projects/MET/MET_test_data/unit_test/model_data/grib2/sref_mn/sref_mean_2012040821_F015.grib2"
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -18.8
+DEBUG 4:       plane max: 22.7
+DEBUG 4:       scan mode: 64
+DEBUG 4:      valid time: 20120409_120000
+DEBUG 4:       lead time: 150000
+DEBUG 4:       init time: 20120408_210000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -17.4
+DEBUG 4:       plane max: 21.8
+DEBUG 4:       scan mode: 64
+DEBUG 4:      valid time: 20120409_120000
+DEBUG 4:       lead time: 150000
+DEBUG 4:       init time: 20120408_210000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 3: MetGrib2DataFile::check_uv_rotation() -> Found pair match "VGRD/P850" in GRIB2 record 10 field 1
+DEBUG 3: Rotating U and V wind components from grid-relative to earth-relative.
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lambert Conformal
+DEBUG 4:    Nx: 185
+DEBUG 4:    Ny: 129
+DEBUG 4:    Lat_LL: 12.190
+DEBUG 4:    Lon_LL: 133.459
+DEBUG 4:    Lon_orient: 95.000
+DEBUG 4:    Alpha: 406.820
+DEBUG 4:    Cone: 0.423
+DEBUG 4:    Bx: 104.0012
+DEBUG 4:    By: 356.7313
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -17.6582
+DEBUG 4:    plane max: 20.8246
+DEBUG 4:    valid time: 20120409_120000
+DEBUG 4:    lead time: 150000
+DEBUG 4:    init time: 20120408_210000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 2: Reading data for UGRD/P850.
+DEBUG 2: For UGRD/P850, found 1 forecast levels, 0 forecast climatology mean and 0 standard deviation level(s), and 0 observation climatology mean and 0 standard deviation level(s).
+DEBUG 3: MetGrib2DataFile::data_plane_array() -> Found exact match for "VGRD/P850" in GRIB2 record 10 field 1 of GRIB2 file "/d1/projects/MET/MET_test_data/unit_test/model_data/grib2/sref_mn/sref_mean_2012040821_F015.grib2"
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -17.4
+DEBUG 4:       plane max: 21.8
+DEBUG 4:       scan mode: 64
+DEBUG 4:      valid time: 20120409_120000
+DEBUG 4:       lead time: 150000
+DEBUG 4:       init time: 20120408_210000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -18.8
+DEBUG 4:       plane max: 22.7
+DEBUG 4:       scan mode: 64
+DEBUG 4:      valid time: 20120409_120000
+DEBUG 4:       lead time: 150000
+DEBUG 4:       init time: 20120408_210000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 3: MetGrib2DataFile::check_uv_rotation() -> Found pair match "UGRD/P850" in GRIB2 record 4 field 1
+DEBUG 3: Rotating U and V wind components from grid-relative to earth-relative.
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lambert Conformal
+DEBUG 4:    Nx: 185
+DEBUG 4:    Ny: 129
+DEBUG 4:    Lat_LL: 12.190
+DEBUG 4:    Lon_LL: 133.459
+DEBUG 4:    Lon_orient: 95.000
+DEBUG 4:    Alpha: 406.820
+DEBUG 4:    Cone: 0.423
+DEBUG 4:    Bx: 104.0012
+DEBUG 4:    By: 356.7313
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -17.2597
+DEBUG 4:    plane max: 21.4671
+DEBUG 4:    valid time: 20120409_120000
+DEBUG 4:    lead time: 150000
+DEBUG 4:    init time: 20120408_210000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 2: Reading data for VGRD/P850.
+DEBUG 2: For VGRD/P850, found 1 forecast levels, 0 forecast climatology mean and 0 standard deviation level(s), and 0 observation climatology mean and 0 standard deviation level(s).
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 7: update_missing_values(T) hdr_typ(data_type=i): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [0 - 6] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000234 seconds
+DEBUG 7: update_missing_values(T) hdr_sid(data_type=i): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [0 - 3546] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.00025 seconds
+DEBUG 7: update_missing_values(T) hdr_vld(data_type=i): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [0 - 60] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000193 seconds
+DEBUG 7: update_missing_values(T) hdr_lat(data_type=f): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [15.1 - 61.13] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000379 seconds
+DEBUG 7: update_missing_values(T) hdr_lon(data_type=f): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [-147.27 - -50.03] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000377 seconds
+DEBUG 7: update_missing_values(T) hdr_elv(data_type=f): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [0 - 12497] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000374 seconds
+DEBUG 7: update_missing_values(T) hdr_prpt_typ(data_type=i): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [120 - 287] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000204 seconds
+DEBUG 7: update_missing_values(T) hdr_irpt_typ(data_type=i): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [11 - 562] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000191 seconds
+DEBUG 7: update_missing_values(T) hdr_inst_typ(data_type=i): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [49 - 111] Positive count: 0
+DEBUG 3: update_missing_values(T) hdr_inst_typ(data_type=i): found 11157 FillValues out of 11370
+DEBUG 7: update_missing_values(T)  took 0.00025 seconds
+DEBUG 3: Processing each "obs.field" name as a GRIB code abbreviation since the point observations are specified as GRIB codes.
+DEBUG 2: Searching 120275 observations from 11370 messages.
+DEBUG 7: update_missing_values(T) obs_hid(data_type=i): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [0 - 109] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000299 seconds
+DEBUG 7: update_missing_values(T) obs_vid(data_type=i): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [0 - 8] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000292 seconds
+DEBUG 7: update_missing_values(T) obs_lvl(data_type=f): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [4.8 - 1019] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000812 seconds
+DEBUG 7: update_missing_values(T) obs_hgt(data_type=f): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [-45.104 - 35223.4] Positive count: 0
+DEBUG 3: update_missing_values(T) obs_hgt(data_type=f): found 17267 FillValues out of 32768
+DEBUG 7: update_missing_values(T)  took 0.000791 seconds
+DEBUG 7: update_missing_values(T) obs_val(data_type=f): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [-45 - 35290] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000806 seconds
+DEBUG 7: update_missing_values(T) obs_hid(data_type=i): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [109 - 279] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000338 seconds
+DEBUG 7: update_missing_values(T) obs_vid(data_type=i): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [0 - 8] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000291 seconds
+DEBUG 7: update_missing_values(T) obs_lvl(data_type=f): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [5.8 - 1021] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000813 seconds
+DEBUG 7: update_missing_values(T) obs_hgt(data_type=f): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [-33.0859 - 34051.8] Positive count: 0
+DEBUG 3: update_missing_values(T) obs_hgt(data_type=f): found 15923 FillValues out of 32768
+DEBUG 7: update_missing_values(T)  took 0.000787 seconds
+DEBUG 7: update_missing_values(T) obs_val(data_type=f): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [-33.4 - 34138] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000845 seconds
+DEBUG 7: update_missing_values(T) obs_hid(data_type=i): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [279 - 6217] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000363 seconds
+DEBUG 7: update_missing_values(T) obs_vid(data_type=i): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [0 - 9] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000291 seconds
+DEBUG 7: update_missing_values(T) obs_lvl(data_type=f): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [72.2 - 1031.4] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000821 seconds
+DEBUG 7: update_missing_values(T) obs_hgt(data_type=f): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [0 - 18221.9] Positive count: 0
+DEBUG 3: update_missing_values(T) obs_hgt(data_type=f): found 8394 FillValues out of 32768
+DEBUG 7: update_missing_values(T)  took 0.000856 seconds
+DEBUG 7: update_missing_values(T) obs_val(data_type=f): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [-29.2 - 18247] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000812 seconds
+DEBUG 7: update_missing_values(T) obs_hid(data_type=i): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [6218 - 11369] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000305 seconds
+DEBUG 7: update_missing_values(T) obs_vid(data_type=i): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [0 - 9] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.00024 seconds
+DEBUG 7: update_missing_values(T) obs_lvl(data_type=f): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [267.3 - 1025.2] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000608 seconds
+DEBUG 7: update_missing_values(T) obs_hgt(data_type=f): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [0 - 9974.01] Positive count: 0
+DEBUG 3: update_missing_values(T) obs_hgt(data_type=f): found 7476 FillValues out of 21971
+DEBUG 7: update_missing_values(T)  took 0.000632 seconds
+DEBUG 7: update_missing_values(T) obs_val(data_type=f): FillValue(<T>)=-9999
+DEBUG 7: update_missing_values(T)  data range [-19.8 - 9999] Positive count: 0
+DEBUG 7: update_missing_values(T)  took 0.000589 seconds
+DEBUG 3: Computing KDE point weights using 97 observation locations.
+DEBUG 7: Computed KDE weights for 97 observation locations:
+DEBUG 7:  [1] 72206 (30.48, 81.7) 148044
+DEBUG 7:  [2] 72520 (40.53, 80.22) 1.59236e+06
+DEBUG 7:  [3] 72597 (42.38, 122.88) 90166.5
+DEBUG 7:  [4] 72518 (42.69, 73.83) 1922.58
+DEBUG 7:  [5] 71600 (43.93, 60.02) 1.26723e+18
+DEBUG 7:  [6] 71722 (46.3, 76) 4.20218e+13
+DEBUG 7:  [7] 72764 (46.77, 100.76) 406501
+DEBUG 7:  [8] 71836 (51.27, 80.65) 5.8257e+35
+DEBUG 7:  [9] 71908 (53.9, 122.8) 6.21297e+18
+DEBUG 7:  [10] 71867 (53.97, 101.1) 1.29969e+40
+DEBUG 7:  [11] 71913 (58.75, 94.07) 5.09449e+52
+DEBUG 7:  [12] 71945 (58.83, 122.6) 6.25449e+18
+DEBUG 7:  [13] 72250 (25.92, 97.42) 475.528
+DEBUG 7:  [14] 72208 (32.89, 80.03) 4.14362e+06
+DEBUG 7:  [15] 72632 (42.7, 83.47) 94867.6
+DEBUG 7:  [16] 74001 (34.6, 86.62) 29.0663
+DEBUG 7:  [17] 72403 (38.98, 77.49) 54.93
+DEBUG 7:  [18] 72572 (40.77, 111.95) 1.53258e+11
+DEBUG 7:  [19] 72662 (44.07, 103.21) 1.73933e+10
+DEBUG 7:  [20] 72712 (46.87, 68.01) 5.03064e+09
+DEBUG 7:  [21] 71845 (51.45, 90.2) 2.26251e+14
+DEBUG 7:  [22] 76644 (20.98, 89.65) 1.13331e+06
+DEBUG 7:  [23] 76595 (21.02, 86.85) 1.13331e+06
+DEBUG 7:  [24] 72201 (24.55, 81.79) 462.785
+DEBUG 7:  [25] 76225 (28.63, 106.08) 2.52213e+08
+DEBUG 7:  [26] 72230 (33.18, 86.78) 37.4944
+DEBUG 7:  [27] 72388 (36.05, 115.18) 2.36721e+08
+DEBUG 7:  [28] 72318 (37.21, 80.41) 13.2383
+DEBUG 7:  [29] 72440 (37.24, 93.4) 255152
+DEBUG 7:  [30] 72528 (42.94, 78.72) 1.66529e+06
+DEBUG 7:  [31] 72645 (44.5, 88.11) 9.99018e+08
+DEBUG 7:  [32] 72776 (47.46, 111.39) 8.46777e+17
+DEBUG 7:  [33] 71934 (60.02, 111.93) 9.02764e+35
+DEBUG 7:  [34] 72393 (34.75, 120.57) 1.00925e+09
+DEBUG 7:  [35] 72305 (34.78, 76.88) 2.99635e+08
+DEBUG 7:  [36] 72493 (37.74, 122.22) 1.01032e+09
+DEBUG 7:  [37] 72456 (39.07, 95.63) 21279.4
+DEBUG 7:  [38] 72476 (39.12, 108.52) 1.53258e+11
+DEBUG 7:  [39] 72426 (39.42, 83.82) 2.51016e+08
+DEBUG 7:  [40] 72501 (40.87, 72.86) 1922.19
+DEBUG 7:  [41] 72649 (44.85, 93.56) 4.43333e+10
+DEBUG 7:  [42] 72786 (47.68, 117.63) 2.49635e+06
+DEBUG 7:  [43] 72261 (29.37, 100.92) 2.21128e+06
+DEBUG 7:  [44] 72364 (31.87, 106.7) 2.52213e+08
+DEBUG 7:  [45] 72340 (34.84, 92.26) 249641
+DEBUG 7:  [46] 72317 (36.1, 79.94) 13.2383
+DEBUG 7:  [47] 72451 (37.76, 99.97) 1.87686e+07
+DEBUG 7:  [48] 74002 (39.47, 76.07) 38.6317
+DEBUG 7:  [49] 72562 (41.13, 100.7) 1.50651e+09
+DEBUG 7:  [50] 72681 (43.57, 116.21) 3.9706e+14
+DEBUG 7:  [51] 72694 (44.91, 123.01) 90156.2
+DEBUG 7:  [52] 72634 (44.91, 84.72) 94894.5
+DEBUG 7:  [53] 76743 (17.98, 92.93) 1.79904e+15
+DEBUG 7:  [54] 72558 (41.32, 96.37) 21451
+DEBUG 7:  [55] 72797 (47.93, 124.56) 7.8738e+08
+DEBUG 7:  [56] 71203 (49.95, 119.4) 2.49635e+06
+DEBUG 7:  [57] 70398 (55.05, 131.59) 3.11717e+28
+DEBUG 7:  [58] 78073 (25.05, 77.47) 8.45729e+06
+DEBUG 7:  [59] 72210 (27.71, 82.4) 751313
+DEBUG 7:  [60] 72251 (27.78, 97.51) 475.708
+DEBUG 7:  [61] 72240 (30.13, 93.22) 28340.8
+DEBUG 7:  [62] 72265 (31.94, 102.19) 2.19788e+06
+DEBUG 7:  [63] 72327 (36.25, 86.56) 127.282
+DEBUG 7:  [64] 72768 (48.21, 106.63) 8.46738e+17
+DEBUG 7:  [65] 74455 (41.61, 90.58) 680.646
+DEBUG 7:  [66] 71603 (43.87, 66.1) 5.82415e+09
+DEBUG 7:  [67] 72659 (45.45, 98.41) 406510
+DEBUG 7:  [68] 71811 (50.22, 66.27) 1.00515e+11
+DEBUG 7:  [69] 71816 (53.3, 60.37) 8.34773e+19
+DEBUG 7:  [70] 76458 (23.2, 106.42) 7.14351e+22
+DEBUG 7:  [71] 72202 (25.76, 80.38) 462.586
+DEBUG 7:  [72] 72274 (32.23, 110.96) 2.71185e+09
+DEBUG 7:  [73] 72235 (32.32, 90.08) 1188.8
+DEBUG 7:  [74] 78016 (32.37, 64.68) 1.43854e+88
+DEBUG 7:  [75] 72402 (37.93, 75.47) 126.907
+DEBUG 7:  [76] 71815 (48.55, 58.57) 1.24828e+18
+DEBUG 7:  [77] 72747 (48.56, 93.4) 4.43271e+10
+DEBUG 7:  [78] 71119 (53.55, 114.1) 4.92907e+31
+DEBUG 7:  [79] 78526 (18.43, 65.99) 12.5063
+DEBUG 7:  [80] 72248 (32.45, 93.84) 27977
+DEBUG 7:  [81] 72215 (33.36, 84.57) 5070.04
+DEBUG 7:  [82] 72357 (35.18, 97.44) 17487.5
+DEBUG 7:  [83] 74560 (40.15, 89.34) 680.646
+DEBUG 7:  [84] 74494 (41.66, 69.96) 8101.89
+DEBUG 7:  [85] 74389 (43.89, 70.26) 8108.84
+DEBUG 7:  [86] 71906 (58.1, 68.42) 7.764e+35
+DEBUG 7:  [87] ASDE04 (19.2, 66.9) 12.5063
+DEBUG 7:  [88] 76394 (25.87, 100.23) 1.24933e+06
+DEBUG 7:  [89] 72233 (30.34, 89.83) 1188.81
+DEBUG 7:  [90] 72214 (30.45, 84.3) 159157
+DEBUG 7:  [91] 72249 (32.84, 97.3) 17487.4
+DEBUG 7:  [92] 72293 (32.85, 117.12) 515408
+DEBUG 7:  [93] 74004 (32.85, 114.4) 514199
+DEBUG 7:  [94] 72363 (35.23, 101.71) 1.80328e+07
+DEBUG 7:  [95] 71109 (50.68, 127.37) 8.61557e+11
+DEBUG 7:  [96] 71823 (53.75, 73.67) 1.64475e+32
+DEBUG 7:  [97] 71907 (58.47, 78.08) 1.6451e+32
+DEBUG 4: Applying KDE point weights computed using 97 observation locations.
+DEBUG 4: Applying KDE point weights computed using 97 observation locations.
+DEBUG 4: Applying KDE point weights computed using 97 observation locations.
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 2: Processing TMP/P850 versus TMP/P850, for observation type ADPUPA, over region FULL, for interpolation method NEAREST(1), using 97 matched pairs.
+DEBUG 3: Number of matched pairs   = 97
+DEBUG 3: Observations processed    = 120275
+DEBUG 3: Rejected: station id      = 0
+DEBUG 3: Rejected: obs var name    = 107223
+DEBUG 3: Rejected: valid time      = 0
+DEBUG 3: Rejected: bad obs value   = 0
+DEBUG 3: Rejected: off the grid    = 5
+DEBUG 3: Rejected: topography      = 0
+DEBUG 3: Rejected: level mismatch  = 12950
+DEBUG 3: Rejected: quality marker  = 0
+DEBUG 3: Rejected: message type    = 0
+DEBUG 3: Rejected: masking region  = 0
+DEBUG 3: Rejected: bad fcst value  = 0
+DEBUG 3: Rejected: bad climo mean  = 0
+DEBUG 3: Rejected: bad climo stdev = 0
+DEBUG 3: Rejected: mpr filter      = 0
+DEBUG 3: Rejected: duplicates      = 0
+DEBUG 2: Computing Categorical Statistics.
+DEBUG 2: Computing Multi-Category Statistics.
+DEBUG 2: Computing Scalar Partial Sums and Continuous Statistics.
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 2: Processing UGRD/P850 versus UGRD/P850, for observation type ADPUPA, over region FULL, for interpolation method NEAREST(1), using 96 matched pairs.
+DEBUG 3: Number of matched pairs   = 96
+DEBUG 3: Observations processed    = 120275
+DEBUG 3: Rejected: station id      = 0
+DEBUG 3: Rejected: obs var name    = 106252
+DEBUG 3: Rejected: valid time      = 0
+DEBUG 3: Rejected: bad obs value   = 0
+DEBUG 3: Rejected: off the grid    = 5
+DEBUG 3: Rejected: topography      = 0
+DEBUG 3: Rejected: level mismatch  = 13921
+DEBUG 3: Rejected: quality marker  = 0
+DEBUG 3: Rejected: message type    = 1
+DEBUG 3: Rejected: masking region  = 0
+DEBUG 3: Rejected: bad fcst value  = 0
+DEBUG 3: Rejected: bad climo mean  = 0
+DEBUG 3: Rejected: bad climo stdev = 0
+DEBUG 3: Rejected: mpr filter      = 0
+DEBUG 3: Rejected: duplicates      = 0
+DEBUG 2: Computing Categorical Statistics.
+DEBUG 2: Computing Scalar Partial Sums and Continuous Statistics.
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 2: Processing VGRD/P850 versus VGRD/P850, for observation type ADPUPA, over region FULL, for interpolation method NEAREST(1), using 96 matched pairs.
+DEBUG 3: Number of matched pairs   = 96
+DEBUG 3: Observations processed    = 120275
+DEBUG 3: Rejected: station id      = 0
+DEBUG 3: Rejected: obs var name    = 106252
+DEBUG 3: Rejected: valid time      = 0
+DEBUG 3: Rejected: bad obs value   = 0
+DEBUG 3: Rejected: off the grid    = 5
+DEBUG 3: Rejected: topography      = 0
+DEBUG 3: Rejected: level mismatch  = 13921
+DEBUG 3: Rejected: quality marker  = 0
+DEBUG 3: Rejected: message type    = 1
+DEBUG 3: Rejected: masking region  = 0
+DEBUG 3: Rejected: bad fcst value  = 0
+DEBUG 3: Rejected: bad climo mean  = 0
+DEBUG 3: Rejected: bad climo stdev = 0
+DEBUG 3: Rejected: mpr filter      = 0
+DEBUG 3: Rejected: duplicates      = 0
+DEBUG 2: Computing Categorical Statistics.
+DEBUG 2: Computing Scalar Partial Sums and Continuous Statistics.
+DEBUG 2: Computing Vector Partial Sums and Continuous Vector Statistics.
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 1: Output file: /d1/personal/johnhg/METplus/development/METplus-13.0/rc1/MET-feature_3335_point_weight_flag/internal/test_unit/../../test_output/point_weight/point_stat_KDE_WEIGHT_150000L_20120409_120000V.stat
+DEBUG 1: Finish point_stat V13.0.0 by johnhg(6088) at 2026-05-15 18:01:19Z

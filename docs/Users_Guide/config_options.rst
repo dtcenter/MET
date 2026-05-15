@@ -2792,12 +2792,17 @@ or continental-scale averages.
 write_weights
 -------------
 
-When "point_weight_flag = KDE", described above, weights are computed once
-using the location of all point observations used for any verification task.
-The "write_weights" entry is a boolean that can be set to TRUE or FALSE (default).
-If TRUE, the computed weights are written to an output ASCII file. That file
-can be used to set the "mask.sid" station ID masking file option with
-"point_weight_flag = SID" in future runs.
+Point weights are either pre-defined ("point_weight_flag = SID") or computed based
+on the station location density ("point_weight_flag = KDE). The "write_weights"
+entry is a boolean that can be set to TRUE or FALSE (default). If TRUE, the weights
+are written to an output ASCII file ending in "_point_weights.txt". That file can
+be used to define the "mask.sid" station ID masking file in future runs.
+
+Note that "mask.sid" can be specified separately for each verification task, and,
+technically, the same station could be assigned different weights for different
+verification tasks. If the same station name appears in multiple "mask.sid"
+lists, only the first weight encountered for each station is written to the
+output.
 
 .. code-block:: none
 
