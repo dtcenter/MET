@@ -50,7 +50,7 @@ fcst = {
    sid_exc = [];
    obs_quality_inc  = [];
    obs_quality_exc  = [];
-   
+
    field = [
       {
          name  = "${FCST_FIELD_NAME}";
@@ -146,7 +146,7 @@ output_flag = {
 point_weight_flag = NONE;
 kde_ref_angle     = 0.75;
 write_weights     = FALSE;
- 
+
 ////////////////////////////////////////////////////////////////////////////////
 
 tmp_dir       = "/tmp";

@@ -165,7 +165,7 @@ ugrid_coordinates_file = "${MET_TEST_INPUT}/ugrid_data/mpas/static.40962_reduced
 point_weight_flag = NONE;
 kde_ref_angle     = 0.75;
 write_weights     = FALSE;
- 
+
 ////////////////////////////////////////////////////////////////////////////////
 
 tmp_dir       = "/tmp";

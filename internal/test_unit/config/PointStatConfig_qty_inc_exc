@@ -83,7 +83,7 @@ fcst = {
         obs_quality_exc = [];
         desc            = "QTY_INC_UPA";
       },
-      
+
       {
         name            = "TMP";
         level           = [ "Z2" ];
@@ -215,7 +215,7 @@ output_flag = {
 point_weight_flag = NONE;
 kde_ref_angle     = 0.75;
 write_weights     = FALSE;
- 
+
 ////////////////////////////////////////////////////////////////////////////////
 
 tmp_dir       = "/tmp";
