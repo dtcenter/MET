@@ -32,7 +32,7 @@ listNcDiffAttrExcl = c("FileOrigins");
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 strNcDiffExec = system("which ncdiff", intern=T);
 if(length(strNcDiffExec) == 0) {
-  strNcDiffExec = "/usr/local/nco/bin/ncdiff";
+  strNcDiffExec = "/nrit/ral/nco/bin/ncdiff";
 }
 strNcDumpExec = system("which ncdump", intern=T);
 strDiffExec   = system("which diff",   intern=T);

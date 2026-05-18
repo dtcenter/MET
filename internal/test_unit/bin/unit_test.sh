@@ -19,7 +19,7 @@ fi
 
 # if MET_TEST_MET_PYTHON_EXE is not set, use default value
 if [[ -z "${MET_TEST_MET_PYTHON_EXE}" ]] ; then
-  export MET_TEST_MET_PYTHON_EXE=/usr/local/python3/bin/python3
+  export MET_TEST_MET_PYTHON_EXE=/nrit/ral/python3/bin/python3
 fi
 
 UNIT_OPTS=""

@@ -7,7 +7,7 @@
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
   <!ENTITY MET_PYTHON_EXE "${MET_TEST_MET_PYTHON_EXE}">
-  <!ENTITY ANACONDA_BIN   "/usr/local/anaconda3-20190923/bin">
+  <!ENTITY ANACONDA_BIN   "/nrit/ral/anaconda3/bin">
 
   <!ENTITY CONFIG_DIR      "&TEST_DIR;/config">
   <!ENTITY DATA_DIR_PYTHON "&INPUT_DIR;/python">
