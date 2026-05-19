@@ -139,13 +139,15 @@ if [ "$run_unit_tests" == "true" ]; then
   # set MET base repo to the unit test version to get the test tools
   met_base_repo=${MET_BASE_UNIT_REPO_NAME}
 
-  # add -dev to the MET base repo if the tag does not start with a number
-  if [[ ${met_base_tag} =~ ^[0-9] ]]; then
-    met_base_repo=${met_base_repo}-dev
-  fi
-
   run_push=true
 
+fi
+
+# add -dev to the MET base repo if the tag does not start with a number
+# this assumes that met-base and met-base-unit-test tags start with a number and
+# development tags, e.g. branch names, do not
+if [[ ${met_base_tag} =~ ^[0-9] ]]; then
+  met_base_repo=${met_base_repo}-dev
 fi
 
 echo "run_compile=${run_compile}" >> $GITHUB_OUTPUT
