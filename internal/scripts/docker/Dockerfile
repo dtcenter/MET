@@ -30,14 +30,11 @@ ENV MET_DEVELOPMENT=true
 WORKDIR /met
 
 #
-# Update the OS, as needed.
 # Download and install MET.
 # Delete the MET source code for tagged releases matching "v"*.
 #
 RUN \
-    echo "Update packages" &&\
-    dnf upgrade -y --refresh --nodocs \
- && echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" &&\
+    echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" &&\
     git clone ${MET_GIT_URL} ${MET_REPO_DIR} \
  && echo "Build MET" &&\
     (cd ${MET_REPO_DIR} &&\
