@@ -146,7 +146,7 @@ fi
 # add -dev to the MET base repo if the tag does not start with a number
 # this assumes that met-base and met-base-unit-test tags start with a number and
 # development tags, e.g. branch names, do not
-if [[ ${met_base_tag} =~ ^[0-9] ]]; then
+if [[ ! ${met_base_tag} =~ ^[0-9] ]]; then
   met_base_repo=${met_base_repo}-dev
 fi
 
