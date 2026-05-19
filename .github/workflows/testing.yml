@@ -61,7 +61,7 @@ jobs:
         env:
           commit_msg: ${{ github.event.head_commit.message }}
           force_tests: ${{ github.event.inputs.force_tests }}
-          met_base_tag_override: ${{ github.event.inputs.met_base_tag }}
+          met_base_tag_override: feature_74_ubi9
 
     outputs:
       run_compile: ${{ steps.job_status.outputs.run_compile }}
