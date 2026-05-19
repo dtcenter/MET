@@ -1,5 +1,5 @@
 ARG MET_BASE_REPO=met-base-unit-test
-ARG MET_BASE_TAG=3.4-latest
+ARG MET_BASE_TAG=3.5-latest
 
 FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_TAG}
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
@@ -25,11 +25,6 @@ ENV MET_GIT_URL=https://github.com/dtcenter/MET
 ENV MET_DEVELOPMENT=true
 
 #
-# Update the OS, as needed.
-#
-RUN apt update
-
-#
 # Set the working directory.
 #
 WORKDIR /met
@@ -48,6 +43,8 @@ RUN if [ ! -e "${MET_REPO_DIR}/configure.ac" ]; then \
     exit 1; \
   fi
 
-RUN cd ${MET_REPO_DIR} \
- && internal/scripts/docker/build_met_docker.sh
-
+RUN \
+    echo "Upgrade packages" &&\
+    dnf upgrade -y --refresh --nodocs \
+ && echo "Build MET" &&\
+    (cd ${MET_REPO_DIR} && internal/scripts/docker/build_met_docker.sh)

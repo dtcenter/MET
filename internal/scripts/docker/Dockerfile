@@ -10,7 +10,7 @@ MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 ARG SOURCE_BRANCH
 
 #
-# SOURCE_BRANCH is not defined when built via Docker Hub.
+# Fail if SOURCE_BRANCH is not defined
 #
 RUN if [ "x${SOURCE_BRANCH}" = "x" ]; then \
       echo "ERROR: SOURCE_BRANCH undefined! Rebuild with \"--build-arg SOURCE_BRANCH={branch name}\""; \
@@ -25,21 +25,21 @@ ENV MET_GIT_URL=https://github.com/dtcenter/MET
 ENV MET_DEVELOPMENT=true
 
 #
-# Update the OS, as needed.
-#
-RUN apt update
-
-#
 # Set the working directory.
 #
 WORKDIR /met
 
 #
+# Update the OS, as needed.
 # Download and install MET.
 # Delete the MET source code for tagged releases matching "v"*.
 #
-RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
- && git clone ${MET_GIT_URL} ${MET_REPO_DIR} \
- && cd ${MET_REPO_DIR} \
- && git checkout ${MET_GIT_NAME} \
- && internal/scripts/docker/build_met_docker.sh
+RUN \
+    echo "Update packages" &&\
+    dnf upgrade -y --refresh --nodocs \
+ && echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" &&\
+    git clone ${MET_GIT_URL} ${MET_REPO_DIR} \
+ && echo "Build MET" &&\
+    (cd ${MET_REPO_DIR} &&\
+     git checkout ${MET_GIT_NAME} &&\
+     internal/scripts/docker/build_met_docker.sh)

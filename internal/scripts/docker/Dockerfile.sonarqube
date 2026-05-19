@@ -1,5 +1,5 @@
 ARG MET_BASE_REPO=met-base
-ARG MET_BASE_TAG=3.4-latest
+ARG MET_BASE_TAG=3.5-latest
 
 FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_TAG}
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
@@ -68,11 +68,6 @@ RUN echo "Installing SonarQube into $HOME/.sonar" \
  && echo export PATH="$HOME/.sonar/build-wrapper-linux-x86:\$PATH" >> $HOME/.bashrc
 
 #
-# Update the OS, as needed.
-#
-RUN apt update
-
-#
 # Set the working directory.
 #
 WORKDIR /met
@@ -80,8 +75,7 @@ WORKDIR /met
 #
 # Copy MET Download and install MET.
 #
-RUN echo "Copying MET into ${MET_REPO_DIR}" \
- && mkdir -p ${MET_REPO_DIR}
+RUN echo "Copying MET into ${MET_REPO_DIR}" && mkdir -p ${MET_REPO_DIR}
 
 COPY . ${MET_REPO_DIR}
 
@@ -90,5 +84,8 @@ RUN if [ ! -e "${MET_REPO_DIR}/configure.ac" ]; then \
     exit 1; \
   fi
 
-RUN cd ${MET_REPO_DIR} \
- && internal/scripts/docker/build_met_sonarqube.sh
+RUN \
+    echo "Upgrade packages" &&\
+    dnf upgrade -y --refresh --nodocs \
+ && echo "Build MET for SonarQube" &&\
+    (cd ${MET_REPO_DIR} && internal/scripts/docker/build_met_sonarqube.sh)
