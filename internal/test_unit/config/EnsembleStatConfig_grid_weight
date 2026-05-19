@@ -240,7 +240,7 @@ rng = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-grid_weight_flag  = NONE;
+grid_weight_flag  = ${GRID_WEIGHT};
 point_weight_flag = NONE;
 kde_ref_angle     = 0.75;
 write_weights     = FALSE;
