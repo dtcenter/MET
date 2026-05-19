@@ -5,10 +5,24 @@ run_push=false
 run_unit_tests=false
 run_diff=false
 run_update_truth=false
-met_base_repo=met-base
-met_base_tag=3.5-latest
 input_data_version=develop
 truth_data_version=develop
+
+# set constants for the MET base repository names (regular and unit test)
+MET_BASE_REPO_NAME=met-base
+MET_BASE_UNIT_REPO_NAME=met-base-unit-test
+
+# set MET base repo to regular repo by default for compilation check
+met_base_repo=${MET_BASE_REPO_NAME}
+
+# default MET base tag
+met_base_tag=3.5-latest
+
+# override the MET base tag if set
+if [[ -n "${met_base_tag_override}" ]]; then
+    met_base_tag=${met_base_tag_override}
+fi
+
 
 if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
     
@@ -122,7 +136,14 @@ fi
 # if running unit tests, use unit_test MET base image and push image
 if [ "$run_unit_tests" == "true" ]; then
 
-  met_base_repo=met-base-unit-test
+  # set MET base repo to the unit test version to get the test tools
+  met_base_repo=${MET_BASE_UNIT_REPO_NAME}
+
+  # add -dev to the MET base repo if the tag does not start with a number
+  if [[ ${met_base_tag} =~ ^[0-9] ]]; then
+    met_base_repo=${met_base_repo}-dev
+  fi
+
   run_push=true
 
 fi

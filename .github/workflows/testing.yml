@@ -39,6 +39,10 @@ on:
         description: 'Run the unit tests'
         default: true
         type: boolean
+      met_base_tag:
+        description: 'Override the MET base tag'
+        default: ''
+        required: false
 
 env:
   DOCKERHUB_REPO: dtcenter/met-dev
@@ -57,6 +61,7 @@ jobs:
         env:
           commit_msg: ${{ github.event.head_commit.message }}
           force_tests: ${{ github.event.inputs.force_tests }}
+          met_base_tag_override: ${{ github.event.inputs.met_base_tag }}
 
     outputs:
       run_compile: ${{ steps.job_status.outputs.run_compile }}
