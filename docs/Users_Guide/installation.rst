@@ -51,7 +51,7 @@ The following libraries are conditionally required, depending on the intended
 verification use and compiler language:
 
 * `GRIB2C <https://github.com/NOAA-EMC/NCEPLIBS-g2c>`_
-  Library (with dependencies Z, PNG, JASPER), if compiling GRIB2 support
+  Library (with dependencies Z, PNG, AEC, JASPER), if compiling GRIB2 support
 * `Python <https://docs.python.org/3/>`_ Libraries,
   if compiling support for Python embedding
 * `ecKit <https://github.com/ecmwf/eckit>`_
@@ -349,6 +349,8 @@ External Library Handling in compile_MET_all.sh
     |                   |                                |                              |
     |                   |                                | LIB_PNG,                     |
     |                   |                                |                              |
+    |                   |                                | LIB_AEC,                     |
+    |                   |                                |                              |
     |                   |                                | LIB_Z                        |
     +-------------------+--------------------------------+------------------------------+
     | *Optional*        | :code:`--enable-all` or        | MET_PYTHON_BIN_EXE,          |
@@ -411,12 +413,12 @@ this step on the machine ‘hera’.
   compile_MET_all.sh  install_met_env.hera  tar_files
 
   /contrib/met/13.0.0$ ls tar_files
-  atlas-0.30.0.tar.gz   eckit-1.24.4.tar.gz  HDF-EOS2.16v1.00.tar.Z    proj-7.1.0.tar.gz
-  atlas-0.35.0.tar.gz   g2clib-1.6.4.tar.gz  jasper-2.0.25.tar.gz      sqlite-autoconf-3430100.tar.gz
-  bufr_v11.6.0.tar.gz   gsl-1.11.tar.gz      jpegsrc.v9e.tar.gz        tiff-4.6.0.tar.gz
-  ecbuild-3.5.0.tar.gz  gsl-2.7.1.tar.gz     libpng-1.6.37.tar.gz      zlib-1.2.11.tar.gz
-  ecbuild-3.7.0.tar.gz  HDF4.2r3.tar.gz      netcdf-4.7.4.tar.gz
-  eckit-1.20.2.tar.gz   hdf5-1.12.2.tar.gz   netcdf-cxx4-4.3.1.tar.gz
+  atlas-0.30.0.tar.gz   eckit-1.28.3.tar.gz  HDF-EOS2.16v1.00.tar.Z    netcdf-cxx4-4.3.1.tar.gz
+  atlas-0.44.1.tar.gz   g2clib-2.2.0.tar.gz  jasper-2.0.25.tar.gz      proj-7.1.0.tar.gz
+  bufr_v12.3.0.tar.gz   gsl-1.11.tar.gz      jpegsrc.v9e.tar.gz        sqlite-autoconf-3500300.tar.gz
+  ecbuild-3.5.0.tar.gz  gsl-2.7.1.tar.gz     libaec-1.1.3.tar.gz       tiff-4.6.0.tar.gz
+  ecbuild-3.7.0.tar.gz  HDF4.2r3.tar.gz      libpng-1.6.37.tar.gz      zlib-1.3.1.tar.gz
+  eckit-1.20.2.tar.gz   hdf5-1.14.3.tar.gz   netcdf-c-4.9.3.tar.gz
 
 Simply enter the following into the terminal to execute the script:
 

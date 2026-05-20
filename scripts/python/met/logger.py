@@ -105,6 +105,8 @@ class met_base_tools(object):
    ENV_MET_PYTHON_DEBUG = "MET_PYTHON_DEBUG"
    ENV_MET_PYTHON_TMP_FORMAT = "MET_PYTHON_TMP_FORMAT"
 
+   SERIALIZE_EXT_NAMES = [ "json", "nc", "txt" ]
+
    @staticmethod
    def convert_byte_type_to_array(ndarray_data):
       array_data = []
@@ -146,9 +148,12 @@ class met_base_tools(object):
 
    @staticmethod
    def get_numpy_filename(tmp_filename):
-      return logger.replace_extension(tmp_filename, "json", "npy") if tmp_filename.endswith(".json") else \
-             logger.replace_extension(tmp_filename, "txt", "npy") if tmp_filename.endswith(".txt") else \
-             logger.replace_extension(tmp_filename, "nc", "npy") if tmp_filename.endswith(".nc") else f'{tmp_filename}.npy'
+      numpy_filename = f'{tmp_filename}.npy'
+      for file_ext in met_base_tools.SERIALIZE_EXT_NAMES:
+        if tmp_filename.endswith(f".{file_ext}"):
+           numpy_filename = logger.replace_extension(tmp_filename, file_ext, "npy")
+           break
+      return numpy_filename
 
    @staticmethod
    def get_prompt():

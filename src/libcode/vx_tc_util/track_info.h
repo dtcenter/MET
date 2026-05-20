@@ -81,9 +81,6 @@ class TrackInfo {
       int          NPoints;
       int          NAlloc;
 
-      // Input ATCF Track Lines
-      StringArray  TrackLines;
-
    public:
 
       TrackInfo();
@@ -156,7 +153,7 @@ class TrackInfo {
       const ConcatString & field_source()     const;
       int                  n_diag()           const;
       const StringArray &  diag_name()        const;
-      const std::string    diag_name(int)     const;
+            std::string    diag_name(int)     const;
 
       StringArray          track_lines()      const;
 
@@ -167,9 +164,9 @@ class TrackInfo {
       void add(const TrackPoint &);
       bool add(const ATCFTrackLine &, bool check_dup = false, bool check_anly = false);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
-      bool add_diag_data(DiagFile &, const StringArray &);
+      bool add_diag_data(const DiagFile &, const StringArray &);
       void add_diag_value(int, double);
-      void add_uniq_diag_name(const std::string);
+      void add_uniq_diag_name(const std::string &);
       
       bool has(const ATCFTrackLine &) const;
 
@@ -221,8 +218,6 @@ inline const ConcatString & TrackInfo::field_source()     const { return FieldSo
 inline int                  TrackInfo::n_diag()           const { return DiagName.n(); }
 inline const StringArray &  TrackInfo::diag_name()        const { return DiagName;     }
 
-inline StringArray          TrackInfo::track_lines()      const { return TrackLines;   }
-
 ////////////////////////////////////////////////////////////////////////
 //
 // TrackInfoArray class stores an array of TrackInfo objects.
@@ -236,8 +231,6 @@ class TrackInfoArray {
                               const StringArray &, const int,
                               const StringArray &, const int,
                               const bool);
-
-   private:
 
       void init_from_scratch();
       void assign(const TrackInfoArray &);
@@ -266,7 +259,7 @@ class TrackInfoArray {
       bool add(const ATCFTrackLine &, bool check_dup = false, bool check_anly = false);
       bool has(const ATCFTrackLine &) const;
       bool erase_storm_id(const ConcatString &);
-      int  add_diag_data(DiagFile &, const StringArray &);
+      int  add_diag_data(const DiagFile &, const StringArray &);
 
          //
          //  get stuff
@@ -279,7 +272,7 @@ class TrackInfoArray {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TrackInfoArray::n() const { return Track.size(); }
+inline int TrackInfoArray::n() const { return (int) Track.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 

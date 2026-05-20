@@ -20,6 +20,7 @@
 //   003   09/28/22  Prestopnik      MET #2227 Remove namspace std and netCDF from header files
 //   004   04/26/23  Halley Gotway   MET #2523 Reorder NetCDF dimensions
 //   005   03/11/24  Halley Gotway   MET #2833 range/azimuth grid
+//   006   04/13/26  Halley Gotway   MET #3370 check for analysis tracks
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -105,7 +106,7 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return "tc_rmw";
 }
 
@@ -147,7 +148,7 @@ __attribute__((noreturn)) static void usage(int exit_code) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+static void process_command_line(int argc, char **argv) {
     CommandLine cline;
     ConcatString default_config_file;
 
@@ -210,8 +211,8 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-GrdFileType get_file_type(const StringArray &file_list,
-                          const GrdFileType in_ftype) {
+static GrdFileType get_file_type(const StringArray &file_list,
+                                 const GrdFileType in_ftype) {
     int i;
     Met2dDataFile *mtddf = nullptr;
     GrdFileType out_ftype;
@@ -245,13 +246,14 @@ GrdFileType get_file_type(const StringArray &file_list,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool file_is_ok(const ConcatString &file_name, const GrdFileType t) {
+static bool file_is_ok(const ConcatString &file_name,
+                       const GrdFileType t) {
     return(file_exists(file_name.c_str()) || is_python_grdfiletype(t));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_rmw() {
+static void process_rmw() {
 
     // Process the track data
     TrackInfoArray tracks;
@@ -267,8 +269,9 @@ void process_rmw() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_tracks(TrackInfoArray& tracks) {
-    StringArray files, files_model_suffix;
+static void process_tracks(TrackInfoArray& tracks) {
+    StringArray files;
+    StringArray files_model_suffix;
 
     // Initialize
     tracks.clear();
@@ -281,22 +284,19 @@ void process_tracks(TrackInfoArray& tracks) {
          << "Processing " << files.n() << " track data file(s).\n";
 
     process_track_files(files, files_model_suffix, tracks);
-
-    write_tc_track_lines  (nc_out, tracks[0]);
-    write_tc_track_lat_lon(nc_out, track_point_dim, tracks[0]);
-    write_tc_rmw          (nc_out, track_point_dim, tracks[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 // Automated Tropical Cyclone Forecasting System
 // https://science.nrlmry.navy.mil/atcf/docs/ATCF-FAQ.html
 
-void get_atcf_files(const StringArray& source,
-                    const StringArray& model_suffix,
-                    StringArray& files,
-                    StringArray& files_model_suffix) {
+static void get_atcf_files(const StringArray& source,
+                           const StringArray& model_suffix,
+                           StringArray& files,
+                           StringArray& files_model_suffix) {
 
-    StringArray cur_source, cur_files;
+    StringArray cur_source;
+    StringArray cur_files;
 
     if(source.n() != model_suffix.n()) {
         mlog << Error << "\nget_atcf_files() -> "
@@ -325,10 +325,9 @@ void get_atcf_files(const StringArray& source,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_track_files(const StringArray& files,
-                         const StringArray& model_suffix,
-                         TrackInfoArray& tracks) {
-    int cur_read, cur_add, tot_read, tot_add;
+static void process_track_files(const StringArray& files,
+                                const StringArray& model_suffix,
+                                TrackInfoArray& tracks) {
     LineDataFile f;
     ConcatString cs;
     ATCFTrackLine line;
@@ -337,7 +336,11 @@ void process_track_files(const StringArray& files,
     tracks.clear();
 
     // Initialize counts
-    tot_read = tot_add = 0;
+    int tot_read = 0;
+    int tot_add = 0;
+
+    // Set metadata pointer
+    line.set_best_technique(&conf_info.BestTechnique);
 
     // Process input ATCF files
     for(int i = 0; i < files.n(); i++) {
@@ -352,7 +355,8 @@ void process_track_files(const StringArray& files,
         }
 
         // Initialize counts
-        cur_read = cur_add = 0;
+        int cur_read = 0;
+        int cur_add = 0;
 
         // Read each line
         while(f >> line) {
@@ -371,7 +375,8 @@ void process_track_files(const StringArray& files,
             if(!is_keeper(&line)) continue;
 
             // Attempt to add current line to TrackInfoArray
-            if(tracks.add(line, true, false)) {
+            // MET #3370 check for analysis tracks
+            if(tracks.add(line, true, true)) {
                 cur_add++;
                 tot_add++;
             }
@@ -412,7 +417,7 @@ void process_track_files(const StringArray& files,
 //
 ////////////////////////////////////////////////////////////////////////
 
-bool is_keeper(const ATCFLineBase * line) {
+static bool is_keeper(const ATCFLineBase * line) {
    bool keep = true;
    ConcatString cs;
 
@@ -490,22 +495,22 @@ bool is_keeper(const ATCFLineBase * line) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_deck(const StringArray& a) {
+static void set_deck(const StringArray& a) {
     set_atcf_source(a, deck_source, deck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_atcf_source(const StringArray& a,
-                     StringArray& source,
-                     StringArray& model_suffix) {
+static void set_atcf_source(const StringArray& a,
+                            StringArray& source,
+                            StringArray& model_suffix) {
     StringArray sa;
-    ConcatString cs, suffix;
+    ConcatString suffix;
 
     // Check for optional suffix sub-argument
     for(int i = 0; i < a.n(); i++) {
         if(a[i] == "suffix") {
-            cs = a[i];
+            ConcatString cs(a[i]);
             sa = cs.split("=");
             if(sa.n() != 2) {
                 mlog << Error << "\nset_atcf_source() -> "
@@ -520,7 +525,7 @@ void set_atcf_source(const StringArray& a,
 
     // Parse remaining sources
     for(int i = 0; i < a.n(); i++) {
-        if( a[i] == "suffix" ) continue;
+        if(a[i] == "suffix") continue;
         source.add(a[i]);
         model_suffix.add(suffix);
     }
@@ -528,25 +533,25 @@ void set_atcf_source(const StringArray& a,
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_data_files(const StringArray& a) {
+static void set_data_files(const StringArray& a) {
     data_files = a;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray& a) {
+static void set_config(const StringArray& a) {
     config_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out(const StringArray& a) {
+static void set_out(const StringArray& a) {
     out_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_grid() {
+static void setup_grid() {
 
     rng_azi_data.name = "TCRMW";
     rng_azi_data.range_n = conf_info.n_range;
@@ -565,8 +570,8 @@ void setup_grid() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file() {
-    VarInfo* data_info = (VarInfo*) nullptr;
+static void setup_nc_file() {
+    const VarInfo* data_info = nullptr;
 
     // Create NetCDF file
     nc_out = open_ncfile(out_file.c_str(), true);
@@ -638,7 +643,7 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_lat_lon(vector<double> &lats, vector<double> &lons) {
+static void compute_lat_lon(vector<double> &lats, vector<double> &lons) {
 
     // Set the size
     int nxy = rng_azi_grid.range_n() * rng_azi_grid.azimuth_n();
@@ -648,7 +653,8 @@ void compute_lat_lon(vector<double> &lats, vector<double> &lons) {
     // Compute lat and lon coordinate arrays
     for(int ir = 0; ir < rng_azi_grid.range_n(); ir++) {
         for(int ia = 0; ia < rng_azi_grid.azimuth_n(); ia++) {
-            double lat, lon;
+            double lat;
+            double lon;
             int i = ir * rng_azi_grid.azimuth_n() + ia;
             rng_azi_grid.rng_azi_to_latlon(
                 ir * rng_azi_grid.range_delta_km(),
@@ -662,12 +668,15 @@ void compute_lat_lon(vector<double> &lats, vector<double> &lons) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_fields(const TrackInfoArray& tracks) {
-    VarInfo *data_info = (VarInfo *) nullptr;
+static void process_fields(const TrackInfoArray& tracks) {
+    VarInfo *data_info = nullptr;
     DataPlane data_dp;
 
     // Take only first track
     TrackInfo track = tracks[0];
+
+    // Store track points actually used
+    TrackInfo track_keep;
 
     mlog << Debug(2) << "Processing 1 track consisting of "
          << track.n_points() << " points.\n";
@@ -714,18 +723,10 @@ void process_fields(const TrackInfoArray& tracks) {
         // Compute lat and lon coordinate arrays
         compute_lat_lon(lats, lons);
 
-        // Write coordinate arrays
-        write_tc_data(rng_azi_grid, i_point, lats_var, lats.data());
-        write_tc_data(rng_azi_grid, i_point, lons_var, lons.data());
+        // Number of variables found for this point
+        int n_var_found = 0;
 
-        // Write valid and lead times
-        write_tc_valid_time(i_point,
-            valid_time_str_var, valid_time_ut_var,
-            valid_time);
-        write_tc_lead_time(i_point,
-            lead_time_str_var, lead_time_sec_var,
-            point.lead());
-
+        // Loop over the requested variables
         for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
 
             // Update the variable info with the valid time of the track point
@@ -736,13 +737,24 @@ void process_fields(const TrackInfoArray& tracks) {
 
             data_info->set_valid(valid_time);
 
-            // Find data for this track point
-            get_series_entry(i_point, data_info, data_files, ftype, data_dp, grid_in);
+            // Find data for this track point or continue
+            if(get_series_entry(track_keep.n_points(),
+                                data_info, data_files,
+                                ftype, data_dp, grid_in,
+                                false, false)) {
+                n_var_found++;
+            }
+            else {
+                continue;
+            }
 
             // Regrid data and log the range of values before and after
-            double dmin, dmax, dmin_rgd, dmax_rgd;
+            double dmin;
+            double dmax;
             data_dp.data_range(dmin, dmax);
             data_dp = met_regrid(data_dp, grid_in, grid_out, data_info->regrid());
+            double dmin_rgd;
+            double dmax_rgd;
             data_dp.data_range(dmin_rgd, dmax_rgd);
 
             mlog << Debug(4) << data_info->magic_str()
@@ -750,14 +762,15 @@ void process_fields(const TrackInfoArray& tracks) {
                  << "), regrid range (" << dmin_rgd << ", " << dmax_rgd << ")\n";
 
             // if this is "U", setup everything for matching "V" and compute the radial/tangential
-            if(wind_converter.compute_winds_if_input_is_u(i_point, sname, slevel, valid_time, data_files, ftype,
+            if(wind_converter.compute_winds_if_input_is_u(track_keep.n_points(),
+                   sname, slevel, valid_time, data_files, ftype,
                    grid_in, grid_out, data_dp, rng_azi_grid)) {
                 write_tc_pressure_level_data(rng_azi_grid,
-                    pressure_level_indices, data_info->level_attr(), i_point,
+                    pressure_level_indices, data_info->level_attr(), track_keep.n_points(),
                     data_3d_vars[conf_info.radial_velocity_field_name.string()],
                     wind_converter.get_wind_r_arr());
                 write_tc_pressure_level_data(rng_azi_grid,
-                    pressure_level_indices, data_info->level_attr(), i_point,
+                    pressure_level_indices, data_info->level_attr(), track_keep.n_points(),
                     data_3d_vars[conf_info.tangential_velocity_field_name.string()],
                     wind_converter.get_wind_t_arr());
             }
@@ -766,15 +779,50 @@ void process_fields(const TrackInfoArray& tracks) {
             if(has_pressure_level(variable_levels[data_info->name_attr()])) {
                 write_tc_pressure_level_data(rng_azi_grid,
                     pressure_level_indices, data_info->level_attr(),
-                    i_point, data_3d_vars[data_info->name_attr()], data_dp.data());
+                    track_keep.n_points(), data_3d_vars[data_info->name_attr()], data_dp.data());
             }
             else {
-                write_tc_data(rng_azi_grid, i_point,
+                write_tc_data(rng_azi_grid, track_keep.n_points(),
                     data_3d_vars[data_info->name_attr()], data_dp.data());
             }
-        }
-    } // Close loop over track points
+        } // end for i_var
 
+        // Write metadata for this track point since data was found
+        if(n_var_found > 0) {
+
+            mlog << Debug(3) << "Using track point with data from " << n_var_found
+                 << " of " << conf_info.get_n_data() << " requested fields.\n";
+
+            // Write coordinate arrays
+            write_tc_data(rng_azi_grid, track_keep.n_points(), lats_var, lats.data());
+            write_tc_data(rng_azi_grid, track_keep.n_points(), lons_var, lons.data());
+
+            // Write valid and lead times
+            write_tc_valid_time(track_keep.n_points(),
+                valid_time_str_var, valid_time_ut_var,
+                valid_time);
+            write_tc_lead_time(track_keep.n_points(),
+                lead_time_str_var, lead_time_sec_var,
+                point.lead());
+
+            // Store the current track point
+            track_keep.add(track[i_point]);
+        }
+        // Otherwise, skip this track point
+        else {
+            mlog << Debug(3) << "Skipping track point since no data found "
+                 << conf_info.get_n_data() << " requested fields.\n";
+        }
+
+    } // end for i_point
+
+    mlog << Debug(2) << "Found data for " << track_keep.n_points()
+         << " of " << track.n_points() << " points.\n";
+
+    // Write the track points that were used
+    write_tc_track_lines  (nc_out, track_keep);
+    write_tc_track_lat_lon(nc_out, track_point_dim, track_keep);
+    write_tc_rmw          (nc_out, track_point_dim, track_keep);
 }
 
 ////////////////////////////////////////////////////////////////////////

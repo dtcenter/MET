@@ -13,12 +13,12 @@
 //
 // Model
 //
-model = "HCLT";
+model = "${MODEL}";
 
 //
 // Storm identifier
 //
-storm_id = "";
+storm_id = "AL082014";
 
 //
 // Basin
@@ -51,14 +51,19 @@ init_inc = "";
 //
 valid_beg = "";
 valid_end = "";
-valid_inc = [];
+valid_inc = [ ${VALID_INC} ];
 valid_exc = [];
 
 //
 // Subset by the valid hour and lead time.
 //
 valid_hour = [];
-lead       = [ "00", "06", "12", "18", "24" ];
+lead       = [];
+
+//
+// Define BEST track names.
+//
+best_technique = [ "BEST" ];
 
 ////////////////////////////////////////////////////////////////////////////////
 

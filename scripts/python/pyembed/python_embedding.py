@@ -41,7 +41,7 @@ class pyembed_tools():
     class_name = "pyembed_tools"
 
     @staticmethod
-    def add_python_path(called_file):   # called_file = __file__
+    def add_python_path(called_file):   # Set __file__ into called_file
         method_name = f"{pyembed_tools.class_name}.add_python_path()"
         script_dir = os.path.abspath(os.path.dirname(called_file))
         if os.path.exists(script_dir) and script_dir != os.curdir:

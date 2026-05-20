@@ -26,6 +26,7 @@ class dataplane(met_base):
 
    KEEP_XARRAY = True
    class_name = "dataplane"
+   DEBUG_ENABLED = None
 
    ATTR_USER_FILL_VALUE = 'user_fill_value'
 
@@ -61,6 +62,45 @@ class dataplane(met_base):
        spec.loader.exec_module(met_in)
        sys.argv = argv_org  # restore sys.argv
        return met_in
+
+   #Return True if there is no non serialiable objects in attrs
+   @staticmethod
+   def check_attrs(attrs):
+      has_non_serializable = True
+      for attr_key, attr_value in attrs.items():
+        if not isinstance(attr_value, ( np.generic, str, list, dict, int, float, bool ) ):
+           met_base.error_message(f"Found non serializable object {type(attr_value)}: {attr_key} = {attr_value}")
+           has_non_serializable = False
+      return has_non_serializable
+
+   @staticmethod
+   def get_attrs(met_in):
+      is_from_met_data = False
+      if hasattr(met_in, 'attrs'):
+         attrs = met_in.attrs
+         if dataplane.is_debug_enabled():
+            met_base.info_message("attrs from met_in")
+      elif hasattr(met_in.met_data, 'attrs') and met_in.met_data.attrs:
+         attrs = met_in.met_data.attrs
+         is_from_met_data = True
+         if dataplane.is_debug_enabled():
+            met_base.info_message("attrs from met_in.met_data")
+      else:
+         attrs = {}
+         met_base.info_message("attrs is missing")
+
+      if not dataplane.check_attrs(attrs):
+         if is_from_met_data:
+            met_base.error_message("Please set \"attrs\" at the customized python script")
+         else:
+            met_base.error_message("Please update user defined \"attrs\"")
+      return attrs
+
+   @staticmethod
+   def is_debug_enabled():
+      if dataplane.DEBUG_ENABLED is None:
+         dataplane.DEBUG_ENABLED = met_base_tools.is_debug_enabled("dataplane")
+      return dataplane.DEBUG_ENABLED
 
    @staticmethod
    def is_integer(a_data):
@@ -118,7 +158,7 @@ class dataplane(met_base):
 
    @staticmethod
    def read_dataplane(tmp_filename):
-      if met_base_tools.is_debug_enabled("dataplane"):
+      if dataplane.is_debug_enabled():
          met_base.log_message(f"Called dataplane.read_dataplane({tmp_filename})")
       # Default is JSON for attributes and NUMPY serialization for 2D array
       return dataplane.read_dataplane_nc(tmp_filename) if met_base_tools.use_netcdf_format() \
@@ -126,7 +166,7 @@ class dataplane(met_base):
 
    @staticmethod
    def read_dataplane_json_numpy(tmp_filename):
-      if met_base_tools.is_debug_enabled("dataplane"):
+      if dataplane.is_debug_enabled():
          met_base.log_message("Read from a temporary JSON file and a temporary numpy output (dataplane)")
 
       met_info = {}
@@ -144,7 +184,7 @@ class dataplane(met_base):
    def read_dataplane_nc(netcdf_filename):
       import netCDF4 as nc
 
-      if met_base_tools.is_debug_enabled("dataplane"):
+      if dataplane.is_debug_enabled():
          met_base.log_message("Read from a temporary NetCDF file (dataplane)")
 
       # read NetCDF file
@@ -229,12 +269,11 @@ class dataplane(met_base):
 
    @staticmethod
    def write_dataplane_json_numpy(met_in, tmp_filename):
-      if met_base_tools.is_debug_enabled("dataplane"):
+      if dataplane.is_debug_enabled():
          met_base.log_message("Save to a temporary JSON file and a temporary numpy output (dataplane)")
-      if hasattr(met_in.met_data, 'attrs') and met_in.met_data.attrs:
-         attrs = met_in.met_data.attrs
-      else:
-         attrs = met_in.attrs
+
+      attrs = dataplane.get_attrs(met_in)
+
       with open(tmp_filename,'w') as json_fh:
           json.dump(attrs, json_fh, cls=NumpyTypeEncoder)
 
@@ -246,15 +285,10 @@ class dataplane(met_base):
    def write_dataplane_nc(met_in, netcdf_filename):
       import netCDF4 as nc
 
-      if met_base_tools.is_debug_enabled("dataplane"):
+      if dataplane.is_debug_enabled():
          met_base.log_message("Save to a temporary NetCDF file (dataplane)")
 
-      met_info = {'met_data': met_in.met_data}
-      if hasattr(met_in.met_data, 'attrs') and met_in.met_data.attrs:
-         attrs = met_in.met_data.attrs
-      else:
-         attrs = met_in.attrs
-      met_info['attrs'] = attrs
+      met_info['attrs'] = dataplane.get_attrs(met_in)
 
       # write NetCDF file
       ds = nc.Dataset(netcdf_filename, 'w')

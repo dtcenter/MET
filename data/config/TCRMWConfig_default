@@ -49,6 +49,11 @@ valid_exc = [];
 valid_hour = [];
 lead       = [];
 
+//
+// Define BEST track names.
+//
+best_technique = [ "BEST" ];
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //

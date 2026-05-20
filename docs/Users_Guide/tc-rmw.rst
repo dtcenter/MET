@@ -7,7 +7,9 @@ TC-RMW Tool
 Introduction
 ============
 
-The TC-RMW tool regrids tropical cyclone model data onto a moving range-azimuth grid centered on points along the storm track provided in ATCF format, most likely the adeck generated from the file. The radial grid spacing can be defined in kilometers or as a factor of the radius of maximum winds (RMW). The azimuthal grid spacing is defined in degrees clockwise from due east. If wind vector fields are specified in the configuration file, the radial and tangential wind components will be computed. Any regridding method available in MET can be used to interpolate data on the model output grid to the specified range-azimuth grid. The regridding will be done separately on each vertical level. The model data files must coincide with track points in a user-provided ATCF formatted track file.
+The TC-RMW tool regrids tropical cyclone model data onto a moving range-azimuth grid centered on points along the storm track provided in ATCF format. It can process forecast storm tracks found in ATCF adeck files or analysis tracks (e.g. BEST track) found in ATCF bdeck files. The radial grid spacing can be defined in kilometers or as a factor of the radius of maximum winds (RMW). The azimuthal grid spacing is defined in degrees clockwise from due east. If wind vector fields are specified in the configuration file, the radial and tangential wind components will be computed. Any regridding method available in MET can be used to interpolate data on the model output grid to the specified range-azimuth grid. The regridding will be done separately on each vertical level.
+
+Each run of TC-RMW processes a single track. Users should define track filtering criteria in the TC-RMW configuration file to select a single one. While earlier versions of TC-RMW required that the gridded input data files and filtered track points must exactly coincide, that requirement has been relaxed. However output is only written for track points for which gridded input data is provided.
 
 Practical Information
 =====================
@@ -56,7 +58,32 @@ _______________________
 
 .. code-block:: none
 
-  model =       "GFS";
+  model      = "";
+  storm_id   = "";
+  basin      = "";
+  cyclone    = "";
+  init_inc   = "";
+  valid_beg  = "";
+  valid_end  = "";
+  valid_inc  = [];
+  valid_exc  = [];
+  valid_hour = [];
+  lead       = [];
+
+The configuration options listed above are common to many MET-TC tools and are described in :numref:`config_options_tc`. They are used to subset the input ATCF track data down to the set of points for which the TC-RMW conversion should be performed.
+
+_______________________
+
+.. code-block:: none
+
+  best_technique = [ "BEST" ];
+
+The **best_technique** entry specifies a comma-separated list of technique name(s) to be interpreted as BEST track data.
+
+_______________________
+
+.. code-block:: none
+
   censor_thresh = [];
   censor_val    = [];
   data  = {
@@ -81,7 +108,19 @@ _______________________
   }
   regrid = { ... }
 
-The configuration options listed above are common to many MET tools and are described in :numref:`config_options`. The name and level entries in the data dictionary define the data to be processed.  The regrid dictionary defines if and how regridding will be performed.
+The configuration options listed above are common to many MET tools and are described in :numref:`config_options`. The name and level entries in the data dictionary define the data to be processed. The regrid dictionary defines if and how regridding will be performed.
+
+____________________
+
+.. code-block:: none
+
+  best_technique = [ "BEST" ];
+  best_baseline  = [ "BCLP", "BCD5", "BCLA" ];
+
+The **best_technique** field specifies a comma-separated list of technique name(s) to be interpreted as BEST track data. The default value (BEST) should suffice for most users. The **best_baseline** field specifies a comma-separated list of CLIPER/SHIFOR baseline forecasts to be derived from the best tracks. Specifying multiple **best_technique** values and at least one **best_baseline** value results in a warning since the derived baseline forecast technique names may be used multiple times.
+
+
+
 
 _______________________
 

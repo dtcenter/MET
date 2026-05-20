@@ -24,8 +24,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Define the wind intensity levels to be handled
-static const int WindIntensity[] = { 34, 50, 64 };
-static const int NWinds = sizeof(WindIntensity)/sizeof(*WindIntensity);
+static const std::vector<int> WindIntensity = { 34, 50, 64 };
+static const int NWinds = (int) WindIntensity.size();
 
 // ATCF columns that can be filtered
 static const std::vector<std::string> atcf_column_vals = {
@@ -173,7 +173,7 @@ class TrackPoint {
       bool WarmCore;
 
       // Wind Radii
-      QuadInfo      Wind[NWinds];
+      std::vector<QuadInfo> Wind = std::vector<QuadInfo>(NWinds);
 
       // Consensus track variables
       int           NumMembers; 
@@ -184,6 +184,9 @@ class TrackPoint {
 
       // Diagnostic values
       NumArray      DiagVal;
+
+      // Input ATCF Track Lines
+      StringArray   TrackLines;
 
    public:
 
@@ -262,17 +265,19 @@ class TrackPoint {
 
       int              n_diag()        const;
       double           diag_val(int)   const;
+      StringArray      track_lines()   const;
    
          //
          //  do stuff
          //
 
+      bool set(const ATCFTrackLine &, bool check_dup = false);
       void set_wind(int, const QuadInfo &);
-      bool set(const ATCFTrackLine &);
+      bool has(const ATCFTrackLine &) const;
       bool is_match(const ATCFTrackLine &) const;
       void clear_diag_value();
       void add_diag_value(double);
-      double get_diag_val(const StringArray &, const std::string) const;
+      double get_diag_val(const StringArray &, const std::string &) const;
       double get_atcf_val(const std::string &) const;
    
 };
@@ -328,6 +333,7 @@ inline double        TrackPoint::track_stdev()  const { return TrackStdev;  }
 inline double        TrackPoint::v_max_stdev()  const { return VmaxStdev;   }
 inline double        TrackPoint::mslp_stdev()   const { return MSLPStdev;   }
 inline int           TrackPoint::n_diag()       const { return DiagVal.n(); }
+inline StringArray   TrackPoint::track_lines()  const { return TrackLines;  }
 
 ////////////////////////////////////////////////////////////////////////
 
