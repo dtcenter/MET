@@ -33,6 +33,7 @@
 #include <fstream>
 #include <limits.h>
 #include <math.h>
+#include <numeric>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -44,6 +45,7 @@
 #include "series_data.h"
 #include "series_pdf.h"
 
+#include "nav.h"
 #include "vx_statistics.h"
 #include "vx_nc_util.h"
 #include "vx_regrid.h"
@@ -63,8 +65,8 @@ static void setup_diag_info(void);
 static void process_series(void);
 static void process_hist1d(const vector<DataPlane> &);
 static void process_hist2d(const vector<DataPlane> &);
-static void process_energy(const vector<DataPlane> &);
-static void process_error_energy(const vector<DataPlane> &);
+static void process_power_spectrum(const vector<DataPlane> &);
+static void process_error_power_spectrum(const vector<DataPlane> &);
 static void accumulate(vector<double> &, const vector<double> &);
 static DataPlane dct_typeII(const DataPlane &);
 static void process_info_theory(void);
@@ -81,10 +83,13 @@ static void add_var_att_local(NcVar *, const char *,
 static void write_hist_bins(void);
 static void write_hist1d(void);
 static void write_hist2d(void);
-static void write_energy(void);
-static void write_error_energy(void);
+static void write_wavelengths(void);
+static void write_power_spectrum(void);
+static void write_error_power_spectrum(void);
 static void write_info_theory(void);
 static void clean_up(void);
+
+static double get_grid_res_km(const Grid &);
 
 static Met2dDataFile *get_mtddf(const StringArray &, const int);
 
@@ -122,10 +127,11 @@ int met_main(int argc, char *argv[]) {
    // Write information theory output
    if(conf_info.nc_info.do_info_theory) write_info_theory();
 
-   // Write power spectrum output
+   // Write power spectrum output for the full domain
    if(conf_info.nc_info.do_power_spectrum) {
-      write_energy();
-      if(multiple_data_sources) write_error_energy();
+      write_wavelengths();
+      write_power_spectrum();
+      if(multiple_data_sources) write_error_power_spectrum();
    }
 
    // Write benchmarking metrics
@@ -285,6 +291,7 @@ static void setup_diag_info(void) {
    // Resize based on the number of variables and masks
    diag_info.resize(conf_info.get_n_data());
    for(auto &info : diag_info) info.resize(conf_info.get_n_mask());
+   power_info.resize(conf_info.get_n_data());
 
    // Loop over variables
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
@@ -443,10 +450,16 @@ static void process_series(void) {
       process_hist2d(data_dp);
 
       // Process the power spectrum
-      process_energy(data_dp);
+      if(conf_info.nc_info.do_power_spectrum) {
 
-      // Process the error power spectrum
-      if(multiple_data_sources) process_error_energy(data_dp);
+         // JHG, handle bad data values prior to doing the power spectrum
+
+         // Process the power spectrum
+         process_power_spectrum(data_dp);
+
+         // Process the error power spectrum
+         if(multiple_data_sources) process_error_power_spectrum(data_dp);
+      }
 
    } // end for i_series
 
@@ -547,34 +560,26 @@ static void process_hist2d(const vector<DataPlane> &data_dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_energy(const vector<DataPlane> &data_dp) {
+static void process_power_spectrum(const vector<DataPlane> &data_dp) {
 
-   // Process the power spectrum
+   // Process the power spectrum for the full input domain
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
+      // Apply the discrete cosine transform
+      DataPlane dct_dp(dct_typeII(data_dp[i_var]));
 
-         DiagInfo *i_diag = &diag_info[i_var][i_mask];
+      // Sum the radial energy
+      accumulate(power_info[i_var].power,
+                 radial_energy(dct_dp));
 
-         // Apply the mask before updating the data ranges
-         DataPlane mask_dp(data_dp[i_var]);
-         apply_mask(mask_dp, conf_info.mask_mp[i_mask]);
-
-         // Apply the discrete cosine transform
-         DataPlane dct_dp(dct_typeII(mask_dp));
-
-         // Sum the radial energy
-         accumulate(i_diag->energy, radial_energy(dct_dp));
-
-      } // end for i_mask
    } // end for i_var
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_error_energy(const vector<DataPlane> &data_dp) {
+static void process_error_power_spectrum(const vector<DataPlane> &data_dp) {
 
-   // Process the power spectrum
+   // Process the power spectrum for the full input domain
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
@@ -582,22 +587,13 @@ static void process_error_energy(const vector<DataPlane> &data_dp) {
          // Compute difference field
          DataPlane diff_dp(subtract(data_dp[i_var], data_dp[j_var]));
 
-         for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
+         // Apply the discrete cosine transform
+         DataPlane dct_dp(dct_typeII(diff_dp));
 
-            DiagInfo *i_diag = &diag_info[i_var][i_mask];
+         // Sum the radial energy
+         accumulate(power_info[i_var].error_power[j_var],
+                    radial_energy(dct_dp));
 
-            // Apply the mask before updating the data ranges
-            DataPlane mask_dp(diff_dp);
-            apply_mask(mask_dp, conf_info.mask_mp[i_mask]);
-
-            // Apply the discrete cosine transform
-            DataPlane dct_dp(dct_typeII(mask_dp));
-
-            // Sum the radial energy
-            accumulate(i_diag->error_energy[j_var],
-                       radial_energy(dct_dp));
-
-         } // end for i_mask
       } // end for j_var
    } // end for i_var
 }
@@ -817,8 +813,8 @@ static void setup_nc_file(void) {
 
    // Add the power spectra dimension
    if(conf_info.nc_info.do_power_spectrum) {
-      energy_dim = add_dim(nc_out, "energy",
-                           (long) min(grid.nx(), grid.ny()));
+      wavenumber_dim = add_dim(nc_out, "wavenumber",
+                               (long) min(grid.nx(), grid.ny()));
    }
 }
 
@@ -1100,58 +1096,82 @@ static void write_info_theory(void) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void write_energy(void) {
-   vector<size_t> offsets = { 0, 0 };
-   vector<size_t> counts  = { 1, energy_dim.getSize() };
+static void write_wavelengths(void) {
 
-   // NetCDF dimensions remain constant across all variables
-   vector<NcDim> dims = { mask_dim, energy_dim };
+   // Define wavenumber values
+   int n_waves = wavenumber_dim.getSize();
+   vector<int> wavenumbers(n_waves);
+   iota(wavenumbers.begin(), wavenumbers.end(), 1);
 
-   // Define and write engery power spectrum
+   // Define wavelength values
+   vector<float> wavelengths(n_waves);
+   double grid_res_km = get_grid_res_km(grid);
+   for(int i=0; i<n_waves; i++) {
+      wavelengths[i] = wavenumbers[n_waves - 1 - i] * grid_res_km;
+   }
+
+   // Add wavenumber coordinate variable
+   NcVar num_var = add_var(nc_out, "wavenumber", ncInt64, wavenumber_dim);
+   add_var_att_local(&num_var, "long_name", "Wavenumbers");
+   add_var_att_local(&num_var, "units", "1");
+   num_var.putVar(wavenumbers.data());
+
+   // Add wavelength variable
+   NcVar len_var = add_var(nc_out, "wavelength", ncFloat, wavenumber_dim);
+   add_var_att_local(&len_var, "long_name", "Wavelengths");
+   add_var_att_local(&len_var, "units", "km");
+   ConcatString cs;
+   cs.format("%g km", grid_res_km);
+   add_var_att_local(&len_var, "grid_res", cs);
+   len_var.putVar(wavelengths.data());
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Power spectra can be computed and written only for the full
+// rectangular input domain. The mask dimension is not used.
+//
+////////////////////////////////////////////////////////////////////////
+
+static void write_power_spectrum(void) {
+
+   // Define and write the power spectrum
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       const VarInfo *i_data = conf_info.data_info[i_var];
 
       // Define NetCDF variable name
       ConcatString var_str(get_nc_var_str(i_data, i_var+1));
-      ConcatString var_name("energy_");
+      ConcatString var_name("power_spectrum_");
       var_name << var_str;
 
       // Create NetCDF variable
-      NcVar var = add_var(nc_out, var_name, ncFloat, dims,
+      NcVar var = add_var(nc_out, var_name, ncFloat, wavenumber_dim,
                           deflate_level);
 
       // Add variable attributes
-      ConcatString cs;
-      cs << "Kinetic energy power spectrum for " << var_str;
+      ConcatString cs("Power spectrum for ");
+      cs << var_str;
       add_var_data_atts(&var, cs, i_data->level_attr(), i_data->units_attr());
+      add_var_att_local(&var, "mask", full_domain_str);
 
-      // Write power spectrum for each mask
-      for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
+      // Write power spectrum
+      PowerInfo *p_diag = &power_info[i_var];
 
-         DiagInfo *i_diag = &diag_info[i_var][i_mask];
+      // Divide sums by the series length
+      for(auto &x : p_diag->power) x /= n_series;
 
-         // Divide sums by the series length
-         for(auto &x : i_diag->energy) x /= n_series;
+      // Write the mean power data
+      var.putVar(p_diag->power.data());
 
-         // Write the mean energy
-         offsets[0] = i_mask;
-         var.putVar(offsets, counts, i_diag->energy.data());
-
-      } // end for i_mask
    } // end for i_var
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-static void write_error_energy(void) {
-   vector<size_t> offsets = { 0, 0 };
-   vector<size_t> counts  = { 1, energy_dim.getSize() };
+static void write_error_power_spectrum(void) {
 
-   // NetCDF dimensions remain constant across all variables
-   vector<NcDim> dims = { mask_dim, energy_dim };
-
-   // Define and write error energy power spectrum
+   // Define and write the error power spectrum
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       const VarInfo *i_data = conf_info.data_info[i_var];
@@ -1161,14 +1181,13 @@ static void write_error_energy(void) {
          const VarInfo *j_data = conf_info.data_info[j_var];
 
          // Define NetCDF variable name
-         ConcatString var_str;
-         var_str << get_nc_var_str(i_data, i_var+1) << "_"
-                 << get_nc_var_str(j_data, j_var+1);
-	 ConcatString var_name("error_energy_");
-         var_name << var_str;
+         ConcatString i_var_str(get_nc_var_str(i_data, i_var+1));
+         ConcatString j_var_str(get_nc_var_str(j_data, j_var+1));
+	 ConcatString var_name("error_power_spectrum_");
+         var_name << i_var_str << "_" << j_var_str;
 
          // Create NetCDF variable
-         NcVar var = add_var(nc_out, var_name, ncFloat, dims,
+         NcVar var = add_var(nc_out, var_name, ncFloat, wavenumber_dim,
                              deflate_level);
 
          // Level attribute
@@ -1180,24 +1199,20 @@ static void write_error_energy(void) {
                                               j_data->units_attr()));
 
          // Add variable attributes
-         ConcatString cs;
-         cs << "Kinetic error energy power spectrum for "
-            << var_str << " values";
+         ConcatString cs("Power spectrum of errors for ");
+         cs << i_var_str << " minus " << j_var_str;
          add_var_data_atts(&var, cs, level_cs, units_cs);
+         add_var_att_local(&var, "mask", full_domain_str);
 
-         // Write power spectrum for each mask
-         for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
+         // Write power spectrum
+         PowerInfo *p_diag = &power_info[i_var];
 
-            DiagInfo *i_diag = &diag_info[i_var][i_mask];
+         // Divide sums by the series length
+         for(auto &x : p_diag->error_power[j_var]) x /= n_series;
 
-            // Divide sums by the series length
-            for(auto &x : i_diag->error_energy[j_var]) x /= n_series;
+         // Write the mean error power
+         var.putVar(p_diag->error_power[j_var].data());
 
-            // Write the mean error energy
-            offsets[0] = i_mask;
-            var.putVar(offsets, counts, i_diag->error_energy[j_var].data());
-
-         } // end for i_mask
       } // end for j_var
    } // end for i_var
 }
@@ -1260,6 +1275,48 @@ static void clean_up(void) {
     }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Estimate the grid spacking in km
+//
+////////////////////////////////////////////////////////////////////////
+
+static double get_grid_res_km(const Grid &g) {
+
+   int nx = grid.nx();
+   int ny = grid.ny();
+
+   // X-spacing at the center
+   double lat1;
+   double lon1;
+   g.xy_to_latlon(0, nint(ny/2.0), lat1, lon1);
+   double lat2;
+   double lon2;
+   g.xy_to_latlon(nx - 1, nint(ny/2.0), lat2, lon2);
+   double dx_km = gc_dist(lat1, lon1, lat2, lon2) / (nx - 1);
+
+   // Y-spacing at the center
+   g.xy_to_latlon(nint(nx/2.0), 0, lat1, lon1);
+   g.xy_to_latlon(nint(nx/2.0), ny - 1, lat2, lon2);
+   double dy_km = gc_dist(lat1, lon1, lat2, lon2) / (ny - 1);
+
+   // Log message when grid spacing differs
+   if(!is_eq(dx_km, dy_km, 0.1)) {
+      mlog << Debug(3) << "Grid spacing in the X (" << dx_km
+           << " km) and Y (" << dy_km << " km) dimensions differ.\n";
+   }
+   double res_km = min(dx_km, dy_km);
+
+   // Attempt to round to the nearest integer
+   if(is_eq(dx_km, (double) nint(res_km), 0.1)) {
+      res_km = (double) nint(res_km);
+   }
+
+   mlog << Debug(3) << "Using grid spacing of " << res_km << " km.\n";
+
+   return res_km;
 }
 
 ////////////////////////////////////////////////////////////////////////
