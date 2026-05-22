@@ -79,6 +79,15 @@ _____________________
 
 .. code-block:: none
 
+  power_spectrum_missing_flag  = NONE;
+  power_spectrum_missing_value = 0.0;
+
+The **power_spectrum_missing_flag** and **power_spectrum_missing_value** entries define how bad data values should be handled when computing power spectra. For all other output types, bad data values are ignored but they are problematic for power spectra. Set **power_spectrum_missing_flag** to **NONE** (default) to skip power spectrum when bad data is present, to **MEAN** to replace bad data with the mean of each input field, or to **VALUE** to replace bad data with the constant numeric value specified by **power_spectrum_missing_value**. Note that these configuration options can be specified separately for each input field.
+
+_____________________
+
+.. code-block:: none
+
   data = {
    field = [
         {

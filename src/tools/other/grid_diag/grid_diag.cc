@@ -581,26 +581,25 @@ static void prepare_power_spectrum_data(vector<DataPlane> &data_dp) {
          else {
 
             // Initialize to the config file value
-            double v = conf_info.ps_missing_value[i_var];
-            ConcatString v_desc("constant");
+            double fill;
+            ConcatString desc;
 
             // Replace with the mean of the field
             if(conf_info.ps_missing_flag[i_var] == PSMissingType::Mean) {
-               double sum = 0.0;
-               int n = 0;
-               for(const auto &x : data_dp[i_var].const_buf()) {
-                  if(!is_bad_data(x)) { sum += x; n++; }
-               }
-               v = (n > 0 ? sum/n : bad_data_double);
-               v_desc = "mean";
-
+               fill = data_dp[i_var].mean();
+               desc = "mean";
+            }
+            // Use config file value
+            else {
+               fill = conf_info.ps_missing_value[i_var];
+               desc = "constant";
             }
 
             mlog << Debug(3) << "Replacing "
                  << conf_info.data_info[i_var]->magic_str_attr()
-                 << " power spectrum missing data with a " << v_desc
-                 << " value of " << v << ".\n";
-            data_dp[i_var].replace_bad_data(v);
+                 << " power spectrum missing data with a " << desc
+                 << " value of " << fill << ".\n";
+            data_dp[i_var].replace_bad_data(fill);
          }
       }
 

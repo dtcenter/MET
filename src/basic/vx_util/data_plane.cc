@@ -504,6 +504,27 @@ int DataPlane::n_good_data() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+double DataPlane::mean() const {
+   double sum = 0.0;
+   int n = 0;
+
+#pragma omp parallel default(none) \
+   shared(sum, n)
+   {
+
+      // Accumulate sum
+#pragma omp for schedule(static) \
+                reduction(+: sum, n)
+      for(int j=0; j<Nxy; ++j) {
+         if(!is_bad_data(Data[j])) { sum += Data[j]; n++; }
+      }
+   } // End omp parallel
+
+   return (n > 0 ? sum / n : bad_data_double);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 double DataPlane::get(int x, int y) const {
    int n;
 

@@ -101,6 +101,7 @@ class DataPlane {
       bool     has_bad_data() const;
       bool     is_all_bad_data() const;
       int      n_good_data() const;
+      double   mean() const;
 
       unixtime init() const;
       unixtime valid() const;
