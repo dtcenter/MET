@@ -33,6 +33,12 @@ censor_thresh = [];
 censor_val    = [];
 
 //
+// Specify the handling of missing data for power spectrum computations
+//
+power_spectrum_missing_flag  = NONE;
+power_spectrum_missing_value = 0.0;
+
+//
 // Data fields
 //
 data = {

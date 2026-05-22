@@ -561,6 +561,18 @@ enum class MatchType {
 };
 
 ////////////////////////////////////////////////////////////////////////
+
+//
+// Enumeration for Grid-Diag Power Spectrum missing flag options
+//
+
+enum class PSMissingType {
+   None, // Skip power spectrums when missing data is present
+   Mean, // Replace missing with the mean of the field
+   Value // Replace missing with a constant value
+};
+
+////////////////////////////////////////////////////////////////////////
 //
 // Constants used in configuartion files
 //
@@ -928,6 +940,8 @@ static const char conf_key_hist1d_flag[]         = "histogram_1d";
 static const char conf_key_hist2d_flag[]         = "histogram_2d";
 static const char conf_key_info_theory_flag[]    = "info_theory";
 static const char conf_key_power_spectrum_flag[] = "power_spectrum";
+static const char conf_key_ps_missing_flag[]     = "power_spectrum_missing_flag";
+static const char conf_key_ps_missing_value[]    = "power_spectrum_missing_value";
 
 //
 // STAT-Analysis and Pair-Stat specific parameter key names
@@ -1446,6 +1460,14 @@ static const char conf_val_engine[] = "ENGINE";
 static const char conf_val_merge_both[] = "MERGE_BOTH";
 static const char conf_val_merge_fcst[] = "MERGE_FCST";
 static const char conf_val_no_merge[]   = "NO_MERGE";
+
+//
+// Grid-Diag specific parameter value names
+//
+
+// Power spectrum missing flag values
+static const char conf_val_mean[]  = "MEAN";
+static const char conf_val_value[] = "VALUE";
 
 ////////////////////////////////////////////////////////////////////////
 

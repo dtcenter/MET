@@ -38,15 +38,6 @@ extern void dct_typeII_2d(double *data, int nrow, int ncol) {
       }
    }
 
-   // Print the DCT matrix
-   printf("2D DCT Input:\n");
-   for(int i=0; i<10; i++) {
-      for(int j=0; j<10; j++) {
-         printf("%8.2f ", gsl_matrix_get(m, i, j));
-      }
-      printf("\n");
-   }
-
    // Transform Rows
    gsl_fft_real_wavetable *col_wt = gsl_fft_real_wavetable_alloc(ncol);
    gsl_fft_real_workspace *col_ws = gsl_fft_real_workspace_alloc(ncol);
@@ -73,15 +64,6 @@ extern void dct_typeII_2d(double *data, int nrow, int ncol) {
          int n = DefaultTO.two_to_one(ncol, nrow, j, i);
          data[n] = gsl_matrix_get(m, i, j);
       }
-   }
-
-   // Print the DCT matrix
-   printf("2D DCT Output:\n");
-   for(int i=0; i<10; i++) {
-      for(int j=0; j<10; j++) {
-         printf("%8.2f ", gsl_matrix_get(m, i, j));
-      }
-      printf("\n");
    }
 
    // Free resources

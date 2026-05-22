@@ -117,6 +117,10 @@ void GridDiagConfInfo::clear() {
    }
    data_info.clear();
 
+   ps_missing_flag.clear();
+   ps_missing_value.clear();
+   ps_skip.clear();
+
    return;
 }
 
@@ -156,6 +160,9 @@ void GridDiagConfInfo::set_n_data() {
 
    // Allocate space based on the number of verification tasks
    data_info.resize(n_data, nullptr);
+   ps_missing_flag.resize(n_data);
+   ps_missing_value.resize(n_data);
+   ps_skip.resize(n_data, false);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -211,6 +218,10 @@ void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
               << ").\n\n";
          exit(1);
       }
+
+      // Parse power spectrum missing flag and value
+      ps_missing_flag[i]  = int_to_psmissingtype(i_dict.lookup_int(conf_key_ps_missing_flag));
+      ps_missing_value[i] = i_dict.lookup_double(conf_key_ps_missing_value);
 
    } // end for i
 

@@ -3886,6 +3886,44 @@ NormalizeType parse_conf_normalize(Dictionary *dict) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+PSMissingType int_to_psmissingtype(int v) {
+   PSMissingType t = PSMissingType::None;
+
+   // Convert integer to enumerated PSMissingType
+        if(v == conf_const.lookup_int(conf_val_none))  t = PSMissingType::None;
+   else if(v == conf_const.lookup_int(conf_val_mean))  t = PSMissingType::Mean;
+   else if(v == conf_const.lookup_int(conf_val_value)) t = PSMissingType::Value;
+   else {
+      mlog << Error << "\nint_to_psmissingtype() -> "
+           << "Unexpected value of " << v << ".\n\n";
+      exit(1);
+   }
+
+   return t;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString psmissingtype_to_string(PSMissingType type) {
+   ConcatString s;
+
+   // Convert enumerated PSMissingType to string
+   switch(type) {
+      case PSMissingType::None:  s = conf_val_none;  break;
+      case PSMissingType::Mean:  s = conf_val_mean;  break;
+      case PSMissingType::Value: s = conf_val_value; break;
+      default:
+         mlog << Error << "\npsmissingtype_to_string() -> "
+              << "Unexpected PSMissingType value of "
+              << enum_class_as_int(type) << ".\n\n";
+         exit(1);
+   }
+
+   return s;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 //
 // Print consistent error message and exit
 //

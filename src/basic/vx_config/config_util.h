@@ -201,6 +201,9 @@ extern ConcatString dist_to_string(DistType, const NumArray &);
 extern ConcatString griddecomptype_to_string(GridDecompType);
 extern ConcatString wavelettype_to_string(WaveletType);
 
+extern PSMissingType int_to_psmissingtype(int);
+extern ConcatString psmissingtype_to_string(PSMissingType);
+
 extern int parse_conf_percentile(Dictionary *dict);
 
 extern void python_compile_error(const char *caller=nullptr);

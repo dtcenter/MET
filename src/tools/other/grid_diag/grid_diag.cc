@@ -65,6 +65,7 @@ static void setup_diag_info(void);
 static void process_series(void);
 static void process_hist1d(const vector<DataPlane> &);
 static void process_hist2d(const vector<DataPlane> &);
+static void prepare_power_spectrum_data(vector<DataPlane> &);
 static void process_power_spectrum(const vector<DataPlane> &);
 static void process_error_power_spectrum(const vector<DataPlane> &);
 static void accumulate(vector<double> &, const vector<double> &);
@@ -452,7 +453,8 @@ static void process_series(void) {
       // Process the power spectrum
       if(conf_info.nc_info.do_power_spectrum) {
 
-         // JHG, handle bad data values prior to doing the power spectrum
+         // Prepare power spectrum data
+         prepare_power_spectrum_data(data_dp);
 
          // Process the power spectrum
          process_power_spectrum(data_dp);
@@ -560,10 +562,60 @@ static void process_hist2d(const vector<DataPlane> &data_dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
+static void prepare_power_spectrum_data(vector<DataPlane> &data_dp) {
+
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+
+      // Check for input bad data
+      if(data_dp[i_var].has_bad_data()) {
+
+         // Skip power spectrum for missing data
+         if(conf_info.ps_missing_flag[i_var] == PSMissingType::None ||
+            data_dp[i_var].is_all_bad_data()) {
+
+            mlog << Debug(3) << "Skipping "
+                 << conf_info.data_info[i_var]->magic_str_attr()
+                 << " power spectrum due to missing data.\n";
+            conf_info.ps_skip[i_var] = true;
+         }
+         else {
+
+            // Initialize to the config file value
+            double v = conf_info.ps_missing_value[i_var];
+            ConcatString v_desc("constant");
+
+            // Replace with the mean of the field
+            if(conf_info.ps_missing_flag[i_var] == PSMissingType::Mean) {
+               double sum = 0.0;
+               int n = 0;
+               for(const auto &x : data_dp[i_var].const_buf()) {
+                  if(!is_bad_data(x)) { sum += x; n++; }
+               }
+               v = (n > 0 ? sum/n : bad_data_double);
+               v_desc = "mean";
+
+            }
+
+            mlog << Debug(3) << "Replacing "
+                 << conf_info.data_info[i_var]->magic_str_attr()
+                 << " power spectrum missing data with a " << v_desc
+                 << " value of " << v << ".\n";
+            data_dp[i_var].replace_bad_data(v);
+         }
+      }
+
+   } // end for i_var
+}
+
+////////////////////////////////////////////////////////////////////////
+
 static void process_power_spectrum(const vector<DataPlane> &data_dp) {
 
    // Process the power spectrum for the full input domain
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+
+      // Check skip
+      if(conf_info.ps_skip[i_var]) continue;
 
       // Apply the discrete cosine transform
       DataPlane dct_dp(dct_typeII(data_dp[i_var]));
@@ -582,7 +634,13 @@ static void process_error_power_spectrum(const vector<DataPlane> &data_dp) {
    // Process the power spectrum for the full input domain
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
+      // Check skip
+      if(conf_info.ps_skip[i_var]) continue;
+
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
+
+         // Check skip
+         if(conf_info.ps_skip[j_var]) continue;
 
          // Compute difference field
          DataPlane diff_dp(subtract(data_dp[i_var], data_dp[j_var]));
@@ -1138,6 +1196,9 @@ static void write_power_spectrum(void) {
    // Define and write the power spectrum
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
+      // Check skip
+      if(conf_info.ps_skip[i_var]) continue;
+
       const VarInfo *i_data = conf_info.data_info[i_var];
 
       // Define NetCDF variable name
@@ -1174,9 +1235,15 @@ static void write_error_power_spectrum(void) {
    // Define and write the error power spectrum
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
+      // Check skip
+      if(conf_info.ps_skip[i_var]) continue;
+
       const VarInfo *i_data = conf_info.data_info[i_var];
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
+
+         // Check skip
+         if(conf_info.ps_skip[j_var]) continue;
 
          const VarInfo *j_data = conf_info.data_info[j_var];
 

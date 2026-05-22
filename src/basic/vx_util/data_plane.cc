@@ -458,6 +458,16 @@ void DataPlane::set_all(float *data, int nx, int ny) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+bool DataPlane::has_bad_data() const {
+
+   // Search for bad data
+   auto it = find(Data.begin(), Data.end(), bad_data_double);
+
+   return it != Data.end();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 bool DataPlane::is_all_bad_data() const {
    bool status = true;
 
