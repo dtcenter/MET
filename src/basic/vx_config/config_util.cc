@@ -3887,15 +3887,15 @@ NormalizeType parse_conf_normalize(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-PSMissingType int_to_psmissingtype(int v) {
-   PSMissingType t = PSMissingType::None;
+MissingDataType int_to_missingdatatype(int v) {
+   MissingDataType t = MissingDataType::None;
 
-   // Convert integer to enumerated PSMissingType
-        if(v == conf_const.lookup_int(conf_val_none))  t = PSMissingType::None;
-   else if(v == conf_const.lookup_int(conf_val_mean))  t = PSMissingType::Mean;
-   else if(v == conf_const.lookup_int(conf_val_value)) t = PSMissingType::Value;
+   // Convert integer to enumerated MissingDataType
+        if(v == conf_const.lookup_int(conf_val_none))  t = MissingDataType::None;
+   else if(v == conf_const.lookup_int(conf_val_mean))  t = MissingDataType::Mean;
+   else if(v == conf_const.lookup_int(conf_val_value)) t = MissingDataType::Value;
    else {
-      mlog << Error << "\nint_to_psmissingtype() -> "
+      mlog << Error << "\nint_to_missingdatatype() -> "
            << "Unexpected value of " << v << ".\n\n";
       exit(1);
    }
@@ -3905,22 +3905,74 @@ PSMissingType int_to_psmissingtype(int v) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConcatString psmissingtype_to_string(PSMissingType type) {
+ConcatString missingdatatype_to_string(MissingDataType type) {
    ConcatString s;
 
-   // Convert enumerated PSMissingType to string
+   // Convert enumerated MissingDataType to string
    switch(type) {
-      case PSMissingType::None:  s = conf_val_none;  break;
-      case PSMissingType::Mean:  s = conf_val_mean;  break;
-      case PSMissingType::Value: s = conf_val_value; break;
+      case MissingDataType::None:  s = conf_val_none;  break;
+      case MissingDataType::Mean:  s = conf_val_mean;  break;
+      case MissingDataType::Value: s = conf_val_value; break;
       default:
-         mlog << Error << "\npsmissingtype_to_string() -> "
-              << "Unexpected PSMissingType value of "
+         mlog << Error << "\nmissingdatatype_to_string() -> "
+              << "Unexpected MissingDataType value of "
               << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
    return s;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Code for PowerSpectrumInfo struct
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void PowerSpectrumInfo::clear() {
+   missing_flag = MissingDataType::None;
+   missing_value = bad_data_double;
+   vld_thresh = bad_data_double;
+   skip = false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PowerSpectrumInfo &PowerSpectrumInfo::operator=(const PowerSpectrumInfo &a) noexcept {
+   if(this != &a) {
+      missing_flag = a.missing_flag;
+      missing_value = a.missing_value;
+      vld_thresh = a.vld_thresh;
+      skip = a.skip;
+   }
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PowerSpectrumInfo parse_conf_power_spectrum(Dictionary *dict) {
+   Dictionary *ps_dict = (Dictionary *) nullptr;
+   PowerSpectrumInfo info;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_power_spectrum() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: power_spectrum
+   ps_dict = dict->lookup_dictionary(conf_key_power_spectrum);
+
+   // Conf: missing_flag
+   info.missing_flag = int_to_missingdatatype(ps_dict->lookup_int(conf_key_missing_flag));
+
+   // Conf: missing_value
+   info.missing_value = ps_dict->lookup_double(conf_key_missing_value);
+
+   // Conf: vld_thresh
+   info.vld_thresh = ps_dict->lookup_double(conf_key_vld_thresh);
+
+   return info;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -79,10 +79,15 @@ _____________________
 
 .. code-block:: none
 
-  power_spectrum_missing_flag  = NONE;
-  power_spectrum_missing_value = 0.0;
+  power_spectrum = {
+     missing_flag  = NONE;
+     missing_value = 0.0;
+     vld_thresh    = 0.5;
+  }
 
-The **power_spectrum_missing_flag** and **power_spectrum_missing_value** entries define how bad data values should be handled when computing power spectra. For all other output types, bad data values are ignored but they are problematic for power spectra. Set **power_spectrum_missing_flag** to **NONE** (default) to skip power spectrum when bad data is present, to **MEAN** to replace bad data with the mean of each input field, or to **VALUE** to replace bad data with the constant numeric value specified by **power_spectrum_missing_value**. Note that these configuration options can be specified separately for each input field.
+The **power_spectrum** dictionary defines options for computing power spectra and can be specified separately for each **data.field** entry below.
+
+The **missing_flag** and **missing_value** entries define how bad data values should be handled. For all other output types, bad data values are ignored but they are problematic for power spectra. Set **missing_flag** to **NONE** (default) to skip power spectrum when bad data is present, to **MEAN** to replace bad data with the mean of each input field, or to **VALUE** to replace bad data with the constant numeric value specified by **missing_value**. Set **vld_thresh** to a number beween 0 and 1 to define the required ratio of valid data to be present to compute power spectra output for that field.
 
 _____________________
 

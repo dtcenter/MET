@@ -62,10 +62,8 @@ class GridDiagConfInfo {
 
       std::vector<VarInfo *> data_info; // VarInfo pointer array [n_data]
 
-      // Missing data handling options for power spectrum computation
-      std::vector<PSMissingType> ps_missing_flag;  // [n_data]
-      std::vector<double>        ps_missing_value; // [n_data]
-      std::vector<bool>          ps_skip;          // [n_data]
+      // Power spectrum options
+      std::vector<PowerSpectrumInfo> ps_info; // [n_data]
 
       // Masking region names and MaskPlanes
       StringArray mask_name;

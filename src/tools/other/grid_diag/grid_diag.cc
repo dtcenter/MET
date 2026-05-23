@@ -566,17 +566,23 @@ static void prepare_power_spectrum_data(vector<DataPlane> &data_dp) {
 
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      // Check for input bad data
-      if(data_dp[i_var].has_bad_data()) {
+      int nxy = data_dp[i_var].nxy();
+      int n_vld = data_dp[i_var].n_good_data();
+
+      // Check for bad data
+      if(n_good < nxy) {
+
+         PowerSpectrumInfo *ps_ptr = &conf_info.ps_info[i_var];
+
 
          // Skip power spectrum for missing data
-         if(conf_info.ps_missing_flag[i_var] == PSMissingType::None ||
-            data_dp[i_var].is_all_bad_data()) {
+         if(ps_ptr->missing_flag == MissingDataType::None ||
+            (double) n_vld/nxy < ps_ptr->vld_thresh) {
 
             mlog << Debug(3) << "Skipping "
                  << conf_info.data_info[i_var]->magic_str_attr()
                  << " power spectrum due to missing data.\n";
-            conf_info.ps_skip[i_var] = true;
+            ps_ptr->skip = true;
          }
          else {
 
@@ -585,13 +591,13 @@ static void prepare_power_spectrum_data(vector<DataPlane> &data_dp) {
             ConcatString desc;
 
             // Replace with the mean of the field
-            if(conf_info.ps_missing_flag[i_var] == PSMissingType::Mean) {
+            if(ps_ptr->missing_flag == MissingDataType::Mean) {
                fill = data_dp[i_var].mean();
                desc = "mean";
             }
             // Use config file value
             else {
-               fill = conf_info.ps_missing_value[i_var];
+               fill = ps_ptr->missing_value;
                desc = "constant";
             }
 
@@ -614,7 +620,7 @@ static void process_power_spectrum(const vector<DataPlane> &data_dp) {
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       // Check skip
-      if(conf_info.ps_skip[i_var]) continue;
+      if(conf_info.ps_info[i_var].skip) continue;
 
       // Apply the discrete cosine transform
       DataPlane dct_dp(dct_typeII(data_dp[i_var]));
@@ -634,12 +640,12 @@ static void process_error_power_spectrum(const vector<DataPlane> &data_dp) {
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       // Check skip
-      if(conf_info.ps_skip[i_var]) continue;
+      if(conf_info.ps_info[i_var].skip) continue;
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
          // Check skip
-         if(conf_info.ps_skip[j_var]) continue;
+         if(conf_info.ps_info[j_var].skip) continue;
 
          // Compute difference field
          DataPlane diff_dp(subtract(data_dp[i_var], data_dp[j_var]));
@@ -1196,7 +1202,7 @@ static void write_power_spectrum(void) {
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       // Check skip
-      if(conf_info.ps_skip[i_var]) continue;
+      if(conf_info.ps_info[i_var].skip) continue;
 
       const VarInfo *i_data = conf_info.data_info[i_var];
 
@@ -1235,14 +1241,14 @@ static void write_error_power_spectrum(void) {
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       // Check skip
-      if(conf_info.ps_skip[i_var]) continue;
+      if(conf_info.ps_info[i_var].skip) continue;
 
       const VarInfo *i_data = conf_info.data_info[i_var];
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
          // Check skip
-         if(conf_info.ps_skip[j_var]) continue;
+         if(conf_info.ps_info[j_var].skip) continue;
 
          const VarInfo *j_data = conf_info.data_info[j_var];
 

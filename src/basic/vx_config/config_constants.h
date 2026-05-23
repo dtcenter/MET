@@ -566,10 +566,27 @@ enum class MatchType {
 // Enumeration for Grid-Diag Power Spectrum missing flag options
 //
 
-enum class PSMissingType {
-   None, // Skip power spectrums when missing data is present
-   Mean, // Replace missing with the mean of the field
-   Value // Replace missing with a constant value
+enum class MissingDataType {
+   None, // No missing data type
+   Mean, // Replace missing data with the mean of the field
+   Value // Replace missing data with a constant value
+};
+
+//
+// Struct to store power spectrum information
+//
+
+struct PowerSpectrumInfo {
+   MissingDataType missing_flag;
+   double          missing_value;
+   double          vld_thresh;
+   bool            skip;
+
+   PowerSpectrumInfo() { clear(); }
+   ~PowerSpectrumInfo() { clear(); }
+   PowerSpectrumInfo(PowerSpectrumInfo const &i) { *this = i; }
+   PowerSpectrumInfo &operator=(const PowerSpectrumInfo &a) noexcept;
+   void clear();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -940,8 +957,9 @@ static const char conf_key_hist1d_flag[]         = "histogram_1d";
 static const char conf_key_hist2d_flag[]         = "histogram_2d";
 static const char conf_key_info_theory_flag[]    = "info_theory";
 static const char conf_key_power_spectrum_flag[] = "power_spectrum";
-static const char conf_key_ps_missing_flag[]     = "power_spectrum_missing_flag";
-static const char conf_key_ps_missing_value[]    = "power_spectrum_missing_value";
+static const char conf_key_power_spectrum[]      = "power_spectrum";
+static const char conf_key_missing_flag[]        = "missing_flag";
+static const char conf_key_missing_value[]       = "missing_value";
 
 //
 // STAT-Analysis and Pair-Stat specific parameter key names
