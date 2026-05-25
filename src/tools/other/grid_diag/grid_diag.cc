@@ -570,10 +570,9 @@ static void prepare_power_spectrum_data(vector<DataPlane> &data_dp) {
       int n_vld = data_dp[i_var].n_good_data();
 
       // Check for bad data
-      if(n_good < nxy) {
+      if(n_vld < nxy) {
 
          PowerSpectrumInfo *ps_ptr = &conf_info.ps_info[i_var];
-
 
          // Skip power spectrum for missing data
          if(ps_ptr->missing_flag == MissingDataType::None ||
@@ -608,7 +607,6 @@ static void prepare_power_spectrum_data(vector<DataPlane> &data_dp) {
             data_dp[i_var].replace_bad_data(fill);
          }
       }
-
    } // end for i_var
 }
 
