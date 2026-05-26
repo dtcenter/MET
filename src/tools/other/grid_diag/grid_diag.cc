@@ -1216,7 +1216,9 @@ static void write_power_spectrum(void) {
       // Add variable attributes
       ConcatString cs("Power spectrum for ");
       cs << var_str;
-      add_var_data_atts(&var, cs, i_data->level_attr(), i_data->units_attr());
+      ConcatString units_cs("(");
+      units_cs << i_data->units_attr() << ")^2";
+      add_var_data_atts(&var, cs, i_data->level_attr(), units_cs);
       add_var_att_local(&var, "mask", full_domain_str);
 
       // Write power spectrum
@@ -1265,8 +1267,9 @@ static void write_error_power_spectrum(void) {
                                               j_data->level_attr()));
 
          // Units attribute
-         ConcatString units_cs(get_nc_att_str(i_data->units_attr(),
-                                              j_data->units_attr()));
+         ConcatString units_cs("(");
+         units_cs << get_nc_att_str(i_data->units_attr(),
+                                    j_data->units_attr()) << ")^2";
 
          // Add variable attributes
          ConcatString cs("Power spectrum of errors for ");
