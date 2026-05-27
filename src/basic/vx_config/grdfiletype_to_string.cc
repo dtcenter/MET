@@ -57,7 +57,9 @@ switch ( t )  {
    case FileType_Python_Numpy:     s = "FileType_Python_Numpy";     break;
    case FileType_Python_Xarray:    s = "FileType_Python_Xarray";    break;
    case FileType_UGrid:            s = "FileType_UGrid";            break;
+   case FileType_Zarr:             s = "FileType_Zarr";             break;
    case FileType_Pairs:            s = "FileType_Pairs";            break;
+
 
    default:
       s = "(bad value)";
@@ -93,6 +95,7 @@ else if ( strcmp(text, "FileType_Bufr"          ) == 0 )   { t = FileType_Bufr; 
 else if ( strcmp(text, "FileType_Python_Numpy"  ) == 0 )   { t = FileType_Python_Numpy;     return true; }
 else if ( strcmp(text, "FileType_Python_Xarray" ) == 0 )   { t = FileType_Python_Xarray;    return true; }
 else if ( strcmp(text, "FileType_UGrid"         ) == 0 )   { t = FileType_UGrid;            return true; }
+else if ( strcmp(text, "FileType_Zarr"          ) == 0 )   { t = FileType_Zarr;             return true; }
 else if ( strcmp(text, "FileType_Pairs"         ) == 0 )   { t = FileType_Pairs;            return true; }
    //
    //  nope

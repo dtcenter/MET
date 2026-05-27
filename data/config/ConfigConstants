@@ -78,6 +78,7 @@ NETCDF_NCCF    = 6;
 PYTHON_NUMPY   = 7;
 PYTHON_XARRAY  = 8;
 NETCDF_UGRID   = 9;
+ZARR           = 10;
 
 // Set Logic
 NONE           = 1;

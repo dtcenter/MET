@@ -362,6 +362,7 @@ GrdFileType parse_conf_file_type(Dictionary *dict, bool search_parent) {
       else if(v == conf_const.lookup_int(conf_val_netcdf_pint))   t = FileType_NcPinterp;
       else if(v == conf_const.lookup_int(conf_val_netcdf_nccf))   t = FileType_NcCF;
       else if(v == conf_const.lookup_int(conf_val_netcdf_ugrid))  t = FileType_UGrid;
+      else if(v == conf_const.lookup_int(conf_val_zarr))          t = FileType_Zarr;
       else if(v == conf_const.lookup_int(conf_val_python_numpy))  t = FileType_Python_Numpy;
       else if(v == conf_const.lookup_int(conf_val_python_xarray)) t = FileType_Python_Xarray;
       else {

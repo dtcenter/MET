@@ -1363,6 +1363,7 @@ static const char conf_val_netcdf_wrf    [] = "NETCDF_WRF";
 static const char conf_val_netcdf_pint   [] = "NETCDF_PINT";
 static const char conf_val_netcdf_nccf   [] = "NETCDF_NCCF";
 static const char conf_val_netcdf_ugrid  [] = "NETCDF_UGRID";
+static const char conf_val_zarr          [] = "ZARR";
 static const char conf_val_python_numpy  [] = "PYTHON_NUMPY";
 static const char conf_val_python_xarray [] = "PYTHON_XARRAY";
 
