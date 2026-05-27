@@ -1,0 +1,5 @@
+*.o
+*.a
+.deps
+Makefile
+*.dSYM

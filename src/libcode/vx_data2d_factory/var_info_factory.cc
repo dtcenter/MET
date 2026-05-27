@@ -7,15 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ///////////////////////////////////////////////////////////////////////////////
-//
-//   Filename:   var_info.cc
-//
-//   Description:
-//
-//   Mod#   Date      Name           Description
-//   ----   ----      ----           -----------
-//
-///////////////////////////////////////////////////////////////////////////////
 
 #include <map>
 #include <stdlib.h>
@@ -32,6 +23,7 @@
 
 #ifdef WITH_PYTHON
    #include "var_info_python.h"
+   #include "var_info_zarr.h"
 #endif
 
 #ifdef WITH_GRIB2
@@ -42,7 +34,6 @@
 #include "vx_log.h"
 
 using namespace std;
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -99,6 +90,14 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          p->set_file_type(type);
          vi = p;
          p = nullptr;
+         break;
+#else
+         python_compile_error(method_name);
+#endif
+
+      case FileType_Zarr:
+#ifdef WITH_PYTHON
+         vi = new VarInfoZarr;
          break;
 #else
          python_compile_error(method_name);

@@ -28,6 +28,7 @@
 
 #ifdef WITH_PYTHON
 #include "data2d_python.h"
+#include "data2d_zarr.h"
 #endif
 
 #ifdef WITH_GRIB2
@@ -91,7 +92,6 @@ MetPythonDataFile * p = nullptr;
          break;
 
 #ifdef WITH_PYTHON
-
       case FileType_Python_Numpy:
          p = new MetPythonDataFile;
          p->set_type(type);
@@ -104,13 +104,14 @@ MetPythonDataFile * p = nullptr;
          mtddf = p;
          break;
 
+      case FileType_Zarr:
+         mtddf = new MetZarrDataFile;
+         break;
 #else
-
       case FileType_Python_Numpy:
       case FileType_Python_Xarray:
-
+      case FileType_Zarr:
          python_compile_error(method_name);
-
 #endif
 
       case FileType_HdfEos:
