@@ -26,6 +26,7 @@ pyembed_DATA = \
      read_tmp_diag.py \
      read_tmp_ascii.py \
      read_tmp_point_nc.py \
+     read_zarr_dataplae.py \
      set_python_env.py \
      write_tmp_dataplane.py \
      write_tmp_diag.py \
