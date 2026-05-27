@@ -54,6 +54,8 @@ verification use and compiler language:
   Library (with dependencies Z, PNG, AEC, JASPER), if compiling GRIB2 support
 * `Python <https://docs.python.org/3/>`_ Libraries,
   if compiling support for Python embedding
+* `Zarr-Python <https://zarr.readthedocs.io/>`_ Package,
+  if compiling support for Python embedding to reading Zarr data 
 * `ecKit <https://github.com/ecmwf/eckit>`_
   Library, if compiling support for unstructured grids
 * `ATLAS <https://math-atlas.sourceforge.net/>`_
