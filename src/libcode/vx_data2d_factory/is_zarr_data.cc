@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -8,36 +6,35 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
-
-
 ////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <cmath>
 
-#ifndef  __DATA2D_FACTORY_H__
-#define  __DATA2D_FACTORY_H__
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-#include "data2d_factory.h"
-#include "data2d_factory_utils.h"
-#include "is_bufr_file.h"
-#include "is_grib_file.h"
-#include "is_netcdf_file.h"
 #include "is_zarr_data.h"
-#include "parse_file_list.h"
-#include "var_info_factory.h"
+#include "vx_util.h"
+#include "vx_log.h"
 
-
-////////////////////////////////////////////////////////////////////////
-
-
-#endif   //  __DATA2D_FACTORY_H__
-
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+bool is_zarr_data(const string &path) {
+   string zgroup_file = path + "/.zgroup";
+   string zarray_file = path + "/.zarray";
 
+   // check for a directory containing .zgroup and/or .zarray
+   bool has_zgroup = file_exists(zgroup_file.c_str());
+   bool has_zarray = file_exists(zarray_file.c_str());
+
+   return has_zgroup || has_zarray;
+}
+
+////////////////////////////////////////////////////////////////////////
 

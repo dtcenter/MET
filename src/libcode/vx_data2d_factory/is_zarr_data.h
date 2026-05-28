@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -8,36 +6,17 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
+////////////////////////////////////////////////////////////////////////
 
-
+#ifndef  __IS_ZARR_DATA_H__
+#define  __IS_ZARR_DATA_H__
 
 ////////////////////////////////////////////////////////////////////////
 
-
-#ifndef  __DATA2D_FACTORY_H__
-#define  __DATA2D_FACTORY_H__
-
+extern bool is_zarr_data(const std::string &path);
 
 ////////////////////////////////////////////////////////////////////////
 
-
-#include "data2d_factory.h"
-#include "data2d_factory_utils.h"
-#include "is_bufr_file.h"
-#include "is_grib_file.h"
-#include "is_netcdf_file.h"
-#include "is_zarr_data.h"
-#include "parse_file_list.h"
-#include "var_info_factory.h"
-
+#endif   /*  __IS_ZARR_DATA_H__  */
 
 ////////////////////////////////////////////////////////////////////////
-
-
-#endif   //  __DATA2D_FACTORY_H__
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-
