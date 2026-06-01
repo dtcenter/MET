@@ -27,6 +27,8 @@
 #include "vx_math.h"
 #include "vx_log.h"
 
+#include "is_zarr_store.h"
+
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
@@ -76,10 +78,26 @@ void MetZarrDataFile::close() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetZarrDataFile::open(const char * _filename) {
-   // TODO: Open the input file
+bool MetZarrDataFile::open(const char * _path) {
+   const char *method_name = "MetZarrDataFile::open(const char *) -> ";
+
+   // Check for a valid Zarr store
+   if(!is_zarr_store(_path)) {
+      mlog << Error << "\n" << method_name
+           << _path << " is not a valid Zarr store.\n\n";
+      exit(1);
+   }
+
+   Filename = _path;
+
    return true;
 }
+
+// JHG: We could consider having the open function inventory the
+// list of dataset names and/or inspect the metadata, but there's
+// no clear and obvious need for that here since the data_plane
+// function will need to handle it. Note that a single Zarr store can
+// contain multiple grids. 
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -116,6 +134,8 @@ bool MetZarrDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    // Narrow the vinfo pointer
    auto vinfo_zarr = (VarInfoZarr*)(&vinfo);
 
+   // JHG: call python function to read the data
+
    return true;
 }
 
@@ -127,8 +147,10 @@ int MetZarrDataFile::data_plane_array(VarInfo &vinfo,
    // Initialize
    plane_array.clear();
 
-   //  narrow the vinfo pointer
+   // Narrow the vinfo pointer
    auto vinfo_zarr = (VarInfoZarr*)(&vinfo);
+
+   // JHG: call python function to read multiple data planes
 
    return 0;
 }
@@ -137,13 +159,11 @@ int MetZarrDataFile::data_plane_array(VarInfo &vinfo,
 
 int MetZarrDataFile::index(VarInfo &vinfo) {
 
-   //  Is the file open?
+   // Is the file open?
    if(!Raw_Grid) return -1;
-   //
-   //  ok
-   //
 
    return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
+

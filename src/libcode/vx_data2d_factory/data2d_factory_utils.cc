@@ -17,7 +17,7 @@
 #include "is_grib_file.h"
 #include "is_netcdf_file.h"
 #include "is_bufr_file.h"
-#include "is_zarr_data.h"
+#include "is_zarr_store.h"
 
 #include "vx_data2d.h"
 #include "vx_util.h"
@@ -63,8 +63,9 @@ GrdFileType grd_file_type(const char * filename) {
    // try to get the file type from the filename suffix
    suffix_type = file_type_by_suffix(filename);
 
-   // look inside the file
-        if(is_grib1_file    (filename)) data_type = FileType_Gb1;
+   // look inside the directory or file
+        if(is_zarr_store    (filename)) data_type = FileType_Zarr;
+   else if(is_grib1_file    (filename)) data_type = FileType_Gb1;
    else if(is_grib2_file    (filename)) data_type = FileType_Gb2;
    else if(is_ncpinterp_file(filename)) data_type = FileType_NcPinterp;
    else if(is_ncwrf_file    (filename)) data_type = FileType_NcWrf;
@@ -72,7 +73,6 @@ GrdFileType grd_file_type(const char * filename) {
    else if(is_ncmet_file    (filename)) data_type = FileType_NcMet;
    else if(is_bufr_file     (filename)) data_type = FileType_Bufr;
    else if(is_ugrid_file    (filename)) data_type = FileType_UGrid;
-   else if(is_zarr_data     (filename)) data_type = FileType_Zarr;
    else                                 data_type = FileType_None;
 
    // print warning for inconsistent types

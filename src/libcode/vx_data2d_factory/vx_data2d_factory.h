@@ -26,7 +26,7 @@
 #include "is_bufr_file.h"
 #include "is_grib_file.h"
 #include "is_netcdf_file.h"
-#include "is_zarr_data.h"
+#include "is_zarr_store.h"
 #include "parse_file_list.h"
 #include "var_info_factory.h"
 

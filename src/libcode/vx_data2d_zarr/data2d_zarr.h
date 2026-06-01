@@ -62,8 +62,8 @@ class MetZarrDataFile : public Met2dDataFile {
          //  do stuff
          //
 
-      bool open  (const char * filename);
-      void close ();
+      bool open(const char * path);
+      void close();
       void dump(std::ostream &, int = 0) const;
 };
 

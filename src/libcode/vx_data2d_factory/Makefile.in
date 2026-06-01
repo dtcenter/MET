@@ -111,7 +111,7 @@ am_libvx_data2d_factory_a_OBJECTS =  \
 	libvx_data2d_factory_a-is_netcdf_file.$(OBJEXT) \
 	libvx_data2d_factory_a-is_grib_file.$(OBJEXT) \
 	libvx_data2d_factory_a-is_bufr_file.$(OBJEXT) \
-	libvx_data2d_factory_a-is_zarr_data.$(OBJEXT) \
+	libvx_data2d_factory_a-is_zarr_store.$(OBJEXT) \
 	libvx_data2d_factory_a-parse_file_list.$(OBJEXT) \
 	libvx_data2d_factory_a-var_info_factory.$(OBJEXT) \
 	libvx_data2d_factory_a-data2d_factory_utils.$(OBJEXT) \
@@ -138,7 +138,7 @@ am__depfiles_remade =  \
 	./$(DEPDIR)/libvx_data2d_factory_a-is_bufr_file.Po \
 	./$(DEPDIR)/libvx_data2d_factory_a-is_grib_file.Po \
 	./$(DEPDIR)/libvx_data2d_factory_a-is_netcdf_file.Po \
-	./$(DEPDIR)/libvx_data2d_factory_a-is_zarr_data.Po \
+	./$(DEPDIR)/libvx_data2d_factory_a-is_zarr_store.Po \
 	./$(DEPDIR)/libvx_data2d_factory_a-parse_file_list.Po \
 	./$(DEPDIR)/libvx_data2d_factory_a-var_info_factory.Po
 am__mv = mv -f
@@ -358,7 +358,7 @@ libvx_data2d_factory_a_SOURCES = \
               is_netcdf_file.cc is_netcdf_file.h \
               is_grib_file.cc is_grib_file.h \
               is_bufr_file.cc is_bufr_file.h \
-              is_zarr_data.cc is_zarr_data.h \
+              is_zarr_store.cc is_zarr_store.h \
               parse_file_list.cc parse_file_list.h \
               var_info_factory.cc var_info_factory.h \
               data2d_factory_utils.cc data2d_factory_utils.h \
@@ -419,7 +419,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_factory_a-is_bufr_file.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_factory_a-is_grib_file.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_factory_a-is_netcdf_file.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_factory_a-is_zarr_data.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_factory_a-is_zarr_store.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_factory_a-parse_file_list.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_factory_a-var_info_factory.Po@am__quote@ # am--include-marker
 
@@ -485,19 +485,19 @@ libvx_data2d_factory_a-is_bufr_file.obj: is_bufr_file.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_factory_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_factory_a-is_bufr_file.obj `if test -f 'is_bufr_file.cc'; then $(CYGPATH_W) 'is_bufr_file.cc'; else $(CYGPATH_W) '$(srcdir)/is_bufr_file.cc'; fi`
 
-libvx_data2d_factory_a-is_zarr_data.o: is_zarr_data.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_factory_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_factory_a-is_zarr_data.o -MD -MP -MF $(DEPDIR)/libvx_data2d_factory_a-is_zarr_data.Tpo -c -o libvx_data2d_factory_a-is_zarr_data.o `test -f 'is_zarr_data.cc' || echo '$(srcdir)/'`is_zarr_data.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_factory_a-is_zarr_data.Tpo $(DEPDIR)/libvx_data2d_factory_a-is_zarr_data.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='is_zarr_data.cc' object='libvx_data2d_factory_a-is_zarr_data.o' libtool=no @AMDEPBACKSLASH@
+libvx_data2d_factory_a-is_zarr_store.o: is_zarr_store.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_factory_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_factory_a-is_zarr_store.o -MD -MP -MF $(DEPDIR)/libvx_data2d_factory_a-is_zarr_store.Tpo -c -o libvx_data2d_factory_a-is_zarr_store.o `test -f 'is_zarr_store.cc' || echo '$(srcdir)/'`is_zarr_store.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_factory_a-is_zarr_store.Tpo $(DEPDIR)/libvx_data2d_factory_a-is_zarr_store.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='is_zarr_store.cc' object='libvx_data2d_factory_a-is_zarr_store.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_factory_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_factory_a-is_zarr_data.o `test -f 'is_zarr_data.cc' || echo '$(srcdir)/'`is_zarr_data.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_factory_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_factory_a-is_zarr_store.o `test -f 'is_zarr_store.cc' || echo '$(srcdir)/'`is_zarr_store.cc
 
-libvx_data2d_factory_a-is_zarr_data.obj: is_zarr_data.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_factory_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_factory_a-is_zarr_data.obj -MD -MP -MF $(DEPDIR)/libvx_data2d_factory_a-is_zarr_data.Tpo -c -o libvx_data2d_factory_a-is_zarr_data.obj `if test -f 'is_zarr_data.cc'; then $(CYGPATH_W) 'is_zarr_data.cc'; else $(CYGPATH_W) '$(srcdir)/is_zarr_data.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_factory_a-is_zarr_data.Tpo $(DEPDIR)/libvx_data2d_factory_a-is_zarr_data.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='is_zarr_data.cc' object='libvx_data2d_factory_a-is_zarr_data.obj' libtool=no @AMDEPBACKSLASH@
+libvx_data2d_factory_a-is_zarr_store.obj: is_zarr_store.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_factory_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_factory_a-is_zarr_store.obj -MD -MP -MF $(DEPDIR)/libvx_data2d_factory_a-is_zarr_store.Tpo -c -o libvx_data2d_factory_a-is_zarr_store.obj `if test -f 'is_zarr_store.cc'; then $(CYGPATH_W) 'is_zarr_store.cc'; else $(CYGPATH_W) '$(srcdir)/is_zarr_store.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_factory_a-is_zarr_store.Tpo $(DEPDIR)/libvx_data2d_factory_a-is_zarr_store.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='is_zarr_store.cc' object='libvx_data2d_factory_a-is_zarr_store.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_factory_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_factory_a-is_zarr_data.obj `if test -f 'is_zarr_data.cc'; then $(CYGPATH_W) 'is_zarr_data.cc'; else $(CYGPATH_W) '$(srcdir)/is_zarr_data.cc'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_factory_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_factory_a-is_zarr_store.obj `if test -f 'is_zarr_store.cc'; then $(CYGPATH_W) 'is_zarr_store.cc'; else $(CYGPATH_W) '$(srcdir)/is_zarr_store.cc'; fi`
 
 libvx_data2d_factory_a-parse_file_list.o: parse_file_list.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_factory_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_factory_a-parse_file_list.o -MD -MP -MF $(DEPDIR)/libvx_data2d_factory_a-parse_file_list.Tpo -c -o libvx_data2d_factory_a-parse_file_list.o `test -f 'parse_file_list.cc' || echo '$(srcdir)/'`parse_file_list.cc
@@ -684,7 +684,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libvx_data2d_factory_a-is_bufr_file.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_factory_a-is_grib_file.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_factory_a-is_netcdf_file.Po
-	-rm -f ./$(DEPDIR)/libvx_data2d_factory_a-is_zarr_data.Po
+	-rm -f ./$(DEPDIR)/libvx_data2d_factory_a-is_zarr_store.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_factory_a-parse_file_list.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_factory_a-var_info_factory.Po
 	-rm -f Makefile
@@ -737,7 +737,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libvx_data2d_factory_a-is_bufr_file.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_factory_a-is_grib_file.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_factory_a-is_netcdf_file.Po
-	-rm -f ./$(DEPDIR)/libvx_data2d_factory_a-is_zarr_data.Po
+	-rm -f ./$(DEPDIR)/libvx_data2d_factory_a-is_zarr_store.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_factory_a-parse_file_list.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_factory_a-var_info_factory.Po
 	-rm -f Makefile

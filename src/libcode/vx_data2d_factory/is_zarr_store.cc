@@ -17,7 +17,7 @@
 #include <fcntl.h>
 #include <cmath>
 
-#include "is_zarr_data.h"
+#include "is_zarr_store.h"
 #include "vx_util.h"
 #include "vx_log.h"
 
@@ -25,7 +25,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_zarr_data(const string &path) {
+bool is_zarr_store(const string &path) {
    string zgroup_file = path + "/.zgroup";
    string zarray_file = path + "/.zarray";
 

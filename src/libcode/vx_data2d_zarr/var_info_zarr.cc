@@ -7,15 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ///////////////////////////////////////////////////////////////////////////////
-//
-//   Filename:   var_info_zarr.cc
-//
-//   Description:
-//
-//   Mod#   Date      Name           Description
-//   ----   ----      ----           -----------
-//
-///////////////////////////////////////////////////////////////////////////////
 
 #include <map>
 #include <string>
@@ -79,7 +70,7 @@ VarInfo *VarInfoZarr::clone() const {
 
 void VarInfoZarr::init_from_scratch() {
 
-   // First call the parent's initialization
+   // Call the parent's initialization
    VarInfo::init_from_scratch();
 
    clear();
@@ -91,10 +82,8 @@ void VarInfoZarr::init_from_scratch() {
 
 void VarInfoZarr::assign(const VarInfoZarr &v) {
 
-   // First call the parent's assign
+   // Call the parent's assign
    VarInfo::assign(v);
-
-   // TODO: Copy class members here
 
    return;
 }
@@ -103,10 +92,8 @@ void VarInfoZarr::assign(const VarInfoZarr &v) {
 
 void VarInfoZarr::clear() {
 
-   // First call the parent's clear
+   // Call the parent's clear
    VarInfo::clear();
-
-   // TODO: Initialize class members here
 
    return;
 }
@@ -115,8 +102,9 @@ void VarInfoZarr::clear() {
 
 void VarInfoZarr::dump(ostream &out) const {
 
-   // TODO: Dump out the class member contents here
+   // Call the parent's dump
    out << "VarInfoZarr::dump():\n";
+   VarInfo::dump(out);
 
    return;
 }
@@ -124,12 +112,7 @@ void VarInfoZarr::dump(ostream &out) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoZarr::set_dict(Dictionary & dict, bool do_exit) {
-
-   VarInfo::set_dict(dict);
-
-   // TODO: Parse class members here
-
-   return true;
+   return VarInfo::set_dict(dict);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

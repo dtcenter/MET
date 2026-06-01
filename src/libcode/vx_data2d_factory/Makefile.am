@@ -15,7 +15,7 @@ libvx_data2d_factory_a_SOURCES = \
               is_netcdf_file.cc is_netcdf_file.h \
               is_grib_file.cc is_grib_file.h \
               is_bufr_file.cc is_bufr_file.h \
-              is_zarr_data.cc is_zarr_data.h \
+              is_zarr_store.cc is_zarr_store.h \
               parse_file_list.cc parse_file_list.h \
               var_info_factory.cc var_info_factory.h \
               data2d_factory_utils.cc data2d_factory_utils.h \
