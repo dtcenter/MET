@@ -12,6 +12,5 @@ include ${top_srcdir}/Make-include
 
 noinst_LIBRARIES = libvx_data2d_zarr.a
 libvx_data2d_zarr_a_SOURCES = \
-              var_info_zarr.cc var_info_zarr.h \
               data2d_zarr.cc data2d_zarr.h
 libvx_data2d_zarr_a_CPPFLAGS = ${MET_CPPFLAGS}

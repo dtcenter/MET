@@ -108,7 +108,6 @@ am__v_AR_1 =
 libvx_data2d_zarr_a_AR = $(AR) $(ARFLAGS)
 libvx_data2d_zarr_a_LIBADD =
 am_libvx_data2d_zarr_a_OBJECTS =  \
-	libvx_data2d_zarr_a-var_info_zarr.$(OBJEXT) \
 	libvx_data2d_zarr_a-data2d_zarr.$(OBJEXT)
 libvx_data2d_zarr_a_OBJECTS = $(am_libvx_data2d_zarr_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -126,8 +125,7 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/libvx_data2d_zarr_a-data2d_zarr.Po \
-	./$(DEPDIR)/libvx_data2d_zarr_a-var_info_zarr.Po
+am__depfiles_remade = ./$(DEPDIR)/libvx_data2d_zarr_a-data2d_zarr.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -342,7 +340,6 @@ MAINTAINERCLEANFILES = Makefile.in
 # The library
 noinst_LIBRARIES = libvx_data2d_zarr.a
 libvx_data2d_zarr_a_SOURCES = \
-              var_info_zarr.cc var_info_zarr.h \
               data2d_zarr.cc data2d_zarr.h
 
 libvx_data2d_zarr_a_CPPFLAGS = ${MET_CPPFLAGS}
@@ -395,7 +392,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_zarr_a-data2d_zarr.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_zarr_a-var_info_zarr.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -416,20 +412,6 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-libvx_data2d_zarr_a-var_info_zarr.o: var_info_zarr.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_zarr_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_zarr_a-var_info_zarr.o -MD -MP -MF $(DEPDIR)/libvx_data2d_zarr_a-var_info_zarr.Tpo -c -o libvx_data2d_zarr_a-var_info_zarr.o `test -f 'var_info_zarr.cc' || echo '$(srcdir)/'`var_info_zarr.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_zarr_a-var_info_zarr.Tpo $(DEPDIR)/libvx_data2d_zarr_a-var_info_zarr.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='var_info_zarr.cc' object='libvx_data2d_zarr_a-var_info_zarr.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_zarr_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_zarr_a-var_info_zarr.o `test -f 'var_info_zarr.cc' || echo '$(srcdir)/'`var_info_zarr.cc
-
-libvx_data2d_zarr_a-var_info_zarr.obj: var_info_zarr.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_zarr_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_zarr_a-var_info_zarr.obj -MD -MP -MF $(DEPDIR)/libvx_data2d_zarr_a-var_info_zarr.Tpo -c -o libvx_data2d_zarr_a-var_info_zarr.obj `if test -f 'var_info_zarr.cc'; then $(CYGPATH_W) 'var_info_zarr.cc'; else $(CYGPATH_W) '$(srcdir)/var_info_zarr.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_zarr_a-var_info_zarr.Tpo $(DEPDIR)/libvx_data2d_zarr_a-var_info_zarr.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='var_info_zarr.cc' object='libvx_data2d_zarr_a-var_info_zarr.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_zarr_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_zarr_a-var_info_zarr.obj `if test -f 'var_info_zarr.cc'; then $(CYGPATH_W) 'var_info_zarr.cc'; else $(CYGPATH_W) '$(srcdir)/var_info_zarr.cc'; fi`
 
 libvx_data2d_zarr_a-data2d_zarr.o: data2d_zarr.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_zarr_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_zarr_a-data2d_zarr.o -MD -MP -MF $(DEPDIR)/libvx_data2d_zarr_a-data2d_zarr.Tpo -c -o libvx_data2d_zarr_a-data2d_zarr.o `test -f 'data2d_zarr.cc' || echo '$(srcdir)/'`data2d_zarr.cc
@@ -570,7 +552,6 @@ clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/libvx_data2d_zarr_a-data2d_zarr.Po
-	-rm -f ./$(DEPDIR)/libvx_data2d_zarr_a-var_info_zarr.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -617,7 +598,6 @@ installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/libvx_data2d_zarr_a-data2d_zarr.Po
-	-rm -f ./$(DEPDIR)/libvx_data2d_zarr_a-var_info_zarr.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

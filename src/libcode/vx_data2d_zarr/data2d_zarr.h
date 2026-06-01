@@ -16,13 +16,13 @@
 #include <stdlib.h>
 #include <vector>
 
+#include "data2d_python.h"
 #include "data_plane.h"
 #include "data_class.h"
-#include "var_info_zarr.h"
 
 ////////////////////////////////////////////////////////////////////////
 
-class MetZarrDataFile : public Met2dDataFile {
+class MetZarrDataFile : public MetPythonDataFile {
 
    private:
 

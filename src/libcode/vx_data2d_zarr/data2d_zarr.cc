@@ -132,7 +132,7 @@ void MetZarrDataFile::dump(ostream & out, int depth) const {
 bool MetZarrDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
    // Narrow the vinfo pointer
-   auto vinfo_zarr = (VarInfoZarr*)(&vinfo);
+   auto vinfo_python = (VarInfoPython*)(&vinfo);
 
    // JHG: call python function to read the data
 
@@ -148,7 +148,7 @@ int MetZarrDataFile::data_plane_array(VarInfo &vinfo,
    plane_array.clear();
 
    // Narrow the vinfo pointer
-   auto vinfo_zarr = (VarInfoZarr*)(&vinfo);
+   auto vinfo_python = (VarInfoPython*)(&vinfo);
 
    // JHG: call python function to read multiple data planes
 
