@@ -549,17 +549,20 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
    // Flag to process observation climatology data
    cmn_flag = set_climo_flag(pd.o_na, pd.ocmn_na);
 
-   // Setup probability thresholds, equally spaced by ensemble size
-   for(i=0; i<=n_prob; i++) p_thresh.add((double) i/n_prob);
+   // MET #3396 Setup centered probability thresholds based on the ensemble size
+   ConcatString cs("==");
+   cs << n_prob;
+   ThreshArray ta(string_to_prob_thresh(cs.c_str()));
+   for(i=0; i<ta.n(); i++) p_thresh.add(ta[i].get_value());
 
    // Setup forecast probabilistic contingency table
    Nx2ContingencyTable fcst_pct;
-   fcst_pct.set_size(n_prob);
+   fcst_pct.set_size(n_prob+1);
    fcst_pct.set_thresholds(p_thresh.vals());
 
    // Setup climatology probabilistic contingency table
    Nx2ContingencyTable climo_pct;
-   climo_pct.set_size(n_prob);
+   climo_pct.set_size(n_prob+1);
    climo_pct.set_thresholds(p_thresh.vals());
 
    // Initialize
