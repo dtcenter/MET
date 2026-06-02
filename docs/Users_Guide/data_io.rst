@@ -398,6 +398,13 @@ The following is a summary of the input and output formats for each of the tools
 
     * **Output**: ASCII description of their contents printed to the screen.
 
+.. _Output Column Types:
+
+Output Column Types
+===================
+
+MET ASCII output files are in a fixed-width column format. Each column has a column header. Each individual column header has an associated data type (i.e. "VERSION" is a string). This information is useful for users who wish to use Python to read MET output. The datatype for each MET linetype can be found in data/table_files/met_column_types.json. 
+
 .. _Configuration File Details:
 
 Configuration File Details
