@@ -278,8 +278,9 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    ign = pd.ign_na.wmean(pd.wgt_na);
 
    // Get the sum of the weights
+   n_pair = 0;
    double w_sum = 0.0;
-   for(int i=0, n_pair=0; i<pd.wgt_na.n(); i++) {
+   for(int i=0; i<pd.wgt_na.n(); i++) {
       if(!pd.skip_ba[i]) {
          n_pair++;
          w_sum += pd.wgt_na[i];
