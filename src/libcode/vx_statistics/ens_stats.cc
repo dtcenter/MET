@@ -238,10 +238,13 @@ void ECNTInfo::assign(const ECNTInfo &c) {
 ////////////////////////////////////////////////////////////////////////
 
 void ECNTInfo::set(const PairDataEnsemble &pd) {
-   int i;
-   double w, w_sum;
-   double fbar, obar, ffbar, oobar, fobar, abserr;
-   NumArray cur;
+   double w;
+   double fbar;
+   double obar;
+   double ffbar;
+   double oobar;
+   double fobar;
+   double abserr;
 
    // Store the number of ensemble members
    n_ens = pd.n_ens;
@@ -275,7 +278,8 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    ign = pd.ign_na.wmean(pd.wgt_na);
 
    // Get the sum of the weights
-   for(i=0, n_pair=0, w_sum=0.0; i<pd.wgt_na.n(); i++) {
+   double w_sum = 0.0;
+   for(int i=0, n_pair=0; i<pd.wgt_na.n(); i++) {
       if(!pd.skip_ba[i]) {
          n_pair++;
          w_sum += pd.wgt_na[i];
@@ -298,7 +302,7 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
 
       // Compute ME and RMSE values
       fbar = obar = ffbar = oobar = fobar = abserr = 0.0;
-      for(i=0; i<pd.n_obs; i++) {
+      for(int i=0; i<pd.n_obs; i++) {
 
          if(pd.skip_ba[i]) continue;
 
@@ -321,7 +325,7 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
       if(pd.has_obs_error()) {
 
          fbar = obar = ffbar = oobar = fobar = abserr = 0.0;
-         for(i=0; i<pd.n_obs; i++) {
+         for(int i=0; i<pd.n_obs; i++) {
 
             if(pd.skip_ba[i]) continue;
 
@@ -524,10 +528,6 @@ void RPSInfo::set_cdp_thresh(const ThreshArray &ta) {
 ////////////////////////////////////////////////////////////////////////
 
 void RPSInfo::set(const PairDataEnsemble &pd) {
-   int i, j, k, n_event;
-   double p;
-   bool cmn_flag;
-   NumArray p_thresh, climo_prob;
 
    // Store the dimensions
    n_pair = pd.n_pair;
@@ -547,13 +547,14 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
    fthresh.check_bin_thresh();
 
    // Flag to process observation climatology data
-   cmn_flag = set_climo_flag(pd.o_na, pd.ocmn_na);
+   bool cmn_flag = set_climo_flag(pd.o_na, pd.ocmn_na);
 
    // MET #3396 Setup centered probability thresholds based on the ensemble size
    ConcatString cs("==");
    cs << n_prob;
    ThreshArray ta(string_to_prob_thresh(cs.c_str()));
-   for(i=0; i<ta.n(); i++) p_thresh.add(ta[i].get_value());
+   NumArray p_thresh;
+   for(int i=0; i<ta.n(); i++) p_thresh.add(ta[i].get_value());
 
    // Setup forecast probabilistic contingency table
    Nx2ContingencyTable fcst_pct;
@@ -570,31 +571,33 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
    rps     = rpscl   = 0.0;
 
    // Loop over the fthresh entries and populate PCT tables for each
-   for(i=0; i<fthresh.n(); i++) {
+   for(int i=0; i<fthresh.n(); i++) {
 
       // Initialize PCT counts
       fcst_pct.zero_out();
       climo_pct.zero_out();
 
       // Derive climatological probabilities
+      NumArray climo_prob;
       if(cmn_flag) climo_prob = derive_climo_prob(pd.cdf_info_ptr,
                                                   pd.ocmn_na, pd.ocsd_na,
                                                   fthresh[i]);
 
       // Loop over the observations
-      for(j=0; j<pd.n_obs; j++) {
+      for(int j=0; j<pd.n_obs; j++) {
 
          // Store climo point data
          ClimoPntInfo cpi(pd.fcmn_na[j], pd.fcsd_na[j],
                           pd.ocmn_na[j], pd.ocsd_na[j]);
 
          // Loop over ensemble members and count events
-         for(k=0, n_event=0; k<n_prob; k++) {
+         int n_event = 0;
+         for(int k=0; k<n_prob; k++) {
             if(fthresh[i].check(pd.e_na[k][j], &cpi)) n_event++;
          }
 
          // Update the forecast PCT counts
-         p = (double) n_event/n_prob;
+         auto p = (double) n_event/n_prob;
          if(fthresh[i].check(pd.o_na[j], &cpi)) {
             fcst_pct.inc_event(p);
          }
