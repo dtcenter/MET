@@ -99,7 +99,7 @@ interp = {
 
 hira = {
    flag            = TRUE;
-   width           = [ 1, 3, 5, 10, 20 ];
+   width           = [ 1, 5, 10, 20 ];
    vld_thresh      = 1.0;
    cov_thresh      = [ ==0.10 ];
    shape           = SQUARE;
