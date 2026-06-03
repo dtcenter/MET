@@ -457,6 +457,33 @@ struct MaskLatLon {
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Struct to store wind vector metadata
+//
+
+struct WindVectorInfo {
+   StringArray u_wind;         // U-wind field names
+   StringArray v_wind;         // V-wind field names
+   StringArray wind_speed;     // Wind speed field names
+   StringArray wind_direction; // Wind direction field names
+   StringArray kinetic_energy; // Kinetic energy field names
+
+   WindVectorInfo() { clear(); }
+   ~WindVectorInfo() { clear(); }
+   WindVectorInfo(WindVectorInfo const &i) { *this = i; }
+   WindVectorInfo &operator=(const WindVectorInfo &a) noexcept;
+   bool operator==(const WindVectorInfo &) const;
+   void clear();
+
+   bool is_u_wind(const std::string &) const;
+   bool is_v_wind(const std::string &) const;
+   bool is_wind_speed(const std::string &) const;
+   bool is_wind_direction(const std::string &) const;
+   bool is_kinetic_energy(const std::string &) const;
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Enumeration for duplicate_flag configuration parameter
 //
 
@@ -750,6 +777,16 @@ static const char conf_key_ugrid_dataset[]          = "ugrid_dataset";
 static const char conf_key_ugrid_map_config[]       = "ugrid_map_config";
 static const char conf_key_ugrid_max_distance_km[]  = "ugrid_max_distance_km";
 static const char conf_key_ugrid_metadata_map[]     = "ugrid_metadata_map";
+
+//
+// Entries to define wind vector metadata
+//
+
+static const char conf_key_u_wind_field_name[]         = "u_wind_field_name";
+static const char conf_key_v_wind_field_name[]         = "v_wind_field_name";
+static const char conf_key_wind_speed_field_name[]     = "wind_speed_field_name";
+static const char conf_key_wind_direction_field_name[] = "wind_direction_field_name";
+static const char conf_key_kinetic_energy_field_name[] = "kinetic_energy_field_name";
 
 //
 // Entries to override file metadata 
@@ -1329,8 +1366,6 @@ static const char conf_key_n_azimuth[]   = "n_azimuth";
 static const char conf_key_delta_range[] = "delta_range_km";
 static const char conf_key_rmw_scale[]   = "rmw_scale";
 static const char conf_key_compute_tangential_and_radial_winds[] = "compute_tangential_and_radial_winds";
-static const char conf_key_u_wind_field_name[] = "u_wind_field_name";
-static const char conf_key_v_wind_field_name[] = "v_wind_field_name";
 static const char conf_key_radial_velocity_field_name[] = "radial_velocity_field_name";
 static const char conf_key_tangential_velocity_field_name[] = "tangential_velocity_field_name";
 static const char conf_key_radial_velocity_long_field_name[] = "radial_velocity_long_field_name";

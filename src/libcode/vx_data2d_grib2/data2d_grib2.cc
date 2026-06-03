@@ -673,10 +673,12 @@ DataPlaneArray MetGrib2DataFile::check_derived( const VarInfoGrib2 *vinfo ){
 
       //  perform the derivation
       DataPlane plane_deriv;
-      if(vinfo->name() == "WIND") derive_wind(array_u[i], array_v[i],
-                                              plane_deriv);
-      else                        derive_wdir(array_u[i], array_v[i],
-                                              plane_deriv);
+      if(vinfo->name() == "WIND") derive_wind_speed(
+                                     array_u[i], array_v[i],
+                                     plane_deriv);
+      else                        derive_wind_direction(
+                                     array_u[i], array_v[i],
+                                     plane_deriv);
 
       //  add the current data plane
       array_ret.add(plane_deriv, array_u.lower(i), array_u.upper(i));

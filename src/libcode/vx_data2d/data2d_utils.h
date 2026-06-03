@@ -20,27 +20,33 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-extern bool build_grid_by_grid_string(const char *attr_grid, Grid &grid,
-                                      const char *caller_name=nullptr,
-                                      bool do_warning=true);
+extern bool build_grid_by_grid_string(
+               const char *attr_grid, Grid &grid,
+               const char *caller_name=nullptr,
+               bool do_warning=true);
 
-extern bool build_grid_by_grid_string(const ConcatString &attr_grid, Grid &grid,
-                                      const char *caller_name=nullptr,
-                                      bool do_warning=true);
+extern bool build_grid_by_grid_string(
+               const ConcatString &attr_grid, Grid &grid,
+               const char *caller_name=nullptr,
+               bool do_warning=true);
 
-extern bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
-                        DataPlane &wdir);
+extern bool derive_wind_direction(
+               const DataPlane &u2d, const DataPlane &v2d,
+               DataPlane &wdir);
 
-extern bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
-                        DataPlane &wind);
+extern bool derive_wind_speed(
+               const DataPlane &u2d, const DataPlane &v2d,
+               DataPlane &wind);
 
-extern void rotate_wdir_grid_to_earth(const DataPlane &wdir2d,
-                                      const Grid &,
-                                      DataPlane &wdir2d_rot);
+extern void rotate_wind_direction_grid_to_earth(
+               const DataPlane &wdir2d,
+               const Grid &,
+               DataPlane &wdir2d_rot);
 
-extern bool rotate_uv_grid_to_earth(const DataPlane &u2d, const DataPlane &v2d,
-                                    const Grid &,
-                                    DataPlane &u2d_rot, DataPlane &v2d_rot);
+extern bool rotate_uv_grid_to_earth(
+               const DataPlane &u2d, const DataPlane &v2d,
+               const Grid &,
+               DataPlane &u2d_rot, DataPlane &v2d_rot);
 
 extern void set_attrs(const VarInfo *info, DataPlane &dp);
 

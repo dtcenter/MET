@@ -24,8 +24,9 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-bool build_grid_by_grid_string(const char *grid_str, Grid &grid,
-                               const char *caller_name, bool do_warning) {
+bool build_grid_by_grid_string(
+        const char *grid_str, Grid &grid,
+        const char *caller_name, bool do_warning) {
    bool status = false;
 
    if (nullptr != grid_str && m_strlen(grid_str) > 0) {
@@ -58,8 +59,9 @@ bool build_grid_by_grid_string(const char *grid_str, Grid &grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool build_grid_by_grid_string(const ConcatString &grid_str, Grid &grid,
-                               const char *caller_name, bool do_warning) {
+bool build_grid_by_grid_string(
+        const ConcatString &grid_str, Grid &grid,
+        const char *caller_name, bool do_warning) {
    bool status = false;
 
    if(grid_str.nonempty()) {
@@ -72,8 +74,9 @@ bool build_grid_by_grid_string(const ConcatString &grid_str, Grid &grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
-                 DataPlane &wdir2d) {
+bool derive_wind_direction(
+        const DataPlane &u2d, const DataPlane &v2d,
+        DataPlane &wdir2d) {
    const int nx = u2d.nx();
    const int ny = u2d.ny();
 
@@ -84,7 +87,7 @@ bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
    // Check that the dimensions match
    //
    if(u2d.nx() != v2d.nx() || u2d.ny() != v2d.ny()) {
-      mlog << Warning << "\nderive_wdir() -> "
+      mlog << Warning << "\nderive_wind_direction() -> "
            << "the dimensions for U and V do not match: ("
            << u2d.nx() << ", " << u2d.ny() << ") != ("
            << v2d.nx() << ", " << v2d.ny() << ")\n\n";
@@ -138,8 +141,9 @@ bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
-                 DataPlane &wind2d) {
+bool derive_wind_speed(
+        const DataPlane &u2d, const DataPlane &v2d,
+        DataPlane &wind2d) {
    const int nx = u2d.nx();
    const int ny = u2d.ny();
 
@@ -150,7 +154,7 @@ bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
    // Check that the dimensions match
    //
    if(u2d.nx() != v2d.nx() || u2d.ny() != v2d.ny()) {
-      mlog << Warning << "\nderive_wind() -> "
+      mlog << Warning << "\nderive_wind_speed() -> "
            << "the dimensions for U and V do not match: ("
            << u2d.nx() << ", " << u2d.ny() << ") != ("
            << v2d.nx() << ", " << v2d.ny() << ")\n\n";
@@ -204,8 +208,9 @@ bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
 
 ////////////////////////////////////////////////////////////////////////
 
-void rotate_wdir_grid_to_earth(const DataPlane &wdir2d, const Grid &g,
-                               DataPlane &wdir2d_rot) {
+void rotate_wind_direction_grid_to_earth(
+        const DataPlane &wdir2d, const Grid &g,
+        DataPlane &wdir2d_rot) {
    const int nx = wdir2d.nx();
    const int ny = wdir2d.ny();
 
@@ -263,9 +268,10 @@ void rotate_wdir_grid_to_earth(const DataPlane &wdir2d, const Grid &g,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool rotate_uv_grid_to_earth(const DataPlane &u2d, const DataPlane &v2d,
-                             const Grid &g,
-                             DataPlane &u2d_rot, DataPlane &v2d_rot) {
+bool rotate_uv_grid_to_earth(
+        const DataPlane &u2d, const DataPlane &v2d,
+        const Grid &g,
+        DataPlane &u2d_rot, DataPlane &v2d_rot) {
    const int nx = u2d.nx();
    const int ny = u2d.ny();
 

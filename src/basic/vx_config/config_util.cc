@@ -818,6 +818,112 @@ vector<MaskLatLon> parse_conf_llpnt_mask(Dictionary *dict) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//
+// Code for WindVectorInfo struct
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void WindVectorInfo::clear() {
+   u_wind.clear();
+   v_wind.clear();
+   wind_speed.clear();
+   wind_direction.clear();
+   kinetic_energy.clear();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool WindVectorInfo::operator==(const WindVectorInfo &v) const {
+   bool match = true;
+
+   if(!(u_wind         == v.u_wind        ) ||
+      !(v_wind         == v.v_wind        ) ||
+      !(wind_speed     == v.wind_speed    ) ||
+      !(wind_direction == v.wind_direction) || 
+      !(kinetic_energy == v.kinetic_energy)) {
+      match = false;
+   }
+
+   return match;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+WindVectorInfo &WindVectorInfo::operator=(const WindVectorInfo &a) noexcept {
+   if(this != &a) {
+      u_wind = a.u_wind;
+      v_wind = a.v_wind;
+      wind_speed = a.wind_speed;
+      wind_direction = a.wind_direction;
+      kinetic_energy = a.kinetic_energy;
+   }
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool WindVectorInfo::is_u_wind(const string &s) const {
+   return u_wind.has(s);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool WindVectorInfo::is_v_wind(const string &s) const {
+   return v_wind.has(s);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool WindVectorInfo::is_wind_speed(const string &s) const {
+   return wind_speed.has(s);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool WindVectorInfo::is_wind_direction(const string &s) const {
+   return wind_direction.has(s);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool WindVectorInfo::is_kinetic_energy(const string &s) const {
+   return kinetic_energy.has(s);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+WindVectorInfo parse_conf_wind_vector_info(Dictionary *dict) {
+   WindVectorInfo info;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_wind_vector_info() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: u_wind_field_name
+   info.u_wind = dict->lookup_string_array(conf_key_u_wind_field_name);
+
+   // Conf: v_wind_field_name
+   info.v_wind = dict->lookup_string_array(conf_key_v_wind_field_name);
+
+   // Conf: wind_speed_field_name
+   info.wind_speed = dict->lookup_string_array(conf_key_wind_speed_field_name);
+
+   // Conf: wind_direction_field_name
+   info.wind_direction = dict->lookup_string_array(conf_key_wind_direction_field_name);
+
+   // Conf: kinetic_energy_field_name
+   info.kinetic_energy = dict->lookup_string_array(conf_key_kinetic_energy_field_name);
+
+   return info;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Utility parsing functions
+//
+///////////////////////////////////////////////////////////////////////////////
 
 SingleThresh parse_conf_quality_mark_thresh(Dictionary *dict) {
    const char *method_name = "parse_conf_quality_mark_thresh() -> ";

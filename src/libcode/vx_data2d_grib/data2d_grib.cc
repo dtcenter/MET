@@ -595,11 +595,11 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
 
             // Derive wind direction
             if(vinfo_grib->code() == wdir_grib_code) {
-               derive_wdir(u_plane_array[i], v_plane_array[i], cur_plane);
+               derive_wind_direction(u_plane_array[i], v_plane_array[i], cur_plane);
             }
             // Derive wind speed
             else {
-               derive_wind(u_plane_array[i], v_plane_array[i], cur_plane);
+               derive_wind_speed(u_plane_array[i], v_plane_array[i], cur_plane);
             }
 
             // Add the current data plane
@@ -656,7 +656,7 @@ void MetGrib1DataFile::rotate_winds(VarInfoGrib &vinfo_grib, DataPlane &plane) {
    else if(vinfo_grib.is_wind_direction()) {
       mlog << Debug(3) << "MetGrib1DataFile::rotate_winds() -> "
            << "Have wind direction, calling rotate.\n";
-      rotate_wdir_grid_to_earth(plane, grid(), u2d);
+      rotate_wind_direction_grid_to_earth(plane, grid(), u2d);
       plane = u2d;
    }
 
