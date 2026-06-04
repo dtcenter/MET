@@ -119,6 +119,8 @@ void VarInfo::assign(const VarInfo &v) {
    DefaultRegrid = v.DefaultRegrid;
    Regrid = v.Regrid;
 
+   WindInfo = v.WindInfo;
+
    SetAttrName = v.SetAttrName;
    SetAttrUnits = v.SetAttrUnits;
    SetAttrLevel = v.SetAttrLevel;
@@ -179,6 +181,8 @@ void VarInfo::clear() {
 
    DefaultRegrid.clear();
    Regrid.clear();
+
+   WindInfo.clear();
 
    SetAttrName.clear();
    SetAttrUnits.clear();
@@ -548,6 +552,9 @@ bool VarInfo::set_dict(Dictionary &dict, bool do_exit) {
 
    // Parse regrid, if present
    Regrid = parse_conf_regrid(&dict, &DefaultRegrid, false);
+
+   // Parse wind metadata
+   WindInfo = parse_conf_wind_metadata(&dict);
 
    // Parse set_attr strings
    SetAttrName =

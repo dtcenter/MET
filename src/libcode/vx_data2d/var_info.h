@@ -60,6 +60,8 @@ class VarInfo
       RegridInfo    DefaultRegrid; // Default regridding logic
       RegridInfo    Regrid;        // Regridding logic
 
+      WindMetadata  WindInfo;  // Wind variable metadata
+
       // Options to override metadata
       ConcatString  SetAttrName;
       ConcatString  SetAttrUnits;

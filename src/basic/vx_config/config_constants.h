@@ -460,18 +460,18 @@ struct MaskLatLon {
 // Struct to store wind vector metadata
 //
 
-struct WindVectorInfo {
+struct WindMetadata {
    StringArray u_wind;         // U-wind field names
    StringArray v_wind;         // V-wind field names
    StringArray wind_speed;     // Wind speed field names
    StringArray wind_direction; // Wind direction field names
    StringArray kinetic_energy; // Kinetic energy field names
 
-   WindVectorInfo() { clear(); }
-   ~WindVectorInfo() { clear(); }
-   WindVectorInfo(WindVectorInfo const &i) { *this = i; }
-   WindVectorInfo &operator=(const WindVectorInfo &a) noexcept;
-   bool operator==(const WindVectorInfo &) const;
+   WindMetadata() { clear(); }
+   ~WindMetadata() { clear(); }
+   WindMetadata(WindMetadata const &i) { *this = i; }
+   WindMetadata &operator=(const WindMetadata &a) noexcept;
+   bool operator==(const WindMetadata &) const;
    void clear();
 
    bool is_u_wind(const std::string &) const;
