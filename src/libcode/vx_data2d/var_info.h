@@ -88,7 +88,7 @@ class VarInfo
       void assign(const VarInfo &);
       bool handle_config_error(const ConcatString &msg, bool do_exit) const;
       bool is_flag_set(int) const;
-      int  check_wind_info(int, const StringArray &) const;
+      int  get_wind_flag(int, const StringArray &) const;
       void parse_and_set_name_level(Dictionary &dict);
       bool validate_censor_arrays(const ThreshArray &ta, const NumArray &na,
                                   bool do_exit, const char *caller_name=nullptr) const;
@@ -216,6 +216,7 @@ class VarInfo
       virtual bool is_v_wind()            const;
       virtual bool is_wind_speed()        const;
       virtual bool is_wind_direction()    const;
+      virtual bool is_grid_relative()     const;
               bool is_prob()              const;
 };
 

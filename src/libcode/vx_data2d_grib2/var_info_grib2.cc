@@ -482,9 +482,8 @@ bool VarInfoGrib2::is_precipitation() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsPrecipitation)) {
-      return(SetAttrIsPrecipitation != 0);
-   }
+   int flag = SetAttrIsPrecipitation;
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Reference:
@@ -507,9 +506,8 @@ bool VarInfoGrib2::is_specific_humidity() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsSpecificHumidity)) {
-      return(SetAttrIsSpecificHumidity != 0);
-   }
+   int flag = SetAttrIsSpecificHumidity;
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Reference:
@@ -527,9 +525,8 @@ bool VarInfoGrib2::is_u_wind() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsUWind)) {
-      return(SetAttrIsUWind != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsUWind, WindInfo.u_wind);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Reference:
@@ -549,9 +546,8 @@ bool VarInfoGrib2::is_v_wind() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsVWind)) {
-      return(SetAttrIsVWind != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsVWind, WindInfo.v_wind);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Reference:
@@ -571,9 +567,8 @@ bool VarInfoGrib2::is_wind_speed() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsWindSpeed)) {
-      return(SetAttrIsWindSpeed != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsWindSpeed, WindInfo.wind_speed);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Reference:
@@ -593,9 +588,8 @@ bool VarInfoGrib2::is_wind_direction() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsWindDirection)) {
-      return(SetAttrIsWindDirection != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsWindDirection, WindInfo.wind_direction);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Reference:

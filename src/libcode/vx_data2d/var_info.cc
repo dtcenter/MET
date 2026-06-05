@@ -781,11 +781,11 @@ bool VarInfo::is_flag_set(int flag) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int VarInfo::check_wind_info(const int set_attr_val,
-                             const StringArray &field_names) const {
+int VarInfo::get_wind_flag(const int set_attr_val,
+                           const StringArray &field_names) const {
    int flag = bad_data_double;
 
-   // Use explicit definition, if provided
+   // Use explicit boolean definition, if provided
    if(!is_bad_data(set_attr_val)) flag = set_attr_val != 0;
 
    // Otherwise, check the list of field names
@@ -809,29 +809,35 @@ bool VarInfo::is_specific_humidity() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_u_wind() const {
-   return is_flag_set(check_wind_info(SetAttrIsUWind,
-                                      WindInfo.u_wind));
+   return is_flag_set(get_wind_flag(SetAttrIsUWind,
+                                    WindInfo.u_wind));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_v_wind() const {
-   return is_flag_set(check_wind_info(SetAttrIsVWind,
-                                      WindInfo.v_wind));
+   return is_flag_set(get_wind_flag(SetAttrIsVWind,
+                                    WindInfo.v_wind));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_wind_speed() const {
-   return is_flag_set(check_wind_info(SetAttrIsWindSpeed,
-                                      WindInfo.wind_speed));
+   return is_flag_set(get_wind_flag(SetAttrIsWindSpeed,
+                                    WindInfo.wind_speed));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_wind_direction() const {
-   return is_flag_set(check_wind_info(SetAttrIsWindDirection,
-                                      WindInfo.wind_direction));
+   return is_flag_set(get_wind_flag(SetAttrIsWindDirection,
+                                    WindInfo.wind_direction));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_grid_relative() const {
+   return is_flag_set(SetAttrIsGridRelative);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
