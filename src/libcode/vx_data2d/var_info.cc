@@ -809,25 +809,29 @@ bool VarInfo::is_specific_humidity() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_u_wind() const {
-   return is_flag_set(check_wind_info(SetAttrIsUWind, WindInfo.u_wind));
+   return is_flag_set(check_wind_info(SetAttrIsUWind,
+                                      WindInfo.u_wind));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_v_wind() const {
-   return is_flag_set(check_wind_info(SetAttrIsVWind, WindInfo.v_wind));
+   return is_flag_set(check_wind_info(SetAttrIsVWind,
+                                      WindInfo.v_wind));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_wind_speed() const {
-   return is_flag_set(check_wind_info(SetAttrIsWindSpeed, WindInfo.wind_speed));
+   return is_flag_set(check_wind_info(SetAttrIsWindSpeed,
+                                      WindInfo.wind_speed));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_wind_direction() const {
-   return is_flag_set(check_wind_info(SetAttrIsWindDirection, WindInfo.wind_speed));
+   return is_flag_set(check_wind_info(SetAttrIsWindDirection,
+                                      WindInfo.wind_direction));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

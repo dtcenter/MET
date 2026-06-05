@@ -33,7 +33,6 @@ u_wind_field_name = "UGRD,U";
 v_wind_field_name = "VGRD,V";
 wind_speed_field_name = "WIND,SP";
 wind_direction_field_name = "WDIR,DD";
-kinetic_energy_field_name = "KENG,KE";
 
 ////////////////////////////////////////////////////////////////////////////////
 //

@@ -828,7 +828,6 @@ void WindMetadata::clear() {
    v_wind.clear();
    wind_speed.clear();
    wind_direction.clear();
-   kinetic_energy.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -839,8 +838,7 @@ bool WindMetadata::operator==(const WindMetadata &v) const {
    if(!(u_wind         == v.u_wind        ) ||
       !(v_wind         == v.v_wind        ) ||
       !(wind_speed     == v.wind_speed    ) ||
-      !(wind_direction == v.wind_direction) || 
-      !(kinetic_energy == v.kinetic_energy)) {
+      !(wind_direction == v.wind_direction)) {
       match = false;
    }
 
@@ -855,39 +853,8 @@ WindMetadata &WindMetadata::operator=(const WindMetadata &a) noexcept {
       v_wind = a.v_wind;
       wind_speed = a.wind_speed;
       wind_direction = a.wind_direction;
-      kinetic_energy = a.kinetic_energy;
    }
    return *this;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-bool WindMetadata::is_u_wind(const string &s) const {
-   return u_wind.has(s);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-bool WindMetadata::is_v_wind(const string &s) const {
-   return v_wind.has(s);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-bool WindMetadata::is_wind_speed(const string &s) const {
-   return wind_speed.has(s);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-bool WindMetadata::is_wind_direction(const string &s) const {
-   return wind_direction.has(s);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-bool WindMetadata::is_kinetic_energy(const string &s) const {
-   return kinetic_energy.has(s);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -912,9 +879,6 @@ WindMetadata parse_conf_wind_metadata(Dictionary *dict) {
 
    // Conf: wind_direction_field_name
    info.wind_direction.parse_css(dict->lookup_string(conf_key_wind_direction_field_name));
-
-   // Conf: kinetic_energy_field_name
-   info.kinetic_energy.parse_css(dict->lookup_string(conf_key_kinetic_energy_field_name));
 
    return info;
 }

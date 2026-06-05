@@ -465,7 +465,7 @@ struct WindMetadata {
    StringArray v_wind;         // V-wind field names
    StringArray wind_speed;     // Wind speed field names
    StringArray wind_direction; // Wind direction field names
-   StringArray kinetic_energy; // Kinetic energy field names
+   ConcatString standard_name; // Standard field name, optional
 
    WindMetadata() { clear(); }
    ~WindMetadata() { clear(); }
@@ -474,11 +474,15 @@ struct WindMetadata {
    bool operator==(const WindMetadata &) const;
    void clear();
 
-   bool is_u_wind(const std::string &) const;
-   bool is_v_wind(const std::string &) const;
-   bool is_wind_speed(const std::string &) const;
-   bool is_wind_direction(const std::string &) const;
-   bool is_kinetic_energy(const std::string &) const;
+   bool is_u_wind(const std::string &s) const { return u_wind.has(s); }
+   bool is_v_wind(const std::string &s) const { return v_wind.has(s); }
+   bool is_wind_speed(const std::string &s) const { return wind_speed.has(s); }
+   bool is_wind_direction(const std::string &s) const { return wind_direction.has(s); }
+
+   // Supported derivations
+   bool is_kinetic_energy(const std::string &s) const { return s == "KENG"; }
+   bool is_vorticity(const std::string &s) const { return s == "ABSV"; }
+   bool is_divergence(const std::string &s) const { return s == "ABSD"; }
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -786,7 +790,6 @@ static const char conf_key_u_wind_field_name[]         = "u_wind_field_name";
 static const char conf_key_v_wind_field_name[]         = "v_wind_field_name";
 static const char conf_key_wind_speed_field_name[]     = "wind_speed_field_name";
 static const char conf_key_wind_direction_field_name[] = "wind_direction_field_name";
-static const char conf_key_kinetic_energy_field_name[] = "kinetic_energy_field_name";
 
 //
 // Entries to override file metadata 
