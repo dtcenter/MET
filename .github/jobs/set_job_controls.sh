@@ -6,7 +6,7 @@ run_unit_tests=false
 run_diff=false
 run_update_truth=false
 met_base_repo=met-base
-met_base_tag=3.4-latest
+met_base_tag=3.5-latest
 input_data_version=develop
 truth_data_version=develop
 
