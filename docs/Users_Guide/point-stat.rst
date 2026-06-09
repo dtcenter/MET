@@ -1563,7 +1563,7 @@ The first set of header columns are common to all of the output files generated 
     - Double
   * - 74-76
     - DIR_ERR, :raw-html:`<br />` DIR_ERR_BCL, :raw-html:`<br />` DIR_ERR_BCU
-    - Signed angle between the directions of the average forecast and observed wing vectors. Positive if the forecast wind vector is counterclockwise from the observed wind vector including bootstrap upper and lower confidence limits
+    - Signed angle between the directions of the average forecast and observed wind vectors. Positive if the forecast wind vector is counterclockwise from the observed wind vector including bootstrap upper and lower confidence limits
     - Double
   * - 77-79
     - DIR_ABSERR, :raw-html:`<br />` DIR_ABSERR_BCL, :raw-html:`<br />` DIR_ABSERR_BCU
