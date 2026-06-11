@@ -362,6 +362,261 @@ return n_valid;
 ////////////////////////////////////////////////////////////////////////
 
 
+bool Met2dDataFile::derive_data_plane(VarInfo *vinfo, DataPlane &dp)
+
+{
+
+if(!vinfo) return false;
+
+bool status = false;
+
+   //
+   // Derive wind speed and direction from U and V
+   //
+
+if(vinfo->is_wind_speed() || vinfo->is_wind_direction()) {
+   DataPlane u_dp;
+   DataPlane v_dp;
+   status = read_wind_data_plane(vinfo, vinfo->wind_info().u_wind, u_dp) &&
+            read_wind_data_plane(vinfo, vinfo->wind_info().v_wind, v_dp);
+
+   if(status) {
+      if(vinfo->is_wind_speed()) {
+         status = derive_wind_speed(u_dp, v_dp, dp);
+      }
+      else {
+         status = derive_wind_direction(u_dp, v_dp, dp);
+      }
+   }
+}
+
+   //
+   // Derive U and V from wind speed and direction
+   //
+
+else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
+   DataPlane spd_dp;
+   DataPlane dir_dp;
+   status = read_wind_data_plane(vinfo, vinfo->wind_info().wind_speed, spd_dp) &&
+            read_wind_data_plane(vinfo, vinfo->wind_info().wind_direction, dir_dp);
+
+   if(status) {
+      if(vinfo->is_wind_speed()) {
+         status = derive_u_wind(spd_dp, dir_dp, dp);
+      }
+      else {
+         status = derive_v_wind(spd_dp, dir_dp, dp);
+      }
+   }
+}
+
+return status;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Met2dDataFile::derive_data_plane_array(VarInfo *vinfo,
+                                            DataPlaneArray &dpa)
+
+{
+
+if(!vinfo) return false;
+
+bool status = false;
+
+   //
+   // Derive wind speed and direction from U and V
+   //
+
+if(vinfo->is_wind_speed() || vinfo->is_wind_direction()) {
+   DataPlaneArray uwnd_dpa;
+   DataPlaneArray vwnd_dpa;
+   status = read_wind_data_plane_array(vinfo, vinfo->wind_info().u_wind, uwnd_dpa) &&
+            read_wind_data_plane_array(vinfo, vinfo->wind_info().v_wind, vwnd_dpa);
+
+   if(!status) return status;
+
+   if(uwnd_dpa.n_planes() != vwnd_dpa.n_planes()) {
+      mlog << Warning << "\nMet2dDataFile::derive_data_plane_array() -> "
+           << "when deriving winds, the number of U-wind records ("
+           << uwnd_dpa.n_planes()
+           << ") does not match the number of V-wind records ("
+           << vwnd_dpa.n_planes()
+           << ") for file '" << filename() << "'\n\n";
+      return false;
+   }
+
+   //
+   // Loop through each of the data planes
+   //
+   for(int i=0; i<uwnd_dpa.n_planes(); i++) {
+
+      // Levels must match
+      if(!is_eq(uwnd_dpa.lower(i), vwnd_dpa.lower(i)) ||
+         !is_eq(uwnd_dpa.upper(i), vwnd_dpa.upper(i)) ){
+         mlog << Warning << "\nMet2dDataFile::derive_data_plane_array() -> "
+              << "when deriving winds for level " << i+1
+              << ", the U-wind levels (" << uwnd_dpa.lower(i)
+              << ", " << uwnd_dpa.upper(i)
+              << ") do not match the V-wind levels ("
+              << vwnd_dpa.lower(i) << ", " << vwnd_dpa.upper(i)
+              << ") in file '" << filename() << "'\n\n";
+         return false;
+      }
+
+      // Do the derivation
+      DataPlane dp;
+      if(vinfo->is_wind_speed()) {
+         status = derive_wind_speed(uwnd_dpa[i], vwnd_dpa[i], dp);
+      }
+      else {
+         status = derive_wind_direction(uwnd_dpa[i], vwnd_dpa[i], dp);
+      }
+
+      // Store the result
+      dpa.add(dp, uwnd_dpa.lower(i), uwnd_dpa.upper(i));
+   }
+}
+
+   //
+   // Derive U and V from wind speed and direction
+   //
+
+else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
+   DataPlaneArray wspd_dpa;
+   DataPlaneArray wdir_dpa;
+   status = read_wind_data_plane_array(vinfo, vinfo->wind_info().wind_speed, wspd_dpa) &&
+            read_wind_data_plane_array(vinfo, vinfo->wind_info().wind_direction, wdir_dpa);
+
+   if(!status) return status;
+
+   if(wspd_dpa.n_planes() != wdir_dpa.n_planes()) {
+      mlog << Warning << "\nMet2dDataFile::derive_data_plane_array() -> "
+           << "when deriving winds, the number of wind speed records ("
+           << wspd_dpa.n_planes()
+           << ") does not match the number of wind direction records ("
+           << wdir_dpa.n_planes()
+           << ") for file '" << filename() << "'\n\n";
+      return false;
+   }
+
+   //
+   // Loop through each of the data planes
+   //
+   for(int i=0; i<wspd_dpa.n_planes(); i++) {
+
+      // Levels must match
+      if(!is_eq(wspd_dpa.lower(i), wdir_dpa.lower(i)) ||
+         !is_eq(wspd_dpa.upper(i), wdir_dpa.upper(i)) ){
+         mlog << Warning << "\nMet2dDataFile::derive_data_plane_array() -> "
+              << "when deriving winds for level " << i+1
+              << ", the wind speed levels (" << wspd_dpa.lower(i)
+              << ", " << wspd_dpa.upper(i)
+              << ") do not match the wind direction levels ("
+              << wdir_dpa.lower(i) << ", " << wdir_dpa.upper(i)
+              << ") in file '" << filename() << "'\n\n";
+         return false;
+      }
+
+      // Do the derivation
+      DataPlane dp;
+      if(vinfo->is_u_wind()) {
+         status = derive_u_wind(wspd_dpa[i], wdir_dpa[i], dp);
+      }
+      else {
+         status = derive_v_wind(wspd_dpa[i], wdir_dpa[i], dp);
+      }
+
+      // Store the result
+      dpa.add(dp, wspd_dpa.lower(i), wspd_dpa.upper(i));
+   }
+}
+
+return status;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Met2dDataFile::read_wind_data_plane(VarInfo *vinfo,
+                                         const StringArray &names,
+                                         DataPlane &dp)
+
+{
+
+if(!vinfo) return false;
+
+bool status = false;
+
+    // Copy input VarInfo
+
+VarInfo * vinfo_cur = vinfo->clone();
+
+    // Try each of the possible names
+
+for(int i=0; i<names.n(); i++) {
+   vinfo_cur->set_name(names[i]);
+   vinfo_cur->set_magic(names[i], vinfo_cur->level_name());
+   if(data_plane(*vinfo_cur, dp, false)) {
+      status = true;
+      break;
+   }
+}
+
+   // Cleanup
+
+if(vinfo_cur) { delete vinfo_cur; vinfo_cur = nullptr; }
+
+return status;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Met2dDataFile::read_wind_data_plane_array(VarInfo *vinfo,
+                                               const StringArray &names,
+                                               DataPlaneArray &dpa)
+
+{
+
+if(!vinfo) return false;
+
+bool status = false;
+
+    // Copy input VarInfo
+
+VarInfo * vinfo_cur = vinfo->clone();
+
+    // Try each of the possible names
+
+for(int i=0; i<names.n(); i++) {
+   vinfo_cur->set_name(names[i]);
+   vinfo_cur->set_magic(names[i], vinfo_cur->level_name());
+   if(data_plane_array(*vinfo_cur, dpa, false)) {
+      status = true;
+      break;
+   }
+}
+
+   // Cleanup
+
+if(vinfo_cur) { delete vinfo_cur; vinfo_cur = nullptr; }
+
+return status;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool Met2dDataFile::process_data_plane(VarInfo *vinfo, DataPlane &dp)
 
 {

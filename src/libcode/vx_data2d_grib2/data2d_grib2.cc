@@ -148,7 +148,8 @@ void MetGrib2DataFile::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
+bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
+                                  bool do_derive) {
 
    //  narrow the vinfo pointer
    auto vinfo_g2 = (VarInfoGrib2*)(&vinfo);
@@ -159,26 +160,24 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    find_record_matches(vinfo_g2, listMatch, listMatchRange);
 
    //  if no matches were found, check for derived records
-   if( 1 > listMatch.size() ){
-
-      DataPlaneArray plane_array = check_derived(vinfo_g2);
+   if(listMatch.empty() && do_derive) {
+      DataPlaneArray plane_array;
+      derive_data_plane_array(vinfo_g2, plane_array);
 
       //  verify that only a single data_plane was found
-      if( 1 > plane_array.n_planes() ){
+      if(plane_array.n_planes() < 1){
 
          mlog << Warning << "\nMetGrib2DataFile::data_plane() -> "
               << "No matching record found for '"
               << vinfo_g2->magic_str() << "'\n\n";
          return false;
 
-      } else if( 1 < plane_array.n_planes() ){
+      } else if(plane_array.n_planes() > 1) {
 
          mlog << Warning << "\nMetGrib2DataFile::data_plane() -> "
-              << "Wind speed/direction derivation found "
-              << plane_array.n_planes()
-              << " matching records found for '"
+              << "found " << plane_array.n_planes()
+              << " matching derived records for '"
               << vinfo_g2->magic_str() << "'\n\n";
-
       }
 
       //  report the matched record
@@ -240,7 +239,8 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 ////////////////////////////////////////////////////////////////////////
 
 int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
-                                       DataPlaneArray &plane_array) {
+                                       DataPlaneArray &plane_array,
+                                       bool do_derive) {
 
    // Initialize
    plane_array.clear();
@@ -307,12 +307,12 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
    }
 
    //  if nothing was found, try to build derived records
-   else {
+   else if(do_derive) {
 
-      plane_array = check_derived(vinfo_g2);
+      derive_data_plane_array(vinfo_g2, plane_array);
 
       //  if no matches were found, bail
-      if( 1 > plane_array.n_planes() ){
+      if(plane_array.n_planes() < 1) {
          mlog << Warning << "\nMetGrib2DataFile::data_plane_array() -> "
               << "No matching records found for '"
               << vinfo_g2->magic_str() << "'\n\n";
@@ -321,9 +321,8 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
 
       //  report the matched record
       mlog << Debug(3) << "\nMetGrib2DataFile::data_plane_array() -> "
-           << "Wind speed/direction derivation "
            << "found " << plane_array.n_planes()
-           << " matching records found for '"
+           << " matching derived records for '"
            << vinfo_g2->magic_str() << "'\n\n";
 
       return plane_array.n_planes();
@@ -620,72 +619,6 @@ DataPlane MetGrib2DataFile::check_uv_rotation(const VarInfoGrib2 *vinfo, Grib2Re
    else                        { plane = v2d_rot; }
 
    return plane;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-DataPlaneArray MetGrib2DataFile::check_derived( const VarInfoGrib2 *vinfo ){
-   DataPlaneArray array_ret;
-
-   //  if the requested field cannot be derived, bail
-   if( vinfo->name() != "WIND" &&
-       vinfo->name() != "WDIR" ) {
-      return array_ret;
-   }
-
-   //  read the data_plane objects for each constituent
-   DataPlaneArray array_u, array_v;
-   VarInfoGrib2 vinfo_cons(*vinfo);
-   vinfo_cons.set_name( ugrd_abbr_str );
-   data_plane_array(vinfo_cons, array_u);
-   vinfo_cons.set_name( vgrd_abbr_str );
-   data_plane_array(vinfo_cons, array_v);
-
-   //  derive wind speed or direction
-   if( array_u.n_planes() != array_v.n_planes() ){
-      mlog << Warning << "\nMetGrib2DataFile::data_plane_array() -> "
-           << "when deriving winds, the number of U-wind records ("
-           << array_u.n_planes()
-           << ") does not match the number of V-wind record ("
-           << array_v.n_planes()
-           << ") for GRIB2 file '" << filename() << "'\n\n";
-
-      return array_ret;
-   }
-
-   //  loop through each of the data planes
-   for(int i=0; i < array_u.n_planes(); i++) {
-
-      //  check that the current level values match
-      if( !is_eq(array_u.lower(i), array_v.lower(i)) ||
-          !is_eq(array_u.upper(i), array_v.upper(i)) ){
-
-         mlog << Warning << "\nMetGrib1DataFile::data_plane_array() -> "
-              << "when deriving winds for level " << i+1
-              << ", the U-wind levels (" << array_u.lower(i)
-              << ", " << array_u.upper(i)
-              << ") do not match the V-wind levels ("
-              << array_v.lower(i) << ", " << array_v.upper(i)
-              << ") in GRIB file '" << filename() << "'\n\n";
-
-         return array_ret;
-      }
-
-      //  perform the derivation
-      DataPlane plane_deriv;
-      if(vinfo->name() == "WIND") derive_wind_speed(
-                                     array_u[i], array_v[i],
-                                     plane_deriv);
-      else                        derive_wind_direction(
-                                     array_u[i], array_v[i],
-                                     plane_deriv);
-
-      //  add the current data plane
-      array_ret.add(plane_deriv, array_u.lower(i), array_u.upper(i));
-
-   }
-
-   return array_ret;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -270,53 +270,54 @@ Grid MetNcCFDataFile::build_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_va
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
-{
-  // Not sure why we do this
-
-  auto vinfo_nc = (VarInfoNcCF *)&vinfo;
-  static const string method_name
+bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
+                                 bool do_derive) {
+   auto vinfo_nc = (VarInfoNcCF *) &vinfo;
+   static const string method_name
       = "MetNcCFDataFile::data_plane(VarInfo &, DataPlane &) -> ";
 
-  LongArray dimension = vinfo_nc->dimension();
-  NcVarInfo *data_var = get_data_var(vinfo);
-  if (nullptr != data_var) {
-    int time_dim_slot = data_var->t_slot;
-    int zdim_slot = data_var->z_slot;
+   LongArray dimension = vinfo_nc->dimension();
+   NcVarInfo *data_var = get_data_var(vinfo);
+   if (nullptr != data_var) {
+      int time_dim_slot = data_var->t_slot;
+      int zdim_slot = data_var->z_slot;
 
-    // set vlevels if needed
-    _file->set_vlevels(data_var);
+      // set vlevels if needed
+      _file->set_vlevels(data_var);
 
-    for (int idx=0; idx<dimension.n_elements(); idx++) {
-      long dim_offset = dimension[idx];
-      if (dim_offset == vx_data2d_star) continue;
-      if (idx == time_dim_slot) {
-        dimension[time_dim_slot] = find_time_offset(vinfo, data_var);
+      for (int idx=0; idx<dimension.n_elements(); idx++) {
+         long dim_offset = dimension[idx];
+         if (dim_offset == vx_data2d_star) continue;
+         if (idx == time_dim_slot) {
+            dimension[time_dim_slot] = find_time_offset(vinfo, data_var);
+         }
+         else if (idx == zdim_slot) {
+            dimension[idx] = long(find_z_offset(vinfo, data_var));
+         }
+         else {
+            mlog << Debug(7) << method_name << "parsing generic dimension " << idx
+                 << " for \"" << vinfo.req_name() << "\" variable.\n\n";
+
+            dimension[idx] = long(find_generic_offset(vinfo, data_var, idx));
+         }
       }
-      else if (idx == zdim_slot) {
-        dimension[idx] = long(find_z_offset(vinfo, data_var));
-      }
-      else {
-         mlog << Debug(7) << method_name << "parsing generic dimension " << idx
-              << " for \"" << vinfo.req_name() << "\" variable.\n\n";
+   }
 
-         dimension[idx] = long(find_generic_offset(vinfo, data_var, idx));
-      }
-    }
-  }
+   // Read the data
+   bool status = data_plane(vinfo, plane, dimension);
 
-  // Read the data
-  bool status = data_plane(vinfo, plane, dimension);
+   // Attempt to derive the data
+   if(!status && do_derive) {
+      status = derive_data_plane(vinfo_nc, plane);
+   }
 
-  return status;
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, const LongArray &dimension)
 {
-  // Not sure why we do this
-
   auto vinfo_nc = (VarInfoNcCF *)&vinfo;
   static const string method_name
       = "MetNcCFDataFile::data_plane(VarInfo &, DataPlane &, LongArray &) -> ";
@@ -393,7 +394,8 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, const LongArr
 ////////////////////////////////////////////////////////////////////////
 
 int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
-                                      DataPlaneArray &plane_array) {
+                                      DataPlaneArray &plane_array,
+                                      bool do_derive) {
    int n_rec = 0;
    DataPlane plane;
    bool status = false;
@@ -428,6 +430,11 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
    else if (data_plane(vinfo, plane)) {
       plane_array.add(plane, bad_data_int, bad_data_int);
       n_rec++;
+   }
+
+   // Attempt to derive the data
+   if(n_rec == 0 && do_derive) {
+      status = derive_data_plane_array(vinfo_nc, plane_array);
    }
 
    return n_rec;

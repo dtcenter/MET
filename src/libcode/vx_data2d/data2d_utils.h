@@ -30,13 +30,21 @@ extern bool build_grid_by_grid_string(
                const char *caller_name=nullptr,
                bool do_warning=true);
 
+extern bool derive_wind_speed(
+               const DataPlane &uwnd, const DataPlane &vwnd,
+               DataPlane &wspd);
+
 extern bool derive_wind_direction(
-               const DataPlane &u2d, const DataPlane &v2d,
+               const DataPlane &uwnd, const DataPlane &vwnd,
                DataPlane &wdir);
 
-extern bool derive_wind_speed(
-               const DataPlane &u2d, const DataPlane &v2d,
-               DataPlane &wind);
+extern bool derive_u_wind(
+               const DataPlane &wspd, const DataPlane &wdir,
+               DataPlane &uwnd);
+
+extern bool derive_v_wind(
+               const DataPlane &wspd, const DataPlane &wdir,
+               DataPlane &vwnd);
 
 extern void rotate_wind_direction_grid_to_earth(
                const DataPlane &wdir2d,

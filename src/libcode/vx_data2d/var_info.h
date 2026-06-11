@@ -148,6 +148,7 @@ class VarInfo
       NumArray     range()          const;
 
       RegridInfo   regrid()         const;
+      WindMetadata wind_info()      const;
 
       ConcatString magic_str_attr() const;
       ConcatString name_attr()      const;
@@ -254,6 +255,7 @@ inline int          VarInfo::n_bins()         const { return nBins;            }
 inline NumArray     VarInfo::range()          const { return Range;            }
 
 inline RegridInfo   VarInfo::regrid()         const { return Regrid;           }
+inline WindMetadata VarInfo::wind_info()      const { return WindInfo;         }
 
 inline ConcatString VarInfo::name_attr()      const { return(SetAttrName.empty()     ? name()       : SetAttrName);     }
 inline ConcatString VarInfo::units_attr()     const { return(SetAttrUnits.empty()    ? units()      : SetAttrUnits);    }

@@ -163,8 +163,8 @@ void MetUGridDataFile::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
-{
+bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
+                                  bool do_derive) {
    bool status = false;
    auto data_var = (NcVarInfo *)nullptr;
    static const string method_name
@@ -179,6 +179,11 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
    if (nullptr != data_var) {
       // Read the data
       status = data_plane(vinfo, plane, data_var);
+
+      // Attempt to derive the data
+      if(!status && do_derive) {
+         status = derive_data_plane(&vinfo, plane);
+      }
    }
    else {
       LevelInfo level = vinfo.level();
@@ -309,7 +314,8 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, const NcVarI
 ////////////////////////////////////////////////////////////////////////
 
 int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
-                                       DataPlaneArray &plane_array) {
+                                       DataPlaneArray &plane_array,
+                                       bool do_derive) {
    int n_rec = 0;
    DataPlane plane;
    static const string method_name
@@ -322,7 +328,7 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
    long lvl_lower = level.lower();
    long lvl_upper = level.upper();
    ConcatString req_name = vinfo.req_name();
-   NcVarInfo *data_vinfo  = _file->find_by_name(req_name.c_str());
+   NcVarInfo *data_vinfo = _file->find_by_name(req_name.c_str());
    if (level.type() == LevelType_Time) {
       mlog << Error << "\n" << method_name
            << "LevelType_Time for unstructured grid is not enabled\n\n";
@@ -375,7 +381,7 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
             }
          }
       }
-      else if (data_plane(vinfo, plane)) {
+      else if (data_plane(vinfo, plane, do_derive)) {
          plane_array.add(plane, lvl_lower, lvl_upper);
          n_rec++;
       }

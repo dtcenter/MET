@@ -62,11 +62,11 @@ class MetNcMetDataFile : public Met2dDataFile {
 
          //  retrieve the first matching data plane
 
-      bool data_plane(VarInfo &, DataPlane &);
+      bool data_plane(VarInfo &, DataPlane &, bool do_derive = true);
 
          //  retrieve all matching data planes
 
-      int data_plane_array(VarInfo &, DataPlaneArray &);
+      int data_plane_array(VarInfo &, DataPlaneArray &, bool do_derive = true);
 
          //  retrieve the index of the first matching record
 

@@ -121,7 +121,8 @@ void MetNcWrfDataFile::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
+bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
+                                  bool do_derive) {
    bool status = false;
    double pressure;
    ConcatString level_str;
@@ -152,6 +153,11 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    status = WrfNc->data(vinfo_nc->req_name().c_str(),
                         dimension, plane, pressure, info);
 
+   // Attempt to derive the data
+   if(!status && do_derive) {
+      status = derive_data_plane(vinfo_nc, plane);
+   }
+
    // Check that the times match those requested
    if(status) {
 
@@ -180,10 +186,13 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
       status = process_data_plane(&vinfo, plane);
 
       // Set the VarInfo object's name, long_name, and units strings
-      if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
-      else                                 vinfo.set_name(info->name);
-      if(info->long_name_att.length() > 0) vinfo.set_long_name(info->long_name_att.c_str());
-      if(info->units_att.length()     > 0) vinfo.set_units(info->units_att.c_str());
+      // Note that info is null for derived fields
+      if(info) {
+         if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
+         else                                 vinfo.set_name(info->name);
+         if(info->long_name_att.length() > 0) vinfo.set_long_name(info->long_name_att.c_str());
+         if(info->units_att.length()     > 0) vinfo.set_units(info->units_att.c_str());
+      }
 
       // Set the VarInfo object's level string for pressure levels
       if(!is_bad_data(pressure)) {
@@ -198,7 +207,8 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 ////////////////////////////////////////////////////////////////////////
 
 int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
-                                           DataPlaneArray &plane_array) {
+                                       DataPlaneArray &plane_array,
+                                       bool do_derive) {
    int i, i_dim, n_level, status, lower, upper;
    ConcatString level_str;
    double pressure, min_level, max_level;
@@ -245,6 +255,11 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
       status = WrfNc->data(vinfo_nc->req_name().c_str(),
                            cur_dim, cur_plane, pressure, info);
 
+      // Attempt to derive the data
+      if(!status && do_derive) {
+         status = derive_data_plane(vinfo_nc, cur_plane);
+      }
+
       // Check that the times match those requested
       if(status) {
 
@@ -283,7 +298,8 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
       plane_array.add(cur_plane, pressure, pressure);
 
       // Set the VarInfo object's name, long_name, and units strings
-      if(i==0) {
+      // Note that info is null for derived fields
+      if(i==0 && info) {
          if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
          else                                 vinfo.set_name(info->name);
          if(info->long_name_att.length() > 0) vinfo.set_long_name(info->long_name_att.c_str());

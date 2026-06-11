@@ -295,7 +295,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MetPythonDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
+bool MetPythonDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, bool)
 
 {
 
@@ -360,7 +360,9 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-int MetPythonDataFile::data_plane_array(VarInfo &vinfo, DataPlaneArray &plane_array)
+int MetPythonDataFile::data_plane_array(VarInfo &vinfo,
+                                        DataPlaneArray &plane_array,
+                                        bool)
 
 {
 

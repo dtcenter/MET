@@ -111,13 +111,11 @@ class MetGrib2DataFile : public Met2dDataFile {
 
       void read_grib2_record_list();
 
+      // JHG, move this to the base class
       DataPlane check_uv_rotation( const VarInfoGrib2 *vinfo,
                                    Grib2Record *rec,
                                    DataPlane plane
                                  );
-
-      DataPlaneArray check_derived( const VarInfoGrib2 *vinfo );
-
 
    public:
 
@@ -136,11 +134,11 @@ class MetGrib2DataFile : public Met2dDataFile {
 
          //  retrieve the first matching data plane
 
-      bool data_plane(VarInfo &, DataPlane &);
+      bool data_plane(VarInfo &, DataPlane &, bool do_derive = true);
 
          //  retrieve all matching data planes
 
-      int data_plane_array(VarInfo &, DataPlaneArray &);
+      int data_plane_array(VarInfo &, DataPlaneArray &, bool do_derive = true);
 
          //  retrieve the index of the first matching record
 
