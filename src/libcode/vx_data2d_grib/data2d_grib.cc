@@ -544,7 +544,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
 
    // If nothing was found, try to build derived records
    if(plane_array.n_planes() == 0 && do_derive) {
-      derive_data_plane_array(&vinfo, plane_array);
+      derive_winds(&vinfo, plane_array);
    }
 
    mlog << Debug(3) << "MetGrib1DataFile::data_plane_array() -> "

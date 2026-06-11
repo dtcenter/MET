@@ -362,7 +362,7 @@ return n_valid;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Met2dDataFile::derive_data_plane(VarInfo *vinfo, DataPlane &dp)
+bool Met2dDataFile::derive_winds(VarInfo *vinfo, DataPlane &dp)
 
 {
 
@@ -375,17 +375,25 @@ bool status = false;
    //
 
 if(vinfo->is_wind_speed() || vinfo->is_wind_direction()) {
-   DataPlane u_dp;
-   DataPlane v_dp;
-   status = read_wind_data_plane(vinfo, vinfo->wind_info().u_wind, u_dp) &&
-            read_wind_data_plane(vinfo, vinfo->wind_info().v_wind, v_dp);
+   DataPlane uwnd_dp;
+   DataPlane vwnd_dp;
+   ConcatString uwnd_units;
+   ConcatString vwnd_units;
+   status = read_wind_data(vinfo, vinfo->wind_info().u_wind,
+                           uwnd_dp, uwnd_units) &&
+            read_wind_data(vinfo, vinfo->wind_info().v_wind,
+                           vwnd_dp, vwnd_units);
 
    if(status) {
       if(vinfo->is_wind_speed()) {
-         status = derive_wind_speed(u_dp, v_dp, dp);
+         status = derive_wind_speed(uwnd_dp, vwnd_dp, dp);
+         vinfo->set_long_name("Wind Speed");
+         vinfo->set_units(uwnd_units);
       }
       else {
-         status = derive_wind_direction(u_dp, v_dp, dp);
+         status = derive_wind_direction(uwnd_dp, vwnd_dp, dp);
+         vinfo->set_long_name("Wind Direction");
+         vinfo->set_units("deg");
       }
    }
 }
@@ -395,17 +403,25 @@ if(vinfo->is_wind_speed() || vinfo->is_wind_direction()) {
    //
 
 else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
-   DataPlane spd_dp;
-   DataPlane dir_dp;
-   status = read_wind_data_plane(vinfo, vinfo->wind_info().wind_speed, spd_dp) &&
-            read_wind_data_plane(vinfo, vinfo->wind_info().wind_direction, dir_dp);
+   DataPlane wspd_dp;
+   DataPlane wdir_dp;
+   ConcatString wspd_units;
+   ConcatString wdir_units;
+   status = read_wind_data(vinfo, vinfo->wind_info().wind_speed,
+                           wspd_dp, wspd_units) &&
+            read_wind_data(vinfo, vinfo->wind_info().wind_direction,
+                           wdir_dp, wdir_units);
 
    if(status) {
-      if(vinfo->is_wind_speed()) {
-         status = derive_u_wind(spd_dp, dir_dp, dp);
+      if(vinfo->is_u_wind()) {
+         status = derive_u_wind(wspd_dp, wdir_dp, dp);
+         vinfo->set_long_name("U-Component of Wind");
+         vinfo->set_units(wspd_units);
       }
       else {
-         status = derive_v_wind(spd_dp, dir_dp, dp);
+         status = derive_v_wind(wspd_dp, wdir_dp, dp);
+         vinfo->set_long_name("V-Component of Wind");
+         vinfo->set_units(wspd_units);
       }
    }
 }
@@ -418,10 +434,11 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Met2dDataFile::derive_data_plane_array(VarInfo *vinfo,
-                                            DataPlaneArray &dpa)
+bool Met2dDataFile::derive_winds(VarInfo *vinfo, DataPlaneArray &dpa)
 
 {
+
+static const char *method_name = "Met2dDataFile::derive_winds() -> ";
 
 if(!vinfo) return false;
 
@@ -434,13 +451,26 @@ bool status = false;
 if(vinfo->is_wind_speed() || vinfo->is_wind_direction()) {
    DataPlaneArray uwnd_dpa;
    DataPlaneArray vwnd_dpa;
-   status = read_wind_data_plane_array(vinfo, vinfo->wind_info().u_wind, uwnd_dpa) &&
-            read_wind_data_plane_array(vinfo, vinfo->wind_info().v_wind, vwnd_dpa);
-
+   ConcatString uwnd_units;
+   ConcatString vwnd_units;
+   status = read_wind_data(vinfo, vinfo->wind_info().u_wind,
+                           uwnd_dpa, uwnd_units) &&
+            read_wind_data(vinfo, vinfo->wind_info().v_wind,
+                           vwnd_dpa, vwnd_units);
    if(!status) return status;
 
+   // Store the long name and units
+   if(vinfo->is_wind_speed()) {
+      vinfo->set_long_name("Wind Speed");
+      vinfo->set_units(uwnd_units);
+   }
+   else {
+      vinfo->set_long_name("Wind Direction");
+      vinfo->set_units("deg");
+   }
+
    if(uwnd_dpa.n_planes() != vwnd_dpa.n_planes()) {
-      mlog << Warning << "\nMet2dDataFile::derive_data_plane_array() -> "
+      mlog << Warning << "\n" << method_name
            << "when deriving winds, the number of U-wind records ("
            << uwnd_dpa.n_planes()
            << ") does not match the number of V-wind records ("
@@ -457,7 +487,7 @@ if(vinfo->is_wind_speed() || vinfo->is_wind_direction()) {
       // Levels must match
       if(!is_eq(uwnd_dpa.lower(i), vwnd_dpa.lower(i)) ||
          !is_eq(uwnd_dpa.upper(i), vwnd_dpa.upper(i)) ){
-         mlog << Warning << "\nMet2dDataFile::derive_data_plane_array() -> "
+         mlog << Warning << "\n" << method_name
               << "when deriving winds for level " << i+1
               << ", the U-wind levels (" << uwnd_dpa.lower(i)
               << ", " << uwnd_dpa.upper(i)
@@ -488,13 +518,27 @@ if(vinfo->is_wind_speed() || vinfo->is_wind_direction()) {
 else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
    DataPlaneArray wspd_dpa;
    DataPlaneArray wdir_dpa;
-   status = read_wind_data_plane_array(vinfo, vinfo->wind_info().wind_speed, wspd_dpa) &&
-            read_wind_data_plane_array(vinfo, vinfo->wind_info().wind_direction, wdir_dpa);
+   ConcatString wspd_units;
+   ConcatString wdir_units;
+   status = read_wind_data(vinfo, vinfo->wind_info().wind_speed,
+                           wspd_dpa, wspd_units) &&
+            read_wind_data(vinfo, vinfo->wind_info().wind_direction,
+                           wdir_dpa, wdir_units);
 
    if(!status) return status;
 
+   // Store the long name and units
+   if(vinfo->is_u_wind()) {
+      vinfo->set_long_name("U-Component of Wind");
+      vinfo->set_units(wspd_units);
+   }
+   else {
+      vinfo->set_long_name("V-Component of Wind");
+      vinfo->set_units(wspd_units);
+   }
+
    if(wspd_dpa.n_planes() != wdir_dpa.n_planes()) {
-      mlog << Warning << "\nMet2dDataFile::derive_data_plane_array() -> "
+      mlog << Warning << "\n" << method_name
            << "when deriving winds, the number of wind speed records ("
            << wspd_dpa.n_planes()
            << ") does not match the number of wind direction records ("
@@ -511,7 +555,7 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
       // Levels must match
       if(!is_eq(wspd_dpa.lower(i), wdir_dpa.lower(i)) ||
          !is_eq(wspd_dpa.upper(i), wdir_dpa.upper(i)) ){
-         mlog << Warning << "\nMet2dDataFile::derive_data_plane_array() -> "
+         mlog << Warning << "\n" << method_name
               << "when deriving winds for level " << i+1
               << ", the wind speed levels (" << wspd_dpa.lower(i)
               << ", " << wspd_dpa.upper(i)
@@ -543,9 +587,46 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Met2dDataFile::read_wind_data_plane(VarInfo *vinfo,
-                                         const StringArray &names,
-                                         DataPlane &dp)
+bool Met2dDataFile::rotate_winds(VarInfo *vinfo, DataPlane &dp)
+
+{
+
+if(!vinfo) return false;
+
+bool status = false;
+
+// JHG work here
+
+return status;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Met2dDataFile::rotate_winds(VarInfo *vinfo, DataPlaneArray &dpa)
+
+{
+
+if(!vinfo) return false;
+
+bool status = false;
+
+// JHG work here
+
+return status;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Met2dDataFile::read_wind_data(VarInfo *vinfo,
+                                   const StringArray &names,
+                                   DataPlane &dp,
+                                   ConcatString &units)
 
 {
 
@@ -564,6 +645,7 @@ for(int i=0; i<names.n(); i++) {
    vinfo_cur->set_magic(names[i], vinfo_cur->level_name());
    if(data_plane(*vinfo_cur, dp, false)) {
       status = true;
+      units = vinfo_cur->units();
       break;
    }
 }
@@ -580,9 +662,10 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Met2dDataFile::read_wind_data_plane_array(VarInfo *vinfo,
-                                               const StringArray &names,
-                                               DataPlaneArray &dpa)
+bool Met2dDataFile::read_wind_data(VarInfo *vinfo,
+                                   const StringArray &names,
+                                   DataPlaneArray &dpa,
+                                   ConcatString &units)
 
 {
 
@@ -601,6 +684,7 @@ for(int i=0; i<names.n(); i++) {
    vinfo_cur->set_magic(names[i], vinfo_cur->level_name());
    if(data_plane_array(*vinfo_cur, dpa, false)) {
       status = true;
+      units = vinfo_cur->units();
       break;
    }
 }

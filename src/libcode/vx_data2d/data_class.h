@@ -83,6 +83,11 @@ class Met2dDataFile : public Met2dData {
 
       void mtddf_init_from_scratch();
 
+      bool read_wind_data(VarInfo *, const StringArray &,
+                          DataPlane &, ConcatString &);
+      bool read_wind_data(VarInfo *, const StringArray &,
+                          DataPlaneArray &, ConcatString &);
+
       bool GridShifted;
 
    protected:
@@ -156,13 +161,13 @@ class Met2dDataFile : public Met2dData {
       int data_planes(std::vector<VarInfo*>&,
                       std::vector<DataPlane>&);
 
-      bool derive_data_plane(VarInfo *, DataPlane &);
+         //  derive and rotate wind fields
 
-      bool derive_data_plane_array(VarInfo *, DataPlaneArray &);
+      bool derive_winds(VarInfo *, DataPlane &);
+      bool derive_winds(VarInfo *, DataPlaneArray &);
 
-      bool read_wind_data_plane(VarInfo *, const StringArray &, DataPlane &);
-
-      bool read_wind_data_plane_array(VarInfo *, const StringArray &, DataPlaneArray &);
+      bool rotate_winds(VarInfo *, DataPlane &);
+      bool rotate_winds(VarInfo *, DataPlaneArray &);
 
          //  post-process data after reading it
 

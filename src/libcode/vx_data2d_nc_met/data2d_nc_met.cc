@@ -240,7 +240,7 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
 
    // Attempt to derive the data
    if(!status && do_derive) {
-      status = derive_data_plane(vinfo_nc, plane);
+      status = derive_winds(vinfo_nc, plane);
    }
 
    // Check that the times match those requested

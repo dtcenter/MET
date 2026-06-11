@@ -308,7 +308,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
 
    // Attempt to derive the data
    if(!status && do_derive) {
-      status = derive_data_plane(vinfo_nc, plane);
+      status = derive_winds(vinfo_nc, plane);
    }
 
    return status;
@@ -434,7 +434,7 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
 
    // Attempt to derive the data
    if(n_rec == 0 && do_derive) {
-      status = derive_data_plane_array(vinfo_nc, plane_array);
+      status = derive_winds(vinfo_nc, plane_array);
    }
 
    return n_rec;

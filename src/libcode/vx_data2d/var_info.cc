@@ -300,7 +300,7 @@ void VarInfo::set_name(const char *str) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfo::set_name(const string str) {
+void VarInfo::set_name(const string &str) {
    Name = str;
    return;
 }
@@ -322,6 +322,13 @@ void VarInfo::set_long_name(const char *str) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfo::set_units(const char *str) {
+   Units = str;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfo::set_units(const string &str) {
    Units = str;
    return;
 }

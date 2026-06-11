@@ -162,7 +162,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
    //  if no matches were found, check for derived records
    if(listMatch.empty() && do_derive) {
       DataPlaneArray plane_array;
-      derive_data_plane_array(vinfo_g2, plane_array);
+      derive_winds(vinfo_g2, plane_array);
 
       //  verify that only a single data_plane was found
       if(plane_array.n_planes() < 1){
@@ -309,7 +309,7 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
    //  if nothing was found, try to build derived records
    else if(do_derive) {
 
-      derive_data_plane_array(vinfo_g2, plane_array);
+      derive_winds(vinfo_g2, plane_array);
 
       //  if no matches were found, bail
       if(plane_array.n_planes() < 1) {
