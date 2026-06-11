@@ -642,7 +642,16 @@ VarInfo * vinfo_cur = vinfo->clone();
 
 for(int i=0; i<names.n(); i++) {
    vinfo_cur->set_name(names[i]);
-   vinfo_cur->set_magic(names[i], vinfo_cur->level_name());
+
+   // Wrap level in parenthesis, if needed
+   string lstr = vinfo_cur->level_name();
+   if(lstr.find(',') != string::npos &&
+      lstr.find('(') == string::npos) {
+      lstr.insert(0, "(");
+      lstr.append(")");
+   }
+   vinfo_cur->set_magic(names[i], lstr);
+
    if(data_plane(*vinfo_cur, dp, false)) {
       status = true;
       units = vinfo_cur->units();
@@ -681,7 +690,16 @@ VarInfo * vinfo_cur = vinfo->clone();
 
 for(int i=0; i<names.n(); i++) {
    vinfo_cur->set_name(names[i]);
-   vinfo_cur->set_magic(names[i], vinfo_cur->level_name());
+
+   // Wrap level in parenthesis, if needed
+   string lstr = vinfo_cur->level_name();
+   if(lstr.find(',') != string::npos &&
+      lstr.find('(') == string::npos) {
+      lstr.insert(0, "(");
+      lstr.append(")");
+   }
+   vinfo_cur->set_magic(names[i], lstr);
+
    if(data_plane_array(*vinfo_cur, dpa, false)) {
       status = true;
       units = vinfo_cur->units();

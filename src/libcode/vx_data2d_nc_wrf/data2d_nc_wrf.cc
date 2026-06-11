@@ -124,7 +124,7 @@ void MetNcWrfDataFile::dump(ostream & out, int depth) const {
 bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
                                   bool do_derive) {
    bool status = false;
-   double pressure;
+   double pressure = bad_data_double;
    ConcatString level_str;
    VarInfoNcWrf * vinfo_nc = (VarInfoNcWrf *) &vinfo;
    NcVarInfo *info = (NcVarInfo *) nullptr;
