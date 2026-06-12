@@ -35,16 +35,16 @@ class MetNcCFDataFile : public Met2dDataFile {
       MetNcCFDataFile & operator=(const MetNcCFDataFile &);
 
       int add_data_planes_by_time(VarInfo &vinfo, const LevelInfo &level,
-                                  DataPlaneArray &plane_array);
+                                  DataPlaneArray &plane_array, bool do_winds);
       int add_data_planes_by_z(VarInfo &vinfo, const LevelInfo &level,
-                               DataPlaneArray &plane_array);
+                               DataPlaneArray &plane_array, bool do_winds);
       LongArray collect_time_offsets(VarInfo &vinfo);
       LongArray collect_z_offsets(VarInfo &vinfo);
 
       long convert_generic_to_offset(double value, const std::string& dim_name, std::vector<double> values);
       long convert_time_to_offset(double time_value) const;
       long convert_z_to_offset(double z_value, const NcVarInfo* data_var);
-      bool data_plane(VarInfo &, DataPlane &, const LongArray &dimension);
+      bool read_data_plane(VarInfo &, DataPlane &, const LongArray &dimension, bool do_winds);
       void error_message(const bool is_dim_time, const int error_code,
                          const double _lower, const double _upper,
                          const long _value, const ConcatString &var_name,
@@ -99,11 +99,11 @@ class MetNcCFDataFile : public Met2dDataFile {
 
       //  retrieve the first matching data plane
 
-      bool data_plane(VarInfo &, DataPlane &, bool do_derive = true);
+      bool data_plane(VarInfo &, DataPlane &, bool do_winds = true);
 
       //  retrieve all matching data planes
 
-      int data_plane_array(VarInfo &, DataPlaneArray &, bool do_derive = true);
+      int data_plane_array(VarInfo &, DataPlaneArray &, bool do_winds = true);
 
       //  retrieve the index of the first matching record
 

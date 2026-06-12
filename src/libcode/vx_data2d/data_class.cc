@@ -110,7 +110,7 @@ void Met2dDataFile::mtddf_init_from_scratch()
 Raw_Grid  = (Grid *) nullptr;
 Dest_Grid = (Grid *) nullptr;
 
-ShiftRight  = 0;
+ShiftRight = 0;
 GridShifted = false;
 
 return;
@@ -130,7 +130,7 @@ if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = (Grid *) nullptr; }
 
 Filename.clear();
 
-ShiftRight  = 0;
+ShiftRight = 0;
 GridShifted = false;
 
 return;
@@ -360,7 +360,7 @@ return n_valid;
 
 
 ////////////////////////////////////////////////////////////////////////
-
+// JHG enhance to add support for kinetic energy, vorticity, and divergence
 
 bool Met2dDataFile::derive_winds(VarInfo *vinfo, DataPlane &dp)
 
@@ -391,6 +391,16 @@ if(vinfo->is_wind_speed() || vinfo->is_wind_direction()) {
          vinfo->set_units(uwnd_units);
       }
       else {
+
+         // Rotate U/V winds, if needed
+         if(vinfo->need_rotation()) {
+            DataPlane uwnd_dp_orig(uwnd_dp);
+            DataPlane vwnd_dp_orig(vwnd_dp);
+            rotate_uv_grid_to_earth(uwnd_dp_orig, vwnd_dp_orig,
+                                    *Raw_Grid, uwnd_dp, vwnd_dp);
+            vinfo->set_grid_relative_flag(false);
+         }
+
          status = derive_wind_direction(uwnd_dp, vwnd_dp, dp);
          vinfo->set_long_name("Wind Direction");
          vinfo->set_units("deg");
@@ -411,6 +421,14 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
                            wspd_dp, wspd_units) &&
             read_wind_data(vinfo, vinfo->wind_info().wind_direction,
                            wdir_dp, wdir_units);
+
+   // Rotate wind direction, if needed
+   if(vinfo->need_rotation()) {
+      DataPlane wdir_dp_orig(wdir_dp);
+      rotate_wind_direction_grid_to_earth(wdir_dp_orig,
+                                          *Raw_Grid, wdir_dp);
+      vinfo->set_grid_relative_flag(false);
+   }
 
    if(status) {
       if(vinfo->is_u_wind()) {
@@ -458,6 +476,18 @@ if(vinfo->is_wind_speed() || vinfo->is_wind_direction()) {
             read_wind_data(vinfo, vinfo->wind_info().v_wind,
                            vwnd_dpa, vwnd_units);
    if(!status) return status;
+
+   // Rotate U/V winds, if needed
+   if(vinfo->need_rotation()) {
+      for(int i=0; i<uwnd_dpa.n_planes(); i++) {
+         DataPlane uwnd_dp_orig(uwnd_dpa[i]);
+         DataPlane vwnd_dp_orig(vwnd_dpa[i]);
+         rotate_uv_grid_to_earth(uwnd_dp_orig, vwnd_dp_orig,
+                                 *Raw_Grid,
+                                  uwnd_dpa.at(i), vwnd_dpa.at(i));
+      }
+      vinfo->set_grid_relative_flag(false);
+   }
 
    // Store the long name and units
    if(vinfo->is_wind_speed()) {
@@ -527,6 +557,16 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
 
    if(!status) return status;
 
+   // Rotate wind direction, if needed
+   if(vinfo->need_rotation()) {
+      for(int i=0; i<wdir_dpa.n_planes(); i++) {
+         DataPlane wdir_dp_orig(wdir_dpa[i]);
+         rotate_wind_direction_grid_to_earth(wdir_dp_orig,
+                                             *Raw_Grid, wdir_dpa.at(i));
+         vinfo->set_grid_relative_flag(false);
+      }
+   }
+
    // Store the long name and units
    if(vinfo->is_u_wind()) {
       vinfo->set_long_name("U-Component of Wind");
@@ -591,29 +631,51 @@ bool Met2dDataFile::rotate_winds(VarInfo *vinfo, DataPlane &dp)
 
 {
 
-if(!vinfo) return false;
+static const char *method_name = "Met2dDataFile::rotate_winds() -> ";
+
+if(!vinfo || !vinfo->need_rotation()) return false;
 
 bool status = false;
 
-// JHG work here
+DataPlane uwnd_dp;
+DataPlane vwnd_dp;
+DataPlane tmp_dp;
+ConcatString units;
 
-return status;
-
+// Rotate U-Wind
+if(vinfo->is_u_wind()) {
+   uwnd_dp = dp;
+   status = read_wind_data(vinfo, vinfo->wind_info().v_wind,
+                           vwnd_dp, units);
+   if(status) status = rotate_uv_grid_to_earth(uwnd_dp, vwnd_dp,
+                                               *Raw_Grid,
+                                               dp, tmp_dp);
+}
+// Rotate V-Wind
+else if(vinfo->is_v_wind()) {
+   vwnd_dp = dp;
+   status = read_wind_data(vinfo, vinfo->wind_info().u_wind,
+                           uwnd_dp, units);
+   if(status) status = rotate_uv_grid_to_earth(uwnd_dp, vwnd_dp,
+                                               *Raw_Grid,
+                                               tmp_dp, dp);
+}
+// Rotate Wind Direction
+else if(vinfo->is_wind_direction()) {
+   tmp_dp = dp;
+   if(status) rotate_wind_direction_grid_to_earth(
+                 tmp_dp, *Raw_Grid, dp);
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool Met2dDataFile::rotate_winds(VarInfo *vinfo, DataPlaneArray &dpa)
-
-{
-
-if(!vinfo) return false;
-
-bool status = false;
-
-// JHG work here
+if(!status) {
+   mlog << Warning << "\n" << method_name
+        << "Trouble rotating wind field (" << vinfo->magic_str()
+        << ") from grid to earth relative.\n\n";
+}
+// Update flag for a successful rotation
+else {
+   vinfo->set_grid_relative_flag(false);
+}
 
 return status;
 
@@ -652,9 +714,11 @@ for(int i=0; i<names.n(); i++) {
    }
    vinfo_cur->set_magic(names[i], lstr);
 
+   // Retrieve units and grid-relative status
    if(data_plane(*vinfo_cur, dp, false)) {
       status = true;
       units = vinfo_cur->units();
+      vinfo->set_grid_relative_flag(vinfo_cur->is_grid_relative());
       break;
    }
 }
@@ -700,9 +764,11 @@ for(int i=0; i<names.n(); i++) {
    }
    vinfo_cur->set_magic(names[i], lstr);
 
+   // Retrieve units and grid-relative status
    if(data_plane_array(*vinfo_cur, dpa, false)) {
       status = true;
       units = vinfo_cur->units();
+      vinfo->set_grid_relative_flag(vinfo_cur->is_grid_relative());
       break;
    }
 }
@@ -719,11 +785,18 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Met2dDataFile::process_data_plane(VarInfo *vinfo, DataPlane &dp)
+bool Met2dDataFile::process_data_plane(VarInfo *vinfo, DataPlane &dp,
+                                       bool do_winds)
 
 {
 
 if ( ! vinfo )  return false;
+
+   //
+   // Rotate winds, if requested and needed
+   //
+
+if(do_winds && vinfo->need_rotation()) rotate_winds(vinfo, dp);
 
    //
    // Apply conversion logic

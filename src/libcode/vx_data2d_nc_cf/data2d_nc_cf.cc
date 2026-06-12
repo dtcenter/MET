@@ -159,7 +159,7 @@ void MetNcCFDataFile::dump(ostream & out, int depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 int MetNcCFDataFile::add_data_planes_by_time(VarInfo &vinfo, const LevelInfo &level,
-                                             DataPlaneArray &plane_array) {
+                                             DataPlaneArray &plane_array, bool do_winds) {
    int n_rec = 0;
    const auto *vinfo_nc = (VarInfoNcCF *)&vinfo;
    const NcVarInfo *data_var = get_data_var(vinfo);
@@ -192,7 +192,7 @@ int MetNcCFDataFile::add_data_planes_by_time(VarInfo &vinfo, const LevelInfo &le
          auto time_idx = time_offsets[idx];
          if (time_idx < time_cnt) {
             dimension[t_slot] = time_offsets[idx];
-            if (data_plane(vinfo, plane, dimension)) {
+            if (read_data_plane(vinfo, plane, dimension, do_winds)) {
                plane_array.add(plane, (double)time_lower, (double)time_upper);
                n_rec++;
                if (mlog.verbosity_level() >= nc_cf_debug_level) {
@@ -210,7 +210,7 @@ int MetNcCFDataFile::add_data_planes_by_time(VarInfo &vinfo, const LevelInfo &le
 ////////////////////////////////////////////////////////////////////////
 
 int MetNcCFDataFile::add_data_planes_by_z(VarInfo &vinfo, const LevelInfo &level,
-                                          DataPlaneArray &plane_array) {
+                                          DataPlaneArray &plane_array, bool do_winds) {
    int n_rec = 0;
    const auto *vinfo_nc = (VarInfoNcCF *)&vinfo;
    const NcVarInfo *data_var = get_data_var(vinfo);
@@ -242,7 +242,7 @@ int MetNcCFDataFile::add_data_planes_by_z(VarInfo &vinfo, const LevelInfo &level
          auto z_idx = (int)z_offsets[idx];
          if (z_idx < z_cnt) {
             dimension[z_slot] = z_offsets[idx];
-            if (data_plane(vinfo, plane, dimension)) {
+            if (read_data_plane(vinfo, plane, dimension, do_winds)) {
                plane_array.add(plane, z_lower, z_upper);
                n_rec++;
             }
@@ -271,10 +271,10 @@ Grid MetNcCFDataFile::build_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_va
 ////////////////////////////////////////////////////////////////////////
 
 bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
-                                 bool do_derive) {
+                                 bool do_winds) {
    auto vinfo_nc = (VarInfoNcCF *) &vinfo;
    static const string method_name
-      = "MetNcCFDataFile::data_plane(VarInfo &, DataPlane &) -> ";
+      = "MetNcCFDataFile::data_plane() -> ";
 
    LongArray dimension = vinfo_nc->dimension();
    NcVarInfo *data_var = get_data_var(vinfo);
@@ -307,7 +307,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
    bool status = data_plane(vinfo, plane, dimension);
 
    // Attempt to derive the data
-   if(!status && do_derive) {
+   if(!status && do_winds) {
       status = derive_winds(vinfo_nc, plane);
    }
 
@@ -316,11 +316,12 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, const LongArray &dimension)
+bool MetNcCFDataFile::read_data_plane(VarInfo &vinfo, DataPlane &plane,
+                                      const LongArray &dimension, bool do_winds)
 {
   auto vinfo_nc = (VarInfoNcCF *)&vinfo;
   static const string method_name
-      = "MetNcCFDataFile::data_plane(VarInfo &, DataPlane &, LongArray &) -> ";
+      = "MetNcCFDataFile::read_data_plane() -> ";
 
   Grid grid_attr = vinfo.grid_attr();
   _file->update_grid(grid_attr);
@@ -369,7 +370,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, const LongArr
       }
     }
 
-    status = process_data_plane(&vinfo, plane);
+    status = process_data_plane(&vinfo, plane, do_winds);
 
     // Set the VarInfo object's name, long_name, level, and units strings
 
@@ -395,7 +396,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, const LongArr
 
 int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
                                       DataPlaneArray &plane_array,
-                                      bool do_derive) {
+                                      bool do_winds) {
    int n_rec = 0;
    DataPlane plane;
    bool status = false;
@@ -422,18 +423,18 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
    cur_time_index = cur_z_index = 0;
 
    if (0 <= t_dim_slot && range_flag == dimension[t_dim_slot] && level.type() == LevelType_Time) {
-      n_rec = add_data_planes_by_time(vinfo, level, plane_array);
+      n_rec = add_data_planes_by_time(vinfo, level, plane_array, do_winds);
    }
    else if (0 <= z_dim_slot && range_flag == dimension[z_dim_slot] && level.type() == LevelType_Pres) {
-      n_rec = add_data_planes_by_z(vinfo, level, plane_array);
+      n_rec = add_data_planes_by_z(vinfo, level, plane_array, do_winds);
    }
-   else if (data_plane(vinfo, plane)) {
+   else if (data_plane(vinfo, plane, do_winds)) {
       plane_array.add(plane, bad_data_int, bad_data_int);
       n_rec++;
    }
 
    // Attempt to derive the data
-   if(n_rec == 0 && do_derive) {
+   if(n_rec == 0 && do_winds) {
       status = derive_winds(vinfo_nc, plane_array);
    }
 

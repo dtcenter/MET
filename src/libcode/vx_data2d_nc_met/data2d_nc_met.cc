@@ -210,7 +210,7 @@ void MetNcMetDataFile::set_range_azimuth_times(int i_track_point, DataPlane &pla
 ////////////////////////////////////////////////////////////////////////
 
 bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
-                                  bool do_derive) {
+                                  bool do_winds) {
    bool status = false;
    ConcatString req_time_str, data_time_str;
    VarInfoNcMet * vinfo_nc = (VarInfoNcMet *) &vinfo;
@@ -239,7 +239,7 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
                         plane, info);
 
    // Attempt to derive the data
-   if(!status && do_derive) {
+   if(!status && do_winds) {
       status = derive_winds(vinfo_nc, plane);
    }
 
@@ -283,7 +283,7 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
          status = false;
       }
 
-      status = process_data_plane(&vinfo, plane);
+      status = process_data_plane(&vinfo, plane, do_winds);
 
       // Set the VarInfo object's name, long_name, level, and units strings
       if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
@@ -300,7 +300,7 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
 
 int MetNcMetDataFile::data_plane_array(VarInfo &vinfo,
                                        DataPlaneArray &plane_array,
-                                       bool do_derive) {
+                                       bool do_winds) {
    bool status = false;
    int n_rec = 0;
    DataPlane plane;
@@ -309,7 +309,7 @@ int MetNcMetDataFile::data_plane_array(VarInfo &vinfo,
    plane_array.clear();
 
    // Can only read a single 2D data plane from a MET NetCDF file
-   status = data_plane(vinfo, plane, do_derive);
+   status = data_plane(vinfo, plane, do_winds);
 
    // Add the data plane to the DataPlaneArray with no level values
    if(status) {

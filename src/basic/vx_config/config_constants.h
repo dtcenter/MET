@@ -465,7 +465,6 @@ struct WindMetadata {
    StringArray v_wind;         // V-wind field names
    StringArray wind_speed;     // Wind speed field names
    StringArray wind_direction; // Wind direction field names
-   ConcatString standard_name; // Standard field name, optional
 
    WindMetadata() { clear(); }
    ~WindMetadata() { clear(); }

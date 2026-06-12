@@ -295,7 +295,8 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MetPythonDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, bool)
+bool MetPythonDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
+                                   bool do_winds)
 
 {
 
@@ -332,7 +333,7 @@ if ( status ) {
 
    plane = Plane;
 
-   status = process_data_plane(&vinfo, plane);
+   status = process_data_plane(&vinfo, plane, do_winds);
 
 }
 
@@ -362,7 +363,7 @@ return true;
 
 int MetPythonDataFile::data_plane_array(VarInfo &vinfo,
                                         DataPlaneArray &plane_array,
-                                        bool)
+                                        bool do_winds)
 
 {
 
@@ -400,7 +401,7 @@ if ( status ) {
 
    plane = Plane;
 
-   status = process_data_plane(&vinfo, plane);
+   status = process_data_plane(&vinfo, plane, do_winds);
 
 }
 

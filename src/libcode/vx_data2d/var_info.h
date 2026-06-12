@@ -60,7 +60,8 @@ class VarInfo
       RegridInfo    DefaultRegrid; // Default regridding logic
       RegridInfo    Regrid;        // Regridding logic
 
-      WindMetadata  WindInfo;  // Wind variable metadata
+      bool          GridRelativeFlag; // Wind data is grid relative
+      WindMetadata  WindInfo;         // Wind variable metadata
 
       // Options to override metadata
       ConcatString  SetAttrName;
@@ -204,6 +205,8 @@ class VarInfo
       void set_default_regrid(const RegridInfo &);
       void set_regrid(const RegridInfo &);
 
+      void set_grid_relative_flag(bool);
+
       void set_level_info_grib(Dictionary & dict);
       void set_prob_info_grib(ConcatString prob_name,
                               double thresh_lo, double thresh_hi);
@@ -218,7 +221,8 @@ class VarInfo
       virtual bool is_v_wind()            const;
       virtual bool is_wind_speed()        const;
       virtual bool is_wind_direction()    const;
-      virtual bool is_grid_relative()     const;
+              bool is_grid_relative()     const;
+              bool need_rotation()        const;
               bool is_prob()              const;
 };
 

@@ -164,11 +164,11 @@ void MetUGridDataFile::dump(ostream & out, int depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
-                                  bool do_derive) {
+                                  bool do_winds) {
    bool status = false;
    auto data_var = (NcVarInfo *)nullptr;
    static const string method_name
-      = "MetUGridDataFile::data_plane(VarInfo &, DataPlane &) -> ";
+      = "MetUGridDataFile::data_plane(VarInfo &, DataPlane &, bool) -> ";
 
    // Initialize the data plane
 
@@ -178,10 +178,10 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
    data_var = _file->find_by_name(req_name.c_str());
    if (nullptr != data_var) {
       // Read the data
-      status = data_plane(vinfo, plane, data_var);
+      status = data_plane(vinfo, plane, data_var, do_winds);
 
       // Attempt to derive the data
-      if(!status && do_derive) {
+      if(!status && do_winds) {
          status = derive_winds(&vinfo, plane);
       }
    }
@@ -196,7 +196,7 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
             int vlevel = extract_vlevels(req_name, nc_var_info->name.c_str());
             if (vlevel >= lvl_lower && vlevel <= lvl_upper) {
                vinfo.set_req_name(nc_var_info->name.c_str());
-               status = data_plane(vinfo, plane, nc_var_info);
+               status = data_plane(vinfo, plane, nc_var_info, do_winds);
                if (status) {
                   mlog << Debug(5) << method_name
                        << "Found range match for VarInfo \"" << req_name
@@ -218,7 +218,8 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
 // The requested variable name is the prefix of the actual variable name.
 //
 
-bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, const NcVarInfo *data_var)
+bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
+                                  const NcVarInfo *data_var, bool do_winds)
 {
    // Not sure why we do this
    bool status = false;
@@ -226,7 +227,7 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, const NcVarI
    VarInfoUGrid *vinfo_nc = (VarInfoUGrid *)&vinfo;
    static const string method_name_s = "MetUGridDataFile::data_plane() -> ";
    static const string method_name
-         = "MetUGridDataFile::data_plane(VarInfo &, DataPlane &, const NcVarInfo *) -> ";
+         = "MetUGridDataFile::data_plane(VarInfo &, DataPlane &, const NcVarInfo *, bool) -> ";
 
    // Initialize the data plane
 
@@ -305,7 +306,7 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, const NcVarI
       }
 
       // Read the data
-      status = read_data_plane(data_var->name, vinfo, plane, dimension);
+      status = read_data_plane(data_var->name, vinfo, plane, dimension, do_winds);
    }
 
    return status;
@@ -315,7 +316,7 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, const NcVarI
 
 int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
                                        DataPlaneArray &plane_array,
-                                       bool do_derive) {
+                                       bool do_winds) {
    int n_rec = 0;
    DataPlane plane;
    static const string method_name
@@ -342,7 +343,7 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
                int vlevel = extract_vlevels(req_name, nc_var_info->name.c_str());
                if (vlevel >= lvl_lower && vlevel <= lvl_upper) {
                   vinfo.set_req_name(nc_var_info->name.c_str());
-                  if (data_plane(vinfo, plane, nc_var_info)) {
+                  if (data_plane(vinfo, plane, nc_var_info, do_winds)) {
                      plane_array.add(plane, vlevel, vlevel);
                      n_rec++;
                   }
@@ -375,13 +376,13 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
          }
          for (int idx=tmp_lower; idx<=tmp_upper; idx++) {
             _cur_vert_index = idx;
-            if (data_plane(vinfo, plane, data_vinfo)) {
+            if (data_plane(vinfo, plane, data_vinfo, do_winds)) {
                plane_array.add(plane, lvl_lower, lvl_upper);
                n_rec++;
             }
          }
       }
-      else if (data_plane(vinfo, plane, do_derive)) {
+      else if (data_plane(vinfo, plane, do_winds)) {
          plane_array.add(plane, lvl_lower, lvl_upper);
          n_rec++;
       }
@@ -747,7 +748,8 @@ int MetUGridDataFile::index(VarInfo &vinfo){
 ////////////////////////////////////////////////////////////////////////
 
 bool MetUGridDataFile::read_data_plane(ConcatString var_name, VarInfo &vinfo,
-                                       DataPlane &plane, LongArray &dimension) {
+                                       DataPlane &plane, LongArray &dimension,
+                                       bool do_winds) {
    static const string method_name = "MetUGridDataFile::read_data_plane() -> ";
 
    // Read the data
@@ -793,7 +795,7 @@ bool MetUGridDataFile::read_data_plane(ConcatString var_name, VarInfo &vinfo,
          status = false;
       }
 
-      if (status) status = process_data_plane(&vinfo, plane);
+      if (status) status = process_data_plane(&vinfo, plane, do_winds);
       else {
          mlog << Debug(2) << "\n" << method_name << "not processed data_plane\n";
       }

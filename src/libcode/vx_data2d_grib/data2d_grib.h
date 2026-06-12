@@ -42,10 +42,6 @@ class MetGrib1DataFile : public Met2dDataFile {
 
       DataPlane Plane;
 
-      void rotate_winds(VarInfoGrib &, DataPlane &);
-      
-      bool data_plane_scalar(VarInfoGrib &, DataPlane &);
-
    public:
 
       MetGrib1DataFile();
@@ -86,11 +82,11 @@ class MetGrib1DataFile : public Met2dDataFile {
 
          //  retrieve the first matching data plane
 
-      bool data_plane(VarInfo &, DataPlane &, bool do_derive = true);
+      bool data_plane(VarInfo &, DataPlane &, bool do_winds = true);
 
          //  retrieve all matching data planes
 
-      int data_plane_array(VarInfo &, DataPlaneArray &, bool do_derive = true);
+      int data_plane_array(VarInfo &, DataPlaneArray &, bool do_winds = true);
 
          //  retrieve the index of the first matching record
 

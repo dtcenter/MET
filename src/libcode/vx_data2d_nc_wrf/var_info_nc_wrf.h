@@ -242,7 +242,6 @@ class VarInfoNcWrf : public VarInfo
       bool is_v_wind()            const override;
       bool is_wind_speed()        const override;
       bool is_wind_direction()    const override;
-      bool is_grid_relative()     const override;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

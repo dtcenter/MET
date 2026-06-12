@@ -119,6 +119,7 @@ void VarInfo::assign(const VarInfo &v) {
    DefaultRegrid = v.DefaultRegrid;
    Regrid = v.Regrid;
 
+   GridRelativeFlag = v.GridRelativeFlag;
    WindInfo = v.WindInfo;
 
    SetAttrName = v.SetAttrName;
@@ -182,6 +183,7 @@ void VarInfo::clear() {
    DefaultRegrid.clear();
    Regrid.clear();
 
+   GridRelativeFlag = false;
    WindInfo.clear();
 
    SetAttrName.clear();
@@ -463,6 +465,13 @@ void VarInfo::set_default_regrid(const RegridInfo &ri) {
 
 void VarInfo::set_regrid(const RegridInfo &ri) {
    Regrid = ri;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfo::set_grid_relative_flag(bool f) {
+   GridRelativeFlag = f;
    return;
 }
 
@@ -844,7 +853,16 @@ bool VarInfo::is_wind_direction() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_grid_relative() const {
-   return is_flag_set(SetAttrIsGridRelative);
+   return (!is_bad_data(SetAttrIsGridRelative) ?
+           SetAttrIsGridRelative != 0 :
+           GridRelativeFlag);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::need_rotation() const {
+   return (is_u_wind() || is_v_wind() || is_wind_direction()) &&
+          is_grid_relative();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -38,8 +38,9 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-double scaled2dbl(int scale_factor, int scale_value);
-int    parse_int4(g2int);
+static bool is_grid_relative(const Grib2Record *);
+static double scaled2dbl(int scale_factor, int scale_value);
+static int    parse_int4(g2int);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -82,19 +83,12 @@ MetGrib2DataFile & MetGrib2DataFile::operator=(const MetGrib2DataFile &) {
 
 void MetGrib2DataFile::grib2_init_from_scratch() {
    ScanMode = -1;
-
-   PairMap[ugrd_abbr_str] = vgrd_abbr_str;
-   PairMap[vgrd_abbr_str] = ugrd_abbr_str;
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void MetGrib2DataFile::close() {
    fclose(FileGrib2);
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -149,7 +143,7 @@ void MetGrib2DataFile::dump(ostream & out, int depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
-                                  bool do_derive) {
+                                  bool do_winds) {
 
    //  narrow the vinfo pointer
    auto vinfo_g2 = (VarInfoGrib2*)(&vinfo);
@@ -160,7 +154,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
    find_record_matches(vinfo_g2, listMatch, listMatchRange);
 
    //  if no matches were found, check for derived records
-   if(listMatch.empty() && do_derive) {
+   if(listMatch.empty() && do_winds) {
       DataPlaneArray plane_array;
       derive_winds(vinfo_g2, plane_array);
 
@@ -188,7 +182,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
 
       plane = plane_array[0];
 
-      return process_data_plane(vinfo_g2, plane);
+      return process_data_plane(vinfo_g2, plane, do_winds);
 
    }  //  END: if( 1 > listMatch.size() )
 
@@ -228,10 +222,11 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
    bool read_success = read_grib2_record_data_plane(listMatch[0],
                                                     plane);
 
-   //  check the data plane for wind rotation
-   plane = check_uv_rotation(vinfo_g2, listMatch[0], plane);
-
-   if(read_success) read_success = process_data_plane(vinfo_g2, plane);
+   if(read_success) {
+      //  store whether winds are grid relative
+      vinfo_g2->set_grid_relative_flag(is_grid_relative(listMatch[0]));
+      read_success = process_data_plane(vinfo_g2, plane, do_winds);
+   }
 
    return read_success;
 }
@@ -240,7 +235,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
 
 int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
                                        DataPlaneArray &plane_array,
-                                       bool do_derive) {
+                                       bool do_winds) {
 
    // Initialize
    plane_array.clear();
@@ -307,7 +302,7 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
    }
 
    //  if nothing was found, try to build derived records
-   else if(do_derive) {
+   else if(do_winds) {
 
       derive_winds(vinfo_g2, plane_array);
 
@@ -336,9 +331,6 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
       DataPlane plane;
       num_read += ( read_grib2_record_data_plane(*it, plane) ? 1 : 0 );
 
-      //  check the data plane for wind rotation
-      plane = check_uv_rotation(vinfo_g2, *it, plane);
-
       //  add the data plane to the array at the specified level(s)
       double lvl_lower = (double)(*it)->LvlVal1;
       double lvl_upper = (double)(*it)->LvlVal2;
@@ -347,7 +339,10 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
          lvl_upper = ( (double)(*it)->LvlVal2 ) / 100.0;
       }
 
-      if(process_data_plane(vinfo_g2, plane)) {
+      //  store whether winds are grid relative
+      vinfo_g2->set_grid_relative_flag(is_grid_relative(*it));
+
+      if(process_data_plane(vinfo_g2, plane, do_winds)) {
          plane_array.add(plane, lvl_lower, lvl_upper);
       }
    }
@@ -574,51 +569,6 @@ void MetGrib2DataFile::find_record_matches(const VarInfoGrib2* vinfo,
    }  //  END:  for( vector<Grib2Record*>::iterator it = RecList.begin(); ...)
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-DataPlane MetGrib2DataFile::check_uv_rotation(const VarInfoGrib2 *vinfo, Grib2Record *rec, DataPlane plane){
-
-   //  check that the field is present in the pair map
-   string parm_name = vinfo->name().text();
-   if( 0 == PairMap.count( parm_name ) ||
-       0 == (rec->ResCompFlag & 8) ) {
-      return plane;
-   }
-
-   //  build the magic string of the pair field, and check it
-   ConcatString pair_mag = build_magic( rec );
-   pair_mag.replace(parm_name.data(), PairMap[parm_name].data());
-   if( 0 == NameRecMap.count( string(pair_mag.text()) ) ){
-      mlog << Debug(3) << "MetGrib2DataFile::check_uv_rotation -> "
-           << "UV rotation pair record not found: '" << pair_mag
-           << "'\n";
-      return plane;
-   }
-
-   //  read the data plane for the pair record
-   Grib2Record *rec_pair = NameRecMap[pair_mag.text()];
-   DataPlane plane_pair;
-   read_grib2_record_data_plane(NameRecMap[pair_mag.text()],
-                                plane_pair);
-
-   mlog << Debug(3) << "MetGrib2DataFile::check_uv_rotation() -> "
-        << "Found pair match \"" << pair_mag << "\" in GRIB2 record "
-        << rec_pair->RecNum << " field " << rec_pair->FieldNum << "\n";
-
-   //  rotate the winds
-   DataPlane u2d;
-   DataPlane v2d;
-   DataPlane u2d_rot;
-   DataPlane v2d_rot;
-   if( 'U' == parm_name.at(0) ){ u2d = plane;  v2d = plane_pair; }
-   else                        { v2d = plane;  u2d = plane_pair; }
-   rotate_uv_grid_to_earth(u2d, v2d, *Raw_Grid, u2d_rot, v2d_rot);
-   if( 'U' == parm_name.at(0) ){ plane = u2d_rot; }
-   else                        { plane = v2d_rot; }
-
-   return plane;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -896,10 +846,6 @@ void MetGrib2DataFile::read_grib2_record_list() {
 
          //  add the record to the list
          RecList.emplace_back(rec);
-
-         //  build data structure for U/V wind pairs
-         string rec_mag = build_magic(rec).text();
-         NameRecMap[rec_mag] = rec;
 
          g2_free(gfld);
 
@@ -1617,7 +1563,13 @@ int MetGrib2DataFile::index( VarInfo &vinfo ){
 //
 ////////////////////////////////////////////////////////////////////////
 
-double scaled2dbl(int scale_factor, int scale_value) {
+static bool is_grid_relative(const Grib2Record *r) {
+   return (r->ResCompFlag & 8) != 0;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static double scaled2dbl(int scale_factor, int scale_value) {
    if (scale_factor == 0) return (double) scale_value;
    if (scale_factor < 0)  return ( scale_value * pow(10.0, -scale_factor) );
    return                        ( scale_value / pow(10.0,  scale_factor) );
@@ -1625,7 +1577,7 @@ double scaled2dbl(int scale_factor, int scale_value) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int parse_int4(g2int i) {
+static int parse_int4(g2int i) {
    unsigned char c[4];
    unsigned long n = i;
  

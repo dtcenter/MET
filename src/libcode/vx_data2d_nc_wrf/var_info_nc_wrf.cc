@@ -410,24 +410,4 @@ bool VarInfoNcWrf::is_wind_direction() const {
    return false;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-
-bool VarInfoNcWrf::is_grid_relative() const {
-
-   //
-   // Check set_attrs entry
-   //
-   int flag = SetAttrIsGridRelative;
-   if(!is_bad_data(flag)) return is_flag_set(flag);
-
-   //
-   // Check to see if the VarInfo name matches any of expected Pinterp
-   // variables that should be rotated from grid-relative to earth-relative.
-   //
-   return has_prefix(pinterp_grid_relative_names,
-                     n_pinterp_grid_relative_names,
-                     Name.c_str());
-}
-
 ///////////////////////////////////////////////////////////////////////////////

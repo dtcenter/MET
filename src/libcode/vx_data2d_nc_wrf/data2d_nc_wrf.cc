@@ -6,9 +6,7 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <iostream>
 #include <unistd.h>
@@ -23,6 +21,9 @@
 
 using namespace std;
 
+////////////////////////////////////////////////////////////////////////
+
+static bool is_grid_relative(const char *);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -122,7 +123,7 @@ void MetNcWrfDataFile::dump(ostream & out, int depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
-                                  bool do_derive) {
+                                  bool do_winds) {
    bool status = false;
    double pressure = bad_data_double;
    ConcatString level_str;
@@ -153,8 +154,11 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
    status = WrfNc->data(vinfo_nc->req_name().c_str(),
                         dimension, plane, pressure, info);
 
+   // Store whether winds are grid relative
+   vinfo_nc->set_grid_relative_flag(is_grid_relative(vinfo_nc->req_name().c_str()));
+
    // Attempt to derive the data
-   if(!status && do_derive) {
+   if(!status && do_winds) {
       status = derive_winds(vinfo_nc, plane);
    }
 
@@ -183,7 +187,7 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
          status = false;
       }
 
-      status = process_data_plane(&vinfo, plane);
+      status = process_data_plane(&vinfo, plane, do_winds);
 
       // Set the VarInfo object's name, long_name, and units strings
       // Note that info is null for derived fields
@@ -208,7 +212,7 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
 
 int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
                                        DataPlaneArray &plane_array,
-                                       bool do_derive) {
+                                       bool do_winds) {
    int i, i_dim, n_level, status, lower, upper;
    ConcatString level_str;
    double pressure, min_level, max_level;
@@ -255,8 +259,11 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
       status = WrfNc->data(vinfo_nc->req_name().c_str(),
                            cur_dim, cur_plane, pressure, info);
 
+      // Store whether winds are grid relative
+      vinfo_nc->set_grid_relative_flag(is_grid_relative(vinfo_nc->req_name().c_str()));
+
       // Attempt to derive the data
-      if(!status && do_derive) {
+      if(!status && do_winds) {
          status = derive_winds(vinfo_nc, cur_plane);
       }
 
@@ -285,7 +292,7 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
             status = false;
          }
 
-         status = process_data_plane(&vinfo, cur_plane);
+         status = process_data_plane(&vinfo, cur_plane, do_winds);
 
          // Add current plane to the data plane array
          plane_array.add(cur_plane, pressure, pressure);
@@ -326,6 +333,13 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
 
 int MetNcWrfDataFile::index(VarInfo &vinfo){
    return -1;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static bool is_grid_relative(const char *name) {
+   return has_prefix(pinterp_grid_relative_names,
+                     n_pinterp_grid_relative_names, name);
 }
 
 ////////////////////////////////////////////////////////////////////////

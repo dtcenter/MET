@@ -405,7 +405,7 @@ return count;
 ////////////////////////////////////////////////////////////////////////
 
 bool MetGrib1DataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
-                                  bool do_derive) {
+                                  bool do_winds) {
    bool status = false;
    int n_planes = 0;
    DataPlaneArray plane_array;
@@ -413,7 +413,7 @@ bool MetGrib1DataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
    int j;
 
    // Call data_plane_array() to retrieve all matching records
-   n_planes = data_plane_array(*vinfo_grib, plane_array, do_derive);
+   n_planes = data_plane_array(*vinfo_grib, plane_array, do_winds);
 
    // Process multiple matches
    if ( n_planes > 0 )  {
@@ -466,7 +466,7 @@ bool MetGrib1DataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
 
 int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
                                        DataPlaneArray &plane_array,
-                                       bool do_derive) {
+                                       bool do_winds) {
    bool status = false;
    bool exact;
    int i, lower, upper, type_num;
@@ -503,29 +503,11 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
          // Read current record
          status = get_data_plane(r, cur_plane);
 
-         // Check if these are winds that should be rotated
-         if(status &&
-            is_grid_relative(r) &&
-            (vinfo_grib->is_u_wind() ||
-             vinfo_grib->is_v_wind() ||
-             vinfo_grib->is_wind_direction())) {
-
-            // Initialize the current VarInfo object
-            vinfo_grib_winds = *vinfo_grib;
-            cur_level = vinfo_grib_winds.level();
-
-            // Reset the level range for pressure and vertical levels
-            if(cur_level.type() == LevelType_Pres ||
-               cur_level.type() == LevelType_Vert) {
-               cur_level.set_range(lower, upper);
-               vinfo_grib_winds.set_level_info(cur_level);
-            }
-
-            // Rotate the winds
-            rotate_winds(vinfo_grib_winds, cur_plane);
+         if(status) {
+            // Store whether winds are grid relative
+            vinfo.set_grid_relative_flag(is_grid_relative(r));
+            status = process_data_plane(&vinfo, cur_plane, do_winds);
          }
-
-         if(status) status = process_data_plane(&vinfo, cur_plane);
 
          if(!status) {
             cur_plane.clear();
@@ -543,7 +525,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
    } // end for loop
 
    // If nothing was found, try to build derived records
-   if(plane_array.n_planes() == 0 && do_derive) {
+   if(plane_array.n_planes() == 0 && do_winds) {
       derive_winds(&vinfo, plane_array);
    }
 
@@ -556,101 +538,6 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
    return plane_array.n_planes();
 }
 
-////////////////////////////////////////////////////////////////////////
-//
-// This function rotates the wind data that's passed in from
-// grid-relative to earth-relative.
-//
-////////////////////////////////////////////////////////////////////////
-
-void MetGrib1DataFile::rotate_winds(VarInfoGrib &vinfo_grib, DataPlane &plane) {
-   VarInfoGrib vinfo_grib_winds = vinfo_grib;
-   DataPlane u2d, v2d, u2d_rot, v2d_rot;
-
-   // For U-wind, retrieve the corresponding V-wind, and rotate
-   if(vinfo_grib.is_u_wind()) {
-
-      mlog << Debug(3) << "MetGrib1DataFile::rotate_winds() -> "
-           << "Have U-wind record, reading V-wind record.\n";
-      vinfo_grib_winds.set_name(vgrd_abbr_str);
-      data_plane_scalar(vinfo_grib_winds, v2d);
-      rotate_uv_grid_to_earth(plane, v2d, grid(), u2d_rot, v2d_rot);
-      plane = u2d_rot;
-   }
-
-   // For V-wind, retrieve the corresponding U-wind, and rotate
-   else if(vinfo_grib.is_v_wind()) {
-
-      mlog << Debug(3) << "MetGrib1DataFile::rotate_winds() -> "
-           << "Have V-wind record, reading U-wind record.\n";
-      vinfo_grib_winds.set_name(ugrd_abbr_str);
-      data_plane_scalar(vinfo_grib_winds, u2d);
-      rotate_uv_grid_to_earth(u2d, plane, grid(), u2d_rot, v2d_rot);
-      plane = v2d_rot;
-   }
-
-   // For wind direction, rotate
-   else if(vinfo_grib.is_wind_direction()) {
-      mlog << Debug(3) << "MetGrib1DataFile::rotate_winds() -> "
-           << "Have wind direction, calling rotate.\n";
-      rotate_wind_direction_grid_to_earth(plane, grid(), u2d);
-      plane = u2d;
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// This function retrieves a single data plane as reqested in the
-// VarInfo object but does not attempt to rotate or derive winds.
-//
-////////////////////////////////////////////////////////////////////////
-
-bool MetGrib1DataFile::data_plane_scalar(VarInfoGrib &vinfo_grib,
-                                         DataPlane &plane) {
-   int i;
-   GribRecord r;
-   bool status = false;
-
-   // Initialize the data plane
-   plane.clear();
-
-   // Loop through the records in the GRIB file looking for a match
-   for(i=0; i<GF->n_records(); i++) {
-
-      // Read the current record.
-      GF->seek_record(i);
-      (*GF) >> r;
-
-      // Check for an exact match
-      if(is_exact_match(vinfo_grib, r)) {
-
-         mlog << Debug(3) << "MetGrib1DataFile::data_plane_scalar() -> "
-              << "Found exact match for VarInfo \""
-              << vinfo_grib.magic_str() << "\" in GRIB record "
-              << i+1 << " of GRIB file \"" << filename()
-              << "\".\n";
-
-         // Read current record
-         status = get_data_plane(r, plane);
-
-         if(status) status = process_data_plane(&vinfo_grib, plane);
-
-         break;
-      }
-   } // end for loop
-
-   if(!status) {
-      mlog << Warning << "\nMetGrib1DataFile::data_plane_scalar() -> "
-           << "No exact match found for VarInfo \""
-           << vinfo_grib.magic_str() << "\" in GRIB file \""
-           << filename() << "\".\n\n";
-   }
-
-   return status;
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Check whether or not the res_flag indicates that the vectors are defined
@@ -658,7 +545,7 @@ bool MetGrib1DataFile::data_plane_scalar(VarInfoGrib &vinfo_grib,
 //
 //////////////////////////////////////////////////////////////////////////////
 
-bool is_grid_relative(const GribRecord &r) {
+static bool is_grid_relative(const GribRecord &r) {
    unsigned char res_flag = 0;
 
    // LatLon

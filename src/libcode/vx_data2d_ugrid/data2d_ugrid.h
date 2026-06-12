@@ -86,12 +86,12 @@ class MetUGridDataFile : public Met2dDataFile {
 
       //  retrieve the first matching data plane
 
-      bool data_plane(VarInfo &, DataPlane &, bool do_derive = true);
-      bool data_plane(VarInfo &, DataPlane &, const NcVarInfo *);
+      bool data_plane(VarInfo &, DataPlane &, bool do_winds = true);
+      bool data_plane(VarInfo &, DataPlane &, const NcVarInfo *, bool do_winds);
 
       //  retrieve all matching data planes
 
-      int data_plane_array(VarInfo &, DataPlaneArray &, bool do_derive = true);
+      int data_plane_array(VarInfo &, DataPlaneArray &, bool do_winds = true);
 
       //  retrieve the index of the first matching record
 
@@ -100,7 +100,7 @@ class MetUGridDataFile : public Met2dDataFile {
       int index(VarInfo &);
 
       bool read_data_plane(ConcatString var_name, VarInfo &vinfo,
-                           DataPlane &plane, LongArray &dimension);
+                           DataPlane &plane, LongArray &dimension, bool do_winds);
 
       //
       //  do stuff

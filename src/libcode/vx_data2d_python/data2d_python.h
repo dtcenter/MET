@@ -86,9 +86,9 @@ class MetPythonDataFile : public Met2dDataFile {
 
       void dump (std::ostream &, int depth = 0) const;
 
-      bool data_plane(VarInfo &, DataPlane &, bool do_derive = true);
+      bool data_plane(VarInfo &, DataPlane &, bool do_winds = true);
 
-      int  data_plane_array(VarInfo &, DataPlaneArray &, bool do_derive = true);
+      int  data_plane_array(VarInfo &, DataPlaneArray &, bool do_winds = true);
 
       int  index(VarInfo &);
 
