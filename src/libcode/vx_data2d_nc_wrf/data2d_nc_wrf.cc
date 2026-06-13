@@ -23,7 +23,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool is_grid_relative(const char *);
+static bool is_grid_relative(VarInfo *);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -155,7 +155,7 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
                         dimension, plane, pressure, info);
 
    // Store whether winds are grid relative
-   vinfo_nc->set_grid_relative_flag(is_grid_relative(vinfo_nc->req_name().c_str()));
+   vinfo_nc->set_grid_relative_flag(is_grid_relative(vinfo_nc));
 
    // Attempt to derive the data
    if(!status && do_winds) {
@@ -260,7 +260,7 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
                            cur_dim, cur_plane, pressure, info);
 
       // Store whether winds are grid relative
-      vinfo_nc->set_grid_relative_flag(is_grid_relative(vinfo_nc->req_name().c_str()));
+      vinfo_nc->set_grid_relative_flag(is_grid_relative(vinfo_nc));
 
       // Attempt to derive the data
       if(!status && do_winds) {
@@ -337,9 +337,12 @@ int MetNcWrfDataFile::index(VarInfo &vinfo){
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool is_grid_relative(const char *name) {
-   return has_prefix(pinterp_grid_relative_names,
-                     n_pinterp_grid_relative_names, name);
+static bool is_grid_relative(VarInfo *vinfo) {
+
+   // All WRF winds are grid relative
+   return vinfo->is_u_wind() ||
+          vinfo->is_v_wind() ||
+          vinfo->is_wind_direction();
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -178,6 +178,97 @@ static bool derive_wind_speed_and_direction(
 
 ////////////////////////////////////////////////////////////////////////
 
+bool derive_kinetic_energy(
+        const DataPlane &uwnd, const DataPlane &vwnd,
+        DataPlane &keng) {
+
+   mlog << Debug(3)
+        << "Deriving kinetic energy from U and V wind components.\n";
+
+   //
+   // Check that the dimensions match
+   //
+   if(uwnd.nx() != vwnd.nx() || uwnd.ny() != vwnd.ny()) {
+      mlog << Warning << "\nderive_kinetic_energy() -> "
+           << "the dimensions for U and V do not match: ("
+           << uwnd.nx() << ", " << uwnd.ny() << ") != ("
+           << vwnd.nx() << ", " << vwnd.ny() << ")\n\n";
+      return false;
+   }
+
+   //
+   // Initialize output
+   //
+   keng = uwnd;
+   keng.set_constant(bad_data_double);
+
+   const int nx = uwnd.nx();
+   const int ny = uwnd.ny();
+
+#pragma omp parallel default(shared) \
+   shared(uwnd, vwnd, keng)
+   {
+
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
+
+            //
+            // Get the U and V components for this grid point
+            //
+            double u = uwnd.get(x, y);
+            double v = vwnd.get(x, y);
+
+            double der_v = bad_data_double;
+
+            //
+            // Derive value
+            //
+            if(!is_bad_data(u) && !is_bad_data(v)) {
+               der_v = (u*u + v*v)/2.0;
+               keng.set(der_v, x, y);
+            }
+
+         } // end for y
+      } // end for x
+   } // End omp parallel
+
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool derive_vorticity(
+        const DataPlane &uwnd, const DataPlane &vwnd,
+        DataPlane &absv) {
+
+   mlog << Debug(3)
+        << "Deriving absolute vorticity from U and V wind components.\n";
+
+   // JHG work here
+   absv = uwnd;
+
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool derive_divergence(
+        const DataPlane &uwnd, const DataPlane &vwnd,
+        DataPlane &absd) {
+
+   mlog << Debug(3)
+        << "Deriving absolute divergence from U and V wind components.\n";
+
+   // JHG work here
+   absd = uwnd;
+
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool derive_u_wind(
         const DataPlane &wspd, const DataPlane &wdir,
         DataPlane &uwnd) {

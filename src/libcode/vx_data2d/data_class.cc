@@ -360,7 +360,6 @@ return n_valid;
 
 
 ////////////////////////////////////////////////////////////////////////
-// JHG enhance to add support for kinetic energy, vorticity, and divergence
 
 bool Met2dDataFile::derive_winds(VarInfo *vinfo, DataPlane &dp)
 
@@ -371,10 +370,10 @@ if(!vinfo) return false;
 bool status = false;
 
    //
-   // Derive wind speed and direction from U and V
+   // Derive wind fields from U and V
    //
 
-if(vinfo->is_wind_speed() || vinfo->is_wind_direction()) {
+if(vinfo->need_uv_wind()) {
    DataPlane uwnd_dp;
    DataPlane vwnd_dp;
    ConcatString uwnd_units;
@@ -385,25 +384,45 @@ if(vinfo->is_wind_speed() || vinfo->is_wind_direction()) {
                            vwnd_dp, vwnd_units);
 
    if(status) {
+
+      // Rotate U/V winds, if needed
+      if(vinfo->need_rotation()) {
+         DataPlane uwnd_dp_orig(uwnd_dp);
+         DataPlane vwnd_dp_orig(vwnd_dp);
+         rotate_uv_grid_to_earth(uwnd_dp_orig, vwnd_dp_orig,
+                                 *Raw_Grid, uwnd_dp, vwnd_dp);
+         vinfo->set_grid_relative_flag(false);
+      }
+
+      // Derive wind speed
       if(vinfo->is_wind_speed()) {
          status = derive_wind_speed(uwnd_dp, vwnd_dp, dp);
          vinfo->set_long_name("Wind Speed");
          vinfo->set_units(uwnd_units);
       }
-      else {
-
-         // Rotate U/V winds, if needed
-         if(vinfo->need_rotation()) {
-            DataPlane uwnd_dp_orig(uwnd_dp);
-            DataPlane vwnd_dp_orig(vwnd_dp);
-            rotate_uv_grid_to_earth(uwnd_dp_orig, vwnd_dp_orig,
-                                    *Raw_Grid, uwnd_dp, vwnd_dp);
-            vinfo->set_grid_relative_flag(false);
-         }
-
+      // Derive wind direction
+      else if(vinfo->is_wind_direction()) {
          status = derive_wind_direction(uwnd_dp, vwnd_dp, dp);
          vinfo->set_long_name("Wind Direction");
          vinfo->set_units("deg");
+      }
+      // Derive kinetic energy
+      else if(vinfo->is_kinetic_energy()) {
+         status = derive_kinetic_energy(uwnd_dp, vwnd_dp, dp);
+         vinfo->set_long_name("Kinetic Energy");
+         vinfo->set_units("J/kg");
+      }
+      // Derive vorticity
+      else if(vinfo->is_vorticity()) {
+         status = derive_vorticity(uwnd_dp, vwnd_dp, dp);
+         vinfo->set_long_name("Absolute Vorticity");
+         vinfo->set_units("1/s");
+      }
+      // Derive divergence
+      else if(vinfo->is_divergence()) {
+         status = derive_divergence(uwnd_dp, vwnd_dp, dp);
+         vinfo->set_long_name("Absolute Divergence");
+         vinfo->set_units("1/s");
       }
    }
 }
@@ -463,10 +482,10 @@ if(!vinfo) return false;
 bool status = false;
 
    //
-   // Derive wind speed and direction from U and V
+   // Derive wind fields from U and V
    //
 
-if(vinfo->is_wind_speed() || vinfo->is_wind_direction()) {
+if(vinfo->need_uv_wind()) {
    DataPlaneArray uwnd_dpa;
    DataPlaneArray vwnd_dpa;
    ConcatString uwnd_units;
@@ -475,6 +494,7 @@ if(vinfo->is_wind_speed() || vinfo->is_wind_direction()) {
                            uwnd_dpa, uwnd_units) &&
             read_wind_data(vinfo, vinfo->wind_info().v_wind,
                            vwnd_dpa, vwnd_units);
+
    if(!status) return status;
 
    // Rotate U/V winds, if needed
@@ -494,11 +514,24 @@ if(vinfo->is_wind_speed() || vinfo->is_wind_direction()) {
       vinfo->set_long_name("Wind Speed");
       vinfo->set_units(uwnd_units);
    }
-   else {
+   else if(vinfo->is_wind_direction()) {
       vinfo->set_long_name("Wind Direction");
       vinfo->set_units("deg");
    }
+   else if(vinfo->is_kinetic_energy()) {
+      vinfo->set_long_name("Kinetic Energy");
+      vinfo->set_units("J/kg");
+   }
+   else if(vinfo->is_vorticity()) {
+      vinfo->set_long_name("Absolute Vorticity");
+      vinfo->set_units("1/s");
+   }
+   else if(vinfo->is_divergence()) {
+      vinfo->set_long_name("Absolute Divergence");
+      vinfo->set_units("1/s");
+   }
 
+   // Check for matching dimensions
    if(uwnd_dpa.n_planes() != vwnd_dpa.n_planes()) {
       mlog << Warning << "\n" << method_name
            << "when deriving winds, the number of U-wind records ("
@@ -529,11 +562,26 @@ if(vinfo->is_wind_speed() || vinfo->is_wind_direction()) {
 
       // Do the derivation
       DataPlane dp;
+
+      // Derive wind speed
       if(vinfo->is_wind_speed()) {
          status = derive_wind_speed(uwnd_dpa[i], vwnd_dpa[i], dp);
       }
-      else {
+      // Derive wind direction
+      else if(vinfo->is_wind_direction()) {
          status = derive_wind_direction(uwnd_dpa[i], vwnd_dpa[i], dp);
+      }
+      // Derive kinetic energy
+      else if(vinfo->is_kinetic_energy()) {
+         status = derive_kinetic_energy(uwnd_dpa[i], vwnd_dpa[i], dp);
+      }
+      // Derive vorticity
+      else if(vinfo->is_vorticity()) {
+         status = derive_vorticity(uwnd_dpa[i], vwnd_dpa[i], dp);
+      }
+      // Derive divergence
+      else if(vinfo->is_divergence()) {
+         status = derive_divergence(uwnd_dpa[i], vwnd_dpa[i], dp);
       }
 
       // Store the result

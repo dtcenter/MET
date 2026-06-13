@@ -38,6 +38,18 @@ extern bool derive_wind_direction(
                const DataPlane &uwnd, const DataPlane &vwnd,
                DataPlane &wdir);
 
+extern bool derive_kinetic_energy(
+               const DataPlane &uwnd, const DataPlane &vwnd,
+               DataPlane &keng);
+
+extern bool derive_vorticity(
+               const DataPlane &uwnd, const DataPlane &vwnd,
+               DataPlane &absv);
+
+extern bool derive_divergence(
+               const DataPlane &uwnd, const DataPlane &vwnd,
+               DataPlane &absd);
+
 extern bool derive_u_wind(
                const DataPlane &wspd, const DataPlane &wdir,
                DataPlane &uwnd);
