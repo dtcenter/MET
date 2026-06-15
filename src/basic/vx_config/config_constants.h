@@ -480,8 +480,6 @@ struct WindMetadata {
 
    // Supported derivations
    bool is_kinetic_energy(const std::string &s) const { return s == "KENG"; }
-   bool is_vorticity(const std::string &s) const { return s == "ABSV"; }
-   bool is_divergence(const std::string &s) const { return s == "ABSD"; }
 };
 
 ////////////////////////////////////////////////////////////////////////

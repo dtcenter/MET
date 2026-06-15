@@ -412,18 +412,6 @@ if(vinfo->need_uv_wind()) {
          vinfo->set_long_name("Kinetic Energy");
          vinfo->set_units("J/kg");
       }
-      // Derive vorticity
-      else if(vinfo->is_vorticity()) {
-         status = derive_vorticity(uwnd_dp, vwnd_dp, dp);
-         vinfo->set_long_name("Absolute Vorticity");
-         vinfo->set_units("1/s");
-      }
-      // Derive divergence
-      else if(vinfo->is_divergence()) {
-         status = derive_divergence(uwnd_dp, vwnd_dp, dp);
-         vinfo->set_long_name("Absolute Divergence");
-         vinfo->set_units("1/s");
-      }
    }
 }
 
@@ -522,14 +510,6 @@ if(vinfo->need_uv_wind()) {
       vinfo->set_long_name("Kinetic Energy");
       vinfo->set_units("J/kg");
    }
-   else if(vinfo->is_vorticity()) {
-      vinfo->set_long_name("Absolute Vorticity");
-      vinfo->set_units("1/s");
-   }
-   else if(vinfo->is_divergence()) {
-      vinfo->set_long_name("Absolute Divergence");
-      vinfo->set_units("1/s");
-   }
 
    // Check for matching dimensions
    if(uwnd_dpa.n_planes() != vwnd_dpa.n_planes()) {
@@ -574,14 +554,6 @@ if(vinfo->need_uv_wind()) {
       // Derive kinetic energy
       else if(vinfo->is_kinetic_energy()) {
          status = derive_kinetic_energy(uwnd_dpa[i], vwnd_dpa[i], dp);
-      }
-      // Derive vorticity
-      else if(vinfo->is_vorticity()) {
-         status = derive_vorticity(uwnd_dpa[i], vwnd_dpa[i], dp);
-      }
-      // Derive divergence
-      else if(vinfo->is_divergence()) {
-         status = derive_divergence(uwnd_dpa[i], vwnd_dpa[i], dp);
       }
 
       // Store the result

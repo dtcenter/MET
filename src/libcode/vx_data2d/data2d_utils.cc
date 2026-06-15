@@ -239,36 +239,6 @@ bool derive_kinetic_energy(
 
 ////////////////////////////////////////////////////////////////////////
 
-bool derive_vorticity(
-        const DataPlane &uwnd, const DataPlane &vwnd,
-        DataPlane &absv) {
-
-   mlog << Debug(3)
-        << "Deriving absolute vorticity from U and V wind components.\n";
-
-   // JHG work here
-   absv = uwnd;
-
-   return true;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool derive_divergence(
-        const DataPlane &uwnd, const DataPlane &vwnd,
-        DataPlane &absd) {
-
-   mlog << Debug(3)
-        << "Deriving absolute divergence from U and V wind components.\n";
-
-   // JHG work here
-   absd = uwnd;
-
-   return true;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 bool derive_u_wind(
         const DataPlane &wspd, const DataPlane &wdir,
         DataPlane &uwnd) {

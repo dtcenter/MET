@@ -858,18 +858,6 @@ bool VarInfo::is_kinetic_energy() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfo::is_vorticity() const {
-   return WindInfo.is_vorticity(Name);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-bool VarInfo::is_divergence() const {
-   return WindInfo.is_divergence(Name);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 bool VarInfo::is_grid_relative() const {
    return (!is_bad_data(SetAttrIsGridRelative) ?
            SetAttrIsGridRelative != 0 :
@@ -881,19 +869,15 @@ bool VarInfo::is_grid_relative() const {
 bool VarInfo::need_uv_wind() const { 
    return(is_wind_speed()     ||
           is_wind_direction() ||
-          is_kinetic_energy() ||
-          is_vorticity()      ||
-          is_divergence());
+          is_kinetic_energy());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::need_rotation() const {
-   return (is_u_wind()         ||
-           is_v_wind()         ||
-           is_wind_direction() ||
-           is_vorticity()      ||
-           is_divergence())    &&
+   return (is_u_wind()          ||
+           is_v_wind()          ||
+           is_wind_direction()) &&
           is_grid_relative();
 }
 

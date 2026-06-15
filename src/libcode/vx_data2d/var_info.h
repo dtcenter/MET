@@ -222,8 +222,6 @@ class VarInfo
       virtual bool is_wind_speed()        const;
       virtual bool is_wind_direction()    const;
               bool is_kinetic_energy()    const;
-              bool is_vorticity()         const;
-              bool is_divergence()        const;
               bool is_grid_relative()     const;
               bool need_uv_wind()         const;
               bool need_rotation()        const;
