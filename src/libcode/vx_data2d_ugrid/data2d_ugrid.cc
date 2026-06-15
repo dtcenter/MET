@@ -177,8 +177,12 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
    ConcatString req_name = vinfo.req_name();
    data_var = _file->find_by_name(req_name.c_str());
    if (nullptr != data_var) {
+
       // Read the data
       status = data_plane(vinfo, plane, data_var, do_winds);
+
+      // Assume that UGRID winds are earth-relative
+      vinfo.set_grid_relative_flag(false);
 
       // Attempt to derive the data
       if(!status && do_winds) {

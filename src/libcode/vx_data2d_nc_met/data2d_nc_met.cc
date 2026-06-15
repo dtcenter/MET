@@ -238,6 +238,9 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
                         vinfo_nc->dimension(),
                         plane, info);
 
+   // Assume that winds in MET output files are earth-relative
+   vinfo_nc->set_grid_relative_flag(false);
+
    // Attempt to derive the data
    if(!status && do_winds) {
       status = derive_winds(vinfo_nc, plane);
