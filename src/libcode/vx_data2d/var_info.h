@@ -173,6 +173,7 @@ class VarInfo
       virtual void add_grib_code(Dictionary &);
 
       void set_req_name(const char *);
+      void set_req_name(const std::string &);
       void set_name(const char *);
       void set_name(const std::string &);
       void set_units(const char *);

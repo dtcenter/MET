@@ -295,6 +295,13 @@ void VarInfo::set_req_name(const char *str) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfo::set_req_name(const string &str) {
+   ReqName = str;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_name(const char *str) {
    Name = str;
    return;

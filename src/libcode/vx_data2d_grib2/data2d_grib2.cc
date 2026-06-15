@@ -477,12 +477,12 @@ void MetGrib2DataFile::find_record_matches(const VarInfoGrib2* vinfo,
       }
 
       //  test for an index or field name match
-      else if( ( vinfo->name().empty()                     &&
-                 vinfo->discipline()  == (*it)->Discipline &&
-                 vinfo->parm_cat()    == (*it)->ParmCat    &&
-                 vinfo->parm()        == (*it)->Parm       ) ||
-               ( vinfo->name().nonempty()                  &&
-                 vinfo->name().text() == (*it)->ParmName   ) ){
+      else if( ( vinfo->req_name().empty()                     &&
+                 vinfo->discipline()      == (*it)->Discipline &&
+                 vinfo->parm_cat()        == (*it)->ParmCat    &&
+                 vinfo->parm()            == (*it)->Parm     ) ||
+               ( vinfo->req_name().nonempty()                  &&
+                 vinfo->req_name().text() == (*it)->ParmName ) ){
 
          //  test the level type number, if specified
          if ( !is_bad_data(vinfo->level().type_num()) &&

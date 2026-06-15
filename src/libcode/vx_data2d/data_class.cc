@@ -723,6 +723,7 @@ VarInfo * vinfo_cur = vinfo->clone();
     // Try each of the possible names
 
 for(int i=0; i<names.n(); i++) {
+   vinfo_cur->set_req_name(names[i]);
    vinfo_cur->set_name(names[i]);
 
    // Wrap level in parenthesis, if needed
@@ -773,6 +774,7 @@ VarInfo * vinfo_cur = vinfo->clone();
     // Try each of the possible names
 
 for(int i=0; i<names.n(); i++) {
+   vinfo_cur->set_req_name(names[i]);
    vinfo_cur->set_name(names[i]);
 
    // Wrap level in parenthesis, if needed
