@@ -206,6 +206,7 @@ class VarInfo
       void set_regrid(const RegridInfo &);
 
       void set_grid_relative_flag(bool);
+      void set_earth_relative();
 
       void set_level_info_grib(Dictionary & dict);
       void set_prob_info_grib(ConcatString prob_name,
@@ -222,6 +223,7 @@ class VarInfo
       virtual bool is_wind_speed()        const;
       virtual bool is_wind_direction()    const;
               bool is_kinetic_energy()    const;
+              bool is_wind_rotation()     const;
               bool is_grid_relative()     const;
               bool need_uv_wind()         const;
               bool need_rotation()        const;

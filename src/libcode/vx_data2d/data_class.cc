@@ -391,7 +391,7 @@ if(vinfo->need_uv_wind()) {
          DataPlane vwnd_dp_orig(vwnd_dp);
          rotate_uv_grid_to_earth(uwnd_dp_orig, vwnd_dp_orig,
                                  *Raw_Grid, uwnd_dp, vwnd_dp);
-         vinfo->set_grid_relative_flag(false);
+         vinfo->set_earth_relative();
       }
 
       // Derive wind speed
@@ -434,7 +434,7 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
       DataPlane wdir_dp_orig(wdir_dp);
       rotate_wind_direction_grid_to_earth(wdir_dp_orig,
                                           *Raw_Grid, wdir_dp);
-      vinfo->set_grid_relative_flag(false);
+      vinfo->set_earth_relative();
    }
 
    if(status) {
@@ -494,7 +494,7 @@ if(vinfo->need_uv_wind()) {
                                  *Raw_Grid,
                                   uwnd_dpa.at(i), vwnd_dpa.at(i));
       }
-      vinfo->set_grid_relative_flag(false);
+      vinfo->set_earth_relative();
    }
 
    // Store the long name and units
@@ -583,7 +583,7 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
          DataPlane wdir_dp_orig(wdir_dpa[i]);
          rotate_wind_direction_grid_to_earth(wdir_dp_orig,
                                              *Raw_Grid, wdir_dpa.at(i));
-         vinfo->set_grid_relative_flag(false);
+         vinfo->set_earth_relative();
       }
    }
 
@@ -683,8 +683,8 @@ else if(vinfo->is_v_wind()) {
 // Rotate Wind Direction
 else if(vinfo->is_wind_direction()) {
    tmp_dp = dp;
-   if(status) rotate_wind_direction_grid_to_earth(
-                 tmp_dp, *Raw_Grid, dp);
+   rotate_wind_direction_grid_to_earth(tmp_dp, *Raw_Grid, dp);
+   status = true;
 }
 
 if(!status) {
@@ -694,7 +694,7 @@ if(!status) {
 }
 // Update flag for a successful rotation
 else {
-   vinfo->set_grid_relative_flag(false);
+   vinfo->set_earth_relative();
 }
 
 return status;
@@ -816,7 +816,16 @@ if ( ! vinfo )  return false;
    // Rotate winds, if requested and needed
    //
 
-if(do_winds && vinfo->need_rotation()) rotate_winds(vinfo, dp);
+if(do_winds && vinfo->is_wind_rotation()) {
+
+   if(vinfo->need_rotation()) {
+      rotate_winds(vinfo, dp);
+   }
+   else {
+      mlog << Debug(3) << "Wind field \"" << vinfo->magic_str()
+           << "\" is defined as earth-relative.\n";
+   }
+}
 
    //
    // Apply conversion logic

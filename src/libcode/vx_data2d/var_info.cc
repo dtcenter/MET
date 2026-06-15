@@ -477,6 +477,14 @@ void VarInfo::set_grid_relative_flag(bool f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfo::set_earth_relative() {
+   GridRelativeFlag = false;
+   SetAttrIsGridRelative = 0;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 
    // Check for embedded whitespace
@@ -858,6 +866,14 @@ bool VarInfo::is_kinetic_energy() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+bool VarInfo::is_wind_rotation() const {
+   return (is_u_wind() ||
+           is_v_wind() ||
+           is_wind_direction());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 bool VarInfo::is_grid_relative() const {
    return (!is_bad_data(SetAttrIsGridRelative) ?
            SetAttrIsGridRelative != 0 :
@@ -875,9 +891,7 @@ bool VarInfo::need_uv_wind() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::need_rotation() const {
-   return (is_u_wind()          ||
-           is_v_wind()          ||
-           is_wind_direction()) &&
+   return is_wind_rotation() &&
           is_grid_relative();
 }
 
