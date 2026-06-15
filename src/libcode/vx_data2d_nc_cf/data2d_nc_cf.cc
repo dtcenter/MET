@@ -304,7 +304,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
    }
 
    // Read the data
-   bool status = data_plane(vinfo, plane, dimension);
+   bool status = read_data_plane(vinfo, plane, dimension, do_winds);
 
    // Assume that CF-compliant NetCDF winds are earth-relative
    vinfo_nc->set_grid_relative_flag(false);
