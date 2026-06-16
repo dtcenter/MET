@@ -43,7 +43,8 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    unixtime ut, init_ut, valid_ut;
    const char *method_name = "is_prelim_match() -> ";
 
-   int p_code, code_for_lookup= vinfo.field_rec ();
+   int p_code;
+   int code_for_lookup = vinfo.field_rec();
    double p_thresh_lo, p_thresh_hi;
 
    Section1_Header *pds = (Section1_Header *) g.pds;
@@ -53,8 +54,8 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    // clean up the code - except for code 33 and 34 (UGRID and VGRID)
    // and name WIND when we derive wind speed and direction
    bool is_lookup_for_wind_components =
-      ( vinfo.code () == ugrd_grib_code || \
-        vinfo.code () == vgrd_grib_code ) && \
+      ( vinfo.code () == ugrd_grib_code ||
+        vinfo.code () == vgrd_grib_code ) &&
       field_name == "WIND";
    if ( is_lookup_for_wind_components)
    {
@@ -62,9 +63,9 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
       field_name.clear ();
       code_for_lookup = vinfo.code ();
    }
-   vinfo.set_code (bad_data_int);
-   vinfo.units ().clear ();
-   vinfo.long_name ().clear ();
+   vinfo.set_code(bad_data_int);
+   vinfo.units().clear();
+   vinfo.long_name().clear();
 
    //
    //  check ptv
@@ -155,17 +156,19 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    // if it is one of APCP names - (APCP_Z0) - use 'APCP' only
    if ( check_reg_exp("^APCP_[0-9]*$", field_name.c_str()) )  field_name = "APCP";
 
-   Grib1TableEntry tab;
-   int tab_match = -1;
+   vector<Grib1TableEntry> matches;
 
    // if the name is specified, use it
    if( !field_name.empty() ) {
 
       //  look up the name in the grib tables
-      if( !GribTable.lookup_grib1(field_name.c_str(), vinfo_ptv, code_for_lookup, vinfo_center, vinfo_subcenter, tab, tab_match) )
+
+      if(GribTable.lookup_grib1(field_name.c_str(), vinfo_ptv, code_for_lookup,
+                                vinfo_center, vinfo_subcenter, matches) == 0)
       {
          //  if did not find with params from the header - try default
-         if( !GribTable.lookup_grib1(field_name.c_str(), default_grib1_ptv, code_for_lookup, default_grib1_center, default_grib1_subcenter, tab, tab_match) )
+         if(GribTable.lookup_grib1(field_name.c_str(), default_grib1_ptv, code_for_lookup,
+                                   default_grib1_center, default_grib1_subcenter, matches) == 0)
          {
             //  if the lookup still fails, then it's not a match
             return false;
@@ -187,9 +190,11 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
       }
 
       //  use the specified indexes to look up the field name
-      if( !GribTable.lookup_grib1(code_for_lookup, vinfo_ptv, vinfo_center, vinfo_subcenter,tab) ) {
+      if(GribTable.lookup_grib1(code_for_lookup, vinfo_ptv,
+                                vinfo_center, vinfo_subcenter, matches) == 0 ) {
          //if did not find with params from the header - try default
-         if( !GribTable.lookup_grib1(code_for_lookup, default_grib1_ptv, default_grib1_center, default_grib1_subcenter, tab) )
+         if(GribTable.lookup_grib1(code_for_lookup, default_grib1_ptv,
+                                   default_grib1_center, default_grib1_subcenter, matches) == 0)
          {
             mlog << Error << "\n" << method_name
                  << "no parameter found with matching GRIB1_ptv ("
@@ -200,9 +205,9 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
          }
       }
    }
-   vinfo.set_code      ( tab.code         );
-   vinfo.set_units     ( tab.units.c_str());
-   vinfo.set_long_name ( tab.full_name.c_str()    );
+   vinfo.set_code      ( matches[0].code);
+   vinfo.set_units     ( matches[0].units.c_str());
+   vinfo.set_long_name ( matches[0].full_name.c_str());
 
    //
    //  test the level type number, if specified
