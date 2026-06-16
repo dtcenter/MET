@@ -27,7 +27,7 @@ def usage() -> None:
     )
 
 
-def check_size_and_return(var):
+def check_size_and_return(var: np.ma.MaskedArray, verb: bool) -> bool:
     do_return = False
     size = total_size(var)
     if size <= zero_count_non_na(var):
@@ -116,17 +116,17 @@ def main(argv: list[str]) -> int:
                 int_num_hdr_var += 1
 
             elif var_name in ARRAY_VARS:
-                if check_size_and_return(var):
+                if check_size_and_return(var, verb):
                     return 1
                 int_num_arr_var += 1
 
             elif var_name in REQUIRED_1D_VARS:
-                if check_size_and_return(var):
+                if check_size_and_return(var, verb):
                     return 1
                 int_num_1d_var += 1
 
             elif var_name in OPTIONAL_1D_VARS:
-                check_size_and_return(var)
+                check_size_and_return(var, verb)
                 int_num_1d_var += 1
 
             elif verb:
