@@ -333,7 +333,7 @@ void Grib2TableEntry::clear()
 
 {
 
-index_a = index_b = index_c = mtab_set = mtab_low = mtab_high = cntr = ltab = -1;
+disc = pcat = pnum = mtab_set = mtab_low = mtab_high = cntr = ltab = -1;
 
 parm_name.clear();
 
@@ -355,9 +355,9 @@ void Grib2TableEntry::assign(const Grib2TableEntry & e)
 
 clear();
 
-index_a = e.index_a;
-index_b = e.index_b;
-index_c = e.index_c;
+disc = e.disc;
+pcat = e.pcat;
+pnum = e.pnum;
 mtab_high = e.mtab_high;
 mtab_low = e.mtab_low;
 mtab_set = e.mtab_set;
@@ -385,14 +385,14 @@ void Grib2TableEntry::dump(ostream & out, int depth) const
 Indent prefix(depth);
 
 out << prefix << "Index values = ("
-              << index_a << ", "
+              << disc << ", "
               << mtab_set << ", "
               << mtab_low << ", "
               << mtab_high << ", "
               << cntr << ", "
               << ltab << ", "
-              << index_b << ", "
-              << index_c << ")\n";
+              << pcat << ", "
+              << pnum << ")\n";
 
 out << prefix << "parm_name = " << parm_name.contents() << "\n";
 
@@ -410,9 +410,9 @@ return;
 bool Grib2TableEntry::is_eq(const Grib2TableEntry &e) const
 
 {
-   return (index_a == e.index_a) &&
-          (index_b == e.index_b) &&
-          (index_c == e.index_c) &&
+   return (disc == e.disc) &&
+          (pcat == e.pcat) &&
+          (pnum == e.pnum) &&
           (parm_name == e.parm_name) &&
           (mtab_set == e.mtab_set) &&
           (mtab_low == e.mtab_low) &&
@@ -468,14 +468,14 @@ for (int j=0; j<8; ++j) {
    if(!is_number(tok[j].c_str())) return false;
 }
 
-index_a   = atoi(tok[0].c_str());
+disc      = atoi(tok[0].c_str());
 mtab_set  = atoi(tok[1].c_str());
 mtab_low  = atoi(tok[2].c_str());
 mtab_high = atoi(tok[3].c_str());
 cntr      = atoi(tok[4].c_str());
 ltab      = atoi(tok[5].c_str());
-index_b   = atoi(tok[6].c_str());
-index_c   = atoi(tok[7].c_str());
+pcat      = atoi(tok[6].c_str());
+pnum      = atoi(tok[7].c_str());
 
    //
    //  grab the 3 strings separated by double quotes
@@ -807,19 +807,20 @@ return status;
 
 
 ////////////////////////////////////////////////////////////////////////
+
 ConcatString TableFlatFile::log_arguments(const char * parm_name,
-                                          int a, int b, int c,
+                                          int disc, int pcat, int pnum,
                                           int mtab, int cntr, int ltab) const
 {
 
 ConcatString msg;
 msg << "parm_name = " << parm_name;
-if( bad_data_int != a ) msg << ", index_a = " << a;
+if( bad_data_int != disc ) msg << ", disc = " << disc;
 if( bad_data_int != mtab ) msg << ", grib2_mtab = " << mtab;
 if( bad_data_int != cntr ) msg << ", grib2_cntr = " << cntr;
 if( bad_data_int != ltab ) msg << ", grib2_ltab = " << ltab;
-if( bad_data_int != b ) msg << ", index_b = " << b;
-if( bad_data_int != c ) msg << ", index_c = " << c;
+if( bad_data_int != pcat ) msg << ", pcat = " << pcat;
+if( bad_data_int != pnum ) msg << ", pnum = " << pnum;
 
 return msg;
 
@@ -1251,7 +1252,7 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, Grib1TableEntry & e)   
 ////////////////////////////////////////////////////////////////////////
 
 
-bool TableFlatFile::lookup_grib2(int a, int b, int c, Grib2TableEntry & e)
+bool TableFlatFile::lookup_grib2(int disc, int pcat, int pnum, Grib2TableEntry & e)
 
 {
 
@@ -1259,7 +1260,7 @@ e.clear();
 
 for (int j=0; j<N_grib2_elements; ++j)  {
 
-   if ( (g2e[j].index_a == a) && (g2e[j].index_b == b) && (g2e[j].index_c == c) )  {
+   if ( (g2e[j].disc == disc) && (g2e[j].pcat == pcat) && (g2e[j].pnum == pnum) )  {
 
       e = g2e[j];
 
@@ -1277,7 +1278,7 @@ return false;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool TableFlatFile::lookup_grib2(int a, int b, int c,
+bool TableFlatFile::lookup_grib2(int disc, int pcat, int pnum,
                                  int mtab, int cntr, int ltab,
                                  Grib2TableEntry & e)
 
@@ -1291,9 +1292,9 @@ bool TableFlatFile::lookup_grib2(int a, int b, int c,
    for (int j=0; j<N_grib2_elements; ++j)  {
 
       // Check discipline, parm_cat, and cat
-      if ( g2e[j].index_a != a ||
-           g2e[j].index_b != b ||
-           g2e[j].index_c != c ) continue;
+      if ( g2e[j].disc != disc ||
+           g2e[j].pcat != pcat ||
+           g2e[j].pnum != pnum ) continue;
 
       GribEntryMatch match_status = g2e[j].match(mtab, cntr, ltab);
       if (GribEntryMatch::exact_match == match_status) {
@@ -1320,7 +1321,7 @@ bool TableFlatFile::lookup_grib2(int a, int b, int c,
 ////////////////////////////////////////////////////////////////////////
 
 
-bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
+bool TableFlatFile::lookup_grib2(const char * parm_name, int disc, int pcat, int pnum,
                                  Grib2TableEntry & e, int & n_matches)
 
 {
@@ -1334,9 +1335,9 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
    for(int j=0; j<N_grib2_elements; ++j){
 
       if( g2e[j].parm_name != parm_name ||
-          (bad_data_int != a && g2e[j].index_a != a) ||
-          (bad_data_int != b && g2e[j].index_b != b) ||
-          (bad_data_int != c && g2e[j].index_c != c) )
+          (bad_data_int != disc && g2e[j].disc != disc) ||
+          (bad_data_int != pcat && g2e[j].pcat != pcat) ||
+          (bad_data_int != pnum && g2e[j].pnum != pnum) )
          continue;
 
       bool is_new = true;
@@ -1355,23 +1356,23 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
       ConcatString msg;
       msg << "Multiple GRIB2 table entries match lookup criteria ("
           << "parm_name = " << parm_name;
-      if( bad_data_int != a ) msg << ", index_a = " << a;
-      if( bad_data_int != b ) msg << ", index_b = " << b;
-      if( bad_data_int != c ) msg << ", index_c = " << c;
+      if( bad_data_int != disc ) msg << ", disc = " << disc;
+      if( bad_data_int != pcat ) msg << ", pcat = " << pcat;
+      if( bad_data_int != pnum ) msg << ", pnum = " << pnum;
       msg << "):\n";
       mlog << Debug(3) << "\n" << msg;
 
       for(auto it = matches.begin(); it < matches.end(); it++)
          mlog << Debug(3) << "  parm_name: " << it->parm_name
-                          << ", index_a = "  << it->index_a
-                          << ", index_b = "  << it->index_b
-                          << ", index_c = "  << it->index_c << "\n";
+                          << ", disc = "  << it->disc
+                          << ", pcat = "  << it->pcat
+                          << ", pnum = "  << it->pnum << "\n";
 
       mlog << Debug(3) << "Using the first match found: "
                        << "  parm_name: " << e.parm_name
-                       << ", index_a = "  << e.index_a
-                       << ", index_b = "  << e.index_b
-                       << ", index_c = "  << e.index_c << "\n\n";
+                       << ", disc = "  << e.disc
+                       << ", pcat = "  << e.pcat
+                       << ", pnum = "  << e.pnum << "\n\n";
 
    }
 
@@ -1384,7 +1385,7 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
 
 
 bool TableFlatFile::lookup_grib2(const char * parm_name,
-                                 int a, int b, int c,
+                                 int disc, int pcat, int pnum,
                                  int mtab, int cntr, int ltab,
                                  Grib2TableEntry & e, int & n_matches)
 
@@ -1399,9 +1400,9 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
    for(int j=0; j<N_grib2_elements; ++j){
 
       if( g2e[j].parm_name != parm_name ||
-          (bad_data_int != a && g2e[j].index_a != a) ||
-          (bad_data_int != b && g2e[j].index_b != b) ||
-          (bad_data_int != c && g2e[j].index_c != c) )
+          (bad_data_int != disc && g2e[j].disc != disc) ||
+          (bad_data_int != pcat && g2e[j].pcat != pcat) ||
+          (bad_data_int != pnum && g2e[j].pnum != pnum) )
          continue;
 
       GribEntryMatch match_status = g2e[j].match(mtab, cntr, ltab);
@@ -1428,33 +1429,33 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
    if( 1 < n_matches ){
 
       mlog << Debug(3) << "\nMultiple GRIB2 table entries match lookup criteria ("
-           << log_arguments(parm_name, a, b, c, mtab, cntr, ltab)
+           << log_arguments(parm_name, disc, pcat, pnum, mtab, cntr, ltab)
            << "):\n";
 
       for(auto it = matches.begin(); it < matches.end(); it++)
          mlog << Debug(3) << "  parm_name: "   << it->parm_name
-                          << ", index_a = "    << it->index_a
+                          << ", disc = "       << it->disc
                           << ", grib2_mtab = " << it->mtab_set
                           << ", grib2_cntr = " << it->cntr
                           << ", grib2_ltab = " << it->ltab
-                          << ", index_b = "    << it->index_b
-                          << ", index_c = "    << it->index_c
+                          << ", pcat = "       << it->pcat
+                          << ", pnum = "       << it->pnum
                           << "\n";
 
       mlog << Debug(3) << "Using the first match found: "
                        << "  parm_name: "   << e.parm_name
-                       << ", index_a = "    << e.index_a
+                       << ", disc = "       << e.disc
                        << ", grib2_mtab = " << e.mtab_set
                        << ", grib2_cntr = " << e.cntr
                        << ", grib2_ltab = " << e.ltab
-                       << ", index_b = "    << e.index_b
-                       << ", index_c = "    << e.index_c
+                       << ", pcat = "       << e.pcat
+                       << ", pnum = "       << e.pnum
                        << "\n\n";
 
    }
    else if( 0 == n_matches ){
       mlog << Debug(3) << "No match, lookup criteria ("
-           << log_arguments(parm_name, a, b, c, mtab, cntr, ltab)
+           << log_arguments(parm_name, disc, pcat, pnum, mtab, cntr, ltab)
            << ")\n";
    }
 
