@@ -2,7 +2,7 @@
 
 # check for environment variables, use defaults if necessary
 export MET_TEST_BASE=${MET_TEST_BASE}
-[ -z $MET_PYTHON_BIN_EXE ] && MET_PYTHON_BIN_EXE=python3
+[[ -z $MET_PYTHON_BIN_EXE ]] && MET_PYTHON_BIN_EXE=python3
 MPNC=$MET_TEST_BASE/python/mpnc.py
 
 # get environment settings
