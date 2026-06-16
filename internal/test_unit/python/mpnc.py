@@ -126,7 +126,7 @@ def main(argv: list[str]) -> int:
                 int_num_1d_var += 1
 
             elif var_name in OPTIONAL_1D_VARS:
-                check_size_and_return(var):
+                check_size_and_return(var)
                 int_num_1d_var += 1
 
             elif verb:
