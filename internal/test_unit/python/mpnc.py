@@ -27,6 +27,22 @@ def usage() -> None:
     )
 
 
+def check_size_and_return(var):
+    do_return = False
+    size = total_size(var)
+    if size <= zero_count_non_na(var):
+        if verb:
+            print("all zeroes")
+        do_return = True
+    if size <= na_count(var):
+        if verb:
+            print("all NAs")
+        do_return = True
+    if verb:
+        print("OK")
+    return do_return
+
+
 def parse_args(argv: list[str]) -> tuple[bool, str]:
     verb = False
 
@@ -100,43 +116,17 @@ def main(argv: list[str]) -> int:
                 int_num_hdr_var += 1
 
             elif var_name in ARRAY_VARS:
-                size = total_size(var)
-                if size <= zero_count_non_na(var):
-                    if verb:
-                        print("all zeroes")
+                if check_size_and_return(var):
                     return 1
-                if size <= na_count(var):
-                    if verb:
-                        print("all NAs")
-                    return 1
-                if verb:
-                    print("OK")
                 int_num_arr_var += 1
 
             elif var_name in REQUIRED_1D_VARS:
-                size = total_size(var)
-                if size <= zero_count_non_na(var):
-                    if verb:
-                        print("all zeroes")
+                if check_size_and_return(var):
                     return 1
-                if size <= na_count(var):
-                    if verb:
-                        print("all NAs")
-                    return 1
-                if verb:
-                    print("OK")
                 int_num_1d_var += 1
 
             elif var_name in OPTIONAL_1D_VARS:
-                size = total_size(var)
-                if size <= zero_count_non_na(var):
-                    if verb:
-                        print("all zeroes")
-                elif size <= na_count(var):
-                    if verb:
-                        print("all NAs")
-                elif verb:
-                    print("OK")
+                check_size_and_return(var):
                 int_num_1d_var += 1
 
             elif verb:
