@@ -417,6 +417,10 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
    //  set the matched parameter lookup information
    set_name         ( field_name    );
    set_req_name     ( field_name.c_str()    );
+   if( field_name != "PROB" ){
+      set_units     ( matches[0].units.c_str()     );
+      set_long_name ( matches[0].full_name.c_str() );
+   }
 
    //  call the parent to set the level information
    set_level_info_grib(dict);
@@ -458,7 +462,7 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
    }
 
    set_p_flag(true);
-   set_units("%");
+   set_units(matches[0].units.c_str());
 
    set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
 
