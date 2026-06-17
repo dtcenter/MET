@@ -182,12 +182,20 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
 
       plane = plane_array[0];
 
-      return process_data_plane(vinfo_g2, plane, do_winds);
+      bool status = process_data_plane(vinfo_g2, plane);
+
+      //  handle wind rotation
+      if(status && do_winds) status = rotate_winds(vinfo_g2, plane);
+
+      return status;
 
    }  //  END: if( 1 > listMatch.size() )
 
    //  verify that a only single record was found
-   if( 1 < listMatch.size() ){
+   if(listMatch.empty()) {
+      return false;
+   }
+   else if( 1 < listMatch.size() ){
       ConcatString msg;
       for(size_t i=0; i < listMatch.size(); i++) {
          msg << "  Record " << listMatch[i]->RecNum
@@ -219,16 +227,16 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
         << Filename << "'\n";
 
    //  read the data plane for the matched record
-   bool read_success = read_grib2_record_data_plane(listMatch[0],
-                                                    plane);
+   bool status = read_grib2_record_data_plane(listMatch[0], plane);
 
-   if(read_success) {
-      //  store whether winds are grid relative
+   if(status) {
       vinfo_g2->set_grid_relative_flag(is_grid_relative(listMatch[0]));
-      read_success = process_data_plane(vinfo_g2, plane, do_winds);
+      status = process_data_plane(vinfo_g2, plane);
+      //  handle wind rotation
+      if(status && do_winds) status = rotate_winds(vinfo_g2, plane);
    }
 
-   return read_success;
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -339,13 +347,17 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
          lvl_upper = ( (double)(*it)->LvlVal2 ) / 100.0;
       }
 
-      //  store whether winds are grid relative
+      //  store grid relative status
       vinfo_g2->set_grid_relative_flag(is_grid_relative(*it));
 
-      if(process_data_plane(vinfo_g2, plane, do_winds)) {
+      //  add current plane to the data plane array
+      if(process_data_plane(vinfo_g2, plane)) {
          plane_array.add(plane, lvl_lower, lvl_upper);
       }
    }
+
+   //  handle wind rotation
+   if(do_winds) rotate_winds(vinfo_g2, plane_array);
 
    return num_read;
 }

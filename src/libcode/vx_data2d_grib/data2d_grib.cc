@@ -506,7 +506,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
          if(status) {
             // Store whether winds are grid relative
             vinfo.set_grid_relative_flag(is_grid_relative(r));
-            status = process_data_plane(&vinfo, cur_plane, do_winds);
+            status = process_data_plane(&vinfo, cur_plane);
          }
 
          if(!status) {
@@ -523,6 +523,9 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
 
       }
    } // end for loop
+
+   // Handle wind rotation
+   if(do_winds) rotate_winds(&vinfo, plane_array);
 
    // If nothing was found, try to build derived records
    if(plane_array.n_planes() == 0 && do_winds) {

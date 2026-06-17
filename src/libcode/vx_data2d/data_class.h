@@ -166,10 +166,11 @@ class Met2dDataFile : public Met2dData {
       bool derive_winds(VarInfo *, DataPlane &);
       bool derive_winds(VarInfo *, DataPlaneArray &);
       bool rotate_winds(VarInfo *, DataPlane &);
+      bool rotate_winds(VarInfo *, DataPlaneArray &);
 
          //  post-process data after reading it
 
-      bool process_data_plane(VarInfo *, DataPlane &, bool do_winds = true);
+      bool process_data_plane(VarInfo *, DataPlane &);
 
 };
 

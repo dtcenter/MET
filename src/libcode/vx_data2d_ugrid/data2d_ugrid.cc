@@ -799,10 +799,13 @@ bool MetUGridDataFile::read_data_plane(ConcatString var_name, VarInfo &vinfo,
          status = false;
       }
 
-      if (status) status = process_data_plane(&vinfo, plane, do_winds);
+      if (status) status = process_data_plane(&vinfo, plane);
       else {
          mlog << Debug(2) << "\n" << method_name << "not processed data_plane\n";
       }
+
+      // Handle wind rotation
+      if(status && do_winds) status = rotate_winds(&vinfo, plane);
 
       // Set the VarInfo object's name, long_name, level, and units strings
 

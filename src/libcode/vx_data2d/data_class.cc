@@ -651,9 +651,18 @@ bool Met2dDataFile::rotate_winds(VarInfo *vinfo, DataPlane &dp)
 
 {
 
-static const char *method_name = "Met2dDataFile::rotate_winds() -> ";
+static const char *method_name = "Met2dDataFile::rotate_winds(DataPlane) -> ";
 
-if(!vinfo || !vinfo->need_rotation()) return false;
+if(!vinfo || !vinfo->is_wind_rotation()) return false;
+
+if(vinfo->is_wind_rotation() && !vinfo->is_grid_relative()) {
+   mlog << Debug(3) << "Wind field \"" << vinfo->magic_str()
+        << "\" is already defined as earth-relative.\n";
+   return true;
+}
+
+   //
+   // Apply conversion logic
 
 bool status = false;
 
@@ -690,6 +699,94 @@ else if(vinfo->is_wind_direction()) {
 if(!status) {
    mlog << Warning << "\n" << method_name
         << "Trouble rotating wind field (" << vinfo->magic_str()
+        << ") from grid to earth relative.\n\n";
+}
+// Update flag for a successful rotation
+else {
+   vinfo->set_earth_relative();
+}
+
+return status;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Met2dDataFile::rotate_winds(VarInfo *vinfo, DataPlaneArray &dpa)
+
+{
+
+static const char *method_name = "Met2dDataFile::rotate_winds(DataPlaneArray) -> ";
+
+if(!vinfo || !vinfo->is_wind_rotation()) return false;
+
+if(vinfo->is_wind_rotation() && !vinfo->is_grid_relative()) {
+   mlog << Debug(3) << "Wind field \"" << vinfo->magic_str()
+        << "\" is already defined as earth-relative.\n";
+   return true;
+}
+
+bool status = false;
+
+DataPlaneArray uwnd_dpa;
+DataPlaneArray vwnd_dpa;
+DataPlaneArray tmp_dpa;
+ConcatString units;
+DataPlaneArray *uwnd_out;
+DataPlaneArray *vwnd_out;
+
+// Rotate U-Wind and V-Wind
+if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
+
+   if(vinfo->is_u_wind()) {
+      uwnd_dpa = dpa;
+      uwnd_out = &dpa;
+      vwnd_out = &tmp_dpa;
+      status = read_wind_data(vinfo, vinfo->wind_info().v_wind,
+                              vwnd_dpa, units);
+   }
+   else {
+      vwnd_dpa = dpa;
+      uwnd_out = &tmp_dpa;
+      vwnd_out = &dpa;
+      status = read_wind_data(vinfo, vinfo->wind_info().u_wind,
+                              uwnd_dpa, units);
+   }
+
+   // Check for matching levels
+   if(!uwnd_dpa.levels_match(vwnd_dpa)) {
+      mlog << Warning << "\n" << method_name
+           << "The U-wind and V-wind levels do not match.\n\n";
+      status = false;
+   }
+
+   // Rotate each plane
+   if(status) {
+      for(int i=0; i<uwnd_dpa.n_planes(); i++) {
+         status = rotate_uv_grid_to_earth(
+                     uwnd_dpa.at(i), vwnd_dpa.at(i),
+                     *Raw_Grid, uwnd_out->at(i), vwnd_out->at(i));
+         if(!status) break;
+      }
+   }
+}
+// Rotate Wind Direction
+else if(vinfo->is_wind_direction()) {
+   tmp_dpa = dpa;
+
+   // Rotate each plane
+   for(int i=0; i<dpa.n_planes(); i++) {
+      rotate_wind_direction_grid_to_earth(
+         tmp_dpa.at(i),*Raw_Grid, dpa.at(i));
+   }
+   status = true;
+}
+
+if(!status) {
+   mlog << Warning << "\n" << method_name
+        << "Trouble rotating wind fields (" << vinfo->magic_str()
         << ") from grid to earth relative.\n\n";
 }
 // Update flag for a successful rotation
@@ -807,27 +904,11 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Met2dDataFile::process_data_plane(VarInfo *vinfo, DataPlane &dp,
-                                       bool do_winds)
+bool Met2dDataFile::process_data_plane(VarInfo *vinfo, DataPlane &dp)
 
 {
 
 if ( ! vinfo )  return false;
-
-   //
-   // Rotate winds, if requested and needed
-   //
-
-if(do_winds && vinfo->is_wind_rotation()) {
-
-   if(vinfo->need_rotation()) {
-      rotate_winds(vinfo, dp);
-   }
-   else {
-      mlog << Debug(3) << "Wind field \"" << vinfo->magic_str()
-           << "\" is defined as earth-relative.\n";
-   }
-}
 
    //
    // Apply conversion logic

@@ -333,7 +333,9 @@ if ( status ) {
 
    plane = Plane;
 
-   status = process_data_plane(&vinfo, plane, do_winds);
+   status = process_data_plane(&vinfo, plane);
+
+   if(status && do_winds)  status = rotate_winds(&vinfo, plane);
 
 }
 
@@ -401,7 +403,9 @@ if ( status ) {
 
    plane = Plane;
 
-   status = process_data_plane(&vinfo, plane, do_winds);
+   status = process_data_plane(&vinfo, plane);
+
+   if(status && do_winds)  status = rotate_winds(&vinfo, plane);
 
 }
 

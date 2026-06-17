@@ -373,7 +373,10 @@ bool MetNcCFDataFile::read_data_plane(VarInfo &vinfo, DataPlane &plane,
       }
     }
 
-    status = process_data_plane(&vinfo, plane, do_winds);
+    status = process_data_plane(&vinfo, plane);
+
+    // Handle wind rotation
+    if(status && do_winds) status = rotate_winds(&vinfo, plane);
 
     // Set the VarInfo object's name, long_name, level, and units strings
 
