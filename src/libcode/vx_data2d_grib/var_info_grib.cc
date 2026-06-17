@@ -102,14 +102,14 @@ void VarInfoGrib::assign(const VarInfoGrib &v) {
    VarInfo::assign(v);
 
    // Copy
-   PTV          = v.PTV;
-   Code         = v.Code;
-   LvlType      = v.LvlType;
-   PCode        = v.PCode;
-   Center       = v.Center;
-   Subcenter    = v.Subcenter;
-   FieldRec     = v.FieldRec;
-   TRI          = v.TRI;
+   PTV       = v.PTV;
+   Code      = v.Code;
+   LvlType   = v.LvlType;
+   PCode     = v.PCode;
+   Center    = v.Center;
+   Subcenter = v.Subcenter;
+   FieldRec  = v.FieldRec;
+   TRI       = v.TRI;
 
    return;
 }
@@ -129,6 +129,7 @@ void VarInfoGrib::clear() {
    Center    = bad_data_int;
    Subcenter = bad_data_int;
    FieldRec  = bad_data_int;
+   TRI       = bad_data_int;
 
    return;
 }
@@ -144,7 +145,8 @@ void VarInfoGrib::dump(ostream &out) const {
        << "  LvlType      = " << LvlType   << "\n"
        << "  PCode        = " << PCode     << "\n"
        << "  Center       = " << Center    << "\n"
-       << "  Subcenter    = " << Subcenter << "\n";
+       << "  Subcenter    = " << Subcenter << "\n"
+       << "  TRI          = " << TRI       << "\n";
 
    return;
 }
@@ -278,6 +280,9 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
          }
       }
    }
+   set_code      ( matches[0].code );
+   set_long_name ( matches[0].full_name.c_str() );
+   set_units     ( matches[0].units.c_str() );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -343,7 +348,9 @@ bool VarInfoGrib::set_dict(Dictionary & dict, bool do_exit) {
       return false;
    }
 
-   set_p_flag(true);
+   set_p_flag        ( true );
+   set_p_code        ( matches[0].code  );
+   set_p_units       ( matches[0].units.c_str() );
    set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
 
    return true;
