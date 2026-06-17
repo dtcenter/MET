@@ -403,7 +403,7 @@ The following is a summary of the input and output formats for each of the tools
 Output Column Types
 ===================
 
-MET ASCII output files are in a fixed-width column format. Each column has a column header. Each individual column header has an associated data type (i.e. "VERSION" is a string). This information is useful for users who wish to use Python to read MET output. The datatype for each MET linetype can be found in data/table_files/met_column_types.json. 
+MET ASCII output files are in a whitespace-separated columnar format. The contents of each column are described for the tools which generate that output type, including section :numref:`point_stat-output` for the Point-Stat tool. Each individual column has an associated data type (i.e. "VERSION" is a string, as seen in table :numref:`table_PS_header_info_point-stat_out`). This data type information is useful when reading MET output using Python. The data types of the columns for each MET line type can be found in *data/table_files/met_column_types.json*.
 
 .. _Configuration File Details:
 
