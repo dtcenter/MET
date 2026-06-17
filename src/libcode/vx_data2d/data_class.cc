@@ -653,7 +653,9 @@ bool Met2dDataFile::rotate_winds(VarInfo *vinfo, DataPlane &dp)
 
 static const char *method_name = "Met2dDataFile::rotate_winds(DataPlane) -> ";
 
-if(!vinfo || !vinfo->is_wind_rotation()) return false;
+if(!vinfo) return false;
+
+if(!vinfo->is_wind_rotation()) return true;
 
 if(vinfo->is_wind_rotation() && !vinfo->is_grid_relative()) {
    mlog << Debug(3) << "Wind field \"" << vinfo->magic_str()
@@ -720,7 +722,9 @@ bool Met2dDataFile::rotate_winds(VarInfo *vinfo, DataPlaneArray &dpa)
 
 static const char *method_name = "Met2dDataFile::rotate_winds(DataPlaneArray) -> ";
 
-if(!vinfo || !vinfo->is_wind_rotation()) return false;
+if(!vinfo) return false;
+
+if(!vinfo->is_wind_rotation()) return true;
 
 if(vinfo->is_wind_rotation() && !vinfo->is_grid_relative()) {
    mlog << Debug(3) << "Wind field \"" << vinfo->magic_str()
