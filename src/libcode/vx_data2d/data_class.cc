@@ -492,7 +492,7 @@ if(vinfo->need_uv_wind()) {
          DataPlane vwnd_dp_orig(vwnd_dpa[i]);
          rotate_uv_grid_to_earth(uwnd_dp_orig, vwnd_dp_orig,
                                  *Raw_Grid,
-                                  uwnd_dpa.at(i), vwnd_dpa.at(i));
+                                 uwnd_dpa.at(i), vwnd_dpa.at(i));
       }
       vinfo->set_earth_relative();
    }
@@ -736,7 +736,7 @@ bool status = false;
 
 DataPlaneArray uwnd_dpa;
 DataPlaneArray vwnd_dpa;
-DataPlaneArray tmp_dpa;
+DataPlaneArray tmp_dpa(dpa);
 ConcatString units;
 DataPlaneArray *uwnd_out;
 DataPlaneArray *vwnd_out;
@@ -770,7 +770,7 @@ if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
    if(status) {
       for(int i=0; i<uwnd_dpa.n_planes(); i++) {
          status = rotate_uv_grid_to_earth(
-                     uwnd_dpa.at(i), vwnd_dpa.at(i),
+                     uwnd_dpa[i], vwnd_dpa[i],
                      *Raw_Grid, uwnd_out->at(i), vwnd_out->at(i));
          if(!status) break;
       }
@@ -783,7 +783,7 @@ else if(vinfo->is_wind_direction()) {
    // Rotate each plane
    for(int i=0; i<dpa.n_planes(); i++) {
       rotate_wind_direction_grid_to_earth(
-         tmp_dpa.at(i),*Raw_Grid, dpa.at(i));
+         tmp_dpa[i], *Raw_Grid, dpa.at(i));
    }
    status = true;
 }
