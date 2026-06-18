@@ -841,6 +841,8 @@ for(int i=0; i<names.n(); i++) {
       status = true;
       units = vinfo_cur->units();
       vinfo->set_grid_relative_flag(vinfo_cur->is_grid_relative());
+      mlog << "Found matching wind field \""
+           << vinfo_cur->magic_str() << "\".\n";
       break;
    }
 }
@@ -892,6 +894,8 @@ for(int i=0; i<names.n(); i++) {
       status = true;
       units = vinfo_cur->units();
       vinfo->set_grid_relative_flag(vinfo_cur->is_grid_relative());
+      mlog << "Found matching wind field(s) \""
+           << vinfo_cur->magic_str() << "\".\n";
       break;
    }
 }

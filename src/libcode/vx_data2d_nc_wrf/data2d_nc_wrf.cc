@@ -131,6 +131,7 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
 
    // Read the data
    WrfNc->get_nc_var_info(vinfo_nc->req_name().c_str(), info);
+   if(!info) return false;
    LongArray dimension = vinfo_nc->dimension();
    int dim_count = dimension.n_elements();
    for (int k=0; k<dim_count; k++) {
