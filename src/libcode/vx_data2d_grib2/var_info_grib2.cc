@@ -415,10 +415,13 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
 
    set_ens          (ens_str.c_str());
    //  set the matched parameter lookup information
-   set_name         ( field_name    );
-   set_req_name     ( field_name.c_str()    );
+   set_name         ( field_name );
+   set_req_name     ( field_name.c_str() );
    if( field_name != "PROB" ){
-      set_units     ( matches[0].units.c_str()     );
+      set_discipline( matches[0].disc );
+      set_parm_cat  ( matches[0].pcat );
+      set_parm      ( matches[0].pnum );
+      set_units     ( matches[0].units.c_str() );
       set_long_name ( matches[0].full_name.c_str() );
    }
 
@@ -461,8 +464,12 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
       return false;
    }
 
-   set_p_flag(true);
-   set_units(matches[0].units.c_str());
+   set_discipline ( matches[0].disc );
+   set_parm_cat   ( matches[0].pcat );
+   set_parm       ( matches[0].pnum );
+   set_p_flag     ( true );
+   set_p_units    ( matches[0].units.c_str() );
+   set_units      ( "%" );  
 
    set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
 
