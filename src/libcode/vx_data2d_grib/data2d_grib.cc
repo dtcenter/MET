@@ -503,12 +503,6 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
          // Read current record
          status = get_data_plane(r, cur_plane);
 
-         if(status) {
-            // Store whether winds are grid relative
-            vinfo.set_grid_relative_flag(is_grid_relative(r));
-            status = process_data_plane(&vinfo, cur_plane);
-         }
-
          if(!status) {
             cur_plane.clear();
             lower = upper = bad_data_int;
@@ -517,6 +511,9 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
                  << " from GRIB file \"" << filename() << "\".\n\n";
             continue;
          }
+
+         // Store whether winds are grid relative
+         vinfo.set_grid_relative_flag(is_grid_relative(r));
 
          // Add current record to the data plane array
          plane_array.add(cur_plane, (double) lower, (double) upper);
@@ -530,6 +527,11 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
    // If nothing was found, try to build derived records
    if(plane_array.n_planes() == 0 && do_winds) {
       derive_winds(&vinfo, plane_array);
+   }
+
+   // Post-process each data plane
+   for(int i=0; i<plane_array.n_planes(); i++) {
+      process_data_plane(&vinfo, plane_array.at(i));
    }
 
    mlog << Debug(3) << "MetGrib1DataFile::data_plane_array() -> "

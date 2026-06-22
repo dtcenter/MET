@@ -184,10 +184,10 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
          status = false;
       }
 
-      status = process_data_plane(&vinfo, plane);
-
       // Handle wind rotation
       if(status && do_winds) status = rotate_winds(&vinfo, plane);
+
+      if(status) status = process_data_plane(&vinfo, plane);
 
       // Set the VarInfo object's name, long_name, and units strings
       // Note that info is null for derived fields
@@ -292,14 +292,17 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
             status = false;
          }
 
-         status = process_data_plane(&vinfo, cur_plane);
-
          // Add current plane to the data plane array
          plane_array.add(cur_plane, pressure, pressure);
       }
 
       // Handle wind rotation
       if(do_winds) rotate_winds(&vinfo, plane_array);
+
+      //  post-process each data plane
+      for(int i=0; i<plane_array.n_planes(); i++) {
+         process_data_plane(&vinfo, plane_array.at(i));
+      }
 
       // Check for bad status
       if(!status) return 0;

@@ -182,10 +182,11 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
 
       plane = plane_array[0];
 
-      bool status = process_data_plane(vinfo_g2, plane);
-
       //  handle wind rotation
-      if(status && do_winds) status = rotate_winds(vinfo_g2, plane);
+      bool status = true;
+      if(do_winds) status = rotate_winds(vinfo_g2, plane);
+
+      if(status) status = process_data_plane(vinfo_g2, plane);
 
       return status;
 
@@ -230,10 +231,12 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
    bool status = read_grib2_record_data_plane(listMatch[0], plane);
 
    if(status) {
-      vinfo_g2->set_grid_relative_flag(is_grid_relative(listMatch[0]));
-      status = process_data_plane(vinfo_g2, plane);
+
       //  handle wind rotation
+      vinfo_g2->set_grid_relative_flag(is_grid_relative(listMatch[0]));
       if(status && do_winds) status = rotate_winds(vinfo_g2, plane);
+
+      if(status) status = process_data_plane(vinfo_g2, plane);
    }
 
    return status;
@@ -351,13 +354,16 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
       vinfo_g2->set_grid_relative_flag(is_grid_relative(*it));
 
       //  add current plane to the data plane array
-      if(process_data_plane(vinfo_g2, plane)) {
-         plane_array.add(plane, lvl_lower, lvl_upper);
-      }
+      plane_array.add(plane, lvl_lower, lvl_upper);
    }
 
    //  handle wind rotation
    if(do_winds) rotate_winds(vinfo_g2, plane_array);
+
+   //  post-process each data plane
+   for(int i=0; i<plane_array.n_planes(); i++) {
+      process_data_plane(vinfo_g2, plane_array.at(i));
+   }
 
    return num_read;
 }

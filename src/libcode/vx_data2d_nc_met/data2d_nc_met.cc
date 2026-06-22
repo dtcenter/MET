@@ -286,10 +286,10 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
          status = false;
       }
 
-      status = process_data_plane(&vinfo, plane);
-
       // Handle wind rotation
       if(status && do_winds) status = rotate_winds(&vinfo, plane);
+
+      if(status) status = process_data_plane(&vinfo, plane);
 
       // Set the VarInfo object's name, long_name, level, and units strings
       if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
