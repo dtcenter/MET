@@ -83,9 +83,11 @@ class Met2dDataFile : public Met2dData {
 
       void mtddf_init_from_scratch();
 
-      bool read_wind_data(VarInfo *, const StringArray &,
+      bool read_wind_data(VarInfo *,
+                          const char *, const StringArray &,
                           DataPlane &, ConcatString &);
-      bool read_wind_data(VarInfo *, const StringArray &,
+      bool read_wind_data(VarInfo *,
+                          const char *, const StringArray &,
                           DataPlaneArray &, ConcatString &);
 
       bool GridShifted;

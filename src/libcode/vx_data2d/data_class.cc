@@ -378,9 +378,13 @@ if(vinfo->need_uv_wind()) {
    DataPlane vwnd_dp;
    ConcatString uwnd_units;
    ConcatString vwnd_units;
-   status = read_wind_data(vinfo, vinfo->wind_info().u_wind,
+   status = read_wind_data(vinfo,
+                           conf_key_u_wind_field_name,
+                           vinfo->wind_info().u_wind,
                            uwnd_dp, uwnd_units) &&
-            read_wind_data(vinfo, vinfo->wind_info().v_wind,
+            read_wind_data(vinfo,
+                           conf_key_v_wind_field_name,
+                           vinfo->wind_info().v_wind,
                            vwnd_dp, vwnd_units);
 
    if(status) {
@@ -424,9 +428,13 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
    DataPlane wdir_dp;
    ConcatString wspd_units;
    ConcatString wdir_units;
-   status = read_wind_data(vinfo, vinfo->wind_info().wind_speed,
+   status = read_wind_data(vinfo,
+                           conf_key_wind_speed_field_name,
+                           vinfo->wind_info().wind_speed,
                            wspd_dp, wspd_units) &&
-            read_wind_data(vinfo, vinfo->wind_info().wind_direction,
+            read_wind_data(vinfo,
+                           conf_key_wind_direction_field_name,
+                           vinfo->wind_info().wind_direction,
                            wdir_dp, wdir_units);
 
    // Rotate wind direction, if needed
@@ -478,9 +486,13 @@ if(vinfo->need_uv_wind()) {
    DataPlaneArray vwnd_dpa;
    ConcatString uwnd_units;
    ConcatString vwnd_units;
-   status = read_wind_data(vinfo, vinfo->wind_info().u_wind,
+   status = read_wind_data(vinfo,
+                           conf_key_u_wind_field_name,
+                           vinfo->wind_info().u_wind,
                            uwnd_dpa, uwnd_units) &&
-            read_wind_data(vinfo, vinfo->wind_info().v_wind,
+            read_wind_data(vinfo,
+                           conf_key_v_wind_field_name,
+                           vinfo->wind_info().v_wind,
                            vwnd_dpa, vwnd_units);
 
    if(!status) return status;
@@ -570,9 +582,13 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
    DataPlaneArray wdir_dpa;
    ConcatString wspd_units;
    ConcatString wdir_units;
-   status = read_wind_data(vinfo, vinfo->wind_info().wind_speed,
+   status = read_wind_data(vinfo,
+                           conf_key_wind_speed_field_name,
+                           vinfo->wind_info().wind_speed,
                            wspd_dpa, wspd_units) &&
-            read_wind_data(vinfo, vinfo->wind_info().wind_direction,
+            read_wind_data(vinfo,
+                           conf_key_wind_direction_field_name,
+                           vinfo->wind_info().wind_direction,
                            wdir_dpa, wdir_units);
 
    if(!status) return status;
@@ -676,7 +692,9 @@ ConcatString units;
 // Rotate U-Wind
 if(vinfo->is_u_wind()) {
    uwnd_dp = dp;
-   status = read_wind_data(vinfo, vinfo->wind_info().v_wind,
+   status = read_wind_data(vinfo,
+                           conf_key_v_wind_field_name,
+                           vinfo->wind_info().v_wind,
                            vwnd_dp, units);
    if(status) status = rotate_uv_grid_to_earth(uwnd_dp, vwnd_dp,
                                                *Raw_Grid,
@@ -685,7 +703,9 @@ if(vinfo->is_u_wind()) {
 // Rotate V-Wind
 else if(vinfo->is_v_wind()) {
    vwnd_dp = dp;
-   status = read_wind_data(vinfo, vinfo->wind_info().u_wind,
+   status = read_wind_data(vinfo,
+                           conf_key_u_wind_field_name,
+                           vinfo->wind_info().u_wind,
                            uwnd_dp, units);
    if(status) status = rotate_uv_grid_to_earth(uwnd_dp, vwnd_dp,
                                                *Raw_Grid,
@@ -748,14 +768,18 @@ if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
       uwnd_dpa = dpa;
       uwnd_out = &dpa;
       vwnd_out = &tmp_dpa;
-      status = read_wind_data(vinfo, vinfo->wind_info().v_wind,
+      status = read_wind_data(vinfo,
+                              conf_key_v_wind_field_name,
+                              vinfo->wind_info().v_wind,
                               vwnd_dpa, units);
    }
    else {
       vwnd_dpa = dpa;
       uwnd_out = &tmp_dpa;
       vwnd_out = &dpa;
-      status = read_wind_data(vinfo, vinfo->wind_info().u_wind,
+      status = read_wind_data(vinfo,
+                              conf_key_u_wind_field_name,
+                              vinfo->wind_info().u_wind,
                               uwnd_dpa, units);
    }
 
@@ -807,6 +831,7 @@ return status;
 
 
 bool Met2dDataFile::read_wind_data(VarInfo *vinfo,
+                                   const char *conf_key_name,
                                    const StringArray &names,
                                    DataPlane &dp,
                                    ConcatString &units)
@@ -839,15 +864,16 @@ for(int i=0; i<names.n(); i++) {
    }
 }
 
+if(!status) {
+   mlog << Warning << "\n" << method_name
+        << "No matching wind field found for name(s) \""
+        << write_css(names) << "\". Set \"" << conf_key_name
+        << "\" to specify the matching variable name.\n\n";
+}
+
    // Cleanup
 
 if(vinfo_cur) { delete vinfo_cur; vinfo_cur = nullptr; }
-
-if(!status) {
-   mlog << Warning << "\n" << method_name
-        << "No matching wind data found for names \""
-        << write_css(names) << "\".\n\n";
-}
 
 return status;
 
@@ -858,6 +884,7 @@ return status;
 
 
 bool Met2dDataFile::read_wind_data(VarInfo *vinfo,
+                                   const char *conf_key_name,
                                    const StringArray &names,
                                    DataPlaneArray &dpa,
                                    ConcatString &units)
@@ -890,15 +917,16 @@ for(int i=0; i<names.n(); i++) {
    }
 }
 
+if(!status) {
+   mlog << Warning << "\n" << method_name
+        << "No matching wind field(s) found for name(s) \""
+        << write_css(names) << "\". Set \"" << conf_key_name
+        << "\" to specify the matching variable name.\n\n";
+}
+
    // Cleanup
 
 if(vinfo_cur) { delete vinfo_cur; vinfo_cur = nullptr; }
-
-if(!status) {
-   mlog << Warning << "\n" << method_name
-        << "No matching wind data found for names \""
-        << write_css(names) << "\".\n\n";
-}
 
 return status;
 
