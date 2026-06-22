@@ -813,6 +813,8 @@ bool Met2dDataFile::read_wind_data(VarInfo *vinfo,
 
 {
 
+static const char *method_name = "Met2dDataFile::read_wind_data(DataPlane) -> ";
+
 if(!vinfo) return false;
 
 bool status = false;
@@ -824,20 +826,10 @@ VarInfo * vinfo_cur = vinfo->clone();
     // Try each of the possible names
 
 for(int i=0; i<names.n(); i++) {
-   vinfo_cur->set_req_name(names[i]);
-   vinfo_cur->set_name(names[i]);
 
-   // Wrap level in parenthesis, if needed
-   string lstr = vinfo_cur->level_name();
-   if(lstr.find(',') != string::npos &&
-      lstr.find('(') == string::npos) {
-      lstr.insert(0, "(");
-      lstr.append(")");
-   }
-   vinfo_cur->set_magic(names[i], lstr);
-
-   // Retrieve units and grid-relative status
-   if(data_plane(*vinfo_cur, dp, false)) {
+   // Check for a match
+   if(vinfo_cur->reset_dict_with_name(names[i].c_str()) &&
+      data_plane(*vinfo_cur, dp, false)) {
       status = true;
       units = vinfo_cur->units();
       vinfo->set_grid_relative_flag(vinfo_cur->is_grid_relative());
@@ -850,6 +842,12 @@ for(int i=0; i<names.n(); i++) {
    // Cleanup
 
 if(vinfo_cur) { delete vinfo_cur; vinfo_cur = nullptr; }
+
+if(!status) {
+   mlog << Warning << "\n" << method_name
+        << "No matching wind data found for names \""
+        << write_css(names) << "\".\n\n";
+}
 
 return status;
 
@@ -866,6 +864,8 @@ bool Met2dDataFile::read_wind_data(VarInfo *vinfo,
 
 {
 
+static const char *method_name = "Met2dDataFile::read_wind_data(DataPlaneArray) -> ";
+
 if(!vinfo) return false;
 
 bool status = false;
@@ -877,20 +877,10 @@ VarInfo * vinfo_cur = vinfo->clone();
     // Try each of the possible names
 
 for(int i=0; i<names.n(); i++) {
-   vinfo_cur->set_req_name(names[i]);
-   vinfo_cur->set_name(names[i]);
 
-   // Wrap level in parenthesis, if needed
-   string lstr = vinfo_cur->level_name();
-   if(lstr.find(',') != string::npos &&
-      lstr.find('(') == string::npos) {
-      lstr.insert(0, "(");
-      lstr.append(")");
-   }
-   vinfo_cur->set_magic(names[i], lstr);
-
-   // Retrieve units and grid-relative status
-   if(data_plane_array(*vinfo_cur, dpa, false)) {
+   // Check for a match
+   if(vinfo_cur->reset_dict_with_name(names[i].c_str()) &&
+      data_plane_array(*vinfo_cur, dpa, false)) {
       status = true;
       units = vinfo_cur->units();
       vinfo->set_grid_relative_flag(vinfo_cur->is_grid_relative());
@@ -903,6 +893,12 @@ for(int i=0; i<names.n(); i++) {
    // Cleanup
 
 if(vinfo_cur) { delete vinfo_cur; vinfo_cur = nullptr; }
+
+if(!status) {
+   mlog << Warning << "\n" << method_name
+        << "No matching wind data found for names \""
+        << write_css(names) << "\".\n\n";
+}
 
 return status;
 

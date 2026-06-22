@@ -28,8 +28,8 @@ class VarInfo
 {
    protected:
 
-      ConcatString  MagicStr;  // Requested magic string
       Dictionary    Dict;      // Requested fcst/obs dictionary of fields
+      ConcatString  MagicStr;  // Requested magic string
 
       ConcatString  ReqName;   // Requested parameter name
       ConcatString  Name;      // Name of parameter
@@ -171,6 +171,8 @@ class VarInfo
       virtual void set_magic(const ConcatString &, const ConcatString &);
       virtual bool set_dict(Dictionary &, bool do_exit=true);
       virtual void add_grib_code(Dictionary &);
+
+      bool reset_dict_with_name(const char *);
 
       void set_req_name(const char *);
       void set_req_name(const std::string &);

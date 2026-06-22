@@ -87,6 +87,7 @@ void VarInfo::init_from_scratch() {
 void VarInfo::assign(const VarInfo &v) {
 
    // Copy
+   Dict      = v.Dict;
    MagicStr  = v.MagicStr;
    ReqName   = v.ReqName;
    Name      = v.Name;
@@ -151,6 +152,7 @@ void VarInfo::assign(const VarInfo &v) {
 void VarInfo::clear() {
 
    // Initialize
+   Dict.clear();
    MagicStr.clear();
    ReqName.clear();
    Name.clear();
@@ -537,6 +539,9 @@ bool VarInfo::set_dict(Dictionary &dict, bool do_exit) {
    int n;
    const char *method_name = "VarInfo::set_dict(Dictionary &dict) -> ";
 
+   // Store the dictionary
+   Dict = dict;
+
    // Set init time, if present
    s = dict.lookup_string(conf_key_init_time, false);
    if(dict.last_lookup_status()) set_init(timestring_to_unix(s.c_str()));
@@ -637,8 +642,16 @@ bool VarInfo::set_dict(Dictionary &dict, bool do_exit) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfo::set_level_info_grib(Dictionary & dict){
+bool VarInfo::reset_dict_with_name(const char *str) {
+   DictionaryEntry e;
+   e.set_string(conf_key_name, str);
+   Dict.store(e);
+   return set_dict(Dict);
+}
 
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfo::set_level_info_grib(Dictionary & dict){
    ConcatString field_level = dict.lookup_string(conf_key_level, false);
    LevelType lt;
    string lvl_type, lvl_val1, lvl_val2;
@@ -976,7 +989,7 @@ bool VarInfo::validate_wind_attributes(bool do_exit, const char *caller_name) co
 ///////////////////////////////////////////////////////////////////////////////
 
 ConcatString parse_set_attr_string(Dictionary &dict, const char *key,
-                                    bool check_ws) {
+                                   bool check_ws) {
    ConcatString cs;
 
    cs = dict.lookup_string(key, false);
