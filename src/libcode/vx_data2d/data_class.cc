@@ -673,14 +673,17 @@ if(!vinfo) return false;
 
 if(!vinfo->is_wind_rotation()) return true;
 
-if(vinfo->is_wind_rotation() && !vinfo->is_grid_relative()) {
-   mlog << Debug(3) << "Wind field \"" << vinfo->magic_str()
-        << "\" is already defined as earth-relative.\n";
+if(vinfo->is_grid_relative()) {
+   mlog << Debug(3) << "Rotating wind field \""
+        << vinfo->magic_str()
+        << "\" from grid-relative to earth-relative.\n";
+}
+else {
+   mlog << Debug(3) << "Identified wind field \""
+        << vinfo->magic_str()
+        << "\" as being earth-relative.\n";
    return true;
 }
-
-   //
-   // Apply conversion logic
 
 bool status = false;
 
@@ -746,9 +749,15 @@ if(!vinfo) return false;
 
 if(!vinfo->is_wind_rotation()) return true;
 
-if(vinfo->is_wind_rotation() && !vinfo->is_grid_relative()) {
-   mlog << Debug(3) << "Wind field \"" << vinfo->magic_str()
-        << "\" is already defined as earth-relative.\n";
+if(vinfo->is_grid_relative()) {
+   mlog << Debug(3) << "Rotating " << dpa.n_planes()
+        << " wind field(s) for \"" << vinfo->magic_str()
+        << "\" from grid-relative to earth-relative.\n";
+}
+else {
+   mlog << Debug(3) << "Identified " << dpa.n_planes()
+        << " wind field(s) for \"" << vinfo->magic_str()
+        << "\" as being earth-relative.\n";
    return true;
 }
 

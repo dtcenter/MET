@@ -333,9 +333,6 @@ void rotate_wind_direction_grid_to_earth(
    const int nx = wdir2d.nx();
    const int ny = wdir2d.ny();
 
-   mlog << Debug(3)
-        << "Rotating wind direction from grid-relative to earth-relative.\n";
-
    //
    // Initialize by setting to u2d
    //
@@ -393,9 +390,6 @@ bool rotate_uv_grid_to_earth(
         DataPlane &u2d_rot, DataPlane &v2d_rot) {
    const int nx = u2d.nx();
    const int ny = u2d.ny();
-
-   mlog << Debug(3)
-        << "Rotating U and V wind components from grid-relative to earth-relative.\n";
 
    //
    // Check that the dimensions match
