@@ -656,9 +656,14 @@ static void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
 ////////////////////////////////////////////////////////////////////////
 
 static bool get_data_plane(const char *infile, GrdFileType ftype,
-                           VarInfo *info, DataPlane &dp) {
+                           VarInfo *in_var_info, DataPlane &dp) {
    bool found;
    Met2dDataFile *mtddf = nullptr;
+
+   if(!in_var_info) return false;
+
+   // Clone local copy since reading data can affect contents
+   VarInfo *info = in_var_info->clone();
 
    // Read the current ensemble file
    if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(infile, ftype))) {
@@ -700,8 +705,9 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
 
    } // end if found
 
-   // Deallocate the data file pointer, if necessary
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
+   // Cleanup
+   if(info)  { delete  info;  info = nullptr; }
+   if(mtddf) { delete mtddf; mtddf = nullptr; }
 
    return found;
 }
