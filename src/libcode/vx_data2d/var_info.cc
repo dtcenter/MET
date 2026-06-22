@@ -296,7 +296,7 @@ void VarInfo::set_req_name(const char *str) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfo::set_req_name(const string &str) {
-   ReqName = str;
+   set_req_name(str.c_str());
    return;
 }
 
@@ -310,7 +310,7 @@ void VarInfo::set_name(const char *str) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfo::set_name(const string &str) {
-   Name = str;
+   set_name(str.c_str());
    return;
 }
 
@@ -338,7 +338,7 @@ void VarInfo::set_units(const char *str) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfo::set_units(const string &str) {
-   Units = str;
+   set_units(str.c_str());
    return;
 }
 
