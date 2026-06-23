@@ -393,7 +393,8 @@ if(vinfo->need_uv_wind()) {
    if(status) {
 
       // Rotate U/V winds, if needed
-      if(vinfo_uwnd->need_rotation() &&
+      if(vinfo->is_wind_rotation() &&
+         vinfo_uwnd->need_rotation() &&
          vinfo_vwnd->need_rotation()) {
          DataPlane uwnd_dp_orig(uwnd_dp);
          DataPlane vwnd_dp_orig(vwnd_dp);
@@ -412,6 +413,7 @@ if(vinfo->need_uv_wind()) {
       // Derive wind direction
       else if(vinfo->is_wind_direction()) {
          status = derive_wind_direction(uwnd_dp, vwnd_dp, dp);
+         vinfo->set_earth_relative();
          vinfo->set_long_name("Wind Direction");
          vinfo->set_units("deg");
       }
@@ -456,6 +458,7 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
            << "from grid-relative to earth-relative.\n";
       rotate_wind_direction_grid_to_earth(wdir_dp_orig,
                                           *Raw_Grid, wdir_dp);
+      vinfo->set_earth_relative();
    }
 
    if(status) {
@@ -518,7 +521,8 @@ if(vinfo->need_uv_wind()) {
    if(!status) return status;
 
    // Rotate U/V winds, if needed
-   if(vinfo_uwnd->need_rotation() &&
+   if(vinfo->is_wind_rotation() &&
+      vinfo_uwnd->need_rotation() &&
       vinfo_vwnd->need_rotation()) {
       mlog << Debug(3) << "Rotating " << uwnd_dpa.n_planes()
            << " U and V wind fields from grid-relative "
@@ -538,6 +542,7 @@ if(vinfo->need_uv_wind()) {
       vinfo->set_units(vinfo_uwnd->units());
    }
    else if(vinfo->is_wind_direction()) {
+      vinfo->set_earth_relative();
       vinfo->set_long_name("Wind Direction");
       vinfo->set_units("deg");
    }
@@ -626,13 +631,14 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
    // Rotate wind direction, if needed
    if(vinfo_wdir->need_rotation()) {
       mlog << Debug(3) << "Rotating " << wdir_dpa.n_planes()
-           << " wind direction field(s) from grid-relative"
+           << " wind direction field(s) from grid-relative "
            << "to earth-relative.\n";
       for(int i=0; i<wdir_dpa.n_planes(); i++) {
          DataPlane wdir_dp_orig(wdir_dpa[i]);
          rotate_wind_direction_grid_to_earth(wdir_dp_orig,
                                              *Raw_Grid, wdir_dpa.at(i));
       }
+      vinfo->set_earth_relative();
    }
 
    // Store the long name and units

@@ -129,30 +129,31 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
    // Initialize the data plane
    plane.clear();
 
-   // Read the data
+   // Assume that all WRF winds are grid-relative
+   vinfo_nc->set_grid_relative_flag(true);
+
+   // Read the data if found
    WrfNc->get_nc_var_info(vinfo_nc->req_name().c_str(), info);
-   if(!info) return false;
-   LongArray dimension = vinfo_nc->dimension();
-   int dim_count = dimension.n_elements();
-   for (int k=0; k<dim_count; k++) {
-      if (dimension[k] == vx_data2d_dim_by_value) {
-         string dim_name = GET_NC_NAME(get_nc_dim(info->var, k));
-         NcVarInfo *var_info = find_var_info_by_dim_name(WrfNc->Var, dim_name,
-                                                         WrfNc->Nvars);
-         if (var_info) {
-            long new_offset = get_index_at_nc_data(var_info->var,
-                                                   vinfo_nc->dim_value(k),
-                                                   dim_name, (k == info->t_slot));
-            if (new_offset != bad_data_int) dimension[k] = new_offset;
+   if(info) {
+      LongArray dimension = vinfo_nc->dimension();
+      int dim_count = dimension.n_elements();
+      for (int k=0; k<dim_count; k++) {
+         if (dimension[k] == vx_data2d_dim_by_value) {
+            string dim_name = GET_NC_NAME(get_nc_dim(info->var, k));
+            NcVarInfo *var_info = find_var_info_by_dim_name(WrfNc->Var, dim_name,
+                                                            WrfNc->Nvars);
+            if (var_info) {
+               long new_offset = get_index_at_nc_data(var_info->var,
+                                                      vinfo_nc->dim_value(k),
+                                                      dim_name, (k == info->t_slot));
+               if (new_offset != bad_data_int) dimension[k] = new_offset;
+            }
          }
       }
+
+      status = WrfNc->data(vinfo_nc->req_name().c_str(),
+                           dimension, plane, pressure, info);
    }
-
-   status = WrfNc->data(vinfo_nc->req_name().c_str(),
-                        dimension, plane, pressure, info);
-
-   // Assume that WRF winds are grid-relative
-   vinfo_nc->set_grid_relative_flag(true);
 
    // Attempt to derive the data
    if(!status && do_winds) {

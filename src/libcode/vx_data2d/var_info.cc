@@ -486,6 +486,14 @@ void VarInfo::set_grid_relative_flag(bool f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfo::set_earth_relative() {
+   GridRelativeFlag = false;
+   SetAttrIsGridRelative = 0;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 
    // Check for embedded whitespace
