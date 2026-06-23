@@ -863,7 +863,8 @@ for(int i=0; i<names.n(); i++) {
 if(!status) {
    mlog << Warning << "\n" << method_name
         << "No matching wind field found for name(s) \""
-        << write_css(names) << "\". Set \"" << conf_key_name
+        << write_css(names) << "\".\n"
+        << Set \"" << conf_key_name
         << "\" to specify the matching variable name.\n\n";
 }
 
@@ -915,7 +916,8 @@ for(int i=0; i<names.n(); i++) {
 if(!status) {
    mlog << Warning << "\n" << method_name
         << "No matching wind field(s) found for name(s) \""
-        << write_css(names) << "\". Set \"" << conf_key_name
+        << write_css(names) << "\".\n"
+        << "Set \"" << conf_key_name
         << "\" to specify the matching variable name.\n\n";
 }
 
