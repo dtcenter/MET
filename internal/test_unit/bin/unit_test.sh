@@ -41,6 +41,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_gen_ens_prod.xml \
           unit_pcp_combine.xml \
           unit_regrid.xml \
+          unit_winds.xml \
           unit_wwmca_regrid.xml \
           unit_point_stat.xml \
           unit_stat_analysis_ps.xml \
