@@ -661,6 +661,40 @@ Some tools override the temporary directory by the command line argument
 A description of the use of temporary files in MET can be found in
 :numref:`Contributor's Guide Section %s <tmp_file_use>`.
 
+.. _config_wind_field_names:
+
+wind_field_names
+----------------
+
+As described in :numref:`PS_wind_rotation_derivation`, MET can automatically
+derive wind variables and also rotate them from being grid-relative to earth-relative.
+Logic is provided for each supported input file type to identify input wind components
+and determine whether they are defined as being grid-relative or earth-relative.
+
+The following configuration options can be set to refine the metadata, when needed:
+
+.. code-block:: none
+
+  is_u_wind         = boolean;
+  is_v_wind         = boolean;
+  is_grid_relative  = boolean;
+  is_wind_speed     = boolean;
+  is_wind_direction = boolean;
+
+When deriving and rotating winds, MET searches the input file for matching wind
+components. That search is driven by the following configuration options:
+
+.. code-block:: none
+
+  u_wind_field_name = "UGRD,U";
+  v_wind_field_name = "VGRD,V";
+  wind_speed_field_name = "WIND,SP";
+  wind_direction_field_name = "WDIR,DD";
+
+Each is a comma-separated list of wind variable names to be searched. Users can
+explicity set these options to configure what data should be used in the wind
+derivation and rotation logic.
+
 message_type_group_map
 ----------------------
 
