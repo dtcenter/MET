@@ -393,6 +393,8 @@ if(vinfo->need_uv_wind()) {
       if(vinfo->need_rotation()) {
          DataPlane uwnd_dp_orig(uwnd_dp);
          DataPlane vwnd_dp_orig(vwnd_dp);
+         mlog << Debug(3) << "Rotating U and V wind fields "
+              << "from grid-relative to earth-relative.\n";
          rotate_uv_grid_to_earth(uwnd_dp_orig, vwnd_dp_orig,
                                  *Raw_Grid, uwnd_dp, vwnd_dp);
       }
@@ -439,6 +441,8 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
    // Rotate wind direction, if needed
    if(vinfo->need_rotation()) {
       DataPlane wdir_dp_orig(wdir_dp);
+      mlog << Debug(3) << "Rotating wind direction field "
+           << "from grid-relative to earth-relative.\n";
       rotate_wind_direction_grid_to_earth(wdir_dp_orig,
                                           *Raw_Grid, wdir_dp);
    }
@@ -497,6 +501,9 @@ if(vinfo->need_uv_wind()) {
 
    // Rotate U/V winds, if needed
    if(vinfo->need_rotation()) {
+      mlog << Debug(3) << "Rotating " << uwnd_dpa.n_planes()
+           << " U and V wind fields from grid-relative "
+           << "to earth-relative.\n";
       for(int i=0; i<uwnd_dpa.n_planes(); i++) {
          DataPlane uwnd_dp_orig(uwnd_dpa[i]);
          DataPlane vwnd_dp_orig(vwnd_dpa[i]);
@@ -592,6 +599,9 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
 
    // Rotate wind direction, if needed
    if(vinfo->need_rotation()) {
+      mlog << Debug(3) << "Rotating " << wdir_dpa.n_planes()
+           << " wind direction field(s) from grid-relative"
+           << "to earth-relative.\n";
       for(int i=0; i<wdir_dpa.n_planes(); i++) {
          DataPlane wdir_dp_orig(wdir_dpa[i]);
          rotate_wind_direction_grid_to_earth(wdir_dp_orig,
@@ -739,7 +749,7 @@ static const char *method_name = "Met2dDataFile::rotate_winds(DataPlaneArray) ->
 
 if(!vinfo) return false;
 
-if(!vinfo->is_wind_rotation()) return true;
+if(!vinfo->is_wind_rotation() || dpa.n_planes() == 0) return true;
 
 if(vinfo->is_grid_relative()) {
    mlog << Debug(3) << "Rotating " << dpa.n_planes()
@@ -864,7 +874,7 @@ if(!status) {
    mlog << Warning << "\n" << method_name
         << "No matching wind field found for name(s) \""
         << write_css(names) << "\".\n"
-        << Set \"" << conf_key_name
+        << "Set \"" << conf_key_name
         << "\" to specify the matching variable name.\n\n";
 }
 
