@@ -629,14 +629,11 @@ static void process_n_vld() {
 ////////////////////////////////////////////////////////////////////////
 
 static bool get_data_plane(const char *infile, GrdFileType ftype,
-                           VarInfo *in_var_info, DataPlane &dp,
+                           VarInfo *info, DataPlane &dp,
                            bool do_regrid) {
    bool found;
 
-   if(!in_var_info) return false;
-
-   // Clone local copy since reading data can affect contents
-   VarInfo *info = in_var_info->clone();
+   if(!info) return false;
 
    // Read the current ensemble file
    auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(infile, ftype);
@@ -680,7 +677,6 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
    } // end if found
 
    // Cleanup
-   if(info)  { delete  info;  info = nullptr; }
    if(mtddf) { delete mtddf; mtddf = nullptr; }
 
    return found;
@@ -689,14 +685,11 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 static bool get_data_plane_array(const char *infile, GrdFileType ftype,
-                                 VarInfo *in_var_info, DataPlaneArray &dpa,
+                                 VarInfo *info, DataPlaneArray &dpa,
                                  bool do_regrid) {
    bool found;
 
-   if(!in_var_info) return false;
-
-   // Clone local copy since reading data can affect contents
-   VarInfo *info = in_var_info->clone();
+   if(!info) return false;
 
    // Read the current ensemble file
    auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(infile, ftype);
@@ -753,7 +746,6 @@ static bool get_data_plane_array(const char *infile, GrdFileType ftype,
    } // end if found
 
    // Cleanup
-   if(info)  { delete  info;  info = nullptr; }
    if(mtddf) { delete mtddf; mtddf = nullptr; }
 
    return found;

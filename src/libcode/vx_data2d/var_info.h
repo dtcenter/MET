@@ -209,7 +209,6 @@ class VarInfo
       void set_regrid(const RegridInfo &);
 
       void set_grid_relative_flag(bool);
-      void set_earth_relative();
 
       void set_level_info_grib(Dictionary & dict);
       void set_prob_info_grib(ConcatString prob_name,

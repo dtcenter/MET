@@ -395,7 +395,6 @@ if(vinfo->need_uv_wind()) {
          DataPlane vwnd_dp_orig(vwnd_dp);
          rotate_uv_grid_to_earth(uwnd_dp_orig, vwnd_dp_orig,
                                  *Raw_Grid, uwnd_dp, vwnd_dp);
-         vinfo->set_earth_relative();
       }
 
       // Derive wind speed
@@ -442,7 +441,6 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
       DataPlane wdir_dp_orig(wdir_dp);
       rotate_wind_direction_grid_to_earth(wdir_dp_orig,
                                           *Raw_Grid, wdir_dp);
-      vinfo->set_earth_relative();
    }
 
    if(status) {
@@ -506,7 +504,6 @@ if(vinfo->need_uv_wind()) {
                                  *Raw_Grid,
                                  uwnd_dpa.at(i), vwnd_dpa.at(i));
       }
-      vinfo->set_earth_relative();
    }
 
    // Store the long name and units
@@ -599,7 +596,6 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
          DataPlane wdir_dp_orig(wdir_dpa[i]);
          rotate_wind_direction_grid_to_earth(wdir_dp_orig,
                                              *Raw_Grid, wdir_dpa.at(i));
-         vinfo->set_earth_relative();
       }
    }
 
@@ -726,10 +722,6 @@ if(!status) {
         << "Trouble rotating wind field (" << vinfo->magic_str()
         << ") from grid to earth relative.\n\n";
 }
-// Update flag for a successful rotation
-else {
-   vinfo->set_earth_relative();
-}
 
 return status;
 
@@ -826,10 +818,6 @@ if(!status) {
         << "Trouble rotating wind fields (" << vinfo->magic_str()
         << ") from grid to earth relative.\n\n";
 }
-// Update flag for a successful rotation
-else {
-   vinfo->set_earth_relative();
-}
 
 return status;
 
@@ -855,20 +843,19 @@ bool status = false;
 
     // Copy input VarInfo
 
-VarInfo * vinfo_cur = vinfo->clone();
+VarInfo * vinfo_copy = vinfo->clone();
 
     // Try each of the possible names
 
 for(int i=0; i<names.n(); i++) {
 
-   // Check for a match
-   if(vinfo_cur->reset_dict_with_name(names[i].c_str()) &&
-      data_plane(*vinfo_cur, dp, false)) {
+   // Find matching data with no more wind processing
+   if(vinfo_copy->reset_dict_with_name(names[i].c_str()) &&
+      data_plane(*vinfo_copy, dp, false)) {
       status = true;
-      units = vinfo_cur->units();
-      vinfo->set_grid_relative_flag(vinfo_cur->is_grid_relative());
+      units = vinfo_copy->units();
       mlog << "Found matching wind field \""
-           << vinfo_cur->magic_str() << "\".\n";
+           << vinfo_copy->magic_str() << "\".\n";
       break;
    }
 }
@@ -882,7 +869,7 @@ if(!status) {
 
    // Cleanup
 
-if(vinfo_cur) { delete vinfo_cur; vinfo_cur = nullptr; }
+if(vinfo_copy) { delete vinfo_copy; vinfo_copy = nullptr; }
 
 return status;
 
@@ -908,20 +895,19 @@ bool status = false;
 
     // Copy input VarInfo
 
-VarInfo * vinfo_cur = vinfo->clone();
+VarInfo * vinfo_copy = vinfo->clone();
 
     // Try each of the possible names
 
 for(int i=0; i<names.n(); i++) {
 
-   // Check for a match
-   if(vinfo_cur->reset_dict_with_name(names[i].c_str()) &&
-      data_plane_array(*vinfo_cur, dpa, false)) {
+   // Find matching data with no more wind processing
+   if(vinfo_copy->reset_dict_with_name(names[i].c_str()) &&
+      data_plane_array(*vinfo_copy, dpa, false)) {
       status = true;
-      units = vinfo_cur->units();
-      vinfo->set_grid_relative_flag(vinfo_cur->is_grid_relative());
+      units = vinfo_copy->units();
       mlog << "Found matching wind field(s) \""
-           << vinfo_cur->magic_str() << "\".\n";
+           << vinfo_copy->magic_str() << "\".\n";
       break;
    }
 }
@@ -935,7 +921,7 @@ if(!status) {
 
    // Cleanup
 
-if(vinfo_cur) { delete vinfo_cur; vinfo_cur = nullptr; }
+if(vinfo_copy) { delete vinfo_copy; vinfo_copy = nullptr; }
 
 return status;
 
