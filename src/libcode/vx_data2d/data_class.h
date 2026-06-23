@@ -85,10 +85,10 @@ class Met2dDataFile : public Met2dData {
 
       bool read_wind_data(VarInfo *,
                           const char *, const StringArray &,
-                          DataPlane &, ConcatString &);
+                          DataPlane &);
       bool read_wind_data(VarInfo *,
                           const char *, const StringArray &,
-                          DataPlaneArray &, ConcatString &);
+                          DataPlaneArray &);
 
       bool GridShifted;
 

@@ -374,23 +374,27 @@ bool status = false;
    //
 
 if(vinfo->need_uv_wind()) {
+
+   // Create local copies
+   VarInfo * vinfo_uwnd = vinfo->clone();
+   VarInfo * vinfo_vwnd = vinfo->clone();
+
    DataPlane uwnd_dp;
    DataPlane vwnd_dp;
-   ConcatString uwnd_units;
-   ConcatString vwnd_units;
-   status = read_wind_data(vinfo,
+   status = read_wind_data(vinfo_uwnd,
                            conf_key_u_wind_field_name,
                            vinfo->wind_info().u_wind,
-                           uwnd_dp, uwnd_units) &&
-            read_wind_data(vinfo,
+                           uwnd_dp) &&
+            read_wind_data(vinfo_vwnd,
                            conf_key_v_wind_field_name,
                            vinfo->wind_info().v_wind,
-                           vwnd_dp, vwnd_units);
+                           vwnd_dp);
 
    if(status) {
 
       // Rotate U/V winds, if needed
-      if(vinfo->need_rotation()) {
+      if(vinfo_uwnd->need_rotation() &&
+         vinfo_vwnd->need_rotation()) {
          DataPlane uwnd_dp_orig(uwnd_dp);
          DataPlane vwnd_dp_orig(vwnd_dp);
          mlog << Debug(3) << "Rotating U and V wind fields "
@@ -403,7 +407,7 @@ if(vinfo->need_uv_wind()) {
       if(vinfo->is_wind_speed()) {
          status = derive_wind_speed(uwnd_dp, vwnd_dp, dp);
          vinfo->set_long_name("Wind Speed");
-         vinfo->set_units(uwnd_units);
+         vinfo->set_units(vinfo_uwnd->units());
       }
       // Derive wind direction
       else if(vinfo->is_wind_direction()) {
@@ -418,6 +422,10 @@ if(vinfo->need_uv_wind()) {
          vinfo->set_units("J/kg");
       }
    }
+
+   // Cleanup
+   if(vinfo_uwnd) { delete vinfo_uwnd; vinfo_uwnd = nullptr; }
+   if(vinfo_vwnd) { delete vinfo_vwnd; vinfo_vwnd = nullptr; }
 }
 
    //
@@ -425,21 +433,24 @@ if(vinfo->need_uv_wind()) {
    //
 
 else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
+
+   // Create local copies
+   VarInfo * vinfo_wspd = vinfo->clone();
+   VarInfo * vinfo_wdir = vinfo->clone();
+
    DataPlane wspd_dp;
    DataPlane wdir_dp;
-   ConcatString wspd_units;
-   ConcatString wdir_units;
-   status = read_wind_data(vinfo,
+   status = read_wind_data(vinfo_wspd,
                            conf_key_wind_speed_field_name,
                            vinfo->wind_info().wind_speed,
-                           wspd_dp, wspd_units) &&
-            read_wind_data(vinfo,
+                           wspd_dp) &&
+            read_wind_data(vinfo_wdir,
                            conf_key_wind_direction_field_name,
                            vinfo->wind_info().wind_direction,
-                           wdir_dp, wdir_units);
+                           wdir_dp);
 
    // Rotate wind direction, if needed
-   if(vinfo->need_rotation()) {
+   if(vinfo_wdir->need_rotation()) {
       DataPlane wdir_dp_orig(wdir_dp);
       mlog << Debug(3) << "Rotating wind direction field "
            << "from grid-relative to earth-relative.\n";
@@ -451,14 +462,18 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
       if(vinfo->is_u_wind()) {
          status = derive_u_wind(wspd_dp, wdir_dp, dp);
          vinfo->set_long_name("U-Component of Wind");
-         vinfo->set_units(wspd_units);
+         vinfo->set_units(vinfo_wspd->units());
       }
       else {
          status = derive_v_wind(wspd_dp, wdir_dp, dp);
          vinfo->set_long_name("V-Component of Wind");
-         vinfo->set_units(wspd_units);
+         vinfo->set_units(vinfo_wspd->units());
       }
    }
+
+   // Cleanup
+   if(vinfo_wspd) { delete vinfo_wspd; vinfo_wspd = nullptr; }
+   if(vinfo_wdir) { delete vinfo_wdir; vinfo_wdir = nullptr; }
 }
 
 return status;
@@ -484,23 +499,27 @@ bool status = false;
    //
 
 if(vinfo->need_uv_wind()) {
+
+   // Create local copies
+   VarInfo * vinfo_uwnd = vinfo->clone();
+   VarInfo * vinfo_vwnd = vinfo->clone();
+
    DataPlaneArray uwnd_dpa;
    DataPlaneArray vwnd_dpa;
-   ConcatString uwnd_units;
-   ConcatString vwnd_units;
-   status = read_wind_data(vinfo,
+   status = read_wind_data(vinfo_uwnd,
                            conf_key_u_wind_field_name,
                            vinfo->wind_info().u_wind,
-                           uwnd_dpa, uwnd_units) &&
-            read_wind_data(vinfo,
+                           uwnd_dpa) &&
+            read_wind_data(vinfo_vwnd,
                            conf_key_v_wind_field_name,
                            vinfo->wind_info().v_wind,
-                           vwnd_dpa, vwnd_units);
+                           vwnd_dpa);
 
    if(!status) return status;
 
    // Rotate U/V winds, if needed
-   if(vinfo->need_rotation()) {
+   if(vinfo_uwnd->need_rotation() &&
+      vinfo_vwnd->need_rotation()) {
       mlog << Debug(3) << "Rotating " << uwnd_dpa.n_planes()
            << " U and V wind fields from grid-relative "
            << "to earth-relative.\n";
@@ -516,7 +535,7 @@ if(vinfo->need_uv_wind()) {
    // Store the long name and units
    if(vinfo->is_wind_speed()) {
       vinfo->set_long_name("Wind Speed");
-      vinfo->set_units(uwnd_units);
+      vinfo->set_units(vinfo_uwnd->units());
    }
    else if(vinfo->is_wind_direction()) {
       vinfo->set_long_name("Wind Direction");
@@ -575,6 +594,10 @@ if(vinfo->need_uv_wind()) {
       // Store the result
       dpa.add(dp, uwnd_dpa.lower(i), uwnd_dpa.upper(i));
    }
+
+   // Cleanup
+   if(vinfo_uwnd) { delete vinfo_uwnd; vinfo_uwnd = nullptr; }
+   if(vinfo_vwnd) { delete vinfo_vwnd; vinfo_vwnd = nullptr; }
 }
 
    //
@@ -582,23 +605,26 @@ if(vinfo->need_uv_wind()) {
    //
 
 else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
+
+   // Create local copies
+   VarInfo * vinfo_wspd = vinfo->clone();
+   VarInfo * vinfo_wdir = vinfo->clone();
+
    DataPlaneArray wspd_dpa;
    DataPlaneArray wdir_dpa;
-   ConcatString wspd_units;
-   ConcatString wdir_units;
-   status = read_wind_data(vinfo,
+   status = read_wind_data(vinfo_wspd,
                            conf_key_wind_speed_field_name,
                            vinfo->wind_info().wind_speed,
-                           wspd_dpa, wspd_units) &&
-            read_wind_data(vinfo,
+                           wspd_dpa) &&
+            read_wind_data(vinfo_wdir,
                            conf_key_wind_direction_field_name,
                            vinfo->wind_info().wind_direction,
-                           wdir_dpa, wdir_units);
+                           wdir_dpa);
 
    if(!status) return status;
 
    // Rotate wind direction, if needed
-   if(vinfo->need_rotation()) {
+   if(vinfo_wdir->need_rotation()) {
       mlog << Debug(3) << "Rotating " << wdir_dpa.n_planes()
            << " wind direction field(s) from grid-relative"
            << "to earth-relative.\n";
@@ -612,11 +638,11 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
    // Store the long name and units
    if(vinfo->is_u_wind()) {
       vinfo->set_long_name("U-Component of Wind");
-      vinfo->set_units(wspd_units);
+      vinfo->set_units(vinfo_wspd->units());
    }
    else {
       vinfo->set_long_name("V-Component of Wind");
-      vinfo->set_units(wspd_units);
+      vinfo->set_units(vinfo_wspd->units());
    }
 
    if(wspd_dpa.n_planes() != wdir_dpa.n_planes()) {
@@ -659,6 +685,10 @@ else if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
       // Store the result
       dpa.add(dp, wspd_dpa.lower(i), wspd_dpa.upper(i));
    }
+
+   // Cleanup
+   if(vinfo_wspd) { delete vinfo_wspd; vinfo_wspd = nullptr; }
+   if(vinfo_wdir) { delete vinfo_wdir; vinfo_wdir = nullptr; }
 }
 
 return status;
@@ -693,18 +723,20 @@ else {
 
 bool status = false;
 
+// Create local copy
+VarInfo * vinfo_wind = vinfo->clone();
+
 DataPlane uwnd_dp;
 DataPlane vwnd_dp;
 DataPlane tmp_dp;
-ConcatString units;
 
 // Rotate U-Wind
 if(vinfo->is_u_wind()) {
    uwnd_dp = dp;
-   status = read_wind_data(vinfo,
+   status = read_wind_data(vinfo_wind,
                            conf_key_v_wind_field_name,
                            vinfo->wind_info().v_wind,
-                           vwnd_dp, units);
+                           vwnd_dp);
    if(status) status = rotate_uv_grid_to_earth(uwnd_dp, vwnd_dp,
                                                *Raw_Grid,
                                                dp, tmp_dp);
@@ -712,10 +744,10 @@ if(vinfo->is_u_wind()) {
 // Rotate V-Wind
 else if(vinfo->is_v_wind()) {
    vwnd_dp = dp;
-   status = read_wind_data(vinfo,
+   status = read_wind_data(vinfo_wind,
                            conf_key_u_wind_field_name,
                            vinfo->wind_info().u_wind,
-                           uwnd_dp, units);
+                           uwnd_dp);
    if(status) status = rotate_uv_grid_to_earth(uwnd_dp, vwnd_dp,
                                                *Raw_Grid,
                                                tmp_dp, dp);
@@ -732,6 +764,9 @@ if(!status) {
         << "Trouble rotating wind field (" << vinfo->magic_str()
         << ") from grid to earth relative.\n\n";
 }
+
+// Cleanup
+if(vinfo_wind) { delete vinfo_wind; vinfo_wind = nullptr; }
 
 return status;
 
@@ -765,10 +800,12 @@ else {
 
 bool status = false;
 
+// Create local copy
+VarInfo * vinfo_wind = vinfo->clone();
+
 DataPlaneArray uwnd_dpa;
 DataPlaneArray vwnd_dpa;
 DataPlaneArray tmp_dpa(dpa);
-ConcatString units;
 DataPlaneArray *uwnd_out;
 DataPlaneArray *vwnd_out;
 
@@ -779,19 +816,19 @@ if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
       uwnd_dpa = dpa;
       uwnd_out = &dpa;
       vwnd_out = &tmp_dpa;
-      status = read_wind_data(vinfo,
+      status = read_wind_data(vinfo_wind,
                               conf_key_v_wind_field_name,
                               vinfo->wind_info().v_wind,
-                              vwnd_dpa, units);
+                              vwnd_dpa);
    }
    else {
       vwnd_dpa = dpa;
       uwnd_out = &tmp_dpa;
       vwnd_out = &dpa;
-      status = read_wind_data(vinfo,
+      status = read_wind_data(vinfo_wind,
                               conf_key_u_wind_field_name,
                               vinfo->wind_info().u_wind,
-                              uwnd_dpa, units);
+                              uwnd_dpa);
    }
 
    // Check for matching levels
@@ -829,6 +866,9 @@ if(!status) {
         << ") from grid to earth relative.\n\n";
 }
 
+// Cleanup
+if(vinfo_wind) { delete vinfo_wind; vinfo_wind = nullptr; }
+
 return status;
 
 }
@@ -840,8 +880,7 @@ return status;
 bool Met2dDataFile::read_wind_data(VarInfo *vinfo,
                                    const char *conf_key_name,
                                    const StringArray &names,
-                                   DataPlane &dp,
-                                   ConcatString &units)
+                                   DataPlane &dp)
 
 {
 
@@ -851,21 +890,16 @@ if(!vinfo) return false;
 
 bool status = false;
 
-    // Copy input VarInfo
-
-VarInfo * vinfo_copy = vinfo->clone();
-
     // Try each of the possible names
 
 for(int i=0; i<names.n(); i++) {
 
    // Find matching data with no more wind processing
-   if(vinfo_copy->reset_dict_with_name(names[i].c_str()) &&
-      data_plane(*vinfo_copy, dp, false)) {
+   if(vinfo->reset_dict_with_name(names[i].c_str()) &&
+      data_plane(*vinfo, dp, false)) {
       status = true;
-      units = vinfo_copy->units();
       mlog << "Found matching wind field \""
-           << vinfo_copy->magic_str() << "\".\n";
+           << vinfo->magic_str() << "\".\n";
       break;
    }
 }
@@ -878,10 +912,6 @@ if(!status) {
         << "\" to specify the matching variable name.\n\n";
 }
 
-   // Cleanup
-
-if(vinfo_copy) { delete vinfo_copy; vinfo_copy = nullptr; }
-
 return status;
 
 }
@@ -893,8 +923,7 @@ return status;
 bool Met2dDataFile::read_wind_data(VarInfo *vinfo,
                                    const char *conf_key_name,
                                    const StringArray &names,
-                                   DataPlaneArray &dpa,
-                                   ConcatString &units)
+                                   DataPlaneArray &dpa)
 
 {
 
@@ -904,21 +933,16 @@ if(!vinfo) return false;
 
 bool status = false;
 
-    // Copy input VarInfo
-
-VarInfo * vinfo_copy = vinfo->clone();
-
     // Try each of the possible names
 
 for(int i=0; i<names.n(); i++) {
 
    // Find matching data with no more wind processing
-   if(vinfo_copy->reset_dict_with_name(names[i].c_str()) &&
-      data_plane_array(*vinfo_copy, dpa, false)) {
+   if(vinfo->reset_dict_with_name(names[i].c_str()) &&
+      data_plane_array(*vinfo, dpa, false)) {
       status = true;
-      units = vinfo_copy->units();
       mlog << "Found matching wind field(s) \""
-           << vinfo_copy->magic_str() << "\".\n";
+           << vinfo->magic_str() << "\".\n";
       break;
    }
 }
@@ -930,10 +954,6 @@ if(!status) {
         << "Set \"" << conf_key_name
         << "\" to specify the matching variable name.\n\n";
 }
-
-   // Cleanup
-
-if(vinfo_copy) { delete vinfo_copy; vinfo_copy = nullptr; }
 
 return status;
 
