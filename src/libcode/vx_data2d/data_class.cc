@@ -27,6 +27,14 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+static StringArray swap_uv_name(VarInfo *,
+                                const ConcatString &,
+                                const StringArray &);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class Met2dData
    //
@@ -896,12 +904,16 @@ if(!vinfo) return false;
 
 bool status = false;
 
+    // Update search names, if needed
+
+StringArray search_names(swap_uv_name(vinfo, conf_key_name, names));
+
     // Try each of the possible names
 
-for(int i=0; i<names.n(); i++) {
+for(int i=0; i<search_names.n(); i++) {
 
    // Find matching data with no more wind processing
-   if(vinfo->reset_dict_with_name(names[i].c_str()) &&
+   if(vinfo->reset_dict_with_name(search_names[i].c_str()) &&
       data_plane(*vinfo, dp, false)) {
       status = true;
       mlog << "Found matching wind field \""
@@ -913,7 +925,7 @@ for(int i=0; i<names.n(); i++) {
 if(!status) {
    mlog << Warning << "\n" << method_name
         << "No matching wind field found for name(s) \""
-        << write_css(names) << "\".\n"
+        << write_css(search_names) << "\".\n"
         << "Set \"" << conf_key_name
         << "\" to specify the matching variable name.\n\n";
 }
@@ -939,12 +951,16 @@ if(!vinfo) return false;
 
 bool status = false;
 
+    // Update search names, if needed
+
+StringArray search_names(swap_uv_name(vinfo, conf_key_name, names));
+
     // Try each of the possible names
 
-for(int i=0; i<names.n(); i++) {
+for(int i=0; i<search_names.n(); i++) {
 
    // Find matching data with no more wind processing
-   if(vinfo->reset_dict_with_name(names[i].c_str()) &&
+   if(vinfo->reset_dict_with_name(search_names[i].c_str()) &&
       data_plane_array(*vinfo, dpa, false)) {
       status = true;
       mlog << "Found matching wind field(s) \""
@@ -956,7 +972,7 @@ for(int i=0; i<names.n(); i++) {
 if(!status) {
    mlog << Warning << "\n" << method_name
         << "No matching wind field(s) found for name(s) \""
-        << write_css(names) << "\".\n"
+        << write_css(search_names) << "\".\n"
         << "Set \"" << conf_key_name
         << "\" to specify the matching variable name.\n\n";
 }
@@ -1058,6 +1074,39 @@ if ( mlog.verbosity_level() >= 4 ) {
 }
 
 return true;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static StringArray swap_uv_name(VarInfo *vinfo,
+                                const ConcatString &conf_key_name,
+                                const StringArray &names)
+{
+
+   // If converting between U-wind and V-wind, try swapping U and V
+   // Only add the search string if the substituion works
+   ConcatString cs(vinfo->name());
+   StringArray sa(names);
+
+   // Replace U with V
+   if(vinfo->is_u_wind() &&
+      conf_key_name == conf_key_v_wind_field_name) {
+      cs.replace("U", "V", false);
+      cs.replace("u", "v", false);
+      if(cs != vinfo->name()) sa.insert(0, cs.c_str());
+   }
+   // Replace V with U
+   else if(vinfo->is_v_wind() &&
+           conf_key_name == conf_key_u_wind_field_name) {
+      cs.replace("V", "U", false);
+      cs.replace("v", "u", false);
+      if(cs != vinfo->name()) sa.insert(0, cs.c_str());
+   }
+
+   return sa;
 
 }
 

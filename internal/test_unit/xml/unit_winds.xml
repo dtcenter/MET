@@ -72,10 +72,10 @@
     <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -add &DATA_DIR_MODEL;/wrf/wrfout_solarwind_d02_2019-08-31_12:00:00 \
-      -field 'name="U10"; level="(0,*,*)"; set_attr_name="U10_GRID"; v_wind_field_name="V10"; is_grid_relative=false;' \
-      -field 'name="U10"; level="(0,*,*)"; set_attr_name="U10_EARTH"; v_wind_field_name="V10";' \
-      -field 'name="V10"; level="(0,*,*)"; set_attr_name="V10_GRID"; u_wind_field_name="U10"; is_grid_relative=false;' \
-      -field 'name="V10"; level="(0,*,*)"; set_attr_name="V10_EARTH"; u_wind_field_name="U10";' \
+      -field 'name="U10"; level="(0,*,*)"; set_attr_name="U10_GRID"; is_grid_relative=false;' \
+      -field 'name="U10"; level="(0,*,*)"; set_attr_name="U10_EARTH";' \
+      -field 'name="V10"; level="(0,*,*)"; set_attr_name="V10_GRID"; is_grid_relative=false;' \
+      -field 'name="V10"; level="(0,*,*)"; set_attr_name="V10_EARTH";' \
       -field 'name="WDIR10"; level="(0,*,*)"; set_attr_name="WDIR10_GRID"; is_wind_direction=true; u_wind_field_name="U10"; v_wind_field_name="V10"; is_grid_relative=false;' \
       -field 'name="WDIR10"; level="(0,*,*)"; set_attr_name="WDIR10_EARTH"; is_wind_direction=true; u_wind_field_name="U10"; v_wind_field_name="V10";' \
       -field 'name="WIND10"; level="(0,*,*)"; is_wind_speed=true; u_wind_field_name="U10"; v_wind_field_name="V10";' \
