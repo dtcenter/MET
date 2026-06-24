@@ -1050,10 +1050,14 @@ before applying the probabilistic verification methods.
 Probabilistic statistics in MET are derived from an Nx2 probabilistic
 contingency table. The N-dimension is determined by the number of
 probability bins requested. The "cat_thresh" configuration option
-defines the number of and size of these probabibility bins. The bins
-must include the full range of possible probability values, [0, 1].
-Since selecting bins of equal width is common, shorthand notation is
-provided to do so. The following options are supported.
+defines the number of and size of these probability bins. Options for
+defining probability bins are discussed in Point-Stat section
+:numref:`PS_Probability` and examples are listed below:
+
+* :code:`cat_thresh = [ >=0, >=0.5, >=0.75, >=1.0 ];` explicitly
+  specifies the probability thresholds and defines 3 bins of unequal
+  width between the values 0, 0.5, 0.75, and 1.0. By convention, the
+  greater-than-or-equal-to (">=" or "ge") inequality type is required.
 
 * :code:`cat_thresh = [ ==0.25 ];` specifies an equal probability bin
   width of 0.25 and defines 4 bins between the values 0, 0.25, 0.5, 0.75,
@@ -1066,11 +1070,6 @@ provided to do so. The following options are supported.
   probability value n/10, for n = 0 to 10. The :code:`==n` threshold may
   be set to any integer number of ensemble members greater than 1 to
   define n+1 probability bins.
-
-* :code:`cat_thresh = [ >=0, >=0.5, >=0.75, >=1.0 ];` explicitly
-  specifies the probability thresholds and defines 3 bins of unequal
-  width between the values 0, 0.5, 0.75, and 1.0. By convention, the
-  greater-than-or-equal-to (">=" or "ge") inequality type is required.
 
 field.prob_as_scalar
 """"""""""""""""""""
