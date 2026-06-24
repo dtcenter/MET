@@ -6,7 +6,8 @@ run_unit_tests=false
 run_diff=false
 run_update_truth=false
 met_base_repo=met-base
-met_base_tag=3.5-latest
+# TODO: Change 3.4 back to 3.5 after solving TC-Diag failure
+met_base_tag=3.4-latest
 input_data_version=develop
 truth_data_version=develop
 
