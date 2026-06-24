@@ -206,7 +206,10 @@ MET Version 13.0.0 Upgrade Instructions
 
    MET version 13.0.0 modifies existing output data values in the following ways:
 
-   * None
+   * Ranked probability statistics found in the RPS line type and written by Ensemble-Stat and the
+     HiRA algorithm of Point-Stat are modified slightly. As described in MET
+     `#3396 <https://github.com/dtcenter/MET/issues/3396>`_, improvements to the RPS computation
+     algorithm result in minor changes to the statistics.
 
 .. dropdown:: Additional upgrade instructions - NONE
 
