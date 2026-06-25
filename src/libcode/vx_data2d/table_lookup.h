@@ -202,31 +202,31 @@ class TableFlatFile {
 
 
       int lookup_grib1(int code, int table_number,
-                       std::vector<Grib1TableEntry> &);
+                       std::vector<Grib1TableEntry> &) const;
       int lookup_grib1(int code, int table_number, int center, int subcenter,
-                       std::vector<Grib1TableEntry> &);
+                       std::vector<Grib1TableEntry> &) const;
 
       // Assumes table_number = 2 by default
       int lookup_grib1(int code,
-                       std::vector<Grib1TableEntry> &);
+                       std::vector<Grib1TableEntry> &) const;
       int lookup_grib1(const char * parm_name,
-                       std::vector<Grib1TableEntry> &);
+                       std::vector<Grib1TableEntry> &) const;
 
       int lookup_grib1(const char * parm_name, int table_number, int code,
-                       std::vector<Grib1TableEntry> &);
+                       std::vector<Grib1TableEntry> &) const;
       int lookup_grib1(const char * parm_name, int table_number, int code,int center, int subcenter,
-                       std::vector<Grib1TableEntry> &);
+                       std::vector<Grib1TableEntry> &) const;
 
       int lookup_grib2(int disc, int pcat, int pnum,
-                       std::vector<Grib2TableEntry> &);
+                       std::vector<Grib2TableEntry> &) const;
       int lookup_grib2(int disc, int pcat, int pnum, int mtab, int cntr, int ltab,
-                       std::vector<Grib2TableEntry> &);
+                       std::vector<Grib2TableEntry> &) const;
       int lookup_grib2(const char * parm_name,
-                       std::vector<Grib2TableEntry> &);
+                       std::vector<Grib2TableEntry> &) const;
       int lookup_grib2(const char * parm_name, int disc, int pcat, int pnum,
-                       std::vector<Grib2TableEntry> &);
+                       std::vector<Grib2TableEntry> &) const;
       int lookup_grib2(const char * parm_name, int disc, int pcat, int pnum, int mtab, int cntr, int ltab,
-                       std::vector<Grib2TableEntry> &);
+                       std::vector<Grib2TableEntry> &) const;
 
       void readUserGribTables(const char * table_type);
 

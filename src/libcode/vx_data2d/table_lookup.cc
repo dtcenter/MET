@@ -1047,7 +1047,7 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 int TableFlatFile::lookup_grib1(int code, int table_number,
-                                vector<Grib1TableEntry> &matches) {
+                                vector<Grib1TableEntry> &matches) const {
    matches.clear();
 
    for(const auto &e : g1e) {
@@ -1063,7 +1063,7 @@ int TableFlatFile::lookup_grib1(int code, int table_number,
 ////////////////////////////////////////////////////////////////////////
 
 int TableFlatFile::lookup_grib1(int code, int table_number, int center, int subcenter,
-                                vector<Grib1TableEntry> &matches) {
+                                vector<Grib1TableEntry> &matches) const {
    matches.clear();
 
    for(const auto &e : g1e) {
@@ -1082,7 +1082,7 @@ int TableFlatFile::lookup_grib1(int code, int table_number, int center, int subc
 ////////////////////////////////////////////////////////////////////////
 
 int TableFlatFile::lookup_grib1(int code,
-                                vector<Grib1TableEntry> &matches) {
+                                vector<Grib1TableEntry> &matches) const {
 
    // Assume default table_number = 2
    return lookup_grib1(code, 2, matches);
@@ -1092,7 +1092,7 @@ int TableFlatFile::lookup_grib1(int code,
 ////////////////////////////////////////////////////////////////////////
 
 int TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int code,
-                                vector<Grib1TableEntry> &matches) {
+                                vector<Grib1TableEntry> &matches) const {
    matches.clear();
 
    for(const auto &e : g1e) {
@@ -1110,7 +1110,7 @@ int TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int co
 
 int TableFlatFile::lookup_grib1(const char *parm_name, int table_number,
                                 int code,int center, int subcenter,
-                                vector<Grib1TableEntry> &matches) {
+                                vector<Grib1TableEntry> &matches) const {
    matches.clear();
 
    for(const auto &e : g1e) {
@@ -1130,7 +1130,7 @@ int TableFlatFile::lookup_grib1(const char *parm_name, int table_number,
 ////////////////////////////////////////////////////////////////////////
 
 int TableFlatFile::lookup_grib1(const char * parm_name,
-                                vector<Grib1TableEntry> &matches) {
+                                vector<Grib1TableEntry> &matches) const {
 
    // Assume default table_number = 2
    return lookup_grib1(parm_name, 2, bad_data_int, matches);
@@ -1139,7 +1139,7 @@ int TableFlatFile::lookup_grib1(const char * parm_name,
 ////////////////////////////////////////////////////////////////////////
 
 int TableFlatFile::lookup_grib2(int disc, int pcat, int pnum,
-                                vector<Grib2TableEntry> &matches) {
+                                vector<Grib2TableEntry> &matches) const {
    matches.clear();
 
    for(const auto &e : g2e) {
@@ -1157,7 +1157,7 @@ int TableFlatFile::lookup_grib2(int disc, int pcat, int pnum,
 
 int TableFlatFile::lookup_grib2(int disc, int pcat, int pnum,
                                 int mtab, int cntr, int ltab,
-                                vector<Grib2TableEntry> &matches) {
+                                vector<Grib2TableEntry> &matches) const {
    vector<Grib2TableEntry> exact_matches;
    vector<Grib2TableEntry> partial_matches;
 
@@ -1189,7 +1189,7 @@ int TableFlatFile::lookup_grib2(int disc, int pcat, int pnum,
 
 int TableFlatFile::lookup_grib2(const char * parm_name,
                                 int disc, int pcat, int pnum,
-                                vector<Grib2TableEntry> &matches) {
+                                vector<Grib2TableEntry> &matches) const {
    matches.clear();
 
    for(const auto &e : g2e) {
@@ -1211,7 +1211,7 @@ int TableFlatFile::lookup_grib2(const char * parm_name,
 int TableFlatFile::lookup_grib2(const char * parm_name,
                                 int disc, int pcat, int pnum,
                                 int mtab, int cntr, int ltab,
-                                vector<Grib2TableEntry> &matches) {
+                                vector<Grib2TableEntry> &matches) const {
    vector<Grib2TableEntry> exact_matches;
    vector<Grib2TableEntry> partial_matches;
 
@@ -1246,7 +1246,7 @@ int TableFlatFile::lookup_grib2(const char * parm_name,
 ////////////////////////////////////////////////////////////////////////
 
 int TableFlatFile::lookup_grib2(const char * parm_name,
-                                vector<Grib2TableEntry> &matches) {
+                                vector<Grib2TableEntry> &matches) const {
    return lookup_grib2(parm_name, bad_data_int, bad_data_int, bad_data_int,
                        matches);
 }
