@@ -162,18 +162,15 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    if( !field_name.empty() ) {
 
       //  look up the name in the grib tables
+      //  if did not find with params from the header - try default
 
       if(GribTable.lookup_grib1(field_name.c_str(), vinfo_ptv, code_for_lookup,
-                                vinfo_center, vinfo_subcenter, matches) == 0)
+                                vinfo_center, vinfo_subcenter, matches) == 0 &&
+         GribTable.lookup_grib1(field_name.c_str(), default_grib1_ptv, code_for_lookup,
+                                default_grib1_center, default_grib1_subcenter, matches) == 0)
       {
-         //  if did not find with params from the header - try default
-         if(GribTable.lookup_grib1(field_name.c_str(), default_grib1_ptv, code_for_lookup,
-                                   default_grib1_center, default_grib1_subcenter, matches) == 0)
-         {
-            //  if the lookup still fails, then it's not a match
-            return false;
-         }
-
+         //  if both lookups fail, then it's not a match
+         return false;
       }
 
    }
@@ -190,19 +187,18 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
       }
 
       //  use the specified indexes to look up the field name
+      //  if did not find with params from the header - try default
       if(GribTable.lookup_grib1(code_for_lookup, vinfo_ptv,
-                                vinfo_center, vinfo_subcenter, matches) == 0 ) {
-         //if did not find with params from the header - try default
-         if(GribTable.lookup_grib1(code_for_lookup, default_grib1_ptv,
-                                   default_grib1_center, default_grib1_subcenter, matches) == 0)
-         {
-            mlog << Error << "\n" << method_name
-                 << "no parameter found with matching GRIB1_ptv ("
-                 << vinfo_ptv << ") " << "GRIB1_code ("
-                 << vinfo.field_rec() << "). Use the MET_GRIB_TABLES "
-                 << "environment variable to define custom GRIB tables.\n\n";
-            exit(1);
-         }
+                                vinfo_center, vinfo_subcenter, matches) == 0 &&
+         GribTable.lookup_grib1(code_for_lookup, default_grib1_ptv,
+                                default_grib1_center, default_grib1_subcenter, matches) == 0)
+      {
+         mlog << Error << "\n" << method_name
+              << "no parameter found with matching GRIB1_ptv ("
+              << vinfo_ptv << ") " << "GRIB1_code ("
+              << vinfo.field_rec() << "). Use the MET_GRIB_TABLES "
+              << "environment variable to define custom GRIB tables.\n\n";
+         exit(1);
       }
    }
    vinfo.set_code      ( matches[0].code);

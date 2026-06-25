@@ -827,7 +827,7 @@ bool VarInfo::is_flag_set(int flag) const {
 
 int VarInfo::get_wind_flag(const int set_attr_val,
                            const StringArray &field_names) const {
-   int flag = bad_data_double;
+   int flag = bad_data_int;
 
    // Use explicit boolean definition, if provided
    if(!is_bad_data(set_attr_val)) flag = set_attr_val != 0;

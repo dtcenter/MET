@@ -229,25 +229,23 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
    if( !field_name.empty() ){
 
       //  look up the name in the grib tables
+      //  if did not find with params from the header - try default
       if(GribTable.lookup_grib1(field_name.c_str(), field_ptv, field_code,
                                 field_center, field_subcenter,
+                                matches) == 0 &&
+         GribTable.lookup_grib1(field_name.c_str(), default_grib1_ptv, field_code,
+                                default_grib1_center, default_grib1_subcenter,
                                 matches) == 0)
       {
-         //  if did not find with params from the header - try default
-         if(GribTable.lookup_grib1(field_name.c_str(), default_grib1_ptv, field_code,
-                                   default_grib1_center, default_grib1_subcenter,
-                                   matches) == 0)
-         {
-            mlog << Error << "\nVarInfoGrib::add_grib_code() -> "
-                 << "unrecognized GRIB1 field abbreviation '" << field_name
-                 << "' for table version (" << field_ptv
-                 << "), center (" << field_center
-                 << "), and subcenter (" << field_subcenter
-                 << ") or default table version (" << default_grib1_ptv
-                 << "), center (" << default_grib1_center
-                 << "), and subcenter (" << default_grib1_subcenter << ").\n\n";
-            exit(1);
-         }
+         mlog << Error << "\nVarInfoGrib::add_grib_code() -> "
+              << "unrecognized GRIB1 field abbreviation '" << field_name
+              << "' for table version (" << field_ptv
+              << "), center (" << field_center
+              << "), and subcenter (" << field_subcenter
+              << ") or default table version (" << default_grib1_ptv
+              << "), center (" << default_grib1_center
+              << "), and subcenter (" << default_grib1_subcenter << ").\n\n";
+         exit(1);
       }
    }
 
@@ -263,21 +261,20 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
       }
 
       //  use the specified indexes to look up the field name
+      //  if did not find with params from the header - try default
       if(GribTable.lookup_grib1(field_code, field_ptv,
                                 field_center, field_subcenter,
-                                matches) == 0 ){
-         //if did not find with params from the header - try default
-         if(GribTable.lookup_grib1(field_code, default_grib1_ptv,
-                                   default_grib1_center, default_grib1_subcenter,
-                                   matches) == 0)
-         {
-            mlog << Error << "\nVarInfoGrib::add_grib_code() -> "
-                 << "no parameter found with matching GRIB1_ptv ("
-                 << field_ptv << ") " << "GRIB1_code (" << field_code
-                 << "). Use the MET_GRIB_TABLES environment variable "
-                 << "to define custom GRIB tables.\n\n";
-            exit(1);
-         }
+                                matches) == 0 && 
+         GribTable.lookup_grib1(field_code, default_grib1_ptv,
+                                default_grib1_center, default_grib1_subcenter,
+                                matches) == 0)
+      {
+         mlog << Error << "\nVarInfoGrib::add_grib_code() -> "
+              << "no parameter found with matching GRIB1_ptv ("
+              << field_ptv << ") " << "GRIB1_code (" << field_code
+              << "). Use the MET_GRIB_TABLES environment variable "
+              << "to define custom GRIB tables.\n\n";
+         exit(1);
       }
    }
    set_code      ( matches[0].code );
