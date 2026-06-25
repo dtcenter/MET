@@ -743,20 +743,6 @@ void MaskLatLon::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool operator==(const MaskLatLon &lhs, const MaskLatLon &rhs) {
-   bool match = true;
-
-   if(!(lhs.name       == rhs.name      ) ||
-      !(lhs.lat_thresh == rhs.lat_thresh) ||
-      !(lhs.lon_thresh == rhs.lon_thresh)) {
-      match = false;
-   }
-
-   return match;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 MaskLatLon &MaskLatLon::operator=(const MaskLatLon &a) noexcept {
    if(this != &a) {
       name = a.name;
@@ -828,21 +814,6 @@ void WindMetadata::clear() {
    v_wind.clear();
    wind_speed.clear();
    wind_direction.clear();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-bool operator==(const WindMetadata &lhs, const WindMetadata &rhs) {
-   bool match = true;
-
-   if(!(lhs.u_wind         == rhs.u_wind        ) ||
-      !(lhs.v_wind         == rhs.v_wind        ) ||
-      !(lhs.wind_speed     == rhs.wind_speed    ) ||
-      !(lhs.wind_direction == rhs.wind_direction)) {
-      match = false;
-   }
-
-   return match;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1798,23 +1769,6 @@ void InterpInfo::validate() {
          }
       }
    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-bool operator==(const InterpInfo &lhs, const InterpInfo &rhs) {
-   bool match = true;
-
-   if(!(lhs.field      == rhs.field     ) ||
-      !(lhs.vld_thresh == rhs.vld_thresh) ||
-      !(lhs.n_interp   == rhs.n_interp  ) ||
-      !(lhs.method     == rhs.method    ) ||
-      !(lhs.width      == rhs.width     ) ||
-      !(lhs.shape      == rhs.shape     )) {
-      match = false;
-   }
-
-   return match;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

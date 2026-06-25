@@ -294,9 +294,17 @@ struct InterpInfo {
    ~InterpInfo() { clear(); }
    InterpInfo(InterpInfo const &i) { *this = i; }
    InterpInfo &operator=(const InterpInfo &a) noexcept; // SonarQube findings
-   friend bool operator==(const InterpInfo &lhs, const InterpInfo &rhs);
    void clear();
    void validate(); // Ensure that width and method are accordant
+
+   friend bool operator==(const InterpInfo &lhs, const InterpInfo &rhs) {
+      return(lhs.field      == rhs.field      &&
+             lhs.vld_thresh == rhs.vld_thresh &&
+             lhs.n_interp   == rhs.n_interp   &&
+             lhs.method     == rhs.method     &&
+             lhs.width      == rhs.width      &&
+             lhs.shape      == rhs.shape);
+   }
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -450,8 +458,13 @@ struct MaskLatLon {
    ~MaskLatLon() { clear(); }
    MaskLatLon(MaskLatLon const &i) { *this = i; }
    MaskLatLon &operator=(const MaskLatLon &a) noexcept;
-   friend bool operator==(const MaskLatLon &lhs, const MaskLatLon &rhs);
    void clear();
+
+   friend bool operator==(const MaskLatLon &lhs, const MaskLatLon &rhs) {
+      return(lhs.name       == rhs.name       &&
+             lhs.lat_thresh == rhs.lat_thresh &&
+             lhs.lon_thresh == rhs.lon_thresh);
+   }
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -470,7 +483,6 @@ struct WindMetadata {
    ~WindMetadata() { clear(); }
    WindMetadata(WindMetadata const &i) { *this = i; }
    WindMetadata &operator=(const WindMetadata &a) noexcept;
-   friend bool operator==(const WindMetadata &lhs, const WindMetadata &rhs);
    void clear();
 
    bool is_u_wind(const std::string &s) const { return u_wind.has(s); }
@@ -480,6 +492,13 @@ struct WindMetadata {
 
    // Supported derivations
    bool is_kinetic_energy(const std::string &s) const { return s == "KENG"; }
+
+   friend bool operator==(const WindMetadata &lhs, const WindMetadata &rhs) {
+      return(lhs.u_wind         == rhs.u_wind     &&
+             lhs.v_wind         == rhs.v_wind     &&
+             lhs.wind_speed     == rhs.wind_speed &&
+             lhs.wind_direction == rhs.wind_direction);
+   }
 };
 
 ////////////////////////////////////////////////////////////////////////

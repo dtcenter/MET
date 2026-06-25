@@ -27,7 +27,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static StringArray swap_uv_name(VarInfo *,
+static StringArray swap_uv_name(const VarInfo *,
                                 const ConcatString &,
                                 const StringArray &);
 
@@ -1081,7 +1081,7 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-static StringArray swap_uv_name(VarInfo *vinfo,
+static StringArray swap_uv_name(const VarInfo *vinfo,
                                 const ConcatString &conf_key,
                                 const StringArray &names)
 {
