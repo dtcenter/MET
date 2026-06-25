@@ -56,9 +56,6 @@ nc_pairs_var_suffix = "";
 hss_ec_value        = NA;
 rank_corr_flag      = FALSE;
 
-u_wind_field_name = "U_PL";
-v_wind_field_name = "V_PL";
-
 //
 // Forecast and observation fields to be verified
 //
