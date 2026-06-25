@@ -167,8 +167,8 @@ class Met2dDataFile : public Met2dData {
 
       bool derive_winds(VarInfo *, DataPlane &);
       bool derive_winds(VarInfo *, DataPlaneArray &);
-      bool rotate_winds(VarInfo *, DataPlane &);
-      bool rotate_winds(VarInfo *, DataPlaneArray &);
+      bool rotate_winds(const VarInfo *, DataPlane &);
+      bool rotate_winds(const VarInfo *, DataPlaneArray &);
 
          //  post-process data after reading it
 

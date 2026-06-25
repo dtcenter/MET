@@ -713,7 +713,7 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Met2dDataFile::rotate_winds(VarInfo *vinfo, DataPlane &dp)
+bool Met2dDataFile::rotate_winds(const VarInfo *vinfo, DataPlane &dp)
 
 {
 
@@ -790,7 +790,7 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Met2dDataFile::rotate_winds(VarInfo *vinfo, DataPlaneArray &dpa)
+bool Met2dDataFile::rotate_winds(const VarInfo *vinfo, DataPlaneArray &dpa)
 
 {
 
@@ -892,7 +892,7 @@ return status;
 
 
 bool Met2dDataFile::read_wind_data(VarInfo *vinfo,
-                                   const char *conf_key_name,
+                                   const char *conf_key,
                                    const StringArray &names,
                                    DataPlane &dp)
 
@@ -906,7 +906,7 @@ bool status = false;
 
     // Update search names, if needed
 
-StringArray search_names(swap_uv_name(vinfo, conf_key_name, names));
+StringArray search_names(swap_uv_name(vinfo, conf_key, names));
 
     // Try each of the possible names
 
@@ -926,7 +926,7 @@ if(!status) {
    mlog << Warning << "\n" << method_name
         << "No matching wind field found for name(s) \""
         << write_css(search_names) << "\".\n"
-        << "Set \"" << conf_key_name
+        << "Set \"" << conf_key
         << "\" to specify the matching variable name.\n\n";
 }
 
@@ -939,7 +939,7 @@ return status;
 
 
 bool Met2dDataFile::read_wind_data(VarInfo *vinfo,
-                                   const char *conf_key_name,
+                                   const char *conf_key,
                                    const StringArray &names,
                                    DataPlaneArray &dpa)
 
@@ -953,7 +953,7 @@ bool status = false;
 
     // Update search names, if needed
 
-StringArray search_names(swap_uv_name(vinfo, conf_key_name, names));
+StringArray search_names(swap_uv_name(vinfo, conf_key, names));
 
     // Try each of the possible names
 
@@ -973,7 +973,7 @@ if(!status) {
    mlog << Warning << "\n" << method_name
         << "No matching wind field(s) found for name(s) \""
         << write_css(search_names) << "\".\n"
-        << "Set \"" << conf_key_name
+        << "Set \"" << conf_key
         << "\" to specify the matching variable name.\n\n";
 }
 
@@ -1082,7 +1082,7 @@ return true;
 
 
 static StringArray swap_uv_name(VarInfo *vinfo,
-                                const ConcatString &conf_key_name,
+                                const ConcatString &conf_key,
                                 const StringArray &names)
 {
 
@@ -1093,14 +1093,14 @@ static StringArray swap_uv_name(VarInfo *vinfo,
 
    // Replace U with V
    if(vinfo->is_u_wind() &&
-      conf_key_name == conf_key_v_wind_field_name) {
+      conf_key == conf_key_v_wind_field_name) {
       cs.replace("U", "V", false);
       cs.replace("u", "v", false);
       if(cs != vinfo->name()) sa.insert(0, cs.c_str());
    }
    // Replace V with U
    else if(vinfo->is_v_wind() &&
-           conf_key_name == conf_key_u_wind_field_name) {
+           conf_key == conf_key_u_wind_field_name) {
       cs.replace("V", "U", false);
       cs.replace("v", "u", false);
       if(cs != vinfo->name()) sa.insert(0, cs.c_str());
