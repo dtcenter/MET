@@ -76,7 +76,7 @@ def main(argv: list[str]) -> int:
         num_var = 0
 
         for var_name, variable in ncfile.variables.items():
-            verbose_msg(verb, f"Checking {var_name} ... ", end="")
+            verbose_msg(verb, f"Checking {var_name} ... ", line_break=False)
 
             values = variable[:]
             if all_missing(values):

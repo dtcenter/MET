@@ -27,9 +27,12 @@ def usage() -> None:
     )
 
 
-def verbose_msg(verb, msg):
+def verbose_msg(verb, msg, line_break=True):
     if verb:
-        print(msg)
+        if line_break:
+            print(msg)
+        else:
+            print(msg, end="")
 
 def check_size_and_return(var: np.ma.MaskedArray, verb: bool) -> bool:
     do_return = False
@@ -102,7 +105,7 @@ def main(argv: list[str]) -> int:
         for var_name, variable in ncfile.variables.items():
             var = to_masked_array(variable[:])
 
-            verbose_msg(verb, f"Checking {var_name} ... ", end="")
+            verbose_msg(verb, f"Checking {var_name} ... ", line_break=False)
 
             if var_name in HEADER_VARS:
                 if total_size(var) < 1:
