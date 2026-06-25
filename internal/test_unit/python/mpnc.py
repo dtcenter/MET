@@ -27,19 +27,20 @@ def usage() -> None:
     )
 
 
+def verbose_msg(verb, msg):
+    if verb:
+        print(msg)
+
 def check_size_and_return(var: np.ma.MaskedArray, verb: bool) -> bool:
     do_return = False
     size = total_size(var)
     if size <= zero_count_non_na(var):
-        if verb:
-            print("all zeroes")
+        verbose_msg(verb, "all zeroes")
         do_return = True
     if size <= na_count(var):
-        if verb:
-            print("all NAs")
+        verbose_msg(verb, "all NAs")
         do_return = True
-    if verb:
-        print("OK")
+    verbose_msg(verb, "OK")
     return do_return
 
 
@@ -88,12 +89,10 @@ def main(argv: list[str]) -> int:
     verb, nc_path = parse_args(argv)
 
     if not os.path.isfile(nc_path):
-        if verb:
-            print(f"File not found: {nc_path}")
+        verbose_msg(verb, f"File not found: {nc_path}")
         return 1
 
-    if verb:
-        print(f"Opening {nc_path}")
+    verbose_msg(verb, f"Opening {nc_path}")
 
     int_num_hdr_var = 0
     int_num_arr_var = 0
@@ -103,16 +102,13 @@ def main(argv: list[str]) -> int:
         for var_name, variable in ncfile.variables.items():
             var = to_masked_array(variable[:])
 
-            if verb:
-                print(f"Checking {var_name} ... ", end="")
+            verbose_msg(verb, f"Checking {var_name} ... ", end="")
 
             if var_name in HEADER_VARS:
                 if total_size(var) < 1:
-                    if verb:
-                        print(f"{var_name} empty")
+                    verbose_msg(verb, f"{var_name} empty")
                     return 1
-                if verb:
-                    print("OK")
+                verbose_msg(verb, "OK")
                 int_num_hdr_var += 1
 
             elif var_name in ARRAY_VARS:
@@ -133,16 +129,13 @@ def main(argv: list[str]) -> int:
                 print("ignored")
 
     if int_num_hdr_var not in {3, 4}:
-        if verb:
-            print(f"Unexpected number of header variables ({int_num_hdr_var})")
+        verbose_msg(verb, f"Unexpected number of header variables ({int_num_hdr_var})")
         return 1
 
     if int_num_arr_var != 2 and int_num_1d_var != 8:
-        if verb:
-            print(
-                f"Unexpected number of array variables ({int_num_arr_var}) "
-                f"or 1D variables ({int_num_1d_var})"
-            )
+        verbose_msg(verb, f"Unexpected number of array variables ({int_num_arr_var}) "
+                      f"or 1D variables ({int_num_1d_var})"
+                   )
         return 1
 
     return 0

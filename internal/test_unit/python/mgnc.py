@@ -22,6 +22,10 @@ def usage() -> None:
     )
 
 
+def verbose_msg(verb, msg):
+    if verb:
+        print(msg)
+
 def parse_args(argv: list[str]) -> tuple[bool, str]:
     verb = False
 
@@ -63,33 +67,27 @@ def main(argv: list[str]) -> int:
     verb, nc_path = parse_args(argv)
 
     if not os.path.isfile(nc_path):
-        if verb:
-            print(f"File not found: {nc_path}")
+        verbose_msg(verb, f"File not found: {nc_path}")
         return 1
 
-    if verb:
-        print(f"Opening {nc_path}")
+    verbose_msg(verb, f"Opening {nc_path}")
 
     with Dataset(nc_path, "r") as ncfile:
         num_var = 0
 
         for var_name, variable in ncfile.variables.items():
-            if verb:
-                print(f"Checking {var_name} ... ", end="")
+            verbose_msg(verb, f"Checking {var_name} ... ", end="")
 
             values = variable[:]
             if all_missing(values):
-                if verb:
-                    print("all NAs")
+                verbose_msg(verb, "all NAs")
                 return 1
 
-            if verb:
-                print("OK")
+            verbose_msg(verb, "OK")
             num_var += 1
 
         if num_var < 1:
-            if verb:
-                print("No variables found")
+            verbose_msg(verb, "No variables found")
             return 1
 
     return 0
