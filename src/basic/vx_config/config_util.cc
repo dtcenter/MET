@@ -743,12 +743,12 @@ void MaskLatLon::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool MaskLatLon::operator==(const MaskLatLon &v) const {
+bool operator==(const MaskLatLon &lhs, const MaskLatLon &rhs) {
    bool match = true;
 
-   if(!(name       == v.name      ) ||
-      !(lat_thresh == v.lat_thresh) ||
-      !(lon_thresh == v.lon_thresh)) {
+   if(!(lhs.name       == rhs.name      ) ||
+      !(lhs.lat_thresh == rhs.lat_thresh) ||
+      !(lhs.lon_thresh == rhs.lon_thresh)) {
       match = false;
    }
 
@@ -832,13 +832,13 @@ void WindMetadata::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool WindMetadata::operator==(const WindMetadata &v) const {
+bool operator==(const WindMetadata &lhs, const WindMetadata &rhs) {
    bool match = true;
 
-   if(!(u_wind         == v.u_wind        ) ||
-      !(v_wind         == v.v_wind        ) ||
-      !(wind_speed     == v.wind_speed    ) ||
-      !(wind_direction == v.wind_direction)) {
+   if(!(lhs.u_wind         == rhs.u_wind        ) ||
+      !(lhs.v_wind         == rhs.v_wind        ) ||
+      !(lhs.wind_speed     == rhs.wind_speed    ) ||
+      !(lhs.wind_direction == rhs.wind_direction)) {
       match = false;
    }
 
@@ -1802,15 +1802,15 @@ void InterpInfo::validate() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool InterpInfo::operator==(const InterpInfo &v) const {
+bool operator==(const InterpInfo &lhs, const InterpInfo &rhs) {
    bool match = true;
 
-   if(!(field      == v.field     ) ||
-      !(vld_thresh == v.vld_thresh) ||
-      !(n_interp   == v.n_interp  ) ||
-      !(method     == v.method    ) ||
-      !(width      == v.width     ) ||
-      !(shape      == v.shape     )) {
+   if(!(lhs.field      == rhs.field     ) ||
+      !(lhs.vld_thresh == rhs.vld_thresh) ||
+      !(lhs.n_interp   == rhs.n_interp  ) ||
+      !(lhs.method     == rhs.method    ) ||
+      !(lhs.width      == rhs.width     ) ||
+      !(lhs.shape      == rhs.shape     )) {
       match = false;
    }
 
