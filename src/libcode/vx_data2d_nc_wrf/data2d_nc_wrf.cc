@@ -214,7 +214,7 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
 int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
                                        DataPlaneArray &plane_array,
                                        bool do_winds) {
-   int i, i_dim, n_level, status, lower, upper;
+   int i_dim, n_level, status, lower, upper;
    ConcatString level_str;
    double pressure, min_level, max_level;
    bool found = false;
@@ -251,7 +251,7 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
 
    // Loop through each of levels specified in the range
    cur_dim = dim;
-   for(i=0; i<n_level; i++) {
+   for(int i=0; i<n_level; i++) {
 
       // Set the dimension for the current level
       cur_dim[i_dim] = lower + i;
@@ -301,8 +301,8 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
       if(do_winds) rotate_winds(&vinfo, plane_array);
 
       //  post-process each data plane
-      for(int i=0; i<plane_array.n_planes(); i++) {
-         process_data_plane(&vinfo, plane_array.at(i));
+      for(int j=0; j<plane_array.n_planes(); j++) {
+         process_data_plane(&vinfo, plane_array.at(j));
       }
 
       // Check for bad status

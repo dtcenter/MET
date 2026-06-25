@@ -90,7 +90,7 @@ class MetGrib1DataFile : public Met2dDataFile {
 
          //  retrieve the index of the first matching record
 
-      int index(VarInfo &);
+      int index(VarInfo &) override;
 
 };
 

@@ -850,7 +850,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  use the index to look up the parameter name
          vector<Grib2TableEntry> matches;
          if(GribTable.lookup_grib2(rec->Discipline, rec->ParmCat, rec->Parm,
-                                   gfld->idsect[2], gfld->idsect[0], gfld->idsect[3],
+                                   (int) gfld->idsect[2], (int) gfld->idsect[0], (int) gfld->idsect[3],
                                    matches) == 0){
             mlog << Debug(4) << "MetGrib2DataFile::read_grib2_record_list() - unrecognized GRIB2 "
                  << "field indexes - disc: " << rec->Discipline << ", master table: " << gfld->idsect[2]

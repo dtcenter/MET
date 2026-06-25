@@ -752,7 +752,7 @@ int MetUGridDataFile::index(VarInfo &vinfo){
 ////////////////////////////////////////////////////////////////////////
 
 bool MetUGridDataFile::read_data_plane(ConcatString var_name, VarInfo &vinfo,
-                                       DataPlane &plane, LongArray &dimension,
+                                       DataPlane &plane, const LongArray &dimension,
                                        bool do_winds) {
    static const string method_name = "MetUGridDataFile::read_data_plane() -> ";
 

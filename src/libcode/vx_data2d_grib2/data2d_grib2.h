@@ -123,15 +123,15 @@ class MetGrib2DataFile : public Met2dDataFile {
 
          //  retrieve the first matching data plane
 
-      bool data_plane(VarInfo &, DataPlane &, bool do_winds = true);
+      bool data_plane(VarInfo &, DataPlane &, bool do_winds = true) override;
 
          //  retrieve all matching data planes
 
-      int data_plane_array(VarInfo &, DataPlaneArray &, bool do_winds = true);
+      int data_plane_array(VarInfo &, DataPlaneArray &, bool do_winds = true) override;
 
          //  retrieve the index of the first matching record
 
-      int index(VarInfo &);
+      int index(VarInfo &) override;
 
          //
          //  do stuff

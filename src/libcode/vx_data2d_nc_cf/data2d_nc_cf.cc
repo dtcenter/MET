@@ -405,7 +405,6 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
                                       bool do_winds) {
    int n_rec = 0;
    DataPlane plane;
-   bool status = false;
    static const string method_name
          = "MetNcCFDataFile::data_plane_array(VarInfo &, DataPlaneArray &) -> ";
 
@@ -444,7 +443,7 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
 
    // Attempt to derive the data
    if(n_rec == 0 && do_winds) {
-      status = derive_winds(vinfo_nc, plane_array);
+      derive_winds(vinfo_nc, plane_array);
    }
 
    return n_rec;
