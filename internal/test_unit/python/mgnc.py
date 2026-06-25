@@ -21,10 +21,12 @@ def usage() -> None:
         "  where -v indicates verbose mode, default off\n"
     )
 
-
-def verbose_msg(verb, msg):
+def verbose_msg(verb, msg, line_break=True):
     if verb:
-        print(msg)
+        if line_break:
+            print(msg)
+        else:
+            print(msg, end="")
 
 def parse_args(argv: list[str]) -> tuple[bool, str]:
     verb = False

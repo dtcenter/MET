@@ -26,7 +26,6 @@ def usage() -> None:
         "  where -v indicates verbose mode, default off\n"
     )
 
-
 def verbose_msg(verb, msg, line_break=True):
     if verb:
         if line_break:
