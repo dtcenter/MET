@@ -661,6 +661,40 @@ Some tools override the temporary directory by the command line argument
 A description of the use of temporary files in MET can be found in
 :numref:`Contributor's Guide Section %s <tmp_file_use>`.
 
+.. _config_wind_field_names:
+
+wind_field_names
+----------------
+
+As described in :numref:`PS_wind_rotation_derivation`, MET can automatically
+derive wind variables and also rotate them from being grid-relative to earth-relative.
+Logic is provided for each supported input file type to identify input wind components
+and determine whether they are defined as being grid-relative or earth-relative.
+
+The following configuration options can be set to refine the metadata, when needed:
+
+.. code-block:: none
+
+  is_u_wind         = boolean;
+  is_v_wind         = boolean;
+  is_grid_relative  = boolean;
+  is_wind_speed     = boolean;
+  is_wind_direction = boolean;
+
+When deriving and rotating winds, MET searches the input file for matching wind
+components. That search is driven by the following configuration options:
+
+.. code-block:: none
+
+  u_wind_field_name = "UGRD,U";
+  v_wind_field_name = "VGRD,V";
+  wind_speed_field_name = "WIND,SP";
+  wind_direction_field_name = "WDIR,DD";
+
+Each is a comma-separated list of wind variable names to be searched. Users can
+explicity set these options to configure what data should be used in the wind
+derivation and rotation logic.
+
 message_type_group_map
 ----------------------
 
@@ -1016,10 +1050,14 @@ before applying the probabilistic verification methods.
 Probabilistic statistics in MET are derived from an Nx2 probabilistic
 contingency table. The N-dimension is determined by the number of
 probability bins requested. The "cat_thresh" configuration option
-defines the number of and size of these probabibility bins. The bins
-must include the full range of possible probability values, [0, 1].
-Since selecting bins of equal width is common, shorthand notation is
-provided to do so. The following options are supported.
+defines the number of and size of these probability bins. Options for
+defining probability bins are discussed in Point-Stat section
+:numref:`PS_Probability` and examples are listed below:
+
+* :code:`cat_thresh = [ >=0, >=0.5, >=0.75, >=1.0 ];` explicitly
+  specifies the probability thresholds and defines 3 bins of unequal
+  width between the values 0, 0.5, 0.75, and 1.0. By convention, the
+  greater-than-or-equal-to (">=" or "ge") inequality type is required.
 
 * :code:`cat_thresh = [ ==0.25 ];` specifies an equal probability bin
   width of 0.25 and defines 4 bins between the values 0, 0.25, 0.5, 0.75,
@@ -1032,11 +1070,6 @@ provided to do so. The following options are supported.
   probability value n/10, for n = 0 to 10. The :code:`==n` threshold may
   be set to any integer number of ensemble members greater than 1 to
   define n+1 probability bins.
-
-* :code:`cat_thresh = [ >=0, >=0.5, >=0.75, >=1.0 ];` explicitly
-  specifies the probability thresholds and defines 3 bins of unequal
-  width between the values 0, 0.5, 0.75, and 1.0. By convention, the
-  greater-than-or-equal-to (">=" or "ge") inequality type is required.
 
 field.prob_as_scalar
 """"""""""""""""""""

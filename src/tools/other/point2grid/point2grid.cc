@@ -360,10 +360,15 @@ static void process_command_line(int argc, char **argv) {
       StringArray var_names;
       auto vinfo = VarInfoFactory::new_var_info(FileType_NcMet);
       for(int i=0; i<FieldSA.n(); i++) {
+
+         // Initialize
          vinfo->clear();
+
          // Populate the VarInfo object using the config string
+         config.read(replace_path(config_const_filename).c_str());
          config.read_string(FieldSA[i].c_str());
          vinfo->set_dict(config);
+
          vname = vinfo->name();
          if (var_names.has(vname)) {
             mlog << Error << "\n" << method_name
@@ -628,10 +633,15 @@ static int get_obs_type(NcFile *nc) {
    bool has_attr_grid = false;
    auto vinfo = VarInfoFactory::new_var_info(FileType_NcCF);
    for(int i=0; i<FieldSA.n(); i++) {
+
+      // Initialize
       vinfo->clear();
+
       // Populate the VarInfo object using the config string
+      config.read(replace_path(config_const_filename).c_str());
       config.read_string(FieldSA[i].c_str());
       vinfo->set_dict(config);
+
       if (vinfo->grid_attr().is_set()) {
          has_attr_grid = true;
          break;
@@ -816,6 +826,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       vinfo->clear();
 
       // Populate the VarInfo object using the config string
+      config.read(replace_path(config_const_filename).c_str());
       config.read_string(FieldSA[i].c_str());
       vinfo->set_dict(config);
 
@@ -1316,11 +1327,15 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    if (0 < FieldSA.n() && !user_defined_latlon) {
       ConcatString coordinates_value;
       auto var_info = VarInfoNcCF(*(VarInfoNcCF *)vinfo);
+
       // Initialize
       var_info.clear();
+
       // Populate the VarInfo object using the config string
+      config.read(replace_path(config_const_filename).c_str());
       config.read_string(FieldSA[0].c_str());
       var_info.set_dict(config);
+
       NcVar var_data = get_nc_var(nc_in, var_info.name().c_str());
       if (get_nc_att_value(&var_data, coordinates_att_name, coordinates_value)) {
          StringArray sa = coordinates_value.split(" ");
@@ -1408,6 +1423,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       var_cell_mapping.clear();
 
       // Populate the VarInfo object using the config string
+      config.read(replace_path(config_const_filename).c_str());
       config.read_string(FieldSA[i].c_str());
       vinfo->set_dict(config);
 
@@ -1819,6 +1835,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       vinfo->clear();
 
       // Populate the VarInfo object using the config string
+      config.read(replace_path(config_const_filename).c_str());
       config.read_string(FieldSA[i].c_str());
       vinfo->set_dict(config);
 

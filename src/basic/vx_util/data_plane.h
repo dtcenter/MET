@@ -221,6 +221,7 @@ class DataPlaneArray {
 
       void levels (int, double & _low, double & _up) const;
       void level_range (double & _low, double & _up) const;
+      bool levels_match(const DataPlaneArray &) const;
 
       double data (int plane, int x, int y) const;
       void   set  (double, int plane, int x, int y);

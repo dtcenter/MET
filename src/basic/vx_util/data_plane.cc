@@ -1363,6 +1363,24 @@ void DataPlaneArray::levels(int n, double & _low, double & _up) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+bool DataPlaneArray::levels_match(const DataPlaneArray &d) const {
+
+   // Check for matching number of levels
+   if(Nplanes != d.Nplanes) return false;
+
+   for(int i=0; i<Nplanes; i++) {
+
+      // Check for matching level values
+      if(Lower[i] != d.Lower[i] || Upper[i] != d.Upper[i]) {
+         return false;
+      }
+   }
+
+   return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void DataPlaneArray::level_range(double & _low, double & _up) const {
 
    _low = _up = bad_data_int;
