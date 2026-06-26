@@ -1394,33 +1394,42 @@ static void clean_up(void) {
 ////////////////////////////////////////////////////////////////////////
 
 static double get_grid_res_km(const Grid &g) {
+   double res_km;
 
-   int nx = grid.nx();
-   int ny = grid.ny();
-
-   // X-spacing at the center
-   double lat1;
-   double lon1;
-   g.xy_to_latlon(0, nint(ny/2.0), lat1, lon1);
-   double lat2;
-   double lon2;
-   g.xy_to_latlon(nx - 1, nint(ny/2.0), lat2, lon2);
-   double dx_km = gc_dist(lat1, lon1, lat2, lon2) / (nx - 1);
-
-   // Y-spacing at the center
-   g.xy_to_latlon(nint(nx/2.0), 0, lat1, lon1);
-   g.xy_to_latlon(nint(nx/2.0), ny - 1, lat2, lon2);
-   double dy_km = gc_dist(lat1, lon1, lat2, lon2) / (ny - 1);
-
-   // Log message when grid spacing differs
-   if(!is_eq(dx_km, dy_km, 0.1)) {
-      mlog << Debug(3) << "Grid spacing in the X (" << dx_km
-           << " km) and Y (" << dy_km << " km) dimensions differ.\n";
+   // Use the grid scale, if well-defined
+   if(g.scale_km() > 0) {
+      res_km = g.scale_km();
    }
-   double res_km = min(dx_km, dy_km);
+   // Otherwise, determine the scale from the grid points
+   else {
+
+      int nx = grid.nx();
+      int ny = grid.ny();
+
+      // X-spacing at the center
+      double lat1;
+      double lon1;
+      g.xy_to_latlon(0, (ny - 1)/2.0, lat1, lon1);
+      double lat2;
+      double lon2;
+      g.xy_to_latlon(nx - 1, (ny - 1)/2.0, lat2, lon2);
+      double dx_km = gc_dist(lat1, lon1, lat2, lon2) / (nx - 1);
+
+      // Y-spacing at the center
+      g.xy_to_latlon((nx - 1)/2.0, 0, lat1, lon1);
+      g.xy_to_latlon((nx - 1)/2.0, ny - 1, lat2, lon2);
+      double dy_km = gc_dist(lat1, lon1, lat2, lon2) / (ny - 1);
+
+      // Log message when grid spacing differs
+      if(!is_eq(dx_km, dy_km, 0.1)) {
+         mlog << Debug(3) << "Grid spacing in the X (" << dx_km
+              << " km) and Y (" << dy_km << " km) dimensions differ.\n";
+      }
+      res_km = min(dx_km, dy_km);
+   }
 
    // Attempt to round to the nearest integer
-   if(is_eq(dx_km, (double) nint(res_km), 0.1)) {
+   if(is_eq(res_km, (double) nint(res_km), 0.1)) {
       res_km = (double) nint(res_km);
    }
 
