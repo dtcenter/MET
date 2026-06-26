@@ -136,9 +136,9 @@ int met_main(int argc, char *argv[]) {
    }
 
    // Write benchmarking metrics
-   #ifdef WITH_PROFILER
+#ifdef WITH_PROFILER
    ctrack::result_print();
-   #endif 
+#endif
 
    // Close files and deallocate memory
    clean_up();
@@ -199,8 +199,8 @@ static void process_command_line(int argc, char **argv) {
 
    // List the config files
    mlog << Debug(1)
-       << "Default Config File: " << default_config_file << "\n"
-       << "User Config File: "    << config_file << "\n";
+        << "Default Config File: " << default_config_file << "\n"
+        << "User Config File: "    << config_file << "\n";
 
    // Read the config files
    conf_info.read_config(default_config_file.c_str(),
@@ -285,9 +285,9 @@ string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 static void setup_diag_info(void) {
-   #ifdef WITH_PROFILER
+#ifdef WITH_PROFILER
    CTRACK;
-   #endif
+#endif
 
    // Resize based on the number of variables and masks
    diag_info.resize(conf_info.get_n_data());
@@ -370,8 +370,8 @@ static void process_series(void) {
 
    // List the lengths of the series options
    mlog << Debug(1)
-       << "Processing " << conf_info.get_n_data() << " data fields"
-       << " from " << n_series << " input file(s).\n";
+        << "Processing " << conf_info.get_n_data() << " data fields"
+        << " from " << n_series << " input file(s).\n";
 
    // Loop over the input files
    for(int i_series=0; i_series < n_series; i_series++) {
@@ -469,7 +469,7 @@ static void process_series(void) {
    if(conf_info.nc_info.do_info_theory) process_info_theory();
 
 }
-      
+
 ////////////////////////////////////////////////////////////////////////
 
 static void process_hist1d(const vector<DataPlane> &data_dp) {
@@ -613,6 +613,7 @@ static void prepare_power_spectrum_data(vector<DataPlane> &data_dp) {
 ////////////////////////////////////////////////////////////////////////
 
 static void process_power_spectrum(const vector<DataPlane> &data_dp) {
+   vector<vector<double> > re(conf_info.get_n_data());
 
    // Process the power spectrum for the full input domain
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
@@ -623,9 +624,21 @@ static void process_power_spectrum(const vector<DataPlane> &data_dp) {
       // Apply the discrete cosine transform
       DataPlane dct_dp(dct_typeII(data_dp[i_var]));
 
+      // Compute the radial energy
+      re[i_var] = radial_energy(dct_dp);
+
+      // Compute the mean radial energy of U/V wind components
+      int i_uv = conf_info.data_info[i_var]->uv_index();
+      if(i_uv >= 0 && i_uv < i_var) {
+         for(int i=0; i<(int)re[i_var].size(); i++) {
+            double uv_mn = (re[i_var][i] + re[i_uv][i])/2.0;
+            re[i_var][i] = uv_mn;
+            re[i_uv][i] = uv_mn;
+         }
+      }
+
       // Sum the radial energy
-      accumulate(power_info[i_var].power,
-                 radial_energy(dct_dp));
+      accumulate(power_info[i_var].power, re[i_var]);
 
    } // end for i_var
 }
@@ -633,6 +646,7 @@ static void process_power_spectrum(const vector<DataPlane> &data_dp) {
 ////////////////////////////////////////////////////////////////////////
 
 static void process_error_power_spectrum(const vector<DataPlane> &data_dp) {
+   vector<vector<double> > uv_re(conf_info.get_n_data());
 
    // Process the power spectrum for the full input domain
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
@@ -640,10 +654,14 @@ static void process_error_power_spectrum(const vector<DataPlane> &data_dp) {
       // Check skip
       if(conf_info.ps_info[i_var].skip) continue;
 
+      const VarInfo *i_data = conf_info.data_info[i_var];
+
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
          // Check skip
          if(conf_info.ps_info[j_var].skip) continue;
+
+         const VarInfo *j_data = conf_info.data_info[j_var];
 
          // Compute difference field
          DataPlane diff_dp(subtract(data_dp[i_var], data_dp[j_var]));
@@ -651,9 +669,31 @@ static void process_error_power_spectrum(const vector<DataPlane> &data_dp) {
          // Apply the discrete cosine transform
          DataPlane dct_dp(dct_typeII(diff_dp));
 
+         // Compute the radial energy
+         vector<double> re = radial_energy(dct_dp);
+
+         // Store the radial energy of the U/V wind component diffs
+         if(is_req_level_match(i_data->req_level_name(),
+                               j_data->req_level_name()) &&
+            ((i_data->is_u_wind() && j_data->is_u_wind()) ||
+             (i_data->is_v_wind() && j_data->is_v_wind()))) {
+            uv_re[i_var] = re;
+            uv_re[j_var] = re;
+         }
+
+         // Compute the mean radial enegery of the U/V wind component diffs
+         int i_uv = i_data->uv_index();
+         if(i_uv >= 0 && i_uv < i_var) {
+            for(int i=0; i<(int)uv_re[i_var].size(); i++) {
+               double uv_mn = (uv_re[i_var][i] + uv_re[i_uv][i])/2.0;
+               uv_re[i_var][i] = uv_mn;
+               uv_re[i_uv][i] = uv_mn;
+            }
+            re = uv_re[i_var];
+         }
+
          // Sum the radial energy
-         accumulate(power_info[i_var].error_power[j_var],
-                    radial_energy(dct_dp));
+         accumulate(power_info[i_var].error_power[j_var], re);
 
       } // end for j_var
    } // end for i_var
@@ -744,7 +784,7 @@ static void process_info_theory() {
             for(int i=0; i<i_data->n_bins(); i++) {
                for(int j=0; j<j_data->n_bins(); j++) {
 
-		  int n = i * j_data->n_bins() + j;
+                  int n = i * j_data->n_bins() + j;
 
                   // Increment sums
                   hist2d_ij_sum   += i_diag->hist2d[j_var][n];
@@ -763,7 +803,7 @@ static void process_info_theory() {
 
                   auto p_j = (double) hist2d_j_sum[j] / (double) hist2d_ij_sum;
 
-		  int n = i * j_data->n_bins() + j;
+                  int n = i * j_data->n_bins() + j;
 
                   auto p_ij = (double) i_diag->hist2d[j_var][n] / (double) hist2d_ij_sum;
 
@@ -1029,7 +1069,7 @@ static void write_hist2d(void) {
          ConcatString var_str;
          var_str << get_nc_var_str(i_data, i_var+1) << "_"
                  << get_nc_var_str(j_data, j_var+1);
-	 ConcatString var_name("hist_");
+         ConcatString var_name("hist_");
          var_name << var_str;
 
          // Create NetCDF variable
@@ -1117,7 +1157,7 @@ static void write_info_theory(void) {
                  << get_nc_var_str(j_data, j_var+1);
 
          // Define NetCDF variable names
-	 ConcatString je_var_name("joint_entropy_");
+         ConcatString je_var_name("joint_entropy_");
          je_var_name << var_str;
          ConcatString mi_var_name("mutual_information_");
          mi_var_name << var_str;
@@ -1255,7 +1295,7 @@ static void write_error_power_spectrum(void) {
          // Define NetCDF variable name
          ConcatString i_var_str(get_nc_var_str(i_data, i_var+1));
          ConcatString j_var_str(get_nc_var_str(j_data, j_var+1));
-	 ConcatString var_name("error_power_spectrum_");
+         ConcatString var_name("error_power_spectrum_");
          var_name << i_var_str << "_" << j_var_str;
 
          // Create NetCDF variable
@@ -1294,20 +1334,16 @@ static void write_error_power_spectrum(void) {
 
 static Met2dDataFile *get_mtddf(const StringArray &file_list,
                                 const int i_field) {
-   Met2dDataFile *mtddf = nullptr;
-   Dictionary *dict = nullptr;
-   Dictionary i_dict;
-   GrdFileType file_type;
    int i;
 
    // Conf: data.field
-   dict = conf_info.conf.lookup_array(conf_key_data_field);
+   Dictionary *dict = conf_info.conf.lookup_array(conf_key_data_field);
 
    // Get the i-th data.field entry
-   i_dict = parse_conf_i_vx_dict(dict, i_field);
+   Dictionary i_dict = parse_conf_i_vx_dict(dict, i_field);
 
    // Look for file_type in the i-th data.field entry
-   file_type = parse_conf_file_type(&i_dict);
+   GrdFileType file_type = parse_conf_file_type(&i_dict);
 
    // Find the first file that actually exists
    for(i=0; i < file_list.n(); i++) {
@@ -1322,6 +1358,7 @@ static Met2dDataFile *get_mtddf(const StringArray &file_list,
    }
 
    // Read first valid file
+   Met2dDataFile *mtddf = nullptr;
    if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(
                    file_list[i].c_str(), file_type))) {
       mlog << Error << "\nget_mtddf() -> "

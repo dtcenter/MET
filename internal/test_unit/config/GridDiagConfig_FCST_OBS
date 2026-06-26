@@ -45,11 +45,6 @@ power_spectrum = {
 // Data fields
 //
 data = {
-   name   = "APCP";
-   level  = ["A06"];
-   n_bins = 50;
-   range  = [0,25];
-
    field = [
       { ${FIELD1} },
       { ${FIELD2} }
@@ -71,11 +66,6 @@ mask = {
 //
 // Diagnostic output types
 //
-output_flag = {
-   histogram_1d   = TRUE;
-   histogram_2d   = TRUE;
-   info_theory    = TRUE;
-   power_spectrum = TRUE;
-}
+output_flag = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////

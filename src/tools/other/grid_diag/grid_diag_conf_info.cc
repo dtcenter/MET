@@ -181,7 +181,7 @@ void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
    Dictionary *dict = conf.lookup_array(conf_key_data_field);
 
    // Parse the data field information
-   for(int i=0; i<(int) data_info.size(); i++) {
+   for(int i=0; i<get_n_data(); i++) {
 
       // Determine the file type
       file_type = (file_types.size() > 1 ?
