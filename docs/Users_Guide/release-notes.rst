@@ -51,6 +51,16 @@ MET Version 13.0.0-beta2 Release Notes (20260508)
      * Update METbaseimage to use Python version 3.14
        (`#61 <https://github.com/dtcenter/METbaseimage/issues/61>`_).
 
+
+  .. note::
+
+     When using the **compile_MET_all.sh** script with this developmental
+     release, download the appropriate dependency bundle, **tar_files.met-base-develop.tgz**, using 
+     *wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.met-base-develop.tgz*
+     instead of **tar_files.tgz**. The standard **tar_files.tgz** is intended
+     for stable releases and may not contain compatible versions of the
+     required libraries.
+
 MET Version 13.0.0-beta1 Release Notes (20260205)
 -------------------------------------------------
 
@@ -196,7 +206,10 @@ MET Version 13.0.0 Upgrade Instructions
 
    MET version 13.0.0 modifies existing output data values in the following ways:
 
-   * None
+   * Ranked probability statistics found in the RPS line type and written by Ensemble-Stat and the
+     HiRA algorithm of Point-Stat are modified slightly. As described in MET
+     `#3396 <https://github.com/dtcenter/MET/issues/3396>`_, improvements to the RPS computation
+     algorithm result in minor changes to the statistics.
 
 .. dropdown:: Additional upgrade instructions - NONE
 
