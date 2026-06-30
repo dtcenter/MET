@@ -178,7 +178,7 @@ class VarInfoNcWrf : public VarInfo
       ~VarInfoNcWrf() override;
       VarInfoNcWrf(const VarInfoNcWrf &);
       VarInfoNcWrf & operator=(const VarInfoNcWrf &);
-      VarInfo *clone() const override;
+      std::unique_ptr<VarInfo> clone() const override;
 
       void dump(std::ostream &) const override;
       void clear();

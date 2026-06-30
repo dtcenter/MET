@@ -72,11 +72,8 @@ VarInfoUGrid & VarInfoUGrid::operator=(const VarInfoUGrid &f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo *VarInfoUGrid::clone() const {
-
-   auto ret = new VarInfoUGrid(*this);
-
-   return (VarInfo *)ret;
+unique_ptr<VarInfo> VarInfoUGrid::clone() const {
+   return unique_ptr<VarInfo>(new VarInfoUGrid(*this));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
