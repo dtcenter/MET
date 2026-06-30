@@ -1086,21 +1086,31 @@ static StringArray swap_uv_name(const VarInfo *vinfo,
                                 const StringArray &names)
 {
 
-   // If converting between U-wind and V-wind, try swapping U and V
-   // Only add the search string if the substituion works
-   ConcatString cs(vinfo->name());
+   // Try swapping U and V in the VarInfo name when:
+   //  - Converting between U-wind and V-wind
+   //  - The default setting has not be modified
+   //  - The substitution produces an actual change
+
+   // Lookup default setting from ConfigConstants
+   StringArray default_names;
+   static MetConfig conf_const(replace_path(config_const_filename).c_str());
+   default_names.parse_css(conf_const.lookup_string(conf_key.c_str()));
+
    StringArray sa(names);
+   ConcatString cs(vinfo->name());
 
    // Replace U with V
    if(vinfo->is_u_wind() &&
-      conf_key == conf_key_v_wind_field_name) {
+      conf_key == conf_key_v_wind_field_name &&
+      names == default_names) {
       cs.replace("U", "V", false);
       cs.replace("u", "v", false);
       if(cs != vinfo->name()) sa.insert(0, cs.c_str());
    }
    // Replace V with U
    else if(vinfo->is_v_wind() &&
-           conf_key == conf_key_u_wind_field_name) {
+           conf_key == conf_key_u_wind_field_name &&
+           names == default_names) {
       cs.replace("V", "U", false);
       cs.replace("v", "u", false);
       if(cs != vinfo->name()) sa.insert(0, cs.c_str());
