@@ -256,8 +256,8 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
       cur_dim[i_dim] = lower + i;
 
       // Read data for the current level
-      double status = WrfNc->data(vinfo_nc->req_name().c_str(),
-                                  cur_dim, cur_plane, pressure, info);
+      bool status = WrfNc->data(vinfo_nc->req_name().c_str(),
+                                cur_dim, cur_plane, pressure, info);
 
       // Assume that WRF winds are grid-relative
       vinfo_nc->set_grid_relative_flag(true);
