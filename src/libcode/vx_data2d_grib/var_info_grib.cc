@@ -75,11 +75,8 @@ VarInfoGrib & VarInfoGrib::operator=(const VarInfoGrib &f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo *VarInfoGrib::clone() const {
-
-   VarInfoGrib *ret = new VarInfoGrib(*this);
-
-   return (VarInfo *)ret;
+unique_ptr<VarInfo> VarInfoGrib::clone() const {
+   return unique_ptr<VarInfo>(new VarInfoGrib(*this));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

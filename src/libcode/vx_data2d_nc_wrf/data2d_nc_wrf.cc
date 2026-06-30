@@ -214,10 +214,7 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
 int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
                                        DataPlaneArray &plane_array,
                                        bool do_winds) {
-   int i_dim, n_level, status, lower, upper;
-   ConcatString level_str;
-   double pressure, min_level, max_level;
-   bool found = false;
+   double pressure;
    VarInfoNcWrf *vinfo_nc = (VarInfoNcWrf *) &vinfo;
    LongArray dim = vinfo_nc->dimension();
    NcVarInfo *info = (NcVarInfo *) nullptr;
@@ -229,6 +226,8 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
    plane_array.clear();
 
    // Find the dimension that has the range flag set
+   int i_dim;
+   bool found = false;
    for(i_dim=0; i_dim<dim.n_elements(); i_dim++) {
       if(dim[i_dim] == range_flag) {
          found = true;
@@ -245,9 +244,9 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
    }
 
    // Compute the number of levels
-   lower   = nint(vinfo.level().lower());
-   upper   = nint(vinfo.level().upper());
-   n_level = upper - lower + 1;
+   int lower   = nint(vinfo.level().lower());
+   int upper   = nint(vinfo.level().upper());
+   int n_level = upper - lower + 1;
 
    // Loop through each of levels specified in the range
    cur_dim = dim;
@@ -257,8 +256,8 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
       cur_dim[i_dim] = lower + i;
 
       // Read data for the current level
-      status = WrfNc->data(vinfo_nc->req_name().c_str(),
-                           cur_dim, cur_plane, pressure, info);
+      bool status = WrfNc->data(vinfo_nc->req_name().c_str(),
+                                cur_dim, cur_plane, pressure, info);
 
       // Assume that WRF winds are grid-relative
       vinfo_nc->set_grid_relative_flag(true);
@@ -325,7 +324,10 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
    // Set the VarInfo object's level string for pressure levels
    // Check for a missing value, a single pressure level, or a range
    // of pressure levels
+   double min_level;
+   double max_level;
    plane_array.level_range(min_level, max_level);
+   ConcatString level_str;
    if(is_bad_data(min_level) ||
       is_bad_data(max_level))           level_str << cs_erase << na_str;
    else if(is_eq(min_level, max_level)) level_str << cs_erase << "P" << nint(min_level);

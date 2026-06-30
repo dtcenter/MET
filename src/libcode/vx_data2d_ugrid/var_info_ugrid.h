@@ -45,7 +45,7 @@ class VarInfoUGrid : public VarInfo
       ~VarInfoUGrid() override;
       VarInfoUGrid(const VarInfoUGrid &);
       VarInfoUGrid & operator=(const VarInfoUGrid &);
-      VarInfo *clone() const override;
+      std::unique_ptr<VarInfo> clone() const override;
 
       void dump(std::ostream &) const override;
       void clear();

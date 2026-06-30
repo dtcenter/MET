@@ -1202,7 +1202,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          mlog << Debug(3) << "Using " << var_count << " "
               << vinfo->name() << " observations to populate " << to_count
               << " of " << to_grid.nxy() << " grid points.\n";
-         if (0 < filtered_count ) mlog << log_msg << "\n";
+         if (0 < filtered_count ) mlog << Debug(3) << log_msg << "\n";
       }
    } // end for i
 

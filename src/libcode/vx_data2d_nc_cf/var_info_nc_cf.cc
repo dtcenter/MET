@@ -76,11 +76,8 @@ VarInfoNcCF & VarInfoNcCF::operator=(const VarInfoNcCF &f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo *VarInfoNcCF::clone() const {
-
-   VarInfoNcCF *ret = new VarInfoNcCF(*this);
-
-   return ret;
+unique_ptr<VarInfo> VarInfoNcCF::clone() const {
+   return unique_ptr<VarInfo>(new VarInfoNcCF(*this));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

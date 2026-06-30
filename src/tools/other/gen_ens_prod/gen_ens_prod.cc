@@ -218,7 +218,7 @@ static void process_command_line(int argc, char **argv) {
    mlog << Debug(1) << "Ensemble Files["
         << n_ens_files << "]:\n";
    for(int i=0; i<n_ens_files; i++) {
-      mlog << "   " << ens_files[i]  << "\n";
+      mlog << Debug(1) << "   " << ens_files[i]  << "\n";
    }
 
    // List the control member file
