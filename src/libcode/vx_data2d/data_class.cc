@@ -1093,7 +1093,7 @@ static StringArray swap_uv_name(const VarInfo *vinfo,
 
    // Lookup default setting from ConfigConstants
    StringArray default_names;
-   static MetConfig conf_const(replace_path(config_const_filename).c_str());
+   MetConfig conf_const(replace_path(config_const_filename).c_str());
    default_names.parse_css(conf_const.lookup_string(conf_key.c_str()));
 
    StringArray sa(names);
