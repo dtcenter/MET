@@ -916,7 +916,7 @@ for(int i=0; i<search_names.n(); i++) {
    if(vinfo->reset_dict_with_name(search_names[i].c_str()) &&
       data_plane(*vinfo, dp, false)) {
       status = true;
-      mlog << "Found matching wind field \""
+      mlog << Debug(3) << "Found matching wind field \""
            << vinfo->magic_str() << "\".\n";
       break;
    }
@@ -963,7 +963,7 @@ for(int i=0; i<search_names.n(); i++) {
    if(vinfo->reset_dict_with_name(search_names[i].c_str()) &&
       data_plane_array(*vinfo, dpa, false)) {
       status = true;
-      mlog << "Found matching wind field(s) \""
+      mlog << Debug(3) << "Found matching wind field(s) \""
            << vinfo->magic_str() << "\".\n";
       break;
    }

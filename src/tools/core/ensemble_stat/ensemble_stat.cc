@@ -439,7 +439,7 @@ static void process_command_line(int argc, char **argv) {
    mlog << Debug(1) << "Ensemble Files["
         << n_ens_files << "]:\n";
    for(int i=0; i<n_ens_files; i++) {
-      mlog << "   " << ens_file_list[i] << "\n";
+      mlog << Debug(1) << "   " << ens_file_list[i] << "\n";
    }
 
    // List the control member file
@@ -451,7 +451,7 @@ static void process_command_line(int argc, char **argv) {
       mlog << Debug(1) << method_name << "Gridded Observation Files["
            << grid_obs_file_list.n() << "]:\n" ;
       for(int i=0; i<grid_obs_file_list.n(); i++) {
-         mlog << "   " << grid_obs_file_list[i] << "\n" ;
+         mlog << Debug(1) << "   " << grid_obs_file_list[i] << "\n" ;
       }
    }
 
@@ -460,7 +460,7 @@ static void process_command_line(int argc, char **argv) {
       mlog << Debug(1) << method_name << "Point Observation Files["
            << point_obs_file_list.n() << "]:\n" ;
       for(int i=0; i<point_obs_file_list.n(); i++) {
-         mlog << "   " << point_obs_file_list[i] << "\n" ;
+         mlog << Debug(1) << "   " << point_obs_file_list[i] << "\n" ;
       }
    }
 
