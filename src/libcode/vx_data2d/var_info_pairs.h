@@ -33,7 +33,7 @@ class VarInfoPairs : public VarInfo {
       ~VarInfoPairs();
       VarInfoPairs(const VarInfoPairs &);
       VarInfoPairs & operator=(const VarInfoPairs &);
-      std::unique_ptr<VarInfo> clone() const;
+      std::unique_ptr<VarInfo> clone() const override;
 
       void dump(std::ostream &) const;
       void clear();

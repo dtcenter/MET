@@ -108,7 +108,6 @@ class VarInfo
       UserFunc_1Arg ConvertFx;
 
       void clear();
-      void clone_base() const;
 
       virtual void dump(std::ostream &) const;
 
