@@ -22,12 +22,12 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Apply discrete cosine transform to 2D data by transforming the rows
-// and columns separately
+// Apply discrete cosine transform to 2D data by transforming the
+// columns (nx) and rows (nx) separately
 //
 ////////////////////////////////////////////////////////////////////////
 
-extern void dct_typeII_2d(double *data, int nrow, int ncol) {
+extern void dct_typeII_2d(double *data, int ncol, int nrow) {
 
    // Store input data in a gsl matrix
    gsl_matrix *m = gsl_matrix_alloc(nrow, ncol);
