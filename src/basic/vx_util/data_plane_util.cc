@@ -866,8 +866,8 @@ extern vector<double> radial_energy(const DataPlane &dp) {
    for(int x=0; x<nx; x++) {
       for(int y=0; y<ny; y++) {
 
-         // Energy is the square of coefficient
-         double energy = dp(x,y)*dp(x,y);
+         // Energy is the value squared divided by the number of points
+         double energy = dp(x,y)*dp(x,y)/dp.nxy();
 
          // Euclidean distance from (0,0)
          double dist = sqrt(x*x + y*y);
