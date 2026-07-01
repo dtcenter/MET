@@ -152,4 +152,32 @@
     </output>
   </test>
 
+  <test name="grid_diag_KENG_FCST_OBS">
+    <exec>echo "&DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F006.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F018.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2" \
+                > &OUTPUT_DIR;/grid_diag/keng_fcst_file_list; \
+          echo "&DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_0600_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1800_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2" \
+                > &OUTPUT_DIR;/grid_diag/keng_anly_file_list; \
+         &MET_BIN;/grid_diag</exec>
+    <env>
+      <pair><name>FIELD1</name> <value>name = "KENG"; level = "Z10"; n_bins = 140; range = [0,140];</value></pair>
+      <pair><name>FIELD2</name> <value>name = "KENG"; level = "Z10"; n_bins = 140; range = [0,140];</value></pair>
+    </env>
+    <param> \
+      -data &OUTPUT_DIR;/grid_diag/keng_fcst_file_list \
+      -data &OUTPUT_DIR;/grid_diag/keng_anly_file_list \
+      -config &CONFIG_DIR;/GridDiagConfig_FCST_OBS \
+      -out &OUTPUT_DIR;/grid_diag/grid_diag_KENG_Z10.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_KENG_Z10.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
