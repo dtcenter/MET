@@ -77,7 +77,7 @@ static void read_series_data(int, VarInfo *, const StringArray &,
 static bool read_wind_series(const StringArray &,
                              int, VarInfo *, const StringArray &,
                              const GrdFileType, DataPlane &);
-static void regrid_dp(VarInfo *, const Grid &, DataPlane &);
+static void regrid_data(VarInfo *, const Grid &, DataPlane &);
 static ConcatString get_nc_var_str(const VarInfo *, int);
 static ConcatString get_nc_att_str(const ConcatString &,
                                    const ConcatString &);
@@ -581,7 +581,6 @@ static void prepare_power_spectrum_data(vector<InputDataInfo> &in_data) {
 ////////////////////////////////////////////////////////////////////////
 
 static void process_power_spectrum(const vector<InputDataInfo> &in_data) {
-   vector<vector<double> > re(conf_info.get_n_data());
 
    // Process the power spectrum for the full input domain
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
@@ -589,32 +588,44 @@ static void process_power_spectrum(const vector<InputDataInfo> &in_data) {
       // Check skip
       if(conf_info.ps_info[i_var].skip) continue;
 
-      // Apply the discrete cosine transform
-      DataPlane dct_dp(dct_typeII(in_data[i_var].dp));
+      // Process U/V for kinetic energy
+      if(in_data[i_var].uv_flag) {
 
-      // Compute the radial energy
-      re[i_var] = radial_energy(dct_dp);
+         // Apply the discrete cosine transforms
+         DataPlane u_dct_dp(dct_typeII(in_data[i_var].u_dp));
+         DataPlane v_dct_dp(dct_typeII(in_data[i_var].v_dp));
 
-      // Compute the mean radial energy of U/V wind components
-      int i_uv = conf_info.data_info[i_var]->uv_index();
-      if(i_uv >= 0 && i_uv < i_var) {
-         for(int i=0; i<(int)re[i_var].size(); i++) {
-            double uv_mn = (re[i_var][i] + re[i_uv][i])/2.0;
-            re[i_var][i] = uv_mn;
-            re[i_uv][i] = uv_mn;
+         // Compute the radial energy
+         vector<double> u_re = radial_energy(u_dct_dp);
+         vector<double> v_re = radial_energy(v_dct_dp);
+
+         // Combine the components
+         vector<double> re(u_re.size());
+         for(size_t i=0; i<u_re.size(); i++) {
+            re[i] = (u_re[i] + v_re[i]) / 2.0;
          }
+
+         // Sum the radial energy
+         accumulate(power_info[i_var].power, re);
       }
+      // Process other scalar fields
+      else {
 
-      // Sum the radial energy
-      accumulate(power_info[i_var].power, re[i_var]);
+         // Apply the discrete cosine transform
+         DataPlane dct_dp(dct_typeII(in_data[i_var].dp));
 
+         // Compute the radial energy
+         vector<double> re = radial_energy(dct_dp);
+
+         // Sum the radial energy
+         accumulate(power_info[i_var].power, re);
+      }
    } // end for i_var
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 static void process_error_power_spectrum(const vector<InputDataInfo> &in_data) {
-   vector<vector<double> > uv_re(conf_info.get_n_data());
 
    // Process the power spectrum for the full input domain
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
@@ -631,38 +642,48 @@ static void process_error_power_spectrum(const vector<InputDataInfo> &in_data) {
 
          const VarInfo *j_vinfo = conf_info.data_info[j_var];
 
-         // Compute difference field
-         DataPlane diff_dp(subtract(in_data[i_var].dp, in_data[j_var].dp));
+         // Process U/V for kinetic energy
+         if(in_data[i_var].uv_flag && in_data[j_var].uv_flag) {
 
-         // Apply the discrete cosine transform
-         DataPlane dct_dp(dct_typeII(diff_dp));
+            // Compute difference fields
+            DataPlane u_diff_dp(subtract(in_data[i_var].u_dp,
+                                         in_data[j_var].u_dp));
+            DataPlane v_diff_dp(subtract(in_data[i_var].v_dp,
+                                         in_data[j_var].v_dp));
 
-         // Compute the radial energy
-         vector<double> re = radial_energy(dct_dp);
+            // Apply the discrete cosine transforms
+            DataPlane u_dct_dp(dct_typeII(u_diff_dp));
+            DataPlane v_dct_dp(dct_typeII(v_diff_dp));
 
-         // Store the radial energy of the U/V wind component diffs
-         if(is_req_level_match(i_vinfo->req_level_name(),
-                               j_vinfo->req_level_name()) &&
-            ((i_vinfo->is_u_wind() && j_vinfo->is_u_wind()) ||
-             (i_vinfo->is_v_wind() && j_vinfo->is_v_wind()))) {
-            uv_re[i_var] = re;
-            uv_re[j_var] = re;
-         }
+            // Compute the radial energy
+            vector<double> u_re = radial_energy(u_dct_dp);
+            vector<double> v_re = radial_energy(v_dct_dp);
 
-         // Compute the mean radial enegery of the U/V wind component diffs
-         int i_uv = i_vinfo->uv_index();
-         if(i_uv >= 0 && i_uv < i_var) {
-            for(int i=0; i<(int)uv_re[i_var].size(); i++) {
-               double uv_mn = (uv_re[i_var][i] + uv_re[i_uv][i])/2.0;
-               uv_re[i_var][i] = uv_mn;
-               uv_re[i_uv][i] = uv_mn;
+            // Combine the components
+            vector<double> re(u_re.size());
+            for(size_t i=0; i<u_re.size(); i++) {
+               re[i] = (u_re[i] + v_re[i]) / 2.0;
             }
-            re = uv_re[i_var];
+
+            // Sum the radial energy
+            accumulate(power_info[i_var].error_power[j_var], re);
          }
+         // Process other scalar fields
+         else {
 
-         // Sum the radial energy
-         accumulate(power_info[i_var].error_power[j_var], re);
+            // Compute difference field
+            DataPlane diff_dp(subtract(in_data[i_var].dp,
+                              in_data[j_var].dp));
 
+            // Apply the discrete cosine transform
+            DataPlane dct_dp(dct_typeII(diff_dp));
+
+            // Compute the radial energy
+            vector<double> re = radial_energy(dct_dp);
+
+            // Sum the radial energy
+            accumulate(power_info[i_var].error_power[j_var], re);
+         }
       } // end for j_var
    } // end for i_var
 }
@@ -803,7 +824,7 @@ static void read_series_data(int i_series, VarInfo *i_vinfo,
                     in_data.dp, cur_grid);
 
    // Regrid, if needed
-   regrid_dp(i_vinfo, cur_grid, in_data.dp);
+   regrid_data(i_vinfo, cur_grid, in_data.dp);
 
    // Check for kinetic energy
    in_data.uv_flag = i_vinfo->is_kinetic_energy();
@@ -864,7 +885,7 @@ static bool read_wind_series(const StringArray &wind_names,
               << wind_vinfo->magic_str() << "\".\n";
 
          // Regrid, if needed
-         regrid_dp(i_vinfo, cur_grid, wind_dp);
+         regrid_data(i_vinfo, cur_grid, wind_dp);
 
          break;
       }
@@ -875,7 +896,7 @@ static bool read_wind_series(const StringArray &wind_names,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void regrid_dp(VarInfo *vinfo, const Grid &cur_grid,
+static void regrid_data(VarInfo *vinfo, const Grid &cur_grid,
                       DataPlane &dp) {
 
    // Check for grid match
