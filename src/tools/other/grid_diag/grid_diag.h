@@ -109,6 +109,14 @@ static Grid grid;
 // Input files
 static Met2dDataFile *data_mtddf = nullptr;
 
+// Struct to store scalar and vector input data
+struct InputDataInfo {
+   DataPlane dp;
+   DataPlane u_dp;
+   DataPlane v_dp;
+   bool uv_flag = false;
+};
+
 // Struct to store diagnostic info for each field and masking region
 struct DiagInfo {
 
@@ -118,7 +126,7 @@ struct DiagInfo {
    std::vector<double> bin_mid;
    double bin_delta;
 
-   // Input data info
+   // Range of input data values
    double var_min;
    double var_max;
 
