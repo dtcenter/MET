@@ -1978,6 +1978,97 @@ target_link_libraries(mode_analysis
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 )
 
+add_executable(tc_gen
+    src/tools/tc_utils/tc_gen/tc_gen.cc
+    src/tools/tc_utils/tc_gen/tc_gen.h
+    src/tools/tc_utils/tc_gen/tc_gen_conf_info.cc
+    src/tools/tc_utils/tc_gen/tc_gen_conf_info.h
+)
+
+
+target_link_libraries(tc_gen
+	vx_stat_out
+	vx_statistics
+	vx_shapedata
+	vx_gsl_prob
+	vx_analysis_util
+	vx_tc_util
+	vx_data2d_factory
+	vx_data2d_nc_met
+	vx_data2d_grib
+	${GRIB2_MET_LIBS}
+	vx_data2d_nc_wrf
+	vx_data2d_nc_cf
+    ${UGRID_MET_LIBS}
+    ${PYTHON_MET_LIBS}
+    vx_gis
+	vx_data2d
+	vx_seeps
+	vx_nc_util
+	vx_regrid
+	vx_grid
+	vx_geodesy
+	vx_config
+	vx_pb_util
+	vx_cal
+	vx_nav
+	vx_util_math
+	vx_util
+	vx_math
+	vx_color
+	vx_log
+    ${GRIB2_DEP_LIBS}
+    ${UGRID_DEP_LIBS}
+    ${PYTHON_DEP_LIBS}
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
+	#$(FLIBS)
+)
+
+add_executable(gen_ens_prod
+    src/tools/other/gen_ens_prod/gen_ens_prod.cc
+    src/tools/other/gen_ens_prod/gen_ens_prod.h
+    src/tools/other/gen_ens_prod/gen_ens_prod_conf_info.cc
+    src/tools/other/gen_ens_prod/gen_ens_prod_conf_info.h
+    src/tools/other/gen_ens_prod/compute_eas.cc
+    src/tools/other/gen_ens_prod/compute_eas.h
+)
+
+
+target_link_libraries(gen_ens_prod
+	vx_stat_out
+	vx_statistics
+	vx_shapedata
+	vx_gsl_prob
+	vx_analysis_util
+	vx_data2d_factory
+	vx_data2d_nc_met
+	vx_data2d_grib
+	${GRIB2_MET_LIBS}
+	vx_data2d_nc_wrf
+	vx_data2d_nc_cf
+    ${UGRID_MET_LIBS}
+    ${PYTHON_MET_LIBS}
+	vx_data2d
+	vx_nc_obs
+	vx_seeps
+	vx_nc_util
+	vx_regrid
+	vx_grid
+	vx_geodesy
+	vx_config
+	vx_color
+	vx_util_math
+	vx_util
+	vx_math
+	vx_cal
+	vx_log
+    ${GRIB2_DEP_LIBS}
+    ${UGRID_DEP_LIBS}
+    ${PYTHON_DEP_LIBS}
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
+)
+
+
 #        src/tools/dev_utils/shapefiles/make_mapfiles.cc
 #        src/tools/dev_utils/chk4copyright.cc
 #        src/tools/dev_utils/gen_climo_bin.cc
@@ -1992,10 +2083,6 @@ target_link_libraries(mode_analysis
 #        src/tools/dev_utils/reformat_county_data.cc
 #        src/tools/dev_utils/reformat_map_data.cc
 #        src/tools/dev_utils/swinging_door.cc
-#        src/tools/other/gen_ens_prod/gen_ens_prod.cc
-#        src/tools/other/gen_ens_prod/gen_ens_prod.h
-#        src/tools/other/gen_ens_prod/gen_ens_prod_conf_info.cc
-#        src/tools/other/gen_ens_prod/gen_ens_prod_conf_info.h
 #        src/tools/other/gis_utils/gis_dump_dbf.cc
 #        src/tools/other/gis_utils/gis_dump_shp.cc
 #        src/tools/other/gis_utils/gis_dump_shx.cc
@@ -2138,10 +2225,6 @@ target_link_libraries(mode_analysis
 #        src/tools/tc_utils/tc_dland/tc_dland.cc
 #        src/tools/tc_utils/tc_dland/tc_poly.cc
 #        src/tools/tc_utils/tc_dland/tc_poly.h
-#        src/tools/tc_utils/tc_gen/tc_gen.cc
-#        src/tools/tc_utils/tc_gen/tc_gen.h
-#        src/tools/tc_utils/tc_gen/tc_gen_conf_info.cc
-#        src/tools/tc_utils/tc_gen/tc_gen_conf_info.h
 
 #        src/tools/tc_utils/tc_rmw/tc_rmw.cc
 #        src/tools/tc_utils/tc_rmw/tc_rmw.h
