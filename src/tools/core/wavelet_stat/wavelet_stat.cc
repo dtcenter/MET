@@ -232,8 +232,8 @@ static void process_command_line(int argc, char **argv) {
    conf_info.process_config(ftype, otype);
 
    // Update the input grid, if needed
-   update_mtddf_grid(fcst_mtddf, conf_info.fcst_info[0]);
-   update_mtddf_grid(obs_mtddf, conf_info.obs_info[0]);
+   update_mtddf_grid(fcst_mtddf.get(), conf_info.fcst_info[0]);
+   update_mtddf_grid(obs_mtddf.get(), conf_info.obs_info[0]);
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.fcst_info[0]->regrid(),
@@ -1942,7 +1942,6 @@ static void close_out_files() {
 
       // List the NetCDF file after it is finished
       mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
-      //nc_out->close();
       delete nc_out;
       nc_out = (NcFile *) nullptr;
    }

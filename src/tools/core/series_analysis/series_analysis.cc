@@ -452,17 +452,14 @@ static GrdFileType get_mtddf_file_type(const StringArray &file_list,
    }
 
    // Read first valid file
-   Met2dDataFile *mtddf = nullptr;
-   if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(file_list[i].c_str(), type))) {
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(file_list[i].c_str(), type);
+   if(!mtddf) {
       mlog << Error << "\nTrouble reading data file: "
            << file_list[i] << "\n\n";
       exit(1);
    }
 
    GrdFileType file_type = mtddf->file_type();
-
-   // Clean up 
-   if(mtddf) { delete mtddf; mtddf = nullptr; }
 
    return file_type;
 }
@@ -748,9 +745,6 @@ static bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
 
    // Store the current grid
    if(found) cur_grid = mtddf->grid();
-
-   // Close the data file
-   delete mtddf; mtddf = nullptr;
 
    return found;
 }

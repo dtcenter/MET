@@ -514,7 +514,7 @@ static void process_grid(const Grid &fcst_grid) {
 
       DataPlane dp;
       auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(
-                                 grid_obs_file_list[0].c_str(), otype);
+                      grid_obs_file_list[0].c_str(), otype);
       if(!mtddf) {
          mlog << Error << "\nprocess_grid() -> "
               << "trouble reading file \"" << grid_obs_file_list[0]
@@ -533,8 +533,6 @@ static void process_grid(const Grid &fcst_grid) {
 
       // Store the observation grid
       obs_grid = mtddf->grid();
-
-      if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
    }
    else {
       obs_grid = fcst_grid;
@@ -673,9 +671,6 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
 
    } // end if found
 
-   // Deallocate the data file pointer, if necessary
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
-
    return found;
 }
 
@@ -739,9 +734,6 @@ static bool get_data_plane_array(const char *infile, GrdFileType ftype,
       }
 
    } // end if found
-
-   // Deallocate the data file pointer, if necessary
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
    return found;
 }

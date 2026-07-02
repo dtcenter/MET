@@ -56,9 +56,9 @@ for (j=0; j<(filenames.n()); ++j)  {
    mlog << Debug(2) << method_name
         << "processing file: " << filenames[j] << "\n";
 
-   auto data_2d_file = Met2dDataFileFactory::new_met_2d_data_file(filenames[j].c_str(), varinfo.file_type());
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(filenames[j].c_str(), varinfo.file_type());
 
-   if ( ! data_2d_file->data_plane(varinfo, plane) )  {
+   if ( ! mtddf->data_plane(varinfo, plane) )  {
 
       mlog << Error << "\n" << method_name
            << "unable to get data plane at time " << j << "\n\n";
@@ -67,7 +67,7 @@ for (j=0; j<(filenames.n()); ++j)  {
 
    }
 
-   if ( ! data_2d_file->data_plane(varinfo, plane) )  {
+   if ( ! mtddf->data_plane(varinfo, plane) )  {
 
       mlog << Error << "\n" << method_name
            << "unable to get data plane at time " << j << "\n\n";
@@ -84,15 +84,13 @@ for (j=0; j<(filenames.n()); ++j)  {
 
       raw.set_start_valid_time(valid_times[0]);
 
-      raw.set_grid(data_2d_file->grid());
+      raw.set_grid(mtddf->grid());
 
    }
 
    raw.set_lead_time(j, plane.lead());
 
    raw.put(plane, j);
-
-   delete data_2d_file;  data_2d_file = 0;
 
 }   //  for j
 

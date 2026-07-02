@@ -272,22 +272,20 @@ void get_grid()
    //
 
 mlog << Debug(1) << "Opening data file: " << grid_data_file << "\n";
-auto met_ptr = Met2dDataFileFactory::new_met_2d_data_file(grid_data_file.c_str());
+auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(grid_data_file.c_str());
 
-if ( !met_ptr ) {
+if ( !mtddf ) {
 
       mlog << Error << "\n" << program_name << " -> file \""
            << grid_data_file << "\" not a valid data file\n\n";
       exit (1);
 }
 
-grid = met_ptr->grid();
+grid = mtddf->grid();
 
    //
    //  done
    //
-
-delete met_ptr;   met_ptr = nullptr;
 
 return;
 

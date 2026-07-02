@@ -113,8 +113,8 @@ class ModeExecutive {
    ConcatString obs_file;
 
    // set and used only for trad mode
-   Met2dDataFile * fcst_mtddf;
-   Met2dDataFile * obs_mtddf;
+   std::unique_ptr<Met2dDataFile> fcst_mtddf;
+   std::unique_ptr<Met2dDataFile> obs_mtddf;
 
    // used for both trad and multivar mode
    TTContingencyTable cts[n_cts];

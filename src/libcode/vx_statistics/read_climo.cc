@@ -199,9 +199,6 @@ static void read_climo_file(const char *climo_file, GrdFileType ctype,
                             int day_ts, int hour_ts, Grid &vx_grid,
                             const RegridInfo &regrid_default,
                             DataPlaneArray &dpa, const char *desc) {
-
-   Met2dDataFile *mtddf = nullptr;
-
    DataPlaneArray clm_dpa;
    DataPlane dp;
 
@@ -210,7 +207,9 @@ static void read_climo_file(const char *climo_file, GrdFileType ctype,
    ConcatString clm_ut_cs;
 
    // Allocate memory for data file
-   if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(climo_file, ctype))) {
+   unique_ptr<Met2dDataFile> mtddf;
+   if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(
+                   climo_file, ctype))) {
       mlog << Warning << "\nread_climo_file() -> "
            << "Trouble reading climatology file "
            << climo_file << "\n\n";
@@ -290,8 +289,7 @@ static void read_climo_file(const char *climo_file, GrdFileType ctype,
    } // end for i
 
    // Deallocate memory
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
-   if(info)  { delete info;  info  = (VarInfo       *) nullptr; }
+   if(info) { delete info; info = (VarInfo *) nullptr; }
 
    return;
 }

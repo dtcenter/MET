@@ -309,7 +309,7 @@ void process_command_line(int argc, char **argv) {
          ConcatString ugrid_nc = conf_info.ugrid_nc;
          ConcatString ugrid_map_config_filename = conf_info.ugrid_map_config;
          if (FileType_UGrid == ftype) {
-            MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
+            MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf.get();
             ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
                                            ugrid_map_config_filename);
             if (0 == ugrid_nc.length() || ugrid_nc == "NA") {
@@ -322,7 +322,7 @@ void process_command_line(int argc, char **argv) {
                  << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
          }
          if (FileType_UGrid == otype) {
-            MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)obs_mtddf;
+            MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)obs_mtddf.get();
             ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
                                            ugrid_map_config_filename);
             if (0 == ugrid_nc.length() || ugrid_nc == "NA") {
@@ -345,8 +345,8 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Update the input grid, if needed
-   update_mtddf_grid(fcst_mtddf, conf_info.vx_opt[0].fcst_info);
-   update_mtddf_grid(obs_mtddf, conf_info.vx_opt[0].obs_info);
+   update_mtddf_grid(fcst_mtddf.get(), conf_info.vx_opt[0].fcst_info);
+   update_mtddf_grid(obs_mtddf.get(), conf_info.vx_opt[0].obs_info);
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.vx_opt[0].fcst_info->regrid(),
@@ -706,7 +706,7 @@ void process_scores() {
 
       // Read the gridded data from the input forecast file
       if(!read_data_plane(conf_info.vx_opt[i].fcst_info,
-                          fcst_dp, fcst_mtddf, fcst_file,
+                          fcst_dp, fcst_mtddf.get(), fcst_file,
                           "forecast")) continue;
 
       mlog << Debug(3)
@@ -722,7 +722,7 @@ void process_scores() {
 
       // Read the gridded data from the input observation file
       if(!read_data_plane(conf_info.vx_opt[i].obs_info,
-                          obs_dp, obs_mtddf, obs_file,
+                          obs_dp, obs_mtddf.get(), obs_file,
                           "observation")) continue;
 
       mlog << Debug(3)
@@ -1030,12 +1030,12 @@ void process_scores() {
 
                // Read forecast data for UGRD
                if(!read_data_plane(conf_info.vx_opt[ui].fcst_info,
-                                   fu_dp, fcst_mtddf, fcst_file,
+                                   fu_dp, fcst_mtddf.get(), fcst_file,
                                    "U-wind forecast")) continue;
 
                // Read observation data for UGRD
                if(!read_data_plane(conf_info.vx_opt[ui].obs_info,
-                                   ou_dp, obs_mtddf, obs_file,
+                                   ou_dp, obs_mtddf.get(), obs_file,
                                    "U-wind observation")) continue;
 
                // Read the forecast climatology data for UGRD
@@ -1885,12 +1885,12 @@ void process_scores() {
 
                // Read forecast data for UGRD
                if(!read_data_plane(conf_info.vx_opt[ui].fcst_info,
-                                   fu_dp, fcst_mtddf, fcst_file,
+                                   fu_dp, fcst_mtddf.get(), fcst_file,
                                    "U-wind forecast")) continue;
 
                // Read observation data for UGRD
                if(!read_data_plane(conf_info.vx_opt[ui].obs_info,
-                                   ou_dp, obs_mtddf, obs_file,
+                                   ou_dp, obs_mtddf.get(), obs_file,
                                    "U-wind observation")) continue;
 
                // Read climatology data for UGRD
@@ -3245,10 +3245,6 @@ void clean_up() {
       delete nc_out;
       nc_out = (NcFile *) nullptr;
    }
-
-   // Deallocate memory for data files
-   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) nullptr; }
-   if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = (Met2dDataFile *) nullptr; }
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);

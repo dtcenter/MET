@@ -33,8 +33,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
    // Pointers for the current objects
-   Met2dDataFile * mtddf_cur = nullptr;
-   VarInfo       * vinfo_cur = nullptr; 
+   VarInfo * vinfo_cur = nullptr;
 
    // DataPlane objects for storing the data
    DataPlane plane;
@@ -59,21 +58,21 @@ int main(int argc, char *argv[]) {
    in_file_name << argv[1];
 
    // Create an instance of this file type
-   mtddf_cur = Met2dDataFileFactory::new_met_2d_data_file(in_file_name.c_str());
-   if(!mtddf_cur) {
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(in_file_name.c_str());
+   if(!mtddf) {
       mlog << "\n\n  test_factory() -> "
            << "trouble reading input file \"" << in_file_name << "\"\n\n";
       exit(1);
    }
 
    // Dump the contents
-   mlog << Debug(1) << "\nCALLING: mtddf_cur->Met2dDataFile::dump(cout);\n";
-   mtddf_cur->Met2dDataFile::dump(cout);
-   mlog << Debug(1) << "\nCALLING: mtddf_cur->dump(cout);\n";
-   mtddf_cur->dump(cout);
+   mlog << Debug(1) << "\nCALLING: mtddf->Met2dDataFile::dump(cout);\n";
+   mtddf->Met2dDataFile::dump(cout);
+   mlog << Debug(1) << "\nCALLING: mtddf->dump(cout);\n";
+   mtddf->dump(cout);
 
    // Create a VarInfo object based on the gridded data file type
-   vinfo_cur = VarInfoFactory::new_var_info(mtddf_cur->file_type());
+   vinfo_cur = VarInfoFactory::new_var_info(mtddf->file_type());
 
    mlog << Debug(1) << "\nCALLING: vinfo_cur->VarInfo::dump(cout);\n";
    vinfo_cur->VarInfo::dump(cout);
@@ -102,7 +101,7 @@ int main(int argc, char *argv[]) {
       // Read a single data plane
       mlog << Debug(1) << "\n" << sep_str << "\n\n"
            << "CALLING: data_plane() to read a single record...\n";
-      mtddf_cur->data_plane(*vinfo_cur, plane);
+      mtddf->data_plane(*vinfo_cur, plane);
 
       // Dump information about the data plane
       mlog << Debug(1) << "\nCALLING: plane.dump(cout);\n";
@@ -119,7 +118,7 @@ int main(int argc, char *argv[]) {
       // Read a range of data planes
       mlog << Debug(1) << "\n" << sep_str << "\n\n"
            << "CALLING: data_plane_array() to read multiple records...\n";
-      n_lvl = mtddf_cur->data_plane_array(*vinfo_cur, plane_array);
+      n_lvl = mtddf->data_plane_array(*vinfo_cur, plane_array);
 
       // Dump information about the data planes
       for(i=0; i<n_lvl; i++) {
@@ -146,8 +145,7 @@ int main(int argc, char *argv[]) {
    } // end while loop
 
    // Clean up
-   if(mtddf_cur) { delete mtddf_cur; mtddf_cur = (Met2dDataFile *) 0; }
-   if(vinfo_cur) { delete vinfo_cur; vinfo_cur = (VarInfo       *) 0; }
+   if(vinfo_cur) { delete vinfo_cur; vinfo_cur = (VarInfo *) 0; }
 
    return(0);
 }

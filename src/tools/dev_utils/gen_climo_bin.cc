@@ -347,8 +347,8 @@ void get_field(const char *file, const char *config_str, DataPlane &dp) {
 
    // Instantiate Met2dDataFile object from the factory
    mlog << Debug(1)  << "Opening data file: " << file << "\n";
-   auto mtddf_ptr = Met2dDataFileFactory::new_met_2d_data_file(file, ftype);
-   if(!mtddf_ptr) {
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(file, ftype);
+   if(!mtddf) {
       mlog << Error << "\n" << program_name
            << " -> file \"" << file << "\" not a valid data file\n\n";
       exit(1);
@@ -358,20 +358,20 @@ void get_field(const char *file, const char *config_str, DataPlane &dp) {
    if(grid.nx() > 0 && grid.ny() > 0) {
 
       // Check for a grid mismatch
-      if(!(grid == mtddf_ptr->grid())) {
+      if(!(grid == mtddf->grid())) {
          mlog << Error << "\nget_field() -> "
               << "The grids do not match:\n" << grid.serialize()
-              << " !=\n" << mtddf_ptr->grid().serialize() << "\n\n";
+              << " !=\n" << mtddf->grid().serialize() << "\n\n";
          exit(1);
       }
    }
    // Otherwise, store the grid
    else {
-      grid = mtddf_ptr->grid();
+      grid = mtddf->grid();
    }
 
    // Instantiate VarInfo object from the factory
-   auto vi_ptr = VarInfoFactory::new_var_info(mtddf_ptr->file_type());
+   auto vi_ptr = VarInfoFactory::new_var_info(mtddf->file_type());
    if(!vi_ptr) {
       mlog << Error << "\n" << program_name
            << " -> unable to determine filetype of \"" << file
@@ -383,14 +383,14 @@ void get_field(const char *file, const char *config_str, DataPlane &dp) {
    vi_ptr->set_dict(config);
 
    // Open the data file
-   if(!mtddf_ptr->open(file)) {
+   if(!mtddf->open(file)) {
       mlog << Error << "\n" << program_name
            << " -> can't open file \"" << file << "\"\n\n";
       exit(1);
    }
 
    // Read the data
-   if(!mtddf_ptr->data_plane(*vi_ptr, dp)) {
+   if(!mtddf->data_plane(*vi_ptr, dp)) {
       mlog << Error << "\n" << program_name
            << " -> trouble getting field \"" << config_str
            << "\" from file \"" << file << "\"\n\n";
@@ -401,7 +401,7 @@ void get_field(const char *file, const char *config_str, DataPlane &dp) {
    dp.data_range(dmin, dmax);
    mlog << Debug(2)
         << "Read field \"" << vi_ptr->magic_str() << "\" from \""
-        << mtddf_ptr->filename() << "\" with data ranging from "
+        << mtddf->filename() << "\" with data ranging from "
         << dmin << " to " << dmax << ".\n";
 
    // Set the output variable name, if necessary
@@ -412,8 +412,7 @@ void get_field(const char *file, const char *config_str, DataPlane &dp) {
    }
 
    // Clean up
-   if(mtddf_ptr) { delete mtddf_ptr; mtddf_ptr = (Met2dDataFile * ) nullptr; }
-   if(vi_ptr)    { delete vi_ptr;    vi_ptr    =        (VarInfo *) nullptr; }
+   if(vi_ptr) { delete vi_ptr; vi_ptr = (VarInfo *) nullptr; }
 
    return;
 }

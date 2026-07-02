@@ -146,7 +146,7 @@ static Grid grid;
 static bool is_first_pass = true;
 
 // Data file factory and input files
-static Met2dDataFile *fcst_mtddf = nullptr;
+static std::unique_ptr<Met2dDataFile> fcst_mtddf;
 
 // Pointer to the random number generator to be used
 static gsl_rng *rng_ptr = nullptr;

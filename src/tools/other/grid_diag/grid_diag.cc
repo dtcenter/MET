@@ -73,7 +73,7 @@ static void write_hist2d(void);
 static void write_info_theory(void);
 static void clean_up(void);
 
-static Met2dDataFile *get_mtddf(const StringArray &, const int);
+static unique_ptr<Met2dDataFile> get_mtddf(const StringArray &, const int);
 
 static void usage(int exit_code=1);
 static void set_data_files(const StringArray &);
@@ -213,20 +213,13 @@ static void process_command_line(int argc, char **argv) {
       }
 
       // Get mtddf
-      data_mtddf = get_mtddf(data_files[i], i);
+      auto data_mtddf = get_mtddf(data_files[i], i);
 
       // Store the input data file types
       file_types.emplace_back(data_mtddf->file_type());
 
       // Store the grid
       data_grid = data_mtddf->grid();
-
-      // Deallocate memory for data files
-      if(data_mtddf) {
-         delete data_mtddf;
-         data_mtddf = (Met2dDataFile *) nullptr;
-      }
-
    } // end for i
 
    // Process the configuration
@@ -950,9 +943,8 @@ static void write_info_theory(void) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static Met2dDataFile *get_mtddf(const StringArray &file_list,
-                                const int i_field) {
-   Met2dDataFile *mtddf = nullptr;
+static unique_ptr<Met2dDataFile> get_mtddf(const StringArray &file_list,
+                                           const int i_field) {
    Dictionary *dict = nullptr;
    Dictionary i_dict;
    GrdFileType file_type;
@@ -980,8 +972,9 @@ static Met2dDataFile *get_mtddf(const StringArray &file_list,
    }
 
    // Read first valid file
-   if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(
-                   file_list[i].c_str(), file_type))) {
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(
+                   file_list[i].c_str(), file_type);
+   if(!mtddf) {
       mlog << Error << "\nget_mtddf() -> "
            << "trouble reading data file \""
            << file_list[i] << "\"\n\n";

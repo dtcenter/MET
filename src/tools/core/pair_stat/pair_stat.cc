@@ -1493,9 +1493,6 @@ static void clean_up() {
    // Close the output text files that were open for writing
    finish_txt_files();
 
-   // Deallocate memory for data files
-   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) nullptr; }
-
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);
 

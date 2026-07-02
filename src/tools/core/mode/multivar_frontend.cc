@@ -467,31 +467,29 @@ void MultivarFrontEnd::_read_input(
                           ModeDataType type, GrdFileType f_t,
                           GrdFileType other_t, int shift)
 {
-   auto f = Met2dDataFileFactory::new_met_2d_data_file(name.c_str(), f_t);
-   if (!f) {
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(name.c_str(), f_t);
+   if (!mtddf) {
       mlog << Error << "\nMultivarFrontEnd::_read_input() -> "
            << "Trouble reading fcst file \"" << name << "\"\n\n";
       exit(1);
    }
-   GrdFileType ft = f->file_type();
+   GrdFileType ft = mtddf->file_type();
 
    // store shift right setting
-   f->set_shift_right(shift);
+   mtddf->set_shift_right(shift);
 
    // update config now that we know file type (this sets Fcst to index i)
    DataPlane dp;
 
    if (type == ModeDataType::MvMode_Fcst) {
       config.process_config_field(ft, other_t, type, index);
-      f->data_plane(*(config.Fcst->var_info), dp);
-      fcstInput.emplace_back(ModeInputData(name, dp, f->grid()));
+      mtddf->data_plane(*(config.Fcst->var_info), dp);
+      fcstInput.emplace_back(ModeInputData(name, dp, mtddf->grid()));
    } else {
       config.process_config_field(other_t, ft, type, index);
-      f->data_plane(*(config.Obs->var_info), dp);
-      obsInput.emplace_back(ModeInputData(name, dp, f->grid()));
+      mtddf->data_plane(*(config.Obs->var_info), dp);
+      obsInput.emplace_back(ModeInputData(name, dp, mtddf->grid()));
    }         
-      
-   delete f;
 }
       
 ////////////////////////////////////////////////////////////////////////

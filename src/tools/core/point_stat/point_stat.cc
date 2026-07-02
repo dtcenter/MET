@@ -322,7 +322,7 @@ static void process_command_line(int argc, char **argv) {
          double max_distance_km = conf_info.ugrid_max_distance_km;
          ConcatString ugrid_nc = conf_info.ugrid_nc;
          ConcatString ugrid_map_config_filename = conf_info.ugrid_map_config;
-         auto ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
+         auto ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf.get();
 
          ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
                                         ugrid_map_config_filename);
@@ -2265,9 +2265,6 @@ static void clean_up() {
 
    // Close the output text files that were open for writing
    finish_txt_files();
-
-   // Deallocate memory for data files
-   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) nullptr; }
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);

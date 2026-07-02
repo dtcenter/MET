@@ -87,9 +87,6 @@ void ModeExecutive::init_from_scratch()
 
 {
 
-   fcst_mtddf = (Met2dDataFile *) nullptr;
-   obs_mtddf = (Met2dDataFile *) nullptr;
-
    clear();
 
    return;
@@ -111,8 +108,8 @@ void ModeExecutive::clear()
    fcst_file.clear();
    obs_file.clear();
 
-   if ( fcst_mtddf )  { delete fcst_mtddf;  fcst_mtddf = (Met2dDataFile *) nullptr; }
-   if (  obs_mtddf )  { delete  obs_mtddf;   obs_mtddf = (Met2dDataFile *) nullptr; }
+   fcst_mtddf.reset();
+   obs_mtddf.reset();
 
    for (int j=0; j<n_cts; ++j)  cts[j].zero_out();
 
@@ -153,7 +150,6 @@ void ModeExecutive::init_traditional(int n_files)
    // Get the forecast and observation file types from config, if present
    ftype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_fcst));
    otype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_obs));
-
 
    // Read observation file
    if(!(obs_mtddf = Met2dDataFileFactory::new_met_2d_data_file(obs_file.c_str(), otype))) {

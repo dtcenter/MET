@@ -133,21 +133,21 @@ int met_main(int argc, char * argv[]) {
    // and the VarInfo object using the var_info_factory
    //
    mlog << Debug(1) << "Opening data file: " << InputFilename << "\n";
-   auto met_ptr = Met2dDataFileFactory::new_met_2d_data_file(InputFilename.c_str(), ftype);
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(InputFilename.c_str(), ftype);
 
-   if(!met_ptr) {
+   if(!mtddf) {
       mlog << Error << "\n" << program_name << " -> file \""
            << InputFilename << "\" not a valid data file\n\n";
       exit(1);
    }
 
-   if (FileType_UGrid == met_ptr->file_type()) {
+   if (FileType_UGrid == mtddf->file_type()) {
       mlog << Error << "\n" << program_name << " -> filetype "
-           << grdfiletype_to_string(met_ptr->file_type()) << " is not supported\n\n";
+           << grdfiletype_to_string(mtddf->file_type()) << " is not supported\n\n";
       exit(1);
    }
 
-   auto var_ptr = VarInfoFactory::new_var_info(met_ptr->file_type());
+   auto var_ptr = VarInfoFactory::new_var_info(mtddf->file_type());
 
    if(!var_ptr) {
       mlog << Error << "\n" << program_name << " -> unable to determine filetype of \""
@@ -163,7 +163,7 @@ int met_main(int argc, char * argv[]) {
    //
    // get the data plane from the file for this VarInfo object
    //
-   status = met_ptr->data_plane(*var_ptr, data_plane);
+   status = mtddf->data_plane(*var_ptr, data_plane);
 
    if(!status) {
       mlog << Error << "\n" << program_name << " -> trouble getting field \""
@@ -174,7 +174,7 @@ int met_main(int argc, char * argv[]) {
    //
    // get the grid info from the Met2dDataFile object
    //
-   grid = met_ptr->grid();
+   grid = mtddf->grid();
 
    //
    // read in the color table file and scale the color table to fit
@@ -210,8 +210,7 @@ int met_main(int argc, char * argv[]) {
    //
    // clean up
    //
-   if(met_ptr) { delete met_ptr;  met_ptr = nullptr; }
-   if(var_ptr) { delete var_ptr;  var_ptr = nullptr; }
+   if(var_ptr) { delete var_ptr; var_ptr = nullptr; }
 
    #ifdef  WITH_PYTHON
       GP.finalize();

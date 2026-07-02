@@ -136,9 +136,6 @@ static int              i_txt_row[n_txt];
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-// Data file factory and input files
-static Met2dDataFile *fcst_mtddf = nullptr;
-
 // Pointer to the random number generator to be used
 static gsl_rng *rng_ptr = nullptr;
 

@@ -277,8 +277,7 @@ void process_data_file() {
    write_netcdf(dp_shift, grid, vinfo, mtddf->file_type());
 
    // Clean up
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
-   if(vinfo) { delete vinfo; vinfo = (VarInfo *)       nullptr; }
+   if(vinfo) { delete vinfo; vinfo = (VarInfo *) nullptr; }
 
    #ifdef  WITH_PYTHON
       GP.finalize();

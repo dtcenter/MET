@@ -423,7 +423,7 @@ static void process_data_file() {
    bool goes_data = false;
    bool use_python = false;
    int obs_type;
-   auto fr_mtddf = (Met2dDataFile *) nullptr;
+   unique_ptr<Met2dDataFile> fr_mtddf;
 #ifdef WITH_PYTHON
    string python_command = InputFilename;
    bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
@@ -438,7 +438,7 @@ static void process_data_file() {
 
       python_command = python_command.substr(offset+1);
       obs_type = TYPE_PYTHON;
-      fr_mtddf = new MetNcMetDataFile();
+      fr_mtddf = Met2dDataFileFactory::new_met_2d_data_file(FileType_NcMet);
    }
    else
 #endif
@@ -510,7 +510,7 @@ static void process_data_file() {
       process_point_file(nc_in, config, vinfo, to_grid);
    }
    else if (TYPE_NCCF == obs_type) {
-      process_point_nccf_file(nc_in, config, vinfo, fr_mtddf, to_grid);
+      process_point_nccf_file(nc_in, config, vinfo, fr_mtddf.get(), to_grid);
       unsetenv(nc_att_met_point_nccf);
    }
 #ifdef WITH_PYTHON
@@ -529,9 +529,8 @@ static void process_data_file() {
    close_nc();
 
    // Clean up
-   if(nc_in)    { delete nc_in;    nc_in  = nullptr; }
-   if(fr_mtddf) { delete fr_mtddf; fr_mtddf = (Met2dDataFile *) nullptr; }
-   if(vinfo)    { delete vinfo;    vinfo    = (VarInfo *)       nullptr; }
+   if(nc_in) { delete nc_in; nc_in = nullptr; }
+   if(vinfo) { delete vinfo; vinfo = (VarInfo *) nullptr; }
 
    return;
 }

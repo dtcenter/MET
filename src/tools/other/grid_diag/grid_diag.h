@@ -105,9 +105,6 @@ static StringArray nc_var_sa;
 // Grid variables
 static Grid grid;
 
-// Input files
-static Met2dDataFile *data_mtddf = nullptr;
-
 // Struct to store diagnostic info for each field and masking region
 struct DiagInfo {
 

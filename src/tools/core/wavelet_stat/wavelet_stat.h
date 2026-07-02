@@ -176,8 +176,8 @@ static Grid grid;
 static bool is_first_pass = true;
 
 // Data file factory and input files
-static Met2dDataFile *fcst_mtddf = nullptr;
-static Met2dDataFile *obs_mtddf  = nullptr;
+static std::unique_ptr<Met2dDataFile> fcst_mtddf;
+static std::unique_ptr<Met2dDataFile> obs_mtddf;
 
 // Strings to be output in the STAT and optional text files
 static StatHdrColumns shc;

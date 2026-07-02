@@ -90,16 +90,14 @@ bool read_single_entry(VarInfo* info, const ConcatString& filename,
    }
 
    // Open data file
-   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(filename.c_str(), type);
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(
+                   filename.c_str(), type);
 
    // Attempt to read gridded data
    bool found = mtddf->data_plane(*info, dp);
 
    // Store grid
    if(found) grid = mtddf->grid();
-
-   // Cleanup
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
    return found;
 }
@@ -169,16 +167,14 @@ bool read_all_entries(vector<VarInfo*> &vi_list, const ConcatString &filename,
    }
 
    // Open data file
-   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(filename.c_str(), type);
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(
+                   filename.c_str(), type);
 
    // Attempt to read gridded data
    int n_valid = mtddf->data_planes(vi_list, dp_list);
 
    // Store grid
    if(n_valid > 0) grid = mtddf->grid();
-
-   // Cleanup
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
    return(n_valid > 0);
 }

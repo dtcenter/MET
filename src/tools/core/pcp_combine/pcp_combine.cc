@@ -802,7 +802,6 @@ static int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          auto cur_var = VarInfoFactory::new_var_info(mtddf->file_type());
          if(!cur_var) {
-            delete mtddf;  mtddf = nullptr;
             mlog << Warning << "search_pcp_dir() -> "
                  << "unable to determine filetype of \"" << cur_file
                  << "\"\n";
@@ -831,8 +830,7 @@ static int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          // Cleanup.
          //
-         if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) nullptr; }
-         if(cur_var) { delete cur_var; cur_var = (VarInfo *)       nullptr; }
+         if(cur_var) { delete cur_var; cur_var = (VarInfo *) nullptr; }
 
          // Check for a valid match
          if(i_rec != -1) {
@@ -1292,7 +1290,6 @@ static bool get_field(const char *filename,
                       Grid & grid,
                       DataPlane & plane,
                       bool error_out) {
-   Met2dDataFile *mtddf = nullptr;
    GrdFileType ftype;
    VarInfo *cur_var = nullptr;
    const char *method_name = "get_field() -> ";
@@ -1338,6 +1335,7 @@ static bool get_field(const char *filename,
    //
    // Open the data file.
    //
+   unique_ptr<Met2dDataFile> mtddf;
    if(status) {
       mtddf = Met2dDataFileFactory::new_met_2d_data_file(filename, ftype);
       if(!mtddf) {
@@ -1403,8 +1401,7 @@ static bool get_field(const char *filename,
    //
    // Cleanup.
    //
-   if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) nullptr; }
-   if(cur_var) { delete cur_var; cur_var = (VarInfo *)       nullptr; }
+   if(cur_var) { delete cur_var; cur_var = (VarInfo *) nullptr; }
 
    //
    // Error out and exit, if requested.

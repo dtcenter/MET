@@ -411,7 +411,6 @@ void PlotPointObsConfInfo::process_config(
    Dictionary *fdict = nullptr;
    Dictionary i_fdict;
    StringArray sa;
-   Met2dDataFile *met_ptr = nullptr;
    PlotPointObsOpt opt;
    int i, n_vx;
 
@@ -443,6 +442,9 @@ void PlotPointObsConfInfo::process_config(
 
    // Parse plot_grid_string, if set
    if(m_strlen(plot_grid_string) > 0) {
+
+      unique_ptr<Met2dDataFile> mtddf;
+
       if (!build_grid_by_grid_string(plot_grid_string, grid,
                                      "PlotPointObsConfInfo::process_config -> ", false)) {
          // Extract the grid from a gridded data file
@@ -450,8 +452,8 @@ void PlotPointObsConfInfo::process_config(
               << plot_grid_string << "\".\n";
 
          // Open the data file
-         if(!(met_ptr = Met2dDataFileFactory::new_met_2d_data_file(
-                           plot_grid_string, ftype))) {
+         if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(
+                         plot_grid_string, ftype))) {
             mlog << Error
                  << "\nPlotPointObsConfInfo::process_config() -> "
                  << "can't open file \"" << plot_grid_string
@@ -460,19 +462,19 @@ void PlotPointObsConfInfo::process_config(
          }
 
          // Store the grid
-         grid = met_ptr->grid();
+         grid = mtddf->grid();
       }
 
       // Process gridded data
-      if(n_vx > 0 && met_ptr) {
+      if(n_vx > 0 && mtddf) {
 
          // Allocate and set the VarInfo object
-         grid_data_info = VarInfoFactory::new_var_info(met_ptr->file_type());
+         grid_data_info = VarInfoFactory::new_var_info(mtddf->file_type());
          i_fdict = parse_conf_i_vx_dict(fdict, 0);
          grid_data_info->set_dict(i_fdict);
 
          // Get the requested data
-         if(!met_ptr->data_plane(*grid_data_info, grid_data)) {
+         if(!mtddf->data_plane(*grid_data_info, grid_data)) {
             mlog << Error
                  << "\nPlotPointObsConfInfo::process_config() -> "
                  << "trouble getting field \""
@@ -482,7 +484,7 @@ void PlotPointObsConfInfo::process_config(
          }
 
 	 // Update the grid defintion, as needed for range/azimuth grids
-         grid = met_ptr->grid();
+         grid = mtddf->grid();
 
          // Regrid, if requested
          if(grid_data_info->regrid().enable) {
@@ -506,10 +508,6 @@ void PlotPointObsConfInfo::process_config(
          // Check for a colorbar
          if(grid_plot_info.colorbar_flag) do_colorbar = true;
       }
-
-      // Cleanup
-      if(met_ptr) { delete met_ptr; met_ptr = 0; }
-
    } // end if plot_grid_string
 
    // Conf: point_data

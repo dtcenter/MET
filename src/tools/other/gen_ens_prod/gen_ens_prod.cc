@@ -658,10 +658,10 @@ static void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
 static bool get_data_plane(const char *infile, GrdFileType ftype,
                            VarInfo *info, DataPlane &dp) {
    bool found;
-   Met2dDataFile *mtddf = nullptr;
 
    // Read the current ensemble file
-   if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(infile, ftype))) {
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(infile, ftype);
+   if(!mtddf) {
       mlog << Error << "\nget_data_plane() -> "
            << "trouble reading file \"" << infile << "\"\n\n";
       exit(1);
@@ -699,9 +699,6 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
       }
 
    } // end if found
-
-   // Deallocate the data file pointer, if necessary
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
    return found;
 }
