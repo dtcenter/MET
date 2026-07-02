@@ -16,7 +16,7 @@ MET_BASE_UNIT_REPO_NAME=met-base-unit-test
 met_base_repo=${MET_BASE_REPO_NAME}
 
 # default MET base tag
-met_base_tag=3.5-latest
+met_base_tag=3.4-latest
 
 # override the MET base tag if set
 if [[ -n "${met_base_tag_override}" ]]; then
