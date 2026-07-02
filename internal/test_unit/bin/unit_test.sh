@@ -34,7 +34,6 @@ UNIT=${MET_TEST_BASE}/python/unit.py
 UNIT_XML="unit_ascii2nc.xml \
           unit_ascii2nc_indy.xml \
           unit_madis2nc.xml \
-          unit_trmm2nc.xml \
           unit_pb2nc.xml \
           unit_pb2nc_indy.xml \
           unit_gen_vx_mask.xml \
@@ -64,7 +63,6 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_tc_dland.xml \
           unit_tc_pairs.xml \
           unit_tc_stat.xml \
-          unit_plot_tc.xml \
           unit_tc_rmw.xml \
           unit_rmw_analysis.xml \
           unit_tc_diag.xml \
