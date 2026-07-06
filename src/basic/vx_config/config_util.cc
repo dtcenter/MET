@@ -814,6 +814,7 @@ void WindMetadata::clear() {
    v_wind.clear();
    wind_speed.clear();
    wind_direction.clear();
+   kinetic_energy.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -824,6 +825,7 @@ WindMetadata &WindMetadata::operator=(const WindMetadata &a) noexcept {
       v_wind = a.v_wind;
       wind_speed = a.wind_speed;
       wind_direction = a.wind_direction;
+      kinetic_energy = a.kinetic_energy;
    }
    return *this;
 }
@@ -850,6 +852,9 @@ WindMetadata parse_conf_wind_metadata(Dictionary *dict) {
 
    // Conf: wind_direction_field_name
    info.wind_direction.parse_css(dict->lookup_string(conf_key_wind_direction_field_name));
+
+   // Kinetic energy names are hard-coded
+   info.kinetic_energy.parse_css("KENG");
 
    return info;
 }

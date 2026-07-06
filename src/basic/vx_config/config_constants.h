@@ -474,10 +474,12 @@ struct MaskLatLon {
 //
 
 struct WindMetadata {
+
    StringArray u_wind;         // U-wind field names
    StringArray v_wind;         // V-wind field names
    StringArray wind_speed;     // Wind speed field names
    StringArray wind_direction; // Wind direction field names
+   StringArray kinetic_energy; // Kinetic energy field names
 
    WindMetadata() { clear(); }
    ~WindMetadata() { clear(); }
@@ -489,15 +491,14 @@ struct WindMetadata {
    bool is_v_wind(const std::string &s) const { return v_wind.has(s); }
    bool is_wind_speed(const std::string &s) const { return wind_speed.has(s); }
    bool is_wind_direction(const std::string &s) const { return wind_direction.has(s); }
-
-   // Supported derivations
-   bool is_kinetic_energy(const std::string &s) const { return s == "KENG"; }
+   bool is_kinetic_energy(const std::string &s) const { return kinetic_energy.has(s); }
 
    friend bool operator==(const WindMetadata &lhs, const WindMetadata &rhs) {
-      return(lhs.u_wind         == rhs.u_wind     &&
-             lhs.v_wind         == rhs.v_wind     &&
-             lhs.wind_speed     == rhs.wind_speed &&
-             lhs.wind_direction == rhs.wind_direction);
+      return(lhs.u_wind         == rhs.u_wind         &&
+             lhs.v_wind         == rhs.v_wind         &&
+             lhs.wind_speed     == rhs.wind_speed     &&
+             lhs.wind_direction == rhs.wind_direction &&
+             lhs.kinetic_energy == rhs.kinetic_energy);
    }
 };
 
@@ -856,6 +857,7 @@ static const char conf_key_is_v_wind[]            = "is_v_wind";
 static const char conf_key_is_grid_relative[]     = "is_grid_relative";
 static const char conf_key_is_wind_speed[]        = "is_wind_speed";
 static const char conf_key_is_wind_direction[]    = "is_wind_direction";
+static const char conf_key_is_kinetic_energy[]    = "is_kinetic_energy";
 static const char conf_key_is_prob[]              = "is_prob";
 
 //

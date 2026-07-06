@@ -680,6 +680,7 @@ The following configuration options can be set to refine the metadata, when need
   is_grid_relative  = boolean;
   is_wind_speed     = boolean;
   is_wind_direction = boolean;
+  is_kinetic_energy = boolean;
 
 When deriving and rotating winds, MET searches the input file for matching wind
 components. That search is driven by the following configuration options:
@@ -1197,6 +1198,7 @@ below:
   is_grid_relative     = boolean;
   is_wind_speed        = boolean;
   is_wind_direction    = boolean;
+  is_kinetic_energy    = boolean;
   is_prob              = boolean;
 
 

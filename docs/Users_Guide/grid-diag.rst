@@ -7,9 +7,13 @@ Grid-Diag Tool
 Introduction
 ============
 
-The Grid-Diag tool creates histograms (probability distributions when normalized) for an arbitrary collection of data fields and levels. Joint histograms are created for all possible pairs of variables. If no masking region is specified to subset the data fields spatially, then all points in the input domain are used. However, an arbitrary number of masking regions can be specified and output is created for each one. The histograms are accumulated over all of the input data files. Typically this tool is run with a time series of input data files, similar to Series-Analysis.
+Unlike the Grid-Stat and Point-Stat tools, which compute verification statistics for matched pairs of forecast and observation values, the Grid-Diag tool provides diagnostic information based on the distribution of values found in gridded input files.
 
-The Grid-Diag tool also uses the histograms to derive information theory statistics. Entropy is derived from each 1-dimensional histogram, and joint entropy and mutual information are derived from each 2-dimensional joint histogram. These statistics are defined using log base 2, rather than the natural logarithm which is also commonly used.
+Grid-Diag creates histograms (probability distributions when normalized) for an arbitrary collection of data fields and levels. Joint histograms are created for all possible pairs of variables. If no masking region is specified to subset the data fields spatially, then all points in the input domain are used. However, an arbitrary number of masking regions can be specified and output is created for each one. The histograms are accumulated over all of the input data files. Typically this tool is run with a time series of input data files, similar to Series-Analysis.
+
+Grid-Diag also uses the histograms to derive information theory statistics. Entropy is derived from each 1-dimensional histogram, and joint entropy and mutual information are derived from each 2-dimensional joint histogram. These statistics are defined using log base 2, rather than the natural logarithm which is also commonly used.
+
+Finally, Grid-Diag also derives power spectra for each input field. However, power spectra are computed over the full model domain rather than being subset by spatial masking regions. Note that special logic is applied when processing kinetic energy. Grid-Diag reads the corresponding U and V-wind vector components and applies a discrete cosine transform to them separately prior to copmuting the power spectrum.
 
 Practical Information
 =====================
