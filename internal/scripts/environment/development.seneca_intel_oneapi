@@ -60,9 +60,6 @@ export LDFLAGS="${LDFLAGS} -L${ADDTL_DIR} -L${ADDTL_DIR2} -L${ADDTL_DIR3} -L${AD
 # Variables required to run MET
 export MET_TEST_INPUT=${MET_PROJ_DIR}/MET_test_data/unit_test
 
-# Define Rscript to use a version with the ncdf4 package 1.17 or later 
-export MET_TEST_RSCRIPT=/nrit/ral/R-4.4.0/bin/Rscript
-
 # Define runtime Python version
 export MET_TEST_MET_PYTHON_EXE=${MET_PYTHON_BIN_EXE}
 

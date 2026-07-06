@@ -168,12 +168,24 @@ For continuous variables, many verification measures are based on the forecast e
 
 A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as``'conditional verification''. For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these thresholds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference).
 
+.. _PS_Probability:
+
 Measures for Probabilistic Forecasts and Dichotomous Outcomes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For probabilistic forecasts, many verification measures are based on reliability, accuracy and bias. However, it also is of interest to investigate joint and conditional distributions of the forecasts and the observations, as in :ref:`Wilks (2011) <Wilks-2011>`. See :numref:`Appendix C, Section %s <appendixC>` for specific information.
 
-Probabilistic forecast values are assumed to have a range of either 0 to 1 or 0 to 100. If the max data value is > 1, we assume the data range is 0 to 100, and divide all the values by 100. If the max data value is <= 1, then we use the values as is. Further, thresholds are applied to the probabilities with equality on the lower end. For example, with a forecast probability p, and thresholds t1 and t2, the range is defined as: t1 <= p < t2. The exception is for the highest set of thresholds, when the range includes 1: t1 <= p <= 1. To make configuration easier, in METv6.0, these probabilities may be specified in the configuration file as a list (>=0.00,>=0.25,>=0.50,>=0.75,>=1.00) or using shorthand notation (==0.25) for bins of equal width.
+Probabilistic forecast values are assumed to have a range of either 0 to 1 or 0 to 100. If the max data value is > 1, we assume the data range is 0 to 100, and divide all the values by 100. If the max data value is <= 1, then we use the values as is. Further, thresholds are applied to the probabilities with equality on the lower end. For example, with a forecast probability p, and thresholds t1 and t2, the range is defined as: t1 <= p < t2. The exception is for the highest set of thresholds, when the range includes 1: t1 <= p <= 1.
+
+MET supports multiple methods for defining probability bins:
+
+1. As an explicit list of greater-than-or-equal-to-type thresholds whose values begin at 0.0, end at 1.0, and are monotonically increasing. For example :code:`>=0.00,>=0.25,>=0.50,>=0.75,>=1.00` defines 4 probability bins of equal width. Explicity listing the thresholds enables the definition of non-equal bin widths, such as :code:`>=0.00,>=0.50,>=0.75,>=1.00` with one bin of width 0.5 followed by two of width 0.25.
+
+2. Since equal bin widths are commonly used, a shorthand notation of :code:`==0.25` is also supported. This defines the same 4 probability bins of equal width between 0 and 1, as shown in the example above.
+
+3. As of MET version 12.0.0, an additional shorthand notation of :code:`==N`, where :code:`N` is an integer greater than 1, is also supported. With this notation, :code:`N` is interpreted as the number of ensemble members from which probabilities have been dervied. Often ensemble-derived probabilities are limited to N + 1 values, 0/N, 1/N, 2/N ... N/N. For :code:`==N`, MET defines thresholds to create N + 1 probability bins centered on each of the possible outcomes. For example, :code:`==4` expands to :code:`>=-0.125,>=0.125,>=0.375,>=0.625,>=0.875,>=1.125` which has 5 bins, each centered on 0.00, 0.25, 0.50, 0.75, and 1.00. Note that this convention results thresholds starting less than 0.0 and extending greater than 1.0. While this looks odd, it is necessary to create bins centered of the values of 0.0 and 1.0.
+
+When computing probabilistic statistics, MET first bins the forecast probabilities into an Nx2 probabilistic contingency table. Probabilistic statistics are derived from the Nx2 contingency table rather than the raw probabilities. When doing so, the value of the mid-point is used for all values falling in that bin. Because of this, the choice of probability bins impacts the statistics. For a well-calibrated, smooth distribution of probabilities, the impact of binning is relatively minor. However the impact may be larger for less continuous probabilities. In particular, when evaluating ensemble-derived probability values, users are encouarged to define probability bins with the :code:`==N` option to create bins centered on the possible ensemble-derived probability outcomes.
 
 When the "prob" entry is set as a dictionary to define the field of interest, setting "prob_as_scalar = TRUE" indicates that this data should be processed as regular scalars rather than probabilities. For example, this option can be used to compute traditional 2x2 contingency tables and neighborhood verification statistics for probability data. It can also be used to compare two probability fields directly.
 
@@ -299,7 +311,7 @@ Required Arguments for point_stat
 Optional Arguments for point_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5. The **-ugrid_config** option provides a way for a user to provide a separate config file with metadata about their UGRID.
+4. The **-ugrid_config** option provides a way for a user to provide a separate config file with metadata about their UGRID.
 
 5. The **-point_obs** file may be used to pass additional NetCDF point observation files to be used in the verification. Python embedding for point observations is also supported, as described in :numref:`pyembed-point-obs-data`.
 
@@ -1551,7 +1563,7 @@ The first set of header columns are common to all of the output files generated 
     - Double
   * - 74-76
     - DIR_ERR, :raw-html:`<br />` DIR_ERR_BCL, :raw-html:`<br />` DIR_ERR_BCU
-    - Signed angle between the directions of the average forecast and observed wing vectors. Positive if the forecast wind vector is counterclockwise from the observed wind vector including bootstrap upper and lower confidence limits
+    - Signed angle between the directions of the average forecast and observed wind vectors. Positive if the forecast wind vector is counterclockwise from the observed wind vector including bootstrap upper and lower confidence limits
     - Double
   * - 77-79
     - DIR_ABSERR, :raw-html:`<br />` DIR_ABSERR_BCL, :raw-html:`<br />` DIR_ABSERR_BCU

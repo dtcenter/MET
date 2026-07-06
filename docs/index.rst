@@ -124,7 +124,7 @@ To cite this documentation in publications, please refer to the MET User's Guide
 * Daniel Adriaansen [#NCAR]_
 * David Ahijevych [#NCAR]_
 * David Albo [#NCAR]_
-* Lindsay Blank
+* Lindsay Blank [#CIRA]_
 * Mrinal Biswas [#NCAR]_
 * Barbara Brown [#NCAR]_
 * Randy Bullock [#NCAR]_

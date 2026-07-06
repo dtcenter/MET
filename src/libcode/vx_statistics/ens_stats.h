@@ -74,21 +74,38 @@ class ECNTInfo {
       SingleThresh othresh;
 
       // Number of ensemble members and pairs
-      int n_ens, n_pair;
+      int n_ens;
+      int n_pair;
 
-      double crps_emp, crpscl_emp, crpss_emp, crps_emp_fair, spread_md;
-      double crps_gaus, crpscl_gaus, crpss_gaus;
-      double ign, me, mae, rmse, spread;
-      double me_oerr, mae_oerr, rmse_oerr, spread_oerr;
+      double crps_emp;
+      double crpscl_emp;
+      double crpss_emp;
+      double crps_emp_fair;
+      double spread_md;
+      double crps_gaus;
+      double crpscl_gaus;
+      double crpss_gaus;
+      double ign;
+      double me;
+      double mae;
+      double rmse;
+      double spread;
+      double me_oerr;
+      double mae_oerr;
+      double rmse_oerr;
+      double spread_oerr;
       double spread_plus_oerr;
 
       // Log scores that incorporate observational uncertainty,
       // as advised in Ferro (2017)
-      double ign_conv_oerr, ign_corr_oerr;
+      double ign_conv_oerr;
+      double ign_corr_oerr;
 
       // Bias ratio information
-      int n_ge_obs, n_lt_obs;
-      double me_ge_obs, me_lt_obs;
+      int n_ge_obs;
+      int n_lt_obs;
+      double me_ge_obs;
+      double me_lt_obs;
       double bias_ratio;
 
       // Compute statistics
@@ -134,8 +151,12 @@ class RPSInfo {
       // For ensembles, this is the number of ensemble members.
       int n_prob;
 
-      double rps_rel, rps_res, rps_unc;
-      double rps, rpscl, rpss;
+      double rps_rel;
+      double rps_res;
+      double rps_unc;
+      double rps;
+      double rpscl;
+      double rpss;
       double rpss_smpl;
 
       // Compute statistics
