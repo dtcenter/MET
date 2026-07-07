@@ -262,7 +262,7 @@ static void process_command_line(int argc, char **argv) {
    } // end for i
 
    // Process the configuration
-   conf_info.process_config(file_types);
+   conf_info.process_config(file_types, data_grid);
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.data_info[0]->regrid(),

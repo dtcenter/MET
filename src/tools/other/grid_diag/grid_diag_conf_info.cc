@@ -162,7 +162,8 @@ void GridDiagConfInfo::set_n_data() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
+void GridDiagConfInfo::process_config(vector<GrdFileType> file_types,
+                                      Grid &data_grid) {
    ConcatString s;
    StringArray sa;
    Dictionary i_dict;
@@ -195,6 +196,11 @@ void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
 
       // Set the current dictionaries
       data_info[i]->set_dict(i_dict);
+
+      // Update the grid definition, if needed
+      if(!data_grid.is_set() && data_info[i]->grid_attr().is_set()) {
+         data_grid = data_info[i]->grid_attr();
+      }
 
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {
