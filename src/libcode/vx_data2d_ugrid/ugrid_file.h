@@ -168,6 +168,7 @@ class UGridFile {
       void read_config(const ConcatString &config_filename);
       void read_netcdf_grid();
 
+      void radian_to_degree(std::vector<double> &lat_values, int lat_count);
 };
 
 

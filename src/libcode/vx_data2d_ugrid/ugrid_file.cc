@@ -38,6 +38,7 @@ using namespace netCDF;
 constexpr char def_user_config[] = "UGridConfig_user";
 constexpr char def_config_prefix[] = "UGridConfig_";
 constexpr char def_config_prefix2[] = "MET_BASE/config/UGridConfig_";
+constexpr double lat_epsilon = 0.00001;
 
 array<string, UG_DIM_COUNT> DIM_KEYS = {
       "dim_face", "dim_node", "dim_edge", "dim_time", "dim_vert"
@@ -226,7 +227,7 @@ bool UGridFile::open_metadata(const char * filepath)
 
   if (IS_INVALID_NC_P(_ncMetaFile)) {
     close();
-    return false;
+    exit(1);
   }
 
   NcDim dim;
@@ -305,9 +306,8 @@ bool UGridFile::open_metadata(const char * filepath)
       }
       else if (1 == j && nullptr == _latVar) _latVar = MetaVar[j].var;
       else if (2 == j && nullptr == _lonVar) _lonVar = MetaVar[j].var;
-      else if (3 == j && nullptr == _latVar) z_var = MetaVar[j].var;
+      else if (3 == j && nullptr == z_var) z_var = MetaVar[j].var;
     }
-
   }   //  for j
 
 
@@ -896,6 +896,39 @@ void UGridFile::read_config(const ConcatString &config_filename) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void UGridFile::radian_to_degree(vector<double> &lat_values, int lat_count) {
+  const char *method_name = "UGridFile::radian_to_degree() -> ";
+  int lat_adjusted = 0;
+  int lat_adjusted_total = 0;
+  for (int idx=0; idx<lat_count; idx++) {
+    lat_values[idx] /= rad_per_deg;
+    if (lat_values[idx] > 90.0) {
+      if (!is_eq(lat_values[idx], 90.0, lat_epsilon)) {
+        mlog << Warning << "\n" << method_name << "adjusted " << lat_values[idx]
+             << " (delta: " << (lat_values[idx] - 90.0) << ") to 90.0\n\n";
+        lat_adjusted++;
+      }
+      lat_values[idx] = 90.0;
+      lat_adjusted_total++;
+    }
+    else if (lat_values[idx] < -90.0) {
+      if (!is_eq(lat_values[idx], -90.0, lat_epsilon)) {
+        mlog << Warning << "\n" << method_name << "adjusted " << lat_values[idx]
+             << " (delta: " << (lat_values[idx] + 90.0) << ") to -90.0\n\n";
+        lat_adjusted++;
+      }
+      lat_values[idx] = -90.0;
+      lat_adjusted_total++;
+    }
+  }
+  if (lat_adjusted_total > 0) {
+    mlog << Debug(4) << method_name << "adjusted " << lat_adjusted << " ("
+         << lat_adjusted_total << ") latitues\n";
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////
 
 void UGridFile::read_netcdf_grid()
 {
@@ -931,12 +964,12 @@ void UGridFile::read_netcdf_grid()
 
   if (get_var_units(_latVar, units_value) &&
       (units_value == "rad" || units_value == "radian")) {
-    mlog << Debug(6) << method_name << "convert  " << units_value << " to degree for lat\n";
-    for (int idx=0; idx<face_count; idx++) _lat[idx] /= rad_per_deg;
+    mlog << Debug(6) << method_name << "convert " << units_value << " to degree for lat\n";
+    radian_to_degree(_lat, face_count);
   }
   if (get_var_units(_lonVar, units_value) &&
       (units_value == "rad" || units_value == "radian")) {
-    mlog << Debug(6) << method_name << "  convert " << units_value << " to degree for lon\n";
+    mlog << Debug(6) << method_name << "convert " << units_value << " to degree for lon\n";
     for (int idx=0; idx<face_count; idx++) _lon[idx] /= rad_per_deg;
   }
 
