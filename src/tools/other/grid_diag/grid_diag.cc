@@ -707,7 +707,7 @@ static void accumulate(vector<double> &sum, const vector<double> &cur) {
          exit(1);
       }
 
-      // Increment each element 
+      // Increment each element
       for(int i=0; i<sum.size(); i++) sum[i] += cur[i];
    }
 }
