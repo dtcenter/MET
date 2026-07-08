@@ -2469,9 +2469,9 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
     if(!is_spherical_earch) eccentricity = st_eccentricity_func(semi_major_axis, semi_minor_axis,
                                                                 inverse_flattening);
 
-    // MET #3358 Use the minimum values rather than just the first
-    double x = *(min_element(x_values.begin(), x_values.end()));
-    double y = *(min_element(y_values.begin(), y_values.end()));
+    // MET #3358 Check for negative offset
+    double x = x_values[0];
+    double y = (data.dy_km > 0 ? y_values[0] : y_values.back());
     double lat;
     double lon;
     scale_factor = st_sf_func(proj_standard_parallel, eccentricity, is_north_hemisphere);
