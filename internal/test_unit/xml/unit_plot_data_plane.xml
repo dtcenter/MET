@@ -794,4 +794,33 @@
       <ps>&OUTPUT_DIR;/plot_data_plane/credit_Q_HEIGHT.ps</ps>
     </output>
   </test>
+
+  <test name="plot_data_plane_nws_precip_conus">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_OBS;/stage4_nc/nws_precip_1day_20260410_conus.nc \
+      &OUTPUT_DIR;/plot_data_plane/nws_precip_1day_20260410_conus.ps \
+      'name="observation"; level="(*,*)"; censor_thresh=eq-10000; censor_val=-9999;' \
+      -title "NWS Precip CONUS NetCDF-CF" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nws_precip_1day_20260410_conus.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_nws_precip_ak">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_OBS;/stage4_nc/nws_precip_1day_20260410_ak.nc \
+      &OUTPUT_DIR;/plot_data_plane/nws_precip_1day_20260410_ak.ps \
+      'name="observation"; level="(*,*)";' \
+      -title "NWS Precip Alaska NetCDF-CF" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nws_precip_1day_20260410_ak.ps</ps>
+    </output>
+  </test>
+
 </met_test>
