@@ -180,7 +180,7 @@ void UGridFile::close()
 ////////////////////////////////////////////////////////////////////////
 // Helper: Assign dimension from metadata
 
-void UGridFile::assign_dim_from_metadata(netCDF::NcFile* ncFile, netCDF::NcDim*& dim_ptr,
+void UGridFile::assign_dim_from_metadata(const netCDF::NcFile* ncFile, netCDF::NcDim*& dim_ptr,
                                          const std::string& key, const StringArray& dim_names) {
   std::string meta_name = find_metadata_name(key, dim_names);
   if (!meta_name.empty()) {
@@ -582,15 +582,14 @@ NcVarInfo* UGridFile::find_by_name(const char * var_name) const
 NcVarInfo* UGridFile::find_var_by_dim_name(const char *dim_name) const
 {
   NcVarInfo *var = find_by_name(dim_name);
-  if (!var) {
-    //StringArray dimNames;
+  if (var == nullptr) {
     for (int i=0; i<Nvars; i++) {
-      if (1 == Var[i].Ndims) {
-        NcDim dim = get_nc_dim(Var[i].var, 0);
-        if (GET_NC_NAME(dim) == dim_name) {
-          var = &Var[i];
-          break;
-        }
+      if (1 != Var[i].Ndims) continue
+
+      NcDim dim = get_nc_dim(Var[i].var, 0);
+      if (GET_NC_NAME(dim) == dim_name) {
+        var = &Var[i];
+        break;
       }
     }
   }
@@ -675,7 +674,7 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   //  find varinfo's
 
-  NcVarInfo *var = find_by_name(GET_NC_NAME_P(v).c_str());
+  const NcVarInfo *var = find_by_name(GET_NC_NAME_P(v).c_str());
 
   if (nullptr == var) {
     mlog << Error << "\n" << method_name
@@ -896,7 +895,7 @@ void UGridFile::read_config(const ConcatString &config_filename) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void UGridFile::radian_to_degree(vector<double> &lat_values, int lat_count) {
+void UGridFile::radian_to_degree(vector<double> &lat_values, const int lat_count) const {
   const char *method_name = "UGridFile::radian_to_degree() -> ";
   int lat_adjusted = 0;
   int lat_adjusted_total = 0;

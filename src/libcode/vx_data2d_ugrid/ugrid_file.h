@@ -160,15 +160,14 @@ class UGridFile {
       // Read the grid information from the netCDF file and fill in the
       // grid member with that information.
 
-      void assign_dim_from_metadata(netCDF::NcFile* ncFile, netCDF::NcDim*& dim_ptr,
+      void assign_dim_from_metadata(const netCDF::NcFile* ncFile, netCDF::NcDim*& dim_ptr,
                                     const std::string& key, const StringArray& dim_names);
 
       std::string find_metadata_name(const std::string &key, const StringArray &available_names);
       StringArray get_metadata_names(const std::string &key);
+      void radian_to_degree(std::vector<double> &lat_values, const int lat_count) const;
       void read_config(const ConcatString &config_filename);
       void read_netcdf_grid();
-
-      void radian_to_degree(std::vector<double> &lat_values, int lat_count);
 };
 
 
