@@ -920,7 +920,7 @@ void UGridFile::radian_to_degree(vector<double> &lat_values, const int lat_count
   }
   if (lat_adjusted_total > 0) {
     mlog << Debug(4) << method_name << "adjusted " << lat_adjusted << " ("
-         << lat_adjusted_total << ") latitues\n";
+         << lat_adjusted_total << ") latitudes\n";
   }
 }
 
