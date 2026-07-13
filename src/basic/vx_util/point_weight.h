@@ -46,7 +46,7 @@ class PointWeightInfo {
 
    void assign(const PointWeightInfo &);
 
-   // Point weighting type 
+   // Point weighting type
    PointWeightType Type;
 
    // KDE Reference Angle
@@ -65,7 +65,7 @@ class PointWeightInfo {
    public:
 
       PointWeightInfo();
-     ~PointWeightInfo(); 
+     ~PointWeightInfo();
       PointWeightInfo(const PointWeightInfo &);
       PointWeightInfo & operator=(const PointWeightInfo &a) noexcept;
 

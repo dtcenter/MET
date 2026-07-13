@@ -140,7 +140,7 @@ bool PointWeightInfo::has_sid(const string &sid, double &wgt) const {
 
    // Return bad data for no match
    if(!found) wgt = bad_data_double;
- 
+
    return found;
 }
 
@@ -162,7 +162,7 @@ void PointWeightInfo::compute_kde_weights() {
    mlog << Debug(3) << "Computing KDE point weights using " << n_stn()
         << " observation locations.\n";
 
-   // Store sums for the weights 
+   // Store sums for the weights
    vector<double> p_sum(n_stn(), 0.0);
 
    // Define e constant
@@ -262,19 +262,19 @@ void PointWeightInfo::write_weights() const {
 // Utility functions
 //
 ///////////////////////////////////////////////////////////////////////////////
- 
+
 PointWeightInfo parse_conf_point_weight(Dictionary *dict) {
    const char *method_name = "parse_conf_point_weight() -> ";
    PointWeightInfo info;
-   
+
    if(!dict) {
       mlog << Error << "\n" << method_name
            << "empty dictionary!\n\n";
       exit(1);
-   } 
+   }
 
    // Conf: point_weight_flag
-   
+
    // Get the integer flag value for the current entry
    int v = dict->lookup_int(conf_key_point_weight_flag);
 
@@ -290,8 +290,8 @@ PointWeightInfo parse_conf_point_weight(Dictionary *dict) {
            << "Unexpected config file value of " << v << " for \""
            << conf_key_point_weight_flag << "\".\n\n";
       exit(1);
-   }  
-   
+   }
+
    // Conf: kde_ref_angle
    info.set_kde_ref_angle(dict->lookup_double(conf_key_kde_ref_angle));
 
