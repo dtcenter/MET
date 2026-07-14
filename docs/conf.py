@@ -154,3 +154,4 @@ rst_epilog = f"""
 .. |release_date| replace:: {release_date}
 .. |release_year| replace:: {release_year}
 """
+
