@@ -280,28 +280,31 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 
   LongArray dimension = vinfo_nc->dimension();
   NcVarInfo *data_var = get_data_var(vinfo);
-  if (nullptr != data_var) {
-    int time_dim_slot = data_var->t_slot;
-    int zdim_slot = data_var->z_slot;
+  if (nullptr == data_var) {
+    mlog << Error << "\n" << method_name
+         << "\"" << vinfo.req_name() << "\" variable does not exist\n\n";
+    return false;
+  }
 
-    // set vlevels if needed
-    _file->set_vlevels(data_var);
+  int time_dim_slot = data_var->t_slot;
+  int zdim_slot = data_var->z_slot;
 
-    for (int idx=0; idx<dimension.n_elements(); idx++) {
-      long dim_offset = dimension[idx];
-      if (dim_offset == vx_data2d_star) continue;
-      if (idx == time_dim_slot) {
-        dimension[time_dim_slot] = find_time_offset(vinfo, data_var);
-      }
-      else if (idx == zdim_slot) {
-        dimension[idx] = long(find_z_offset(vinfo, data_var));
-      }
-      else {
-         mlog << Debug(7) << method_name << "parsing generic dimension " << idx
-              << " for \"" << vinfo.req_name() << "\" variable.\n\n";
+  // set vlevels if needed
+  _file->set_vlevels(data_var);
 
-         dimension[idx] = long(find_generic_offset(vinfo, data_var, idx));
-      }
+  for (int idx=0; idx<dimension.n_elements(); idx++) {
+    long dim_offset = dimension[idx];
+    if (dim_offset == vx_data2d_star) continue;
+    if (idx == time_dim_slot) {
+      dimension[time_dim_slot] = find_time_offset(vinfo, data_var);
+    }
+    else if (idx == zdim_slot) {
+      dimension[idx] = long(find_z_offset(vinfo, data_var));
+    }
+    else {
+       mlog << Debug(7) << method_name << "parsing generic dimension " << idx
+            << " for \"" << vinfo.req_name() << "\" variable.\n\n";
+        dimension[idx] = long(find_generic_offset(vinfo, data_var, idx));
     }
   }
 
