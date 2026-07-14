@@ -14,7 +14,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "var_info.h"
+//#include "var_info.h"
+#include "var_info_nc.h"
 
 #include "data_file_type.h"
 #include "long_array.h"
@@ -24,21 +25,15 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class VarInfoNcCF : public VarInfo
+class VarInfoNcCF : public VarInfoNC
 {
    private:
 
-      //
-      // NetCDF-specific parameters
-      //
-
-      LongArray Dimension; // Dimension values for extracting 2D field
-      BoolArray Is_offset; // boolean for Dimension value (true: offset, false: value to be an offset (false for value)
-      NumArray  Dim_value; // Dimension values as float for extracting 2D field
-
       void init_from_scratch();
       void assign(const VarInfoNcCF &);
-      void clear_dimension();
+
+   protected:
+      void set_default_levels(const ConcatString &lstr) override;
 
    public:
       VarInfoNcCF();
@@ -55,13 +50,6 @@ class VarInfoNcCF : public VarInfo
       //
 
       GrdFileType       file_type()      const override;
-      const LongArray & dimension()      const;
-      long              dimension(int i) const;
-      const NumArray  & dim_value()      const;
-      double            dim_value(int i) const;
-      const BoolArray & is_offset()      const;
-      bool              is_offset(int i) const;
-      int               n_dimension()    const;
 
       //
       // set stuff
@@ -69,8 +57,6 @@ class VarInfoNcCF : public VarInfo
 
       void set_magic(const ConcatString &, const ConcatString &) override;
       bool set_dict(Dictionary &s, bool do_exit=true) override;
-
-      void add_dimension(long dim, bool as_offset=true, double dim_value=bad_data_double);
 
       //
       // do stuff
@@ -87,13 +73,6 @@ class VarInfoNcCF : public VarInfo
 ///////////////////////////////////////////////////////////////////////////////
 
 inline GrdFileType       VarInfoNcCF::file_type()      const { return FileType_NcCF;          }
-inline const LongArray & VarInfoNcCF::dimension()      const { return Dimension;              }
-inline long              VarInfoNcCF::dimension(int i) const { return (int)Dimension[i];      }
-inline int               VarInfoNcCF::n_dimension()    const { return Dimension.n_elements(); }
-inline const NumArray  & VarInfoNcCF::dim_value()      const { return Dim_value;              }
-inline double            VarInfoNcCF::dim_value(int i) const { return Dim_value[i];           }
-inline const BoolArray & VarInfoNcCF::is_offset()      const { return Is_offset;              }
-inline bool              VarInfoNcCF::is_offset(int i) const { return Is_offset[i];           }
 
 ///////////////////////////////////////////////////////////////////////////////
 

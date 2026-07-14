@@ -34,8 +34,6 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static void check_dim_offset(const char *);
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 //  Code for class VarInfoNcCF
@@ -126,14 +124,6 @@ void VarInfoNcCF::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcCF::clear_dimension() {
-   Dimension.clear();
-   Is_offset.clear();
-   Dim_value.clear();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 void VarInfoNcCF::dump(ostream &out) const {
 
    // Dump out the contents
@@ -150,215 +140,24 @@ void VarInfoNcCF::dump(ostream &out) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcCF::add_dimension(long dim, bool as_offset, double dim_value) {
-   Dimension.add(dim);
-   Is_offset.add(as_offset);
-   Dim_value.add(dim_value);
-   return;
+void VarInfoNcCF::set_default_levels(const ConcatString &lstr) {
+   Level.set_req_name("*,*");
+   Level.set_name("*,*");
+   add_dimension(vx_data2d_star);
+   add_dimension(vx_data2d_star);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
 void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
-   ConcatString tmp_str;
    const char *method_name = "VarInfoNcCF::set_magic() -> ";
 
    // Store the magic string
-   VarInfo::set_magic(nstr, lstr);
-
-   // Set the requested name and default output name
-   set_req_name(nstr.c_str());
-   set_name(nstr);
+   set_magic_pre(nstr, lstr);
 
    // If there's no level specification, assume (*, *)
-   if(strchr(lstr.c_str(), '(') == nullptr) {
-      Level.set_req_name("*,*");
-      Level.set_name("*,*");
-      clear_dimension();
-      add_dimension(vx_data2d_star);
-      add_dimension(vx_data2d_star);
-   }
-   else {
-      char *ptr = nullptr;
-      char *ptr2 = nullptr;
-      char *ptr3 = nullptr;
-      char *save_ptr = nullptr;
+   parse_level(lstr);
 
-      // Initialize the temp string
-      tmp_str = lstr;
-
-      // Parse the level specification
-      // Retreive the NetCDF level specification
-      ptr = strtok_r((char*)tmp_str.c_str(), "()", &save_ptr);
-
-      // Set the level name
-      Level.set_req_name(ptr);
-      Level.set_name(ptr);
-
-      // If dimensions are specified, clear the default value
-      if (strchr(ptr, ',') != nullptr) clear_dimension();
-
-      // Parse the dimensions
-      bool as_offset = true;
-      while ((ptr2 = strtok_r(ptr, ",", &save_ptr)) != nullptr) {
-         // Check for wildcards
-         if (strchr(ptr2, '*') != nullptr) { add_dimension(vx_data2d_star);
-         }
-         else {
-            as_offset = (*ptr2 != '@');
-            if (!as_offset) ptr2++;
-
-            // Check for a range of levels
-            if ((ptr3 = strchr(ptr2, '-')) != nullptr) {
-
-               // Check if a range has already been supplied
-               if (Dimension.has(range_flag)) {
-                  mlog << Error << "\n" << method_name
-                       << "only one dimension can have a range for NetCDF variable \""
-                       << MagicStr << "\".\n\n";
-                  exit(1);
-               }
-               else {
-                  // Store the dimension of the range and limits
-                  *ptr3++ = 0;
-                  add_dimension(range_flag, as_offset);
-                  // Check for integer dimension offsets
-                  if(as_offset) {
-                     check_dim_offset(ptr2);
-                     check_dim_offset(ptr3);
-                  }
-                  else if (*ptr3 == '@') ptr3++;    // to support @vlevel1-@vlevel2
-                  Level.set_lower(as_offset ? atoi(ptr2) : atof(ptr2));
-                  Level.set_upper(as_offset ? atoi(ptr3) : atof(ptr3));
-
-                  // Assume pressure level type for a range of levels
-                  Level.set_type(LevelType_Pres);
-                  Level.set_is_offset(as_offset);
-               }
-            }
-            // Check for a range of times
-            else if ((ptr3 = strchr(ptr2, ':')) != nullptr) {
-               // Check if a range has already been supplied
-               if (Dimension.has(range_flag)) {
-                  mlog << Error << "\n" << method_name
-                       << "only one dimension can have a range for NetCDF variable \""
-                       << MagicStr << "\".\n\n";
-                  exit(1);
-               }
-               else {
-                  int increment = 0;
-                  // Store the dimension of the range and limits
-                  *ptr3++ = 0;
-                  if(!as_offset && *ptr3 == '@') ptr3++;    // to support @time1:@time2
-
-                  char *ptr_inc = strchr(ptr3, ':');
-                  if (ptr_inc != nullptr) *ptr_inc++ = 0;
-                  mlog << Debug(7) << method_name
-                       << " start: " << ptr2 << ", end: " << ptr3 << "\n";
-
-                  bool datestring_start = is_datestring(ptr2);
-                  bool datestring_end   = is_datestring(ptr3);
-                  if (datestring_start != datestring_end) {
-                     mlog << Error << "\n" << method_name
-                          << "the time value and an index/offset can not be mixed for NetCDF variable \""
-                          << MagicStr << "\".\n\n";
-                     exit(1);
-                  }
-
-                  // Parse the lower and upper time limits
-                  unixtime time_lower = 0;
-                  unixtime time_upper = 0;
-
-                  if (datestring_start && datestring_end) {
-                     as_offset = false;
-                     time_lower = timestring_to_unix(ptr2);
-                     time_upper = timestring_to_unix(ptr3);
-                  }
-                  else if (as_offset) {
-
-                     // Check for integer dimension offsets
-                     check_dim_offset(ptr2);
-                     check_dim_offset(ptr3);
-
-                     time_lower = (unixtime) atoi(ptr2);
-                     time_upper = (unixtime) atoi(ptr3);
-                  }
-                  else {
-                     time_lower = (unixtime) nint(atof(ptr2));
-                     time_upper = (unixtime) nint(atof(ptr3));
-                  }
-
-                  if (ptr_inc != nullptr) {
-                     if (as_offset) {
-                        increment = atoi(ptr_inc);
-                     }
-                     else {
-                        increment = is_float(ptr_inc)
-                                    ? nint(atof(ptr_inc))
-                                    : timestring_to_sec(ptr_inc);
-                        mlog << Debug(7) << method_name
-                             << "increment: \"" << ptr_inc << "\" to "
-                             << increment << " seconds.\n";
-                     }
-                  }
-
-                  add_dimension(range_flag, as_offset);
-                  Level.set_lower((double) time_lower);
-                  Level.set_upper((double) time_upper);
-                  Level.set_increment(increment);
-
-                  // Assume time level type for a range of levels
-                  Level.set_type(LevelType_Time);
-                  Level.set_is_offset(as_offset);
-               }
-            }
-            else {
-               // Single level
-               long level = 0;
-               double level_value = bad_data_double;
-               if (is_datestring(ptr2)) {
-                  unixtime unix_time = timestring_to_unix(ptr2);
-                  level = vx_data2d_dim_by_value;
-                  level_value = (double) unix_time;
-                  as_offset = false;
-               }
-               else if (is_number(ptr2)) {
-                  if (as_offset) {
-                     check_dim_offset(ptr2);
-                     level = atoi(ptr2);
-                  }
-                  else {
-                     level = vx_data2d_dim_by_value;
-                     level_value = atof(ptr2);
-                  }
-               }
-               else {
-                  mlog << Error << "\n" << method_name
-                       << "trouble parsing NetCDF dimension value \""
-                       << ptr2 << "\"!\n\n";
-                  exit(1);
-               }
-               if (as_offset) add_dimension(level, as_offset);
-               else add_dimension(level, as_offset, level_value);
-            }
-         }
-
-         // Set ptr to nullptr for next call to strtok
-         ptr = nullptr;
-
-      } // end while
-
-   } // end else
-
-   // Check for "/PROB" to indicate a probability forecast
-   if (strstr(MagicStr.c_str(), "/PROB") != nullptr) PFlag = 1;
-
-   // Set the long name
-   tmp_str.format("%s(%s)", req_name().text(), Level.req_name().text());
-   set_long_name(tmp_str.c_str());
-
-   // Set the units
-   set_units(na_str);
+   set_magic_post(req_name(), Level.req_name());
 
    return;
 }
@@ -478,17 +277,5 @@ bool VarInfoNcCF::is_wind_direction() const {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static void check_dim_offset(const char *ptr) {
-
-   if(!is_eq(atof(ptr), (double) atoi(ptr))) {
-      mlog << Warning << "\ncheck_dim_offset() -> "
-           << "Found non-integer NetCDF dimension index ("
-           << ptr << " != " << atoi(ptr) << ").\n"
-           << "Did you intend to use \"@" << ptr
-           << "\" to specify the value for that dimension instead?\n\n";
-   }
-
-   return;
-}
 
 ///////////////////////////////////////////////////////////////////////////////

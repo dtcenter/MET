@@ -14,7 +14,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "var_info.h"
+#include "var_info_nc.h"
 
 #include "data_file_type.h"
 #include "long_array.h"
@@ -183,7 +183,7 @@ static const int n_pinterp_wind_speed_names =
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class VarInfoNcWrf : public VarInfo
+class VarInfoNcWrf : public VarInfoNC
 {
    private:
 
@@ -191,13 +191,11 @@ class VarInfoNcWrf : public VarInfo
          // NetCDF-specific parameters
          //
 
-      LongArray Dimension; // Dimension values for extracting 2D field
-      BoolArray Is_offset; // boolean for Dimension value (true: offset, false: value to be an offset (false for value)
-      NumArray  Dim_value; // Dimension values as float for extracting 2D field
-
       void init_from_scratch();
       void assign(const VarInfoNcWrf &);
-      void clear_dimension();
+
+   protected:
+      void set_default_levels(const ConcatString &lstr) override;
 
    public:
       VarInfoNcWrf();
@@ -214,13 +212,6 @@ class VarInfoNcWrf : public VarInfo
          //
 
       GrdFileType       file_type()      const override;
-      const LongArray & dimension()      const;
-      long              dimension(int i) const;
-      const NumArray  & dim_value()      const;
-      double            dim_value(int i) const;
-      const BoolArray & is_offset()      const;
-      bool              is_offset(int i) const;
-      int n_dimension() const;
 
          //
          // set stuff
@@ -228,9 +219,6 @@ class VarInfoNcWrf : public VarInfo
 
       void set_magic(const ConcatString &, const ConcatString &) override;
       bool set_dict(Dictionary &, bool do_exit=true) override;
-
-      void add_dimension(long dim, bool as_index=true, double dim_value=bad_data_double);
-      void set_dimension(int i_dim, long dim);
 
          //
          // do stuff
@@ -248,13 +236,6 @@ class VarInfoNcWrf : public VarInfo
 ///////////////////////////////////////////////////////////////////////////////
 
 inline GrdFileType       VarInfoNcWrf::file_type()      const { return FileType_NcWrf;         }
-inline const LongArray & VarInfoNcWrf::dimension()      const { return Dimension;              }
-inline long              VarInfoNcWrf::dimension(int i) const { return Dimension[i];           }
-inline int               VarInfoNcWrf::n_dimension()    const { return Dimension.n_elements(); }
-inline const NumArray  & VarInfoNcWrf::dim_value()      const { return Dim_value;              }
-inline double            VarInfoNcWrf::dim_value(int i) const { return Dim_value[i];           }
-inline const BoolArray & VarInfoNcWrf::is_offset()      const { return Is_offset;              }
-inline bool              VarInfoNcWrf::is_offset(int i) const { return Is_offset[i];           }
 
 ///////////////////////////////////////////////////////////////////////////////
 
