@@ -294,9 +294,17 @@ struct InterpInfo {
    ~InterpInfo() { clear(); }
    InterpInfo(InterpInfo const &i) { *this = i; }
    InterpInfo &operator=(const InterpInfo &a) noexcept; // SonarQube findings
-   bool operator==(const InterpInfo &) const;
    void clear();
    void validate(); // Ensure that width and method are accordant
+
+   friend bool operator==(const InterpInfo &lhs, const InterpInfo &rhs) {
+      return(lhs.field      == rhs.field      &&
+             lhs.vld_thresh == rhs.vld_thresh &&
+             lhs.n_interp   == rhs.n_interp   &&
+             lhs.method     == rhs.method     &&
+             lhs.width      == rhs.width      &&
+             lhs.shape      == rhs.shape);
+   }
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -450,8 +458,47 @@ struct MaskLatLon {
    ~MaskLatLon() { clear(); }
    MaskLatLon(MaskLatLon const &i) { *this = i; }
    MaskLatLon &operator=(const MaskLatLon &a) noexcept;
-   bool operator==(const MaskLatLon &) const;
    void clear();
+
+   friend bool operator==(const MaskLatLon &lhs, const MaskLatLon &rhs) {
+      return(lhs.name       == rhs.name       &&
+             lhs.lat_thresh == rhs.lat_thresh &&
+             lhs.lon_thresh == rhs.lon_thresh);
+   }
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// Struct to store wind vector metadata
+//
+
+struct WindMetadata {
+   StringArray u_wind;         // U-wind field names
+   StringArray v_wind;         // V-wind field names
+   StringArray wind_speed;     // Wind speed field names
+   StringArray wind_direction; // Wind direction field names
+
+   WindMetadata() { clear(); }
+   ~WindMetadata() { clear(); }
+   WindMetadata(WindMetadata const &i) { *this = i; }
+   WindMetadata &operator=(const WindMetadata &a) noexcept;
+   void clear();
+
+   bool is_u_wind(const std::string &s) const { return u_wind.has(s); }
+   bool is_v_wind(const std::string &s) const { return v_wind.has(s); }
+   bool is_wind_speed(const std::string &s) const { return wind_speed.has(s); }
+   bool is_wind_direction(const std::string &s) const { return wind_direction.has(s); }
+
+   // Supported derivations
+   bool is_kinetic_energy(const std::string &s) const { return s == "KENG"; }
+
+   friend bool operator==(const WindMetadata &lhs, const WindMetadata &rhs) {
+      return(lhs.u_wind         == rhs.u_wind     &&
+             lhs.v_wind         == rhs.v_wind     &&
+             lhs.wind_speed     == rhs.wind_speed &&
+             lhs.wind_direction == rhs.wind_direction);
+   }
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -742,6 +789,15 @@ static const char conf_key_ugrid_dataset[]          = "ugrid_dataset";
 static const char conf_key_ugrid_map_config[]       = "ugrid_map_config";
 static const char conf_key_ugrid_max_distance_km[]  = "ugrid_max_distance_km";
 static const char conf_key_ugrid_metadata_map[]     = "ugrid_metadata_map";
+
+//
+// Entries to define wind vector metadata
+//
+
+static const char conf_key_u_wind_field_name[]         = "u_wind_field_name";
+static const char conf_key_v_wind_field_name[]         = "v_wind_field_name";
+static const char conf_key_wind_speed_field_name[]     = "wind_speed_field_name";
+static const char conf_key_wind_direction_field_name[] = "wind_direction_field_name";
 
 //
 // Entries to override file metadata 
@@ -1320,8 +1376,6 @@ static const char conf_key_n_azimuth[]   = "n_azimuth";
 static const char conf_key_delta_range[] = "delta_range_km";
 static const char conf_key_rmw_scale[]   = "rmw_scale";
 static const char conf_key_compute_tangential_and_radial_winds[] = "compute_tangential_and_radial_winds";
-static const char conf_key_u_wind_field_name[] = "u_wind_field_name";
-static const char conf_key_v_wind_field_name[] = "v_wind_field_name";
 static const char conf_key_radial_velocity_field_name[] = "radial_velocity_field_name";
 static const char conf_key_tangential_velocity_field_name[] = "tangential_velocity_field_name";
 static const char conf_key_radial_velocity_long_field_name[] = "radial_velocity_long_field_name";
