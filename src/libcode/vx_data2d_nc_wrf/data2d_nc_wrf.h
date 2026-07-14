@@ -34,6 +34,7 @@ class MetNcWrfDataFile : public Met2dDataFile {
    private:
 
       void nc_wrf_init_from_scratch();
+      bool get_real_dimension(VarInfoNcWrf *vinfo_nc, NcVarInfo *info, LongArray &dimension) const;
 
       MetNcWrfDataFile(const MetNcWrfDataFile &);
       MetNcWrfDataFile & operator=(const MetNcWrfDataFile &);
