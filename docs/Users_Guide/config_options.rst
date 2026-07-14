@@ -682,7 +682,8 @@ The following configuration options can be set to refine the metadata, when need
   is_wind_direction = boolean;
 
 When deriving and rotating winds, MET searches the input file for matching wind
-components. That search is driven by the following configuration options:
+components. That search is driven by the following configuration options and
+default values found in the "data/config/ConfigConstants" file:
 
 .. code-block:: none
 

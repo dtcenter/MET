@@ -124,11 +124,13 @@ Wind Rotation and Derivation
 
 Numerical weather prediction model output often defines winds relative to the orientation of the model grid rather than true north-south and east-west directions on the earth.
 However point observations typically define winds relative to true earth directions. Prior to comparing them, the model wind data must be rotated from grid-relative to
-to earth-relative. While the degree of grid-to-earth rotation varies based on the projection type and location, failing to rotate the winds has a significant impact on
+to earth-relative. While the degree of grid-to-earth rotation varies based on the projection type and location, failing to rotate the winds can have a significant impact on
 the verification results.
 
 For simplicity, the MET library code attempts to rotate all wind components from being grid-relative to earth-relative regardless of whether they are being compared to point
-observations or gridded analyses. Running the MET tools at verbosity level 3 (-v 3) prints log messages to describing the wind rotation process.
+observations with the Point-Stat tool or gridded analyses with the Grid-Stat tool. Running the MET tools at verbosity level 3 (-v 3) prints log messages to describing the wind
+rotation process. While the logic to determine whether input winds are grid-relative varies by file type, specifying the **is_grid_relative = FALSE;** configuration option
+manually overrides that logic and prevents winds from being rotated.
 
 Wind fields which must be rotated include wind direction and both the U and V components of the wind vector. While wind direction can be rotated by itself, both U and V are
 required to rotate either component. When processing U-wind data, MET attempts to read corresponding V-wind data and vice-versa.
