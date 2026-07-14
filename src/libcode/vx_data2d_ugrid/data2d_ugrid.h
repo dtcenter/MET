@@ -86,21 +86,22 @@ class MetUGridDataFile : public Met2dDataFile {
 
       //  retrieve the first matching data plane
 
-      bool data_plane(VarInfo &, DataPlane &);
-      bool data_plane(VarInfo &, DataPlane &, const NcVarInfo *);
+      bool data_plane(VarInfo &, DataPlane &, bool do_winds = true) override;
+      bool data_plane(VarInfo &, DataPlane &, const NcVarInfo *, bool do_winds);
 
       //  retrieve all matching data planes
 
-      int data_plane_array(VarInfo &, DataPlaneArray &);
+      int data_plane_array(VarInfo &, DataPlaneArray &, bool do_winds = true) override;
 
       //  retrieve the index of the first matching record
 
       int extract_vlevels(const ConcatString &var_name_base, const char *var_name);
 
-      int index(VarInfo &);
+      int index(VarInfo &) override;
 
       bool read_data_plane(ConcatString var_name, VarInfo &vinfo,
-                           DataPlane &plane, LongArray &dimension);
+                           DataPlane &plane, const LongArray &dimension,
+                           bool do_winds);
 
       //
       //  do stuff

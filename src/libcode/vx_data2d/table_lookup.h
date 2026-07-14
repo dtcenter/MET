@@ -109,14 +109,14 @@ class Grib2TableEntry {
       bool is_eq(const Grib2TableEntry &) const;
       GribEntryMatch match(const int &mtab, const int &_cntr, const int &_ltab) const;
 
-      int index_a;     // Section 0 Discipline
+      int disc;        // Section 0 Discipline
       int mtab_set;    // Section 1 Master Tables Version Number used by set_var
       int mtab_low;    // Section 1 Master Tables Version Number low range of tables
       int mtab_high;   // Section 1 Master Tables Version Number high range of tables
-      int cntr;        // Section 1 originating centre, used for local tables
+      int cntr;        // Section 1 originating center, used for local tables
       int ltab;        // Section 1 Local Tables Version Number
-      int index_b;     // Section 4 Template 4.0 Parameter category
-      int index_c;     // Section 4 Template 4.0 Parameter number
+      int pcat;        // Section 4 Template 4.0 Parameter category
+      int pnum;        // Section 4 Template 4.0 Parameter number
 
       ConcatString parm_name;
 
@@ -201,22 +201,32 @@ class TableFlatFile {
       bool read(const char * filename);
 
 
-      bool lookup_grib1(int code, int table_number, Grib1TableEntry &);
-      bool lookup_grib1(int code, int table_number, int center, int subcenter, Grib1TableEntry &);
+      int lookup_grib1(int code, int table_number,
+                       std::vector<Grib1TableEntry> &) const;
+      int lookup_grib1(int code, int table_number, int center, int subcenter,
+                       std::vector<Grib1TableEntry> &) const;
 
-      bool lookup_grib1(int code,               Grib1TableEntry &);   //  assumes table_number is 2
-      bool lookup_grib1(const char * parm_name, Grib1TableEntry &);   //  assumes table_number is 2
+      // Assumes table_number = 2 by default
+      int lookup_grib1(int code,
+                       std::vector<Grib1TableEntry> &) const;
+      int lookup_grib1(const char * parm_name,
+                       std::vector<Grib1TableEntry> &) const;
 
-      bool lookup_grib1(const char * parm_name, int table_number, int code,
-                        Grib1TableEntry &, int & n_matches);
-      bool lookup_grib1(const char * parm_name, int table_number, int code,int center, int subcenter,
-                        Grib1TableEntry &, int & n_matches);
+      int lookup_grib1(const char * parm_name, int table_number, int code,
+                       std::vector<Grib1TableEntry> &) const;
+      int lookup_grib1(const char * parm_name, int table_number, int code,int center, int subcenter,
+                       std::vector<Grib1TableEntry> &) const;
 
-      bool lookup_grib2(int a, int b, int c, Grib2TableEntry &);
-      bool lookup_grib2(int a, int b, int c, int mtab, int cntr, int ltab, Grib2TableEntry &);
-      bool lookup_grib2(const char * parm_name, Grib2TableEntry &, int & n_matches);
-      bool lookup_grib2(const char * parm_name, int a, int b, int c, Grib2TableEntry &, int & n_matches);
-      bool lookup_grib2(const char * parm_name, int a, int b, int c, int mtab, int cntr, int ltab, Grib2TableEntry &, int & n_matches);
+      int lookup_grib2(int disc, int pcat, int pnum,
+                       std::vector<Grib2TableEntry> &) const;
+      int lookup_grib2(int disc, int pcat, int pnum, int mtab, int cntr, int ltab,
+                       std::vector<Grib2TableEntry> &) const;
+      int lookup_grib2(const char * parm_name,
+                       std::vector<Grib2TableEntry> &) const;
+      int lookup_grib2(const char * parm_name, int disc, int pcat, int pnum,
+                       std::vector<Grib2TableEntry> &) const;
+      int lookup_grib2(const char * parm_name, int disc, int pcat, int pnum, int mtab, int cntr, int ltab,
+                       std::vector<Grib2TableEntry> &) const;
 
       void readUserGribTables(const char * table_type);
 
