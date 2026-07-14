@@ -28,8 +28,8 @@ class VarInfo
 {
    protected:
 
-      ConcatString  MagicStr;  // Requested magic string
       Dictionary    Dict;      // Requested fcst/obs dictionary of fields
+      ConcatString  MagicStr;  // Requested magic string
 
       ConcatString  ReqName;   // Requested parameter name
       ConcatString  Name;      // Name of parameter
@@ -60,6 +60,9 @@ class VarInfo
       RegridInfo    DefaultRegrid; // Default regridding logic
       RegridInfo    Regrid;        // Regridding logic
 
+      bool          GridRelativeFlag; // Wind data is grid relative
+      WindMetadata  WindInfo;         // Wind variable metadata
+
       // Options to override metadata
       ConcatString  SetAttrName;
       ConcatString  SetAttrUnits;
@@ -85,7 +88,8 @@ class VarInfo
       void init_from_scratch();
       void assign(const VarInfo &);
       bool handle_config_error(const ConcatString &msg, bool do_exit) const;
-      bool is_flag_set(int flag) const;
+      bool is_flag_set(int) const;
+      int  get_wind_flag(int, const StringArray &) const;
       void parse_and_set_name_level(Dictionary &dict);
       bool validate_censor_arrays(const ThreshArray &ta, const NumArray &na,
                                   bool do_exit, const char *caller_name=nullptr) const;
@@ -98,13 +102,12 @@ class VarInfo
       VarInfo(const VarInfo &);
       VarInfo & operator=(const VarInfo &);
 
-      virtual VarInfo *clone() const = 0;
+      virtual std::unique_ptr<VarInfo> clone() const = 0;
 
       // Conversion function
       UserFunc_1Arg ConvertFx;
 
       void clear();
-      void clone_base() const;
 
       virtual void dump(std::ostream &) const;
 
@@ -145,6 +148,7 @@ class VarInfo
       NumArray     range()          const;
 
       RegridInfo   regrid()         const;
+      WindMetadata wind_info()      const;
 
       ConcatString magic_str_attr() const;
       ConcatString name_attr()      const;
@@ -167,10 +171,14 @@ class VarInfo
       virtual bool set_dict(Dictionary &, bool do_exit=true);
       virtual void add_grib_code(Dictionary &);
 
+      bool reset_dict_with_name(const char *);
+
       void set_req_name(const char *);
+      void set_req_name(const std::string &);
       void set_name(const char *);
-      void set_name(const std::string);
+      void set_name(const std::string &);
       void set_units(const char *);
+      void set_units(const std::string &);
       void set_level_info(const LevelInfo &);
       void set_req_level_name(const char *);
       void set_level_name(const char *);
@@ -199,6 +207,9 @@ class VarInfo
       void set_default_regrid(const RegridInfo &);
       void set_regrid(const RegridInfo &);
 
+      void set_grid_relative_flag(bool);
+      void set_earth_relative();
+
       void set_level_info_grib(Dictionary & dict);
       void set_prob_info_grib(ConcatString prob_name,
                               double thresh_lo, double thresh_hi);
@@ -213,6 +224,11 @@ class VarInfo
       virtual bool is_v_wind()            const;
       virtual bool is_wind_speed()        const;
       virtual bool is_wind_direction()    const;
+              bool is_kinetic_energy()    const;
+              bool is_wind_rotation()     const;
+              bool is_grid_relative()     const;
+              bool need_uv_wind()         const;
+              bool need_rotation()        const;
               bool is_prob()              const;
 };
 
@@ -250,6 +266,7 @@ inline int          VarInfo::n_bins()         const { return nBins;            }
 inline NumArray     VarInfo::range()          const { return Range;            }
 
 inline RegridInfo   VarInfo::regrid()         const { return Regrid;           }
+inline WindMetadata VarInfo::wind_info()      const { return WindInfo;         }
 
 inline ConcatString VarInfo::name_attr()      const { return(SetAttrName.empty()     ? name()       : SetAttrName);     }
 inline ConcatString VarInfo::units_attr()     const { return(SetAttrUnits.empty()    ? units()      : SetAttrUnits);    }

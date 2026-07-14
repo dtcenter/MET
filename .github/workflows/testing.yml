@@ -148,7 +148,7 @@ jobs:
           - jobid: 'job1' 
             tests: 'ascii2nc'
           - jobid: 'job2'
-            tests: 'pb2nc madis2nc pcp_combine gen_ens_prod regrid'
+            tests: 'pb2nc madis2nc pcp_combine gen_ens_prod regrid winds'
       fail-fast: false
     steps:
       - uses: actions/checkout@v6
