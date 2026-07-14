@@ -186,8 +186,12 @@ bool WrfFile::open(const char * filename)
 
 {
 
-int j, k;
-int month, day, year, hour, minute, second, str_len;
+int month;
+int day;
+int year;
+int hour;
+int minute;
+int second;
 char time_str[max_str_len];
 string c;
 NcVar v;
@@ -215,7 +219,7 @@ Dim = new NcDim*[Ndims];
 
 get_dim_names(Nc, &DimNames);
 
-for (j=0; j<Ndims; ++j)  {
+for (int j=0; j<Ndims; ++j)  {
    c = to_lower(DimNames[j]);
    NcDim dim = get_nc_dim(Nc, DimNames[j]);
 
@@ -241,11 +245,13 @@ Time = new unixtime [Ntimes];
 
 
 if ( has_var(Nc, times_var_name) ) {
+   int str_len;
+
    v = get_var(Nc, times_var_name);
 
    get_dim(Nc, strl_dim_name, str_len, true);
 
-   for (j=0; j<Ntimes; ++j)  {
+   for (int j=0; j<Ntimes; ++j)  {
       ConcatString tmp_time_str;
       get_string_val(&v, j, str_len, tmp_time_str);
       m_strncpy( time_str, tmp_time_str.c_str(), str_len, method_name, "time_str", true);
@@ -273,7 +279,7 @@ if ( has_var(Nc, times_var_name) ) {
    //
 else {
 
-   for (j=0; j<Ntimes; ++j)  {
+   for (int j=0; j<Ntimes; ++j)  {
 
       month  = get_int_var(Nc,  month_var_name, j);
       day    = get_int_var(Nc,    day_var_name, j);
@@ -302,7 +308,7 @@ InitTime = parse_init_time(att_value.c_str());
    Nvars = get_var_names(Nc, &varNames);
    Var = new NcVarInfo [Nvars];
 
-   for (j=0; j<Nvars; ++j)  {
+   for (int j=0; j<Nvars; ++j)  {
       v = get_var(Nc, varNames[j].c_str());
 
       Var[j].var = new NcVar(v);
@@ -323,7 +329,7 @@ InitTime = parse_init_time(att_value.c_str());
       dimNames.clear();
       get_dim_names(&v, &dimNames);
       string c;
-      for (k=0; k<dim_count; ++k)  {
+      for (int k=0; k<dim_count; ++k)  {
         c = to_lower(dimNames[k]);
         NcDim dim = get_nc_dim(&v, dimNames[k]);
         Var[j].Dims[k] = &dim;
@@ -348,8 +354,12 @@ void WrfFile::dump(ostream & out, int depth) const
 
 {
 
-int j, k;
-int month, day, year, hour, minute, second;
+int month;
+int day;
+int year;
+int hour;
+int minute;
+int second;
 ConcatString cs;
 string c;
 Indent prefix(depth);
@@ -369,7 +379,7 @@ out << prefix << "\n";
 
 out << prefix << "Ndims = " << Ndims << "\n";
 
-for (j=0; j<Ndims; ++j)  {
+for (int j=0; j<Ndims; ++j)  {
 
    out << p2 << "Dim # " << j << " = " << DimNames[j] << "   (" << (GET_NC_SIZE_P(Dim[j])) << ")\n";
 
@@ -383,7 +393,7 @@ out << prefix << "\n";
 
 out << prefix << "Ntimes = " << Ntimes << "\n";
 
-for (j=0; j<Ntimes; ++j)  {
+for (int j=0; j<Ntimes; ++j)  {
 
    out << p2 << "Time # " << j << " = ";
 
@@ -409,13 +419,13 @@ out << prefix << "\n";
 
 out << prefix << "Nvars = " << Nvars << "\n";
 
-for (j=0; j<Nvars; ++j)  {
+for (int j=0; j<Nvars; ++j)  {
 
    out << p2 << "Var # " << j << " = " << (Var[j].name) << "  (";
 
-  dump_dims(out, j, c);
+   dump_dims(out, j, c);
 
-  out << ")\n";
+   out << ")\n";
 
    out << p3 << "Slots (X, Y, Z, T) = (";
 
@@ -441,6 +451,8 @@ out.flush();
 return;
 
 }
+
+////////////////////////////////////////////////////////////////////////
 
 void WrfFile::dump_dims(ostream& out, int j, string& c) const
 {
@@ -671,7 +683,7 @@ if ( !found )  {
       LongArray c;
 
       if(time_in_pressure) c.add(a[var->t_slot]);
-   
+
       c.add(a[var->z_slot]);
 
       pressure = data(P->var, c) * pressure_unit_conversion;
@@ -682,7 +694,10 @@ if ( !found )  {
 
 }
 
-void WrfFile::setup_dataplane(NcVar* v, const LongArray& a, DataPlane& plane, int dim_count, const NcVarInfo* var) const
+////////////////////////////////////////////////////////////////////////
+
+void WrfFile::setup_dataplane(NcVar* v, const LongArray& a, DataPlane& plane,
+                              int dim_count, const NcVarInfo* var) const
 {
    double value;
 
@@ -727,45 +742,37 @@ void WrfFile::setup_dataplane(NcVar* v, const LongArray& a, DataPlane& plane, in
          plane.set(value, x, y);
 
       } //  for y
-
    }    //  for x
 
    // de-stagger the DataPlane if necessary
    plane.destagger(var->x_stag, var->y_stag);
 }
 
+////////////////////////////////////////////////////////////////////////
+
 bool WrfFile::check_star_position_and_count(const LongArray& a, const NcVarInfo* var)
 {
   const char *method_name = "WrfFile::check_star_position_and_count(const LongArray& a, const NcVarInfo* var) const -> ";
   int count = 0;
   for (int j =0; j<(a.n_elements()); ++j)  {
-
      if ( a[j] == vx_data2d_star )  {
-
         ++count;
-
         if ( (j != var->x_slot) && (j != var->y_slot) )  {
-
            mlog << Warning << "\n" << method_name << " star found in bad slot\n\n";
-
            return false;
-
         }
-
      }
-
   }
 
   if ( count != 2 )  {
-
      mlog << Warning << "\n" << method_name << " bad star count ... " << count << "\n\n";
-
      return false;
-
   }
 
   return true;
 }
+
+////////////////////////////////////////////////////////////////////////
 
 void WrfFile::handle_pressure(const NcVarInfo* var, const string& z_name, NcVarInfo*& P,
                               bool& time_in_pressure, double& pressure_unit_conversion) const
@@ -817,6 +824,8 @@ void WrfFile::handle_pressure(const NcVarInfo* var, const string& z_name, NcVarI
    }
 }
 
+////////////////////////////////////////////////////////////////////////
+
 bool WrfFile::parse_dims_for_var(const string& var_name, NcVarInfo* var, string& z_name)
 {
    const char *method_name = "WrfFile::parse_dims_for_var(const string& var_name, NcVarInfo* var, string& z_name) const -> ";
@@ -828,15 +837,11 @@ bool WrfFile::parse_dims_for_var(const string& var_name, NcVarInfo* var, string&
 
       // X dimension
       if ( c == x_dim_name || c == x_dim_stag_name || c == x_dim_subgrid_name ) {
-
          if(!parse_dim_x(var_name, var, c, k)) return false;
-
       }
       // Y dimension
       else if ( c == y_dim_name || c == y_dim_stag_name || c == y_dim_subgrid_name ) {
-
          parse_dim_y(var, c, k);
-
       }
       // Z dimension
       else if ( c == z_dim_p_interp_name ||
@@ -855,11 +860,8 @@ bool WrfFile::parse_dims_for_var(const string& var_name, NcVarInfo* var, string&
       }
       // T dimension
       else if ( c == t_dim_name ) {
-
          var->t_slot = k;
-
       }
-
    } // end if k
 
    //
@@ -867,17 +869,16 @@ bool WrfFile::parse_dims_for_var(const string& var_name, NcVarInfo* var, string&
    //
 
    if ( var->x_slot < 0 || var->y_slot < 0 )  {
-
       mlog << Error << "\n" << method_name
            << "can't find needed dimensions(s) for variable \""
            << var_name << "\" ... one of the dimensions may be staggered.\n\n";
-
       return false;
-
    }
 
    return true;
 }
+
+////////////////////////////////////////////////////////////////////////
 
 void WrfFile::parse_z_dim(NcVarInfo* var, string& z_name, const string& c, int k)
 {
@@ -895,11 +896,11 @@ void WrfFile::parse_z_dim(NcVarInfo* var, string& z_name, const string& c, int k
 
   // track fields that need to be de-staggered in the Z dimension
   if ( c == z_dim_wrf_stag_name ) {
-
      var->z_stag = true;
-
   }
 }
+
+////////////////////////////////////////////////////////////////////////
 
 void WrfFile::parse_dim_y(NcVarInfo* var, const string& c, int k)
 {
@@ -907,9 +908,7 @@ void WrfFile::parse_dim_y(NcVarInfo* var, const string& c, int k)
 
   // track fields that need to be de-staggered in the Y dimension
   if ( c == y_dim_stag_name ) {
-
      var->y_stag = true;
-
   }
 
   // track fields that are on a subgrid
@@ -917,6 +916,8 @@ void WrfFile::parse_dim_y(NcVarInfo* var, const string& c, int k)
      var->y_subgrid = true;
   }
 }
+
+////////////////////////////////////////////////////////////////////////
 
 bool WrfFile::parse_dim_x(const string& var_name, NcVarInfo* var, const string& c, int k)
 {
@@ -953,7 +954,6 @@ bool WrfFile::parse_dim_x(const string& var_name, NcVarInfo* var, const string& 
 
 
 ////////////////////////////////////////////////////////////////////////
-
 
 bool WrfFile::data(const char * var_name, const LongArray & a, DataPlane & plane,
                    double & pressure, NcVarInfo *&info) const {
@@ -1009,13 +1009,11 @@ bool WrfFile::get_nc_var_info(const char *var_name, NcVarInfo *&info) const {
 
    if (nullptr == info) {
       for (int j=0; j<Nvars; ++j)  {
-
          if ( Var[j].name == var_name )  {
             found = true;
             info = &Var[j];
             break;
          }
-
       }
    }
 
@@ -1032,33 +1030,31 @@ bool WrfFile::get_nc_var_info(const char *var_name, NcVarInfo *&info) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-
 unixtime parse_init_time(const char * s)
-
 {
 
-int j;
-unixtime t;
-int month, day, year, hour, minute, second;
+int month;
+int day;
+int year;
+int hour;
+int minute;
+int second;
 
 
-j = sscanf(s, "%4d-%2d-%2d_%2d:%2d:%2d",
+int j = sscanf(s, "%4d-%2d-%2d_%2d:%2d:%2d",
                &year, &month, &day, &hour, &minute, &second);
 
 if ( j != 6 )  {
-
    mlog << Error << "\nparse_init_time(const char *) -> "
         << "bad time string ... \"" << s << "\"\n\n";
-
    exit ( 1 );
-
 }
 
    //
    //  done
    //
 
-t = mdyhms_to_unix(month, day, year, hour, minute, second);
+unixtime t = mdyhms_to_unix(month, day, year, hour, minute, second);
 
 return t;
 
@@ -1069,11 +1065,10 @@ return t;
 
 
 bool is_bad_data_wrf(double v)
-
 {
 
-if (v < wrf_missing )  return false;
-else                        return true;
+if (v < wrf_missing ) return false;
+else                  return true;
 
 }
 
@@ -1082,16 +1077,12 @@ else                        return true;
 
 
 bool is_accumulation(const char * s)
-
 {
 
-int j;
 bool found = false;
 
-for ( j=0; j<n_accum_var_names; ++j )  {
-
+for ( int j=0; j<n_accum_var_names; ++j )  {
    if ( strcmp(s, accum_var_names[j]) == 0 )  { found = true;  break; }
-
 }
 
 return found;
