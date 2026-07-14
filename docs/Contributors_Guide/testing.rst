@@ -42,7 +42,6 @@ Example::
 Other environment variables required for some of the unit tests include:
 
 * **MET_TEST_MET_PYTHON_EXE** - Path to Python executable to use for Python Embedding tests
-* **MET_TEST_RSCRIPT** - Path to Rscript executable used to run R script tests
 
 Run the tests
 ^^^^^^^^^^^^^
