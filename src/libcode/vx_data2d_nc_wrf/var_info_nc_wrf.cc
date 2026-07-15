@@ -72,11 +72,8 @@ VarInfoNcWrf & VarInfoNcWrf::operator=(const VarInfoNcWrf &f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo *VarInfoNcWrf::clone() const {
-
-   VarInfoNcWrf *ret = new VarInfoNcWrf(*this);
-
-   return (VarInfo *)ret;
+unique_ptr<VarInfo> VarInfoNcWrf::clone() const {
+   return unique_ptr<VarInfo>(new VarInfoNcWrf(*this)); 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -303,9 +300,8 @@ bool VarInfoNcWrf::is_precipitation() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsPrecipitation)) {
-      return(SetAttrIsPrecipitation != 0);
-   }
+   int flag = SetAttrIsPrecipitation;
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Check to see if the VarInfo name matches any of expected Pinterp
@@ -323,9 +319,8 @@ bool VarInfoNcWrf::is_specific_humidity() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsSpecificHumidity)) {
-      return(SetAttrIsSpecificHumidity != 0);
-   }
+   int flag = SetAttrIsSpecificHumidity;
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Check to see if the VarInfo name matches any of expected Pinterp
@@ -343,14 +338,11 @@ bool VarInfoNcWrf::is_u_wind() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsUWind)) {
-      return(SetAttrIsUWind != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsUWind, WindInfo.u_wind);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    // Check if the VarInfo name is U or U<n> where <n> is an integer
-   if( regex_match (Name.c_str(), regex("^U[0-9]*$") )) {
-      return true;
-   }
+   if(regex_match(Name.c_str(), regex("^U[0-9]*$"))) return true;
 
    //
    // Check to see if the VarInfo name matches any of expected Pinterp
@@ -368,14 +360,11 @@ bool VarInfoNcWrf::is_v_wind() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsVWind)) {
-      return(SetAttrIsVWind != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsVWind, WindInfo.v_wind);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    // Check if the VarInfo name is V or V<n> where <n> is an integer
-   if( regex_match (Name.c_str(), regex("^V[0-9]*$") )) {
-      return true;
-   }
+   if(regex_match(Name.c_str(), regex("^V[0-9]*$"))) return true;
 
    //
    // Check to see if the VarInfo name matches any of expected Pinterp
@@ -393,9 +382,8 @@ bool VarInfoNcWrf::is_wind_speed() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsWindSpeed)) {
-      return(SetAttrIsWindSpeed != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsWindSpeed, WindInfo.wind_speed);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Check to see if the VarInfo name matches any of expected Pinterp
@@ -413,25 +401,10 @@ bool VarInfoNcWrf::is_wind_direction() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsWindDirection)) {
-      return(SetAttrIsWindDirection != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsWindDirection, WindInfo.wind_direction);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    return false;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-bool VarInfoNcWrf::is_grid_relative() const {
-
-   //
-   // Check to see if the VarInfo name matches any of expected Pinterp
-   // variables that should be rotated from grid-relative to earth-relative.
-   //
-   return has_prefix(pinterp_grid_relative_names,
-                     n_pinterp_grid_relative_names,
-                     Name.c_str());
 }
 
 ///////////////////////////////////////////////////////////////////////////////

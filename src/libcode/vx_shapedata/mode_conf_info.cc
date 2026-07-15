@@ -910,7 +910,8 @@ const DictionaryEntry * ee = dict->lookup(conf_key_field);
 
 if ( !ee )  {
 
-   mlog << "\nModeConfInfo::read_fields () -> \"field\" entry not found in dictionary!\n\n";
+   mlog << Error << "\nModeConfInfo::read_fields () -> "
+        << "\"field\" entry not found in dictionary!\n\n";
 
    exit ( 1 );
 
@@ -989,7 +990,8 @@ void ModeConfInfo::read_fields_1 (Mode_Field_Info * & info_array, Dictionary * d
  const DictionaryEntry * ee = dict->lookup(conf_key_field);
  if ( !ee )  {
 
-   mlog << "\nModeConfInfo::read_fields () -> \"field\" entry not found in dictionary!\n\n";
+   mlog << Error << "\nModeConfInfo::read_fields () -> \"field\" "
+        << "entry not found in dictionary!\n\n";
 
    exit ( 1 );
 
@@ -1668,7 +1670,8 @@ GrdFileType ModeConfInfo::file_type_for_field(bool isFcst, int field_index)
 
    const DictionaryEntry *e = dict->lookup(conf_key_field);
    if ( !e )  {
-      mlog << "\nModeConfInfo::read_fields () -> \"field\" entry not found in dictionary!\n\n";
+      mlog << Error << "\nModeConfInfo::read_fields () -> \"field\" "
+           << "entry not found in dictionary!\n\n";
    exit ( 1 );
    }
    

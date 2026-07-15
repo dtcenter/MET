@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<!-- Requires: None -->
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <!--                                          -->
+  <!--  GRIB1 wind rotation and U/V derivation  -->
+  <!--  with grid-relative input                -->
+  <!--                                          -->
+
+  <test name="pcp_combine_winds_from_u_and_v_GRIB1">
+    <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+      -add &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      -field 'name="UGRD"; level="Z10"; set_attr_name="UWIND_GRID"; is_grid_relative=false;' \
+      -field 'name="UGRD"; level="Z10"; set_attr_name="UWIND_EARTH";' \
+      -field 'name="VGRD"; level="Z10"; set_attr_name="VWIND_GRID"; is_grid_relative=false;' \
+      -field 'name="VGRD"; level="Z10"; set_attr_name="VWIND_EARTH";' \
+      -field 'name="WDIR"; level="Z10"; set_attr_name="D_WDIR_GRID"; is_grid_relative=false;' \
+      -field 'name="WDIR"; level="Z10"; set_attr_name="D_WDIR_EARTH";' \
+      -field 'name="WIND"; level="Z10"; set_attr_name="D_WIND";' \
+      -field 'name="KENG"; level="Z10"; set_attr_name="D_KENG";' \
+      &OUTPUT_DIR;/winds/pcp_combine_nam_winds_GRIB1.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/winds/pcp_combine_nam_winds_GRIB1.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                             -->
+  <!--  GRIB2 wind speed and direction derivation  -->
+  <!--  with earth-relative input                  -->
+  <!--                                             -->
+
+  <test name="pcp_combine_rotate_winds_from_speed_and_direction_GRIB2">
+    <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+      -add &DATA_DIR_MODEL;/grib2/nbm/blend.t13z.core.f119.co.grib2 \
+      -field 'name="UGRD"; level="Z10"; set_attr_name="D_UWIND";' \
+      -field 'name="VGRD"; level="Z10"; set_attr_name="D_VWIND";' \
+      -field 'name="WDIR"; level="Z10"; set_attr_name="WDIR";' \
+      -field 'name="WDIR"; level="Z10"; set_attr_name="WDIR_ROTATE"; is_grid_relative=true;' \
+      -field 'name="WIND"; level="Z10"; set_attr_name="WIND";' \
+      &OUTPUT_DIR;/winds/pcp_combine_nbm_winds_GRIB2.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/winds/pcp_combine_nbm_winds_GRIB2.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                    -->
+  <!--  NetCDF WRF winds  -->
+  <!--                    -->
+
+  <test name="pcp_combine_winds_from_u_and_v_NETCDF_WRF">
+    <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+      -add &DATA_DIR_MODEL;/wrf/wrfout_solarwind_d02_2019-08-31_12:00:00 \
+      -field 'name="U10"; level="(0,*,*)"; set_attr_name="U10_GRID"; is_grid_relative=false;' \
+      -field 'name="U10"; level="(0,*,*)"; set_attr_name="U10_EARTH";' \
+      -field 'name="V10"; level="(0,*,*)"; set_attr_name="V10_GRID"; is_grid_relative=false;' \
+      -field 'name="V10"; level="(0,*,*)"; set_attr_name="V10_EARTH";' \
+      -field 'name="WDIR10"; level="(0,*,*)"; set_attr_name="WDIR10_GRID"; is_wind_direction=true; u_wind_field_name="U10"; v_wind_field_name="V10"; is_grid_relative=false;' \
+      -field 'name="WDIR10"; level="(0,*,*)"; set_attr_name="WDIR10_EARTH"; is_wind_direction=true; u_wind_field_name="U10"; v_wind_field_name="V10";' \
+      -field 'name="WIND10"; level="(0,*,*)"; is_wind_speed=true; u_wind_field_name="U10"; v_wind_field_name="V10";' \
+      &OUTPUT_DIR;/winds/pcp_combine_winds_NETCDF_WRF.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/winds/pcp_combine_winds_NETCDF_WRF.nc</grid_nc>
+    </output>
+  </test>
+
+</met_test>

@@ -218,7 +218,7 @@ static void process_command_line(int argc, char **argv) {
    mlog << Debug(1) << "Ensemble Files["
         << n_ens_files << "]:\n";
    for(int i=0; i<n_ens_files; i++) {
-      mlog << "   " << ens_files[i]  << "\n";
+      mlog << Debug(1) << "   " << ens_files[i]  << "\n";
    }
 
    // List the control member file
@@ -658,10 +658,12 @@ static void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
 static bool get_data_plane(const char *infile, GrdFileType ftype,
                            VarInfo *info, DataPlane &dp) {
    bool found;
-   Met2dDataFile *mtddf = nullptr;
+
+   if(!info) return false;
 
    // Read the current ensemble file
-   if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(infile, ftype))) {
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(infile, ftype);
+   if(!mtddf) {
       mlog << Error << "\nget_data_plane() -> "
            << "trouble reading file \"" << infile << "\"\n\n";
       exit(1);
@@ -700,8 +702,8 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
 
    } // end if found
 
-   // Deallocate the data file pointer, if necessary
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
+   // Cleanup
+   if(mtddf) { delete mtddf; mtddf = nullptr; }
 
    return found;
 }
