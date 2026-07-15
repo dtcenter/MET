@@ -584,7 +584,7 @@ NcVarInfo* UGridFile::find_var_by_dim_name(const char *dim_name) const
   NcVarInfo *var = find_by_name(dim_name);
   if (var == nullptr) {
     for (int i=0; i<Nvars; i++) {
-      if (1 != Var[i].Ndims) continue
+      if (1 != Var[i].Ndims) continue;
 
       NcDim dim = get_nc_dim(Var[i].var, 0);
       if (GET_NC_NAME(dim) == dim_name) {
@@ -922,7 +922,7 @@ void UGridFile::radian_to_degree(vector<double> &lat_values, const int lat_count
   }
   if (lat_adjusted_total > 0) {
     mlog << Debug(4) << method_name << "adjusted " << lat_adjusted << " ("
-         << lat_adjusted_total << ") latitues\n";
+         << lat_adjusted_total << ") latitudes\n";
   }
 }
 
