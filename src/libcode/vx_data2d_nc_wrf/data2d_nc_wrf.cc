@@ -6,9 +6,7 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <iostream>
 #include <unistd.h>
@@ -22,7 +20,6 @@
 #include "vx_log.h"
 
 using namespace std;
-
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -121,9 +118,10 @@ void MetNcWrfDataFile::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
+bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
+                                  bool do_winds) {
    bool status = false;
-   double pressure;
+   double pressure = bad_data_double;
    ConcatString level_str;
    VarInfoNcWrf * vinfo_nc = (VarInfoNcWrf *) &vinfo;
    NcVarInfo *info = (NcVarInfo *) nullptr;
@@ -131,26 +129,36 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    // Initialize the data plane
    plane.clear();
 
-   // Read the data
+   // Assume that all WRF winds are grid-relative
+   vinfo_nc->set_grid_relative_flag(true);
+
+   // Read the data if found
    WrfNc->get_nc_var_info(vinfo_nc->req_name().c_str(), info);
-   LongArray dimension = vinfo_nc->dimension();
-   int dim_count = dimension.n_elements();
-   for (int k=0; k<dim_count; k++) {
-      if (dimension[k] == vx_data2d_dim_by_value) {
-         string dim_name = GET_NC_NAME(get_nc_dim(info->var, k));
-         NcVarInfo *var_info = find_var_info_by_dim_name(WrfNc->Var, dim_name,
-                                                         WrfNc->Nvars);
-         if (var_info) {
-            long new_offset = get_index_at_nc_data(var_info->var,
-                                                   vinfo_nc->dim_value(k),
-                                                   dim_name, (k == info->t_slot));
-            if (new_offset != bad_data_int) dimension[k] = new_offset;
+   if(info) {
+      LongArray dimension = vinfo_nc->dimension();
+      int dim_count = dimension.n_elements();
+      for (int k=0; k<dim_count; k++) {
+         if (dimension[k] == vx_data2d_dim_by_value) {
+            string dim_name = GET_NC_NAME(get_nc_dim(info->var, k));
+            NcVarInfo *var_info = find_var_info_by_dim_name(WrfNc->Var, dim_name,
+                                                            WrfNc->Nvars);
+            if (var_info) {
+               long new_offset = get_index_at_nc_data(var_info->var,
+                                                      vinfo_nc->dim_value(k),
+                                                      dim_name, (k == info->t_slot));
+               if (new_offset != bad_data_int) dimension[k] = new_offset;
+            }
          }
       }
+
+      status = WrfNc->data(vinfo_nc->req_name().c_str(),
+                           dimension, plane, pressure, info);
    }
 
-   status = WrfNc->data(vinfo_nc->req_name().c_str(),
-                        dimension, plane, pressure, info);
+   // Attempt to derive the data
+   if(!status && do_winds) {
+      status = derive_winds(vinfo_nc, plane);
+   }
 
    // Check that the times match those requested
    if(status) {
@@ -177,13 +185,19 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
          status = false;
       }
 
-      status = process_data_plane(&vinfo, plane);
+      // Handle wind rotation
+      if(status && do_winds) status = rotate_winds(&vinfo, plane);
+
+      if(status) status = process_data_plane(&vinfo, plane);
 
       // Set the VarInfo object's name, long_name, and units strings
-      if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
-      else                                 vinfo.set_name(info->name);
-      if(info->long_name_att.length() > 0) vinfo.set_long_name(info->long_name_att.c_str());
-      if(info->units_att.length()     > 0) vinfo.set_units(info->units_att.c_str());
+      // Note that info is null for derived fields
+      if(info) {
+         if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
+         else                                 vinfo.set_name(info->name);
+         if(info->long_name_att.length() > 0) vinfo.set_long_name(info->long_name_att.c_str());
+         if(info->units_att.length()     > 0) vinfo.set_units(info->units_att.c_str());
+      }
 
       // Set the VarInfo object's level string for pressure levels
       if(!is_bad_data(pressure)) {
@@ -198,11 +212,9 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 ////////////////////////////////////////////////////////////////////////
 
 int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
-                                           DataPlaneArray &plane_array) {
-   int i, i_dim, n_level, status, lower, upper;
-   ConcatString level_str;
-   double pressure, min_level, max_level;
-   bool found = false;
+                                       DataPlaneArray &plane_array,
+                                       bool do_winds) {
+   double pressure;
    VarInfoNcWrf *vinfo_nc = (VarInfoNcWrf *) &vinfo;
    LongArray dim = vinfo_nc->dimension();
    NcVarInfo *info = (NcVarInfo *) nullptr;
@@ -214,6 +226,8 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
    plane_array.clear();
 
    // Find the dimension that has the range flag set
+   int i_dim;
+   bool found = false;
    for(i_dim=0; i_dim<dim.n_elements(); i_dim++) {
       if(dim[i_dim] == range_flag) {
          found = true;
@@ -230,20 +244,28 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
    }
 
    // Compute the number of levels
-   lower   = nint(vinfo.level().lower());
-   upper   = nint(vinfo.level().upper());
-   n_level = upper - lower + 1;
+   int lower   = nint(vinfo.level().lower());
+   int upper   = nint(vinfo.level().upper());
+   int n_level = upper - lower + 1;
 
    // Loop through each of levels specified in the range
    cur_dim = dim;
-   for(i=0; i<n_level; i++) {
+   for(int i=0; i<n_level; i++) {
 
       // Set the dimension for the current level
       cur_dim[i_dim] = lower + i;
 
       // Read data for the current level
-      status = WrfNc->data(vinfo_nc->req_name().c_str(),
-                           cur_dim, cur_plane, pressure, info);
+      bool status = WrfNc->data(vinfo_nc->req_name().c_str(),
+                                cur_dim, cur_plane, pressure, info);
+
+      // Assume that WRF winds are grid-relative
+      vinfo_nc->set_grid_relative_flag(true);
+
+      // Attempt to derive the data
+      if(!status && do_winds) {
+         status = derive_winds(vinfo_nc, cur_plane);
+      }
 
       // Check that the times match those requested
       if(status) {
@@ -270,10 +292,16 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
             status = false;
          }
 
-         status = process_data_plane(&vinfo, cur_plane);
-
          // Add current plane to the data plane array
          plane_array.add(cur_plane, pressure, pressure);
+      }
+
+      // Handle wind rotation
+      if(do_winds) rotate_winds(&vinfo, plane_array);
+
+      //  post-process each data plane
+      for(int j=0; j<plane_array.n_planes(); j++) {
+         process_data_plane(&vinfo, plane_array.at(j));
       }
 
       // Check for bad status
@@ -283,7 +311,8 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
       plane_array.add(cur_plane, pressure, pressure);
 
       // Set the VarInfo object's name, long_name, and units strings
-      if(i==0) {
+      // Note that info is null for derived fields
+      if(i==0 && info) {
          if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
          else                                 vinfo.set_name(info->name);
          if(info->long_name_att.length() > 0) vinfo.set_long_name(info->long_name_att.c_str());
@@ -295,7 +324,10 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
    // Set the VarInfo object's level string for pressure levels
    // Check for a missing value, a single pressure level, or a range
    // of pressure levels
+   double min_level;
+   double max_level;
    plane_array.level_range(min_level, max_level);
+   ConcatString level_str;
    if(is_bad_data(min_level) ||
       is_bad_data(max_level))           level_str << cs_erase << na_str;
    else if(is_eq(min_level, max_level)) level_str << cs_erase << "P" << nint(min_level);
