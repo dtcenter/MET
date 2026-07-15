@@ -16,6 +16,7 @@ MET_BASE_UNIT_REPO_NAME=met-base-unit-test
 met_base_repo=${MET_BASE_REPO_NAME}
 
 # default MET base tag
+# TODO: Change 3.4 back to 3.5 after solving TC-Diag failure
 met_base_tag=3.4-latest
 
 # override the MET base tag if set

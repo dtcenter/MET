@@ -439,7 +439,7 @@ static void process_command_line(int argc, char **argv) {
    mlog << Debug(1) << "Ensemble Files["
         << n_ens_files << "]:\n";
    for(int i=0; i<n_ens_files; i++) {
-      mlog << "   " << ens_file_list[i] << "\n";
+      mlog << Debug(1) << "   " << ens_file_list[i] << "\n";
    }
 
    // List the control member file
@@ -451,7 +451,7 @@ static void process_command_line(int argc, char **argv) {
       mlog << Debug(1) << method_name << "Gridded Observation Files["
            << grid_obs_file_list.n() << "]:\n" ;
       for(int i=0; i<grid_obs_file_list.n(); i++) {
-         mlog << "   " << grid_obs_file_list[i] << "\n" ;
+         mlog << Debug(1) << "   " << grid_obs_file_list[i] << "\n" ;
       }
    }
 
@@ -460,7 +460,7 @@ static void process_command_line(int argc, char **argv) {
       mlog << Debug(1) << method_name << "Point Observation Files["
            << point_obs_file_list.n() << "]:\n" ;
       for(int i=0; i<point_obs_file_list.n(); i++) {
-         mlog << "   " << point_obs_file_list[i] << "\n" ;
+         mlog << Debug(1) << "   " << point_obs_file_list[i] << "\n" ;
       }
    }
 
@@ -629,8 +629,11 @@ static void process_n_vld() {
 ////////////////////////////////////////////////////////////////////////
 
 static bool get_data_plane(const char *infile, GrdFileType ftype,
-                           VarInfo *info, DataPlane &dp, bool do_regrid) {
+                           VarInfo *info, DataPlane &dp,
+                           bool do_regrid) {
    bool found;
+
+   if(!info) return false;
 
    // Read the current ensemble file
    auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(infile, ftype);
@@ -673,8 +676,8 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
 
    } // end if found
 
-   // Deallocate the data file pointer, if necessary
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
+   // Cleanup
+   if(mtddf) { delete mtddf; mtddf = nullptr; }
 
    return found;
 }
@@ -685,9 +688,11 @@ static bool get_data_plane_array(const char *infile, GrdFileType ftype,
                                  VarInfo *info, DataPlaneArray &dpa,
                                  bool do_regrid) {
    bool found;
-   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(infile, ftype);
+
+   if(!info) return false;
 
    // Read the current ensemble file
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(infile, ftype);
    if(!mtddf) {
       mlog << Error << "\nget_data_plane_array() -> "
            << "trouble reading file \"" << infile << "\"\n\n";
@@ -740,8 +745,8 @@ static bool get_data_plane_array(const char *infile, GrdFileType ftype,
 
    } // end if found
 
-   // Deallocate the data file pointer, if necessary
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
+   // Cleanup
+   if(mtddf) { delete mtddf; mtddf = nullptr; }
 
    return found;
 }
