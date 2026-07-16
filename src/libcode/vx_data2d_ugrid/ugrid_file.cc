@@ -898,31 +898,35 @@ void UGridFile::read_config(const ConcatString &config_filename) {
 void UGridFile::radian_to_degree(vector<double> &lat_values, const int lat_count) const {
   const char *method_name = "UGridFile::radian_to_degree() -> ";
   int lat_adjusted = 0;
-  int lat_adjusted_total = 0;
+  int lat_adjusted_by_precision = 0;
   for (int idx=0; idx<lat_count; idx++) {
     lat_values[idx] /= rad_per_deg;
     if (lat_values[idx] > 90.0) {
-      if (!is_eq(lat_values[idx], 90.0, lat_epsilon)) {
+      if (is_eq(lat_values[idx], 90.0, lat_epsilon)) lat_adjusted_by_precision++;
+      else {
         mlog << Warning << "\n" << method_name << "adjusted " << lat_values[idx]
              << " (delta: " << (lat_values[idx] - 90.0) << ") to 90.0\n\n";
         lat_adjusted++;
       }
       lat_values[idx] = 90.0;
-      lat_adjusted_total++;
     }
     else if (lat_values[idx] < -90.0) {
-      if (!is_eq(lat_values[idx], -90.0, lat_epsilon)) {
+      if (is_eq(lat_values[idx], -90.0, lat_epsilon)) lat_adjusted_by_precision++;
+      else {
         mlog << Warning << "\n" << method_name << "adjusted " << lat_values[idx]
              << " (delta: " << (lat_values[idx] + 90.0) << ") to -90.0\n\n";
         lat_adjusted++;
       }
       lat_values[idx] = -90.0;
-      lat_adjusted_total++;
     }
   }
-  if (lat_adjusted_total > 0) {
-    mlog << Debug(4) << method_name << "adjusted " << lat_adjusted << " ("
-         << lat_adjusted_total << ") latitudes\n";
+
+  if (lat_adjusted > 0) {
+    mlog << Warning << "\n" << method_name << "adjusted " << lat_adjusted << " latitudes ("
+         << lat_adjusted_by_precision << " by precision)\n\n";
+  }
+  else if (lat_adjusted_by_precision > 0) {
+    mlog << Debug(4) << method_name << "adjusted " << lat_adjusted_by_precision << " latitudes by precision\n";
   }
 }
 
