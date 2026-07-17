@@ -657,7 +657,7 @@
     <param> \
       &DATA_DIR_MODEL;/wrf/wrfout_solarwind_d02_2019-08-31_12:00:00 \
       &OUTPUT_DIR;/plot_data_plane/wrf_num_z_levels_stag.ps \
-      'name="RH_ZL"; level="(0,0,*,*)";' \
+      'name="RH_ZL"; level="(0,@-78,*,*)";' \
       -title "Relative Humidity Z-level (num_z_levels_stag)" \
       -v 1
     </param>
