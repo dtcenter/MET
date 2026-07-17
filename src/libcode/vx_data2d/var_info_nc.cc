@@ -63,7 +63,7 @@ void VarInfoNC::parse_level(const ConcatString &level_str) {
       // Should be handled by the derived class
       clear_dimension();
       set_default_levels(level_str);
-      return
+      return;
    }
 
    char *ptr = nullptr;
