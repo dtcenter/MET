@@ -38,6 +38,7 @@ using namespace netCDF;
 constexpr char def_user_config[] = "UGridConfig_user";
 constexpr char def_config_prefix[] = "UGridConfig_";
 constexpr char def_config_prefix2[] = "MET_BASE/config/UGridConfig_";
+constexpr double lat_epsilon = 0.00001;
 
 array<string, UG_DIM_COUNT> DIM_KEYS = {
       "dim_face", "dim_node", "dim_edge", "dim_time", "dim_vert"
@@ -179,7 +180,7 @@ void UGridFile::close()
 ////////////////////////////////////////////////////////////////////////
 // Helper: Assign dimension from metadata
 
-void UGridFile::assign_dim_from_metadata(netCDF::NcFile* ncFile, netCDF::NcDim*& dim_ptr,
+void UGridFile::assign_dim_from_metadata(const netCDF::NcFile* ncFile, netCDF::NcDim*& dim_ptr,
                                          const std::string& key, const StringArray& dim_names) {
   std::string meta_name = find_metadata_name(key, dim_names);
   if (!meta_name.empty()) {
@@ -226,7 +227,7 @@ bool UGridFile::open_metadata(const char * filepath)
 
   if (IS_INVALID_NC_P(_ncMetaFile)) {
     close();
-    return false;
+    exit(1);
   }
 
   NcDim dim;
@@ -305,9 +306,8 @@ bool UGridFile::open_metadata(const char * filepath)
       }
       else if (1 == j && nullptr == _latVar) _latVar = MetaVar[j].var;
       else if (2 == j && nullptr == _lonVar) _lonVar = MetaVar[j].var;
-      else if (3 == j && nullptr == _latVar) z_var = MetaVar[j].var;
+      else if (3 == j && nullptr == z_var) z_var = MetaVar[j].var;
     }
-
   }   //  for j
 
 
@@ -582,15 +582,14 @@ NcVarInfo* UGridFile::find_by_name(const char * var_name) const
 NcVarInfo* UGridFile::find_var_by_dim_name(const char *dim_name) const
 {
   NcVarInfo *var = find_by_name(dim_name);
-  if (!var) {
-    //StringArray dimNames;
+  if (var == nullptr) {
     for (int i=0; i<Nvars; i++) {
-      if (1 == Var[i].Ndims) {
-        NcDim dim = get_nc_dim(Var[i].var, 0);
-        if (GET_NC_NAME(dim) == dim_name) {
-          var = &Var[i];
-          break;
-        }
+      if (1 != Var[i].Ndims) continue;
+
+      NcDim dim = get_nc_dim(Var[i].var, 0);
+      if (GET_NC_NAME(dim) == dim_name) {
+        var = &Var[i];
+        break;
       }
     }
   }
@@ -675,7 +674,7 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   //  find varinfo's
 
-  NcVarInfo *var = find_by_name(GET_NC_NAME_P(v).c_str());
+  const NcVarInfo *var = find_by_name(GET_NC_NAME_P(v).c_str());
 
   if (nullptr == var) {
     mlog << Error << "\n" << method_name
@@ -896,6 +895,43 @@ void UGridFile::read_config(const ConcatString &config_filename) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void UGridFile::radian_to_degree(vector<double> &lat_values, const int lat_count) const {
+  const char *method_name = "UGridFile::radian_to_degree() -> ";
+  int lat_adjusted = 0;
+  int lat_adjusted_by_precision = 0;
+  for (int idx=0; idx<lat_count; idx++) {
+    lat_values[idx] /= rad_per_deg;
+    if (lat_values[idx] > 90.0) {
+      if (is_eq(lat_values[idx], 90.0, lat_epsilon)) lat_adjusted_by_precision++;
+      else {
+        mlog << Warning << "\n" << method_name << "adjusted " << lat_values[idx]
+             << " (delta: " << (lat_values[idx] - 90.0) << ") to 90.0\n\n";
+        lat_adjusted++;
+      }
+      lat_values[idx] = 90.0;
+    }
+    else if (lat_values[idx] < -90.0) {
+      if (is_eq(lat_values[idx], -90.0, lat_epsilon)) lat_adjusted_by_precision++;
+      else {
+        mlog << Warning << "\n" << method_name << "adjusted " << lat_values[idx]
+             << " (delta: " << (lat_values[idx] + 90.0) << ") to -90.0\n\n";
+        lat_adjusted++;
+      }
+      lat_values[idx] = -90.0;
+    }
+  }
+
+  if (lat_adjusted > 0) {
+    mlog << Warning << "\n" << method_name << "adjusted " << lat_adjusted << " latitudes ("
+         << lat_adjusted_by_precision << " by precision)\n\n";
+  }
+  else if (lat_adjusted_by_precision > 0) {
+    mlog << Debug(4) << method_name << "adjusted " << lat_adjusted_by_precision << " latitudes by precision\n";
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////
 
 void UGridFile::read_netcdf_grid()
 {
@@ -931,12 +967,12 @@ void UGridFile::read_netcdf_grid()
 
   if (get_var_units(_latVar, units_value) &&
       (units_value == "rad" || units_value == "radian")) {
-    mlog << Debug(6) << method_name << "convert  " << units_value << " to degree for lat\n";
-    for (int idx=0; idx<face_count; idx++) _lat[idx] /= rad_per_deg;
+    mlog << Debug(6) << method_name << "convert " << units_value << " to degree for lat\n";
+    radian_to_degree(_lat, face_count);
   }
   if (get_var_units(_lonVar, units_value) &&
       (units_value == "rad" || units_value == "radian")) {
-    mlog << Debug(6) << method_name << "  convert " << units_value << " to degree for lon\n";
+    mlog << Debug(6) << method_name << "convert " << units_value << " to degree for lon\n";
     for (int idx=0; idx<face_count; idx++) _lon[idx] /= rad_per_deg;
   }
 

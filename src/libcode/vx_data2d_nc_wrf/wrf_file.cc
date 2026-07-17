@@ -548,20 +548,20 @@ if ( !args_ok(a) )  {
 int dim_count = var->getDimCount();
 if ( dim_count != a.n_elements() )  {
 
-   mlog << Error << "\n" << method_name
+   mlog << Warning << "\n" << method_name
         << "needed " << dim_count << " arguments for variable "
         << (GET_NC_NAME_P(var)) << ", got " << (a.n_elements()) << "\n\n";
 
-   exit ( 1 );
+   return bad_data_double;
 
 }
 
 if (dim_count >= max_wrf_args )  {
 
-   mlog << Error << "\n" << method_name
+   mlog << Warning << "\n" << method_name
         << " too may arguments for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
 
-   exit ( 1 );
+   return bad_data_double;
 
 }
 
@@ -615,7 +615,7 @@ if ( dim_count != a.n_elements() )  {
         << "needed " << dim_count << " arguments for variable "
         << var_name << ", got " << a.n_elements() << "\n\n";
 
-   exit ( 1 );
+   return false;
 
 }
 

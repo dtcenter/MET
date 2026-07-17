@@ -139,32 +139,6 @@ static const int n_pinterp_v_wind_names =
 ///////////////////////////////////////////////////////////////////////////////
 
 //
-// List of wind variable names that should be rotated from grid-relative
-// to earth-relative.  MET is not able to read winds from Pinterp files since
-// they are defined on a staggered grid.  If the code is enhanced to do so,
-// the data in these variables should be rotated from grid-relative to
-// earth-relative prior to verifying.
-// Taken from the WRF version 3.2 Registry.EM file
-//
-
-static const char *pinterp_grid_relative_names[] = {
-   "UU",         // x-wind component, m s-1
-   "UZ0",        // U WIND COMPONENT AT ZNT, m s-1
-   "VV",         // y-wind component, m s-1
-   "VZ0"         // V WIND COMPONENT AT ZNT, m s-1
-};
-
-//
-// Number of Pinterp grid relative variable names
-//
-
-static const int n_pinterp_grid_relative_names =
-                     sizeof(pinterp_grid_relative_names)/
-                    sizeof(*pinterp_grid_relative_names);
-
-///////////////////////////////////////////////////////////////////////////////
-
-//
 // List of wind speed variable names
 // Taken from the WRF version 3.2 Registry.EM file
 //
@@ -202,7 +176,7 @@ class VarInfoNcWrf : public VarInfoNC
       ~VarInfoNcWrf() override;
       VarInfoNcWrf(const VarInfoNcWrf &);
       VarInfoNcWrf & operator=(const VarInfoNcWrf &);
-      VarInfo *clone() const override;
+      std::unique_ptr<VarInfo> clone() const override;
 
       void dump(std::ostream &) const override;
       void clear();
@@ -230,7 +204,6 @@ class VarInfoNcWrf : public VarInfoNC
       bool is_v_wind()            const override;
       bool is_wind_speed()        const override;
       bool is_wind_direction()    const override;
-      bool is_grid_relative()     const;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

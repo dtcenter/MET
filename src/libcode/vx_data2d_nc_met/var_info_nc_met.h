@@ -42,7 +42,7 @@ class VarInfoNcMet : public VarInfoNC
       ~VarInfoNcMet() override;
       VarInfoNcMet(const VarInfoNcMet &);
       VarInfoNcMet & operator=(const VarInfoNcMet &);
-      VarInfo *clone() const override;
+      std::unique_ptr<VarInfo> clone() const override;
 
       void dump(std::ostream &) const override;
       void clear();

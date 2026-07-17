@@ -39,7 +39,7 @@ class VarInfoNcCF : public VarInfoNC
       ~VarInfoNcCF() override;
       VarInfoNcCF(const VarInfoNcCF &);
       VarInfoNcCF & operator=(const VarInfoNcCF &);
-      VarInfo *clone() const override;
+      std::unique_ptr<VarInfo> clone() const override;
 
       void dump(std::ostream &) const override;
       void clear();

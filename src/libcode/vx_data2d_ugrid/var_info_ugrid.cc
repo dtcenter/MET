@@ -72,11 +72,8 @@ VarInfoUGrid & VarInfoUGrid::operator=(const VarInfoUGrid &f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo *VarInfoUGrid::clone() const {
-
-   auto ret = new VarInfoUGrid(*this);
-
-   return (VarInfo *)ret;
+unique_ptr<VarInfo> VarInfoUGrid::clone() const {
+   return unique_ptr<VarInfo>(new VarInfoUGrid(*this));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -202,9 +199,8 @@ bool VarInfoUGrid::is_precipitation() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsPrecipitation)) {
-      return(SetAttrIsPrecipitation != 0);
-   }
+   int flag = SetAttrIsPrecipitation;
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Check to see if the VarInfo name begins with the GRIB code abbreviation
@@ -222,9 +218,8 @@ bool VarInfoUGrid::is_specific_humidity() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsSpecificHumidity)) {
-      return(SetAttrIsSpecificHumidity != 0);
-   }
+   int flag = SetAttrIsSpecificHumidity;
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Check to see if the VarInfo name begins with the GRIB code abbreviation
@@ -242,9 +237,8 @@ bool VarInfoUGrid::is_u_wind() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsUWind)) {
-      return(SetAttrIsUWind != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsUWind, WindInfo.u_wind);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    return is_grib_code_abbr_match(Name, ugrd_grib_code);
 }
@@ -256,9 +250,8 @@ bool VarInfoUGrid::is_v_wind() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsVWind)) {
-      return(SetAttrIsVWind != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsVWind, WindInfo.v_wind);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    return is_grib_code_abbr_match(Name, vgrd_grib_code);
 }
@@ -270,9 +263,8 @@ bool VarInfoUGrid::is_wind_speed() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsWindSpeed)) {
-      return(SetAttrIsWindSpeed != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsWindSpeed, WindInfo.wind_speed);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    return is_grib_code_abbr_match(Name, wind_grib_code);
 }
@@ -284,9 +276,8 @@ bool VarInfoUGrid::is_wind_direction() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsWindDirection)) {
-      return(SetAttrIsWindDirection != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsWindDirection, WindInfo.wind_direction);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    return is_grib_code_abbr_match(Name, wdir_grib_code);
 }
