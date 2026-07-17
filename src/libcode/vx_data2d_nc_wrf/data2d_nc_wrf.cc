@@ -121,52 +121,51 @@ void MetNcWrfDataFile::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcWrfDataFile::get_real_dimension(VarInfoNcWrf *vinfo_nc,
-                                          NcVarInfo *info, LongArray &dimension) const {
+bool MetNcWrfDataFile::get_real_dimension(const VarInfoNcWrf *vinfo_nc,
+                                          const NcVarInfo *info, LongArray &dimension) const {
    static const string method_name
          = "MetNcWrfDataFile::get_real_dimension() ->";
    int dim_count = dimension.n_elements();
    for (int k=0; k<dim_count; k++) {
-      if (dimension[k] == vx_data2d_dim_by_value) {
-         string dim_name = GET_NC_NAME(get_nc_dim(info->var, k));
-         NcVarInfo *var_info = find_var_info_by_dim_name(WrfNc->Var, dim_name,
+      if (dimension[k] == range_flag && vinfo_nc->is_offset(k)) {
+         dimension[k] = nint(vinfo_nc->level().lower());
+         continue;
+      }
+
+      if (dimension[k] != vx_data2d_dim_by_value && dimension[k] != range_flag) continue;
+
+      string dim_name = GET_NC_NAME(get_nc_dim(info->var, k));
+      NcVarInfo *var_info = find_var_info_by_dim_name(WrfNc->Var, dim_name,
                                                          WrfNc->Nvars);
-         if (var_info) {
-            long new_offset = get_index_at_nc_data(var_info->var,
-                                                   vinfo_nc->dim_value(k),
-                                                   dim_name, (k == info->t_slot));
-            if (new_offset != bad_data_int) dimension[k] = new_offset;
-            else {
-               mlog << Warning << "\n" << method_name
-                    << "for \"" << vinfo_nc->req_name()
-                    << "\" variable, the dimension value "
-                    << vinfo_nc->dim_value(k) << " for " << dim_name
-                    << " does not exist\n\n";
-               return false;
-            }
+      if (var_info == nullptr) continue;
+
+      if (dimension[k] == vx_data2d_dim_by_value) {
+         long new_offset = get_index_at_nc_data(var_info->var,
+                                                vinfo_nc->dim_value(k),
+                                                dim_name, (k == info->t_slot));
+         if (new_offset != bad_data_int) dimension[k] = new_offset;
+         else {
+            mlog << Warning << "\n" << method_name
+                 << "for \"" << vinfo_nc->req_name()
+                 << "\" variable, the dimension value "
+                 << vinfo_nc->dim_value(k) << " for " << dim_name
+                 << " does not exist\n\n";
+            return false;
          }
       }
       else if (dimension[k] == range_flag) {
-         if (vinfo_nc->is_offset(k)) dimension[k] = nint(vinfo_nc->level().lower());
+         double lower = vinfo_nc->level().lower();
+         double upper = vinfo_nc->level().upper();
+         long new_offset = get_index_at_nc_data(var_info->var, lower, upper,
+                                                dim_name, (k == info->t_slot));
+         if (new_offset != bad_data_int) dimension[k] = new_offset;
          else {
-            string dim_name = GET_NC_NAME(get_nc_dim(info->var, k));
-            NcVarInfo *var_info = find_var_info_by_dim_name(WrfNc->Var, dim_name,
-                                                            WrfNc->Nvars);
-            if (var_info) {
-               double lower = vinfo_nc->level().lower();
-               double upper = vinfo_nc->level().upper();
-               long new_offset = get_index_at_nc_data(var_info->var, lower, upper,
-                                                      dim_name, (k == info->t_slot));
-               if (new_offset != bad_data_int) dimension[k] = new_offset;
-               else {
-                  mlog << Warning << "\n" << method_name
-                       << "for \"" << vinfo_nc->req_name()
-                       << "\" variable, the dimension value between "
-                       << lower <<  " and " << upper << " for " << dim_name
-                       << " does not exist\n\n";
-                  return false;
-               }
-            }
+            mlog << Warning << "\n" << method_name
+                 << "for \"" << vinfo_nc->req_name()
+                 << "\" variable, the dimension value between "
+                 << lower <<  " and " << upper << " for " << dim_name
+                 << " does not exist\n\n";
+            return false;
          }
       }
    }

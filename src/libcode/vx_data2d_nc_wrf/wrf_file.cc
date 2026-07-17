@@ -260,18 +260,17 @@ if ( has_var(Nc, times_var_name) ) {
       // Check for leading blank
       if(time_str[0] == ' ') {
          Time[j] = 0;
+         continue;
       }
-      else {
 
-         if(sscanf(time_str, "%4d-%2d-%2d_%2d:%2d:%2d",
-                   &year, &month, &day, &hour, &minute, &second) != 6) {
-            mlog << Error << "\n" << method_name
-                 << "error parsing time string \"" << time_str << "\".\n\n";
-            return false;
-         }
-
-         Time[j] = mdyhms_to_unix(month, day, year, hour, minute, second);
+      if(sscanf(time_str, "%4d-%2d-%2d_%2d:%2d:%2d",
+                &year, &month, &day, &hour, &minute, &second) != 6) {
+         mlog << Error << "\n" << method_name
+              << "error parsing time string \"" << time_str << "\".\n\n";
+         return false;
       }
+
+      Time[j] = mdyhms_to_unix(month, day, year, hour, minute, second);
    }   //  for j
 }
    //
@@ -1081,8 +1080,8 @@ bool is_accumulation(const char * s)
 
 bool found = false;
 
-for ( int j=0; j<n_accum_var_names; ++j )  {
-   if ( strcmp(s, accum_var_names[j]) == 0 )  { found = true;  break; }
+for ( auto var_name : accum_var_names )  {
+   if ( strcmp(s, var_name) == 0 )  { found = true;  break; }
 }
 
 return found;

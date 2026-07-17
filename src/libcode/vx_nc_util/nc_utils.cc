@@ -1899,7 +1899,7 @@ ConcatString get_value_string(double value, bool is_time) {
 }
 
 
-int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool is_time) {
+int get_index_at_nc_data(NcVar *var, double value, const string &dim_name, bool is_time) {
    int offset = bad_data_int;
    static const char *method_name = "get_index_at_nc_data() -> ";
    if (IS_VALID_NC_P(var)) {
@@ -1923,16 +1923,19 @@ int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool i
                     << units_att_name << "\" attribute.\n\n";
             }
          }
+         bool found = false;
          for (int idx=0; idx<data_size; idx++) {
             if (is_eq(values[idx], value)) {
+               found = true;
+            }
+            if (!found && is_time) {
+               if (is_eq(add_to_unixtime(ut, sec_per_unit, values[idx], no_leap_year), value)) {
+                  found = true;
+               }
+            }
+            if (found) {
                offset = idx;
                break;
-            }
-            if (is_time) {
-               if (is_eq(add_to_unixtime(ut, sec_per_unit, values[idx], no_leap_year), value)) {
-                  offset = idx;
-                  break;
-               }
             }
          }
       }
@@ -1958,7 +1961,7 @@ int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool i
 // returns matching offset or bad_data_int if not found
 
 int get_index_at_nc_data(NcVar *var, double value_min, double value_max,
-                         const string dim_name, bool is_time) {
+                         const string &dim_name, bool is_time) {
    int offset = bad_data_int;
    static const char *method_name = "get_index_at_nc_data(min,max) -> ";
    if (IS_VALID_NC_P(var)) {
@@ -1973,7 +1976,7 @@ int get_index_at_nc_data(NcVar *var, double value_min, double value_max,
          if (is_time) {
             ConcatString units;
             bool has_attr = get_var_units(var, units);
-            if (has_attr && (0 < units.length()))
+            if (has_attr && (!units.empty()))
                 parse_cf_time_string(units.c_str(), ut, sec_per_unit);
             else {
                mlog << Warning << "\n" << method_name
@@ -1982,23 +1985,26 @@ int get_index_at_nc_data(NcVar *var, double value_min, double value_max,
                     << units_att_name << "\" attribute.\n\n";
             }
          }
+         bool found = false;
          // Select the first offset between value_min and value_max
          for (int idx=0; idx<data_size; idx++) {
             if (is_eq(values[idx], value_min)
                 || is_eq(values[idx], value_max)
                 || (values[idx] >= value_min && values[idx] <= value_max)) {
-               offset = idx;
-               break;
+               found = true;
             }
-            if (is_time) {
+            if (!found && is_time) {
                unixtime time_value = add_to_unixtime(ut, sec_per_unit,
                                                      values[idx], no_leap_year);
                if (is_eq(time_value, value_min)
                    || is_eq(time_value, value_max)
                    || (time_value >= value_min && time_value <= value_max)) {
-                  offset = idx;
-                  break;
+                  found = true;
                }
+            }
+            if (found) {
+               offset = idx;
+               break;
             }
          }
       }

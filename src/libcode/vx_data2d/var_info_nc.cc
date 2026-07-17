@@ -63,71 +63,70 @@ void VarInfoNC::parse_level(const ConcatString &level_str) {
       // Should be handled by the derived class
       clear_dimension();
       set_default_levels(level_str);
+      return
    }
-   else {
-      char *ptr = nullptr;
-      char *ptr2 = nullptr;
-      char *ptr3 = nullptr;
-      char *save_ptr = nullptr;
-      ConcatString tmp_str;
 
-      // Initialize the temp string
-      tmp_str = level_str;
+   char *ptr = nullptr;
+   char *ptr2 = nullptr;
+   char *ptr3 = nullptr;
+   char *save_ptr = nullptr;
+   ConcatString tmp_str;
 
-      // Parse the level specification
-      // Retreive the NetCDF level specification
-      ptr = strtok_r((char*)tmp_str.c_str(), "()", &save_ptr);
+   // Initialize the temp string
+   tmp_str = level_str;
 
-      // Set the level name
-      Level.set_req_name(ptr);
-      Level.set_name(ptr);
+   // Parse the level specification
+   // Retreive the NetCDF level specification
+   ptr = strtok_r((char*)tmp_str.c_str(), "()", &save_ptr);
 
-      // If dimensions are specified, clear the default value
-      if (strchr(ptr, ',') != nullptr) clear_dimension();
+   // Set the level name
+   Level.set_req_name(ptr);
+   Level.set_name(ptr);
 
-      // Parse the dimensions
-      bool as_offset = true;
-      while ((ptr2 = strtok_r(ptr, ",", &save_ptr)) != nullptr) {
-         // Check for wildcards
-         if (strchr(ptr2, '*') != nullptr) {
-            add_dimension(vx_data2d_star);
+   // If dimensions are specified, clear the default value
+   if (strchr(ptr, ',') != nullptr) clear_dimension();
+
+   // Parse the dimensions
+   bool as_offset = true;
+   while ((ptr2 = strtok_r(ptr, ",", &save_ptr)) != nullptr) {
+      // Check for wildcards
+      if (strchr(ptr2, '*') != nullptr) {
+         add_dimension(vx_data2d_star);
+      }
+      else {
+         as_offset = (*ptr2 != '@');
+         if (!as_offset) ptr2++;
+
+         // Check for a range of levels
+         ptr3 = strchr(ptr2, '-');
+
+         //skip negative sign of the negative value to check the range
+         if (ptr3 != nullptr && ptr3 == ptr2) ptr3 = strchr((ptr2+1), '-');
+
+         if (ptr3 != nullptr && ptr3 != ptr2) {
+            // Store the dimension of the range and limits
+            parse_vertical_range(ptr2, ptr3, as_offset, method_name);
+         }
+         // Check for a range of times
+         else if ((ptr3 = strchr(ptr2, ':')) != nullptr) {
+            parse_time_range(ptr2, ptr3, as_offset, method_name);
          }
          else {
-            as_offset = (*ptr2 != '@');
-            if (!as_offset) ptr2++;
-
-            // Check for a range of levels
-            ptr3 = strchr(ptr2, '-');
-
-            //skip negative sign of the negative value to check the range
-            if (ptr3 != nullptr && ptr3 == ptr2) ptr3 = strchr((ptr2+1), '-');
-
-            if (ptr3 != nullptr && ptr3 != ptr2) {
-               // Store the dimension of the range and limits
-               parse_vertical_range(ptr2, ptr3, as_offset, method_name);
-            }
-            // Check for a range of times
-            else if ((ptr3 = strchr(ptr2, ':')) != nullptr) {
-               parse_time_range(ptr2, ptr3, as_offset, method_name);
-            }
-            else {
-               parse_single_level(ptr2, as_offset, method_name);
-            }
+            parse_single_level(ptr2, as_offset, method_name);
          }
+      }
 
-         // Set ptr to nullptr for next call to strtok
-         ptr = nullptr;
+      // Set ptr to nullptr for next call to strtok
+      ptr = nullptr;
 
-      } // end while
-
-   } // end else
+   } // end while
 
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNC::parse_single_level(char *lstr, bool as_offset, const char *caller) {
+void VarInfoNC::parse_single_level(const char *lstr, bool as_offset, const char *caller) {
    // Single level
    long level = 0;
    double level_value = bad_data_double;
@@ -160,7 +159,7 @@ void VarInfoNC::parse_single_level(char *lstr, bool as_offset, const char *calle
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNC::parse_time_range(char *ptr_lower, char *ptr_upper,
+void VarInfoNC::parse_time_range(const char *ptr_lower, char *ptr_upper,
                                  bool as_offset, const char *caller) {
 
    // Check if a range has already been supplied
@@ -253,7 +252,7 @@ void VarInfoNC::parse_time_range(char *ptr_lower, char *ptr_upper,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNC::parse_vertical_range(char *ptr_lower, char *ptr_upper,
+void VarInfoNC::parse_vertical_range(const char *ptr_lower, char *ptr_upper,
                                      bool as_offset, const char *caller) {
    const char *method_name = "VarInfoNC::parse_vertical_range() -> ";
   
@@ -317,7 +316,7 @@ void VarInfoNC::parse_vertical_range(char *ptr_lower, char *ptr_upper,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNC::set_dimension(int i_dim, long dim) {
+void VarInfoNC::set_dimension(int i_dim, long dim) const {
    Dimension[i_dim] = dim;
    return;
 }

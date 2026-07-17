@@ -31,9 +31,9 @@ class VarInfoNC : public VarInfo
 
       void clear_dimension();
       void parse_level(const ConcatString &level_str);
-      void parse_single_level(char *lstr, bool as_offset, const char *caller);
-      void parse_time_range(char *ptr_lower, char *ptr_upper, bool as_offset, const char *caller);
-      void parse_vertical_range(char *ptr_lower, char *ptr_upper, bool as_offset, const char *caller);
+      void parse_single_level(const char *lstr, bool as_offset, const char *caller);
+      void parse_time_range(const char *ptr_lower, char *ptr_upper, bool as_offset, const char *caller);
+      void parse_vertical_range(const char *ptr_lower, char *ptr_upper, bool as_offset, const char *caller);
       void set_magic_pre(const ConcatString &nstr, const ConcatString &lstr);
       void set_magic_post(const ConcatString &req_name, const ConcatString &level_name);
 
@@ -50,7 +50,7 @@ class VarInfoNC : public VarInfo
       int               n_dimension()    const;
 
       void add_dimension(long dim, bool as_offset=true, double dim_value=bad_data_double);
-      void set_dimension(int i_dim, long dim);
+      void set_dimension(int i_dim, long dim) const;
 
 };
 
