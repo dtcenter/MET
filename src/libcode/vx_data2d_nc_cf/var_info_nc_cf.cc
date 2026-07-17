@@ -208,8 +208,11 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
             as_offset = (*ptr2 != '@');
             if (!as_offset) ptr2++;
 
+            //skip negative sign of the negative value to check the range
+            if (ptr3 != nullptr && ptr3 == ptr2) ptr3 = strchr((ptr2+1), '-');
+
             // Check for a range of levels
-            if ((ptr3 = strchr(ptr2, '-')) != nullptr) {
+            if (ptr3 != nullptr && ptr3 != ptr2) {
 
                // Check if a range has already been supplied
                if (Dimension.has(range_flag)) {
