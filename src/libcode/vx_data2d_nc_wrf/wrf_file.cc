@@ -536,13 +536,9 @@ double WrfFile::data(NcVar * var, const LongArray & a) const
 {
 const char *method_name = "WrfFile::data(NcVar *, const LongArray &) const -> ";
 if ( !args_ok(a) )  {
-
    mlog << Error << "\n" << method_name << "bad arguments:\n";
-
    a.dump(cerr);
-
    exit ( 1 );
-
 }
 
 int dim_count = var->getDimCount();
@@ -598,13 +594,9 @@ bool WrfFile::data(NcVar * v, const LongArray & a, DataPlane & plane, double & p
    const char *method_name = "WrfFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> ";
 
 if ( !args_ok(a) )  {
-
    mlog << Warning << "\n" << method_name << "bad arguments:\n";
-
    a.dump(cerr);
-
    return false;
-
 }
 
 string var_name = GET_NC_NAME_P(v);
