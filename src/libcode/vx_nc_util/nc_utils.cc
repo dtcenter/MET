@@ -1889,9 +1889,18 @@ bool get_nc_data(NcVar *var, ncbyte *data, const LongArray &dims, const LongArra
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+ConcatString get_value_string(double value, bool is_time) {
+   ConcatString value_str;
+   if (is_time && (value > 10000000.)) value_str << unix_to_yyyymmdd_hhmmss(value);
+   else value_str << value;
+   return value_str;
+}
+
+////////////////////////////////////////////////////////////////////////
 // returns matching offset or bad_data_int if not found
 
-int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool is_time) {
+int get_index_at_nc_data(NcVar *var, double value, const string &dim_name, bool is_time) {
    int offset = bad_data_int;
    static const char *method_name = "get_index_at_nc_data() -> ";
    if (IS_VALID_NC_P(var)) {
@@ -1940,6 +1949,78 @@ int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool i
          mlog << Debug(7) << method_name << "Found value " << value_str
               << " (index=" << offset << ") at " << GET_NC_NAME_P(var)
               << " by dimension name \"" << dim_name << "\"\n";
+   }
+   else {
+      mlog << Debug(7) << method_name << "Not found a dimension variable for \""
+           << dim_name << "\"\n";
+   }
+   return offset;
+}
+
+////////////////////////////////////////////////////////////////////////
+// returns matching offset or bad_data_int if not found
+
+int get_index_at_nc_data(NcVar *var, double value_min, double value_max,
+                         const string &dim_name, bool is_time) {
+   int offset = bad_data_int;
+   static const char *method_name = "get_index_at_nc_data(min,max) -> ";
+   if (IS_VALID_NC_P(var)) {
+      int data_size = get_data_size(var);
+      vector<double> values(data_size);
+
+      if (get_nc_data(var, values.data())) {
+         unixtime ut;
+         int sec_per_unit;
+         bool no_leap_year = get_att_no_leap_year(var);
+         ut = sec_per_unit = 0;
+         if (is_time) {
+            ConcatString units;
+            bool has_attr = get_var_units(var, units);
+            if (has_attr && (!units.empty()))
+                parse_cf_time_string(units.c_str(), ut, sec_per_unit);
+            else {
+               mlog << Warning << "\n" << method_name
+                    << "the time variable \"" << GET_NC_NAME_P(var)
+                    << "\" must contain a \""
+                    << units_att_name << "\" attribute.\n\n";
+            }
+         }
+         bool found = false;
+         // Select the first offset between value_min and value_max
+         for (int idx=0; idx<data_size; idx++) {
+            if (is_eq(values[idx], value_min)
+                || is_eq(values[idx], value_max)
+                || (values[idx] >= value_min && values[idx] <= value_max)) {
+               found = true;
+            }
+            if (!found && is_time) {
+               unixtime time_value = add_to_unixtime(ut, sec_per_unit,
+                                                     values[idx], no_leap_year);
+               if (is_eq(time_value, value_min)
+                   || is_eq(time_value, value_max)
+                   || (time_value >= value_min && time_value <= value_max)) {
+                  found = true;
+               }
+            }
+            if (found) {
+               offset = idx;
+               break;
+            }
+         }
+      }
+
+      ConcatString value_max_str = get_value_string(value_max, is_time);
+      ConcatString value_min_str = get_value_string(value_min, is_time);
+      if (offset == bad_data_int)
+         mlog << Debug(7) << method_name << "Not found value between " << value_min_str
+              << " and " << value_max_str << " at " << GET_NC_NAME_P(var)
+              << " by dimension name \"" << dim_name << "\"\n";
+      else {
+         ConcatString value_str = get_value_string(values[offset], is_time);
+         mlog << Debug(7) << method_name << "Found value " << value_str
+              << " (index=" << offset << ") at " << GET_NC_NAME_P(var)
+              << " by dimension name \"" << dim_name << "\"\n";
+      }
    }
    else {
       mlog << Debug(7) << method_name << "Not found a dimension variable for \""
