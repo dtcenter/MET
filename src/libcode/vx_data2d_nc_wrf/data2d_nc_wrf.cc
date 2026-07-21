@@ -127,7 +127,7 @@ bool MetNcWrfDataFile::get_real_dimension(const VarInfoNcWrf *vinfo_nc,
          = "MetNcWrfDataFile::get_real_dimension() ->";
    int dim_count = dimension.n_elements();
    for (int k=0; k<dim_count; k++) {
-      if (dimension[k] == range_flag && vinfo_nc->is_offset(k)) {
+      if (dimension[k] == range_flag && vinfo_nc->level().is_offset()) {
          dimension[k] = nint(vinfo_nc->level().lower());
          continue;
       }
