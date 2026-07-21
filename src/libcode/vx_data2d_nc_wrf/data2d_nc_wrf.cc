@@ -188,19 +188,21 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
    vinfo_nc->set_grid_relative_flag(true);
 
    // Read the data if found
-   if (! WrfNc->get_nc_var_info(vinfo_nc->req_name().c_str(), info)) {
+   status = WrfNc->get_nc_var_info(vinfo_nc->req_name().c_str(), info);
+
+   if (status) {
+      LongArray dimension = vinfo_nc->dimension();
+      if (! get_real_dimension(vinfo_nc, info, dimension))
+         return false;
+
+      status = WrfNc->data(vinfo_nc->req_name().c_str(),
+                           dimension, plane, pressure, info);
+   }
+   else if (! do_winds) {
       mlog << Error << "\n" << method_name
            << "\"" << vinfo.req_name() << "\" variable does not exist\n\n";
       return false;
    }
-
-   LongArray dimension = vinfo_nc->dimension();
-   if (! get_real_dimension(vinfo_nc, info, dimension))
-      return false;
-
-
-   status = WrfNc->data(vinfo_nc->req_name().c_str(),
-                        dimension, plane, pressure, info);
 
    // Attempt to derive the data
    if(!status && do_winds) {
