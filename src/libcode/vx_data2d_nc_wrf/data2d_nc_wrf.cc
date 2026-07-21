@@ -176,7 +176,6 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
                                   bool do_winds) {
    bool status = false;
    double pressure = bad_data_double;
-   ConcatString level_str;
    auto vinfo_nc = (VarInfoNcWrf *) &vinfo;
    auto info = (NcVarInfo *) nullptr;
    static const string method_name = "MetNcWrfDataFile::data_plane() ->";
