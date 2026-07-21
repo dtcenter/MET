@@ -1889,7 +1889,6 @@ bool get_nc_data(NcVar *var, ncbyte *data, const LongArray &dims, const LongArra
 }
 
 ////////////////////////////////////////////////////////////////////////
-// returns matching offset or bad_data_int if not found
 
 ConcatString get_value_string(double value, bool is_time) {
    ConcatString value_str;
@@ -1898,6 +1897,8 @@ ConcatString get_value_string(double value, bool is_time) {
    return value_str;
 }
 
+////////////////////////////////////////////////////////////////////////
+// returns matching offset or bad_data_int if not found
 
 int get_index_at_nc_data(NcVar *var, double value, const string &dim_name, bool is_time) {
    int offset = bad_data_int;
