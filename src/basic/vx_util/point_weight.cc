@@ -245,7 +245,7 @@ void PointWeightInfo::rescale_weights(double new_min, double new_max) {
       }
    } // End omp parallel
 
-   mlog << Debug(4) << "Rescaled " << n_stn()
+   mlog << Debug(4) << "Rescaling " << n_stn()
         << " point weights from range (" << old_min << ", " << old_max
         << ") to (" << new_min << ", " << new_max << ").\n";
 }
