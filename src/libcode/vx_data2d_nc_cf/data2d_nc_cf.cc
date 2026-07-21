@@ -270,19 +270,10 @@ Grid MetNcCFDataFile::build_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_va
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
-                                 bool do_winds) {
-   auto vinfo_nc = (VarInfoNcCF *) &vinfo;
+bool MetNcCFDataFile::get_real_dimension(VarInfo &vinfo, NcVarInfo *data_var,
+                                         LongArray &dimension) {
    static const string method_name
-      = "MetNcCFDataFile::data_plane() -> ";
-
-   LongArray dimension = vinfo_nc->dimension();
-   NcVarInfo *data_var = get_data_var(vinfo);
-   if (nullptr == data_var) {
-      mlog << Error << "\n" << method_name
-           << "\"" << vinfo.req_name() << "\" variable does not exist\n\n";
-      return false;
-   }
+         = "MetNcCFDataFile::get_real_dimension() ->";
 
    int time_dim_slot = data_var->t_slot;
    int zdim_slot = data_var->z_slot;
@@ -304,6 +295,27 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
               << " for \"" << vinfo.req_name() << "\" variable.\n\n";
           dimension[idx] = long(find_generic_offset(vinfo, data_var, idx));
       }
+   }
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
+                                 bool do_winds) {
+   auto vinfo_nc = (VarInfoNcCF *) &vinfo;
+   static const string method_name
+      = "MetNcCFDataFile::data_plane() -> ";
+
+   LongArray dimension = vinfo_nc->dimension();
+   NcVarInfo *data_var = get_data_var(vinfo);
+   if (nullptr != data_var) {
+      get_real_dimension(vinfo, data_var, dimension);
+   }
+   else if (!do_winds) {
+      mlog << Error << "\n" << method_name
+           << "\"" << vinfo.req_name() << "\" variable does not exist\n\n";
+      return false;
    }
 
    // Read the data
