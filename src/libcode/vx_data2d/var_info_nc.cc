@@ -142,10 +142,9 @@ void VarInfoNC::parse_single_level(const char *lstr, bool as_offset, const char 
          check_dim_offset(lstr);
          level = atoi(lstr);
          if (level < 0) {
-            mlog << Error << "\n" << caller
+            mlog << Warning << "\n" << caller
                  << " negative number is not accepted as an offset: "
                  << level << "\n\n";
-            exit(1);
          }
       }
       else {
@@ -279,10 +278,9 @@ void VarInfoNC::parse_vertical_range(const char *ptr_lower, char *ptr_upper,
    add_dimension(range_flag, as_offset);
    if (*ptr_upper == '@') {
       if (as_offset) {
-         mlog << Error << "\n" << caller
+         mlog << Warning << "\n" << caller
               << "Can not mix an offset and a value for NetCDF variable \""
               << MagicStr << "\".\n\n";
-         exit(1);
       }
       ptr_upper++;    // to support @vlevel_lower-@vlevel_upper
    }
@@ -303,10 +301,9 @@ void VarInfoNC::parse_vertical_range(const char *ptr_lower, char *ptr_upper,
       mlog << Debug(7) << method_name
            << " offset: lower: " << lower << ", upper: " << upper << "\n";
       if (lower < 0 || upper < 0) {
-         mlog << Error << "\n" << method_name
+         mlog << Warning << "\n" << method_name
               << " negative number is not accepted as an offset: lower="
               << lower << ", upper=" << upper << "\n\n";
-         exit(1);
       }
    }
    else {
