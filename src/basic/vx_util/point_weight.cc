@@ -199,6 +199,9 @@ void PointWeightInfo::compute_kde_weights() {
 
    } // End omp parallel
 
+   // Rescale weights
+   rescale_weights(rescale_kde_min, rescale_kde_max);
+
    // Dump weights for high verbosity
    if(mlog.verbosity_level() >= 7) {
       mlog << Debug(7) << "Computed KDE weights for " << n_stn()
@@ -212,6 +215,39 @@ void PointWeightInfo::compute_kde_weights() {
 
    // Note that the weights have been computed
    WeightsComputed = true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void PointWeightInfo::rescale_weights(double new_min, double new_max) {
+
+   if(SIDWeights.empty()) return;
+
+   double old_min = SIDWeights[0].Wgt; 
+   double old_max = SIDWeights[0].Wgt; 
+
+#pragma omp parallel default (none) \
+   shared(SIDWeights, old_min, old_max, new_min, new_max)
+   {
+
+      // Get the old range of weights
+#pragma omp for reduction(min: old_min) \
+                reduction(max: old_max)
+      for(auto &x : SIDWeights) {
+         if(x.Wgt < old_min) old_min = x.Wgt;
+         if(x.Wgt > old_max) old_max = x.Wgt;
+      }
+
+      // Rescale to the new range of weights
+#pragma omp for schedule(static)
+      for(auto &x : SIDWeights) {
+         x.Wgt = new_min + ((x.Wgt - old_min) * (new_max - new_min) / (old_max - old_min));
+      }
+   } // End omp parallel
+
+   mlog << Debug(4) << "Rescaled " << n_stn()
+        << " point weights from range (" << old_min << ", " << old_max
+        << ") to (" << new_min << ", " << new_max << ").\n";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
