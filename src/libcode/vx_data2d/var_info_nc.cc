@@ -141,6 +141,12 @@ void VarInfoNC::parse_single_level(const char *lstr, bool as_offset, const char 
       if (as_offset) {
          check_dim_offset(lstr);
          level = atoi(lstr);
+         if (level < 0) {
+            mlog << Error << "\n" << caller
+                 << " negative number is not accepted as an offset: "
+                 << level << "\n\n";
+            exit(1);
+         }
       }
       else {
          level = vx_data2d_dim_by_value;
@@ -266,8 +272,8 @@ void VarInfoNC::parse_vertical_range(const char *ptr_lower, char *ptr_upper,
 
    *ptr_upper = 0;
    ptr_upper++;
-   mlog << Debug(4) << method_name
-        << " start: " << ptr_lower << ", end: " << ptr_upper
+   mlog << Debug(7) << method_name
+        << " input: start: " << ptr_lower << ", end: " << ptr_upper
         << ", as_offset: " << as_offset << "\n";
 
    add_dimension(range_flag, as_offset);
@@ -294,6 +300,14 @@ void VarInfoNC::parse_vertical_range(const char *ptr_lower, char *ptr_upper,
       }
       Level.set_lower(lower);
       Level.set_upper(upper);
+      mlog << Debug(7) << method_name
+           << " offset: lower: " << lower << ", upper: " << upper << "\n";
+      if (lower < 0 || upper < 0) {
+         mlog << Error << "\n" << method_name
+              << " negative number is not accepted as an offset: lower="
+              << lower << ", upper=" << upper << "\n\n";
+         exit(1);
+      }
    }
    else {
       float lower = atof(ptr_lower);
@@ -305,8 +319,8 @@ void VarInfoNC::parse_vertical_range(const char *ptr_lower, char *ptr_upper,
       }
       Level.set_lower(lower);
       Level.set_upper(upper);
-      mlog << Debug(4) << method_name
-           << " lower: " << lower << ", upper: " << upper << "\n";
+      mlog << Debug(7) << method_name
+           << " value: lower: " << lower << ", upper: " << upper << "\n";
    }
 
    // Assume pressure level type for a range of levels
