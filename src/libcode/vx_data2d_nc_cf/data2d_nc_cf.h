@@ -44,6 +44,9 @@ class MetNcCFDataFile : public Met2dDataFile {
       long convert_generic_to_offset(double value, const std::string& dim_name, std::vector<double> values);
       long convert_time_to_offset(double time_value) const;
       long convert_z_to_offset(double z_value, const NcVarInfo* data_var);
+      bool get_real_dimension(VarInfo &vinfo, NcVarInfo *data_var,
+                              LongArray &dimension);
+
       bool read_data_plane(VarInfo &, DataPlane &, const LongArray &dimension, bool do_winds);
       void error_message(const bool is_dim_time, const int error_code,
                          const double _lower, const double _upper,
