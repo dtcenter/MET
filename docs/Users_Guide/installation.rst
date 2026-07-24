@@ -41,8 +41,8 @@ The required libraries are listed below:
   in C and CXX, for intermediate and output file formats
 * `HDF5 <https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.2/src/hdf5-1.12.2.tar.gz>`__
   is required to support NetCDF 4. HDF5 should be built with
-  `zlib <http://www.zlib.net/>`_
-* `GSL <http://www.gnu.org/software/gsl>`_
+  `zlib <https://www.zlib.net/>`_
+* `GSL <https://www.gnu.org/software/gsl/doc/html/index.html>`_
   GNU Scientific Library Developer's Version for computing
   confidence intervals (use **GSL-1.11** for **PGI** compilers)
 * `Proj <https://proj.org/>`_ Library used to instantiate grids within MET
@@ -84,7 +84,7 @@ They are not required for MET to function, but depending on the user’s intende
   for re-gridding GRIB version 2 data
 * `Integrated Data Viewer (IDV) <http://www.unidata.ucar.edu/software/idv>`_
   for displaying gridded data, including GRIB and NetCDF
-* `ncview utility <http://meteora.ucsd.edu/~pierce/ncview_home_page.html>`_
+* `ncview utility <https://anaconda.org/channels/conda-forge/packages/ncview/overview>`_
   for viewing gridded NetCDF data (e.g. the output of pcp_combine)
 
 .. _compile_script_install:
