@@ -108,7 +108,7 @@ installed. Assuming that the following guidance uses “/d1” as the parent dir
 a suggested format is a path to a “met” directory, followed by the version number
 subdirectory (e.g. /d1/met/13.0.0).
 Next, download the
-`compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/main_v13.0/internal/scripts/installation/compile_MET_all.sh>`_
+`compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/HEAD/internal/scripts/installation/compile_MET_all.sh>`_
 script and
 `tar_files.tgz <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz>`_
 file and place both of these files in the
@@ -118,7 +118,7 @@ the terminal while in the directory MET will be installed in:
 
 .. code-block:: ini
 
-  wget https://raw.githubusercontent.com/dtcenter/MET/main_v13.0/internal/scripts/installation/compile_MET_all.sh
+  wget https://raw.githubusercontent.com/dtcenter/MET/HEAD/internal/scripts/installation/compile_MET_all.sh
   wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz
 
 The tar files will need to be extracted in the MET installation directory:
@@ -170,7 +170,7 @@ environment variables is in an environment configuration file
 configuration file to start with (**install_met_env.generic_gnu**),
 as well as the environment configuration files used on HPCs at NCAR and NOAA,
 can be found in the `MET GitHub repository <https://github.com/dtcenter/MET>`_ in the
-`scripts/installation/config <https://github.com/dtcenter/MET/tree/main_v13.0/internal/scripts/installation/config>`_
+`scripts/installation/config <https://github.com/dtcenter/MET/tree/HEAD/internal/scripts/installation/config>`_
 directory.
 
 .. note:: Starting with MET-12.0.0, C++17 is the default C++ standard for MET due to the requirements of its dependent libraries. However, MET itself only makes use of C++11 features.
