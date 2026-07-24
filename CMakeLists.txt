@@ -146,7 +146,6 @@ include_directories(src/tools/other/ioda2nc)
 # TODO: control including directories based on if they are enabled
 #include_directories(src/tools/other/lidar2nc)
 include_directories(src/tools/other/madis2nc)
-include_directories(src/tools/other/mode_graphics)
 include_directories(src/tools/other/mode_time_domain)
 #include_directories(src/tools/other/modis_regrid)
 include_directories(src/tools/other/pb2nc)
@@ -726,6 +725,8 @@ add_library(vx_data2d
         src/libcode/vx_data2d/table_lookup.h
         src/libcode/vx_data2d/var_info.cc
         src/libcode/vx_data2d/var_info.h
+        src/libcode/vx_data2d/var_info_nc.cc
+        src/libcode/vx_data2d/var_info_nc.h
         src/libcode/vx_data2d/var_info_pairs.cc
         src/libcode/vx_data2d/var_info_pairs.h
         src/libcode/vx_data2d/vx_data2d.h
@@ -2033,8 +2034,101 @@ add_executable(gen_ens_prod
     src/tools/other/gen_ens_prod/compute_eas.h
 )
 
-
 target_link_libraries(gen_ens_prod
+    vx_stat_out
+    vx_statistics
+    vx_shapedata
+    vx_gsl_prob
+    vx_analysis_util
+    vx_data2d_factory
+    vx_data2d_nc_met
+    vx_data2d_grib
+    ${GRIB2_MET_LIBS}
+    vx_data2d_nc_wrf
+    vx_data2d_nc_cf
+    ${UGRID_MET_LIBS}
+    ${PYTHON_MET_LIBS}
+    vx_data2d
+    vx_nc_obs
+    vx_seeps
+    vx_nc_util
+    vx_regrid
+    vx_grid
+    vx_geodesy
+    vx_config
+    vx_color
+    vx_util_math
+    vx_util
+    vx_math
+    vx_cal
+    vx_log
+    ${GRIB2_DEP_LIBS}
+    ${UGRID_DEP_LIBS}
+    ${PYTHON_DEP_LIBS}
+    -lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+)
+
+add_executable(mtd
+    src/tools/other/mode_time_domain/2d_att.cc
+    src/tools/other/mode_time_domain/2d_att.h
+    src/tools/other/mode_time_domain/2d_att_array.cc
+    src/tools/other/mode_time_domain/2d_att_array.h
+    src/tools/other/mode_time_domain/2d_columns.h
+    src/tools/other/mode_time_domain/2d_moments.cc
+    src/tools/other/mode_time_domain/2d_moments.h
+    src/tools/other/mode_time_domain/3d_att.cc
+    src/tools/other/mode_time_domain/3d_att.h
+    src/tools/other/mode_time_domain/3d_att_pair_array.cc
+    src/tools/other/mode_time_domain/3d_att_pair_array.h
+    src/tools/other/mode_time_domain/3d_att_single_array.cc
+    src/tools/other/mode_time_domain/3d_att_single_array.h
+    src/tools/other/mode_time_domain/3d_conv.cc
+    src/tools/other/mode_time_domain/3d_moments.cc
+    src/tools/other/mode_time_domain/3d_moments.h
+    src/tools/other/mode_time_domain/3d_pair_columns.h
+    src/tools/other/mode_time_domain/3d_single_columns.h
+    src/tools/other/mode_time_domain/3d_txt_header.h
+    src/tools/other/mode_time_domain/fo_graph.cc
+    src/tools/other/mode_time_domain/fo_graph.h
+    src/tools/other/mode_time_domain/fo_node.cc
+    src/tools/other/mode_time_domain/fo_node.h
+    src/tools/other/mode_time_domain/fo_node_array.cc
+    src/tools/other/mode_time_domain/fo_node_array.h
+    src/tools/other/mode_time_domain/interest_calc.cc
+    src/tools/other/mode_time_domain/interest_calc.h
+    src/tools/other/mode_time_domain/mm_engine.cc
+    src/tools/other/mode_time_domain/mm_engine.h
+    src/tools/other/mode_time_domain/mtd.cc
+    src/tools/other/mode_time_domain/mtd_config_info.cc
+    src/tools/other/mode_time_domain/mtd_config_info.h
+    src/tools/other/mode_time_domain/mtd_file.h
+    src/tools/other/mode_time_domain/mtd_file_base.cc
+    src/tools/other/mode_time_domain/mtd_file_base.h
+    src/tools/other/mode_time_domain/mtd_file_float.cc
+    src/tools/other/mode_time_domain/mtd_file_float.h
+    src/tools/other/mode_time_domain/mtd_file_int.cc
+    src/tools/other/mode_time_domain/mtd_file_int.h
+    src/tools/other/mode_time_domain/mtd_nc_defs.h
+    src/tools/other/mode_time_domain/mtd_nc_output.cc
+    src/tools/other/mode_time_domain/mtd_nc_output.h
+    src/tools/other/mode_time_domain/mtd_partition.cc
+    src/tools/other/mode_time_domain/mtd_partition.h
+    src/tools/other/mode_time_domain/mtd_read_data.cc
+    src/tools/other/mode_time_domain/mtd_read_data.h
+    src/tools/other/mode_time_domain/mtd_txt_output.cc
+    src/tools/other/mode_time_domain/mtd_txt_output.h
+    src/tools/other/mode_time_domain/mtdfiletype_to_string.cc
+    src/tools/other/mode_time_domain/mtdfiletype_to_string.h
+)
+
+
+target_link_libraries(mtd
+    vx_pxm
+    vx_plot_util
+    vx_nav
+	vx_render
+	vx_ps
+	vx_afm
 	vx_stat_out
 	vx_statistics
 	vx_shapedata
@@ -2048,19 +2142,19 @@ target_link_libraries(gen_ens_prod
 	vx_data2d_nc_cf
     ${UGRID_MET_LIBS}
     ${PYTHON_MET_LIBS}
+	vx_statistics
 	vx_data2d
-	vx_nc_obs
-	vx_seeps
 	vx_nc_util
 	vx_regrid
 	vx_grid
 	vx_geodesy
 	vx_config
-	vx_color
+	vx_gsl_prob
+	vx_cal
 	vx_util_math
 	vx_util
 	vx_math
-	vx_cal
+	vx_color
 	vx_log
     ${GRIB2_DEP_LIBS}
     ${UGRID_DEP_LIBS}
@@ -2068,6 +2162,47 @@ target_link_libraries(gen_ens_prod
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
 )
 
+add_executable(madis2nc
+    src/tools/other/madis2nc/madis2nc.cc
+    src/tools/other/madis2nc/madis2nc.h
+    src/tools/other/madis2nc/madis2nc_conf_info.cc
+    src/tools/other/madis2nc/madis2nc_conf_info.h
+)
+
+target_link_libraries(madis2nc
+    vx_stat_out
+    vx_statistics
+    vx_shapedata
+    vx_analysis_util
+    vx_data2d_factory
+    vx_data2d_nc_met
+    vx_data2d_grib
+    ${GRIB2_MET_LIBS}
+    vx_data2d_nc_wrf
+    vx_data2d_nc_cf
+    ${UGRID_MET_LIBS}
+    ${PYTHON_MET_LIBS}
+    vx_data2d
+    vx_nc_obs
+    vx_nc_util
+    vx_regrid
+    vx_grid
+    vx_geodesy
+    vx_pb_util
+    vx_summary
+    vx_config
+    vx_gsl_prob
+    vx_color
+    vx_util_math
+    vx_util
+    vx_math
+    vx_cal
+    vx_log
+    ${GRIB2_DEP_LIBS}
+    ${UGRID_DEP_LIBS}
+    ${PYTHON_DEP_LIBS}
+    -lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+)
 
 #        src/tools/dev_utils/shapefiles/make_mapfiles.cc
 #        src/tools/dev_utils/chk4copyright.cc
@@ -2111,64 +2246,6 @@ target_link_libraries(gen_ens_prod
 ##        src/tools/other/lidar2nc/hdf_utils.cc
 ##        src/tools/other/lidar2nc/hdf_utils.h
 ##        src/tools/other/lidar2nc/lidar2nc.cc
-##        src/tools/other/madis2nc/madis2nc.cc
-##        src/tools/other/madis2nc/madis2nc.h
-##        src/tools/other/madis2nc/madis2nc_conf_info.cc
-##        src/tools/other/madis2nc/madis2nc_conf_info.h
-#        src/tools/other/mode_time_domain/2d_att.cc
-#        src/tools/other/mode_time_domain/2d_att.h
-#        src/tools/other/mode_time_domain/2d_att_array.cc
-#        src/tools/other/mode_time_domain/2d_att_array.h
-#        src/tools/other/mode_time_domain/2d_columns.h
-#        src/tools/other/mode_time_domain/2d_moments.cc
-#        src/tools/other/mode_time_domain/2d_moments.h
-#        src/tools/other/mode_time_domain/3d_att.cc
-#        src/tools/other/mode_time_domain/3d_att.h
-#        src/tools/other/mode_time_domain/3d_att_pair_array.cc
-#        src/tools/other/mode_time_domain/3d_att_pair_array.h
-#        src/tools/other/mode_time_domain/3d_att_single_array.cc
-#        src/tools/other/mode_time_domain/3d_att_single_array.h
-#        src/tools/other/mode_time_domain/3d_conv.cc
-#        src/tools/other/mode_time_domain/3d_moments.cc
-#        src/tools/other/mode_time_domain/3d_moments.h
-#        src/tools/other/mode_time_domain/3d_pair_columns.h
-#        src/tools/other/mode_time_domain/3d_single_columns.h
-#        src/tools/other/mode_time_domain/3d_txt_header.h
-#        src/tools/other/mode_time_domain/fo_graph.cc
-#        src/tools/other/mode_time_domain/fo_graph.h
-#        src/tools/other/mode_time_domain/fo_node.cc
-#        src/tools/other/mode_time_domain/fo_node.h
-#        src/tools/other/mode_time_domain/fo_node_array.cc
-#        src/tools/other/mode_time_domain/fo_node_array.h
-#        src/tools/other/mode_time_domain/interest_calc.cc
-#        src/tools/other/mode_time_domain/interest_calc.h
-#        src/tools/other/mode_time_domain/mm_engine.cc
-#        src/tools/other/mode_time_domain/mm_engine.h
-#        src/tools/other/mode_time_domain/mtd.cc
-#        src/tools/other/mode_time_domain/mtd_config_info.cc
-#        src/tools/other/mode_time_domain/mtd_config_info.h
-#        src/tools/other/mode_time_domain/mtd_file.h
-#        src/tools/other/mode_time_domain/mtd_file_base.cc
-#        src/tools/other/mode_time_domain/mtd_file_base.h
-#        src/tools/other/mode_time_domain/mtd_file_float.cc
-#        src/tools/other/mode_time_domain/mtd_file_float.h
-#        src/tools/other/mode_time_domain/mtd_file_int.cc
-#        src/tools/other/mode_time_domain/mtd_file_int.h
-#        src/tools/other/mode_time_domain/mtd_nc_defs.h
-#        src/tools/other/mode_time_domain/mtd_nc_output.cc
-#        src/tools/other/mode_time_domain/mtd_nc_output.h
-#        src/tools/other/mode_time_domain/mtd_partition.cc
-#        src/tools/other/mode_time_domain/mtd_partition.h
-#        src/tools/other/mode_time_domain/mtd_read_data.cc
-#        src/tools/other/mode_time_domain/mtd_read_data.h
-#        src/tools/other/mode_time_domain/mtd_txt_output.cc
-#        src/tools/other/mode_time_domain/mtd_txt_output.h
-#        src/tools/other/mode_time_domain/mtdfiletype_to_string.cc
-#        src/tools/other/mode_time_domain/mtdfiletype_to_string.h
-#        src/tools/other/mode_time_domain/nc_grid.cc
-#        src/tools/other/mode_time_domain/nc_grid.h
-#        src/tools/other/mode_time_domain/nc_utils_local.cc
-#        src/tools/other/mode_time_domain/nc_utils_local.h
 ##        src/tools/other/modis_regrid/cloudsat_swath_file.cc
 ##        src/tools/other/modis_regrid/cloudsat_swath_file.h
 ##        src/tools/other/modis_regrid/data_averager.cc
@@ -2183,7 +2260,6 @@ target_link_libraries(gen_ens_prod
 #        src/tools/other/point2grid/point2grid.cc
 #        src/tools/other/point2grid/point2grid_conf_info.cc
 #        src/tools/other/point2grid/point2grid_conf_info.h
-
 #        src/tools/other/shift_data_plane/shift_data_plane.cc
 #        src/tools/other/wwmca_tool/af_cp_file.cc
 #        src/tools/other/wwmca_tool/af_cp_file.h
@@ -2225,7 +2301,6 @@ target_link_libraries(gen_ens_prod
 #        src/tools/tc_utils/tc_dland/tc_dland.cc
 #        src/tools/tc_utils/tc_dland/tc_poly.cc
 #        src/tools/tc_utils/tc_dland/tc_poly.h
-
 #        src/tools/tc_utils/tc_rmw/tc_rmw.cc
 #        src/tools/tc_utils/tc_rmw/tc_rmw.h
 #        src/tools/tc_utils/tc_rmw/tc_rmw_conf_info.cc
