@@ -75,7 +75,7 @@ static void setup_nc_file(void);
 static void read_series_data(int, VarInfo *, const StringArray &,
                              const GrdFileType, InputDataInfo &);
 static bool read_wind_series(const StringArray &,
-                             int, VarInfo *, const StringArray &,
+                             int, const VarInfo *, const StringArray &,
                              const GrdFileType, DataPlane &);
 static void regrid_data(const VarInfo *, const Grid &, DataPlane &);
 static ConcatString get_nc_var_str(const VarInfo *, int);
@@ -859,7 +859,7 @@ static void read_series_data(int i_series, VarInfo *i_vinfo,
 ////////////////////////////////////////////////////////////////////////
 
 static bool read_wind_series(const StringArray &wind_names,
-                             int i_series, VarInfo *i_vinfo,
+                             int i_series, const VarInfo *i_vinfo,
                              const StringArray &in_files,
                              const GrdFileType in_ftype,
                              DataPlane &wind_dp) {
@@ -1292,7 +1292,7 @@ static void write_wavelengths(void) {
    vector<float> wavelengths(n_waves);
    double grid_res_km = get_grid_res_km(grid);
    for(int i=0; i<n_waves; i++) {
-      wavelengths[i] = (float) wavenumbers[n_waves - 1 - i] * grid_res_km;
+      wavelengths[i] = wavenumbers[n_waves - 1 - i] * (float) grid_res_km;
    }
 
    // Add wavenumber coordinate variable

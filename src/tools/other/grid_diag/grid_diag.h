@@ -140,7 +140,7 @@ struct DiagInfo {
    std::map<int, double> mutual_information;
 };
 
-// DiagInfo objects [n_data][n_mask]
+// DiagInfo objects, sized as n_data by n_mask
 std::vector<std::vector<DiagInfo> > diag_info; 
 
 // Struct to store power spectrum information
@@ -151,7 +151,7 @@ struct PowerInfo {
    std::map<int, std::vector<double> > error_power;
 };
 
-// PowerInfo objects [n_data]
+// PowerInfo objects, sized as n_data
 std::vector<PowerInfo> power_info;
 
 // Series length
