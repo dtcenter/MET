@@ -111,7 +111,7 @@ void VarInfoNcMet::clear() {
    VarInfo::clear();
 
    // Initialize
-   Dimension.clear();
+   clear_dimension();
 
    return;
 }
@@ -132,113 +132,42 @@ void VarInfoNcMet::dump(ostream &out) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcMet::add_dimension(long dim) {
-   Dimension.add(dim);
-   return;
+void VarInfoNcMet::set_default_levels(const ConcatString &lstr) {
+   // MET #3087 Set the level name string:
+   //   - If empty or '*' from Point2Grid, set to *,* to indicate gridded output
+   //   - If nonempty, use the input level string to support U/V vector level matching
+   if(lstr.empty() || lstr == "*") {
+      Level.set_req_name("*,*");
+      Level.set_name("*,*");
+   }
+   else {     
+      Level.set_req_name(lstr.c_str());
+      Level.set_name(lstr.c_str());
+   }
+   Dimension.add(vx_data2d_star);
+   Dimension.add(vx_data2d_star);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
-   ConcatString tmp_str;
-   auto ptr = (char *) nullptr;
-   auto ptr2 = (char *) nullptr;
-   auto ptr3 = (char *) nullptr;
-   auto save_ptr = (char *) nullptr;
 
    // Store the magic string
-   VarInfo::set_magic(nstr, lstr);
-
-   // Set the requested name and default output name
-   set_req_name(nstr.c_str());
-   set_name(nstr);
+   set_magic_pre(nstr, lstr);
 
    // Parse the level dimensions, if specified
-   if(lstr.string().find_first_of("(") != std::string::npos) {
-
-      // Initialize the temp string
-      tmp_str = lstr;
-
-      // Retreive the NetCDF level specification
-      ptr = strtok_r((char*)tmp_str.c_str(), "()", &save_ptr);
-
-      // Set the level name
-      Level.set_req_name(ptr);
-      Level.set_name(ptr);
-
-      // If dimensions are specified, clear the default value
-      if(strchr(ptr, ',') != nullptr) Dimension.clear();
-
-      // Parse the dimensions
-      while((ptr2 = strtok_r(ptr, ",", &save_ptr)) != nullptr) {
-
-         // Check for wildcards
-         if(strchr(ptr2, '*') != nullptr) Dimension.add(vx_data2d_star);
-         else {
-
-            // @value notation not supported in vx_data_nc_met
-            if(*ptr2 == '@') {
-               mlog << Warning << "\nVarInfoNcMet::set_magic() -> "
-                    << "problem parsing \"" << MagicStr << "\" for the vx_data2d_nc_met library.\n"
-                    << "NetCDF dimensions must be specified as 0-based integer indices rather "
-                    << "than using the NetCDF dimension \"@value\" notation.\n\n";
-            }
-
-            // Check for a range of levels
-            if((ptr3 = strchr(ptr2, '-')) != nullptr) {
-
-               // Check if a range has already been supplied
-               if(Dimension.has(range_flag)) {
-                  mlog << Error << "\nVarInfoNcMet::set_magic() -> "
-                       << "only one dimension can have a range for NetCDF variable \""
-                       << MagicStr << "\".\n\n";
-                  exit(1);
-               }
-               // Store the dimension of the range and limits
-               else {
-                  Dimension.add(range_flag);
-                  Level.set_lower(atoi(ptr2));
-                  Level.set_upper(atoi(++ptr3));
-               }
-            }
-            // Single level
-            else {
-               Dimension.add(atoi(ptr2));
-            }
-         }
-
-         // Set ptr to nullptr for next call to strtok
-         ptr = nullptr;
-      } // end while
-   }
-   // Otherwise, assume (*,*) level dimensions
-   else {
-
-      // MET #3087 Set the level name string:
-      //   - If empty or '*' from Point2Grid, set to *,* to indicate gridded output
-      //   - If nonempty, use the input level string to support U/V vector level matching
-      if(lstr.empty() || lstr == "*") {
-         Level.set_req_name("*,*");
-         Level.set_name("*,*");
-      }
-      else {     
-         Level.set_req_name(lstr.c_str());
-         Level.set_name(lstr.c_str());
-      }
-      Dimension.clear();
-      Dimension.add(vx_data2d_star);
-      Dimension.add(vx_data2d_star);
+   if(lstr.string().find_first_of("(") != std::string::npos
+         && lstr.string().find_first_of("@") != std::string::npos) {
+      mlog << Warning << "\nVarInfoNcMet::set_magic() -> "
+           << "problem parsing \"" << MagicStr << "\" for the vx_data2d_nc_met library.\n"
+           << "NetCDF dimensions must be specified as 0-based integer indices rather "
+           << "than using the NetCDF dimension \"@value\" notation.\n\n";
+      exit(1);
    }
 
-   // Check for "/PROB" to indicate a probability forecast
-   if(strstr(MagicStr.c_str(), "/PROB") != nullptr) PFlag = 1;
+   parse_level(lstr);
 
-   // Set the long name
-   tmp_str.format("%s(%s)", req_name().text(), Level.req_name().text());
-   set_long_name(tmp_str.c_str());
-
-   // Set the units
-   set_units(na_str);
+   set_magic_post(req_name(), Level.req_name());
 
    return;
 }

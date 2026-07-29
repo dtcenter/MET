@@ -885,8 +885,7 @@ bool VarInfo::is_wind_direction() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_kinetic_energy() const {
-   return is_flag_set(get_wind_flag(SetAttrIsKineticEnergy,
-                                    WindInfo.kinetic_energy));
+   return WindInfo.is_kinetic_energy(Name);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

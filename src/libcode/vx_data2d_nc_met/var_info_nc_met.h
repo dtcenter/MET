@@ -14,7 +14,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "var_info.h"
+#include "var_info_nc.h"
 
 #include "data_file_type.h"
 #include "long_array.h"
@@ -23,7 +23,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class VarInfoNcMet : public VarInfo
+class VarInfoNcMet : public VarInfoNC
 {
    private:
 
@@ -31,10 +31,11 @@ class VarInfoNcMet : public VarInfo
          // NetCDF-specific parameters
          //
 
-      LongArray Dimension; // Dimension values for extracting 2D field
-
       void init_from_scratch();
       void assign(const VarInfoNcMet &);
+
+   protected:
+      void set_default_levels(const ConcatString &lstr) override;
 
    public:
       VarInfoNcMet();
@@ -51,9 +52,6 @@ class VarInfoNcMet : public VarInfo
          //
 
       GrdFileType file_type()             const override;
-      const       LongArray & dimension() const;
-      long        dimension(int i)        const;
-      int         n_dimension()           const;
 
          //
          // set stuff
@@ -61,8 +59,6 @@ class VarInfoNcMet : public VarInfo
 
       void set_magic(const ConcatString &, const ConcatString &) override;
       bool set_dict(Dictionary &s, bool do_exit=true) override;
-
-      void add_dimension(long dim);
 
          //
          // do stuff
@@ -79,9 +75,6 @@ class VarInfoNcMet : public VarInfo
 ///////////////////////////////////////////////////////////////////////////////
 
 inline GrdFileType       VarInfoNcMet::file_type()      const { return FileType_NcMet;         }
-inline const LongArray & VarInfoNcMet::dimension()      const { return Dimension;              }
-inline long              VarInfoNcMet::dimension(int i) const { return Dimension[i];           }
-inline int               VarInfoNcMet::n_dimension()    const { return Dimension.n_elements(); }
 
 ///////////////////////////////////////////////////////////////////////////////
 

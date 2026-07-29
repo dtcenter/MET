@@ -401,7 +401,7 @@ The following lines consist of 4 integers followed by 3 strings:
 
 References:
 | `Office Note 388 GRIB1 <http://www.nco.ncep.noaa.gov/pmb/docs/on388>`_
-| `A Guide to the Code Form FM 92-IX Ext. GRIB Edition 1 <http://www.wmo.int/pages/prog/www/WMOCodes/Guides/GRIB/GRIB1-Contents.html>`_
+| `A Guide to the Code Form FM 92-IX Ext. GRIB Edition 1 <https://community.wmo.int/site/knowledge-hub/programmes-and-initiatives/wmo-information-system-wis/grib-edition-1>`_
 
 
 GRIB2 table files begin with "grib2" prefix and end with a ".txt" suffix.
@@ -680,10 +680,10 @@ The following configuration options can be set to refine the metadata, when need
   is_grid_relative  = boolean;
   is_wind_speed     = boolean;
   is_wind_direction = boolean;
-  is_kinetic_energy = boolean;
 
 When deriving and rotating winds, MET searches the input file for matching wind
-components. That search is driven by the following configuration options:
+components. That search is driven by the following configuration options and
+default values found in the "data/config/ConfigConstants" file:
 
 .. code-block:: none
 
@@ -1198,7 +1198,6 @@ below:
   is_grid_relative     = boolean;
   is_wind_speed        = boolean;
   is_wind_direction    = boolean;
-  is_kinetic_energy    = boolean;
   is_prob              = boolean;
 
 

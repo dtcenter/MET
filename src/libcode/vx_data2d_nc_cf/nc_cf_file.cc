@@ -945,7 +945,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   {
     mlog << Error << "\n" << method_name
          << "variable " << GET_NC_NAME_P(v) << " not found!\n\n";
-    exit(1);
+    return false;
   }
 
   //  check star positions and count
