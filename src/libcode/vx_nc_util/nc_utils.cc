@@ -3635,8 +3635,7 @@ unixtime get_init_time(NcVar *time_var) {
    }
 
    int data_type = GET_NC_TYPE_ID_P(time_var);
-   bool is_string_time = (NC_UBYTE == data_type || NC_BYTE == data_type
-                          || NC_CHAR == data_type || NC_STRING == data_type);
+   bool is_string_time = (NC_CHAR == data_type || NC_STRING == data_type);
    double time_value = get_nc_time(time_var, 0);
    init_time = time_value;
    if (!is_string_time) {
@@ -3691,12 +3690,9 @@ unixtime get_reference_unixtime(NcVar *time_var, int &sec_per_unit,
    sec_per_unit = 1;
    if (get_var_units(time_var, time_unit_str)) {
       if (time_unit_str.empty()) {
-         int data_type = GET_NC_TYPE_ID_P(time_var);
-         if (NC_UBYTE != data_type && NC_BYTE != data_type) {
-            mlog << Warning << "\n" << (caller != nullptr ? caller : method_name)
-                 << "the \"" << GET_NC_NAME_P(time_var)
-                 << "\" variable must contain a \"units\" attribute.\n\n";
-         }
+         mlog << Warning << "\n" << (caller != nullptr ? caller : method_name)
+              << "the \"" << GET_NC_NAME_P(time_var)
+              << "\" variable does not have a \"units\" attribute.\n\n";
       }
       else {
          parse_cf_time_string(time_unit_str.c_str(), ref_ut, sec_per_unit);

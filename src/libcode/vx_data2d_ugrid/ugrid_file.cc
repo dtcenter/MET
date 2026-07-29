@@ -824,8 +824,7 @@ bool UGridFile::metadata_time() {
   }
 
   int data_type = GET_NC_TYPE_ID_P(_tVar);
-  bool is_string_time = (NC_UBYTE == data_type || NC_BYTE == data_type
-                         || NC_CHAR == data_type || NC_STRING == data_type);
+  bool is_string_time = (NC_CHAR == data_type || NC_STRING == data_type);
 
   // Determine the number of times present.
   int n_times = IS_VALID_NC_P(_tDim) ? get_dim_size(_tDim)
