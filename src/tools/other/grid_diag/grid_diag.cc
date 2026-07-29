@@ -77,7 +77,7 @@ static void read_series_data(int, VarInfo *, const StringArray &,
 static bool read_wind_series(const StringArray &,
                              int, VarInfo *, const StringArray &,
                              const GrdFileType, DataPlane &);
-static void regrid_data(VarInfo *, const Grid &, DataPlane &);
+static void regrid_data(const VarInfo *, const Grid &, DataPlane &);
 static ConcatString get_nc_var_str(const VarInfo *, int);
 static ConcatString get_nc_att_str(const ConcatString &,
                                    const ConcatString &);
@@ -633,14 +633,10 @@ static void process_error_power_spectrum(const vector<InputDataInfo> &in_data) {
       // Check skip
       if(conf_info.ps_info[i_var].skip) continue;
 
-      const VarInfo *i_vinfo = conf_info.data_info[i_var];
-
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
          // Check skip
          if(conf_info.ps_info[j_var].skip) continue;
-
-         const VarInfo *j_vinfo = conf_info.data_info[j_var];
 
          // Process U/V for kinetic energy
          if(in_data[i_var].uv_flag && in_data[j_var].uv_flag) {
@@ -830,17 +826,16 @@ static void read_series_data(int i_series, VarInfo *i_vinfo,
    in_data.uv_flag = i_vinfo->is_kinetic_energy();
 
    // Read U/V components for kinetic energy
-   if(in_data.uv_flag) {
-      if(!read_wind_series(i_vinfo->wind_info().u_wind,
-            i_series, i_vinfo, in_files, in_ftype, in_data.u_dp) ||
-         !read_wind_series(i_vinfo->wind_info().v_wind,
-            i_series, i_vinfo, in_files, in_ftype, in_data.v_dp)) {
-         mlog << Error << "\nread_series_data() -> "
-              << "trouble reading U/V wind components "
-              << "for kinetic energy field \""
-              << i_vinfo->magic_str() << "\"!\n\n";
-         exit(1);
-      }
+   if(in_data.uv_flag &&
+      (!read_wind_series(i_vinfo->wind_info().u_wind,
+          i_series, i_vinfo, in_files, in_ftype, in_data.u_dp) ||
+       !read_wind_series(i_vinfo->wind_info().v_wind,
+          i_series, i_vinfo, in_files, in_ftype, in_data.v_dp))) {
+      mlog << Error << "\nread_series_data() -> "
+           << "trouble reading U/V wind components "
+           << "for kinetic energy field \""
+           << i_vinfo->magic_str() << "\"!\n\n";
+      exit(1);
    }
 
    // Initialize time ranges
@@ -896,8 +891,8 @@ static bool read_wind_series(const StringArray &wind_names,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void regrid_data(VarInfo *vinfo, const Grid &cur_grid,
-                      DataPlane &dp) {
+static void regrid_data(const VarInfo *vinfo, const Grid &cur_grid,
+                        DataPlane &dp) {
 
    // Check for grid match
    if(cur_grid == grid) return;
@@ -1289,7 +1284,7 @@ static void write_info_theory(void) {
 static void write_wavelengths(void) {
 
    // Define wavenumber values
-   int n_waves = wavenumber_dim.getSize();
+   auto n_waves = (int) wavenumber_dim.getSize();
    vector<int> wavenumbers(n_waves);
    iota(wavenumbers.begin(), wavenumbers.end(), 1);
 
@@ -1297,7 +1292,7 @@ static void write_wavelengths(void) {
    vector<float> wavelengths(n_waves);
    double grid_res_km = get_grid_res_km(grid);
    for(int i=0; i<n_waves; i++) {
-      wavelengths[i] = wavenumbers[n_waves - 1 - i] * grid_res_km;
+      wavelengths[i] = (float) wavenumbers[n_waves - 1 - i] * grid_res_km;
    }
 
    // Add wavenumber coordinate variable

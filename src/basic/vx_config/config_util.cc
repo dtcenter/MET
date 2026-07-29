@@ -432,7 +432,6 @@ map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict,
 ///////////////////////////////////////////////////////////////////////////////
 
 map<STATLineType,StringArray> parse_conf_output_stats(Dictionary *dict) {
-   Dictionary *out_dict = (Dictionary *) nullptr;
    map<STATLineType,StringArray> output_map;
    STATLineType line_type;
    StringArray sa;
@@ -444,7 +443,7 @@ map<STATLineType,StringArray> parse_conf_output_stats(Dictionary *dict) {
    }
 
    // Get the output flag dictionary
-   out_dict = dict->lookup_dictionary(conf_key_output_stats);
+   auto out_dict = dict->lookup_dictionary(conf_key_output_stats);
 
    // Loop over the output flag dictionary entries
    for(int i=0; i<out_dict->n_entries(); i++) {
@@ -1006,7 +1005,6 @@ NumArray parse_conf_eclv_points(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
-   Dictionary *ts_dict = (Dictionary *) nullptr;
    TimeSummaryInfo info;
    bool is_correct_type = false;
 
@@ -1017,7 +1015,7 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
    }
 
    // Conf: time_summary
-   ts_dict = dict->lookup_dictionary(conf_key_time_summary);
+   auto ts_dict = dict->lookup_dictionary(conf_key_time_summary);
 
    // Conf: flag
    info.flag = ts_dict->lookup_bool(conf_key_flag);
@@ -1160,7 +1158,6 @@ void parse_add_conf_key_values_map(
 
 map<ConcatString,ConcatString> parse_conf_key_value_map(
       Dictionary *dict, const char *conf_key_map_name, const char *caller) {
-   Dictionary *map_dict = (Dictionary *) nullptr;
    map<ConcatString,ConcatString> m;
    ConcatString key, val;
    const char *method_name = (nullptr != caller) ? caller : "parse_conf_key_value_map() -> ";
@@ -1171,7 +1168,7 @@ map<ConcatString,ConcatString> parse_conf_key_value_map(
    }
 
    // Conf: map_name: message_type_map, obs_var_map, etc
-   map_dict = dict->lookup_array(conf_key_map_name);
+   auto map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
    for(int i=0; i<map_dict->n_entries(); i++) {
@@ -1254,7 +1251,6 @@ map<ConcatString,StringArray> parse_conf_obs_to_qc_map(Dictionary *dict) {
 
 map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
       Dictionary *dict, const char *conf_key_map_name, const char *caller) {
-   Dictionary *map_dict = (Dictionary *) nullptr;
    StringArray sa;
    ConcatString key;
    UserFunc_1Arg fx;
@@ -1267,7 +1263,7 @@ map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
    }
 
    // Conf: diag_convert_map
-   map_dict = dict->lookup_array(conf_key_map_name);
+   auto map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
    for(int i=0; i<map_dict->n_entries(); i++) {
@@ -1790,8 +1786,7 @@ InterpInfo & InterpInfo::operator=(const InterpInfo &a) noexcept {
 ///////////////////////////////////////////////////////////////////////////////
 
 InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
-   Dictionary *interp_dict = (Dictionary *) nullptr;
-   Dictionary *type_dict = (Dictionary *) nullptr;
+   Dictionary *type_dict = nullptr;
    InterpInfo info;
    NumArray mthd_na;
    NumArray wdth_na;
@@ -1809,7 +1804,7 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
    }
 
    // Conf: interp
-   interp_dict = dict->lookup_dictionary(conf_key);
+   auto interp_dict = dict->lookup_dictionary(conf_key);
 
    // Conf: field - may be missing
    v = interp_dict->lookup_int(conf_key_field, false);
@@ -2017,7 +2012,6 @@ ClimoCDFInfo &ClimoCDFInfo::operator=(const ClimoCDFInfo &a) noexcept {
 ///////////////////////////////////////////////////////////////////////////////
 
 ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
-   Dictionary *cdf_dict = (Dictionary *) nullptr;
    ClimoCDFInfo info;
    NumArray bins;
    bool center;
@@ -2030,7 +2024,7 @@ ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
    }
 
    // Conf: climo_cdf
-   cdf_dict = dict->lookup_dictionary(conf_key_climo_cdf);
+   auto cdf_dict = dict->lookup_dictionary(conf_key_climo_cdf);
 
    // Conf: cdf_bins
    bins = cdf_dict->lookup_num_array(conf_key_cdf_bins);
@@ -2120,7 +2114,6 @@ NbrhdInfo &NbrhdInfo::operator=(const NbrhdInfo &a) noexcept {
 ///////////////////////////////////////////////////////////////////////////////
 
 NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
-   Dictionary *nbrhd_dict = (Dictionary *) nullptr;
    NbrhdInfo info;
    int i;
    int v;
@@ -2132,7 +2125,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
    }
 
    // Conf: nbrhd
-   nbrhd_dict = dict->lookup_dictionary(conf_key);
+   auto nbrhd_dict = dict->lookup_dictionary(conf_key);
 
    // Conf: field - may be missing
 
@@ -2353,7 +2346,6 @@ HiRAInfo &HiRAInfo::operator=(const HiRAInfo &a) noexcept {
 ///////////////////////////////////////////////////////////////////////////////
 
 HiRAInfo parse_conf_hira(Dictionary *dict) {
-   Dictionary *hira_dict = (Dictionary *) nullptr;
    HiRAInfo info;
    int v;
 
@@ -2364,7 +2356,7 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
    }
 
    // Conf: hira
-   hira_dict = dict->lookup_dictionary(conf_key_hira);
+   auto hira_dict = dict->lookup_dictionary(conf_key_hira);
 
    // Conf: flag
    info.flag = hira_dict->lookup_bool(conf_key_flag);
@@ -3144,7 +3136,7 @@ void check_mctc_thresh(const ThreshArray &ta) {
 ///////////////////////////////////////////////////////////////////////////////
 
 const char * statlinetype_to_string(const STATLineType t) {
-   const char *s = (const char *) nullptr;
+   const char *s = nullptr;
 
    switch(t) {
       case STATLineType::sl1l2:      s = stat_sl1l2_str;     break;
@@ -3265,7 +3257,7 @@ STATLineType string_to_statlinetype(const char *s) {
 ///////////////////////////////////////////////////////////////////////////////
 
 const char * bootintervaltype_to_string(const BootIntervalType t) {
-   auto s = (const char *) nullptr;
+   const char *s = nullptr;
 
    switch(t) {
       case BootIntervalType::BCA:    s = conf_val_bca;     break;
@@ -3975,7 +3967,6 @@ PowerSpectrumInfo &PowerSpectrumInfo::operator=(const PowerSpectrumInfo &a) noex
 ///////////////////////////////////////////////////////////////////////////////
 
 PowerSpectrumInfo parse_conf_power_spectrum(Dictionary *dict) {
-   Dictionary *ps_dict = (Dictionary *) nullptr;
    PowerSpectrumInfo info;
 
    if(!dict) {
@@ -3985,7 +3976,7 @@ PowerSpectrumInfo parse_conf_power_spectrum(Dictionary *dict) {
    }
 
    // Conf: power_spectrum
-   ps_dict = dict->lookup_dictionary(conf_key_power_spectrum);
+   auto ps_dict = dict->lookup_dictionary(conf_key_power_spectrum);
 
    // Conf: missing_flag
    info.missing_flag = int_to_missingdatatype(ps_dict->lookup_int(conf_key_missing_flag));
