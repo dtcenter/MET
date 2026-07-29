@@ -1157,12 +1157,11 @@ int get_int_var(NcVar * var, const int index) {
 ////////////////////////////////////////////////////////////////////////
 
 double get_nc_time(NcVar * var, const int index) {
-   double k;
    vector<size_t> start;
    vector<size_t> count;
    const char *method_name = "get_nc_time() -> ";
 
-   k = bad_data_double;
+   double k = bad_data_double;
    if (IS_VALID_NC_P(var)) {
       int dim_idx = 0;
       int dim_size = get_dim_size(var, dim_idx);
@@ -1183,19 +1182,24 @@ double get_nc_time(NcVar * var, const int index) {
          exit(1);
       }
 
+      int buf_len = 512;
+      int dataType = GET_NC_TYPE_ID_P(var);
+      int dim_count = get_dim_count(var);
+      if (dataType == NC_CHAR) {
+         buf_len = get_dim_size(var, (dim_count-1));
+      }
+
       int vi;
       short vs;
       float vf;
       ncbyte vb;
       long long vl;
       unixtime ref_ut;
-      int buf_len = 512;
-      vector<char> tmp_buf(buf_len);
-      int dataType = GET_NC_TYPE_ID_P(var);
+      vector<char> tmp_buf(buf_len+1);
 
       start.emplace_back(index);
       count.emplace_back(1);
-      tmp_buf[0] = 0;
+      tmp_buf[0] = tmp_buf[buf_len] = 0;
 
       switch (dataType) {
          case NC_DOUBLE:
@@ -1214,12 +1218,13 @@ double get_nc_time(NcVar * var, const int index) {
             k = (double)vb;
             break;
          case NC_CHAR:
-            if (2 == get_dim_count(var)) {
-               buf_len = get_dim_size(var, 1);
+            if (2 == dim_count) {
                start.emplace_back(0);
                count.emplace_back(buf_len);
             }
+            else count[0] = buf_len;
             for (int i=0; i<buf_len; i++) tmp_buf[i] = 0;
+
             var->getVar(start, count, tmp_buf.data());
             parse_time_string(tmp_buf.data(), ref_ut);
             k = ref_ut;
@@ -3618,60 +3623,86 @@ int get_data_size(NcVar *var) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+unixtime get_init_time(NcVar *time_var) {
+   unixtime init_time = 0;
+   const char *method_name = "get_init_time(NcVar *) -> ";
+
+   if (IS_INVALID_NC_P(time_var)) {
+      mlog << Debug(4) << method_name
+           << "could not extract init time\n";
+      return init_time;
+   }
+
+   int data_type = GET_NC_TYPE_ID_P(time_var);
+   bool is_string_time = (NC_UBYTE == data_type || NC_BYTE == data_type
+                          || NC_CHAR == data_type || NC_STRING == data_type);
+   double time_value = get_nc_time(time_var, 0);
+   init_time = time_value;
+   if (!is_string_time) {
+      int sec_per_unit = 0;
+      bool no_leap_year = true;
+      unixtime ref_ut = get_reference_unixtime(time_var, sec_per_unit,
+                                               no_leap_year, method_name);
+      init_time = ref_ut + (unixtime)(sec_per_unit * time_value);
+   }
+
+   mlog << Debug(4) << method_name
+        << "get InitTime (" << unix_to_yyyymmdd_hhmmss(init_time)
+        << ") from \"" << GET_NC_NAME_P(time_var) << "\" variable (value="
+        << time_value << ").\n";
+
+   return init_time;
+}
+////////////////////////////////////////////////////////////////////////
 // Moved from nc_cf_file.cc
-// init_time or valid_time from filename`
+// init_time from NetCDF, default variable name is forecast_reference_time
+// Can get valid_time id byte or char type with variable name
 
 string init_time_var_name = "forecast_reference_time";
-unixtime get_init_time(NcFile *nc_file) {
+
+unixtime get_init_time(NcFile *nc_file, const char *time_var_name) {
    unixtime init_time = 0;
-   NcVar init_time_var = get_var(nc_file, init_time_var_name.c_str());
    const char *method_name = "get_init_time(NcFile *, string &) -> ";
 
-   if (IS_INVALID_NC(init_time_var)) {
+   if (time_var_name == nullptr) time_var_name = init_time_var_name.c_str();
+
+   NcVar time_var = get_var(nc_file, time_var_name);
+   if (IS_INVALID_NC(time_var)) {
       mlog << Debug(4) << method_name
            << "could not extract init time from the "
-           << "\"" << init_time_var_name << "\" variable.\n";
+           << "\"" << time_var_name << "\" variable.\n";
    }
    else {
-      unixtime ut = 0;
-      int sec_per_unit = 0;
-      ConcatString units;
-
-      // Parse the units for the time variable.
-      if (get_var_units(&init_time_var, units)) {
-         if (units.empty()) {
-            mlog << Warning << "\n" << method_name
-                 << "the \"" << init_time_var_name << "\" variable must contain a \"units\" attribute.\n\n";
-         }
-         else {
-            parse_cf_time_string(units.c_str(), ut, sec_per_unit);
-         }
-      }
-
-      double time_value = get_nc_time(&init_time_var,0);
-      init_time = ut + (unixtime)(sec_per_unit * time_value);
-      mlog << Debug(4) << method_name
-           << "get InitTime (" << unix_to_yyyymmdd_hhmmss(init_time)
-           << ") from \"" << init_time_var_name << "\" variable (value=" << time_value<< ").\n";
+      init_time = get_init_time(&time_var);
    }
    return init_time;
 }
 
 ////////////////////////////////////////////////////////////////////////
+// retrurn 0 if units attribute is missing
 
 unixtime get_reference_unixtime(NcVar *time_var, int &sec_per_unit,
-                                bool &no_leap_year) {
+                                bool &no_leap_year, const char *caller) {
    unixtime ref_ut = 0;
    ConcatString time_unit_str;
    static const char *method_name = "get_reference_unixtime() -> ";
 
+   sec_per_unit = 1;
    if (get_var_units(time_var, time_unit_str)) {
-      parse_cf_time_string(time_unit_str.c_str(), ref_ut, sec_per_unit);
-      no_leap_year = (sec_per_day == sec_per_unit) ? get_att_no_leap_year(time_var) : false;
+      if (time_unit_str.empty()) {
+         int data_type = GET_NC_TYPE_ID_P(time_var);
+         if (NC_UBYTE != data_type && NC_BYTE != data_type) {
+            mlog << Warning << "\n" << (caller != nullptr ? caller : method_name)
+                 << "the \"" << GET_NC_NAME_P(time_var)
+                 << "\" variable must contain a \"units\" attribute.\n\n";
+         }
+      }
+      else {
+         parse_cf_time_string(time_unit_str.c_str(), ref_ut, sec_per_unit);
+      }
    }
-   else {
-      sec_per_unit = 1;
-   }
+   no_leap_year = (sec_per_day == sec_per_unit) ? get_att_no_leap_year(time_var) : false;
 
    return ref_ut;
 }
@@ -3708,7 +3739,7 @@ bool is_nc_unit_time(const char *units) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void parse_cf_time_string(const char *str, unixtime &ref_ut,
+bool parse_cf_time_string(const char *str, unixtime &ref_ut,
                           int &sec_per_unit) {
    static const char *method_name = "parse_cf_time_string() -> ";
 
@@ -3721,7 +3752,7 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut,
       mlog << Warning << "\n" << method_name
            << "unexpected NetCDF CF convention time unit \""
            << str << "\"\n\n";
-      return;
+      return false;
    }
    else {
       // Tokenize the input string
@@ -3756,7 +3787,7 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut,
          mlog << Warning << "\n" << method_name
               << "Unsupported time step in the CF convention time unit \""
               << str << "\"\n\n";
-         return;
+         return false;
       }
 
       // Parse the reference time
@@ -3775,7 +3806,7 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut,
         << "\"\n\t\t as a reference time of " << unix_to_yyyymmdd_hhmmss(ref_ut)
         << " and " << sec_per_unit << " second(s) per time step.\n";
 
-   return;
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3800,16 +3831,17 @@ void parse_time_string(const char *str, unixtime &ut) {
       //   2016-01-28T12:00:00Z
       //   1977-08-07 12:00:00Z
       StringArray tok;
+      StringArray hms;
+      StringArray ymd;
       tok.parse_delim(str, " _T");
       // Parse the reference time
-      StringArray ymd, hms;
       ymd.parse_delim(tok[0], "-");
       if(tok.n_elements() > 1) hms.parse_delim(tok[1], ":");
       else                     hms.parse_delim("00:00:00", ":");
       ut = mdyhms_to_unix(atoi(ymd[1].c_str()), atoi(ymd[2].c_str()),
-                              atoi(ymd[0].c_str()), atoi(hms[0].c_str()),
-                              hms.n_elements() > 1 ? atoi(hms[1].c_str()) : 0,
-                              hms.n_elements() > 2 ? atoi(hms[2].c_str()) : 0);
+                          atoi(ymd[0].c_str()), atoi(hms[0].c_str()),
+                          hms.n_elements() > 1 ? atoi(hms[1].c_str()) : 0,
+                          hms.n_elements() > 2 ? atoi(hms[2].c_str()) : 0);
    }
 
    mlog << Debug(4) << method_name
