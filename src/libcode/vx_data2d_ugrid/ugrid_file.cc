@@ -23,7 +23,6 @@
 #include <netcdf>
 
 #include "vx_math.h"
-#include "vx_cal.h"
 #include "vx_log.h"
 #include "config_util.h"
 
@@ -46,7 +45,7 @@ array<string, UG_DIM_COUNT> DIM_KEYS = {
 
 array<string, UG_META_VAR_COUNT> COORD_VAR_KEYS = {
       "time", "lat_face", "lon_face", "vert_face", "lat_edge",
-      "lon_edge", "lat_node", "lon_node", "cell_id"
+      "lon_edge", "lat_node", "lon_node", "cell_id", "init_time"
 };
 
 static double get_nc_var_att_double(const NcVar *nc_var, const char *att_name,
@@ -97,6 +96,9 @@ void UGridFile::init_from_scratch()
   _tDim = (NcDim *)nullptr;
   _latVar = (NcVar *)nullptr;
   _lonVar = (NcVar *)nullptr;
+  _zVar = (NcVar *)nullptr;
+  _tVar = (NcVar *)nullptr;
+  _init_time_var = (NcVar *)nullptr;
 
   // Close any existing file
 
@@ -219,18 +221,18 @@ bool UGridFile::open(const char * filepath)
 
 bool UGridFile::open_metadata(const char * filepath)
 {
-  unixtime ut = 0;
   const char *method_name = "UGridFile::open_metadata() -> ";
 
   // Open the file
   _ncMetaFile = open_ncfile(filepath);
+
+  mlog << Debug(7) << method_name << "open " << filepath << "\n";
 
   if (IS_INVALID_NC_P(_ncMetaFile)) {
     close();
     exit(1);
   }
 
-  NcDim dim;
   StringArray dim_names;
   get_dim_names(_ncMetaFile, &dim_names);
 
@@ -256,152 +258,23 @@ bool UGridFile::open_metadata(const char * filepath)
   assign_dim_from_metadata(_ncFile, _tDim, DIM_KEYS[3], dim_names);     // Time dimension
   assign_dim_from_metadata(_ncFile, _virtDim, DIM_KEYS[4], dim_names);  // Vertical dimension
 
-  int max_dim_count = 0;
-  StringArray var_names;
-  ConcatString att_value;
-  auto z_var = (NcVar *)nullptr;
-  auto valid_time_var = (NcVar *)nullptr;
-  string time_dim_name = find_metadata_name(DIM_KEYS[3], dim_names);
-  string vert_dim_name = find_metadata_name(DIM_KEYS[4], dim_names);
+  metadata_coord_variables();
 
-  StringArray time_names = get_metadata_names(COORD_VAR_KEYS[0]);
-  StringArray lat_names = get_metadata_names(COORD_VAR_KEYS[1]);
-  StringArray lon_names = get_metadata_names(COORD_VAR_KEYS[2]);
-  StringArray z_names = get_metadata_names(COORD_VAR_KEYS[3]);
-  for (int j=0; j<Nvars; ++j) {
-    if (time_names.has(Var[j].name)) {
-      valid_time_var = Var[j].var;
-      _time_var_info = &Var[j];
-    }
-    else if (lat_names.has(Var[j].name)) _latVar = Var[j].var;
-    else if (lon_names.has(Var[j].name)) _lonVar = Var[j].var;
-    else if (z_names.has(Var[j].name)) {
-      z_var = Var[j].var;
-      z_var_name = Var[j].name;
-    }
-  }
-
-  get_var_names(_ncMetaFile, &var_names);
-  for (int j=0; j<COORD_VAR_KEYS.size(); j++) {
-    string meta_name = find_metadata_name(COORD_VAR_KEYS[j], var_names);
-    if (0 < meta_name.length()) {
-      NcVar v = get_var(_ncMetaFile, meta_name.c_str());
-
-      MetaVar[j].var = new NcVar(v);
-
-      MetaVar[j].name = GET_NC_NAME(v).c_str();
-
-      int dim_count = GET_NC_DIM_COUNT(v);
-      MetaVar[j].Ndims = dim_count;
-      MetaVar[j].Dims = new NcDim * [dim_count];
-      if (dim_count > max_dim_count) max_dim_count = dim_count;
-
-      //  parse the variable attributes
-      get_att_str( MetaVar[j], long_name_att_name, MetaVar[j].long_name_att );
-      get_att_str( MetaVar[j], units_att_name,     MetaVar[j].units_att     );
-
-      if (0 == j && nullptr == _time_var_info) {
-        valid_time_var = MetaVar[j].var;
-        _time_var_info = &MetaVar[j];
-      }
-      else if (1 == j && nullptr == _latVar) _latVar = MetaVar[j].var;
-      else if (2 == j && nullptr == _lonVar) _lonVar = MetaVar[j].var;
-      else if (3 == j && nullptr == z_var) z_var = MetaVar[j].var;
-    }
-  }   //  for j
-
-
-  // Pull out the valid and init times
-  if (IS_INVALID_NC_P(valid_time_var)) {
+  InitTime = 0;
+  if (!metadata_time()) {
     mlog << Debug(4) << method_name
          << "could not extract valid time from the "
          << "time variable from " << filepath << "\n";
-
-    ValidTime.add(ut);
   }
-  else {
-    int sec_per_unit;
 
-    // Store the dimension for the time variable as the time dimension
-    ConcatString units;
-    bool use_bounds_var = false;
-    int time_dim_count = get_dim_count(valid_time_var);
-    if (time_dim_count == 1 || time_dim_count == 2) {
-       NcDim tDim = get_nc_dim(valid_time_var, 0);
-       if (IS_VALID_NC(tDim)) {
-         _tDim = new NcDim(tDim);
-       }
-    }
-
-    // Parse the units for the time variable.
-    ut = sec_per_unit = 0;
-    if (get_var_units(valid_time_var, units) && (time_dim_count < 2)) {
-      if (units.empty()) {
-         mlog << Warning << "\n" << method_name
-              << "the \"time\" variable must contain a \"units\" attribute. "
-              << "Using valid time of 0\n\n";
-      }
-      else {
-         mlog << Debug(4) << method_name
-              << "parsing units for the time variable \"" << units << "\"\n";
-         parse_cf_time_string(units.c_str(), ut, sec_per_unit);
-      }
-    }
-
-    // Determine the number of times present.
-    int n_times = IS_VALID_NC_P(_tDim) ? get_dim_size(_tDim)
-                                       : get_data_size(valid_time_var);
-    int tim_buf_size = n_times;
-    vector<double> time_values(tim_buf_size);
-    if(2 == time_dim_count) {
-      for(int i=0; i<n_times; i++) {
-        time_values[i] = get_nc_time(valid_time_var, i);
-        ValidTime.add(time_values[i]);
-        raw_times.add(time_values[i]);
-        mlog << Debug(7) << method_name
-             << "get time " << time_values[i] << " ("
-             << unix_to_yyyymmdd_hhmmss(time_values[i]) << ") from "
-             << GET_NC_NAME_P(valid_time_var) << "\n";
-      }
-    }
-    else if( get_nc_data(valid_time_var, time_values.data()) ) {
-      bool no_leap_year = get_att_no_leap_year(valid_time_var);
-      if( time_dim_count > 1 ) {
-        double latest_time = bad_data_double;
-        for(int i=0; i<n_times; i++) {
-          if( latest_time < time_values[i] ) latest_time = time_values[i];
-        }
-        ValidTime.add(add_to_unixtime(ut, sec_per_unit, latest_time, no_leap_year));
-        raw_times.add(latest_time);
-      }
-      else {
-        if (use_bounds_var) {
-          double bounds_diff;
-          for(int i=0; i<n_times; i++) {
-            ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i*2+1], no_leap_year));
-            raw_times.add(time_values[i*2+1]);
-            bounds_diff = time_values[i*2+1] - time_values[i*2];
-            if (abs(bounds_diff - nint(bounds_diff)) < TIME_EPSILON) {
-              AccumTime = (unixtime)(sec_per_unit * nint(bounds_diff));
-            }
-            else {
-              AccumTime = (unixtime)(sec_per_unit * bounds_diff);
-            }
-          }
-        }
-        else {
-          for(int i=0; i<n_times; i++) {
-            ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i], no_leap_year));
-            raw_times.add(time_values[i]);
-          }
-        }
-      }
-    }
-    else ValidTime.add(0);  //Initialize
+  // Override InitTime if init_time is defined at the configuration file
+  if (_init_time_var != nullptr) {
+    InitTime = get_init_time(_init_time_var);
   }
 
   // Get InitTime from the forecast_reference_time
-  InitTime = get_init_time(_ncFile);
+  if (InitTime == 0 ) InitTime = get_init_time(_ncFile);
+
 
   // Pull out the grid.  This must be done after pulling out the dimension
   // and variable information since this information is used to pull out the
@@ -414,6 +287,8 @@ bool UGridFile::open_metadata(const char * filepath)
   // Should be called after read_netcdf_grid() is called
 
   StringArray dimNames;
+  string time_dim_name = find_metadata_name(DIM_KEYS[3], dim_names);
+  string vert_dim_name = find_metadata_name(DIM_KEYS[4], dim_names);
   for (int j=0; j<Nvars; ++j) {
 
     int dim_count = Var[j].Ndims;
@@ -435,18 +310,17 @@ bool UGridFile::open_metadata(const char * filepath)
   }   //  for j
 
   // Find the vertical level variable from dimension name if not found
-  if (IS_INVALID_NC_P(z_var) && (!vert_dim_name.empty())) {
+  if (IS_INVALID_NC_P(_zVar) && (!vert_dim_name.empty())) {
     NcVarInfo *info = find_var_by_dim_name(vert_dim_name.c_str());
-    if (info) z_var = info->var;
+    if (info) _zVar = info->var;
   }
 
   // Pull out the vertical levels
-  if (IS_VALID_NC_P(z_var)) {
-
-    int z_count = get_data_size(z_var);
+  if (IS_VALID_NC_P(_zVar)) {
+    int z_count = get_data_size(_zVar);
     vector<double> z_values(z_count);
 
-    if( get_nc_data(z_var, z_values.data()) ) {
+    if( get_nc_data(_zVar, z_values.data()) ) {
       for(int i=0; i<z_count; i++) {
         vlevels.add(z_values[i]);
       }
@@ -549,7 +423,8 @@ void UGridFile::dump(ostream & out, int depth) const
 
 ////////////////////////////////////////////////////////////////////////
 
-std::string UGridFile::find_metadata_name(const std::string &key, const StringArray &available_names) {
+std::string UGridFile::find_metadata_name(const std::string &key,
+                                          const StringArray &available_names) {
   string meta_name = "";
   StringArray meta_names = get_metadata_names(key);
 
@@ -678,7 +553,7 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   if (nullptr == var) {
     mlog << Error << "\n" << method_name
          << "variable " << GET_NC_NAME_P(v) << " not found!\n\n";
-    return true;;
+    return true;
   }
 
   //  check star positions and count
@@ -820,7 +695,6 @@ bool UGridFile::get_var_info() {
   }
 
   NcDim dim;
-  int max_dim_count = 0;
   ConcatString att_value;
   StringArray var_names;
 
@@ -835,7 +709,6 @@ bool UGridFile::get_var_info() {
 
     int dim_count = GET_NC_DIM_COUNT(v);
     Var[j].Ndims = dim_count;
-    if (dim_count > max_dim_count) max_dim_count = dim_count;
 
     Var[j].Dims = new NcDim * [dim_count];
 
@@ -860,6 +733,151 @@ int UGridFile::lead_time() const
   return (int) dt;
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+void UGridFile::metadata_coord_variables() {
+  static const string method_name
+      = "UGridFile::metadata_coord_variables() => ";
+
+  //Variables at the data file first
+  StringArray time_names = get_metadata_names(COORD_VAR_KEYS[0]);
+  StringArray lat_names = get_metadata_names(COORD_VAR_KEYS[1]);
+  StringArray lon_names = get_metadata_names(COORD_VAR_KEYS[2]);
+  StringArray z_names = get_metadata_names(COORD_VAR_KEYS[3]);
+  StringArray init_time_names = get_metadata_names(COORD_VAR_KEYS[9]);
+  for (int j=0; j<Nvars; ++j) {
+    if (time_names.has(Var[j].name)) {
+      _tVar = Var[j].var;
+      //_time_var_info = &Var[j];
+    }
+    else if (lat_names.has(Var[j].name)) _latVar = Var[j].var;
+    else if (lon_names.has(Var[j].name)) _lonVar = Var[j].var;
+    else if (z_names.has(Var[j].name)) {
+      _zVar = Var[j].var;
+      z_var_name = Var[j].name;
+    }
+    else if (init_time_names.has(Var[j].name)) {
+      _init_time_var = Var[j].var;
+      mlog << Debug(97) << method_name
+           << "found _init_time_var (" << GET_NC_NAME_P(_init_time_var)
+           << ") from data file\n";
+    }
+  }
+
+  // Variables at the coordinate file (could be the same as the data file)
+  StringArray var_names;
+  get_var_names(_ncMetaFile, &var_names);
+  for (int j=0; j<COORD_VAR_KEYS.size(); j++) {
+    string meta_name = find_metadata_name(COORD_VAR_KEYS[j], var_names);
+    if (0 < meta_name.length()) {
+      NcVar v = get_var(_ncMetaFile, meta_name.c_str());
+
+      MetaVar[j].var = new NcVar(v);
+      MetaVar[j].name = GET_NC_NAME(v).c_str();
+
+      int dim_count = GET_NC_DIM_COUNT(v);
+      MetaVar[j].Ndims = dim_count;
+      MetaVar[j].Dims = new NcDim * [dim_count];
+
+      //  parse the variable attributes
+      get_att_str( MetaVar[j], long_name_att_name, MetaVar[j].long_name_att );
+      get_att_str( MetaVar[j], units_att_name,     MetaVar[j].units_att     );
+
+      if (0 == j && nullptr == _tVar) {
+        _tVar = MetaVar[j].var;
+        //_time_var_info = &MetaVar[j];
+      }
+      else if (1 == j && nullptr == _latVar) _latVar = MetaVar[j].var;
+      else if (2 == j && nullptr == _lonVar) _lonVar = MetaVar[j].var;
+      else if (3 == j && nullptr == _zVar) _zVar = MetaVar[j].var;
+      else if (9 == j && nullptr == _init_time_var) {
+        _init_time_var = MetaVar[j].var;
+        mlog << Debug(97) << method_name
+             << "found _init_time_var (" << GET_NC_NAME_P(_init_time_var)
+             << ") from data file\n";
+      }
+    }
+  }   //  for j
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool UGridFile::metadata_time() {
+  const char *method_name = "UGridFile::metadata_time() -> ";
+
+  // Pull out the valid and init times
+  if (IS_INVALID_NC_P(_tVar)) {
+    ValidTime.add(0);
+    return false;
+  }
+
+  // Store the dimension for the time variable as the time dimension
+  bool use_bounds_var = false;
+  int time_dim_count = get_dim_count(_tVar);
+  if (nullptr == _tDim && (time_dim_count == 1 || time_dim_count == 2)) {
+     NcDim tDim = get_nc_dim(_tVar, 0);
+     if (IS_VALID_NC(tDim)) {
+       _tDim = new NcDim(tDim);
+     }
+  }
+
+  int data_type = GET_NC_TYPE_ID_P(_tVar);
+  bool is_string_time = (NC_UBYTE == data_type || NC_BYTE == data_type
+                         || NC_CHAR == data_type || NC_STRING == data_type);
+
+  // Determine the number of times present.
+  int n_times = IS_VALID_NC_P(_tDim) ? get_dim_size(_tDim)
+                                     : get_data_size(_tVar);
+  vector<double> time_values(n_times);
+  if(is_string_time) {   // String type: YYYY-MM-DD HH:MM:SS
+    mlog << Debug(7) << method_name
+           << "from " << GET_NC_NAME_P(_tVar) << "\n";
+    for(int i=0; i<n_times; i++) {
+      time_values[i] = get_nc_time(_tVar, i);
+      ValidTime.add(time_values[i]);
+      raw_times.add(time_values[i]);
+      mlog << Debug(7) << method_name
+           << "get time " << time_values[i] << " ("
+           << unix_to_yyyymmdd_hhmmss(time_values[i]) << ")\n";
+    }
+  }
+  else if( get_nc_data(_tVar, time_values.data()) ) {
+    // Parse the units for the time variable.
+    int sec_per_unit = 0;
+    bool no_leap_year = true;
+    unixtime ref_ut = get_reference_unixtime(_tVar, sec_per_unit,
+                                             no_leap_year, method_name);
+    if (ref_ut != 0) InitTime = ref_ut;
+
+    if (use_bounds_var) {
+      double bounds_diff;
+      for(int i=0; i<n_times; i++) {
+        ValidTime.add(add_to_unixtime(ref_ut, sec_per_unit, time_values[i*2+1],
+                      no_leap_year));
+        raw_times.add(time_values[i*2+1]);
+        bounds_diff = time_values[i*2+1] - time_values[i*2];
+        if (abs(bounds_diff - nint(bounds_diff)) < TIME_EPSILON) {
+          AccumTime = (unixtime)(sec_per_unit * nint(bounds_diff));
+        }
+        else {
+          AccumTime = (unixtime)(sec_per_unit * bounds_diff);
+        }
+      }
+    }
+    else {
+      for(int i=0; i<n_times; i++) {
+        raw_times.add(time_values[i]);
+        ValidTime.add(add_to_unixtime(ref_ut, sec_per_unit, time_values[i],
+                                      no_leap_year));
+      }
+    }
+  }
+  else ValidTime.add(0);  //Initialize
+
+  return true;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -945,7 +963,7 @@ void UGridFile::read_netcdf_grid()
 
   vector<double> _lat(face_count);
   vector<double> _lon(face_count);
-  
+
   if (IS_INVALID_NC_P(_latVar)) {
     mlog << Error << "\n" << method_name << "latitude variable is missing\n\n";
     exit(1);

@@ -30,7 +30,7 @@
 
 
 static const int UG_DIM_COUNT = 5;
-static const int UG_META_VAR_COUNT = 9;
+static const int UG_META_VAR_COUNT = 10;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@ class UGridFile {
         return 1;
       }
       
-      NcVarInfo *get_time_var_info() const { return _time_var_info; }
+      //NcVarInfo *get_time_var_info() const { return _time_var_info; }
       
          //
          //  time
@@ -146,6 +146,9 @@ class UGridFile {
 
       netCDF::NcVar *_latVar;
       netCDF::NcVar *_lonVar;
+      netCDF::NcVar *_zVar;
+      netCDF::NcVar *_tVar;
+      netCDF::NcVar *_init_time_var;
       NcVarInfo *_time_var_info;
 
       int face_count;
@@ -165,6 +168,8 @@ class UGridFile {
 
       std::string find_metadata_name(const std::string &key, const StringArray &available_names);
       StringArray get_metadata_names(const std::string &key);
+      void metadata_coord_variables();
+      bool metadata_time();
       void radian_to_degree(std::vector<double> &lat_values, const int lat_count) const;
       void read_config(const ConcatString &config_filename);
       void read_netcdf_grid();
