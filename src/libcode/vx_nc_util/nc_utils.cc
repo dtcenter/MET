@@ -1190,12 +1190,12 @@ double get_nc_time(NcVar * var, const int index) {
       long long vl;
       unixtime ref_ut;
       int buf_len = 512;
-      vector<char> tmp_buf(buf_len);
+      vector<char> tmp_buf(buf_len+1);
       int dataType = GET_NC_TYPE_ID_P(var);
 
       start.emplace_back(index);
       count.emplace_back(1);
-      tmp_buf[0] = 0;
+      tmp_buf[0] = tmp_buf[buf_len] =0;
 
       switch (dataType) {
          case NC_DOUBLE:
@@ -1218,6 +1218,10 @@ double get_nc_time(NcVar * var, const int index) {
                buf_len = get_dim_size(var, 1);
                start.emplace_back(0);
                count.emplace_back(buf_len);
+            }
+            else {
+               buf_len = get_dim_size(var, 0);
+               count[0] = buf_len;
             }
             for (int i=0; i<buf_len; i++) tmp_buf[i] = 0;
             var->getVar(start, count, tmp_buf.data());
