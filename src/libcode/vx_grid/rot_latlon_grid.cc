@@ -229,11 +229,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double RotatedLatLonGrid::calc_area(int x, int y) const
+double RotatedLatLonGrid::calc_area(int x, int y, bool centered) const
 
 {
 
-double area = LatLonGrid::calc_area(x, y);
+double area = LatLonGrid::calc_area(x, y, centered);
 
 return area;
 

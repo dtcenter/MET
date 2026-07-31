@@ -158,7 +158,6 @@ for (j=0; j<ny_half; ++j)  {
    k = Ny - 1 - i;
 
    L.lether_root_weight(k, r, w);
-   // L.d_and_r_root_weight(k, r, w);
 
    latitude = asind(r);
 
@@ -272,17 +271,21 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double GaussianGrid::calc_area(int x, int y) const
+double GaussianGrid::calc_area(int x, int y, bool centered) const
 
 {
 
 double lat_top, lat_bot;
 double area;
 
-if ( y == (Ny - 1) )  lat_top = 90.0;
-else                  lat_top = Latitudes[y + 1];
-
-lat_bot = Latitudes[y];
+if ( centered ) {
+   lat_top = (y == (Ny - 1) ? 90.0 : (Latitudes[y] + Latitudes[y+1]) / 2.0);
+   lat_bot = (y == 0        ?  0.0 : (Latitudes[y] + Latitudes[y-1]) / 2.0);
+}
+else {
+   lat_top = (y == (Ny - 1) ? 90.0 : Latitudes[y+1]);
+   lat_bot = Latitudes[y];
+}
 
 area = rad_per_deg*fabs(Delta_Lon);   //  Delta_Lon in radians
 
