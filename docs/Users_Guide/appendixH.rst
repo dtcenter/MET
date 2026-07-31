@@ -43,6 +43,9 @@ To correctly parse the UGRID topology, MET needs the following information that 
   * - time
     - Coordinate variable for time
     - Required
+  * - init_time
+    - Coordinate variable for initial time (for the lead time)
+    - Optional
   * - dim_vert
     - Dimension name for the vertical coordinate, if present
     - Optional
