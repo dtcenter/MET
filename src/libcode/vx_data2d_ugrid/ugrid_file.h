@@ -30,7 +30,7 @@
 
 
 static const int UG_DIM_COUNT = 5;
-static const int UG_META_VAR_COUNT = 9;
+static const int UG_META_VAR_COUNT = 10;
 
 
 ////////////////////////////////////////////////////////////////////////
