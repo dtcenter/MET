@@ -40,11 +40,11 @@ static const char *def_config_prefix = "UGridConfig_";
 static const char *def_config_prefix2 = "MET_BASE/config/UGridConfig_";
 constexpr double lat_epsilon = 0.00001;
 
-array<string, UG_DIM_COUNT> DIM_KEYS = {
+const array<string, UG_DIM_COUNT> DIM_KEYS = {
       "dim_face", "dim_node", "dim_edge", "dim_time", "dim_vert"
 };
 
-array<string, UG_META_VAR_COUNT> COORD_VAR_KEYS = {
+const array<string, UG_META_VAR_COUNT> COORD_VAR_KEYS = {
       "time", "lat_face", "lon_face", "vert_face", "lat_edge",
       "lon_edge", "lat_node", "lon_node", "cell_id", "init_time"
 };
@@ -261,9 +261,9 @@ bool UGridFile::open_metadata(const char * filepath)
   int max_dim_count = 0;
   StringArray var_names;
   ConcatString att_value;
-  NcVar *z_var = (NcVar *)nullptr;
-  NcVar *valid_time_var = (NcVar *)nullptr;
-  NcVar *init_time_var = (NcVar *)nullptr;
+  auto z_var = (NcVar *)nullptr;
+  auto init_time_var = (NcVar *)nullptr;
+  auto valid_time_var = (NcVar *)nullptr;
 
   StringArray time_names = get_metadata_names(COORD_VAR_KEYS[0]);
   StringArray lat_names = get_metadata_names(COORD_VAR_KEYS[1]);
