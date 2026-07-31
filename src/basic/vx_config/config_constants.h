@@ -536,9 +536,10 @@ enum class ObsSummary {
 //
 
 enum class GridWeightType {
-   None,    // Apply no grid box weighting
-   Cos_Lat, // Apply cosine latitude weighting
-   Area     // Apply true grid box area weighting
+   None,     // Apply no grid box weighting
+   Cos_Lat,  // Apply cosine latitude weighting
+   Area,     // Apply true grid box area weighting
+   Area_Cntr // Apply centered true grid box area weighting
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -1451,8 +1452,9 @@ static const char conf_val_pctile[] = "PCTILE";
 static const char conf_val_bca[]    = "BCA";
 
 // Grid weight flag values
-static const char conf_val_cos_lat[] = "COS_LAT";
-static const char conf_val_area[]    = "AREA";
+static const char conf_val_cos_lat[]   = "COS_LAT";
+static const char conf_val_area[]      = "AREA";
+static const char conf_val_area_cntr[] = "AREA_CNTR";
 
 // Point weight flag values
 static const char conf_val_sid[]     = "SID";

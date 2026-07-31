@@ -871,27 +871,32 @@ The "method" entry defines the regridding method to be used.
 
   * Valid regridding methods:
 
-    * MIN         for the minimum value
+    * MIN          for the minimum value
 
-    * MAX         for the maximum value
+    * MAX          for the maximum value
 
-    * MEDIAN      for the median value
+    * MEDIAN       for the median value
 
-    * UW_MEAN     for the unweighted average value
+    * UW_MEAN      for the unweighted average value
 
-    * DW_MEAN     for the distance-weighted average value (weight =
+    * DW_MEAN      for the distance-weighted average value (weight =
       distance^-2)
 
-    * AW_MEAN     for an area-weighted mean when regridding from
-      high to low resolution grids (width = 1)
+    * AW_MEAN      for an area-weighted mean when regridding from
+      high to low resolution grids (width = 1) computed using the
+      lower-left corner of each grid box
 
-    * LS_FIT      for a least-squares fit
+    * AW_MEAN_CNTR for an area-weighted mean when regridding from
+      high to low resolution grids (width = 1) computed using the
+      center of each grid box
 
-    * BILIN       for bilinear interpolation (width = 2)
+    * LS_FIT       for a least-squares fit
 
-    * NEAREST     for the nearest grid point (width = 1)
+    * BILIN        for bilinear interpolation (width = 2)
 
-    * BUDGET      for the mass-conserving budget interpolation
+    * NEAREST      for the nearest grid point (width = 1)
+
+    * BUDGET       for the mass-conserving budget interpolation
 
       * The budget interpolation method is often used for precipitation
         in order to roughly conserve global averages. However it is
@@ -904,18 +909,18 @@ The "method" entry defines the regridding method to be used.
         values, assuming enough valid data is present to meet the
         "vld_thresh" threshold.
 
-    * FORCE       to compare gridded data directly with no interpolation
+    * FORCE        to compare gridded data directly with no interpolation
       as long as the grid x and y dimensions match.
 
-    * UPPER_LEFT  for the upper left grid point (width = 1)
+    * UPPER_LEFT   for the upper left grid point (width = 1)
 
-    * UPPER_RIGHT for the upper right grid point (width = 1)
+    * UPPER_RIGHT  for the upper right grid point (width = 1)
 
-    * LOWER_RIGHT for the lower right grid point (width = 1)
+    * LOWER_RIGHT  for the lower right grid point (width = 1)
 
-    * LOWER_LEFT  for the lower left grid point (width = 1)
+    * LOWER_LEFT   for the lower left grid point (width = 1)
 
-    * MAXGAUSS    to compute the maximum value in the neighborhood
+    * MAXGAUSS     to compute the maximum value in the neighborhood
       and apply a Gaussian smoother to the result
 
     The BEST, GEOG_MATCH, and HIRA options are not valid for regridding.
@@ -2758,7 +2763,11 @@ Three grid weighting options are currently supported:
 * COS_LAT to define the weight as the cosine of the grid point latitude.
   This an approximation for grid box area used by NCEP and WMO.
 
-* AREA to define the weight as the true area of the grid box (km^2).
+* AREA to define the weight as the true area of the grid box (km^2)
+  defined by the lower-left corner of each grid box.
+
+* AREA_CNTR to define the weight as the true area of the grid box (km^2)
+  defined by the center point of each grid box.
 
 If requested in the config file, the raw grid weights can be written to
 the NetCDF output from Grid-Stat and Ensemble-Stat.

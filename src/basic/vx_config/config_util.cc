@@ -161,6 +161,7 @@ void RegridInfo::validate() {
       method != InterpMthd::Lower_Right &&
       method != InterpMthd::Lower_Left &&
       method != InterpMthd::AW_Mean &&
+      method != InterpMthd::AW_Mean_Cntr &&
       method != InterpMthd::MaxGauss) {
       mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting the regridding method from \""
@@ -177,7 +178,8 @@ void RegridInfo::validate() {
        method == InterpMthd::Upper_Right ||
        method == InterpMthd::Lower_Right ||
        method == InterpMthd::Lower_Left ||
-       method == InterpMthd::AW_Mean) &&
+       method == InterpMthd::AW_Mean ||
+       method == InterpMthd::AW_Mean_Cntr) &&
       width != 1) {
       mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting regridding width from "
@@ -2447,9 +2449,10 @@ GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
    v = dict->lookup_int(conf_key_grid_weight_flag);
 
    // Convert integer to enumerated GridWeightType
-        if(v == conf_const.lookup_int(conf_val_none))    t = GridWeightType::None;
-   else if(v == conf_const.lookup_int(conf_val_cos_lat)) t = GridWeightType::Cos_Lat;
-   else if(v == conf_const.lookup_int(conf_val_area))    t = GridWeightType::Area;
+        if(v == conf_const.lookup_int(conf_val_none))      t = GridWeightType::None;
+   else if(v == conf_const.lookup_int(conf_val_cos_lat))   t = GridWeightType::Cos_Lat;
+   else if(v == conf_const.lookup_int(conf_val_area))      t = GridWeightType::Area;
+   else if(v == conf_const.lookup_int(conf_val_area_cntr)) t = GridWeightType::Area_Cntr;
    else {
       mlog << Error << "\n" << method_name
            << "Unexpected config file value of " << v << " for \""
@@ -3083,28 +3086,29 @@ void check_climo_n_vx(Dictionary *dict, const int n_input) {
 InterpMthd int_to_interpmthd(int i) {
    InterpMthd m = InterpMthd::None;
 
-        if(i == conf_const.lookup_int(interpmthd_none_str))        m = InterpMthd::None;
-   else if(i == conf_const.lookup_int(interpmthd_min_str))         m = InterpMthd::Min;
-   else if(i == conf_const.lookup_int(interpmthd_max_str))         m = InterpMthd::Max;
-   else if(i == conf_const.lookup_int(interpmthd_median_str))      m = InterpMthd::Median;
-   else if(i == conf_const.lookup_int(interpmthd_uw_mean_str))     m = InterpMthd::UW_Mean;
-   else if(i == conf_const.lookup_int(interpmthd_dw_mean_str))     m = InterpMthd::DW_Mean;
-   else if(i == conf_const.lookup_int(interpmthd_aw_mean_str))     m = InterpMthd::AW_Mean;
-   else if(i == conf_const.lookup_int(interpmthd_ls_fit_str))      m = InterpMthd::LS_Fit;
-   else if(i == conf_const.lookup_int(interpmthd_bilin_str))       m = InterpMthd::Bilin;
-   else if(i == conf_const.lookup_int(interpmthd_nbrhd_str))       m = InterpMthd::Nbrhd;
-   else if(i == conf_const.lookup_int(interpmthd_nearest_str))     m = InterpMthd::Nearest;
-   else if(i == conf_const.lookup_int(interpmthd_budget_str))      m = InterpMthd::Budget;
-   else if(i == conf_const.lookup_int(interpmthd_force_str))       m = InterpMthd::Force;
-   else if(i == conf_const.lookup_int(interpmthd_best_str))        m = InterpMthd::Best;
-   else if(i == conf_const.lookup_int(interpmthd_upper_left_str))  m = InterpMthd::Upper_Left;
-   else if(i == conf_const.lookup_int(interpmthd_upper_right_str)) m = InterpMthd::Upper_Right;
-   else if(i == conf_const.lookup_int(interpmthd_lower_right_str)) m = InterpMthd::Lower_Right;
-   else if(i == conf_const.lookup_int(interpmthd_lower_left_str))  m = InterpMthd::Lower_Left;
-   else if(i == conf_const.lookup_int(interpmthd_gaussian_str))    m = InterpMthd::Gaussian;
-   else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))    m = InterpMthd::MaxGauss;
-   else if(i == conf_const.lookup_int(interpmthd_geog_match_str))  m = InterpMthd::Geog_Match;
-   else if(i == conf_const.lookup_int(interpmthd_hira_str))        m = InterpMthd::HiRA;
+        if(i == conf_const.lookup_int(interpmthd_none_str))         m = InterpMthd::None;
+   else if(i == conf_const.lookup_int(interpmthd_min_str))          m = InterpMthd::Min;
+   else if(i == conf_const.lookup_int(interpmthd_max_str))          m = InterpMthd::Max;
+   else if(i == conf_const.lookup_int(interpmthd_median_str))       m = InterpMthd::Median;
+   else if(i == conf_const.lookup_int(interpmthd_uw_mean_str))      m = InterpMthd::UW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_dw_mean_str))      m = InterpMthd::DW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_aw_mean_str))      m = InterpMthd::AW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_aw_mean_cntr_str)) m = InterpMthd::AW_Mean_Cntr;
+   else if(i == conf_const.lookup_int(interpmthd_ls_fit_str))       m = InterpMthd::LS_Fit;
+   else if(i == conf_const.lookup_int(interpmthd_bilin_str))        m = InterpMthd::Bilin;
+   else if(i == conf_const.lookup_int(interpmthd_nbrhd_str))        m = InterpMthd::Nbrhd;
+   else if(i == conf_const.lookup_int(interpmthd_nearest_str))      m = InterpMthd::Nearest;
+   else if(i == conf_const.lookup_int(interpmthd_budget_str))       m = InterpMthd::Budget;
+   else if(i == conf_const.lookup_int(interpmthd_force_str))        m = InterpMthd::Force;
+   else if(i == conf_const.lookup_int(interpmthd_best_str))         m = InterpMthd::Best;
+   else if(i == conf_const.lookup_int(interpmthd_upper_left_str))   m = InterpMthd::Upper_Left;
+   else if(i == conf_const.lookup_int(interpmthd_upper_right_str))  m = InterpMthd::Upper_Right;
+   else if(i == conf_const.lookup_int(interpmthd_lower_right_str))  m = InterpMthd::Lower_Right;
+   else if(i == conf_const.lookup_int(interpmthd_lower_left_str))   m = InterpMthd::Lower_Left;
+   else if(i == conf_const.lookup_int(interpmthd_gaussian_str))     m = InterpMthd::Gaussian;
+   else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))     m = InterpMthd::MaxGauss;
+   else if(i == conf_const.lookup_int(interpmthd_geog_match_str))   m = InterpMthd::Geog_Match;
+   else if(i == conf_const.lookup_int(interpmthd_hira_str))         m = InterpMthd::HiRA;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
            << "Unexpected value of " << i
