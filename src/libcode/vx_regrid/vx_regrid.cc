@@ -42,6 +42,7 @@ DataPlane met_regrid(const DataPlane & in, const Grid & from_grid,
          break;
 
       case InterpMthd::AW_Mean:
+      case InterpMthd::AW_Mean_Cntr:
          out = met_regrid_area_weighted (in, from_grid, to_grid, info);
          break;
 
@@ -205,7 +206,8 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
             }
             else {
                if(is_bad_data(value = from_data(xf, yf))) continue;
-               double weight = from_grid.calc_area(xf, yf);
+               double weight = from_grid.calc_area(xf, yf,
+                                  info.method == InterpMthd::AW_Mean_Cntr);
 
                int n = to_data.two_to_one(xt, yt);
                to_data_sum[n] += value*weight;

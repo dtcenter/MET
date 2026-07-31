@@ -72,7 +72,7 @@ for (x=0; x<(grid.nx()); ++x)  {
       dist_left   = gc_dist(lat_corner, lon_corner, lat_up, lon_up);
 
 
-      area = grid.calc_area(x, y);
+      area = grid.calc_area(x, y, true);
 
       area_approx = dist_bottom*dist_left;
 
