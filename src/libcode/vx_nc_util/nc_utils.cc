@@ -3658,7 +3658,7 @@ unixtime get_init_time(NcVar *time_var) {
 // init_time from NetCDF, default variable name is forecast_reference_time
 // Can get valid_time id byte or char type with variable name
 
-string init_time_var_name = "forecast_reference_time";
+const string init_time_var_name = "forecast_reference_time";
 
 unixtime get_init_time(NcFile *nc_file, const char *time_var_name) {
    unixtime init_time = 0;
