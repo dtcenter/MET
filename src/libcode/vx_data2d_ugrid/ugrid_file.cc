@@ -39,11 +39,11 @@ constexpr char def_config_prefix[] = "UGridConfig_";
 constexpr char def_config_prefix2[] = "MET_BASE/config/UGridConfig_";
 constexpr double lat_epsilon = 0.00001;
 
-array<string, UG_DIM_COUNT> DIM_KEYS = {
+const array<string, UG_DIM_COUNT> DIM_KEYS = {
       "dim_face", "dim_node", "dim_edge", "dim_time", "dim_vert"
 };
 
-array<string, UG_META_VAR_COUNT> COORD_VAR_KEYS = {
+const array<string, UG_META_VAR_COUNT> COORD_VAR_KEYS = {
       "time", "lat_face", "lon_face", "vert_face", "lat_edge",
       "lon_edge", "lat_node", "lon_node", "cell_id", "init_time"
 };
