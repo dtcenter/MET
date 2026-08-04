@@ -177,7 +177,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
                         if result:
                             logger.debug(result.stdout)
                         else:
-                            logger.debug("No result object")
+                            logger.debug(f"No result object, stat file missing {filepath}")
                         out_ok = False
                         break
                     # check stat file has non-header lines
