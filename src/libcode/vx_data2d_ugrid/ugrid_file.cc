@@ -550,7 +550,7 @@ void UGridFile::dump(ostream & out, int depth) const
 
 ////////////////////////////////////////////////////////////////////////
 
-std::string UGridFile::find_metadata_name(std::string &key, StringArray &available_names) {
+std::string UGridFile::find_metadata_name(const std::string &key, StringArray &available_names) {
   string meta_name = "";
   StringArray meta_names = get_metadata_names(key);
 
@@ -809,7 +809,7 @@ bool UGridFile::getData(const char *var_name,
 ////////////////////////////////////////////////////////////////////////
 
 
-StringArray UGridFile::get_metadata_names(std::string &key) {
+StringArray UGridFile::get_metadata_names(const std::string &key) {
   StringArray empty;
   auto search = metadata_map.find(key);
   return search == metadata_map.end() ? empty : metadata_map[key];
