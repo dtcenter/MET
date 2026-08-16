@@ -183,9 +183,8 @@ void PointWeightInfo::compute_kde_weights() {
                 collapse(2)
       for(int i=0; i<n_stn(); i++) {
          for(int j=i+1; j<n_stn(); j++) {
-            double dlat = SIDWeights[i].Lat - SIDWeights[j].Lat;
-            double dlon = angle_between(SIDWeights[i].Lon, SIDWeights[j].Lon);
-            double ang  = sqrt(dlat*dlat + dlon*dlon);
+            double ang  = gc_angle(SIDWeights[i].Lat, SIDWeights[i].Lon,
+                                   SIDWeights[j].Lat, SIDWeights[j].Lon);
             double exp  = ang/KDERefAngle;
             double p    = pow(e, -exp*exp);
             p_sum[i]   += p;
