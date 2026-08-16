@@ -630,8 +630,7 @@ double UGridFile::getData(NcVar * var, const LongArray & a) const
 
   if (!status)
   {
-    mlog << Error << "\nUGridFile::getData(NcVar *, const LongArray &) const -> "
-         << "bad status for var->get()\n\n";
+    mlog << Error << "\n" << method_name << "bad status for var->get()\n\n";
     exit(1);
   }
 
@@ -679,7 +678,7 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   if (nullptr == var) {
     mlog << Error << "\n" << method_name
          << "variable " << GET_NC_NAME_P(v) << " not found!\n\n";
-    exit(1);
+    return true;;
   }
 
   //  check star positions and count

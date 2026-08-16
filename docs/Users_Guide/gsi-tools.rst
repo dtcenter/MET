@@ -6,7 +6,7 @@ GSI Tools
 
 Gridpoint Statistical Interpolation (GSI) diagnostic files are binary files written out from the data assimilation code before the first and after each outer loop. The files contain useful information about how a single observation was used in the analysis by providing details such as the innovation (O-B), observation values, observation error, adjusted observation error, and quality control information.
 
-For more detail on generating GSI diagnostic files and their contents, see the `GSI User's Guide. <http://www.dtcenter.org/com-GSI/users/docs/index.php>`_
+For more detail on generating GSI diagnostic files and their contents, see the `GSI User's Guide (pdf) <https://dtcenter.org/sites/default/files/community-code/gsi/docs/users-guide/GSIUserGuide_v3.7.pdf>`_.
 
 When MET reads GSI diagnostic files, the innovation (O-B; generated prior to the first outer loop) or analysis increment (O-A; generated after the final outer loop) is split into separate values for the observation (OBS) and the forecast (FCST), where the forecast value corresponds to the background (O-B) or analysis (O-A).
 

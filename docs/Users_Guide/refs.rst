@@ -215,7 +215,7 @@ References
 |   *Probabilistic Forecasting Using Ensemble Model Output Statistics and*
 |   *Minimum CRPS Estimation*. Technical Report no. 449, Department of
 |   Statistics, University of Washington. Available at
-|   http://www.stat.washington.edu/www/research/reports/
+|   https://stat.uw.edu/research/tech-reports/calibrated-probabilistic-forecasting-using-ensemble-model-output-statistics-and-minimum-crps
 |
 
 .. _Haiden-2012:
