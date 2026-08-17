@@ -38,6 +38,7 @@ using namespace netCDF;
 static const char *def_user_config = "UGridConfig_user";
 static const char *def_config_prefix = "UGridConfig_";
 static const char *def_config_prefix2 = "MET_BASE/config/UGridConfig_";
+constexpr double lat_epsilon = 0.00001;
 
 array<string, UG_DIM_COUNT> DIM_KEYS = {
       "dim_face", "dim_node", "dim_edge", "dim_time", "dim_vert"
@@ -892,6 +893,40 @@ void UGridFile::read_config(ConcatString config_filename) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void UGridFile::radian_to_degree(vector<double> &lat_values, const int lat_count) const {
+  const char *method_name = "UGridFile::radian_to_degree() -> ";
+  int lat_adjusted = 0;
+  int lat_adjusted_total = 0;
+  for (int idx=0; idx<lat_count; idx++) {
+    lat_values[idx] /= rad_per_deg;
+    if (lat_values[idx] > 90.0) {
+      if (!is_eq(lat_values[idx], 90.0, lat_epsilon)) {
+        mlog << Warning << "\n" << method_name << "adjusted " << lat_values[idx]
+             << " (delta: " << (lat_values[idx] - 90.0) << ") to 90.0\n\n";
+        lat_adjusted++;
+      }
+      lat_values[idx] = 90.0;
+      lat_adjusted_total++;
+    }
+    else if (lat_values[idx] < -90.0) {
+      if (!is_eq(lat_values[idx], -90.0, lat_epsilon)) {
+        mlog << Warning << "\n" << method_name << "adjusted " << lat_values[idx]
+             << " (delta: " << (lat_values[idx] + 90.0) << ") to -90.0\n\n";
+        lat_adjusted++;
+      }
+      lat_values[idx] = -90.0;
+      lat_adjusted_total++;
+    }
+  }
+  if (lat_adjusted_total > 0) {
+    mlog << Debug(4) << method_name << "adjusted " << lat_adjusted << " ("
+         << lat_adjusted_total << ") latitudes\n";
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 void UGridFile::read_netcdf_grid()
 {
@@ -927,13 +962,13 @@ void UGridFile::read_netcdf_grid()
 
   if (get_var_units(_latVar, units_value)) {
     if (units_value == "rad" || units_value == "radian") {
-      mlog << Debug(6) << method_name << "convert  " << units_value << " to degree for lat\n";
-      for (int idx=0; idx<face_count; idx++) _lat[idx] /= rad_per_deg;
+      mlog << Debug(6) << method_name << "convert " << units_value << " to degree for lat\n";
+      radian_to_degree(_lat, face_count);
     }
   }
   if (get_var_units(_lonVar, units_value)) {
     if (units_value == "rad" || units_value == "radian") {
-      mlog << Debug(6) << method_name << "  convert " << units_value << " to degree for lon\n";
+      mlog << Debug(6) << method_name << "convert " << units_value << " to degree for lon\n";
       for (int idx=0; idx<face_count; idx++) _lon[idx] /= rad_per_deg;
     }
   }

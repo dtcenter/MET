@@ -20,6 +20,7 @@
 //   003   09/28/22  Prestopnik      MET #2227 Remove namspace std and netCDF from header files
 //   004   04/26/23  Halley Gotway   MET #2523 Reorder NetCDF dimensions
 //   005   03/11/24  Halley Gotway   MET #2833 range/azimuth grid
+//   006   04/13/26  Halley Gotway   MET #3370 check for analysis tracks
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -340,6 +341,12 @@ void process_track_files(const StringArray& files,
     // Initialize counts
     tot_read = tot_add = 0;
 
+    // Set metadata pointer
+    StringArray BestTechnique;
+    BestTechnique.add("BEST");
+    BestTechnique.set_ignore_case(true);
+    line.set_best_technique(&BestTechnique);
+
     // Process input ATCF files
     for(int i = 0; i < files.n(); i++) {
 
@@ -372,7 +379,8 @@ void process_track_files(const StringArray& files,
             if(!is_keeper(&line)) continue;
 
             // Attempt to add current line to TrackInfoArray
-            if(tracks.add(line, true, false)) {
+            // MET #3370 check for analysis tracks
+            if(tracks.add(line, true, true)) {
                 cur_add++;
                 tot_add++;
             }

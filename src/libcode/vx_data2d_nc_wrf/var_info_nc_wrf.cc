@@ -209,8 +209,23 @@ void VarInfoNcWrf::set_magic(const ConcatString &nstr, const ConcatString &lstr)
             as_offset = (*ptr2 != '@');
             if (!as_offset) ptr2++;
 
+            ptr3 = strchr(ptr2, '-');
+            //skip negative sign of the negative value to check the range
+            if (ptr3 != nullptr && ptr3 == ptr2) ptr3 = strchr((ptr2+1), '-');
+
             // Check for a range of levels
-            if((ptr3 = strchr(ptr2, '-')) != nullptr) {
+            if (ptr3 != nullptr && ptr3 != ptr2) {
+               *ptr3 = 0;
+               ptr3++;
+               if (*ptr3 == '@') {
+                  if (as_offset) {
+                     mlog << Error << "\n" << method_name
+                          << "Can not mix an offset and a value for NetCDF variable \""
+                          << MagicStr << "\".\n\n";
+                     exit(1);
+                  }
+                  ptr3++;    // to support @vlevel_lower-@vlevel_upper
+               }
 
                // Check if a range has already been supplied
                if(Dimension.has(range_flag)) {
@@ -223,10 +238,11 @@ void VarInfoNcWrf::set_magic(const ConcatString &nstr, const ConcatString &lstr)
                else {
                   add_dimension(range_flag);
                   Level.set_lower(atoi(ptr2));
-                  Level.set_upper(atoi(++ptr3));
+                  Level.set_upper(atoi(ptr3));
 
                   // Assume pressure level type for a range of levels
                   Level.set_type(LevelType_Pres);
+                  Level.set_is_offset(as_offset);
                }
             }
             // Single level
