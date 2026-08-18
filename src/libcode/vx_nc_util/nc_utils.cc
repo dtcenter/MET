@@ -3637,7 +3637,7 @@ unixtime get_init_time(NcVar *time_var) {
    int data_type = GET_NC_TYPE_ID_P(time_var);
    bool is_string_time = (NC_CHAR == data_type || NC_STRING == data_type);
    double time_value = get_nc_time(time_var, 0);
-   init_time = time_value;
+   init_time = (unixtime)time_value;
    if (!is_string_time) {
       int sec_per_unit = 0;
       bool no_leap_year = true;
