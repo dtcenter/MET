@@ -87,7 +87,6 @@ void UGridFile::init_from_scratch()
   _ncFile = (NcFile *) nullptr;
   _ncMetaFile = (NcFile *) nullptr;
   Var = (NcVarInfo *) nullptr;
-  _time_var_info = (NcVarInfo *)nullptr;
 
   _faceDim = (NcDim *)nullptr;
   _edgeDim = (NcDim *)nullptr;
@@ -750,7 +749,6 @@ void UGridFile::metadata_coord_variables() {
   for (int j=0; j<Nvars; ++j) {
     if (time_names.has(Var[j].name)) {
       _tVar = Var[j].var;
-      //_time_var_info = &Var[j];
     }
     else if (lat_names.has(Var[j].name)) _latVar = Var[j].var;
     else if (lon_names.has(Var[j].name)) _lonVar = Var[j].var;
@@ -787,7 +785,6 @@ void UGridFile::metadata_coord_variables() {
 
       if (0 == j && nullptr == _tVar) {
         _tVar = MetaVar[j].var;
-        //_time_var_info = &MetaVar[j];
       }
       else if (1 == j && nullptr == _latVar) _latVar = MetaVar[j].var;
       else if (2 == j && nullptr == _lonVar) _lonVar = MetaVar[j].var;
@@ -835,11 +832,11 @@ bool UGridFile::metadata_time() {
            << "from " << GET_NC_NAME_P(_tVar) << "\n";
     for(int i=0; i<n_times; i++) {
       time_values[i] = get_nc_time(_tVar, i);
-      ValidTime.add(time_values[i]);
+      ValidTime.add((unixtime)time_values[i]);
       raw_times.add(time_values[i]);
       mlog << Debug(7) << method_name
            << "get time " << time_values[i] << " ("
-           << unix_to_yyyymmdd_hhmmss(time_values[i]) << ")\n";
+           << unix_to_yyyymmdd_hhmmss((unixtime)time_values[i]) << ")\n";
     }
   }
   else if( get_nc_data(_tVar, time_values.data()) ) {

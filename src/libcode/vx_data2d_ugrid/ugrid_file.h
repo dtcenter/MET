@@ -65,8 +65,6 @@ class UGridFile {
         return 1;
       }
       
-      //NcVarInfo *get_time_var_info() const { return _time_var_info; }
-      
          //
          //  time
          //
@@ -149,7 +147,6 @@ class UGridFile {
       netCDF::NcVar *_zVar;
       netCDF::NcVar *_tVar;
       netCDF::NcVar *_init_time_var;
-      NcVarInfo *_time_var_info;
 
       int face_count;
 
