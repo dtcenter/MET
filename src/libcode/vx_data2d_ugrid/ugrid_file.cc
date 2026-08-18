@@ -511,7 +511,7 @@ double UGridFile::getData(NcVar * var, const LongArray & a) const
   //  done
 
   mlog << Debug(6) << method_name << "took "
-       << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+       << (clock()-start_clock)/CLOCKS_PER_SEC << " seconds\n";
 
   return d;
 }
@@ -589,7 +589,7 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     }
     else {
       offsets.add(a[k]);
-      if (k != var->t_slot && k != var->z_slot) length = plane_size - a[k];
+      if (k != var->t_slot && k != var->z_slot) length = (int)(plane_size - a[k]);
     }
     lengths.add(length);
     dim_size = v->getDim(k).getSize();
@@ -626,7 +626,7 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     log_message << " " << (a[idx] == vx_data2d_star ? "*" : std::to_string(a[idx]));
   }
   mlog << Debug(6) << method_name << "took "
-       << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds. "
+       << (clock()-start_clock)/CLOCKS_PER_SEC << " seconds. "
        << GET_NC_NAME_P(v) << ": levels: (" << log_message << " )"
        << " min=" << min_value << ", max_value=" << max_value<< "\n";
 
@@ -647,7 +647,7 @@ bool UGridFile::getData(const char *var_name,
 
   //  store the times
   unixtime valid_ut;
-  if(info->t_slot >= 0) valid_ut = ValidTime[a[info->t_slot]];
+  if(info->t_slot >= 0) valid_ut = ValidTime[(int)a[info->t_slot]];
   else                  valid_ut = ValidTime[0];
 
   //  if unset, set the init time to the valid time
@@ -664,8 +664,8 @@ bool UGridFile::getData(const char *var_name,
 
   plane.set_init(init_ut);
   plane.set_valid(valid_ut);
-  plane.set_lead(valid_ut - init_ut);
-  plane.set_accum(accum_time);
+  plane.set_lead((int)(valid_ut - init_ut));
+  plane.set_accum((int)accum_time);
 
   //  done
 
