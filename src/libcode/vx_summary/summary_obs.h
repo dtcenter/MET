@@ -117,10 +117,11 @@ public:
 
   static int unixtimeToSecs(const time_t unix_time)
   {
-    struct tm *time_struct = gmtime(&unix_time);
+    struct tm time_struct;
+    gmtime_r(&unix_time, &time_struct);
 
-    return (time_struct->tm_hour * 3600) +
-      (time_struct->tm_min * 60) + time_struct->tm_sec;
+    return (time_struct.tm_hour * 3600) +
+      (time_struct.tm_min * 60) + time_struct.tm_sec;
   }
 
   // Convert the number of seconds from the beginning of the day to a string
@@ -150,7 +151,8 @@ public:
   static time_t getFirstIntervalOfDay(const time_t test_time,
       const int begin_secs, const int end_secs, const int step)
   {
-    struct tm *time_struct = gmtime(&test_time);
+    struct tm time_struct;
+    gmtime_r(&test_time, &time_struct);
 
     int start_of_day_secs = 0;
 
@@ -174,15 +176,15 @@ public:
       start_of_day_secs = begin_secs % step;
     }
 
-    time_struct->tm_hour = start_of_day_secs / 3600;
-    start_of_day_secs -= time_struct->tm_hour * 3600;
+    time_struct.tm_hour = start_of_day_secs / 3600;
+    start_of_day_secs  -= time_struct.tm_hour * 3600;
 
-    time_struct->tm_min = start_of_day_secs / 60;
-    start_of_day_secs -= time_struct->tm_min * 60;
+    time_struct.tm_min = start_of_day_secs / 60;
+    start_of_day_secs -= time_struct.tm_min * 60;
 
-    time_struct->tm_sec = start_of_day_secs;
+    time_struct.tm_sec = start_of_day_secs;
 
-    return timegm(time_struct);
+    return timegm(&time_struct);
   }
 
   // Get the interval time of the interval that contains the given data
@@ -212,26 +214,28 @@ public:
 
   static time_t getEndOfDay(const time_t unix_time)
   {
-    struct tm *time_struct = gmtime(&unix_time);
+    struct tm time_struct;
+    gmtime_r(&unix_time, &time_struct);
 
-    time_struct->tm_hour = 23;
-    time_struct->tm_min = 59;
-    time_struct->tm_sec = 59;
+    time_struct.tm_hour = 23;
+    time_struct.tm_min = 59;
+    time_struct.tm_sec = 59;
 
-    return timegm(time_struct);
+    return timegm(&time_struct);
   }
 
   static std::string _timeToString(const time_t unix_time)
   {
-    struct tm *time_struct = gmtime(&unix_time);
+    struct tm time_struct;
+    gmtime_r(&unix_time, &time_struct);
 
     char time_string[tmp_buf_size];
 
     snprintf(time_string, sizeof(time_string), 
              "%04d%02d%02d_%02d%02d%02d",
-             time_struct->tm_year + 1900, time_struct->tm_mon + 1,
-             time_struct->tm_mday,
-             time_struct->tm_hour, time_struct->tm_min, time_struct->tm_sec);
+             time_struct.tm_year + 1900, time_struct.tm_mon + 1,
+             time_struct.tm_mday,
+             time_struct.tm_hour, time_struct.tm_min, time_struct.tm_sec);
 
     return time_string;
   }
