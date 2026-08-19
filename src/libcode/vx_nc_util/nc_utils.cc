@@ -1199,7 +1199,8 @@ double get_nc_time(NcVar * var, const int index) {
 
       start.emplace_back(index);
       count.emplace_back(1);
-      tmp_buf[0] = tmp_buf[buf_len] = 0;
+      tmp_buf[0] = 0;
+      tmp_buf[buf_len] = 0;
 
       switch (dataType) {
          case NC_DOUBLE:
