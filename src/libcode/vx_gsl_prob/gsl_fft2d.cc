@@ -21,6 +21,10 @@
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
+
+static void normalize_dct_typeII(gsl_vector_view &vals, int len);
+
+////////////////////////////////////////////////////////////////////////
 //
 // Apply discrete cosine transform to 2D data by transforming the
 // columns (nx) and rows (ny) separately
@@ -46,6 +50,7 @@ extern void dct_typeII_2d(double *data, int ncol, int nrow) {
       gsl_vector_view row = gsl_matrix_row(m, i);
       gsl_fft_real_transform(row.vector.data, row.vector.stride,
                              ncol, col_wt, col_ws);
+      normalize_dct_typeII(row, ncol);
    }
 
    // Transform Columns
@@ -56,6 +61,7 @@ extern void dct_typeII_2d(double *data, int ncol, int nrow) {
       gsl_vector_view col = gsl_matrix_column(m, j);
       gsl_fft_real_transform(col.vector.data, col.vector.stride,
                              nrow, row_wt, row_ws);
+      normalize_dct_typeII(col, nrow);
    }
 
    // Store the result
@@ -72,6 +78,37 @@ extern void dct_typeII_2d(double *data, int ncol, int nrow) {
    gsl_fft_real_wavetable_free(col_wt);
    gsl_fft_real_workspace_free(row_ws);
    gsl_fft_real_workspace_free(col_ws);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Code for misc functions
+//
+////////////////////////////////////////////////////////////////////////
+
+void normalize_dct_typeII(gsl_vector_view &vals, int len) {
+
+   // Check for sufficient length
+   if(len < 1) {
+      mlog << Error << "\nnormalize_dct_typeII() -> "
+           << "length (" << len << ") must be >= 1!\n\n";
+      exit(1);
+   }
+
+   // Apply orthonormalization scaling factors for DCT Type II:
+   //   https://docs.scipy.org/doc/scipy/reference/generated/scipy.fftpack.dct.html
+
+   // Scale first element by sqrt(1/(4n))
+   double scale_first = 1.0/sqrt(4.0*len);
+
+   // Scale all remaining elements by sqrt(1/(2n))
+   double scale_rest  = 1.0/sqrt(2.0*len);
+
+   gsl_vector_set(&vals.vector, 0, gsl_vector_get(&vals.vector, 0) * scale_first);
+   gsl_vector_view rest = gsl_vector_subvector(&vals.vector, 1, len - 1);
+   gsl_vector_scale(&rest.vector, scale_rest);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
