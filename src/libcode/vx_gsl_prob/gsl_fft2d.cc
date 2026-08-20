@@ -86,7 +86,7 @@ extern void dct_typeII_2d(double *data, int ncol, int nrow) {
 //
 ////////////////////////////////////////////////////////////////////////
 
-void normalize_dct_typeII(gsl_vector_view &vals, int len) {
+static void normalize_dct_typeII(gsl_vector_view &vals, int len) {
 
    // Check for sufficient length
    if(len < 1) {
