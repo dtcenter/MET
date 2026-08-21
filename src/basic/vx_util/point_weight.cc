@@ -11,6 +11,7 @@
 #include <iostream>
 
 #include "vx_util.h"
+#include "nav.h"
 
 #include "config_file.h"
 #include "config_constants.h"
