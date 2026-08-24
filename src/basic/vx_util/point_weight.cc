@@ -167,6 +167,7 @@ void PointWeightInfo::compute_kde_weights() {
 
    // Store sums for the weights
    vector<double> p_sum(n_stn(), 0.0);
+   vector<double> a_sum(n_stn(), 0.0);
 
    // Define e constant
    const double e = exp(1.0);
@@ -178,7 +179,7 @@ void PointWeightInfo::compute_kde_weights() {
                     initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
 
 #pragma omp parallel default (none) \
-   shared(SIDWeights, KDERefAngle, p_sum, e)
+   shared(SIDWeights, KDERefAngle, p_sum, a_sum, e)
    {
 
       // Compute the sums of the pairwise distances
@@ -190,8 +191,14 @@ void PointWeightInfo::compute_kde_weights() {
                                    SIDWeights[j].Lat, SIDWeights[j].Lon);
             double exp  = ang/KDERefAngle;
             double p    = pow(e, -exp*exp);
+
+            // Sum of the terms
             p_sum[i]   += p;
             p_sum[j]   += p;
+
+            // Sum of the angles for error message
+            a_sum[i]   += ang;
+            a_sum[j]   += ang;
          }
       }
    } // End omp parallel
@@ -202,9 +209,13 @@ void PointWeightInfo::compute_kde_weights() {
       // Sanity check
       if(is_eq(p_sum[i], 0.0)) {
          mlog << Error << "\n" << method_name
-              << "computed an infinite weight. Adjust the \""
-              << conf_key_kde_ref_angle << " = " << KDERefAngle
-              << "\" configuration option to avoid it!\n\n";
+              << "computed an infinite weight for location ("
+              << SIDWeights[i].Lat << ", " << SIDWeights[i].Lon
+              << ") with an average angular difference of "
+              << a_sum[i] / (n_stn() - 1) << " to " << n_stn() - 1
+              << " other points.\n"
+              << "Adjust the \"" << conf_key_kde_ref_angle << " = "
+              << KDERefAngle << "\" configuration option to avoid it!\n\n";
          exit(1);
       }
       SIDWeights[i].Wgt = 1.0/p_sum[i];
