@@ -189,6 +189,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_weight/ensemble_stat_SID_WEIGHT_20120410_120000V.stat</stat>
+      <exist>&OUTPUT_DIR;/point_weight/ensemble_stat_SID_WEIGHT_20120410_120000V_SID_point_weights.txt</exist>
     </output>
   </test>
 
@@ -215,6 +216,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_weight/ensemble_stat_KDE_WEIGHT_20120410_120000V.stat</stat>
+      <exist>&OUTPUT_DIR;/point_weight/ensemble_stat_KDE_WEIGHT_20120410_120000V_KDE_point_weights.txt</exist>
     </output>
   </test>
 
