@@ -104,7 +104,6 @@ void PointWeightInfo::add_wgt(const string &sid, double wgt) {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool PointWeightInfo::has_sid(const string &sid) const {
-   const char *method_name = "PointWeightInfo()::has_sid() -> ";
    bool found = false;
 
    // Search for a matching entry
@@ -255,7 +254,7 @@ void PointWeightInfo::rescale_weights(double new_min, double new_max) {
       // Get the old range of weights
 #pragma omp for reduction(min: old_min) \
                 reduction(max: old_max)
-      for(auto &x : SIDWeights) {
+      for(const auto &x : SIDWeights) {
          if(x.Wgt < old_min) old_min = x.Wgt;
          if(x.Wgt > old_max) old_max = x.Wgt;
       }
