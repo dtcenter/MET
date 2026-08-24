@@ -156,12 +156,14 @@ bool PointWeightInfo::has_sid(const string &sid, double &wgt) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void PointWeightInfo::compute_kde_weights() {
+   const char *method_name = "PointWeightInfo()::compute_kde_weights() -> ";
 
    // Check for no work to do
    if(Type != PointWeightType::KDE || WeightsComputed) return;
 
-   mlog << Debug(3) << "Computing KDE point weights using " << n_stn()
-        << " observation locations.\n";
+   mlog << Debug(3) << "Computing KDE point weights for " << n_stn()
+        << " observation locations using reference angle " << KDERefAngle
+        << ".\n";
 
    // Store sums for the weights
    vector<double> p_sum(n_stn(), 0.0);
@@ -180,8 +182,8 @@ void PointWeightInfo::compute_kde_weights() {
    {
 
       // Compute the sums of the pairwise distances
-#pragma omp for reduction(vec_double_plus: p_sum) \
-                collapse(2)
+      // Do not parallelize the inner loop which depends on the value of i
+#pragma omp for reduction(vec_double_plus: p_sum)
       for(int i=0; i<n_stn(); i++) {
          for(int j=i+1; j<n_stn(); j++) {
             double ang  = gc_angle(SIDWeights[i].Lat, SIDWeights[i].Lon,
@@ -192,12 +194,21 @@ void PointWeightInfo::compute_kde_weights() {
             p_sum[j]   += p;
          }
       }
-
-      // Compute weights as the inverse of the p sums
-#pragma omp for schedule(static)
-      for(int i=0; i<n_stn(); i++) SIDWeights[i].Wgt = 1.0/p_sum[i];
-
    } // End omp parallel
+
+   // Compute weights as the inverse of the p sums
+   for(int i=0; i<n_stn(); i++) {
+
+      // Sanity check
+      if(is_eq(p_sum[i], 0.0)) {
+         mlog << Error << "\n" << method_name
+              << "computed an infinite weight. Adjust the \""
+              << conf_key_kde_ref_angle << " = " << KDERefAngle
+              << "\" configuration option to avoid it!\n\n";
+         exit(1);
+      }
+      SIDWeights[i].Wgt = 1.0/p_sum[i];
+   }
 
    // Rescale weights
    rescale_weights(rescale_kde_min, rescale_kde_max);
