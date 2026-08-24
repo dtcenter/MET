@@ -97,7 +97,7 @@ double dl = (lon1_radians - lon2_radians);
 
 double x = haversine(dp) + cos(lat1_radians)*cos(lat2_radians)*haversine(dl);
 
-return ahaversine(x);
+return deg_per_rad*ahaversine(x);
 
 }
 
