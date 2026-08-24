@@ -208,7 +208,7 @@ rng = {
 grid_weight_flag  = NONE;
 point_weight_flag = ${POINT_WEIGHT};
 kde_ref_angle     = 0.75;
-write_weights     = FALSE;
+write_weights     = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
 
