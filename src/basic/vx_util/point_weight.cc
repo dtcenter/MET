@@ -162,8 +162,8 @@ void PointWeightInfo::compute_kde_weights() {
    if(Type != PointWeightType::KDE || WeightsComputed) return;
 
    mlog << Debug(3) << "Computing KDE point weights for " << n_stn()
-        << " observation locations using reference angle " << KDERefAngle
-        << ".\n";
+        << " observation locations using a reference angle of " << KDERefAngle
+        << " degrees.\n";
 
    // Store sums for the weights
    vector<double> p_sum(n_stn(), 0.0);

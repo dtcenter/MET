@@ -2804,7 +2804,8 @@ methods are planned for future versions:
   "mask.sid".
 
 * KDE to apply a kernel density estimator to compute weights based on observation
-  density to avoid the impact of oversampling from data rich regions.
+  density to avoid the impact of oversampling from data rich regions. Note that
+  KDE weights are automatically rescaled a standard range of 1 to 100.
 
 .. code-block:: none
 
@@ -2818,6 +2819,9 @@ weights for "point_weight_flag = KDE". This reference angle is defined in degree
 with a default value of 0.75. As described in :ref:`Haiden et al., 2012 <Haiden-2012>`,
 an increase of this parameter increases the weights of data-sparse regions in global
 or continental-scale averages.
+
+MET checks for the divide-by-zero condition to avoid computing an infinite KDE weights.
+When that occurs, MET errors out and instructs the user to adjust the reference angle.
 
 .. code-block:: none
 
