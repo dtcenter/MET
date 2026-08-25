@@ -208,9 +208,7 @@ void NumArray::dump(ostream & out, int depth) const
    out << prefix << "Length = " << n_elements() << "\n";
    out << prefix << "Sorted = " << (Sorted ? "true" : "false") << "\n";
 
-   int j;
-
-   for (j=0; j<n_elements(); ++j)  {
+   for (int j=0; j<n_elements(); ++j)  {
 
       out << prefix << "Element # " << j << " = " << e[j] << "\n";
 
@@ -268,11 +266,10 @@ int NumArray::has(double d, bool forward) const
 
 {
 
-   int j;
    int found = 0;
 
    if (forward) {
-      for (j=0; j<n_elements(); ++j) {
+      for (int j=0; j<n_elements(); ++j) {
          if ( is_eq(e[j], d) ) {
             found = 1;
             break;
@@ -280,7 +277,7 @@ int NumArray::has(double d, bool forward) const
       }
    }
    else {
-      for (j=n_elements()-1; j>=0; --j) {
+      for (int j=n_elements()-1; j>=0; --j) {
          if ( is_eq(e[j], d) ) {
             found = 1;
             break;
@@ -769,20 +766,18 @@ void NumArray::compute_mean_variance(double &mn, double &var) const
 
 {
 
-   int j, count;
-   double s, s_sq;
-
-   if(n_elements() == 0) {
+   if(e.empty()) {
 
       mn = var = bad_data_double;
 
       return;
    }
 
-   s = s_sq = 0.0;
-   count = 0;
+   double s = 0.0;
+   double s_sq = 0.0;
+   int count = 0;
 
-   for(j=0; j<n_elements(); j++) {
+   for(int j=0; j<n_elements(); j++) {
       if(is_bad_data(e[j])) continue;
       s    += e[j];
       s_sq += e[j]*e[j];
@@ -833,10 +828,10 @@ double NumArray::sum() const
 
 {
 
-   int j, count;
-   double s;
+   int count = 0;
+   double s = 0.0;
 
-   for(j=0, count=0, s=0.0; j<n_elements(); j++) {
+   for(int j=0; j<n_elements(); j++) {
       if(is_bad_data(e[j])) continue;
       s += e[j];
       count++;
@@ -856,11 +851,9 @@ double NumArray::mode() const
 
 {
 
-   int j, k, max_n, max_j;
    NumArray uniq_v, uniq_n;
-   double v;
 
-   for(j=0; j<n_elements(); j++) {
+   for(int j=0; j<n_elements(); j++) {
 
       // If value isn't already in the list, add it
       if(!uniq_v.has(e[j])) {
@@ -870,7 +863,7 @@ double NumArray::mode() const
       // Otherwise, increment the existing count
       else {
 
-         for(k=0; k<uniq_v.n_elements(); k++) {
+         for(int k=0; k<uniq_v.n_elements(); k++) {
             if(is_eq(uniq_v[k], e[j])) {
                uniq_n.set(k, uniq_n[k] + 1);
                break;
@@ -881,7 +874,9 @@ double NumArray::mode() const
 
    // Search uniq_v and uniq_n for the most common value
    // Return the minimum of the most common values
-   for(j=0, max_n=0, max_j=-1; j<uniq_n.n_elements(); j++) {
+   int max_n = 0;
+   int max_j = -1;
+   for(int j=0; j<uniq_n.n_elements(); j++) {
 
       if((uniq_n[j] >  max_n) ||
          (is_eq(uniq_n[j], max_n) && max_j >= 0 && uniq_v[j] < uniq_v[max_j])) {
@@ -890,6 +885,7 @@ double NumArray::mode() const
       }
    }
 
+   double v;
    if(max_j >= 0) v = uniq_v[max_j];
    else           v = bad_data_double;
 
@@ -905,13 +901,11 @@ double NumArray::min() const
 
 {
 
-   if(n_elements() == 0) return bad_data_double;
-
-   int j;
+   if(e.empty()) return bad_data_double;
 
    double min_v = e[0];
 
-   for(j=0; j<n_elements(); j++) {
+   for(int j=0; j<n_elements(); j++) {
       if(is_bad_data(e[j])) continue;
       if(e[j] < min_v) min_v = e[j];
    }
@@ -928,13 +922,11 @@ double NumArray::max() const
 
 {
 
-   if(n_elements() == 0) return bad_data_double;
-
-   int j;
+   if(e.empty()) return bad_data_double;
 
    double max_v = e[0];
 
-   for(j=0; j<n_elements(); j++) {
+   for(int j=0; j<n_elements(); j++) {
       if(is_bad_data(e[j])) continue;
       if(e[j] > max_v) max_v = e[j];
    }
@@ -951,11 +943,10 @@ double NumArray::range() const
 
 {
 
-   double v, v1, v2;
-
-   v1 = max();
-   v2 = min();
-   v  = (is_bad_data(v1) || is_bad_data(v2) ? bad_data_double : v1 - v2);
+   double v1 = max();
+   double v2 = min();
+   double v  = (is_bad_data(v1) || is_bad_data(v2) ?
+                bad_data_double : v1 - v2);
 
    return v;
 
@@ -969,9 +960,8 @@ int NumArray::n_valid() const
 
 {
 
-   int j, n_vld;
-
-   for(j=0, n_vld=0; j<n_elements(); j++) {
+   int n_vld = 0;
+   for(int j=0; j<n_elements(); j++) {
       if(!is_bad_data(e[j])) n_vld++;
    }
 
@@ -989,12 +979,10 @@ ConcatString NumArray::serialize() const
 
    ConcatString s;
 
-   if(n_elements() == 0) return s;
-
-   int j;
+   if(e.empty()) return s;
 
    s << e[0];
-   for(j=1; j<n_elements(); j++) s << " " << e[j];
+   for(int j=1; j<n_elements(); j++) s << " " << e[j];
 
    return s;
 
@@ -1093,15 +1081,16 @@ double NumArray::mean() const
 
 {
 
-   int j, count;
-   double s, mn;
+   int count = 0;
+   double s = 0.0;
 
-   for(j=0, count=0, s=0.0; j<n_elements(); j++) {
+   for(int j=0; j<n_elements(); j++) {
       if(is_bad_data(e[j])) continue;
       s += e[j];
       count++;
    }
 
+   double mn;
    if(count == 0) mn = bad_data_double;
    else           mn = s/count;
 
@@ -1159,16 +1148,18 @@ double NumArray::wmean(const NumArray &wgt) const
       exit ( 1 );
    }
 
-   int j, count;
-   double w, s, wmn;
+   int count = 0;
+   double w = 0.0;
+   double s = 0.0;
 
-   for(j=0, count=0, w=0.0, s=0.0; j<n_elements(); j++) {
+   for(int j=0; j<n_elements(); j++) {
       if(is_bad_data(e[j]) || is_bad_data(wgt[j])) continue;
       s += wgt[j]*e[j];
       w += wgt[j];
       count++;
    }
 
+   double wmn;
    if(count == 0) wmn = bad_data_double;
    else           wmn = s/w;
 
@@ -1184,13 +1175,12 @@ double NumArray::wmean_sqrt(const NumArray &wgt) const
 
 {
 
-   int j;
    NumArray squares;
    double v;
 
    // square the current values
    squares.extend(n_elements());
-   for(j=0; j<n_elements(); j++) {
+   for(int j=0; j<n_elements(); j++) {
       v = (is_bad_data(e[j]) ? bad_data_double : e[j]*e[j]);
       squares.add(v);
    }
@@ -1211,13 +1201,12 @@ double NumArray::wmean_fisher(const NumArray &wgt) const
 
 {
 
-   int j;
    NumArray xform;
    double v;
 
    // apply fisher transform
    xform.extend(n_elements());
-   for(j=0; j<n_elements(); j++) {
+   for(int j=0; j<n_elements(); j++) {
       v = (is_bad_data(e[j]) ? bad_data_double : atanh(e[j]));
       xform.add(v);
    }
@@ -1238,15 +1227,13 @@ double NumArray::variance(int skip_index) const
 
 {
 
-   if(n() == 0)  return bad_data_double;
+   if(e.empty())  return bad_data_double;
 
-   int j, count;
-   double s, s_sq, var;
+   int count = 0;
+   double s = 0.0;
+   double s_sq = 0.0;
 
-   s = s_sq = 0.0;
-   count = 0;
-
-   for(j=0; j<n(); j++) {
+   for(int j=0; j<n(); j++) {
       if(is_bad_data(e[j]) || j == skip_index) continue;
       s    += e[j];
       s_sq += e[j]*e[j];
@@ -1254,6 +1241,7 @@ double NumArray::variance(int skip_index) const
    }
 
    // Check for slightly negative precision error
+   double var;
    if(count > 1) {
       var = (s_sq - s*s/(double) count)/((double) (count - 1));
       if(is_eq(var, 0.0)) var = 0.0;
@@ -1290,13 +1278,12 @@ double NumArray::mean_abs_diff() const
 
 {
 
-   int i, j, count;
-   double sum, mad;
-
    int n = n_elements();
 
-   for(i=0, count=0, sum=0.0; i<n; i++) {
-      for(j=i+1; j<n; j++) {
+   int count = 0;
+   double sum = 0.0;
+   for(int i=0; i<n; i++) {
+      for(int j=i+1; j<n; j++) {
 
          if( is_bad_data(e[i]) || is_bad_data(e[j]) ) continue;
          sum += abs(e[i]-e[j]);
@@ -1304,6 +1291,7 @@ double NumArray::mean_abs_diff() const
       }
    }
 
+   double mad;
    if(count == 0) mad = bad_data_double;
    else           mad = sum / count;
 
