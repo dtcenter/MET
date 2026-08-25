@@ -27,27 +27,9 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static int compare_unixtime(const void *, const void *);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
    //
    //  Code for class TimeArray
    //
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-TimeArray::TimeArray()
-
-{
-
-init_from_scratch();
-
-}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -69,12 +51,21 @@ TimeArray::TimeArray(const TimeArray & a)
 
 {
 
-init_from_scratch();
-
 assign(a);
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+TimeArray::TimeArray(TimeArray && a) noexcept
+   : e(move(a.e)), Sorted(a.Sorted)
+{
+
+a.Sorted = false;
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -95,15 +86,33 @@ return *this;
 ////////////////////////////////////////////////////////////////////////
 
 
+TimeArray & TimeArray::operator=(TimeArray && a) noexcept
+
+{
+
+if ( this == &a )  return *this;
+
+e = move(a.e);
+Sorted = a.Sorted;
+a.Sorted = false;
+
+return *this;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool TimeArray::operator==(const TimeArray & a) const
 
 {
 
-if ( Nelements != a.Nelements )  return false;
+if ( n() != a.n() )  return false;
 
 bool status = true;
 
-for (int j=0; j<Nelements; ++j)  {
+for (int j=0; j<n(); ++j)  {
 
    if ( e[j] != a.e[j] )  {
       status = false;
@@ -119,29 +128,11 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TimeArray::init_from_scratch()
-
-{
-
-e = (unixtime*) nullptr;
-
-clear();
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void TimeArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (unixtime *) nullptr; }
-
-Nelements = Nalloc = 0;
+e.clear();
 
 Sorted = false;
 
@@ -157,9 +148,9 @@ void TimeArray::erase()
 
 {
 
-Nelements = 0;
-
-Sorted = false;
+int n = n_elements();
+e.clear();
+e.reserve(n);
 
 return;
 
@@ -175,20 +166,9 @@ void TimeArray::assign(const TimeArray & a)
 
 clear();
 
-if ( a.Nelements == 0 )  return;
-
-extend(a.Nelements);
-
-for (int j=0; j<(a.Nelements); ++j)  {
-
-   e[j] = a.e[j];
-
-}
-
-Nelements = a.Nelements;
+e = a.e;
 
 Sorted = a.Sorted;
-
 
 return;
 
@@ -198,56 +178,12 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TimeArray::extend(int n, bool exact)
+void TimeArray::extend(int len)
 
 
 {
 
-if ( Nalloc >= n )  return;
-
-if ( ! exact )  {
-
-   int k;
-
-   k = n/time_array_alloc_inc;
-
-   if ( n%time_array_alloc_inc )  ++k;
-
-   n = k*time_array_alloc_inc;
-
-}
-
-unixtime * u = (unixtime *) nullptr;
-
-u = new unixtime [n];
-
-if ( !u )  {
-
-   mlog << Error << "\nvoid TimeArray::extend(int) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-memset(u, 0, n*sizeof(unixtime));
-
-if ( e )  {
-
-   for (int j=0; j<Nelements; ++j)  {
-
-      u[j] = e[j];
-
-   }
-
-   delete [] e;  e = (unixtime *) nullptr;
-
-}
-
-e = u; u = (unixtime *) nullptr;
-
-Nalloc = n;
-
+e.reserve(len);
 
 return;
 
@@ -264,11 +200,10 @@ void TimeArray::dump(ostream & out, int depth) const
 Indent prefix(depth);
 
 
-out << prefix << "Nelements = " << Nelements << "\n";
-out << prefix << "Nalloc    = " << Nalloc    << "\n";
+out << prefix << "Nelements = " << n() << "\n";
 out << prefix << "Sorted    = " << (Sorted ? "true" : "false") << "\n";
 
-for (int j=0; j<Nelements; ++j)  {
+for (int j=0; j<n(); ++j)  {
 
    out << prefix << "Element # " << j << " = "
        << unix_to_yyyymmdd_hhmmss(e[j]) << "\n";
@@ -293,7 +228,7 @@ unixtime TimeArray::operator[](int n) const
 
 {
 
-if ( (n < 0) || (n >= Nelements) )  {
+if ( (n < 0) || (n >= n_elements()) )  {
 
    mlog << Error << "\nTimeArray::operator[](int) const -> "
        << "range check error\n\n";
@@ -328,7 +263,7 @@ int TimeArray::index(unixtime u) const
 
 int match = -1;
 
-for (int j=0; j<Nelements; ++j)  {
+for (int j=0; j<n(); ++j)  {
 
    if ( e[j] == u )  {  match = j;  break;  }
 
@@ -346,9 +281,7 @@ void TimeArray::add(unixtime u)
 
 {
 
-extend(Nelements + 1, false);
-
-e[Nelements++] = u;
+e.emplace_back(u);
 
 Sorted = false;
 
@@ -364,11 +297,11 @@ void TimeArray::add(const TimeArray & a)
 
 {
 
-extend(Nelements + a.Nelements);
+extend(n() + a.n());
 
-for (int j=0; j<(a.Nelements); ++j)  {
+for (int j=0; j<(a.n()); ++j)  {
 
-   e[Nelements++] = a.e[j];
+   e.emplace_back(a.e[j]);
 
 }
 
@@ -386,13 +319,11 @@ void TimeArray::add_const(unixtime u, int n)
 
 {
 
-extend(Nelements + n);
+extend(n_elements() + n);
 
-int j;
+for (int j=0; j<n; ++j)  {
 
-for (j=0; j<n; ++j)  {
-
-   e[Nelements++] = u;
+   e.emplace_back(u);
 
 }
 
@@ -414,9 +345,9 @@ StringArray sa;
 
 sa.parse_css(text);
 
-extend(Nelements + sa.n_elements());
+extend(n_elements() + sa.n());
 
-for (int j=0; j<sa.n_elements(); j++)  {
+for (int j=0; j<sa.n(); j++)  {
 
   add(timestring_to_unix(sa[j].c_str()));
 
@@ -436,7 +367,7 @@ void TimeArray::set(int n, unixtime u)
 
 {
 
-if ( (n < 0) || (n >= Nelements) )  {
+if ( (n < 0) || (n >= n_elements()) )  {
 
    mlog << Error << "\nTimeArray::set(int, unixtime) -> "
         << "range check error\n\n";
@@ -461,12 +392,10 @@ unixtime TimeArray::min() const
 
 {
 
-unixtime u;
+if(e.empty())  return bad_data_ll;
 
-if(Nelements == 0)  return bad_data_ll;
-
-u = e[0];
-for(int j=0; j<Nelements; j++) {
+unixtime u = e[0];
+for(int j=0; j<n(); j++) {
    if(e[j] < u) u = e[j];
 }
 
@@ -482,12 +411,10 @@ unixtime TimeArray::max() const
 
 {
 
-unixtime u;
+if(e.empty())  return bad_data_ll;
 
-if(Nelements == 0)  return bad_data_ll;
-
-u = e[0];
-for(int j=0; j<Nelements; j++) {
+unixtime u = e[0];
+for(int j=0; j<n(); j++) {
    if(e[j] > u) u = e[j];
 }
 
@@ -503,14 +430,16 @@ ConcatString TimeArray::serialize() const
 
 {
 
-   ConcatString s;
+ConcatString s;
 
-   if(n_elements() == 0) return s;
+if(e.empty()) return s;
 
-   s << e[0];
-   for(int j=1; j<n_elements(); j++) s << " " << unix_to_yyyymmdd_hhmmss(e[j]);
+s << e[0];
+for(int j=1; j<n(); j++) {
+   s << " " << unix_to_yyyymmdd_hhmmss(e[j]);
+}
 
-   return s;
+return s;
 
 }
 
@@ -522,9 +451,9 @@ void TimeArray::sort_array()
 
 {
 
-if ( Nelements <= 1 )  return;
+if ( n() <= 1 )  return;
 
-qsort(e, Nelements, sizeof(unixtime), compare_unixtime);
+sort(e.begin(), e.end());
 
 Sorted = true;
 
@@ -548,7 +477,7 @@ void TimeArray::equal_dt(TimeArray &beg, TimeArray &end) const
 end.clear();
 beg.clear();
 
-if ( Nelements == 0 )  return;
+if ( e.empty() )  return;
 
 // Use first point to begin first segment
 beg.add(e[0]);
@@ -557,7 +486,7 @@ int cur_dt;
 int prv_dt = 0;
 bool new_ts = true;
 
-for(int i=1; i<Nelements; i++, prv_dt=cur_dt) {
+for(int i=1; i<n(); i++, prv_dt=cur_dt) {
    cur_dt = (int)(e[i] - e[i-1]);
    if(new_ts) {
       prv_dt = cur_dt;
@@ -573,7 +502,7 @@ for(int i=1; i<Nelements; i++, prv_dt=cur_dt) {
 }
 
 // Use last point to end the last segment
-end.add(e[Nelements - 1]);
+end.add(e[n() - 1]);
 
 return;
 
@@ -590,8 +519,8 @@ TimeArray TimeArray::subset(int beg, int end) const
 TimeArray subset_ta;
 
 // Check bounds
-if ( beg < 0 || beg >= Nelements ||
-     end < 0 || end >= Nelements ||
+if ( beg < 0 || beg >= n() ||
+     end < 0 || end >= n() ||
      end < beg )  {
    mlog << Error << "\nTimeArray::subset(int, int) -> "
         << "range check error\n\n";
@@ -602,26 +531,6 @@ if ( beg < 0 || beg >= Nelements ||
 for(int i=beg; i<=end; i++) subset_ta.add(e[i]);
 
 return subset_ta;
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
-
-int compare_unixtime(const void *p1, const void *p2)
-
-{
-
-const unixtime *a = (const unixtime *) p1;
-const unixtime *b = (const unixtime *) p2;
-
-
-if ( (*a) < (*b) )  return -1;
-
-if ( (*a) > (*b) )  return 1;
-
-
-return 0;
 
 }
 
