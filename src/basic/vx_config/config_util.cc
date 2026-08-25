@@ -735,6 +735,19 @@ StringArray parse_sid_mask_as_list(const ConcatString &mask_sid_str) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+MaskLatLon::MaskLatLon(const MaskLatLon &a) {
+   name = a.name;
+   lat_thresh = a.lat_thresh;
+   lon_thresh = a.lon_thresh;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+MaskLatLon::MaskLatLon(MaskLatLon &&a) noexcept
+   : name(a.name), lat_thresh(a.lat_thresh), lon_thresh(a.lon_thresh) { }
+
+///////////////////////////////////////////////////////////////////////////////
+
 void MaskLatLon::clear() {
    name.clear();
    lat_thresh.clear();
@@ -743,11 +756,25 @@ void MaskLatLon::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-MaskLatLon &MaskLatLon::operator=(const MaskLatLon &a) noexcept {
+MaskLatLon & MaskLatLon::operator=(const MaskLatLon &a) {
    if(this != &a) {
       name = a.name;
       lat_thresh = a.lat_thresh;
       lon_thresh = a.lon_thresh;
+   }
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+MaskLatLon & MaskLatLon::operator=(MaskLatLon &&a) noexcept {
+   if(this != &a) {
+      name = a.name;
+      lat_thresh = a.lat_thresh;
+      lon_thresh = a.lon_thresh;
+      a.name.clear();
+      a.lat_thresh.clear();
+      a.lon_thresh.clear();
    }
    return *this;
 }
@@ -1419,7 +1446,20 @@ void TimeSummaryInfo::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-BootInfo & BootInfo::operator=(const BootInfo &a) noexcept {
+BootInfo & BootInfo::operator=(const BootInfo &a) {
+   if(this != &a) {
+     interval = a.interval;
+     rep_prop = a.rep_prop;
+     n_rep = a.n_rep;
+     rng = a.rng;
+     seed = a.seed;
+   }
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+BootInfo & BootInfo::operator=(BootInfo &&a) noexcept {
    if(this != &a) {
      interval = a.interval;
      rep_prop = a.rep_prop;
@@ -1933,6 +1973,26 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//
+// Code for class ClimoCDFInfo
+//
+///////////////////////////////////////////////////////////////////////////////
+
+ClimoCDFInfo::ClimoCDFInfo(const ClimoCDFInfo &a) {
+   flag = a.flag;
+   n_bin = a.n_bin;
+   cdf_ta = a.cdf_ta;
+   write_bins = a.write_bins;
+   direct_prob = a.direct_prob;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ClimoCDFInfo::ClimoCDFInfo(ClimoCDFInfo &&a) noexcept
+   : flag(a.flag), n_bin(a.n_bin), cdf_ta(a.cdf_ta),
+     write_bins(a.write_bins), direct_prob(a.direct_prob) { }
+
+///////////////////////////////////////////////////////////////////////////////
 
 void ClimoCDFInfo::clear() {
    flag = false;
@@ -2002,7 +2062,7 @@ void ClimoCDFInfo::set_cdf_ta(int n_bin, bool &center) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ClimoCDFInfo &ClimoCDFInfo::operator=(const ClimoCDFInfo &a) noexcept {
+ClimoCDFInfo &ClimoCDFInfo::operator=(const ClimoCDFInfo &a) {
    if(this != &a) {
       flag = a.flag;
       n_bin = a.n_bin;
@@ -2013,6 +2073,22 @@ ClimoCDFInfo &ClimoCDFInfo::operator=(const ClimoCDFInfo &a) noexcept {
    return *this;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+ClimoCDFInfo &ClimoCDFInfo::operator=(ClimoCDFInfo &&a) noexcept {
+   if(this != &a) {
+      flag = a.flag;
+      a.flag = false;
+      n_bin = a.n_bin;
+      a.n_bin = 0;
+      cdf_ta = move(a.cdf_ta);
+      write_bins = a.write_bins;
+      a.write_bins = false;
+      direct_prob = a.direct_prob;
+      a.direct_prob = false;
+   }
+   return *this;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 

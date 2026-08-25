@@ -743,7 +743,7 @@ static void track_counts(const GenEnsProdVarInfo *ens_info,
 
    // Ensemble thresholds
    const int n_thr = ens_info->cat_ta.n();
-   const SingleThresh *thr_buf = ens_info->cat_ta.buf();
+   const SingleThresh *thr_buf = ens_info->cat_ta.thresh();
 
    // Increment counts for each grid point
    for(int i=0; i<nxy; i++) {
