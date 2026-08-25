@@ -450,7 +450,7 @@ VxPairDataPoint::VxPairDataPoint(const VxPairDataPoint &vx_pd) {
 ////////////////////////////////////////////////////////////////////////
 
 VxPairDataPoint::VxPairDataPoint(VxPairDataPoint &&vx_pd) noexcept
-   : pd(move(vx_pd.pd)) { }
+   : VxPairBase(move(vx_pd)), pd(move(vx_pd.pd)) { }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -469,6 +469,7 @@ VxPairDataPoint & VxPairDataPoint::operator=(VxPairDataPoint &&vx_pd) noexcept {
 
    if(this == &vx_pd) return *this;
 
+   VxPairBase::operator=(move(vx_pd));
    pd = move(vx_pd.pd);
 
    return *this;
