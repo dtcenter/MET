@@ -24,24 +24,23 @@ class ThreshArray {
 
    public:
 
-      void init_from_scratch();
       void assign(const ThreshArray &);
 
-      SingleThresh * t;
-
-      int Nelements;
-      int Nalloc;
+      std::vector<SingleThresh> t;
 
    public:
 
       ThreshArray();
      ~ThreshArray();
       ThreshArray(const ThreshArray &);
+      ThreshArray(ThreshArray &&) noexcept;
+
       ThreshArray & operator=(const ThreshArray &);
+      ThreshArray & operator=(ThreshArray &&) noexcept;
 
       void clear();
 
-      void extend(int, bool exact = true);
+      void extend(int);
 
       void dump(std::ostream &, int depth = 0) const;
 
@@ -49,7 +48,6 @@ class ThreshArray {
       SingleThresh operator[](int) const;
 
       const SingleThresh * thresh() const;
-      SingleThresh * buf() const;
 
       void add(const SingleThresh &);
       void add(const double, const ThreshType);
@@ -93,10 +91,9 @@ class ThreshArray {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int                  ThreshArray::n_elements() const { return Nelements; }
-inline int                  ThreshArray::n()          const { return Nelements; }
-inline const SingleThresh * ThreshArray::thresh()     const { return t;         }
-inline       SingleThresh * ThreshArray::buf()        const { return t;         }
+inline int                  ThreshArray::n_elements() const { return (int) t.size(); }
+inline int                  ThreshArray::n()          const { return (int) t.size(); }
+inline const SingleThresh * ThreshArray::thresh()     const { return t.data();       }
 
 ////////////////////////////////////////////////////////////////////////
 

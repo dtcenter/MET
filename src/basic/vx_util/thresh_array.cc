@@ -20,34 +20,30 @@
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
-
-static const int thresharray_alloc_inc = 10;
-
-////////////////////////////////////////////////////////////////////////
 //
 //  Code for class ThreshArray
 //
 ////////////////////////////////////////////////////////////////////////
 
 ThreshArray::ThreshArray() {
-
-   init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 ThreshArray::~ThreshArray() {
-
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 ThreshArray::ThreshArray(const ThreshArray & a) {
-
-   init_from_scratch();
-
    assign(a);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ThreshArray::ThreshArray(ThreshArray && a) noexcept
+   : t(move(a.t)) {
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -63,22 +59,20 @@ ThreshArray & ThreshArray::operator=(const ThreshArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ThreshArray::init_from_scratch() {
+ThreshArray & ThreshArray::operator=(ThreshArray && a) noexcept {
 
-   t = (SingleThresh *) nullptr;
+   if(this == &a) return *this;
 
-   clear();
+   t = move(a.t);
 
-   return;
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void ThreshArray::clear() {
 
-   if(t) { delete [] t;  t = (SingleThresh *) nullptr; }
-
-   Nelements = Nalloc = 0;
+   t.clear();
 
    return;
 }
@@ -86,31 +80,22 @@ void ThreshArray::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void ThreshArray::assign(const ThreshArray & a) {
-   int j;
 
    clear();
 
-   extend(a.Nelements);
-
-   for(j=0; j<(a.Nelements); j++) add(a.t[j]);
-
-   Nelements = a.Nelements;
-
-   return;
+   t = a.t;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void ThreshArray::dump(ostream & out, int depth) const {
-   int j;
 
    Indent prefix(depth);
    Indent prefix2(depth + 1);
 
-   out << prefix << "Nelements = " << Nelements << "\n";
-   out << prefix << "Nalloc    = " << Nalloc    << "\n";
+   out << prefix << "Nelements = " << n() << "\n";
 
-   for(j=0; j<Nelements; j++) {
+   for(int j=0; j<n(); j++) {
       out << prefix2 << "Element # " << j << " = \"" << t[j].get_str() << "\"\n";
    }
 
@@ -121,32 +106,9 @@ void ThreshArray::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ThreshArray::extend(int n, bool exact) {
-   int j, k;
+void ThreshArray::extend(int len) {
 
-   if(n <= Nalloc) return;
-
-   if(!exact) {
-      k = n/thresharray_alloc_inc;
-
-      if(n%thresharray_alloc_inc) k++;
-
-      n = k*thresharray_alloc_inc;
-   }
-
-   SingleThresh *u = (SingleThresh *) nullptr;
-
-   u = new SingleThresh [n];
-
-   if(t) {
-      for(j=0; j<Nelements; j++) u[j] = t[j];
-
-      delete [] t; t = (SingleThresh *) nullptr;
-   }
-
-   t = u; u = (SingleThresh *) nullptr;
-
-   Nalloc = n;
+   t.reserve(len);
 
    return;
 }
@@ -156,10 +118,10 @@ void ThreshArray::extend(int n, bool exact) {
 bool ThreshArray::operator==(const ThreshArray &ta) const {
 
    // Check for the same length
-   if(Nelements != ta.n()) return false;
+   if(n() != ta.n()) return false;
 
    // Check for equality of individual elements
-   for(int i=0; i<Nelements; i++) {
+   for(int i=0; i<n(); i++) {
       if(!(t[i] == ta[i])) return false;
    }
 
@@ -170,7 +132,7 @@ bool ThreshArray::operator==(const ThreshArray &ta) const {
 
 SingleThresh ThreshArray::operator[](int n) const {
 
-   if((n < 0) || (n >= Nelements)) {
+   if((n < 0) || (n >= n_elements())) {
       mlog << Error << "\nThreshArray::operator[](int) const -> "
            << "range check error!\n\n";
       exit(1);
@@ -184,11 +146,7 @@ SingleThresh ThreshArray::operator[](int n) const {
 
 void ThreshArray::add(const SingleThresh &st) {
 
-   extend(Nelements + 1, false);
-
-   t[Nelements] = st;
-
-   Nelements++;
+   t.emplace_back(st);
 
    return;
 }
@@ -200,11 +158,7 @@ void ThreshArray::add(const double val, const ThreshType type) {
 
    st.set(val, type);
 
-   extend(Nelements + 1, false);
-
-   t[Nelements] = st;
-
-   Nelements++;
+   add(st);
 
    return;
 }
@@ -216,11 +170,7 @@ void ThreshArray::add(const char *thresh_str) {
 
    st.set(thresh_str);
 
-   extend(Nelements + 1, false);
-
-   t[Nelements] = st;
-
-   Nelements++;
+   add(st);
 
    return;
 }
@@ -228,13 +178,12 @@ void ThreshArray::add(const char *thresh_str) {
 ////////////////////////////////////////////////////////////////////////
 
 void ThreshArray::add(const ThreshArray & a) {
-   int j;
 
-   if(a.n() == 0) return;
+   if(a.t.empty()) return;
 
-   extend(Nelements + a.n());
+   extend(n() + a.n());
 
-   for(j=0; j<(a.n()); j++) add(a[j]);
+   for(int j=0; j<(a.n()); j++) add(a[j]);
 
    return;
 }
@@ -242,14 +191,13 @@ void ThreshArray::add(const ThreshArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void ThreshArray::add_css(const char *text) {
-   int j;
    StringArray sa;
 
    sa.parse_css(text);
 
-   extend(Nelements + sa.n());
+   extend(n() + sa.n());
 
-   for(j=0; j<sa.n(); j++) add(sa[j].c_str());
+   for(int j=0; j<sa.n(); j++) add(sa[j].c_str());
 
    return;
 }
@@ -304,9 +252,9 @@ int ThreshArray::has(const SingleThresh &st, int & index) const {
 
    index = -1;
 
-   if(Nelements == 0) return 0;
+   if(t.empty()) return 0;
 
-   for(int j=0; j<Nelements; j++) {
+   for(int j=0; j<n(); j++) {
 
       if(t[j] == st) { index = j; return 1; }
    }
@@ -324,9 +272,9 @@ ConcatString ThreshArray::get_str(const char *sep, int precision) const {
    ConcatString cur_str;
    ConcatString tmp_str;
 
-   if(Nelements == 0) tmp_str = na_str;
+   if(t.empty()) tmp_str = na_str;
 
-   for(int i=0; i<Nelements; i++) {
+   for(int i=0; i<n(); i++) {
       cur_str = t[i].get_str(precision);
 
       if(i==0) tmp_str << cur_str;
@@ -342,9 +290,9 @@ ConcatString ThreshArray::get_abbr_str(const char *sep, int precision) const {
    ConcatString cur_str;
    ConcatString tmp_str;
 
-   if(Nelements == 0) tmp_str = na_str;
+   if(t.empty()) tmp_str = na_str;
 
-   for(int i=0; i<Nelements; i++) {
+   for(int i=0; i<n(); i++) {
       cur_str = t[i].get_abbr_str(precision);
 
       if(i==0) tmp_str << cur_str;
@@ -362,7 +310,7 @@ void ThreshArray::check_bin_thresh() const {
    // Check that the threshold values are monotonically increasing
    // and the threshold types are inequalities that remain the same
    //
-   for(int i=0; i<Nelements-1; i++) {
+   for(int i=0; i<n()-1; i++) {
 
       if(t[i].get_value() >  t[i+1].get_value() ||
          t[i].get_type()  != t[i+1].get_type()  ||
@@ -383,27 +331,27 @@ void ThreshArray::check_bin_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int ThreshArray::check_bins(double v, const ClimoPntInfo *cpi) const {
-   int i, bin;
+   int bin;
 
    // Check for bad data or no thresholds
-   if(is_bad_data(v) || Nelements == 0) return bad_data_int;
+   if(is_bad_data(v) || t.empty()) return bad_data_int;
 
    // For < and <=, check thresholds left to right
    if(t[0].get_type() == thresh_lt ||
       t[0].get_type() == thresh_le) {
 
-      for(i=0, bin=-1; i<Nelements; i++) {
+      for(int i=0, bin=-1; i<n(); i++) {
          if(t[i].check(v, cpi)) {
             bin = i;
             break;
          }
       }
-      if(bin == -1) bin = Nelements;
+      if(bin == -1) bin = n();
    }
    // For > and >=, check thresholds right to left
    else {
 
-      for(i=Nelements-1, bin=-1; i>=0; i--) {
+      for(int i=n()-1, bin=-1; i>=0; i--) {
          if(t[i].check(v, cpi)) {
             bin = i+1;
             break;
@@ -424,7 +372,7 @@ bool ThreshArray::check_dbl(double v, const ClimoPntInfo *cpi) const {
    //
    // Check if the value satisifes all the thresholds in the array
    //
-   for(int i=0; i<Nelements; i++) if(!t[i].check(v, cpi)) return false;
+   for(int i=0; i<n(); i++) if(!t[i].check(v, cpi)) return false;
 
    return true;
 }
@@ -434,7 +382,7 @@ bool ThreshArray::check_dbl(double v, const ClimoPntInfo *cpi) const {
 bool ThreshArray::need_perc() {
    bool status = false;
 
-   for(int i=0; i<Nelements; i++) {
+   for(int i=0; i<n(); i++) {
       if(t[i].need_perc()) {
          status = true;
          break;
@@ -449,9 +397,9 @@ bool ThreshArray::need_perc() {
 void ThreshArray::set_perc(const NumArray *fptr, const NumArray *optr,
                            const NumArray *fcptr, const NumArray *ocptr) {
 
-   if(Nelements == 0) return;
+   if(t.empty()) return;
 
-   for(int i=0; i<Nelements; i++) {
+   for(int i=0; i<n(); i++) {
       t[i].set_perc(fptr, optr, fcptr, ocptr);
    }
 
@@ -465,7 +413,7 @@ void ThreshArray::set_perc(const NumArray *fptr, const NumArray *optr,
                            const ThreshArray *farr,
                            const ThreshArray *oarr) {
 
-   if(Nelements == 0) return;
+   if(t.empty()) return;
 
    if(!farr || !oarr) {
       mlog << Error << "\nThreshArray::set_perc() -> "
@@ -473,14 +421,14 @@ void ThreshArray::set_perc(const NumArray *fptr, const NumArray *optr,
       exit(1);
    }
 
-   if(farr->n() != Nelements ||
-      oarr->n() != Nelements) {
+   if(farr->n() != n() ||
+      oarr->n() != n()) {
       mlog << Error << "\nThreshArray::set_perc() -> "
            << "not enough thresholds provided!\n\n";
       exit(1);
    }
 
-   for(int i=0; i<Nelements; i++) {
+   for(int i=0; i<n(); i++) {
       t[i].set_perc(fptr, optr, fcptr, ocptr,
                     &(farr->thresh()[i]),
                     &(oarr->thresh()[i]));
@@ -493,9 +441,9 @@ void ThreshArray::set_perc(const NumArray *fptr, const NumArray *optr,
 
 void ThreshArray::multiply_by(const double x) {
 
-   if(Nelements == 0) return;
+   if(t.empty()) return;
 
-   for(int i=0; i<Nelements; i++) t[i].multiply_by(x);
+   for(int i=0; i<n(); i++) t[i].multiply_by(x);
 
    return;
 
@@ -505,9 +453,9 @@ void ThreshArray::multiply_by(const double x) {
 
 void ThreshArray::get_simple_nodes(vector <Simple_Node> &v) {
 
-   if(Nelements == 0) return;
+   if(t.empty()) return;
 
-   for(int i=0; i<Nelements; i++) t[i].get_simple_nodes(v);
+   for(int i=0; i<n(); i++) t[i].get_simple_nodes(v);
 
    return;
 
@@ -518,7 +466,7 @@ void ThreshArray::get_simple_nodes(vector <Simple_Node> &v) {
 bool ThreshArray::equal_bin_width(double &width) const {
 
    // Check number of elements
-   if(Nelements < 2) {
+   if(n() < 2) {
       width = bad_data_double;
       return false;
    }
@@ -528,7 +476,7 @@ bool ThreshArray::equal_bin_width(double &width) const {
    bool is_equal = true;
 
    // Check for consistent widths, ignoring the last bin
-   for(int i=0; i<(Nelements-2); i++) {
+   for(int i=0; i<(n()-2); i++) {
       double cur_width = t[i+1].get_value() - t[i].get_value();
       if(!is_eq(width, cur_width, loose_tol)) {
          width = bad_data_double;
