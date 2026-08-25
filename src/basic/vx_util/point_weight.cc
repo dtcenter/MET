@@ -211,10 +211,10 @@ void PointWeightInfo::compute_kde_weights() {
               << "computed an infinite weight for location ("
               << SIDWeights[i].Lat << ", " << SIDWeights[i].Lon
               << ") with an average angular difference of "
-              << a_sum[i] / (n_stn() - 1) << " to " << n_stn() - 1
-              << " other points.\n"
+              << a_sum[i] / (n_stn() - 1) << " degrees from "
+              << n_stn() - 1 << " other points.\n"
               << "Adjust the \"" << conf_key_kde_ref_angle << " = "
-              << KDERefAngle << "\" configuration option to avoid it!\n\n";
+              << KDERefAngle << "\" configuration setting to avoid it!\n\n";
          exit(1);
       }
       SIDWeights[i].Wgt = 1.0/p_sum[i];
