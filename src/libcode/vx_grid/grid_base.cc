@@ -986,11 +986,11 @@ assign(g);
 
 
 Grid::Grid(Grid && g) noexcept
-   : rep(move(g.rep)), swap_to_north(g.swap_to_north)
+   : rep(g.rep), swap_to_north(g.swap_to_north)
 
 {
 
-g.swap_to_north = false;
+g.rep = nullptr;
 
 }
 
@@ -1018,9 +1018,10 @@ Grid & Grid::operator=(Grid && g) noexcept
 
 if ( this != &g ) {
 
-   rep = move(g.rep);
+   if(rep) delete rep;
+   rep = g.rep;
    swap_to_north = g.swap_to_north;
-   g.swap_to_north = false;
+   g.rep = nullptr;
 
 }
 
