@@ -31,12 +31,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int crc_array_alloc_inc = 25;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 template <typename T>
 
 class CRC_Array {
@@ -47,12 +41,7 @@ class CRC_Array {
 
       void assign(const CRC_Array &);
 
-
       std::vector<T> e;
-
-      int Nelements;
-
-      int Nalloc;
 
    public:
 
@@ -61,6 +50,8 @@ class CRC_Array {
      ~CRC_Array() { clear(); }
 
       CRC_Array(const CRC_Array <T> & _a)  { init_from_scratch();  assign(_a); }
+
+      CRC_Array(CRC_Array <T> && _a) noexcept : e(move(_a.e)) {}
 
       CRC_Array & operator=(const CRC_Array <T> & _a)  {
 
@@ -72,13 +63,23 @@ class CRC_Array {
 
       }
 
+      CRC_Array & operator=(CRC_Array <T> && _a) noexcept {
+
+         if ( this == &_a )  return *this;
+
+         e = move(_a.e);
+
+         return *this;
+
+      }
+
       CRC_Array <T> & operator=(const NumArray &);
 
       bool operator==(const CRC_Array <T> &) const;
 
       void clear();
 
-      void extend(int, bool exact = true);
+      void extend(int);
 
       void dump(std::ostream &, int depth = 0) const;
 
@@ -93,8 +94,8 @@ class CRC_Array {
          //  get stuff
          //
 
-      int n_elements() const { return Nelements; }
-      int n         () const { return Nelements; }
+      int n_elements() const { return (int) e.size(); }
+      int n         () const { return (int) e.size(); }
 
       T operator[] (int) const;
 
@@ -159,9 +160,9 @@ bool CRC_Array<T>::operator==(const CRC_Array<T> & a) const
 
 {
 
-if ( Nelements != a.Nelements )  return false;
+if ( n() != a.n() )  return false;
 
-for(int j=0; j<Nelements; ++j)  {
+for(int j=0; j<n(); ++j)  {
    if(e[j] != a.e[j])  return false;
 }
 
@@ -197,8 +198,6 @@ void CRC_Array<T>::clear()
 
 e.clear();
 
-Nelements = Nalloc = 0;
-
 return;
 
 }
@@ -215,14 +214,11 @@ void CRC_Array<T>::assign(const CRC_Array <T> & a)
 
 clear();
 
-if ( a.Nelements == 0 )  return;
+if ( a.n() == 0 )  return;
 
-extend(a.Nelements);
+extend(a.n());
 
 e = a.e;
-
-Nelements = a.Nelements;
-
 
 return;
 
@@ -234,28 +230,11 @@ return;
 
 template <typename T>
 
-void CRC_Array<T>::extend(int len, bool exact)
+void CRC_Array<T>::extend(int len)
 
 {
 
-if ( Nalloc >= len )  return;
-
-if ( ! exact )  {
-
-   int k;
-
-   k = len/crc_array_alloc_inc;
-
-   if ( len%crc_array_alloc_inc )  ++k;
-
-   len = k*crc_array_alloc_inc;
-
-}
-
-e.reserve( len );
-
-Nalloc = len;
-
+e.reserve(len);
 
 return;
 
@@ -273,13 +252,9 @@ void CRC_Array<T>::dump(std::ostream & out, int depth) const
 
 Indent prefix(depth);
 
+out << prefix << "Nelements = " << n() << "\n";
 
-out << prefix << "Nelements = " << Nelements << "\n";
-out << prefix << "Nalloc    = " << Nalloc    << "\n";
-
-int j;
-
-for (j=0; j<Nelements; ++j)  {
+for (int j=0; j<n(); ++j)  {
 
    out << prefix << "Element # " << j << " = " << e[j] << "\n";
 
@@ -308,9 +283,9 @@ void CRC_Array<T>::dump_one_line(std::ostream & out, int depth) const
 int j;
 Indent prefix(depth);
 
-out << prefix << '(' << Nelements << ") ";
+out << prefix << '(' << n() << ") ";
 
-for (j=0; j<Nelements; ++j)  {
+for (j=0; j<n(); ++j)  {
 
    if ( j > 0 )  out << ' ';
 
@@ -355,12 +330,11 @@ template <typename T>
 void CRC_Array<T>::set(int ix, const T & elem)
 
 {
-   if ( (ix < 0) || (ix >= Nelements) )  {
+   if ( (ix < 0) || (ix >= n()) )  {
 
       mlog << Error << "\nCRC_Array::set(int, T) const -> "
            << "range check error ... index = " << ix 
-           << ", Nelements = " << Nelements 
-           << ", Nalloc = " << Nalloc
+           << ", Nelements = " << n() 
            << "\n\n";
 
       exit ( 1 );
@@ -379,12 +353,11 @@ T CRC_Array<T>::operator[](int i) const
 
 {
 
-if ( (i < 0) || (i >= Nelements) )  {
+if ( (i < 0) || (i >= n()) )  {
 
    mlog << Error << "\nCRC_Array::operator[](int) const -> "
         << "range check error ... index = " << i 
-        << ", Nelements = " << Nelements 
-        << ", Nalloc = " << Nalloc 
+        << ", Nelements = " << n()
         << "\n\n";
 
    exit ( 1 );
@@ -405,10 +378,9 @@ bool CRC_Array<T>::has(const T & k, bool forward) const
 
 {
 
-int j;
 bool found = false;
 if (forward) {
-   for (j=0; j<Nelements; ++j)  {
+   for (int j=0; j<n(); ++j)  {
       if ( e[j] == k ) {
           found = true;
           break;
@@ -416,7 +388,7 @@ if (forward) {
    }
 }
 else {
-   for (j=Nelements-1; j>=0; --j)  {
+   for (int j=n()-1; j>=0; --j)  {
       if ( e[j] == k ) {
           found = true;
           break;
@@ -438,18 +410,17 @@ bool CRC_Array<T>::has(const T & k, int & index, bool forward) const
 
 {
 
-int j;
 bool found = false;
 
 index = -1;
 
 if (forward) {
-   for (j=0; j<Nelements; ++j)  {
+   for (int j=0; j<n(); ++j)  {
       if ( e[j] == k )  { index = j; found = true; break; }
    }
 }
 else {
-   for (j=Nelements-1; j>=0; --j)  {
+   for (int j=n()-1; j>=0; --j)  {
       if ( e[j] == k )  { index = j; found = true; break; }
    }
 }
@@ -468,11 +439,7 @@ void CRC_Array<T>::add(const T & k)
 
 {
 
-extend(Nelements + 1, false);
-
 e.emplace_back(k);
-
-Nelements++;
 
 return;
 
@@ -488,15 +455,11 @@ void CRC_Array<T>::add(const CRC_Array<T> & a)
 
 {
 
-extend(Nelements + a.Nelements);
+extend(n() + a.n());
 
-int j;
-
-for (j=0; j<(a.Nelements); ++j)  {
+for (int j=0; j<(a.n()); ++j)  {
 
    e.emplace_back(a.e[j]);
-
-   Nelements++;
 
 }
 
@@ -535,11 +498,11 @@ StringArray sa;
 
 sa.parse_css(text);
 
-extend(Nelements + sa.n_elements());
+extend(n() + sa.n());
 
 int j;
 
-for (j=0; j<(sa.n_elements()); j++)  {
+for (j=0; j<(sa.n()); j++)  {
 
   add(timestring_to_sec(sa[j].c_str()));
 
@@ -559,7 +522,7 @@ void CRC_Array<T>::sort_increasing()
 
 {
 
-if ( Nelements <= 1 )  return;
+if ( n() <= 1 )  return;
 
 std::sort(e.begin(), e.end());
 
@@ -577,12 +540,11 @@ T CRC_Array<T>::sum() const
 
 {
 
-int j, count;
-T s;
+T s = 0;
 
-s = 0;
+int count;
 
-for(j=0, count=0; j<Nelements; j++) {
+for(int j=0, count=0; j<n(); j++) {
 
    if ( is_bad_data(e[j]) ) continue;
 
@@ -607,13 +569,11 @@ T CRC_Array<T>::min() const
 
 {
 
-if ( Nelements == 0 )  return bad_data_int;
-
-int j;
+if ( n() == 0 )  return bad_data_int;
 
 T min_v = e[0];
 
-for(j=0; j<Nelements; j++) {
+for(int j=0; j<n(); j++) {
 
    if ( is_bad_data(e[j]) ) continue;
 
@@ -635,13 +595,11 @@ T CRC_Array<T>::max() const
 
 {
 
-if(Nelements == 0) return bad_data_int;
-
-int j;
+if(n() == 0) return bad_data_int;
 
 T max_v = e[0];
 
-for(j=0; j<Nelements; j++) {
+for(int j=0; j<n(); j++) {
 
    if ( is_bad_data(e[j]) )  continue;
 
@@ -663,9 +621,7 @@ void CRC_Array<T>::increment(const T & k)
 
 {
 
-int j;
-
-for (j=0; j<Nelements; ++j)  {
+for (int j=0; j<n(); ++j)  {
 
    e[j] += k;
 

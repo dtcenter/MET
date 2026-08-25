@@ -63,6 +63,18 @@ NumArray::NumArray(const NumArray & a)
 ////////////////////////////////////////////////////////////////////////
 
 
+NumArray::NumArray(NumArray && a) noexcept
+   : e(move(a.e)), Sorted(a.Sorted)
+{
+
+   a.Sorted = false;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 NumArray & NumArray::operator=(const NumArray & a)
 
 {
@@ -70,6 +82,24 @@ NumArray & NumArray::operator=(const NumArray & a)
    if ( this == &a )  return *this;
 
    assign(a);
+
+   return *this;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+NumArray & NumArray::operator=(NumArray && a) noexcept
+
+{
+
+   if ( this == &a )  return *this;
+
+   e = move(a.e);
+   Sorted = a.Sorted;
+   a.Sorted = false;
 
    return *this;
 
