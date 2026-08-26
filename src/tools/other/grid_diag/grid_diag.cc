@@ -69,7 +69,7 @@ static void prepare_power_spectrum_data(vector<InputDataInfo> &);
 static void process_power_spectrum(const vector<InputDataInfo> &);
 static void process_error_power_spectrum(const vector<InputDataInfo> &);
 static std::vector<double> radial_spectral_variance(const DataPlane &);
-static void accumulate(vector<double> &, const vector<double> &);
+static void sum_spectral_variance(vector<double> &, const vector<double> &);
 static DataPlane dct_typeII(const DataPlane &);
 static void process_info_theory(void);
 static void setup_nc_file(void);
@@ -606,8 +606,8 @@ static void process_power_spectrum(const vector<InputDataInfo> &in_data) {
             re[i] = (u_re[i] + v_re[i]) / 2.0;
          }
 
-         // Sum the radial energy
-         accumulate(power_info[i_var].power, re);
+         // Sum the spectral variance
+         sum_spectral_variance(power_info[i_var].power, re);
       }
       // Process other scalar fields
       else {
@@ -618,8 +618,8 @@ static void process_power_spectrum(const vector<InputDataInfo> &in_data) {
          // Compute the radial energy
          vector<double> re = radial_spectral_variance(dct_dp);
 
-         // Sum the radial energy
-         accumulate(power_info[i_var].power, re);
+         // Sum the spectral variance
+         sum_spectral_variance(power_info[i_var].power, re);
       }
    } // end for i_var
 }
@@ -662,8 +662,8 @@ static void process_error_power_spectrum(const vector<InputDataInfo> &in_data) {
                re[i] = (u_re[i] + v_re[i]) / 2.0;
             }
 
-            // Sum the radial energy
-            accumulate(power_info[i_var].error_power[j_var], re);
+            // Sum the spectral variance
+            sum_spectral_variance(power_info[i_var].error_power[j_var], re);
          }
          // Process other scalar fields
          else {
@@ -678,8 +678,8 @@ static void process_error_power_spectrum(const vector<InputDataInfo> &in_data) {
             // Compute the radial energy
             vector<double> re = radial_spectral_variance(dct_dp);
 
-            // Sum the radial energy
-            accumulate(power_info[i_var].error_power[j_var], re);
+            // Sum the spectral variance
+            sum_spectral_variance(power_info[i_var].error_power[j_var], re);
          }
       } // end for j_var
    } // end for i_var
@@ -688,27 +688,32 @@ static void process_error_power_spectrum(const vector<InputDataInfo> &in_data) {
 ////////////////////////////////////////////////////////////////////////
 //
 // Compute the radial spectral variance from a 2D array of DCT-II
-// coefficients.
+// coefficients, following Denis et al. (2002).
 //   - Each axis is normalized independently by its own dimension
-//     (alph = sqrt((x/nx)^2 + (y/ny)^2)) so that non-square domains
-//     are not biased toward the shorter axis.
+//     (alph = sqrt((x/nx)^2 + (y/ny)^2)), giving an elliptical
+//     (rather than circular) truncation appropriate for rectangular
+//     domains, per section 2b of Denis et al. (2002).
 //   - Points with alph >= 1 fall outside the valid isotropic
 //     wavenumber range (the "corners" of the coefficient array) and
-//     are excluded rather than folded into the last bin.
-//   - The (0,0) DC coefficient is excluded -- it represents the
-//     domain mean, not spectral energy.
+//     are excluded.
+//   - The (0,0) DC coefficient and the entire near-DC shell
+//     (alph < 1/N) are excluded, per the k=1..N-1 range above.
 //
 ////////////////////////////////////////////////////////////////////////
 
 static vector<double> radial_spectral_variance(const DataPlane &dp) {
 
-   // Define the number of bins as the smaller dimension
+   // Use the smaller dimension
    int nx = dp.nx();
    int ny = dp.ny();
-   int n_bins = min(nx, ny);
-   vector<double> re(n_bins, 0.0);
+   int N = min(nx, ny);
 
-   double inv_n_bins = 1.0 / n_bins;
+   // Output spans k = 1 .. N-1 inclusive, per Denis et al. (2002).
+   // re[k-1] holds the energy for wavenumber k.
+   int n_bins = N - 1;
+   vector<double> re(n_bins, 0.0); 
+
+   double inv_N = 1.0 / N;
 
    // Accumulate spectral variance for each DCT coefficient
    for(int x=0; x<nx; x++) {
@@ -722,19 +727,17 @@ static vector<double> radial_spectral_variance(const DataPlane &dp) {
          double ay = (double) y / ny;
          double alph = sqrt(ax*ax + ay*ay);
 
-         // Discard the entire lowest-wavenumber shell (alph < 1/N)
-         // and the out-of-range corner region (alph >= 1)
-         if(alph < inv_n_bins || alph >= 1.0) continue;
+         // Exclude the near-DC shell (alph < 1/N) and the
+         // out-of-range corner region (alph >= 1) -- neither
+         // corresponds to a valid k in {1, ..., N-1}.
+         if(alph < inv_N || alph >= 1.0) continue;
 
-         // Map alph to a bin index in [0, n_bins - 1]
-         auto bin = (int) (alph * n_bins);
-         if(bin >= n_bins) bin = n_bins - 1;
+         // Map alph to wavenumber k in {1, ..., N-1}, then to the
+         // 0-based array index (k - 1).
+         int k = (int) (alph * N);
+         if(k >= N) k = N - 1;
 
-         // Energy is the coefficient squared, normalized by the
-         // number of grid points
-         double spec_var = dp(x,y) * dp(x,y) / dp.nxy();
-
-         re[bin] += spec_var;
+         re[k - 1] += dp(x,y) * dp(x,y) / dp.nxy();
 
       } // end for y
    } // end for x
@@ -744,7 +747,8 @@ static vector<double> radial_spectral_variance(const DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void accumulate(vector<double> &sum, const vector<double> &cur) {
+static void sum_spectral_variance(vector<double> &sum,
+                                  const vector<double> &cur) {
 
    // Initialize the sum if needed
    if(sum.empty()) {
@@ -755,7 +759,7 @@ static void accumulate(vector<double> &sum, const vector<double> &cur) {
 
       // Must be the same size
       if(sum.size() != cur.size()) {
-         mlog << Error << "\naccumulate() -> "
+         mlog << Error << "\nsum_spectral_variance() -> "
               << "vector lengths do not match (" << sum.size()
               << " != " << cur.size() << ")!\n\n";
          exit(1);
@@ -1064,7 +1068,7 @@ static void setup_nc_file(void) {
    // Add the power spectra dimension
    if(conf_info.nc_info.do_power_spectrum) {
       wavenumber_dim = add_dim(nc_out, "wavenumber",
-                               (long) min(grid.nx(), grid.ny()));
+                               (long) min(grid.nx(), grid.ny())-1);
    }
 }
 
@@ -1348,32 +1352,34 @@ static void write_info_theory(void) {
 
 static void write_wavelengths(void) {
 
-   // Define wavenumber values
-   auto n_waves = (int) wavenumber_dim.getSize();
-   vector<int> wavenumbers(n_waves);
-   iota(wavenumbers.begin(), wavenumbers.end(), 1);
-
-   // Define wavelength values
-   vector<float> wavelengths(n_waves);
+   // Define wavenumbers and wavelengths based on the number of bins
+   int N = min(grid.nx(), grid.ny());
+   int n_bins = N - 1;
    double grid_res_km = get_grid_res_km(grid);
-   for(int i=0; i<n_waves; i++) {
-      wavelengths[i] = wavenumbers[n_waves - 1 - i] * (float) grid_res_km;
+
+   vector<int> wavenumber(n_bins);
+   vector<float> wavelength(n_bins);
+
+   for(int i=0; i<n_bins; i++) {
+      int k = i + 1;
+      wavenumber[i] = k;
+      wavelength[i] = 2.0 * N * grid_res_km / k;
    }
 
    // Add wavenumber coordinate variable
    NcVar num_var = add_var(nc_out, "wavenumber", ncInt64, wavenumber_dim);
-   add_var_att_local(&num_var, "long_name", "Wavenumbers");
+   add_var_att_local(&num_var, "long_name", "Wavenumber");
    add_var_att_local(&num_var, "units", "1");
-   num_var.putVar(wavenumbers.data());
+   num_var.putVar(wavenumber.data());
 
    // Add wavelength variable
    NcVar len_var = add_var(nc_out, "wavelength", ncFloat, wavenumber_dim);
-   add_var_att_local(&len_var, "long_name", "Wavelengths");
+   add_var_att_local(&len_var, "long_name", "Wavelength");
    add_var_att_local(&len_var, "units", "km");
    ConcatString cs;
    cs.format("%g km", grid_res_km);
    add_var_att_local(&len_var, "grid_res", cs);
-   len_var.putVar(wavelengths.data());
+   len_var.putVar(wavelength.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
