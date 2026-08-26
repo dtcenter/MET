@@ -13,7 +13,7 @@ Grid-Diag creates histograms (probability distributions when normalized) for an 
 
 Grid-Diag also uses the histograms to derive information theory statistics. Entropy is derived from each 1-dimensional histogram, and joint entropy and mutual information are derived from each 2-dimensional joint histogram. These statistics are defined using log base 2, rather than the natural logarithm which is also commonly used.
 
-Finally, Grid-Diag also derives power spectra for each input field. However, power spectra are computed over the full model domain rather than being subset by spatial masking regions. Note that special logic is applied when processing kinetic energy. Grid-Diag reads the corresponding U and V-wind vector components and applies a discrete cosine transform to them separately prior to copmuting the power spectrum.
+Finally, Grid-Diag also derives power spectra for each input field using discrete cosine transforms, as described in :ref:`Denis et al. (2002) <Denis-2002>` and :ref:`Durran et al. (2017) <Durran-2017>`. However, power spectra are computed over the full model domain rather than being subset by spatial masking regions. Note that special logic is applied when processing kinetic energy. Grid-Diag reads the corresponding U and V-wind vector components and applies a discrete cosine transform to them separately prior to computing the power spectrum. If multiple inputs are provided with the **-data** command line option, the error power spectrum of the difference fields is also computed.
 
 Practical Information
 =====================
@@ -154,3 +154,4 @@ If 2-dimensional joint historgrams are requested, a corresponding **hist_** vari
 
 If information theory output is requested, **entropy_**, **joint_entropy_**, and **mutual_information_** variables are written. Shannon entropy is derived from each 1-dimensional histogram, while joint entropy and mutual information are derived from each 2-dimensional joint histogram. These variables have one dimension for the number of masking regions and are computed using log base 2 rather than the natural logarithm. As such, their units are specified in the output as "bits" rather than "nats".
 
+If power spectrum output is requested, **wavenumber**, **wavelength**, and **power_spectrum_** variables are written. These variables have a single **wavenumber** dimension which is the minimum of the Nx and Ny dimensions of the verification grid. If multiple inputs are provided with the **-data** command line option, **error_power_spectrum_** variables are also written for the difference fields.
