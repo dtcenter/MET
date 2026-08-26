@@ -30,7 +30,7 @@
 
 
 static const int UG_DIM_COUNT = 5;
-static const int UG_META_VAR_COUNT = 9;
+static const int UG_META_VAR_COUNT = 10;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -163,8 +163,8 @@ class UGridFile {
       // Read the grid information from the netCDF file and fill in the
       // grid member with that information.
 
-      std::string find_metadata_name(std::string &key, StringArray &available_names);
-      StringArray get_metadata_names(std::string &key);
+      std::string find_metadata_name(const std::string &key, StringArray &available_names);
+      StringArray get_metadata_names(const std::string &key);
       void radian_to_degree(std::vector<double> &lat_values, const int lat_count) const;
       void read_config(ConcatString config_filename);
       void read_netcdf_grid();

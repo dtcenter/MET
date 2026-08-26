@@ -35,8 +35,8 @@
       -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_OUT_TO_GRID_000000L_20120409_120000V.stat</stat>
-      <exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_OUT_TO_GRID_000000L_20120409_120000V_pairs.nc</exist>
+      <stat>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_OUT_TO_GRID_120000L_20120409_120000V.stat</stat>
+      <exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_OUT_TO_GRID_120000L_20120409_120000V_pairs.nc</exist>
     </output>
   </test>
 
@@ -53,8 +53,8 @@
       -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_DIAG_000000L_20120409_120000V.stat</stat>
-      <exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_DIAG_000000L_20120409_120000V_pairs.nc</exist>
+      <stat>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_DIAG_120000L_20120409_120000V.stat</stat>
+      <exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_DIAG_120000L_20120409_120000V_pairs.nc</exist>
     </output>
   </test>
 
@@ -79,7 +79,7 @@
       -outdir &OUTPUT_DIR;/point_stat_ugrid -v 1 
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_000000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_120000L_20120409_120000V.stat</stat>
     </output>
   </test>
 
@@ -98,7 +98,7 @@
       -outdir &OUTPUT_DIR;/point_stat_ugrid -v 1 
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_000000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_120000L_20120409_120000V.stat</stat>
     </output>
   </test>
 
@@ -118,7 +118,7 @@
       -outdir &OUTPUT_DIR;/point_stat_ugrid -v 1 
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_CFG_OUT_TEMP_000000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_CFG_OUT_TEMP_120000L_20120409_120000V.stat</stat>
     </output>
   </test>
 
