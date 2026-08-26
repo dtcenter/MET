@@ -704,7 +704,14 @@ static void accumulate(vector<double> &sum, const vector<double> &cur) {
       }
 
       // Increment each element
-      for(int i=0; i<sum.size(); i++) sum[i] += cur[i];
+      for(int i=0; i<sum.size(); i++) {
+         if(is_bad_data(sum[i]) || is_bad_data(cur[i])) {
+            sum[i] = bad_data_double;
+         }
+         else {
+            sum[i] += cur[i];
+         }
+      }
    }
 }
 
