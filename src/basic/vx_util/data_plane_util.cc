@@ -843,15 +843,20 @@ DataPlane distance_map(const DataPlane &dp) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Compute the radial energy from a 2D array of DCT-II coefficients.
+//   - Each axis is normalized independently by its own dimension
+//     (alph = sqrt((x/nx)^2 + (y/ny)^2)) so that non-square domains
+//     are not biased toward the shorter axis.
+//   - Points with alph >= 1 fall outside the valid isotropic
+//     wavenumber range (the "corners" of the coefficient array) and
+//     are excluded rather than folded into the last bin.
+//   - The (0,0) DC coefficient is excluded -- it represents the
+//     domain mean, not spectral energy.
+//
+////////////////////////////////////////////////////////////////////////
 
 extern vector<double> radial_energy(const DataPlane &dp) {
-
-   // Check for empty input
-   if(dp.is_empty()) {
-      mlog << Error << "\nradial_energy() -> "
-           << "empty input!\n\n";
-      exit(1);
-   }
 
    // Define the number of bins as the smaller dimension
    int nx = dp.nx();
@@ -859,24 +864,33 @@ extern vector<double> radial_energy(const DataPlane &dp) {
    int n_bins = min(nx, ny);
    vector<double> re(n_bins, 0.0);
 
-   // Maximum euclidean distance from (0,0)
-   double max_dist = sqrt((nx-1)*(nx-1) + (ny-1)*(ny-1));
+   double inv_n_bins = 1.0 / n_bins;
 
-   // Accumulate the radial energy for each bin
+   // Accumulate energy for each DCT coefficient
    for(int x=0; x<nx; x++) {
       for(int y=0; y<ny; y++) {
 
-         // Energy is the value squared divided by the number of points
-         double energy = dp(x,y)*dp(x,y)/dp.nxy();
+         // Exclude the domain mean in the (0,0) DC coefficient
+         if(x == 0 && y == 0) continue;
 
-         // Euclidean distance from (0,0)
-         double dist = sqrt(x*x + y*y);
+         // Normalize each axis independently before combining
+         double ax = (double) x / nx;
+         double ay = (double) y / ny;
+         double alph = sqrt(ax*ax + ay*ay);
 
-         // Map distance to a bin index [0, n_bins - 1]
-         auto bin = (int)((dist / max_dist) * (n_bins - 1));
+         // Discard the entire lowest-wavenumber shell (alph < 1/N)
+         // and the out-of-range corner region (alph >= 1)
+         if(alph < inv_n_bins || alph >= 1.0) continue;
 
-         // Accumulate energy for each bin
-         if(bin < n_bins) re[bin] += energy;
+         // Map alph to a bin index in [0, n_bins - 1]
+         auto bin = (int) (alph * n_bins);
+         if(bin >= n_bins) bin = n_bins - 1;
+
+         // Energy is the coefficient squared, normalized by the
+         // number of grid points
+         double energy = dp(x,y) * dp(x,y) / dp.nxy();
+
+         re[bin] += energy;
 
       } // end for y
    } // end for x
