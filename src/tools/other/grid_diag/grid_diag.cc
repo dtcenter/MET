@@ -68,6 +68,7 @@ static void process_hist2d(const vector<InputDataInfo> &);
 static void prepare_power_spectrum_data(vector<InputDataInfo> &);
 static void process_power_spectrum(const vector<InputDataInfo> &);
 static void process_error_power_spectrum(const vector<InputDataInfo> &);
+static std::vector<double> radial_spectral_variance(const DataPlane &);
 static void accumulate(vector<double> &, const vector<double> &);
 static DataPlane dct_typeII(const DataPlane &);
 static void process_info_theory(void);
@@ -596,8 +597,8 @@ static void process_power_spectrum(const vector<InputDataInfo> &in_data) {
          DataPlane v_dct_dp(dct_typeII(in_data[i_var].v_dp));
 
          // Compute the radial energy
-         vector<double> u_re = radial_energy(u_dct_dp);
-         vector<double> v_re = radial_energy(v_dct_dp);
+         vector<double> u_re = radial_spectral_variance(u_dct_dp);
+         vector<double> v_re = radial_spectral_variance(v_dct_dp);
 
          // Combine the components
          vector<double> re(u_re.size());
@@ -615,7 +616,7 @@ static void process_power_spectrum(const vector<InputDataInfo> &in_data) {
          DataPlane dct_dp(dct_typeII(in_data[i_var].dp));
 
          // Compute the radial energy
-         vector<double> re = radial_energy(dct_dp);
+         vector<double> re = radial_spectral_variance(dct_dp);
 
          // Sum the radial energy
          accumulate(power_info[i_var].power, re);
@@ -652,8 +653,8 @@ static void process_error_power_spectrum(const vector<InputDataInfo> &in_data) {
             DataPlane v_dct_dp(dct_typeII(v_diff_dp));
 
             // Compute the radial energy
-            vector<double> u_re = radial_energy(u_dct_dp);
-            vector<double> v_re = radial_energy(v_dct_dp);
+            vector<double> u_re = radial_spectral_variance(u_dct_dp);
+            vector<double> v_re = radial_spectral_variance(v_dct_dp);
 
             // Combine the components
             vector<double> re(u_re.size());
@@ -675,13 +676,70 @@ static void process_error_power_spectrum(const vector<InputDataInfo> &in_data) {
             DataPlane dct_dp(dct_typeII(diff_dp));
 
             // Compute the radial energy
-            vector<double> re = radial_energy(dct_dp);
+            vector<double> re = radial_spectral_variance(dct_dp);
 
             // Sum the radial energy
             accumulate(power_info[i_var].error_power[j_var], re);
          }
       } // end for j_var
    } // end for i_var
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Compute the radial spectral variance from a 2D array of DCT-II
+// coefficients.
+//   - Each axis is normalized independently by its own dimension
+//     (alph = sqrt((x/nx)^2 + (y/ny)^2)) so that non-square domains
+//     are not biased toward the shorter axis.
+//   - Points with alph >= 1 fall outside the valid isotropic
+//     wavenumber range (the "corners" of the coefficient array) and
+//     are excluded rather than folded into the last bin.
+//   - The (0,0) DC coefficient is excluded -- it represents the
+//     domain mean, not spectral energy.
+//
+////////////////////////////////////////////////////////////////////////
+
+static vector<double> radial_spectral_variance(const DataPlane &dp) {
+
+   // Define the number of bins as the smaller dimension
+   int nx = dp.nx();
+   int ny = dp.ny();
+   int n_bins = min(nx, ny);
+   vector<double> re(n_bins, 0.0);
+
+   double inv_n_bins = 1.0 / n_bins;
+
+   // Accumulate spectral variance for each DCT coefficient
+   for(int x=0; x<nx; x++) {
+      for(int y=0; y<ny; y++) {
+
+         // Exclude the domain mean in the (0,0) DC coefficient
+         if(x == 0 && y == 0) continue;
+
+         // Normalize each axis independently before combining
+         double ax = (double) x / nx;
+         double ay = (double) y / ny;
+         double alph = sqrt(ax*ax + ay*ay);
+
+         // Discard the entire lowest-wavenumber shell (alph < 1/N)
+         // and the out-of-range corner region (alph >= 1)
+         if(alph < inv_n_bins || alph >= 1.0) continue;
+
+         // Map alph to a bin index in [0, n_bins - 1]
+         auto bin = (int) (alph * n_bins);
+         if(bin >= n_bins) bin = n_bins - 1;
+
+         // Energy is the coefficient squared, normalized by the
+         // number of grid points
+         double spec_var = dp(x,y) * dp(x,y) / dp.nxy();
+
+         re[bin] += spec_var;
+
+      } // end for y
+   } // end for x
+
+   return re;
 }
 
 ////////////////////////////////////////////////////////////////////////
