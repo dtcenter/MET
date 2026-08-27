@@ -195,8 +195,6 @@ MET Version 13.0.0 Upgrade Instructions
 
 .. dropdown:: Output format changes
 
-.. dropdown:: Output format changes
-
    MET version 13.0.0 adds or modifies the following output file formats:
 
    * Grid-Diag output format
@@ -209,9 +207,9 @@ MET Version 13.0.0 Upgrade Instructions
      * New information theory variables are added for "entropy", "joint_entropy", and
        "mutual_information".
 
-     * A new power spectrum "wavenumber" dimension is added, along with variables for the
-       "wavenumber", "wavelength", and "power_spectrum_" for each input provided. For
-       multiple inputs, "error_power_spectrum_" variables are added for the difference fields.
+     * A new power spectrum "wavenumber" dimension is added, along with "wavenumber" and
+       "wavelength" variables. "power_spectrum" variables are written for each input,
+       and "error_power_spectrum" variables contain the differences for multiple inputs.
 
    * Gen-Ens-Prod output format
 
