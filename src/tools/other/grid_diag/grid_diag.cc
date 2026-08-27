@@ -734,7 +734,7 @@ static vector<double> radial_spectral_variance(const DataPlane &dp) {
 
          // Map alph to wavenumber k in {1, ..., N-1}, then to the
          // 0-based array index (k - 1).
-         int k = (int) (alph * N);
+         auto k = (int) (alph * N);
          if(k >= N) k = N - 1;
 
          re[k - 1] += dp(x,y) * dp(x,y) / dp.nxy();
@@ -1363,7 +1363,7 @@ static void write_wavelengths(void) {
    for(int i=0; i<n_bins; i++) {
       int k = i + 1;
       wavenumber[i] = k;
-      wavelength[i] = 2.0 * N * grid_res_km / k;
+      wavelength[i] = (float) ( 2.0 * N * grid_res_km / k );
    }
 
    // Add wavenumber coordinate variable

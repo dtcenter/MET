@@ -34,10 +34,14 @@ using namespace std;
 // coefficients from a real FFT rather than (incorrectly) applying
 // DCT-II scale factors directly to half-complex FFT output.
 //
+// Equations to recover the unnormalized DCT-II coefficients:
+//   X[k] = 2 * Re( V[k] * exp(-i*pi*k/(2n)) )
+//        = 2 * (Re(V[k])*cos(theta) + Im(V[k])*sin(theta))
+//
 ////////////////////////////////////////////////////////////////////////
 
 static void dct_typeII_1d(double *x, size_t stride, int n,
-                          gsl_fft_real_wavetable *wt,
+                          const gsl_fft_real_wavetable *wt,
                           gsl_fft_real_workspace *ws) {
 
    // Reorder the input into a contiguous buffer:
@@ -80,9 +84,7 @@ static void dct_typeII_1d(double *x, size_t stride, int n,
       }
    };
 
-   // Recover the unnormalized DCT-II coefficients:
-   //   X[k] = 2 * Re( V[k] * exp(-i*pi*k/(2n)) )
-   //        = 2 * (Re(V[k])*cos(theta) + Im(V[k])*sin(theta))
+   // Recover the unnormalized DCT-II coefficients
    vector<double> X(n);
    for(int k=0; k<n; k++) {
       double re;
