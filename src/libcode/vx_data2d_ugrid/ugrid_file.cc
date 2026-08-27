@@ -38,14 +38,15 @@ using namespace netCDF;
 static const char *def_user_config = "UGridConfig_user";
 static const char *def_config_prefix = "UGridConfig_";
 static const char *def_config_prefix2 = "MET_BASE/config/UGridConfig_";
+constexpr double lat_epsilon = 0.00001;
 
-array<string, UG_DIM_COUNT> DIM_KEYS = {
+const array<string, UG_DIM_COUNT> DIM_KEYS = {
       "dim_face", "dim_node", "dim_edge", "dim_time", "dim_vert"
 };
 
-array<string, UG_META_VAR_COUNT> COORD_VAR_KEYS = {
+const array<string, UG_META_VAR_COUNT> COORD_VAR_KEYS = {
       "time", "lat_face", "lon_face", "vert_face", "lat_edge",
-      "lon_edge", "lat_node", "lon_node", "cell_id"
+      "lon_edge", "lat_node", "lon_node", "cell_id", "init_time"
 };
 
 static double get_nc_var_att_double(const NcVar *nc_var, const char *att_name,
@@ -260,18 +261,21 @@ bool UGridFile::open_metadata(const char * filepath)
   int max_dim_count = 0;
   StringArray var_names;
   ConcatString att_value;
-  NcVar *z_var = (NcVar *)nullptr;
-  NcVar *valid_time_var = (NcVar *)nullptr;
+  auto z_var = (NcVar *)nullptr;
+  auto init_time_var = (NcVar *)nullptr;
+  auto valid_time_var = (NcVar *)nullptr;
 
   StringArray time_names = get_metadata_names(COORD_VAR_KEYS[0]);
   StringArray lat_names = get_metadata_names(COORD_VAR_KEYS[1]);
   StringArray lon_names = get_metadata_names(COORD_VAR_KEYS[2]);
   StringArray z_names = get_metadata_names(COORD_VAR_KEYS[3]);
+  StringArray init_time_names = get_metadata_names(COORD_VAR_KEYS[9]);
   for (int j=0; j<Nvars; ++j) {
     if (time_names.has(Var[j].name)) {
       valid_time_var = Var[j].var;
       _time_var_info = &Var[j];
     }
+    else if (init_time_names.has(Var[j].name)) init_time_var = Var[j].var;
     else if (lat_names.has(Var[j].name)) _latVar = Var[j].var;
     else if (lon_names.has(Var[j].name)) _lonVar = Var[j].var;
     else if (z_names.has(Var[j].name)) z_var = Var[j].var;
@@ -300,6 +304,7 @@ bool UGridFile::open_metadata(const char * filepath)
         valid_time_var = MetaVar[j].var;
         _time_var_info = &MetaVar[j];
       }
+      else if (9 == j && nullptr == init_time_var) init_time_var = MetaVar[j].var;
       else if (1 == j && nullptr == _latVar) _latVar = MetaVar[j].var;
       else if (2 == j && nullptr == _lonVar) _lonVar = MetaVar[j].var;
       else if (3 == j && nullptr == _latVar) z_var = MetaVar[j].var;
@@ -342,6 +347,7 @@ bool UGridFile::open_metadata(const char * filepath)
          mlog << Debug(4) << method_name
               << "parsing units for the time variable \"" << units << "\"\n";
          parse_cf_time_string(units.c_str(), ut, sec_per_unit);
+         InitTime = ut;
       }
     }
 
@@ -397,8 +403,11 @@ bool UGridFile::open_metadata(const char * filepath)
     else ValidTime.add(0);  //Initialize
   }
 
+  // Override InitTime if init_time is defined at the configuration file
+  if (init_time_var != nullptr) InitTime = get_nc_time(init_time_var, 0);
+
   // Get InitTime from the forecast_reference_time
-  InitTime = get_init_time(_ncFile);
+  if (InitTime == 0) InitTime = get_init_time(_ncFile);
 
   // Pull out the grid.  This must be done after pulling out the dimension
   // and variable information since this information is used to pull out the
@@ -541,7 +550,7 @@ void UGridFile::dump(ostream & out, int depth) const
 
 ////////////////////////////////////////////////////////////////////////
 
-std::string UGridFile::find_metadata_name(std::string &key, StringArray &available_names) {
+std::string UGridFile::find_metadata_name(const std::string &key, StringArray &available_names) {
   string meta_name = "";
   StringArray meta_names = get_metadata_names(key);
 
@@ -800,7 +809,7 @@ bool UGridFile::getData(const char *var_name,
 ////////////////////////////////////////////////////////////////////////
 
 
-StringArray UGridFile::get_metadata_names(std::string &key) {
+StringArray UGridFile::get_metadata_names(const std::string &key) {
   StringArray empty;
   auto search = metadata_map.find(key);
   return search == metadata_map.end() ? empty : metadata_map[key];
@@ -892,6 +901,40 @@ void UGridFile::read_config(ConcatString config_filename) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void UGridFile::radian_to_degree(vector<double> &lat_values, const int lat_count) const {
+  const char *method_name = "UGridFile::radian_to_degree() -> ";
+  int lat_adjusted = 0;
+  int lat_adjusted_total = 0;
+  for (int idx=0; idx<lat_count; idx++) {
+    lat_values[idx] /= rad_per_deg;
+    if (lat_values[idx] > 90.0) {
+      if (!is_eq(lat_values[idx], 90.0, lat_epsilon)) {
+        mlog << Warning << "\n" << method_name << "adjusted " << lat_values[idx]
+             << " (delta: " << (lat_values[idx] - 90.0) << ") to 90.0\n\n";
+        lat_adjusted++;
+      }
+      lat_values[idx] = 90.0;
+      lat_adjusted_total++;
+    }
+    else if (lat_values[idx] < -90.0) {
+      if (!is_eq(lat_values[idx], -90.0, lat_epsilon)) {
+        mlog << Warning << "\n" << method_name << "adjusted " << lat_values[idx]
+             << " (delta: " << (lat_values[idx] + 90.0) << ") to -90.0\n\n";
+        lat_adjusted++;
+      }
+      lat_values[idx] = -90.0;
+      lat_adjusted_total++;
+    }
+  }
+  if (lat_adjusted_total > 0) {
+    mlog << Debug(4) << method_name << "adjusted " << lat_adjusted << " ("
+         << lat_adjusted_total << ") latitudes\n";
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 void UGridFile::read_netcdf_grid()
 {
@@ -927,13 +970,13 @@ void UGridFile::read_netcdf_grid()
 
   if (get_var_units(_latVar, units_value)) {
     if (units_value == "rad" || units_value == "radian") {
-      mlog << Debug(6) << method_name << "convert  " << units_value << " to degree for lat\n";
-      for (int idx=0; idx<face_count; idx++) _lat[idx] /= rad_per_deg;
+      mlog << Debug(6) << method_name << "convert " << units_value << " to degree for lat\n";
+      radian_to_degree(_lat, face_count);
     }
   }
   if (get_var_units(_lonVar, units_value)) {
     if (units_value == "rad" || units_value == "radian") {
-      mlog << Debug(6) << method_name << "  convert " << units_value << " to degree for lon\n";
+      mlog << Debug(6) << method_name << "convert " << units_value << " to degree for lon\n";
       for (int idx=0; idx<face_count; idx++) _lon[idx] /= rad_per_deg;
     }
   }
