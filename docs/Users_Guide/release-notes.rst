@@ -168,6 +168,16 @@ MET Version 13.0.0 Upgrade Instructions
      However, if no spatial masking region is requested in the configuration file, then the
      "FULL" grid will automatically be added, as noted in :numref:`config_options-mask`.
 
+   * Point-Stat, Ensemble-Stat, and Pair-Stat configuration files
+
+     * The existing "point_weight_flag" entry can now be set to "KDE" to request kernel density
+       estimation weighting.
+
+     * The "kde_ref_angle" numeric entry defines a reference angle when computing KDE weights.
+
+     * The "write_weights" boolean entry instructs the tools to write an output text file
+       containing the point weight values applied based on the "point_weight_flag" setting.
+
    * Grid-Diag configuration file
 
      * The "mask.grid" and "mask.poly" entries have changed from strings to arrays of strings
@@ -189,8 +199,6 @@ MET Version 13.0.0 Upgrade Instructions
        or rotate them from being grid-relative to earth-relative. See :numref:`PS_wind_rotation_derivation`
        for a description of wind rotation and derivation and :numref:`config_wind_field_names` for the
        corresponding configuration options.
-
-.. dropdown:: Output format changes - NONE
 
 .. dropdown:: Output format changes - NONE
 
