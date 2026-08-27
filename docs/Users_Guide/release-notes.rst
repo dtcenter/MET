@@ -173,6 +173,9 @@ MET Version 13.0.0 Upgrade Instructions
      * The "mask.grid" and "mask.poly" entries have changed from strings to arrays of strings
        to support the processing of multiple masking regions.
 
+     * The "power_spectrum" dictionary is added to configure how missing data values should
+       handled when computing power spectra.
+
      * The new "output_flag" entry is a dictionary specifying the desired output types.
 
    * Gen-Ens-Prod configuration file
@@ -190,9 +193,9 @@ MET Version 13.0.0 Upgrade Instructions
        for a description of wind rotation and derivation and :numref:`config_wind_field_names` for the
        corresponding configuration options.
 
-.. dropdown:: Output format changes - NONE
+.. dropdown:: Output format changes
 
-.. dropdown:: Output format changes - NONE
+.. dropdown:: Output format changes
 
    MET version 13.0.0 adds or modifies the following output file formats:
 
@@ -203,14 +206,19 @@ MET Version 13.0.0 Upgrade Instructions
 
      * Existing histogram variables are modified to include the "mask" dimension.
 
-     * New information theory variables are added for "entropy", "joint_entropy", and "mutual_information".
+     * New information theory variables are added for "entropy", "joint_entropy", and
+       "mutual_information".
+
+     * A new power spectrum "wavenumber" dimension is added, along with variables for the
+       "wavenumber", "wavelength", and "power_spectrum_" for each input provided. For
+       multiple inputs, "error_power_spectrum_" variables are added for the difference fields.
 
    * Gen-Ens-Prod output format
 
      * Adds new output variables with names include "EAS" and "EAS_WIDTH" for the Ensemble
        Agreement Scale algorithm.
 
-.. dropdown:: Output data changes - NONE
+.. dropdown:: Output data changes
 
    MET version 13.0.0 modifies existing output data values in the following ways:
 
