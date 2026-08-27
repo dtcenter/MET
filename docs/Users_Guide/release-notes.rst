@@ -200,7 +200,7 @@ MET Version 13.0.0 Upgrade Instructions
        for a description of wind rotation and derivation and :numref:`config_wind_field_names` for the
        corresponding configuration options.
 
-.. dropdown:: Output format changes - NONE
+.. dropdown:: Output format changes
 
    MET version 13.0.0 adds or modifies the following output file formats:
 
@@ -218,7 +218,7 @@ MET Version 13.0.0 Upgrade Instructions
      * Adds new output variables with names include "EAS" and "EAS_WIDTH" for the Ensemble
        Agreement Scale algorithm.
 
-.. dropdown:: Output data changes - NONE
+.. dropdown:: Output data changes
 
    MET version 13.0.0 modifies existing output data values in the following ways:
 
