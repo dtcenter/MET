@@ -1743,6 +1743,22 @@ static void process_grid_scores(int i_vx,
          if(is_bad_data(obs_dp(x, y)) ||
             !mask_mp.s_is_on(x, y)) continue;
 
+         // Get the observation error entry pointer
+         if(oerr_ptr) {
+            e = oerr_ptr;
+         }
+         else if(conf_info.vx_opt[i_vx].obs_error.flag) {
+            e = obs_error_table.lookup(
+                   conf_info.vx_opt[i_vx].vx_pd.obs_info->name().c_str(),
+                   conf_info.obtype.c_str(), oraw_dp(x,y));
+
+            // MET #3429: Skip observation if the table lookup fails
+            if(!e) continue;
+         }
+         else {
+            e = (ObsErrorEntry *) nullptr;
+         }
+
          // Get current climatology values
          ClimoPntInfo cpi(
             (fcmn_flag ? fcmn_dp(x, y) : bad_data_double),
@@ -1752,19 +1768,6 @@ static void process_grid_scores(int i_vx,
 
          // Add the observation point
          pd.add_grid_obs(x, y, oraw_dp(x, y), cpi, wgt_dp(x, y));
-
-         // Get the observation error entry pointer
-         if(oerr_ptr) {
-            e = oerr_ptr;
-         }
-         else if(conf_info.vx_opt[i_vx].obs_error.flag) {
-            e = obs_error_table.lookup(
-                   conf_info.vx_opt[i_vx].vx_pd.obs_info->name().c_str(),
-                   conf_info.obtype.c_str(), oraw_dp(x,y));
-         }
-         else {
-            e = (ObsErrorEntry *) nullptr;
-         }
 
          // Store the observation error entry pointer
          pd.add_obs_error_entry(e);
