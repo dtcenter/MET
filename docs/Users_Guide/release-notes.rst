@@ -9,6 +9,26 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.2.2 Release Notes (20260828)
+-------------------------------------------
+
+  .. dropdown:: Bugfixes
+
+     * Fix OpenMP 4.5 compilation errors from the GNU 8.5.0 compiler
+       (`#3359 <https://github.com/dtcenter/MET/issues/3359>`_).
+     * Fix Grid-Stat to correct the timing information of the SEEPS data written to the NetCDF matched pairs output file
+       (`#3362 <https://github.com/dtcenter/MET/issues/3362>`_).
+     * Fix NetCDF CF convention support false_easting and false_northing for lambert conformal projections
+       (`#3374 <https://github.com/dtcenter/MET/issues/3374>`_).
+     * Correctly handle invalid latitude values from an MPAS file
+       (`#3381 <https://github.com/dtcenter/MET/issues/3381>`_).
+     * Refine RPS library code to use centered probability bins
+       (`#3396 <https://github.com/dtcenter/MET/issues/3396>`_).
+     * Enable MPAS UGRID support to parse forecast lead time from diag files
+       (`#3410 <https://github.com/dtcenter/MET/issues/3410>`_).
+     * Fix Ensemble-Stat to skip observations when the requested observation error table lookup fails
+       (`#3429 <https://github.com/dtcenter/MET/issues/3429>`_).
+
 MET Version 12.2.1 Release Notes (20260227)
 -------------------------------------------
 
