@@ -252,7 +252,7 @@
           > &OUTPUT_DIR;/ensemble_stat/obs_error_table_truncated.txt; \
           &MET_BIN;/ensemble_stat</exec>
     <env>
-      <pair><name>DESC</name>                <value>OBSERR_BAD_LOOKUP</value></pair>
+      <pair><name>DESC</name>                <value>OBSERR</value></pair>
       <pair><name>OBS_ERROR_FLAG</name>      <value>TRUE</value></pair>
       <pair><name>MET_OBS_ERROR_TABLE</name> <value>&OUTPUT_DIR;/ensemble_stat/obs_error_table_truncated.txt</value></pair>
       <pair><name>SKIP_CONST</name>          <value>TRUE</value></pair>
