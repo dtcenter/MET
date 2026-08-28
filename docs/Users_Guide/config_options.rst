@@ -373,6 +373,13 @@ values and randomly perturbed ensemble member values. Values less than MIN are
 reset to the minimum value and values greater than MAX are reset to the maximum
 value. A value of NA indicates that the variable is unbounded.
 
+If the observation error table contains no entries for the variable being
+evaluated, MET prints a warning message and disables the observation error
+logic. If the table does contain entries for the variable, but the lookup for
+an individual observation fails, that observation is excluded from the analysis.
+This situation would occur, for example, when the observation value falls outside
+the range of values in the VAL_RANGE column.
+
 MET_GRIB_TABLES
 ---------------
 
