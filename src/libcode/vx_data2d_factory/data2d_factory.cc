@@ -179,7 +179,8 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename)
    //
    if(mtddf &&
       type != FileType_Python_Numpy &&
-      type != FileType_Python_Xarray) {
+      type != FileType_Python_Xarray &&
+      type != FileType_Zarr) {
       if(!(mtddf->open(filename))) {
          mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
               << "error opening file \"" << filename << "\"\n\n";
@@ -210,10 +211,12 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
 
 #ifdef WITH_PYTHON
       //
-      // Set MET_PYTHON_INPUT_ARG environment variable for python types
+      // Set MET_PYTHON_INPUT_ARG environment variable for python
+      // types, including Zarr
       //
       if(type == FileType_Python_Numpy ||
-         type == FileType_Python_Xarray) {
+         type == FileType_Python_Xarray ||
+         type == FileType_Zarr) {
          setenv(met_python_input_arg, filename, 1);
       }
 #endif
@@ -223,7 +226,8 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
       //
       if(mtddf &&
          type != FileType_Python_Numpy &&
-         type != FileType_Python_Xarray) {
+         type != FileType_Python_Xarray &&
+         type != FileType_Zarr) {
          if(!(mtddf->open(filename))) {
             mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
                  << "error opening file \"" << filename << "\"\n\n";
