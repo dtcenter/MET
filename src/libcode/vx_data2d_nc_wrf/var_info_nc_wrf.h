@@ -14,7 +14,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "var_info.h"
+#include "var_info_nc.h"
 
 #include "data_file_type.h"
 #include "long_array.h"
@@ -139,32 +139,6 @@ static const int n_pinterp_v_wind_names =
 ///////////////////////////////////////////////////////////////////////////////
 
 //
-// List of wind variable names that should be rotated from grid-relative
-// to earth-relative.  MET is not able to read winds from Pinterp files since
-// they are defined on a staggered grid.  If the code is enhanced to do so,
-// the data in these variables should be rotated from grid-relative to
-// earth-relative prior to verifying.
-// Taken from the WRF version 3.2 Registry.EM file
-//
-
-static const char *pinterp_grid_relative_names[] = {
-   "UU",         // x-wind component, m s-1
-   "UZ0",        // U WIND COMPONENT AT ZNT, m s-1
-   "VV",         // y-wind component, m s-1
-   "VZ0"         // V WIND COMPONENT AT ZNT, m s-1
-};
-
-//
-// Number of Pinterp grid relative variable names
-//
-
-static const int n_pinterp_grid_relative_names =
-                     sizeof(pinterp_grid_relative_names)/
-                    sizeof(*pinterp_grid_relative_names);
-
-///////////////////////////////////////////////////////////////////////////////
-
-//
 // List of wind speed variable names
 // Taken from the WRF version 3.2 Registry.EM file
 //
@@ -183,7 +157,7 @@ static const int n_pinterp_wind_speed_names =
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class VarInfoNcWrf : public VarInfo
+class VarInfoNcWrf : public VarInfoNC
 {
    private:
 
@@ -191,20 +165,18 @@ class VarInfoNcWrf : public VarInfo
          // NetCDF-specific parameters
          //
 
-      LongArray Dimension; // Dimension values for extracting 2D field
-      BoolArray Is_offset; // boolean for Dimension value (true: offset, false: value to be an offset (false for value)
-      NumArray  Dim_value; // Dimension values as float for extracting 2D field
-
       void init_from_scratch();
       void assign(const VarInfoNcWrf &);
-      void clear_dimension();
+
+   protected:
+      void set_default_levels(const ConcatString &lstr) override;
 
    public:
       VarInfoNcWrf();
       ~VarInfoNcWrf() override;
       VarInfoNcWrf(const VarInfoNcWrf &);
       VarInfoNcWrf & operator=(const VarInfoNcWrf &);
-      VarInfo *clone() const override;
+      std::unique_ptr<VarInfo> clone() const override;
 
       void dump(std::ostream &) const override;
       void clear();
@@ -214,13 +186,6 @@ class VarInfoNcWrf : public VarInfo
          //
 
       GrdFileType       file_type()      const override;
-      const LongArray & dimension()      const;
-      long              dimension(int i) const;
-      const NumArray  & dim_value()      const;
-      double            dim_value(int i) const;
-      const BoolArray & is_offset()      const;
-      bool              is_offset(int i) const;
-      int n_dimension() const;
 
          //
          // set stuff
@@ -228,9 +193,6 @@ class VarInfoNcWrf : public VarInfo
 
       void set_magic(const ConcatString &, const ConcatString &) override;
       bool set_dict(Dictionary &, bool do_exit=true) override;
-
-      void add_dimension(long dim, bool as_index=true, double dim_value=bad_data_double);
-      void set_dimension(int i_dim, long dim);
 
          //
          // do stuff
@@ -242,19 +204,11 @@ class VarInfoNcWrf : public VarInfo
       bool is_v_wind()            const override;
       bool is_wind_speed()        const override;
       bool is_wind_direction()    const override;
-      bool is_grid_relative()     const;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
 inline GrdFileType       VarInfoNcWrf::file_type()      const { return FileType_NcWrf;         }
-inline const LongArray & VarInfoNcWrf::dimension()      const { return Dimension;              }
-inline long              VarInfoNcWrf::dimension(int i) const { return Dimension[i];           }
-inline int               VarInfoNcWrf::n_dimension()    const { return Dimension.n_elements(); }
-inline const NumArray  & VarInfoNcWrf::dim_value()      const { return Dim_value;              }
-inline double            VarInfoNcWrf::dim_value(int i) const { return Dim_value[i];           }
-inline const BoolArray & VarInfoNcWrf::is_offset()      const { return Is_offset;              }
-inline bool              VarInfoNcWrf::is_offset(int i) const { return Is_offset[i];           }
 
 ///////////////////////////////////////////////////////////////////////////////
 

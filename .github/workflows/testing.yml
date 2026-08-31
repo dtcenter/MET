@@ -39,6 +39,10 @@ on:
         description: 'Run the unit tests'
         default: true
         type: boolean
+      met_base_tag:
+        description: 'Override the MET base tag'
+        default: ''
+        required: false
 
 env:
   DOCKERHUB_REPO: dtcenter/met-dev
@@ -57,6 +61,7 @@ jobs:
         env:
           commit_msg: ${{ github.event.head_commit.message }}
           force_tests: ${{ github.event.inputs.force_tests }}
+          met_base_tag_override: ${{ github.event.inputs.met_base_tag }}
 
     outputs:
       run_compile: ${{ steps.job_status.outputs.run_compile }}
@@ -148,7 +153,7 @@ jobs:
           - jobid: 'job1' 
             tests: 'ascii2nc'
           - jobid: 'job2'
-            tests: 'pb2nc madis2nc pcp_combine gen_ens_prod regrid'
+            tests: 'pb2nc madis2nc pcp_combine gen_ens_prod regrid winds'
       fail-fast: false
     steps:
       - uses: actions/checkout@v6
@@ -186,9 +191,9 @@ jobs:
       matrix:
         include:
           - jobid: 'job1'
-            tests: 'ascii2nc_indy pb2nc_indy tc_dland tc_pairs tc_stat plot_tc tc_rmw rmw_analysis tc_diag tc_gen'
+            tests: 'ascii2nc_indy pb2nc_indy tc_dland tc_pairs tc_stat tc_rmw rmw_analysis tc_diag tc_gen'
           - jobid: 'job2'
-            tests: 'met_test_scripts mode_multivar mtd airnow gsi_tools netcdf modis series_analysis wwmca_regrid gen_vx_mask interp_shape grid_diag grib_tables lidar2nc shift_data_plane trmm2nc aeronet wwmca_plot ioda2nc gaussian'
+            tests: 'met_test_scripts mode_multivar mtd airnow gsi_tools netcdf modis series_analysis wwmca_regrid gen_vx_mask interp_shape grid_diag grib_tables lidar2nc shift_data_plane aeronet wwmca_plot ioda2nc gaussian'
       fail-fast: false
     steps:
       - uses: actions/checkout@v6

@@ -744,20 +744,6 @@ void MaskLatLon::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool MaskLatLon::operator==(const MaskLatLon &v) const {
-   bool match = true;
-
-   if(!(name       == v.name      ) ||
-      !(lat_thresh == v.lat_thresh) ||
-      !(lon_thresh == v.lon_thresh)) {
-      match = false;
-   }
-
-   return match;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 MaskLatLon &MaskLatLon::operator=(const MaskLatLon &a) noexcept {
    if(this != &a) {
       name = a.name;
@@ -818,6 +804,61 @@ vector<MaskLatLon> parse_conf_llpnt_mask(Dictionary *dict) {
    return v;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// Code for WindMetadata struct
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void WindMetadata::clear() {
+   u_wind.clear();
+   v_wind.clear();
+   wind_speed.clear();
+   wind_direction.clear();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+WindMetadata &WindMetadata::operator=(const WindMetadata &a) noexcept {
+   if(this != &a) {
+      u_wind = a.u_wind;
+      v_wind = a.v_wind;
+      wind_speed = a.wind_speed;
+      wind_direction = a.wind_direction;
+   }
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+WindMetadata parse_conf_wind_metadata(Dictionary *dict) {
+   WindMetadata info;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_wind_metadata() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: u_wind_field_name
+   info.u_wind.parse_css(dict->lookup_string(conf_key_u_wind_field_name));
+
+   // Conf: v_wind_field_name
+   info.v_wind.parse_css(dict->lookup_string(conf_key_v_wind_field_name));
+
+   // Conf: wind_speed_field_name
+   info.wind_speed.parse_css(dict->lookup_string(conf_key_wind_speed_field_name));
+
+   // Conf: wind_direction_field_name
+   info.wind_direction.parse_css(dict->lookup_string(conf_key_wind_direction_field_name));
+
+   return info;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Utility parsing functions
+//
 ///////////////////////////////////////////////////////////////////////////////
 
 SingleThresh parse_conf_quality_mark_thresh(Dictionary *dict) {
@@ -1729,23 +1770,6 @@ void InterpInfo::validate() {
          }
       }
    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-bool InterpInfo::operator==(const InterpInfo &v) const {
-   bool match = true;
-
-   if(!(field      == v.field     ) ||
-      !(vld_thresh == v.vld_thresh) ||
-      !(n_interp   == v.n_interp  ) ||
-      !(method     == v.method    ) ||
-      !(width      == v.width     ) ||
-      !(shape      == v.shape     )) {
-      match = false;
-   }
-
-   return match;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

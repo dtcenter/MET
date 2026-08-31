@@ -505,9 +505,7 @@ if ( dimCount >= max_met_args )  {
 }
 
 
-int j, count;
-bool found = false;
-NcVarInfo * var = (NcVarInfo *) nullptr;
+auto var = (NcVarInfo *) nullptr;
 const int Nx = grid.nx();
 const int Ny = grid.ny();
 LongArray b = a;
@@ -518,54 +516,37 @@ const int cell_count = Nx * Ny;
    //  find varinfo's
    //
 
-found = false;
+bool found = false;
 
-for (j=0; j<Nvars; ++j)  {
-
+for (int j=0; j<Nvars; ++j)  {
    if ( Var[j].var == v )  { found = true;  var = Var + j;  break; }
-
 }
 
 if ( !found )  {
-
    mlog << Error << "\n" << method_name
         << "variable " << (GET_NC_NAME_P(v)) << " not found!\n\n";
-
-   exit ( 1 );
-
+   return false;
 }
 
    //
    //  check star positions and count
    //
 
-count = 0;
-
-for (j=0; j<(a.n_elements()); ++j)  {
-
+int count = 0;
+for (int j=0; j<(a.n_elements()); ++j)  {
    if ( a[j] == vx_data2d_star )  {
-
       ++count;
-
       if ( (var == nullptr) || ( (j != var->x_slot) && (j != var->y_slot) ) )  {
-
          mlog << Error << "\n" << method_name << "star found in bad slot\n\n";
-
          exit ( 1 );
-
       }
-
    }
-
 }
 
 if ( count != 2 )  {
-
    mlog << Error << "\n" << method_name
         << " bad star count ... " << count << "\n\n";
-
    exit ( 1 );
-
 }
 
    //
@@ -575,11 +556,8 @@ if ( count != 2 )  {
  int x_slot_tmp = 0;
  int y_slot_tmp = 0;
  if ( var == nullptr || (var->x_slot < 0) || (var->y_slot < 0)  )  {
-
    mlog << Error << "\n" << method_name << "bad x|y|z slot\n\n";
-
    exit ( 1 );
-
 }
 else {
   x_slot_tmp = var->x_slot;

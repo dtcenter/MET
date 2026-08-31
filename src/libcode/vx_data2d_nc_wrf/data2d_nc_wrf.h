@@ -34,6 +34,8 @@ class MetNcWrfDataFile : public Met2dDataFile {
    private:
 
       void nc_wrf_init_from_scratch();
+      bool get_real_dimension(const VarInfoNcWrf *vinfo_nc, const NcVarInfo *info,
+                              LongArray &dimension) const;
 
       MetNcWrfDataFile(const MetNcWrfDataFile &);
       MetNcWrfDataFile & operator=(const MetNcWrfDataFile &);
@@ -61,15 +63,15 @@ class MetNcWrfDataFile : public Met2dDataFile {
 
          //  retrieve the first matching data plane
 
-      bool data_plane(VarInfo &, DataPlane &);
+      bool data_plane(VarInfo &, DataPlane &, bool do_winds = true) override;
 
          //  retrieve all matching data planes
 
-      int data_plane_array(VarInfo &, DataPlaneArray &);
+      int data_plane_array(VarInfo &, DataPlaneArray &, bool do_winds = true) override;
 
          //  retrieve the index of the first matching record
 
-      int index(VarInfo &);
+      int index(VarInfo &) override;
 
          //
          //  do stuff
