@@ -52,7 +52,8 @@ inline bool is_netcdf_grdfiletype(const GrdFileType _t) {
 
 inline bool is_python_grdfiletype(const GrdFileType _t) {
    return(_t == FileType_Python_Xarray ||
-          _t == FileType_Python_Numpy);
+          _t == FileType_Python_Numpy  ||
+          _t == FileType_Zarr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
