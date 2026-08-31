@@ -26,10 +26,26 @@
 #include "vx_data2d.h"
 #include "vx_math.h"
 #include "vx_log.h"
-
-#include "is_zarr_store.h"
+#include "vx_util.h"
+#include "vx_cal.h"
 
 using namespace std;
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// Path to the Python embedding script used to read a single 2D field
+// from a Zarr store. Command line arguments:
+//    <MET_PYTHON_INPUT_ARG> <init time, YYYYMMDD_HHMMSS>
+//    <lead time, decimal hours> <variable name> <level name>
+//
+
+static const char zarr_read_script[] =
+   "MET_BASE/python/pyembed/read_zarr_dataplane.py";
+
+////////////////////////////////////////////////////////////////////////
+
+static ConcatString build_zarr_python_command(VarInfo &vinfo);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -66,38 +82,29 @@ MetZarrDataFile & MetZarrDataFile::operator=(const MetZarrDataFile &) {
 ////////////////////////////////////////////////////////////////////////
 
 void MetZarrDataFile::zarr_init_from_scratch() {
+
+   python_init_from_scratch();
+
+   set_type(FileType_Zarr);
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void MetZarrDataFile::close() {
-   // TODO: Close the input file
+
+   MetPythonDataFile::close();
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool MetZarrDataFile::open(const char * _path) {
-   const char *method_name = "MetZarrDataFile::open(const char *) -> ";
 
-   // Check for a valid Zarr store
-   if(!is_zarr_store(_path)) {
-      mlog << Error << "\n" << method_name
-           << _path << " is not a valid Zarr store.\n\n";
-      exit(1);
-   }
-
-   Filename = _path;
-
-   return true;
+   return MetPythonDataFile::open(_path);
 }
-
-// JHG: We could consider having the open function inventory the
-// list of dataset names and/or inspect the metadata, but there's
-// no clear and obvious need for that here since the data_plane
-// function will need to handle it. Note that a single Zarr store can
-// contain multiple grids. 
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -111,14 +118,16 @@ void MetZarrDataFile::dump(ostream & out, int depth) const {
    if(Raw_Grid) {
       out << prefix << "Raw Grid:\n";
       Raw_Grid->dump(out, depth + 1);
-   } else {
+   }
+   else {
       out << prefix << "No raw Grid!\n";
    }
 
    if(Dest_Grid) {
       out << prefix << "Dest Grid:\n";
       Dest_Grid->dump(out, depth + 1);
-   } else {
+   }
+   else {
       out << prefix << "No dest Grid!\n";
    }
 
@@ -131,12 +140,13 @@ void MetZarrDataFile::dump(ostream & out, int depth) const {
 
 bool MetZarrDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
-   // Narrow the vinfo pointer
-   auto vinfo_python = (VarInfoPython*)(&vinfo);
+   // Build the Python command for the requested field and let the
+   // parent class run it, cache it, substitute MET_PYTHON_INPUT_ARG,
+   // and populate Raw_Grid/Dest_Grid/Plane/VInfo
 
-   // JHG: call python function to read the data
+   vinfo.set_req_name(build_zarr_python_command(vinfo).c_str());
 
-   return true;
+   return MetPythonDataFile::data_plane(vinfo, plane);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -144,15 +154,9 @@ bool MetZarrDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 int MetZarrDataFile::data_plane_array(VarInfo &vinfo,
                                       DataPlaneArray &plane_array) {
 
-   // Initialize
-   plane_array.clear();
+   vinfo.set_req_name(build_zarr_python_command(vinfo).c_str());
 
-   // Narrow the vinfo pointer
-   auto vinfo_python = (VarInfoPython*)(&vinfo);
-
-   // JHG: call python function to read multiple data planes
-
-   return 0;
+   return MetPythonDataFile::data_plane_array(vinfo, plane_array);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -167,3 +171,32 @@ int MetZarrDataFile::index(VarInfo &vinfo) {
 
 ////////////////////////////////////////////////////////////////////////
 
+static ConcatString build_zarr_python_command(VarInfo &vinfo) {
+
+   ConcatString cmd;
+
+   //
+   // Arguments for read_zarr_dataplane.py:
+   //    input_file init_time lead_time var level
+   //
+   //  - input_file is left as the literal MET_PYTHON_INPUT_ARG token
+   //    and MetPythonDataFile::data_plane() substitutes it with the
+   //    real Zarr store path (from the environment variable of the
+   //    name) before running the script
+   //  - init_time in YYYYMMDD_HHMMSS format
+   //  - lead_time in decimal hours
+   //
+
+   cmd << replace_path(zarr_read_script)
+       << " " << met_python_input_arg
+       << " " << unix_to_yyyymmdd_hhmmss(vinfo.init())
+       << " " << str_format("%g", (double) vinfo.lead() / 3600.0)
+       << " " << vinfo.name()
+       << " " << vinfo.level_name();
+
+   mlog << Debug(4) << "MetZarrDataFile: zarr command = " << cmd << "\n";
+
+   return cmd;
+}
+
+////////////////////////////////////////////////////////////////////////
