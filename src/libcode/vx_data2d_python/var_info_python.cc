@@ -145,9 +145,8 @@ void VarInfoPython::set_file_type(const GrdFileType t) {
 
    }
 
-   mlog << Error
-        << "VarInfoPython::set_file_type(const GrdFileType) -> bad type ... "
-        << grdfiletype_to_string(t) << "\n\n";
+   mlog << Error << "\nVarInfoPython::set_file_type(const GrdFileType) -> "
+        << "bad type ... " << grdfiletype_to_string(t) << "\n\n";
 
    return;
 }
