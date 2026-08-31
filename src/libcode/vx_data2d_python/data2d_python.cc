@@ -176,6 +176,7 @@ bool use_xarray = false;
 switch ( Type )  {   //  assumes Type is already set
 
    case FileType_Python_Xarray:
+   case FileType_Zarr:
       use_xarray = true;
       break;
 
@@ -184,9 +185,8 @@ switch ( Type )  {   //  assumes Type is already set
       break;
 
    default:
-      mlog << Error
-           << "MetPythonDataFile::open(const char * script_filename) -> bad file type: "
-           << grdfiletype_to_string(Type) << "\n\n";
+      mlog << Error << "MetPythonDataFile::open(const char * script_filename) -> "
+           << "bad file type " << grdfiletype_to_string(Type) << "\n\n";
       exit ( 1 );
 
 }   //  switch

@@ -34,7 +34,7 @@
 
 class MetPythonDataFile : public Met2dDataFile {
 
-   private:
+   protected:
 
       void python_init_from_scratch();
 
