@@ -1,9 +1,6 @@
 ARG MET_BASE_REPO
 ARG MET_BASE_TAG
 
-RUN test -n "$MET_BASE_REPO" || (echo "MET_BASE_REPO build-arg is required" >&2 && exit 1)
-RUN test -n "$MET_BASE_TAG" || (echo "MET_BASE_TAG build-arg is required" >&2 && exit 1)
-
 FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_TAG}
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 
