@@ -176,7 +176,7 @@ int MetZarrDataFile::index(VarInfo &vinfo) {
 ////////////////////////////////////////////////////////////////////////
 
 static ConcatString build_zarr_python_command(VarInfo &vinfo) {
-
+   const char *method_name = "build_zarr_python_command() -> ";
    ConcatString cmd;
 
    //
@@ -188,6 +188,20 @@ static ConcatString build_zarr_python_command(VarInfo &vinfo) {
    // Use name()/level_name(), not req_name()/req_level_name(), since
    // data_plane() overwrites req_name() with the command built here.
    //
+
+   // Check required arguments
+   if(vinfo.name().empty()         ||
+      vinfo.level_name().empty()   ||
+      vinfo.init() == (unixtime) 0 ||
+      is_bad_data(vinfo.lead())) {
+      mlog << Error << "\n" << method_name
+           << "\"" << conf_key_name
+           << "\", \"" << conf_key_level
+           << "\", \"" << conf_key_init_time
+           << "\", and \"" << conf_key_lead_time
+           << "\" are all required when reading Zarr data!\n\n";
+      exit(1);
+   }
 
    // Set when this field's set_attr_grid config option is set, so the
    // script can skip its own grid detection (data_class.cc applies

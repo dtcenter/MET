@@ -144,10 +144,10 @@ set_attr_grid_specified = (set_attr_grid_flag == '1')
 
 log("Input File:\t" + repr(input_file))
 log("Init Time:\t" + repr(init_time_in))
-log("Lead Time (hr):\t" + repr(lead_time_in))
+log("Lead Time (hr):" + repr(lead_time_in))
 log("Variable:\t" + repr(var_name))
-log("Level:\t" + repr(level_in))
-log("set_attr_grid configured:\t" + repr(set_attr_grid_specified))
+log("Level:\t\t" + repr(level_in))
+log("set_attr_grid:\t" + repr(set_attr_grid_specified))
 
 try:
    init_time  = dt.datetime.strptime(init_time_in, '%Y%m%d_%H%M%S')
@@ -167,7 +167,7 @@ except Exception as ex:
 ########################################################################
 
 try:
-   ds = xr.open_zarr(input_file)
+   ds = xr.open_zarr(input_file, decode_timedelta=True)
 except Exception as ex:
    dataplane.quit(
       f"read_zarr_dataplane.py -> Unable to open '{input_file}' as a "
@@ -838,10 +838,10 @@ else:
          log("This grid was derived automatically from the 2D latitude/"
              "longitude coordinates because set_attr_grid is not "
              "configured for this field, and no CF grid_mapping or "
-             "recognized CRS metadata was found. To skip this fit on "
-             "future runs (faster, and avoids depending on the numeric "
-             "fit succeeding), add the following to the field's MET "
-             "config:\n    " + suggest_set_attr_grid(grid))
+             "recognized CRS metadata was found.")
+         log("Add the following configuration option to skip this fit "
+             "in future runs:")
+         log("\t" + suggest_set_attr_grid(grid))
 
       else:
          reason = ""
