@@ -33,14 +33,18 @@ censor_thresh = [];
 censor_val    = [];
 
 //
+// Specify the handling of missing data for power spectra
+//
+power_spectrum = {
+   missing_flag  = VALUE;
+   missing_value = 0.0;
+   vld_thresh    = 0.5;
+}
+
+//
 // Data fields
 //
 data = {
-   name   = "APCP";
-   level  = ["A06"];
-   n_bins = 50;
-   range  = [0,25];
-
    field = [
       { ${FIELD1} },
       { ${FIELD2} }
@@ -62,10 +66,6 @@ mask = {
 //
 // Diagnostic output types
 //
-output_flag = {
-   histogram_1d = TRUE;
-   histogram_2d = TRUE;
-   info_theory  = FALSE;
-}
+output_flag = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////

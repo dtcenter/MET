@@ -202,7 +202,11 @@ extern ConcatString dist_to_string(DistType, const NumArray &);
 extern ConcatString griddecomptype_to_string(GridDecompType);
 extern ConcatString wavelettype_to_string(WaveletType);
 
+extern MissingDataType int_to_missingdatatype(int);
+extern ConcatString missingdatatype_to_string(MissingDataType);
+
 extern int parse_conf_percentile(Dictionary *dict);
+extern PowerSpectrumInfo parse_conf_power_spectrum(Dictionary *dict);
 
 extern void python_compile_error(const char *caller=nullptr);
 extern void ugrid_compile_error(const char *caller=nullptr);

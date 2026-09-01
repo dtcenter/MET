@@ -7,9 +7,13 @@ Grid-Diag Tool
 Introduction
 ============
 
-The Grid-Diag tool creates histograms (probability distributions when normalized) for an arbitrary collection of data fields and levels. Joint histograms are created for all possible pairs of variables. If no masking region is specified to subset the data fields spatially, then all points in the input domain are used. However, an arbitrary number of masking regions can be specified and output is created for each one. The histograms are accumulated over all of the input data files. Typically this tool is run with a time series of input data files, similar to Series-Analysis.
+Unlike the Grid-Stat and Point-Stat tools, which compute verification statistics for matched pairs of forecast and observation values, the Grid-Diag tool provides diagnostic information based on the distribution of values found in gridded input files.
 
-The Grid-Diag tool also uses the histograms to derive information theory statistics. Entropy is derived from each 1-dimensional histogram, and joint entropy and mutual information are derived from each 2-dimensional joint histogram. These statistics are defined using log base 2, rather than the natural logarithm which is also commonly used.
+Grid-Diag creates histograms (probability distributions when normalized) for an arbitrary collection of data fields and levels. Joint histograms are created for all possible pairs of variables. If no masking region is specified to subset the data fields spatially, then all points in the input domain are used. However, an arbitrary number of masking regions can be specified and output is created for each one. The histograms are accumulated over all of the input data files. Typically this tool is run with a time series of input data files, similar to Series-Analysis.
+
+Grid-Diag also uses the histograms to derive information theory statistics. Entropy is derived from each 1-dimensional histogram, and joint entropy and mutual information are derived from each 2-dimensional joint histogram. These statistics are defined using log base 2, rather than the natural logarithm which is also commonly used.
+
+Finally, Grid-Diag also derives power spectra for each input field using discrete cosine transforms, as described in :ref:`Denis et al. (2002) <Denis-2002>` and :ref:`Durran et al. (2017) <Durran-2017>`. However, power spectra are computed over the full model domain rather than being subset by spatial masking regions. Note that special logic is applied when processing kinetic energy. Grid-Diag reads the corresponding U and V-wind vector components and applies a discrete cosine transform to them separately prior to computing the power spectrum. If multiple inputs are provided with the **-data** command line option, the error power spectrum of the difference fields is also computed.
 
 Practical Information
 =====================
@@ -79,6 +83,20 @@ _____________________
 
 .. code-block:: none
 
+  power_spectrum = {
+     missing_flag  = NONE;
+     missing_value = 0.0;
+     vld_thresh    = 0.5;
+  }
+
+The **power_spectrum** dictionary defines options for computing power spectra and can be specified separately for each **data.field** entry below.
+
+The **missing_flag** and **missing_value** entries define how bad data values should be handled. For all other output types, bad data values are ignored but they are problematic for power spectra. Set **missing_flag** to **NONE** (default) to skip power spectrum when bad data is present, to **MEAN** to replace bad data with the mean of each input field, or to **VALUE** to replace bad data with the constant numeric value specified by **missing_value**. Set **vld_thresh** to a number beween 0 and 1 to define the required ratio of valid data to be present to compute power spectra output for that field.
+
+_____________________
+
+.. code-block:: none
+
   data = {
    field = [
         {
@@ -105,9 +123,10 @@ _____________________
 .. code-block:: none
 
    output_flag = {
-      histogram_1d = TRUE;
-      histogram_2d = TRUE;
-      info_theory  = FALSE;
+      histogram_1d   = TRUE;
+      histogram_2d   = TRUE;
+      info_theory    = FALSE;
+      power_spectrum = FALSE;
    }
 
 The **output_flag** dictionary controls the type of output that the Grid-Diag tool generates. Each flag should be set to **TRUE** or **FALSE** to enable the computation and writing of one or more variables to the output NetCDF file, as described below:
@@ -117,6 +136,8 @@ The **output_flag** dictionary controls the type of output that the Grid-Diag to
 2. **histogram_2d** for 2-dimensional histograms for each pair of **data.field** entries, including minimum, maxmimum, and midpoint values for each histogram bin.
 
 3. **info_theory** for information theory metrics, including entropy for each **data.field** entry and mutual information and joint entropy for each pair of entries.
+
+4. **power_spectrum** for power spectrum output.
 
 grid_diag Output File
 ---------------------
@@ -133,3 +154,4 @@ If 2-dimensional joint historgrams are requested, a corresponding **hist_** vari
 
 If information theory output is requested, **entropy_**, **joint_entropy_**, and **mutual_information_** variables are written. Shannon entropy is derived from each 1-dimensional histogram, while joint entropy and mutual information are derived from each 2-dimensional joint histogram. These variables have one dimension for the number of masking regions and are computed using log base 2 rather than the natural logarithm. As such, their units are specified in the output as "bits" rather than "nats".
 
+If power spectrum output is requested, **wavenumber**, **wavelength**, and **power_spectrum_** variables are written. These variables have a single **wavenumber** dimension which is the minimum of the Nx and Ny dimensions of the verification grid. If multiple inputs are provided with the **-data** command line option, **error_power_spectrum_** variables are also written for the difference fields.

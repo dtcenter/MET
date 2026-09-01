@@ -22,6 +22,7 @@
 //   005    10/03/22  Prestopnik      MET #2227 Remove using namespace std and netCDF from header files
 //   006    10/26/22  Linden          MET #2232 Refine the Grid-Diag output variable names when specifying two input data sources
 //   007    01/07/26  Halley Gotway   MET #3171 Multiple masks and information theory
+//   008    02/12/26  Halley Gotway   MET #3304 Power spectrum
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -32,6 +33,7 @@
 #include <fstream>
 #include <limits.h>
 #include <math.h>
+#include <numeric>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -43,6 +45,7 @@
 #include "series_data.h"
 #include "series_pdf.h"
 
+#include "nav.h"
 #include "vx_statistics.h"
 #include "vx_nc_util.h"
 #include "vx_regrid.h"
@@ -60,18 +63,41 @@ using namespace netCDF;
 static void process_command_line(int, char **);
 static void setup_diag_info(void);
 static void process_series(void);
-static void process_hist1d(const vector<DataPlane> &);
-static void process_hist2d(const vector<DataPlane> &);
+static void process_hist1d(const vector<InputDataInfo> &);
+static void process_hist2d(const vector<InputDataInfo> &);
+static void prepare_power_spectrum_data(vector<InputDataInfo> &);
+static void process_power_spectrum(const vector<InputDataInfo> &);
+static void process_error_power_spectrum(const vector<InputDataInfo> &);
+static std::vector<double> radial_spectral_variance(const DataPlane &);
+static void sum_spectral_variance(vector<double> &, const vector<double> &);
+static DataPlane dct_typeII(const DataPlane &);
 static void process_info_theory(void);
 static void setup_nc_file(void);
+static void read_series_data(int, VarInfo *, const StringArray &,
+                             const GrdFileType, InputDataInfo &);
+static bool read_wind_series(const StringArray &,
+                             int, const VarInfo *, const StringArray &,
+                             const GrdFileType, DataPlane &);
+static void regrid_data(const VarInfo *, const Grid &, DataPlane &);
 static ConcatString get_nc_var_str(const VarInfo *, int);
+static ConcatString get_nc_att_str(const ConcatString &,
+                                   const ConcatString &);
 static void write_nc_var_int(const char *, const char *, int);
-static void add_var_att_local(NcVar *, const char *, const ConcatString &);
+static void add_var_data_atts(NcVar *, const ConcatString &,
+                              const ConcatString &,
+                              const ConcatString &);
+static void add_var_att_local(NcVar *, const char *,
+                              const ConcatString &);
 static void write_hist_bins(void);
 static void write_hist1d(void);
 static void write_hist2d(void);
+static void write_wavelengths(void);
+static void write_power_spectrum(void);
+static void write_error_power_spectrum(void);
 static void write_info_theory(void);
 static void clean_up(void);
+
+static double get_grid_res_km(const Grid &);
 
 static Met2dDataFile *get_mtddf(const StringArray &, const int);
 
@@ -109,10 +135,17 @@ int met_main(int argc, char *argv[]) {
    // Write information theory output
    if(conf_info.nc_info.do_info_theory) write_info_theory();
 
+   // Write power spectrum output for the full domain
+   if(conf_info.nc_info.do_power_spectrum) {
+      write_wavelengths();
+      write_power_spectrum();
+      if(multiple_data_sources) write_error_power_spectrum();
+   }
+
    // Write benchmarking metrics
-   #ifdef WITH_PROFILER
+#ifdef WITH_PROFILER
    ctrack::result_print();
-   #endif 
+#endif
 
    // Close files and deallocate memory
    clean_up();
@@ -173,8 +206,8 @@ static void process_command_line(int argc, char **argv) {
 
    // List the config files
    mlog << Debug(1)
-       << "Default Config File: " << default_config_file << "\n"
-       << "User Config File: "    << config_file << "\n";
+        << "Default Config File: " << default_config_file << "\n"
+        << "User Config File: "    << config_file << "\n";
 
    // Read the config files
    conf_info.read_config(default_config_file.c_str(),
@@ -230,7 +263,7 @@ static void process_command_line(int argc, char **argv) {
    } // end for i
 
    // Process the configuration
-   conf_info.process_config(file_types);
+   conf_info.process_config(file_types, data_grid);
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.data_info[0]->regrid(),
@@ -259,21 +292,22 @@ string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 static void setup_diag_info(void) {
-   #ifdef WITH_PROFILER
+#ifdef WITH_PROFILER
    CTRACK;
-   #endif
+#endif
 
    // Resize based on the number of variables and masks
    diag_info.resize(conf_info.get_n_data());
    for(auto &info : diag_info) info.resize(conf_info.get_n_mask());
+   power_info.resize(conf_info.get_n_data());
 
    // Loop over variables
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       // Find bin ranges
-      const VarInfo *i_data = conf_info.data_info[i_var];
-      NumArray range(i_data->range());
-      int i_n_bins = i_data->n_bins();
+      const VarInfo *i_vinfo = conf_info.data_info[i_var];
+      NumArray range(i_vinfo->range());
+      int i_n_bins = i_vinfo->n_bins();
       double var_min = range[0];
       double var_max = range[1];
       double bin_delta = (var_max - var_min) / i_n_bins;
@@ -290,27 +324,27 @@ static void setup_diag_info(void) {
 
       // 1D histogram
       mlog << Debug(2)
-           << "Initializing " << i_data->magic_str_attr()
+           << "Initializing " << i_vinfo->magic_str_attr()
            << " histogram with " << i_n_bins << " bins from "
            << var_min << " to " << var_max << ".\n";
       vector<long long> hist1d;
       init_pdf(i_n_bins, hist1d);
 
       // Keep track of unique output variable names
-      if(nc_var_sa.has(i_data->magic_str_attr())) unique_variable_names = false;
-      nc_var_sa.add(i_data->magic_str_attr());
+      if(nc_var_sa.has(i_vinfo->magic_str_attr())) unique_variable_names = false;
+      nc_var_sa.add(i_vinfo->magic_str_attr());
 
       // 2D histograms
       map<int, vector<long long> > hist2d; 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-         const VarInfo *j_data = conf_info.data_info[j_var];
+         const VarInfo *j_vinfo = conf_info.data_info[j_var];
 
-         int j_n_bins = j_data->n_bins();
+         int j_n_bins = j_vinfo->n_bins();
 
          mlog << Debug(2)
-              << "Initializing " << i_data->magic_str_attr() << "_"
-              << j_data->magic_str_attr() << " joint histogram with "
+              << "Initializing " << i_vinfo->magic_str_attr() << "_"
+              << j_vinfo->magic_str_attr() << " joint histogram with "
               << i_n_bins << " x " << j_n_bins << " bins.\n";
 
          hist2d[j_var] = vector<long long>();
@@ -336,15 +370,14 @@ static void setup_diag_info(void) {
 ////////////////////////////////////////////////////////////////////////
 
 static void process_series(void) {
-   vector<DataPlane> data_dp(conf_info.get_n_data());
+   vector<InputDataInfo> in_data(conf_info.get_n_data());
    const StringArray *cur_files;
    const GrdFileType *cur_ftype;
-   Grid cur_grid;
 
    // List the lengths of the series options
    mlog << Debug(1)
-       << "Processing " << conf_info.get_n_data() << " data fields"
-       << " from " << n_series << " input file(s).\n";
+        << "Processing " << conf_info.get_n_data() << " data fields"
+        << " from " << n_series << " input file(s).\n";
 
    // Loop over the input files
    for(int i_series=0; i_series < n_series; i_series++) {
@@ -357,7 +390,7 @@ static void process_series(void) {
       // Read the input data for this series entry
       for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-         VarInfo *i_data = conf_info.data_info[i_var];
+         VarInfo *i_vinfo = conf_info.data_info[i_var];
 
          // Check for separate data files for each field
          if(data_files.size() > 1) {
@@ -370,58 +403,34 @@ static void process_series(void) {
          }
 
          mlog << Debug(2)
-              << "Reading field " << i_data->magic_str_attr()
+              << "Reading field " << i_vinfo->magic_str_attr()
               << " data from file: " << (*cur_files)[i_series]
               << "\n";
 
-         get_series_entry(i_series, i_data, *cur_files, *cur_ftype,
-                          data_dp[i_var], cur_grid);
+         // Read the series data
+         read_series_data(i_series, i_vinfo, *cur_files, *cur_ftype,
+                          in_data[i_var]);
 
-         // Regrid, if necessary
-         if(!(cur_grid == grid)) {
-            mlog << Debug(2)
-                 << "Regridding field " << i_data->magic_str_attr()
-                 << " to the verification grid using "
-                 << i_data->regrid().get_str() << ".\n";
-            data_dp[i_var] = met_regrid(data_dp[i_var],
-                                        cur_grid, grid,
-                                        i_data->regrid());
-         }
-
-         // Initialize time ranges
-         if(i_series == 0 && i_var == 0) {
-            init_beg  = init_end  = data_dp[i_var].init();
-            valid_beg = valid_end = data_dp[i_var].valid();
-            lead_beg  = lead_end  = data_dp[i_var].lead();
-         }
-         // Update time ranges
-         else {
-            if(data_dp[i_var].init() < init_beg) {
-               init_beg  = data_dp[i_var].init();
-            }
-            if(data_dp[i_var].init() > init_end) {
-               init_end  = data_dp[i_var].init();
-            }
-            if(data_dp[i_var].valid() < valid_beg) {
-               valid_beg = data_dp[i_var].valid();
-            }
-            if(data_dp[i_var].valid() > valid_end) {
-               valid_end = data_dp[i_var].valid();
-            }
-            if(data_dp[i_var].lead() < lead_beg) {
-               lead_beg  = data_dp[i_var].lead();
-            }
-            if(data_dp[i_var].lead() > lead_end) {
-               lead_end  = data_dp[i_var].lead();
-            }
-         }
       } // end for i_var
 
       // Process the 1D histograms
-      process_hist1d(data_dp);
+      process_hist1d(in_data);
 
       // Process the 2D histograms
-      process_hist2d(data_dp);
+      process_hist2d(in_data);
+
+      // Process the power spectrum
+      if(conf_info.nc_info.do_power_spectrum) {
+
+         // Prepare power spectrum data
+         prepare_power_spectrum_data(in_data);
+
+         // Process the power spectrum
+         process_power_spectrum(in_data);
+
+         // Process the error power spectrum
+         if(multiple_data_sources) process_error_power_spectrum(in_data);
+      }
 
    } // end for i_series
 
@@ -429,15 +438,15 @@ static void process_series(void) {
    if(conf_info.nc_info.do_info_theory) process_info_theory();
 
 }
-      
+
 ////////////////////////////////////////////////////////////////////////
 
-static void process_hist1d(const vector<DataPlane> &data_dp) {
+static void process_hist1d(const vector<InputDataInfo> &in_data) {
 
    // Update the 1D histogram counts
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var];
 
       // Loop over the masks
       for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
@@ -445,7 +454,7 @@ static void process_hist1d(const vector<DataPlane> &data_dp) {
          DiagInfo *i_diag = &diag_info[i_var][i_mask];
 
          // Apply the mask before updating the data ranges
-         DataPlane dp(data_dp[i_var]);
+         DataPlane dp(in_data[i_var].dp);
          apply_mask(dp, conf_info.mask_mp[i_mask]);
          double min;
          double max;
@@ -461,27 +470,27 @@ static void process_hist1d(const vector<DataPlane> &data_dp) {
          update_pdf(i_diag->bin_min[0],
                     i_diag->bin_delta,
                     i_diag->hist1d,
-                    data_dp[i_var],
+                    in_data[i_var].dp,
                     conf_info.mask_mp[i_mask]);
 
          mlog << Debug(2)
-              << "Processed " << i_data->magic_str_attr()
+              << "Processed " << i_vinfo->magic_str_attr()
               << " data over region " << conf_info.mask_name[i_mask]
               << " with range (" << i_diag->var_min << ", "
               << i_diag->var_max << ") into bins with range ("
-              << i_data->range()[0] << ", "
-              << i_data->range()[1] << ").\n";
+              << i_vinfo->range()[0] << ", "
+              << i_vinfo->range()[1] << ").\n";
 
          // Compare input data and bin ranges 
-         if(i_diag->var_min < i_data->range()[0] ||
-            i_diag->var_max > i_data->range()[1]) {
+         if(i_diag->var_min < i_vinfo->range()[0] ||
+            i_diag->var_max > i_vinfo->range()[1]) {
             mlog << Warning << "\nprocess_hist1d() -> "
-                 << "the range of the " << i_data->magic_str_attr()
+                 << "the range of the " << i_vinfo->magic_str_attr()
                  << " data over region " << conf_info.mask_name[i_mask]
                  << " (" << i_diag->var_min << ", " << i_diag->var_max
                  << ") falls outside the configuration file range ("
-                 << i_data->range()[0] << ", "
-                 << i_data->range()[1] << ")!\n\n";
+                 << i_vinfo->range()[0] << ", "
+                 << i_vinfo->range()[1] << ")!\n\n";
          }
       } // end for i_mask
    } // end for i_var
@@ -489,16 +498,16 @@ static void process_hist1d(const vector<DataPlane> &data_dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_hist2d(const vector<DataPlane> &data_dp) {
+static void process_hist2d(const vector<InputDataInfo> &in_data) {
 
    // Process the 2D joint histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var];
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-         const VarInfo *j_data = conf_info.data_info[j_var];
+         const VarInfo *j_vinfo = conf_info.data_info[j_var];
 
          for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
 
@@ -506,18 +515,274 @@ static void process_hist2d(const vector<DataPlane> &data_dp) {
             DiagInfo *j_diag = &diag_info[j_var][i_mask];
 
             // Update 2D histogram counts
-            update_joint_pdf(i_data->n_bins(),
-                             j_data->n_bins(),
+            update_joint_pdf(i_vinfo->n_bins(),
+                             j_vinfo->n_bins(),
                              i_diag->bin_min[0],
                              j_diag->bin_min[0],
                              i_diag->bin_delta,
                              j_diag->bin_delta,
                              i_diag->hist2d[j_var],
-                             data_dp[i_var], data_dp[j_var],
+                             in_data[i_var].dp, in_data[j_var].dp,
                              conf_info.mask_mp[i_mask]);
          } // end for i_mask
       } // end for j_var
    } // end for i_var
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void prepare_power_spectrum_data(vector<InputDataInfo> &in_data) {
+
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+
+      int nxy = in_data[i_var].dp.nxy();
+      int n_vld = in_data[i_var].dp.n_good_data();
+
+      // Check for bad data
+      if(n_vld < nxy) {
+
+         PowerSpectrumInfo *ps_ptr = &conf_info.ps_info[i_var];
+
+         // Skip power spectrum for missing data
+         if(ps_ptr->missing_flag == MissingDataType::None ||
+            (double) n_vld/nxy < ps_ptr->vld_thresh) {
+
+            mlog << Debug(3) << "Skipping "
+                 << conf_info.data_info[i_var]->magic_str_attr()
+                 << " power spectrum due to missing data.\n";
+            ps_ptr->skip = true;
+         }
+         else {
+
+            // Initialize to the config file value
+            double fill;
+            ConcatString desc;
+
+            // Replace with the mean of the field
+            if(ps_ptr->missing_flag == MissingDataType::Mean) {
+               fill = in_data[i_var].dp.mean();
+               desc = "mean";
+            }
+            // Use config file value
+            else {
+               fill = ps_ptr->missing_value;
+               desc = "constant";
+            }
+
+            mlog << Debug(3) << "Replacing "
+                 << conf_info.data_info[i_var]->magic_str_attr()
+                 << " power spectrum missing data with a " << desc
+                 << " value of " << fill << ".\n";
+            in_data[i_var].dp.replace_bad_data(fill);
+         }
+      }
+   } // end for i_var
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void process_power_spectrum(const vector<InputDataInfo> &in_data) {
+
+   // Process the power spectrum for the full input domain
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+
+      // Check skip
+      if(conf_info.ps_info[i_var].skip) continue;
+
+      // Process U/V for kinetic energy
+      if(in_data[i_var].uv_flag) {
+
+         // Apply the discrete cosine transforms
+         DataPlane u_dct_dp(dct_typeII(in_data[i_var].u_dp));
+         DataPlane v_dct_dp(dct_typeII(in_data[i_var].v_dp));
+
+         // Compute the radial energy
+         vector<double> u_re = radial_spectral_variance(u_dct_dp);
+         vector<double> v_re = radial_spectral_variance(v_dct_dp);
+
+         // Combine the components
+         vector<double> re(u_re.size());
+         for(size_t i=0; i<u_re.size(); i++) {
+            re[i] = (u_re[i] + v_re[i]) / 2.0;
+         }
+
+         // Sum the spectral variance
+         sum_spectral_variance(power_info[i_var].power, re);
+      }
+      // Process other scalar fields
+      else {
+
+         // Apply the discrete cosine transform
+         DataPlane dct_dp(dct_typeII(in_data[i_var].dp));
+
+         // Compute the radial energy
+         vector<double> re = radial_spectral_variance(dct_dp);
+
+         // Sum the spectral variance
+         sum_spectral_variance(power_info[i_var].power, re);
+      }
+   } // end for i_var
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void process_error_power_spectrum(const vector<InputDataInfo> &in_data) {
+
+   // Process the power spectrum for the full input domain
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+
+      // Check skip
+      if(conf_info.ps_info[i_var].skip) continue;
+
+      for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
+
+         // Check skip
+         if(conf_info.ps_info[j_var].skip) continue;
+
+         // Process U/V for kinetic energy
+         if(in_data[i_var].uv_flag && in_data[j_var].uv_flag) {
+
+            // Compute difference fields
+            DataPlane u_diff_dp(subtract(in_data[i_var].u_dp,
+                                         in_data[j_var].u_dp));
+            DataPlane v_diff_dp(subtract(in_data[i_var].v_dp,
+                                         in_data[j_var].v_dp));
+
+            // Apply the discrete cosine transforms
+            DataPlane u_dct_dp(dct_typeII(u_diff_dp));
+            DataPlane v_dct_dp(dct_typeII(v_diff_dp));
+
+            // Compute the radial energy
+            vector<double> u_re = radial_spectral_variance(u_dct_dp);
+            vector<double> v_re = radial_spectral_variance(v_dct_dp);
+
+            // Combine the components
+            vector<double> re(u_re.size());
+            for(size_t i=0; i<u_re.size(); i++) {
+               re[i] = (u_re[i] + v_re[i]) / 2.0;
+            }
+
+            // Sum the spectral variance
+            sum_spectral_variance(power_info[i_var].error_power[j_var], re);
+         }
+         // Process other scalar fields
+         else {
+
+            // Compute difference field
+            DataPlane diff_dp(subtract(in_data[i_var].dp,
+                              in_data[j_var].dp));
+
+            // Apply the discrete cosine transform
+            DataPlane dct_dp(dct_typeII(diff_dp));
+
+            // Compute the radial energy
+            vector<double> re = radial_spectral_variance(dct_dp);
+
+            // Sum the spectral variance
+            sum_spectral_variance(power_info[i_var].error_power[j_var], re);
+         }
+      } // end for j_var
+   } // end for i_var
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Compute the radial spectral variance from a 2D array of DCT-II
+// coefficients, following Denis et al. (2002).
+//   - Each axis is normalized independently by its own dimension
+//     (alph = sqrt((x/nx)^2 + (y/ny)^2)), giving an elliptical
+//     (rather than circular) truncation appropriate for rectangular
+//     domains, per section 2b of Denis et al. (2002).
+//   - Points with alph >= 1 fall outside the valid isotropic
+//     wavenumber range (the "corners" of the coefficient array) and
+//     are excluded.
+//   - The (0,0) DC coefficient and the entire near-DC shell
+//     (alph < 1/N) are excluded, per the k=1..N-1 range above.
+//
+////////////////////////////////////////////////////////////////////////
+
+static vector<double> radial_spectral_variance(const DataPlane &dp) {
+
+   // Use the smaller dimension
+   int nx = dp.nx();
+   int ny = dp.ny();
+   int N = min(nx, ny);
+
+   // Output spans k = 1 .. N-1 inclusive, per Denis et al. (2002).
+   // re[k-1] holds the energy for wavenumber k.
+   int n_bins = N - 1;
+   vector<double> re(n_bins, 0.0); 
+
+   double inv_N = 1.0 / N;
+
+   // Accumulate spectral variance for each DCT coefficient
+   for(int x=0; x<nx; x++) {
+      for(int y=0; y<ny; y++) {
+
+         // Exclude the domain mean in the (0,0) DC coefficient
+         if(x == 0 && y == 0) continue;
+
+         // Normalize each axis independently before combining
+         double ax = (double) x / nx;
+         double ay = (double) y / ny;
+         double alph = sqrt(ax*ax + ay*ay);
+
+         // Exclude the near-DC shell (alph < 1/N) and the
+         // out-of-range corner region (alph >= 1) -- neither
+         // corresponds to a valid k in {1, ..., N-1}.
+         if(alph < inv_N || alph >= 1.0) continue;
+
+         // Map alph to wavenumber k in {1, ..., N-1}, then to the
+         // 0-based array index (k - 1).
+         auto k = (int) (alph * N);
+         if(k >= N) k = N - 1;
+
+         re[k - 1] += dp(x,y) * dp(x,y) / dp.nxy();
+
+      } // end for y
+   } // end for x
+
+   return re;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void sum_spectral_variance(vector<double> &sum,
+                                  const vector<double> &cur) {
+
+   // Initialize the sum if needed
+   if(sum.empty()) {
+      sum = cur;
+   }
+   // Otherwise, accumulate values
+   else {
+
+      // Must be the same size
+      if(sum.size() != cur.size()) {
+         mlog << Error << "\nsum_spectral_variance() -> "
+              << "vector lengths do not match (" << sum.size()
+              << " != " << cur.size() << ")!\n\n";
+         exit(1);
+      }
+
+      // Increment each element
+      for(int i=0; i<sum.size(); i++) {
+         if(is_bad_data(sum[i]) || is_bad_data(cur[i])) {
+            sum[i] = bad_data_double;
+         }
+         else {
+            sum[i] += cur[i];
+         }
+      }
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static DataPlane dct_typeII(const DataPlane &dp) {
+   DataPlane dct_dp(dp);
+   dct_typeII_2d(dct_dp.buf().data(), dct_dp.nx(), dct_dp.ny());
+   return dct_dp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -551,11 +816,11 @@ static void process_info_theory() {
    // Compute joint entropy and mutual information for the 2D histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var];
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-         const VarInfo *j_data = conf_info.data_info[j_var];
+         const VarInfo *j_vinfo = conf_info.data_info[j_var];
 
          for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
 
@@ -567,13 +832,13 @@ static void process_info_theory() {
 
             // 2D histogram sums 
             long long hist2d_ij_sum = 0;
-            vector<long long> hist2d_i_sum(i_data->n_bins(), 0);
-            vector<long long> hist2d_j_sum(j_data->n_bins(), 0);
+            vector<long long> hist2d_i_sum(i_vinfo->n_bins(), 0);
+            vector<long long> hist2d_j_sum(j_vinfo->n_bins(), 0);
 
-            for(int i=0; i<i_data->n_bins(); i++) {
-               for(int j=0; j<j_data->n_bins(); j++) {
+            for(int i=0; i<i_vinfo->n_bins(); i++) {
+               for(int j=0; j<j_vinfo->n_bins(); j++) {
 
-		  int n = i * j_data->n_bins() + j;
+                  int n = i * j_vinfo->n_bins() + j;
 
                   // Increment sums
                   hist2d_ij_sum   += i_diag->hist2d[j_var][n];
@@ -584,15 +849,15 @@ static void process_info_theory() {
             } // end for i
 
             // Compute probabilities and acccumulate mutual information
-            for(int i=0; i<i_data->n_bins(); i++) {
+            for(int i=0; i<i_vinfo->n_bins(); i++) {
 
                auto p_i = (double) hist2d_i_sum[i] / (double) hist2d_ij_sum;
 
-               for(int j=0; j<j_data->n_bins(); j++) {
+               for(int j=0; j<j_vinfo->n_bins(); j++) {
 
                   auto p_j = (double) hist2d_j_sum[j] / (double) hist2d_ij_sum;
 
-		  int n = i * j_data->n_bins() + j;
+                  int n = i * j_vinfo->n_bins() + j;
 
                   auto p_ij = (double) i_diag->hist2d[j_var][n] / (double) hist2d_ij_sum;
 
@@ -613,6 +878,105 @@ static void process_info_theory() {
 
 ////////////////////////////////////////////////////////////////////////
 
+static void read_series_data(int i_series, VarInfo *i_vinfo,
+                             const StringArray &in_files,
+                             const GrdFileType in_ftype,
+                             InputDataInfo &in_data) {
+   Grid cur_grid;
+
+   // Read the requested field
+   get_series_entry(i_series, i_vinfo, in_files, in_ftype,
+                    in_data.dp, cur_grid);
+
+   // Regrid, if needed
+   regrid_data(i_vinfo, cur_grid, in_data.dp);
+
+   // Check for kinetic energy
+   in_data.uv_flag = i_vinfo->is_kinetic_energy();
+
+   // Read U/V components for kinetic energy
+   if(in_data.uv_flag &&
+      (!read_wind_series(i_vinfo->wind_info().u_wind,
+          i_series, i_vinfo, in_files, in_ftype, in_data.u_dp) ||
+       !read_wind_series(i_vinfo->wind_info().v_wind,
+          i_series, i_vinfo, in_files, in_ftype, in_data.v_dp))) {
+      mlog << Error << "\nread_series_data() -> "
+           << "trouble reading U/V wind components "
+           << "for kinetic energy field \""
+           << i_vinfo->magic_str() << "\"!\n\n";
+      exit(1);
+   }
+
+   // Initialize time ranges
+   auto dp = &in_data.dp;
+   if(valid_beg == 0 && valid_end == 0) {
+      init_beg  = init_end  = dp->init();
+      valid_beg = valid_end = dp->valid();
+      lead_beg  = lead_end  = dp->lead();
+   }
+   // Update time ranges
+   else {
+      if(dp->init()  < init_beg)  init_beg  = dp->init();
+      if(dp->init()  > init_end)  init_end  = dp->init();
+      if(dp->valid() < valid_beg) valid_beg = dp->valid();
+      if(dp->valid() > valid_end) valid_end = dp->valid();
+      if(dp->lead()  < lead_beg)  lead_beg  = dp->lead();
+      if(dp->lead()  > lead_end)  lead_end  = dp->lead();
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static bool read_wind_series(const StringArray &wind_names,
+                             int i_series, const VarInfo *i_vinfo,
+                             const StringArray &in_files,
+                             const GrdFileType in_ftype,
+                             DataPlane &wind_dp) {
+   bool found = false;
+   auto wind_vinfo = i_vinfo->clone();
+   Grid cur_grid;
+
+   // Loop over possible wind names
+   for(int i=0; i<wind_names.n(); i++) {
+
+      // Look for match
+      if(wind_vinfo->reset_dict_with_name(wind_names[i].c_str()) &&
+         get_series_entry(i_series, wind_vinfo.get(), in_files, in_ftype,
+                          wind_dp, cur_grid)) {
+         found = true;
+
+         mlog << Debug(3) << "Found matching wind field \""
+              << wind_vinfo->magic_str() << "\".\n";
+
+         // Regrid, if needed
+         regrid_data(i_vinfo, cur_grid, wind_dp);
+
+         break;
+      }
+   }
+
+   return found;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void regrid_data(const VarInfo *vinfo, const Grid &cur_grid,
+                        DataPlane &dp) {
+
+   // Check for grid match
+   if(cur_grid == grid) return;
+
+   mlog << Debug(2)
+        << "Regridding field " << vinfo->magic_str_attr()
+        << " to the verification grid using "
+        << vinfo->regrid().get_str() << ".\n";
+   dp = met_regrid(dp, cur_grid, grid, vinfo->regrid());
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 static ConcatString get_nc_var_str(const VarInfo *info, int index) {
    ConcatString cs;
 
@@ -624,6 +988,21 @@ static ConcatString get_nc_var_str(const VarInfo *info, int index) {
    if(multiple_data_sources && !unique_variable_names) {
       cs << "_VAR" << index;
    }
+
+   return cs;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static ConcatString get_nc_att_str(const ConcatString &cs1,
+                                   const ConcatString &cs2) {
+
+   // Return one if equal
+   if(cs1 == cs2) return cs1;
+
+   // Otherwise, include both strings
+   ConcatString cs(cs1);
+   cs << " and " << cs2;
 
    return cs;
 }
@@ -685,6 +1064,12 @@ static void setup_nc_file(void) {
       int mask_size = conf_info.mask_mp[i_mask].count();
       mask_size_var.putVar(offsets, counts, &mask_size);
    }
+
+   // Add the power spectra dimension
+   if(conf_info.nc_info.do_power_spectrum) {
+      wavenumber_dim = add_dim(nc_out, "wavenumber",
+                               (long) min(grid.nx(), grid.ny())-1);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -705,6 +1090,21 @@ static void write_nc_var_int(const char *var_name,
 
 ////////////////////////////////////////////////////////////////////////
 
+static void add_var_data_atts(NcVar *var,
+                              const ConcatString &long_name_cs,
+                              const ConcatString &level_cs,
+                              const ConcatString &units_cs) {
+
+   // Add variable attributes for long_name, level, and units
+   if(var) {
+      add_var_att_local(var, "long_name", long_name_cs);
+      add_var_att_local(var, "level", level_cs);
+      add_var_att_local(var, "units", units_cs);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
 static void add_var_att_local(NcVar *var, const char *att_name,
                               const ConcatString &att_value) {
    if(att_value.nonempty()) add_att(var, att_name, att_value.c_str());
@@ -717,15 +1117,15 @@ static void write_hist_bins(void) {
 
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var];
       DiagInfo *i_diag = &diag_info[i_var][0];
 
       // Define NetCDF variable name
-      ConcatString var_str(get_nc_var_str(i_data, i_var+1));
+      ConcatString var_str(get_nc_var_str(i_vinfo, i_var+1));
 
       // Define NetCDF dimensions
       NcDim var_dim = add_dim(nc_out, var_str,
-                              (long) i_data->n_bins());
+                              (long) i_vinfo->n_bins());
       data_var_dims.emplace_back(var_dim);
       
       // Create NetCDF variable
@@ -745,16 +1145,11 @@ static void write_hist_bins(void) {
       // Add variable attributes
       ConcatString cs;
       cs << cs_erase << "Minimum value of " << var_str << " bin";
-      add_var_att_local(&var_min, "long_name", cs);
-      add_var_att_local(&var_min, "units", i_data->units_attr());
-
+      add_var_data_atts(&var_min, cs, i_vinfo->level_attr(), i_vinfo->units_attr());
       cs << cs_erase << "Maximum value of " << var_str << " bin";
-      add_var_att_local(&var_max, "long_name", cs);
-      add_var_att_local(&var_max, "units", i_data->units_attr());
-
+      add_var_data_atts(&var_max, cs, i_vinfo->level_attr(), i_vinfo->units_attr());
       cs << cs_erase << "Midpoint value of " << var_str << " bin";
-      add_var_att_local(&var_mid, "long_name", cs);
-      add_var_att_local(&var_mid, "units", i_data->units_attr());
+      add_var_data_atts(&var_mid, cs, i_vinfo->level_attr(), i_vinfo->units_attr());
 
       // Write bin values for the current variable
       var_min.putVar(i_diag->bin_min.data());
@@ -773,10 +1168,10 @@ static void write_hist1d(void) {
    // Define and write 1D histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var];
 
       // Define NetCDF variable name
-      ConcatString var_str(get_nc_var_str(i_data, i_var+1));
+      ConcatString var_str(get_nc_var_str(i_vinfo, i_var+1));
       ConcatString var_name("hist_");
       var_name << var_str;
 
@@ -790,7 +1185,7 @@ static void write_hist1d(void) {
       // Add variable attributes
       ConcatString cs;
       cs << "Histogram of " << var_str << " values";
-      add_var_att_local(&var, "long_name", cs);
+      add_var_data_atts(&var, cs, i_vinfo->level_attr(), i_vinfo->units_attr());
 
       // Write 1D histogram for each mask
       for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
@@ -800,7 +1195,7 @@ static void write_hist1d(void) {
          offsets[0] = i_mask;
          offsets[1] = 0;
          counts[0]  = 1;
-         counts[1]  = i_data->n_bins();
+         counts[1]  = i_vinfo->n_bins();
 
          var.putVar(offsets, counts, hist);
 
@@ -817,17 +1212,17 @@ static void write_hist2d(void) {
    // Define and write 2D joint histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var];
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-         const VarInfo *j_data = conf_info.data_info[j_var];
+         const VarInfo *j_vinfo = conf_info.data_info[j_var];
 
          // Define NetCDF variable name
          ConcatString var_str;
-         var_str << get_nc_var_str(i_data, i_var+1) << "_"
-                 << get_nc_var_str(j_data, j_var+1);
-	 ConcatString var_name("hist_");
+         var_str << get_nc_var_str(i_vinfo, i_var+1) << "_"
+                 << get_nc_var_str(j_vinfo, j_var+1);
+         ConcatString var_name("hist_");
          var_name << var_str;
 
          // Create NetCDF variable
@@ -841,7 +1236,11 @@ static void write_hist2d(void) {
          // Add variable attributes
          ConcatString cs;
          cs << "Joint histogram of " << var_str << " values";
-         add_var_att_local(&var, "long_name", cs);
+         add_var_data_atts(&var, cs,
+                           get_nc_att_str(i_vinfo->level_attr(),
+                                          j_vinfo->level_attr()),
+                           get_nc_att_str(i_vinfo->units_attr(),
+                                          j_vinfo->units_attr()));
 
          // Write 2D histogram for each mask
          for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
@@ -852,8 +1251,8 @@ static void write_hist2d(void) {
             offsets[1] = 0;
             offsets[2] = 0;
             counts[0]  = 1;
-            counts[1]  = i_data->n_bins();
-            counts[2]  = j_data->n_bins();
+            counts[1]  = i_vinfo->n_bins();
+            counts[2]  = j_vinfo->n_bins();
 
             var.putVar(offsets, counts, hist);
 
@@ -870,10 +1269,10 @@ static void write_info_theory(void) {
    // Write entropy for each 1D histogram
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var];
 
       // Define NetCDF variable name
-      ConcatString var_str(get_nc_var_str(i_data, i_var+1));
+      ConcatString var_str(get_nc_var_str(i_vinfo, i_var+1));
       ConcatString var_name("entropy_");
       var_name << var_str;
 
@@ -884,8 +1283,7 @@ static void write_info_theory(void) {
       // Add variable attributes
       ConcatString cs;
       cs << "Entropy value for " << var_str;
-      add_var_att_local(&var, "long_name", cs);
-      add_var_att_local(&var, "units", units_cs);
+      add_var_data_atts(&var, cs, i_vinfo->level_attr(), units_cs);
 
       // Store the data
       vector<double> data(conf_info.get_n_mask());
@@ -901,18 +1299,18 @@ static void write_info_theory(void) {
    // Write joint entropy and mutual information for each 2D joint histogram
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var];
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-         const VarInfo *j_data = conf_info.data_info[j_var];
+         const VarInfo *j_vinfo = conf_info.data_info[j_var];
 
          ConcatString var_str;
-         var_str << get_nc_var_str(i_data, i_var+1) << "_"
-                 << get_nc_var_str(j_data, j_var+1);
+         var_str << get_nc_var_str(i_vinfo, i_var+1) << "_"
+                 << get_nc_var_str(j_vinfo, j_var+1);
 
          // Define NetCDF variable names
-	 ConcatString je_var_name("joint_entropy_");
+         ConcatString je_var_name("joint_entropy_");
          je_var_name << var_str;
          ConcatString mi_var_name("mutual_information_");
          mi_var_name << var_str;
@@ -923,26 +1321,165 @@ static void write_info_theory(void) {
          NcVar mi_var = add_var(nc_out, mi_var_name, ncFloat,
                                 mask_dim, deflate_level);
 
+         // Level attribute
+         ConcatString level_cs(get_nc_att_str(i_vinfo->level_attr(),
+                                              j_vinfo->level_attr()));
+
          // Add variable attributes
          ConcatString cs;
          cs << "Joint entropy value for " << var_str;
-         add_var_att_local(&je_var, "long_name", cs);
-         add_var_att_local(&je_var, "units", units_cs);
+         add_var_data_atts(&je_var, cs, level_cs, units_cs);
          cs << cs_erase << "Mutual information value for " << var_str;
-         add_var_att_local(&mi_var, "long_name", cs);
-         add_var_att_local(&mi_var, "units", units_cs);
+         add_var_data_atts(&mi_var, cs, level_cs, units_cs);
 
          // Store the data
          vector<double> je_data(conf_info.get_n_mask());
-         vector<double> mi_data(conf_info.get_n_mask());
+         vector<double> mi_vinfo(conf_info.get_n_mask());
          for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
             je_data[i_mask] = diag_info[i_var][i_mask].joint_entropy[j_var];
-            mi_data[i_mask] = diag_info[i_var][i_mask].mutual_information[j_var];
+            mi_vinfo[i_mask] = diag_info[i_var][i_mask].mutual_information[j_var];
          }
 
          // Write the data
          je_var.putVar(je_data.data());
-         mi_var.putVar(mi_data.data());
+         mi_var.putVar(mi_vinfo.data());
+
+      } // end for j_var
+   } // end for i_var
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void write_wavelengths(void) {
+
+   // Define wavenumbers and wavelengths based on the number of bins
+   int N = min(grid.nx(), grid.ny());
+   int n_bins = N - 1;
+   double grid_res_km = get_grid_res_km(grid);
+
+   vector<int> wavenumber(n_bins);
+   vector<float> wavelength(n_bins);
+
+   for(int i=0; i<n_bins; i++) {
+      int k = i + 1;
+      wavenumber[i] = k;
+      wavelength[i] = (float) ( 2.0 * N * grid_res_km / k );
+   }
+
+   // Add wavenumber coordinate variable
+   NcVar num_var = add_var(nc_out, "wavenumber", ncInt64, wavenumber_dim);
+   add_var_att_local(&num_var, "long_name", "Wavenumber");
+   add_var_att_local(&num_var, "units", "1");
+   num_var.putVar(wavenumber.data());
+
+   // Add wavelength variable
+   NcVar len_var = add_var(nc_out, "wavelength", ncFloat, wavenumber_dim);
+   add_var_att_local(&len_var, "long_name", "Wavelength");
+   add_var_att_local(&len_var, "units", "km");
+   ConcatString cs;
+   cs.format("%g km", grid_res_km);
+   add_var_att_local(&len_var, "grid_res", cs);
+   len_var.putVar(wavelength.data());
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Power spectra can be computed and written only for the full
+// rectangular input domain. The mask dimension is not used.
+//
+////////////////////////////////////////////////////////////////////////
+
+static void write_power_spectrum(void) {
+
+   // Define and write the power spectrum
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+
+      // Check skip
+      if(conf_info.ps_info[i_var].skip) continue;
+
+      const VarInfo *i_vinfo = conf_info.data_info[i_var];
+
+      // Define NetCDF variable name
+      ConcatString var_str(get_nc_var_str(i_vinfo, i_var+1));
+      ConcatString var_name("power_spectrum_");
+      var_name << var_str;
+
+      // Create NetCDF variable
+      NcVar var = add_var(nc_out, var_name, ncFloat, wavenumber_dim,
+                          deflate_level);
+
+      // Add variable attributes
+      ConcatString cs("Power spectrum for ");
+      cs << var_str;
+      ConcatString units_cs("(");
+      units_cs << i_vinfo->units_attr() << ")^2";
+      add_var_data_atts(&var, cs, i_vinfo->level_attr(), units_cs);
+      add_var_att_local(&var, "mask", full_domain_str);
+
+      // Write power spectrum
+      PowerInfo *p_diag = &power_info[i_var];
+
+      // Divide sums by the series length
+      for(auto &x : p_diag->power) x /= n_series;
+
+      // Write the mean power data
+      var.putVar(p_diag->power.data());
+
+   } // end for i_var
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void write_error_power_spectrum(void) {
+
+   // Define and write the error power spectrum
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+
+      // Check skip
+      if(conf_info.ps_info[i_var].skip) continue;
+
+      const VarInfo *i_vinfo = conf_info.data_info[i_var];
+
+      for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
+
+         // Check skip
+         if(conf_info.ps_info[j_var].skip) continue;
+
+         const VarInfo *j_vinfo = conf_info.data_info[j_var];
+
+         // Define NetCDF variable name
+         ConcatString i_var_str(get_nc_var_str(i_vinfo, i_var+1));
+         ConcatString j_var_str(get_nc_var_str(j_vinfo, j_var+1));
+         ConcatString var_name("error_power_spectrum_");
+         var_name << i_var_str << "_" << j_var_str;
+
+         // Create NetCDF variable
+         NcVar var = add_var(nc_out, var_name, ncFloat, wavenumber_dim,
+                             deflate_level);
+
+         // Level attribute
+         ConcatString level_cs(get_nc_att_str(i_vinfo->level_attr(),
+                                              j_vinfo->level_attr()));
+
+         // Units attribute
+         ConcatString units_cs("(");
+         units_cs << get_nc_att_str(i_vinfo->units_attr(),
+                                    j_vinfo->units_attr()) << ")^2";
+
+         // Add variable attributes
+         ConcatString cs("Power spectrum of errors for ");
+         cs << i_var_str << " minus " << j_var_str;
+         add_var_data_atts(&var, cs, level_cs, units_cs);
+         add_var_att_local(&var, "mask", full_domain_str);
+
+         // Write power spectrum
+         PowerInfo *p_diag = &power_info[i_var];
+
+         // Divide sums by the series length
+         for(auto &x : p_diag->error_power[j_var]) x /= n_series;
+
+         // Write the mean error power
+         var.putVar(p_diag->error_power[j_var].data());
 
       } // end for j_var
    } // end for i_var
@@ -952,20 +1489,16 @@ static void write_info_theory(void) {
 
 static Met2dDataFile *get_mtddf(const StringArray &file_list,
                                 const int i_field) {
-   Met2dDataFile *mtddf = nullptr;
-   Dictionary *dict = nullptr;
-   Dictionary i_dict;
-   GrdFileType file_type;
    int i;
 
    // Conf: data.field
-   dict = conf_info.conf.lookup_array(conf_key_data_field);
+   Dictionary *dict = conf_info.conf.lookup_array(conf_key_data_field);
 
    // Get the i-th data.field entry
-   i_dict = parse_conf_i_vx_dict(dict, i_field);
+   Dictionary i_dict = parse_conf_i_vx_dict(dict, i_field);
 
    // Look for file_type in the i-th data.field entry
-   file_type = parse_conf_file_type(&i_dict);
+   GrdFileType file_type = parse_conf_file_type(&i_dict);
 
    // Find the first file that actually exists
    for(i=0; i < file_list.n(); i++) {
@@ -980,6 +1513,7 @@ static Met2dDataFile *get_mtddf(const StringArray &file_list,
    }
 
    // Read first valid file
+   Met2dDataFile *mtddf = nullptr;
    if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(
                    file_list[i].c_str(), file_type))) {
       mlog << Error << "\nget_mtddf() -> "
@@ -1006,6 +1540,57 @@ static void clean_up(void) {
     }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Estimate the grid spacking in km
+//
+////////////////////////////////////////////////////////////////////////
+
+static double get_grid_res_km(const Grid &g) {
+   double res_km;
+
+   // Use the grid scale, if well-defined
+   if(g.scale_km() > 0) {
+      res_km = g.scale_km();
+   }
+   // Otherwise, determine the scale from the grid points
+   else {
+
+      int nx = grid.nx();
+      int ny = grid.ny();
+
+      // X-spacing at the center
+      double lat1;
+      double lon1;
+      g.xy_to_latlon(0, (ny - 1)/2.0, lat1, lon1);
+      double lat2;
+      double lon2;
+      g.xy_to_latlon(nx - 1, (ny - 1)/2.0, lat2, lon2);
+      double dx_km = gc_dist(lat1, lon1, lat2, lon2) / (nx - 1);
+
+      // Y-spacing at the center
+      g.xy_to_latlon((nx - 1)/2.0, 0, lat1, lon1);
+      g.xy_to_latlon((nx - 1)/2.0, ny - 1, lat2, lon2);
+      double dy_km = gc_dist(lat1, lon1, lat2, lon2) / (ny - 1);
+
+      // Log message when grid spacing differs
+      if(!is_eq(dx_km, dy_km, 0.1)) {
+         mlog << Debug(3) << "Grid spacing in the X (" << dx_km
+              << " km) and Y (" << dy_km << " km) dimensions differ.\n";
+      }
+      res_km = min(dx_km, dy_km);
+   }
+
+   // Attempt to round to the nearest integer
+   if(is_eq(res_km, (double) nint(res_km), 0.1)) {
+      res_km = (double) nint(res_km);
+   }
+
+   mlog << Debug(3) << "Using grid spacing of " << res_km << " km.\n";
+
+   return res_km;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1053,8 +1638,8 @@ __attribute__((noreturn)) static void usage(int exit_code) {
 ////////////////////////////////////////////////////////////////////////
 
 static void set_data_files(const StringArray & a) {
-   data_files.emplace_back(a);
    if(!data_files.empty()) multiple_data_sources = true;
+   data_files.emplace_back(a);
 }
 
 ////////////////////////////////////////////////////////////////////////

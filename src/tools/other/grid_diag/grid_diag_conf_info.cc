@@ -46,7 +46,8 @@ void GridDiagNcOutInfo::clear() {
 
 bool GridDiagNcOutInfo::all_false() const {
 
-   bool status = do_hist1d || do_hist2d || do_info_theory;
+   bool status = do_hist1d      || do_hist2d ||
+                 do_info_theory || do_power_spectrum;
 
    return !status;
 }
@@ -55,9 +56,10 @@ bool GridDiagNcOutInfo::all_false() const {
 
 void GridDiagNcOutInfo::set_all_false() {
 
-   do_hist1d      = false;
-   do_hist2d      = false;
-   do_info_theory = false;
+   do_hist1d         = false;
+   do_hist2d         = false;
+   do_info_theory    = false;
+   do_power_spectrum = false;
 
    return;
 }
@@ -66,9 +68,10 @@ void GridDiagNcOutInfo::set_all_false() {
 
 void GridDiagNcOutInfo::set_all_true() {
 
-   do_hist1d      = true;
-   do_hist2d      = true;
-   do_info_theory = true;
+   do_hist1d         = true;
+   do_hist2d         = true;
+   do_info_theory    = true;
+   do_power_spectrum = true;
 
    return;
 }
@@ -113,6 +116,7 @@ void GridDiagConfInfo::clear() {
       if(info) { delete info; info = nullptr; }
    }
    data_info.clear();
+   ps_info.clear();
 
    return;
 }
@@ -153,11 +157,13 @@ void GridDiagConfInfo::set_n_data() {
 
    // Allocate space based on the number of verification tasks
    data_info.resize(n_data, nullptr);
+   ps_info.resize(n_data);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
+void GridDiagConfInfo::process_config(vector<GrdFileType> file_types,
+                                      Grid &data_grid) {
    ConcatString s;
    StringArray sa;
    Dictionary i_dict;
@@ -176,7 +182,7 @@ void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
    Dictionary *dict = conf.lookup_array(conf_key_data_field);
 
    // Parse the data field information
-   for(int i=0; i<(int) data_info.size(); i++) {
+   for(int i=0; i<get_n_data(); i++) {
 
       // Determine the file type
       file_type = (file_types.size() > 1 ?
@@ -190,6 +196,11 @@ void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
 
       // Set the current dictionaries
       data_info[i]->set_dict(i_dict);
+
+      // Update the grid definition, if needed
+      if(!data_grid.is_set() && data_info[i]->grid_attr().is_set()) {
+         data_grid = data_info[i]->grid_attr();
+      }
 
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {
@@ -208,6 +219,9 @@ void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
               << ").\n\n";
          exit(1);
       }
+
+      // Conf: power_spectrum
+      ps_info[i] = parse_conf_power_spectrum(&i_dict);
 
    } // end for i
 
@@ -249,9 +263,10 @@ void GridDiagConfInfo::parse_output_flag() {
    // Parse the various entries
    auto d = e->dict_value();
 
-   nc_info.do_hist1d      = d->lookup_bool(conf_key_hist1d_flag);
-   nc_info.do_hist2d      = d->lookup_bool(conf_key_hist2d_flag);
-   nc_info.do_info_theory = d->lookup_bool(conf_key_info_theory_flag);
+   nc_info.do_hist1d         = d->lookup_bool(conf_key_hist1d_flag);
+   nc_info.do_hist2d         = d->lookup_bool(conf_key_hist2d_flag);
+   nc_info.do_info_theory    = d->lookup_bool(conf_key_info_theory_flag);
+   nc_info.do_power_spectrum = d->lookup_bool(conf_key_power_spectrum_flag);
 
    return;
 }

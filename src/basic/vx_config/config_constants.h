@@ -608,6 +608,35 @@ enum class MatchType {
 };
 
 ////////////////////////////////////////////////////////////////////////
+
+//
+// Enumeration for Grid-Diag Power Spectrum missing flag options
+//
+
+enum class MissingDataType {
+   None, // No missing data type
+   Mean, // Replace missing data with the mean of the field
+   Value // Replace missing data with a constant value
+};
+
+//
+// Struct to store power spectrum information
+//
+
+struct PowerSpectrumInfo {
+   MissingDataType missing_flag;
+   double          missing_value;
+   double          vld_thresh;
+   bool            skip;
+
+   PowerSpectrumInfo() { clear(); }
+   ~PowerSpectrumInfo() { clear(); }
+   PowerSpectrumInfo(PowerSpectrumInfo const &i) { *this = i; }
+   PowerSpectrumInfo &operator=(const PowerSpectrumInfo &a) noexcept;
+   void clear();
+};
+
+////////////////////////////////////////////////////////////////////////
 //
 // Constants used in configuartion files
 //
@@ -827,6 +856,7 @@ static const char conf_key_is_v_wind[]            = "is_v_wind";
 static const char conf_key_is_grid_relative[]     = "is_grid_relative";
 static const char conf_key_is_wind_speed[]        = "is_wind_speed";
 static const char conf_key_is_wind_direction[]    = "is_wind_direction";
+static const char conf_key_is_kinetic_energy[]    = "is_kinetic_energy";
 static const char conf_key_is_prob[]              = "is_prob";
 
 //
@@ -980,9 +1010,13 @@ static const char conf_val_beta[]        = "BETA";
 // Grid-Diag specific parameter key names
 //
 
-static const char conf_key_hist1d_flag[]      = "histogram_1d";
-static const char conf_key_hist2d_flag[]      = "histogram_2d";
-static const char conf_key_info_theory_flag[] = "info_theory";
+static const char conf_key_hist1d_flag[]         = "histogram_1d";
+static const char conf_key_hist2d_flag[]         = "histogram_2d";
+static const char conf_key_info_theory_flag[]    = "info_theory";
+static const char conf_key_power_spectrum_flag[] = "power_spectrum";
+static const char conf_key_power_spectrum[]      = "power_spectrum";
+static const char conf_key_missing_flag[]        = "missing_flag";
+static const char conf_key_missing_value[]       = "missing_value";
 
 //
 // STAT-Analysis and Pair-Stat specific parameter key names
@@ -1499,6 +1533,14 @@ static const char conf_val_engine[] = "ENGINE";
 static const char conf_val_merge_both[] = "MERGE_BOTH";
 static const char conf_val_merge_fcst[] = "MERGE_FCST";
 static const char conf_val_no_merge[]   = "NO_MERGE";
+
+//
+// Grid-Diag specific parameter value names
+//
+
+// Power spectrum missing flag values
+static const char conf_val_mean[]  = "MEAN";
+static const char conf_val_value[] = "VALUE";
 
 ////////////////////////////////////////////////////////////////////////
 
