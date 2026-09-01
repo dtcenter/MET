@@ -38,9 +38,9 @@ jobs:
       - name: Build Docker Image
         run: .github/jobs/build_docker_image.sh
         env:
+          MET_BASE_REPO: ${{ steps.get_met_base_image.outputs.met_base_repo }}
+          MET_BASE_TAG: ${{ steps.get_met_base_image.outputs.met_base_tag }}
           SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}-lite
-          MET_BASE_REPO: ${{ steps.get_met_base_image.output.met_base_repo }}
-          MET_BASE_TAG: ${{ steps.get_met_base_image.output.met_base_tag }}
 
       - name: Push Docker Image
         run: .github/jobs/push_docker_image.sh

@@ -140,15 +140,8 @@ echo run_update_truth: $run_update_truth
 echo input_data_version: $input_data_version
 echo truth_data_version: $truth_data_version
 
-# check for development
-if [ "${run_unit_tests}" == "true" ]; then
-
-   export use_met_base_dev=true
-
-fi
-
 # get the METbaseimage repository and tag
-export run_unit_tests
+export RUN_UNIT_TESTS=${run_unit_tests}
 .github/jobs/get_met_base_image.sh
 
 # get name of branch

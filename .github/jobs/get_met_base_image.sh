@@ -15,8 +15,8 @@ if [[ -n "${met_base_tag_override}" ]]; then
   met_base_tag=${met_base_tag_override}
 fi
 
-# if running unit tests, use unit_test MET base image 
-if [[ -n "${run_unit_tests}" && "${run_unit_tests}" == "true" ]]; then
+# if running unit tests, use unit_test MET base image
+if [[ -n "${RUN_UNIT_TESTS}" && "${RUN_UNIT_TESTS}" == "true" ]]; then
   met_base_repo=${MET_BASE_UNIT_REPO_NAME}
 fi
 
