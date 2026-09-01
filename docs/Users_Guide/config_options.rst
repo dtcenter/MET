@@ -2444,7 +2444,7 @@ used by the World Meteorological Organization (WMO) can be found in "ConfigConst
   WMO_DPT2M_LAPSE_RATE_K_per_M = 0.0012;
 
 Note that the lapse rate value depends on the units of temperature and elevation
-and the user is responsibile for defining it appropriately.
+and the user is responsible for defining it appropriately.
 
 All "lapse_rate_correction" entries can be set separately in each "obs.field" entry.
 
