@@ -31,12 +31,16 @@ jobs:
           username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
+      - name: Get METbaseimage
+        id: get_met_base_image
+        run: .github/jobs/get_met_base_image.sh
+
       - name: Build Docker Image
         run: .github/jobs/build_docker_image.sh
         env:
           SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}-lite
-          MET_BASE_REPO: met-base
-          MET_BASE_TAG: "13.0"
+          MET_BASE_REPO: ${{ steps.get_met_base_image.output.met_base_repo }}
+          MET_BASE_TAG: ${{ steps.get_met_base_image.output.met_base_tag }}
 
       - name: Push Docker Image
         run: .github/jobs/push_docker_image.sh

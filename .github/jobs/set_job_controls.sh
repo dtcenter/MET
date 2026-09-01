@@ -8,22 +8,6 @@ run_update_truth=false
 input_data_version=develop
 truth_data_version=develop
 
-# set constants for the MET base repository names (regular and unit test)
-MET_BASE_REPO_NAME=met-base
-MET_BASE_UNIT_REPO_NAME=met-base-unit-test
-
-# set MET base repo to regular repo by default for compilation check
-met_base_repo=${MET_BASE_REPO_NAME}
-
-# default MET base tag
-met_base_tag=13.0
-
-# override the MET base tag if set
-if [[ -n "${met_base_tag_override}" ]]; then
-    met_base_tag=${met_base_tag_override}
-fi
-
-
 if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
     
   # only run diff logic if pull request INTO 
@@ -133,21 +117,11 @@ if [ "$run_update_truth" == "true" ] ||
 
 fi
 
-# if running unit tests, use unit_test MET base image and push image
+# if running unit tests, push the image
 if [ "$run_unit_tests" == "true" ]; then
-
-  # set MET base repo to the unit test version to get the test tools
-  met_base_repo=${MET_BASE_UNIT_REPO_NAME}
 
   run_push=true
 
-fi
-
-# add -dev to the MET base repo if the tag does not start with a number
-# this assumes that met-base and met-base-unit-test tags start with a number and
-# development tags, e.g. branch names, do not
-if [[ ! ${met_base_tag} =~ ^[0-9] ]]; then
-  met_base_repo=${met_base_repo}-dev
 fi
 
 echo "run_compile=${run_compile}" >> $GITHUB_OUTPUT
@@ -155,8 +129,6 @@ echo "run_push=${run_push}" >> $GITHUB_OUTPUT
 echo "run_unit_tests=${run_unit_tests}" >> $GITHUB_OUTPUT
 echo "run_diff=${run_diff}" >> $GITHUB_OUTPUT
 echo "run_update_truth=${run_update_truth}" >> $GITHUB_OUTPUT
-echo "met_base_repo=${met_base_repo}" >> $GITHUB_OUTPUT
-echo "met_base_tag=${met_base_tag}" >> $GITHUB_OUTPUT
 echo "input_data_version=${input_data_version}" >> $GITHUB_OUTPUT
 echo "truth_data_version=${truth_data_version}" >> $GITHUB_OUTPUT
 
@@ -165,10 +137,19 @@ echo run_push: $run_push
 echo run_unit_tests: $run_unit_tests
 echo run_diff: $run_diff
 echo run_update_truth: $run_update_truth
-echo met_base_repo: $met_base_repo
-echo met_base_tag: $met_base_tag
 echo input_data_version: $input_data_version
 echo truth_data_version: $truth_data_version
+
+# check for development
+if [ "${run_unit_tests}" == "true" ]; then
+
+   export use_met_base_dev=true
+
+fi
+
+# get the METbaseimage repository and tag
+export run_unit_tests
+.github/jobs/get_met_base_image.sh
 
 # get name of branch
 .github/jobs/get_branch_name.sh
