@@ -158,17 +158,22 @@ bool VarInfoPython::set_dict(Dictionary & dict, bool do_exit) {
 
    //
    //  the "name" entry is required and specifies the python command to be run
-   //  store it as the ReqName
+   //  Python embedding logic reads it from ReqName while Zarr logic reads it
+   //  from Name
    //
 
-   ReqName = dict.lookup_string(conf_key_name, true);
+   Name = dict.lookup_string(conf_key_name, true);
+   ReqName = ReqName;
 
    //
-   //  the "level" entry is optional but is used when pairing U/V verification
-   //  tasks and is stored in LevelInfo::ReqName
+   //  the "level" entry is optional but is used when pairing U/V tasks
+   //  Python embedding logic reads it from ReqLevel while Zarr logic reads
+   //  it from Level
    //
 
-   Level.set_req_name(dict.lookup_string(conf_key_level, false, false).c_str());
+   ConcatString cs(dict.lookup_string(conf_key_level, false, false));
+   Level.set_name(cs.c_str());
+   Level.set_req_name(cs.c_str());
 
    //
    //  hard-code the magic string as PYTHON
