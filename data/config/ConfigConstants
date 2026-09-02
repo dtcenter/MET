@@ -161,6 +161,7 @@ AREA           = 3;
 // Point weight flag settings
 NONE           = 1;
 SID            = 2;
+KDE            = 3;
 
 // Duplicate flag settings
 NONE           = 1;

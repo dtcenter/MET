@@ -125,7 +125,7 @@ class VxPairDataPoint : public VxPairBase {
       void load_seeps_climo(const ConcatString &seeps_climo_name);
       void set_seeps_thresh(const SingleThresh &p1_thresh);
 
-      void add_point_obs(const float *, const char *, const char *,
+      bool add_point_obs(const float *, const char *, const char *,
                          unixtime, const char *, const float *,
                          const Grid &, const char *);
 };

@@ -80,7 +80,8 @@
 //   047    10/14/24  Halley Gotway  MET #2279 Add point_weight_flag option.
 //   048    10/15/24  Halley Gotway  MET #2893 Write individual pair OBTYPE.
 //   049    09/11/25  Halley Gotway  MET #3174 Orographic corrections.
-//   050    01/27/26  Halley Gotway  MET #3298 Add the FULL grid, if needed
+//   050    01/27/26  Halley Gotway  MET #3298 Add the FULL grid, if needed.
+//   051    05/12/26  Halley Gotway  MET #3335 Add point_weight_flag = KDE option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -860,7 +861,7 @@ static void process_point_vx() {
    for(int i=0; i<conf_info.get_n_vx(); i++) {
       conf_info.vx_opt[i].vx_pd.calc_obs_summary();
       conf_info.vx_opt[i].vx_pd.print_obs_summary();
-      conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_flag);
+      conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_info);
    }
 
    // Loop through each of the fields to be verified
@@ -1140,11 +1141,18 @@ static void process_point_obs(int i_nc) {
          for(int j=0; j<conf_info.get_n_vx(); j++) {
 
             // Attempt to add the observation to the vx_pd object
-            conf_info.vx_opt[j].vx_pd.add_point_obs(
-                    hdr_arr, hdr_typ_arr, hdr_typ_str.c_str(),
-                    hdr_sid_str.c_str(), hdr_ut,
-                    obs_qty_str.c_str(), obs_arr,
-                    grid, var_name.c_str());
+            if(conf_info.vx_opt[j].vx_pd.add_point_obs(
+                  hdr_arr, hdr_typ_arr, hdr_typ_str.c_str(),
+                  hdr_sid_str.c_str(), hdr_ut,
+                  obs_qty_str.c_str(), obs_arr,
+                  grid, var_name.c_str())) {
+
+               // Update point weight station id locations
+               if(conf_info.point_weight_info.need_sid()) {
+                  conf_info.point_weight_info.add_sid(
+                      hdr_sid_str, hdr_arr[0], hdr_arr[1]);
+               }
+            }
          }
       }
    } // end for i_start
@@ -1929,13 +1937,16 @@ static void setup_txt_files() {
    int  n_prob;
    int  max_col;
    int  max_n_ens;
-   ConcatString tmp_str;
+   ConcatString base_name;
 
    // Check to see if the text files have already been set up
    if(stat_at.nrows() > 0 || stat_at.ncols() > 0) return;
 
    // Create output file names for the stat file and optional text files
-   build_outfile_name(ens_valid_ut, "", tmp_str);
+   build_outfile_name(ens_valid_ut, "", base_name);
+
+   // Store the output point weight file information
+   conf_info.point_weight_info.set_weight_file_prefix(base_name);
 
    /////////////////////////////////////////////////////////////////////
    //
@@ -1974,7 +1985,7 @@ static void setup_txt_files() {
    stat_out = (ofstream *) nullptr;
 
    // Build the file name
-   stat_file << tmp_str << stat_file_ext;
+   stat_file << base_name << stat_file_ext;
 
    // Create the output STAT file
    open_txt_file(stat_out, stat_file.c_str());
@@ -2008,7 +2019,7 @@ static void setup_txt_files() {
          txt_out[i] = (ofstream *) nullptr;
 
          // Build the file name
-         txt_file[i] << tmp_str << "_" << txt_file_abbr[i]
+         txt_file[i] << base_name << "_" << txt_file_abbr[i]
                      << txt_file_ext;
 
          // Create the output text file
@@ -2860,6 +2871,9 @@ static void add_var_att_local(VarInfo *info, NcVar *nc_var, bool is_int,
 ////////////////////////////////////////////////////////////////////////
 
 static void finish_txt_files() {
+
+   // Write the point weight file
+   conf_info.point_weight_info.write_weights();
 
    // Write out the contents of the STAT AsciiTable and
    // close the STAT output files

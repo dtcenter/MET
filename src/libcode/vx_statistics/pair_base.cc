@@ -122,7 +122,7 @@ void PairBase::clear() {
    o_na.clear();
    x_na.clear();
    y_na.clear();
-   wgt_na.clear();      
+   wgt_na.clear();
    fcmn_na.clear();
    fcsd_na.clear();
    ocmn_na.clear();
@@ -175,7 +175,7 @@ void PairBase::erase() {
    o_na.erase();
    x_na.erase();
    y_na.erase();
-   wgt_na.erase();      
+   wgt_na.erase();
    fcmn_na.erase();
    fcsd_na.erase();
    ocmn_na.erase();
@@ -480,7 +480,7 @@ bool PairBase::add_point_obs(const char *typ, const char *sid,
       val.sid = string(sid);
       val.lat = lat;
       val.lon = lon;
-      val.elv = elv; 
+      val.elv = elv;
       val.x   = x;
       val.y   = y;
       val.wgt = wgt;
@@ -786,14 +786,13 @@ void PairBase::calc_obs_summary(){
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_point_weight(const PointWeightType wgt_flag) {
-
+void PairBase::set_point_weight(PointWeightInfo &info) {
    const char *method_name = "PairBase::set_point_weight() -> ";
 
-   if(!IsPointVx || wgt_flag == PointWeightType::None) return;
+   if(!IsPointVx || info.get_type() == PointWeightType::None) return;
 
    // Apply the SID point weight type
-   if(wgt_flag == PointWeightType::SID &&
+   if(info.get_type() == PointWeightType::SID &&
       mask_sid_ptr != nullptr) {
 
       mlog << Debug(4)
@@ -812,13 +811,40 @@ void PairBase::set_point_weight(const PointWeightType wgt_flag) {
       // Loop through the point observations
       for(int i_obs=0; i_obs<n_obs; i_obs++) {
 
-         double wgt; 
+         double wgt;
          if(mask_sid_ptr->has_sid(sid_sa[i_obs], wgt)) {
+            wgt_na.set(i_obs, wgt);
+
+            // Store the pre-computed SID weights
+            info.add_wgt(sid_sa[i_obs], wgt);
+         }
+         else {
+            mlog << Warning << "\n" << method_name
+                 << "no point weight SID match found for station id: "
+                 << sid_sa[i_obs] << "\n\n";
+         }
+      }
+   }
+   // Apply the KDE point weight type
+   else if(info.get_type() == PointWeightType::KDE) {
+
+      // Compute weights, if needed
+      info.compute_kde_weights();
+
+      mlog << Debug(4)
+           << "Applying KDE point weights computed using "
+           << info.n_stn() << " observation locations.\n";
+
+      // Loop through the point observations
+      for(int i_obs=0; i_obs<n_obs; i_obs++) {
+
+         double wgt;
+         if(info.has_sid(sid_sa[i_obs], wgt)) {
             wgt_na.set(i_obs, wgt);
          }
          else {
             mlog << Warning << "\n" << method_name
-                 << "no match found for station id: "
+                 << "no KDE point weight match found for station id: "
                  << sid_sa[i_obs] << "\n\n";
          }
       }
@@ -1576,14 +1602,14 @@ void VxPairBase::calc_obs_summary() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::set_point_weight(const PointWeightType wgt_flag) {
+void VxPairBase::set_point_weight(PointWeightInfo &info) {
 
    if(n_vx == 0) {
       mlog << Warning << "\nVxPairBase::set_point_weight() -> "
            << "set_size() has not been called yet!\n\n";
    }
 
-   for(auto &x : pb_ptr) x->set_point_weight(wgt_flag);
+   for(auto &x : pb_ptr) x->set_point_weight(info);
 
    return;
 }
@@ -2169,7 +2195,7 @@ bool VxPairBase::correct_lapse_rate(const char *pnt_obs_str,
    // Check for valid data
    if(is_bad_data(fcst_elv) || is_bad_data(obs_elv) ||
       is_bad_data(fcst_v)   || is_bad_data(obs_v)   ||
-      is_bad_data(sfc_info.lapse_rate_correction_value)) { 
+      is_bad_data(sfc_info.lapse_rate_correction_value)) {
 
       if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
          ConcatString cs;
@@ -2207,7 +2233,7 @@ bool VxPairBase::correct_lapse_rate(const char *pnt_obs_str,
            << "For station " << obs_sid_str << ", " << fcst_info->magic_str()
            << " versus " << obs_info->magic_str() << ", correcting the "
            << fieldtype_to_string(sfc_info.lapse_rate_correction_apply_to)
-           << " temperature from " << orig_v << " to " << corr_v 
+           << " temperature from " << orig_v << " to " << corr_v
            << " for forecast (" << fcst_elv << ") minus observation ("
            << obs_elv << ") elevation difference of "
            << fcst_elv - obs_elv << " and lapse rate value of "
@@ -2227,7 +2253,7 @@ bool VxPairBase::convert_msl_agl(const char *pnt_obs_str,
    const char *method_name = "PairBase::convert_msl_agl() -> ";
 
    // Check for no work to be done
-   if(sfc_info.msl_agl_conversion_apply_to   == FieldType::None || 
+   if(sfc_info.msl_agl_conversion_apply_to   == FieldType::None ||
       sfc_info.msl_agl_conversion_apply_from == FieldType::None) return true;
 
    // Apply forecast conversion
@@ -2328,7 +2354,7 @@ ClimoPntInfo VxPairBase::get_climo_pnt_info(
    double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                     obs_lvl : obs_hgt);
    int lvl_blw;
-   int lvl_abv; 
+   int lvl_abv;
 
    // Forecast climatology mean
    if(fcmn_dpa.n_planes() > 0) {
@@ -2619,8 +2645,8 @@ void get_interp_points(const DataPlaneArray &dpa,
 
       // Keep track of valid data count
       if(!is_bad_data(v)) n_vld++;
- 
-      // Store the current value     
+
+      // Store the current value
       interp_pnts.add(v);
 
    } // end for i

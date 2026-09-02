@@ -24,6 +24,7 @@
 //                                   climo support
 //   002    09/25/25  Halley Gotway  MET #3186 Censoring and conversion
 //   003    01/27/26  Halley Gotway  MET #3298 Add the FULL grid, if needed
+//   004    05/12/26  Halley Gotway  MET #3335 Add point_weight_flag = KDE option
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -126,7 +127,7 @@ int met_main(int argc, char *argv[]) {
    for(int i=0; i<conf_info.get_n_vx(); i++) {
       conf_info.vx_opt[i].vx_pd.calc_obs_summary();
       conf_info.vx_opt[i].vx_pd.print_obs_summary();
-      conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_flag);
+      conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_info);
    }
 
    // Compute the scores and write them out
@@ -255,6 +256,9 @@ static void setup_txt_files() {
 
    // Create output file names for the stat file and optional text files
    ConcatString base_name(build_outfile_name(""));
+
+   // Store the output point weight file information
+   conf_info.point_weight_info.set_weight_file_prefix(base_name);
 
    /////////////////////////////////////////////////////////////////////
    //
@@ -684,6 +688,8 @@ static void process_ioda_pairs(const ConcatString &file_name) {
          }
       }
    }
+
+   // JHG HERE
 
    mlog << Debug(3) << "Keeping " << n_keep << " of " << n_read
         << " IODA pairs from \"" << file_name << "\".\n";
@@ -1461,6 +1467,9 @@ static void do_pct(const PairStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 static void finish_txt_files() {
+
+   // Write the point weight file
+   conf_info.point_weight_info.write_weights();
 
    // Write out the contents of the STAT AsciiTable and
    // close the STAT output files

@@ -39,6 +39,9 @@ wind_thresh = [ NA ];
 wind_logic  = UNION;
 eclv_points = 0.05;
 
+duplicate_flag = NONE;
+rank_corr_flag = TRUE;
+
 fcst = {
    sid_inc = [];
    sid_exc = [];
@@ -57,9 +60,9 @@ obs = fcst;
 ////////////////////////////////////////////////////////////////////////////////
 
 mask = {
-   grid  = [];
+   grid  = [ ${MASK_GRID} ];
    poly  = [];
-   sid   = [ "${CONFIG_DIR}/SID_CONUS_ADPUPA_ELEV.txt" ];
+   sid   = [ ${MASK_SID} ];
    llpnt = [];
 }
 
@@ -101,6 +104,13 @@ hira = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// Threshold for SEEPS p1 (Probability of being dry)
+//
+seeps_p1_thresh = NA;
+
+////////////////////////////////////////////////////////////////////////////////
+
 output_flag = {
    fho    = NONE;
    ctc    = STAT;
@@ -127,16 +137,12 @@ output_flag = {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Threshold for SEEPS p1 (Probability of being dry)
-
-seeps_p1_thresh = NA;
-
-////////////////////////////////////////////////////////////////////////////////
-
-duplicate_flag = NONE;
-rank_corr_flag = TRUE;
 
 point_weight_flag = ${POINT_WEIGHT};
+kde_ref_angle     = 5.0;
+write_weights     = TRUE;
+
+////////////////////////////////////////////////////////////////////////////////
 
 tmp_dir       = "/tmp";
 output_prefix = "${OUTPUT_PREFIX}";

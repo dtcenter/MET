@@ -187,6 +187,8 @@ ____________________
   obtype_as_group_val_flag = FALSE;
   grid_weight_flag         = NONE;
   point_weight_flag        = NONE;
+  kde_ref_angle            = 0.75;
+  write_weights            = FALSE;
   output_prefix            = "";
   version                  = "VN.N";
 
