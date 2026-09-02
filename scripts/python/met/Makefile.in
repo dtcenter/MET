@@ -308,6 +308,7 @@ pythonmetscriptsdir = $(pkgdatadir)/python/met
 pythonmetscripts_DATA = \
 	logger.py \
 	dataplane.py \
+	grid.py \
 	mprbase.py \
 	point_nc.py \
 	point.py

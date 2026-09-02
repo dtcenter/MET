@@ -31,19 +31,21 @@
 #  Otherwise, detection tries the following, in order, using the first
 #  one that applies:
 #
-#     1) a plain latitude/longitude grid, from 1D lat/lon coordinates
+#     1) from 1D lat/lon coordinates: a LatLon, Gaussian, or Mercator
+#        grid, whichever the latitude coordinate's spacing matches
+#        (see met.grid's met_grid_tools.derive_grid())
 #     2) a Lambert Conformal Conic grid, from a CF "grid_mapping"
 #        variable (see build_lambert_conformal_grid())
 #     3) a Lambert Conformal Conic grid, from a general-purpose CRS
 #        attribute -- rioxarray's crs_wkt/spatial_ref, or the GeoZarr
 #        proposal's proj:wkt2/proj:projjson/proj:code (see
 #        find_proj_crs()). Needs pyproj, imported lazily.
-#     4) otherwise, if 2D lat/lon coordinates are present, the
-#        projection is recovered numerically (see
-#        fit_lambert_conformal_grid()). Needs SciPy, and assumes a
-#        fixed spherical earth radius (DEFAULT_EARTH_RADIUS_KM below).
-#        Prints a ready-to-use set_attr_grid config line so future
-#        runs can skip the fit (see suggest_set_attr_grid()).
+#     4) otherwise, if 2D lat/lon coordinates are present: a Lambert
+#        Conformal Conic or Polar Stereographic grid, whichever fits
+#        better (again via met.grid's derive_grid()). Needs SciPy.
+#        Either of met.grid's grid detection methods (1 or 4) also
+#        logs a ready-to-use set_attr_grid config line so future runs
+#        can skip it.
 #
 #  Ensemble data, distributed/cloud-optimized reads, and other
 #  projections are out of scope for this initial phase.
@@ -56,6 +58,7 @@ import xarray as xr
 import datetime as dt
 
 from met.dataplane import dataplane
+from met.grid import met_grid_tools
 
 ########################################################################
 
@@ -75,11 +78,6 @@ Y_NAMES    = ['y', 'projection_y_coordinate']
 INIT_NAMES = ['time', 'init_time', 'reftime', 'forecast_reference_time']
 LEAD_NAMES = ['lead_time', 'step', 'forecast_period']
 LEV_NAMES  = ['level', 'isobaricInhPa', 'plev', 'pressure']
-
-# standard MET/GRIB spherical earth radius, in km; used as a fixed
-# assumption when numerically fitting a projection (see
-# fit_lambert_conformal_grid())
-DEFAULT_EARTH_RADIUS_KM = 6371.2
 
 def find_name(da_or_ds, candidates):
    # first name from candidates that is a coordinate or dimension of
@@ -144,10 +142,10 @@ set_attr_grid_specified = (set_attr_grid_flag == '1')
 
 log("Input File:\t" + repr(input_file))
 log("Init Time:\t" + repr(init_time_in))
-log("Lead Time (hr):" + repr(lead_time_in))
+log("Lead Time (hr):\t" + repr(lead_time_in))
 log("Variable:\t" + repr(var_name))
-log("Level:\t\t" + repr(level_in))
-log("set_attr_grid:\t" + repr(set_attr_grid_specified))
+log("Level:\t" + repr(level_in))
+log("set_attr_grid configured:\t" + repr(set_attr_grid_specified))
 
 try:
    init_time  = dt.datetime.strptime(init_time_in, '%Y%m%d_%H%M%S')
@@ -167,7 +165,7 @@ except Exception as ex:
 ########################################################################
 
 try:
-   ds = xr.open_zarr(input_file, decode_timedelta=True)
+   ds = xr.open_zarr(input_file)
 except Exception as ex:
    dataplane.quit(
       f"read_zarr_dataplane.py -> Unable to open '{input_file}' as a "
@@ -266,50 +264,6 @@ if da.ndim != 2:
 #
 ########################################################################
 
-def build_latlon_grid(da, lat_name, lon_name):
-   lat = np.asarray(da[lat_name].values)
-   lon = np.asarray(da[lon_name].values)
-
-   if lat.ndim != 1 or lon.ndim != 1:
-      dataplane.quit(
-         "read_zarr_dataplane.py -> latitude/longitude coordinates must "
-         "be 1-dimensional to build a LatLon grid")
-
-   dlat = np.diff(lat)
-   dlon = np.diff(lon)
-
-   if lat.size < 2 or lon.size < 2 or \
-      not np.allclose(dlat, dlat[0], rtol=1e-3) or \
-      not np.allclose(dlon, dlon[0], rtol=1e-3):
-      dataplane.quit(
-         "read_zarr_dataplane.py -> latitude/longitude coordinates are "
-         "not regularly spaced; only regular LatLon grids are supported "
-         "in this initial release")
-
-   # lat_ll is whichever end of the (monotonic) coordinate is
-   # southernmost
-   descending = dlat[0] < 0
-   lat_ll = float(lat[-1] if descending else lat[0])
-
-   # load_numpy() in dataplane_from_numpy_array.hpp maps numpy row r
-   # to DataPlane row (Ny - 1 - r), so row 0 must be the row farthest
-   # from the pin (south); flip when the coordinate is ascending
-   flip_row = not descending   # i.e. flip_row == (dlat[0] > 0)
-
-   grid = {
-      'type':      'LatLon',
-      'name':      'ZarrLatLon',
-      'lat_ll':    lat_ll,
-      'lon_ll':    float(lon[0]),
-      'delta_lat': float(abs(dlat[0])),
-      'delta_lon': float(abs(dlon[0])),
-      'Nlat':      int(lat.size),
-      'Nlon':      int(lon.size),
-   }
-
-   return grid, flip_row
-
-
 def _lambert_conformal_grid_from_params(ds, da, x_name, y_name, grid_name,
                                         scale_lat_1, scale_lat_2, lat_origin,
                                         lon_orient, earth_radius_m):
@@ -358,7 +312,9 @@ def _lambert_conformal_grid_from_params(ds, da, x_name, y_name, grid_name,
          "read_zarr_dataplane.py -> expected 2D latitude/longitude "
          "auxiliary coordinate arrays for a Lambert Conformal grid")
 
-   # see the row-orientation note in build_latlon_grid() above
+   # load_numpy() in dataplane_from_numpy_array.hpp maps numpy row r
+   # to DataPlane row (Ny - 1 - r), so row 0 must be the row farthest
+   # from the pin (south); flip when y is ascending
    flip_row = not descending_y   # i.e. flip_row == (dy[0] > 0)
 
    grid = {
@@ -538,176 +494,6 @@ def build_lambert_conformal_grid_from_crs(ds, da, x_name, y_name, crs,
       lon_orient=lon_0, earth_radius_m=earth_radius_m)
 
 
-def _lcc_forward(lat_deg, lon_deg, n, lon0_deg, r_km):
-   # spherical, tangent-case Lambert Conformal Conic forward
-   # projection (Snyder 1987); n is the cone constant, tangent
-   # standard parallel is asin(n)
-   lat  = np.radians(lat_deg)
-   lon  = np.radians(lon_deg)
-   lon0 = np.radians(lon0_deg)
-   lat0 = np.arcsin(np.clip(n, -0.999999, 0.999999))
-
-   F    = np.cos(lat0) * np.power(np.tan(np.pi / 4.0 + lat0 / 2.0), n) / n
-   rho  = r_km * F / np.power(np.tan(np.pi / 4.0 + lat  / 2.0), n)
-   rho0 = r_km * F / np.power(np.tan(np.pi / 4.0 + lat0 / 2.0), n)
-
-   theta = n * (lon - lon0)
-
-   x = rho * np.sin(theta)
-   y = rho0 - rho * np.cos(theta)
-
-   return x, y
-
-
-def _lcc_grid_regularity_sse(params, lat2d, lon2d):
-   # objective for the fit below: project with trial (n, lon0) and
-   # measure how far the result is from a regular Cartesian grid;
-   # zero at the true projection parameters
-   n, lon0_deg = params
-
-   if not (-0.999 < n < 0.999) or abs(n) < 1e-6:
-      return 1.0e12
-
-   x, y = _lcc_forward(lat2d, lon2d, n, lon0_deg, DEFAULT_EARTH_RADIUS_KM)
-
-   ny, nx = lat2d.shape
-   ii, jj = np.mgrid[0:ny, 0:nx]
-
-   A_x = np.column_stack([np.ones(jj.size), jj.ravel().astype(float)])
-   A_y = np.column_stack([np.ones(ii.size), ii.ravel().astype(float)])
-
-   coef_x, *_ = np.linalg.lstsq(A_x, x.ravel(), rcond=None)
-   coef_y, *_ = np.linalg.lstsq(A_y, y.ravel(), rcond=None)
-
-   return float(np.sum((x.ravel() - A_x @ coef_x) ** 2) +
-               np.sum((y.ravel() - A_y @ coef_y) ** 2))
-
-
-def fit_lambert_conformal_grid(da, lat_name, lon_name):
-   # recover an LCC grid definition from a 2D lat/lon coordinate field
-   # with no CF grid_mapping (or other CRS) metadata: fit the cone
-   # constant and central meridian by searching for the projection
-   # under which the data forms a regular Cartesian grid, then read
-   # the pin point off the real coordinate data and the spacing off
-   # the fit
-
-   try:
-      from scipy.optimize import minimize
-   except ImportError:
-      dataplane.quit(
-         "read_zarr_dataplane.py -> this variable has 2D latitude/"
-         "longitude coordinates with no CF grid_mapping metadata; "
-         "recovering the projection numerically requires SciPy, which "
-         "is not installed in this Python environment")
-
-   lat2d = np.asarray(da[lat_name].values, dtype=float)
-   lon2d = np.asarray(da[lon_name].values, dtype=float)
-
-   if lat2d.ndim != 2 or lon2d.ndim != 2 or lat2d.shape != lon2d.shape:
-      dataplane.quit(
-         "read_zarr_dataplane.py -> expected matching 2D latitude/"
-         "longitude coordinate arrays to fit a projection")
-
-   ny, nx = lat2d.shape
-
-   if ny < 3 or nx < 3:
-      dataplane.quit(
-         "read_zarr_dataplane.py -> grid is too small "
-         f"({ny} x {nx}) to reliably fit a projection")
-
-   n0     = float(np.sin(np.radians(np.nanmedian(lat2d))))
-   lon0_0 = float(np.nanmedian(lon2d))
-
-   log("No CF grid_mapping metadata found; fitting a Lambert "
-       f"Conformal projection to the {ny}x{nx} 2D lat/lon field "
-       f"instead (assuming a {DEFAULT_EARTH_RADIUS_KM} km spherical "
-       "earth radius, the standard MET/GRIB convention)")
-
-   result = minimize(
-      _lcc_grid_regularity_sse, x0=[n0, lon0_0], args=(lat2d, lon2d),
-      method='Nelder-Mead',
-      options={'xatol': 1e-10, 'fatol': 1e-8, 'maxiter': 20000})
-
-   n_fit, lon0_fit = result.x
-
-   x, y = _lcc_forward(lat2d, lon2d, n_fit, lon0_fit, DEFAULT_EARTH_RADIUS_KM)
-   ii, jj = np.mgrid[0:ny, 0:nx]
-   A_x = np.column_stack([np.ones(jj.size), jj.ravel().astype(float)])
-   A_y = np.column_stack([np.ones(ii.size), ii.ravel().astype(float)])
-   coef_x, *_ = np.linalg.lstsq(A_x, x.ravel(), rcond=None)
-   coef_y, *_ = np.linalg.lstsq(A_y, y.ravel(), rcond=None)
-
-   dx, dy = float(coef_x[1]), float(coef_y[1])
-
-   pred_x = (A_x @ coef_x).reshape(ny, nx)
-   pred_y = (A_y @ coef_y).reshape(ny, nx)
-   max_err_km = float(np.max(np.hypot(x - pred_x, y - pred_y)))
-   cell_km = float((abs(dx) + abs(dy)) / 2.0)
-
-   scale_lat = float(np.degrees(np.arcsin(np.clip(n_fit, -1.0, 1.0))))
-
-   log(f"Lambert Conformal fit: standard parallel "
-       f"{scale_lat:.4f} deg, central meridian {lon0_fit % 360:.4f} "
-       f"deg, dx={dx:.4f} km, dy={dy:.4f} km, "
-       f"max residual={max_err_km:.4f} km")
-
-   # a large residual means this grid likely isn't a Lambert
-   # Conformal projection (or needs a different earth radius)
-   if not np.isfinite(max_err_km) or not result.success or \
-      max_err_km > 0.1 * cell_km:
-      dataplane.quit(
-         "read_zarr_dataplane.py -> could not fit a Lambert Conformal "
-         f"projection to this grid (max residual {max_err_km:.4f} km "
-         f"against a {cell_km:.4f} km grid cell); this grid may not "
-         "be a Lambert Conformal projection, or may need a different "
-         f"earth radius than the default {DEFAULT_EARTH_RADIUS_KM} km")
-
-   if abs(dx) < 1e-9 or abs(dy) < 1e-9 or \
-      abs(abs(dx) - abs(dy)) > 0.05 * cell_km:
-      dataplane.quit(
-         "read_zarr_dataplane.py -> fitted grid spacing is not square "
-         f"(dx={dx:.4f} km, dy={dy:.4f} km); non-square Lambert "
-         "Conformal grids are not supported")
-
-   # same pin-point and row-orientation convention as
-   # _lambert_conformal_grid_from_params() above
-   descending_y = dy < 0
-   y_idx = -1 if descending_y else 0
-   flip_row = not descending_y   # i.e. flip_row == (dy > 0)
-
-   grid = {
-      'type':        'Lambert Conformal',
-      'name':        'ZarrLambertConformalFit',
-      'hemisphere':  'N' if scale_lat >= 0 else 'S',
-      'scale_lat_1': scale_lat,
-      'scale_lat_2': scale_lat,
-      'lat_pin':     float(lat2d[y_idx, 0]),
-      'lon_pin':     float(lon2d[y_idx, 0]),
-      'x_pin':       0.0,
-      'y_pin':       0.0,
-      'lon_orient':  float(lon0_fit % 360.0),
-      'd_km':        cell_km,
-      'r_km':        DEFAULT_EARTH_RADIUS_KM,
-      'nx':          int(nx),
-      'ny':          int(ny),
-   }
-
-   return grid, flip_row
-
-
-def detect_flip_row(da, lat_name):
-   # cheaply determine whether the array needs its rows reversed
-   # (see the row-orientation note in build_latlon_grid()), by
-   # comparing the first and last row of the latitude coordinate;
-   # works for both 1D and 2D latitude coordinates and needs no grid
-   # definition. Used even when set_attr_grid overrides the grid,
-   # since it never reorders the array data itself.
-   lat = np.asarray(da[lat_name].values)
-   first, last = (float(lat[0]), float(lat[-1])) if lat.ndim == 1 \
-      else (float(lat[0, 0]), float(lat[-1, 0]))
-   return first < last
-
-
 def build_placeholder_grid(ny, nx):
    # minimal, throwaway LatLon grid used only to satisfy
    # dataplane_from_numpy_array.cc's dimension check; geolocation is
@@ -725,27 +511,12 @@ def build_placeholder_grid(ny, nx):
    }
 
 
-def suggest_set_attr_grid(grid):
-   # format a fitted LCC grid dictionary as a ready-to-use
-   # set_attr_grid config line (grid-spec string format, see
-   # docs/Users_Guide/appendixB.rst); no unit conversion needed since
-   # find_grid_by_name.cc's parse_lambert_grid() uses the same
-   # lat_pin/lon_pin/(x_pin,y_pin)=(0,0) convention as this script
-   parts = ['lambert', str(grid['nx']), str(grid['ny']),
-            f"{grid['lat_pin']:.6f}", f"{grid['lon_pin']:.6f}",
-            f"{grid['lon_orient']:.6f}", f"{grid['d_km']:.6f}",
-            f"{grid['r_km']:.6f}", f"{grid['scale_lat_1']:.6f}"]
-   if abs(grid['scale_lat_2'] - grid['scale_lat_1']) > 1.0e-9:
-      parts.append(f"{grid['scale_lat_2']:.6f}")
-   parts.append(grid['hemisphere'])
-   return 'set_attr_grid = "' + ' '.join(parts) + '";'
-
-
 lat_name = find_name(da, LAT_NAMES)
 lon_name = find_name(da, LON_NAMES)
 
 grid = None
 flip_row = False
+flip_col = False
 
 ny, nx = da.shape
 
@@ -754,7 +525,10 @@ if set_attr_grid_specified:
    # MET will discard whatever grid this script returns and
    # substitute the configured one, checking only that the dimensions
    # match, so skip automatic grid detection; row orientation still
-   # needs to be right, since set_attr_grid doesn't reorder the array
+   # needs to be right, since set_attr_grid doesn't reorder the array.
+   # Column order is only ever a concern for a Gaussian target grid
+   # (see met.grid); this shortcut can't tell what type was
+   # configured, so it doesn't attempt a flip_col here.
    log("set_attr_grid is configured for this field; skipping automatic "
        "grid detection and returning a placeholder grid. MET will "
        "apply the configured set_attr_grid override and confirm its "
@@ -762,7 +536,7 @@ if set_attr_grid_specified:
        "Nx x Ny).")
 
    if lat_name is not None:
-      flip_row = detect_flip_row(da, lat_name)
+      flip_row = met_grid_tools.detect_flip_row(da[lat_name].values)
    else:
       flip_row = False
       log("Warning: no latitude coordinate was found to confirm row "
@@ -776,7 +550,8 @@ if set_attr_grid_specified:
 elif lat_name is not None and lon_name is not None and \
      getattr(da[lat_name], 'ndim', 2) == 1:
 
-   grid, flip_row = build_latlon_grid(da, lat_name, lon_name)
+   grid, flip_row, flip_col = met_grid_tools.derive_grid(
+      da[lat_name].values, da[lon_name].values)
 
 else:
    # steps 2-4 (CF grid_mapping -> CRS attributes -> numeric fit),
@@ -833,15 +608,12 @@ else:
       elif lat_name is not None and lon_name is not None and \
            getattr(da[lat_name], 'ndim', None) == 2:
 
-         grid, flip_row = fit_lambert_conformal_grid(da, lat_name, lon_name)
+         log("No CF grid_mapping or recognized CRS metadata was found; "
+             "falling back to fitting a projection numerically from the "
+             "2D latitude/longitude coordinates")
 
-         log("This grid was derived automatically from the 2D latitude/"
-             "longitude coordinates because set_attr_grid is not "
-             "configured for this field, and no CF grid_mapping or "
-             "recognized CRS metadata was found.")
-         log("Add the following configuration option to skip this fit "
-             "in future runs:")
-         log("\t" + suggest_set_attr_grid(grid))
+         grid, flip_row, flip_col = met_grid_tools.derive_grid(
+            da[lat_name].values, da[lon_name].values)
 
       else:
          reason = ""
@@ -869,6 +641,9 @@ met_data_2d = np.asarray(da.values)
 
 if flip_row:
    met_data_2d = met_data_2d[::-1, :]
+
+if flip_col:
+   met_data_2d = met_data_2d[:, ::-1]
 
 units     = da.attrs.get('units', 'NA')
 long_name = da.attrs.get('long_name', var_name)

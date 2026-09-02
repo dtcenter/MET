@@ -211,8 +211,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
 
 #ifdef WITH_PYTHON
       //
-      // Set MET_PYTHON_INPUT_ARG environment variable for python
-      // types, including Zarr
+      // Set MET_PYTHON_INPUT_ARG for python types, including Zarr
       //
       if(type == FileType_Python_Numpy ||
          type == FileType_Python_Xarray ||
