@@ -24,31 +24,31 @@
 #                         is set for this field, "0" otherwise (see
 #                         VarInfo::grid_attr())
 #
-#  Grid support (per MET issue #3340, initial phase). If set_attr_grid
-#  is configured, grid detection below is skipped and a placeholder
-#  grid matching the data's own shape is returned instead; MET
-#  substitutes the real grid and checks the dimensions itself.
-#  Otherwise, detection tries the following, in order, using the first
-#  one that applies:
+#  Grid support (per MET issue #3340). If set_attr_grid is configured,
+#  grid detection below is skipped and a placeholder grid matching the
+#  data's own shape is returned instead; MET substitutes the real grid
+#  and checks the dimensions itself. Otherwise, detection tries the
+#  following, in order, using the first one that applies:
 #
-#     1) from 1D lat/lon coordinates: a LatLon, Gaussian, or Mercator
+#     1) from a CF "grid_mapping" variable: LatLon, Mercator, Lambert
+#        Conformal Conic, Lambert Azimuthal Equal Area, Polar
+#        Stereographic, or Rotated LatLon (via
+#        met_grid_tools.grid_from_cf_mapping())
+#     2) from a general-purpose CRS attribute -- rioxarray's
+#        crs_wkt/spatial_ref, or the GeoZarr proposal's
+#        proj:wkt2/proj:projjson/proj:code -- supporting the same
+#        projection families as step 1 (via
+#        met_grid_tools.find_proj_crs() + grid_from_crs()). Needs
+#        pyproj, imported lazily.
+#     3) from 1D lat/lon coordinates: a LatLon, Gaussian, or Mercator
 #        grid, whichever the latitude coordinate's spacing matches
 #        (see met.grid's met_grid_tools.derive_grid())
-#     2) a Lambert Conformal Conic grid, from a CF "grid_mapping"
-#        variable (see build_lambert_conformal_grid())
-#     3) a Lambert Conformal Conic grid, from a general-purpose CRS
-#        attribute -- rioxarray's crs_wkt/spatial_ref, or the GeoZarr
-#        proposal's proj:wkt2/proj:projjson/proj:code (see
-#        find_proj_crs()). Needs pyproj, imported lazily.
-#     4) otherwise, if 2D lat/lon coordinates are present: a Lambert
-#        Conformal Conic or Polar Stereographic grid, whichever fits
-#        better (again via met.grid's derive_grid()). Needs SciPy.
-#        Either of met.grid's grid detection methods (1 or 4) also
-#        logs a ready-to-use set_attr_grid config line so future runs
-#        can skip it.
-#
-#  Ensemble data, distributed/cloud-optimized reads, and other
-#  projections are out of scope for this initial phase.
+#     4) otherwise, if 2D lat/lon coordinates are present: Lambert
+#        Conformal Conic, Polar Stereographic, Lambert Azimuthal Equal
+#        Area, or Rotated LatLon, whichever fits best (again via
+#        met.grid's derive_grid()). Needs SciPy. Either of met.grid's
+#        grid detection methods (3 or 4) also logs a ready-to-use
+#        set_attr_grid config line so future runs can skip it.
 #
 ########################################################################
 
@@ -73,6 +73,8 @@ def log(msg):
 
 LAT_NAMES  = ['latitude', 'lat']
 LON_NAMES  = ['longitude', 'lon']
+RLAT_NAMES = ['rlat', 'grid_latitude',  'rlatitude']
+RLON_NAMES = ['rlon', 'grid_longitude', 'rlongitude']
 X_NAMES    = ['x', 'projection_x_coordinate']
 Y_NAMES    = ['y', 'projection_y_coordinate']
 INIT_NAMES = ['time', 'init_time', 'reftime', 'forecast_reference_time']
@@ -260,238 +262,10 @@ if da.ndim != 2:
 
 ########################################################################
 #
-#  build the MET grid dictionary from the dataset's CF metadata
+#  build the MET grid dictionary from the dataset's CF/CRS metadata
+#  (all projection logic lives in met.grid.met_grid_tools)
 #
 ########################################################################
-
-def _lambert_conformal_grid_from_params(ds, da, x_name, y_name, grid_name,
-                                        scale_lat_1, scale_lat_2, lat_origin,
-                                        lon_orient, earth_radius_m):
-   # shared grid-dictionary builder for both Lambert Conformal
-   # detection paths (CF grid_mapping and general-purpose CRS); they
-   # differ only in where the projection parameters came from
-   x = np.asarray(da[x_name].values)
-   y = np.asarray(da[y_name].values)
-
-   if x.ndim != 1 or y.ndim != 1:
-      dataplane.quit(
-         "read_zarr_dataplane.py -> projected x/y coordinates must be "
-         "1-dimensional to build a Lambert Conformal grid")
-
-   dx = np.diff(x)
-   dy = np.diff(y)
-
-   if x.size < 2 or y.size < 2 or \
-      not np.allclose(dx, dx[0], rtol=1e-3) or \
-      not np.allclose(dy, dy[0], rtol=1e-3):
-      dataplane.quit(
-         "read_zarr_dataplane.py -> projected x/y coordinates are not "
-         "regularly spaced")
-
-   # read the pin point off the 2D lat/lon auxiliary coordinates
-   # directly, rather than re-deriving it through a reprojection
-   lat2d_name = find_name(ds, LAT_NAMES)
-   lon2d_name = find_name(ds, LON_NAMES)
-
-   if lat2d_name is None or lon2d_name is None:
-      dataplane.quit(
-         "read_zarr_dataplane.py -> a Lambert Conformal grid requires 2D "
-         "latitude/longitude auxiliary coordinate variables; none were "
-         "found in the store")
-
-   # pin point (x_pin, y_pin) = (0, 0) is the grid's south-west corner;
-   # whichever row has the smallest y is the pin row
-   descending_y = dy[0] < 0
-   y_idx = -1 if descending_y else 0
-
-   lat2d = np.asarray(ds[lat2d_name].values)
-   lon2d = np.asarray(ds[lon2d_name].values)
-
-   if lat2d.ndim != 2 or lon2d.ndim != 2:
-      dataplane.quit(
-         "read_zarr_dataplane.py -> expected 2D latitude/longitude "
-         "auxiliary coordinate arrays for a Lambert Conformal grid")
-
-   # load_numpy() in dataplane_from_numpy_array.hpp maps numpy row r
-   # to DataPlane row (Ny - 1 - r), so row 0 must be the row farthest
-   # from the pin (south); flip when y is ascending
-   flip_row = not descending_y   # i.e. flip_row == (dy[0] > 0)
-
-   grid = {
-      'type':        'Lambert Conformal',
-      'name':        grid_name,
-      'hemisphere':  'N' if lat_origin >= 0 else 'S',
-      'scale_lat_1': float(scale_lat_1),
-      'scale_lat_2': float(scale_lat_2),
-      'lat_pin':     float(lat2d[y_idx, 0]),
-      'lon_pin':     float(lon2d[y_idx, 0]),
-      'x_pin':       0.0,
-      'y_pin':       0.0,
-      'lon_orient':  float(lon_orient),
-      'd_km':        float(abs(dx[0])) / 1000.0,
-      'r_km':        float(earth_radius_m) / 1000.0,
-      'nx':          int(x.size),
-      'ny':          int(y.size),
-   }
-
-   return grid, flip_row
-
-
-def build_lambert_conformal_grid(ds, da, x_name, y_name, cf_var):
-   if 'standard_parallel' not in cf_var.attrs or \
-      'longitude_of_central_meridian' not in cf_var.attrs:
-      dataplane.quit(
-         f"read_zarr_dataplane.py -> the '{cf_var.name}' grid_mapping "
-         "variable is missing required lambert_conformal_conic "
-         "attributes (standard_parallel, longitude_of_central_meridian)")
-
-   std_parallel = np.atleast_1d(cf_var.attrs['standard_parallel']).astype(float)
-   lat_origin = float(cf_var.attrs.get('latitude_of_projection_origin',
-                                       std_parallel[0]))
-   earth_radius_m = float(cf_var.attrs.get(
-      'earth_radius', cf_var.attrs.get('semi_major_axis', 6371229.0)))
-
-   return _lambert_conformal_grid_from_params(
-      ds, da, x_name, y_name, 'ZarrLambertConformal',
-      scale_lat_1=std_parallel[0], scale_lat_2=std_parallel[-1],
-      lat_origin=lat_origin,
-      lon_orient=cf_var.attrs['longitude_of_central_meridian'],
-      earth_radius_m=earth_radius_m)
-
-
-########################################################################
-#
-#  general-purpose CRS metadata support (step 3: rioxarray / GeoZarr)
-#
-########################################################################
-
-# rioxarray's de facto convention first, then the GeoZarr proposal's
-# attributes, most to least completely specified
-PROJ_CRS_ATTR_KEYS = ['crs_wkt', 'spatial_ref', 'proj:wkt2', 'proj:projjson',
-                      'proj:code']
-
-
-def _crs_from_attrs(pyproj_mod, attrs, source_desc):
-   # try each key in PROJ_CRS_ATTR_KEYS and return the first that
-   # parses as a pyproj CRS, plus which key it came from; a malformed
-   # attribute logs a warning rather than blocking a later fallback
-   for key in PROJ_CRS_ATTR_KEYS:
-      if key not in attrs:
-         continue
-      value = attrs[key]
-      try:
-         if key == 'proj:projjson':
-            crs = pyproj_mod.CRS.from_json_dict(value) \
-               if isinstance(value, dict) else pyproj_mod.CRS.from_json(value)
-         else:
-            crs = pyproj_mod.CRS.from_user_input(value)
-         return crs, key
-      except Exception as ex:
-         log(f"Found a '{key}' attribute in {source_desc} but could not "
-             f"parse it as a CRS: {ex}")
-
-   return None, None
-
-
-def find_proj_crs(ds, da):
-   # look for CRS metadata under the rioxarray or GeoZarr conventions:
-   # a grid_mapping variable, a bare 'spatial_ref' coordinate, or
-   # proj:* attributes on the data variable or dataset. Returns
-   # (pyproj.CRS, source description) for the first match, or
-   # (None, None). pyproj is imported lazily so it stays optional.
-
-   candidates = []
-
-   grid_mapping_name = da.attrs.get('grid_mapping')
-   if grid_mapping_name and grid_mapping_name in ds.variables:
-      candidates.append((ds[grid_mapping_name].attrs,
-                          f"the '{grid_mapping_name}' grid_mapping variable"))
-
-   if 'spatial_ref' in ds.variables and grid_mapping_name != 'spatial_ref':
-      candidates.append((ds['spatial_ref'].attrs,
-                          "the 'spatial_ref' coordinate variable"))
-
-   candidates.append((da.attrs, f"the '{da.name}' variable's attributes"))
-   candidates.append((ds.attrs, "the dataset's global attributes"))
-
-   if not any(key in attrs for attrs, _ in candidates
-              for key in PROJ_CRS_ATTR_KEYS):
-      return None, None
-
-   try:
-      import pyproj
-   except ImportError:
-      log("Found crs_wkt/spatial_ref/proj:* attributes, but pyproj is "
-          "not installed in this Python environment, so they can't be "
-          "used; continuing on to the next grid-detection method")
-      return None, None
-
-   for attrs, source_desc in candidates:
-      crs, key = _crs_from_attrs(pyproj, attrs, source_desc)
-      if crs is not None:
-         return crs, f"{source_desc} ('{key}')"
-
-   return None, None
-
-
-def _is_lambert_conformal(crs):
-   try:
-      if crs.to_dict().get('proj') == 'lcc':
-         return True
-   except Exception:
-      pass
-   try:
-      if crs.coordinate_operation is not None:
-         return 'lambert conformal conic' in \
-            (crs.coordinate_operation.method_name or '').lower()
-   except Exception:
-      pass
-   return False
-
-
-def _lcc_params_from_crs(crs):
-   # extract LCC parameters from a pyproj CRS in proj4-style terms;
-   # lat_2 defaults to lat_1 (tangent, single-standard-parallel case)
-   d = crs.to_dict()
-
-   lat_1 = d.get('lat_1', d.get('lat_0'))
-   lat_2 = d.get('lat_2', lat_1)
-   lat_0 = d.get('lat_0', lat_1)
-   lon_0 = d.get('lon_0')
-
-   if lat_1 is None or lon_0 is None:
-      dataplane.quit(
-         "read_zarr_dataplane.py -> found a Lambert Conformal Conic CRS "
-         "but could not read its standard parallel / central meridian "
-         f"parameters from it (parsed parameters: {d})")
-
-   # prefer an explicit spherical radius ('R'), else the ellipsoid's
-   # semi-major axis, else the standard MET/GRIB sphere
-   earth_radius_m = d.get('R')
-   if earth_radius_m is None:
-      try:
-         earth_radius_m = crs.ellipsoid.semi_major_metre
-      except Exception:
-         earth_radius_m = None
-   if earth_radius_m is None:
-      earth_radius_m = 6371229.0
-
-   return float(lat_1), float(lat_2), float(lat_0), float(lon_0), \
-      float(earth_radius_m)
-
-
-def build_lambert_conformal_grid_from_crs(ds, da, x_name, y_name, crs,
-                                          source_desc):
-   lat_1, lat_2, lat_0, lon_0, earth_radius_m = _lcc_params_from_crs(crs)
-
-   log(f"Building a Lambert Conformal grid from CRS metadata found in "
-       f"{source_desc}: standard parallel(s) {lat_1}/{lat_2}, central "
-       f"meridian {lon_0}, earth radius {earth_radius_m / 1000.0:.3f} km")
-
-   return _lambert_conformal_grid_from_params(
-      ds, da, x_name, y_name, 'ZarrLambertConformalCRS',
-      scale_lat_1=lat_1, scale_lat_2=lat_2, lat_origin=lat_0,
-      lon_orient=lon_0, earth_radius_m=earth_radius_m)
 
 
 def build_placeholder_grid(ny, nx):
@@ -547,63 +321,128 @@ if set_attr_grid_specified:
 
    grid = build_placeholder_grid(ny, nx)
 
-elif lat_name is not None and lon_name is not None and \
-     getattr(da[lat_name], 'ndim', 2) == 1:
-
-   grid, flip_row, flip_col = met_grid_tools.derive_grid(
-      da[lat_name].values, da[lon_name].values)
-
 else:
-   # steps 2-4 (CF grid_mapping -> CRS attributes -> numeric fit),
-   # each attempted only if the ones before it found nothing usable
+   # steps 1-4: CF grid_mapping -> CRS attributes -> 1D lat/lon -> 2D
+   # numeric fit; each attempted only if the ones before it found nothing
    x_name = find_name(da, X_NAMES)
    y_name = find_name(da, Y_NAMES)
 
    grid_mapping_name = da.attrs.get('grid_mapping')
    cf_var = ds[grid_mapping_name] \
       if grid_mapping_name and grid_mapping_name in ds.variables else None
-   cf_mapping_type = cf_var.attrs.get('grid_mapping_name') if cf_var is not None else None
+   cf_mapping_type = cf_var.attrs.get('grid_mapping_name') \
+      if cf_var is not None else None
 
-   has_cf_lcc_attrs = (
-      cf_mapping_type == 'lambert_conformal_conic' and
-      'standard_parallel' in cf_var.attrs and
-      'longitude_of_central_meridian' in cf_var.attrs)
+   # projection types that grid_from_cf_mapping() can handle
+   SUPPORTED_CF_TYPES = {
+      'latitude_longitude', 'mercator', 'lambert_conformal_conic',
+      'lambert_azimuthal_equal_area', 'polar_stereographic',
+      'rotated_latitude_longitude',
+   }
 
    #
-   #  step 2: CF grid_mapping convention
+   #  step 1: CF grid_mapping convention (most authoritative when present)
    #
-   if has_cf_lcc_attrs and x_name is not None and y_name is not None:
+   if cf_mapping_type in SUPPORTED_CF_TYPES:
 
-      grid, flip_row = build_lambert_conformal_grid(
-         ds, da, x_name, y_name, cf_var)
+      if cf_mapping_type == 'rotated_latitude_longitude':
+         # rotated lat/lon coordinates may use non-standard names
+         rlat_name = find_name(da, RLAT_NAMES)
+         rlon_name = find_name(da, RLON_NAMES)
+         if rlat_name is None or rlon_name is None:
+            dataplane.quit(
+               f"read_zarr_dataplane.py -> CF grid_mapping type is "
+               f"'rotated_latitude_longitude' but no rotated lat/lon "
+               f"coordinate variables were found (checked for: "
+               f"{RLAT_NAMES} / {RLON_NAMES})")
+         grid, flip_row = met_grid_tools.grid_from_cf_mapping(
+            cf_mapping_type, cf_var.attrs,
+            lat=np.asarray(da[rlat_name].values),
+            lon=np.asarray(da[rlon_name].values),
+            grid_name='ZarrRotatedLatLon')
+
+      elif cf_mapping_type == 'latitude_longitude':
+         if lat_name is None or lon_name is None:
+            dataplane.quit(
+               "read_zarr_dataplane.py -> CF grid_mapping type is "
+               "'latitude_longitude' but no lat/lon coordinate variables "
+               f"were found (checked for: {LAT_NAMES} / {LON_NAMES})")
+         grid, flip_row = met_grid_tools.grid_from_cf_mapping(
+            cf_mapping_type, cf_var.attrs,
+            lat=np.asarray(da[lat_name].values),
+            lon=np.asarray(da[lon_name].values),
+            grid_name='ZarrLatLon')
+
+      else:
+         # projected types need x/y coordinates and 2D lat/lon for
+         # pin-point / corner coordinates
+         if x_name is None or y_name is None:
+            dataplane.quit(
+               f"read_zarr_dataplane.py -> CF grid_mapping type is "
+               f"'{cf_mapping_type}' but no projected x/y coordinate "
+               f"variables were found (checked for: "
+               f"{X_NAMES} / {Y_NAMES})")
+         lat2d_name = find_name(ds, LAT_NAMES)
+         lon2d_name = find_name(ds, LON_NAMES)
+         lat2d = np.asarray(ds[lat2d_name].values) if lat2d_name else None
+         lon2d = np.asarray(ds[lon2d_name].values) if lon2d_name else None
+         grid, flip_row = met_grid_tools.grid_from_cf_mapping(
+            cf_mapping_type, cf_var.attrs,
+            x=np.asarray(da[x_name].values),
+            y=np.asarray(da[y_name].values),
+            lat2d=lat2d, lon2d=lon2d,
+            grid_name='Zarr' + cf_mapping_type.replace('_', ' ')
+                                               .title().replace(' ', ''))
 
    else:
       #
-      #  step 3: general-purpose CRS attributes (rioxarray / GeoZarr)
+      #  step 2: general-purpose CRS attributes (rioxarray / GeoZarr)
       #
-      crs, crs_source = find_proj_crs(ds, da)
+      crs_candidates = []
+      if grid_mapping_name and grid_mapping_name in ds.variables:
+         crs_candidates.append(
+            (ds[grid_mapping_name].attrs,
+             f"the '{grid_mapping_name}' grid_mapping variable"))
+      if 'spatial_ref' in ds.variables and \
+         grid_mapping_name != 'spatial_ref':
+         crs_candidates.append(
+            (ds['spatial_ref'].attrs,
+             "the 'spatial_ref' coordinate variable"))
+      crs_candidates.append(
+         (da.attrs, f"the '{da.name}' variable's attributes"))
+      crs_candidates.append(
+         (ds.attrs, "the dataset's global attributes"))
 
-      if crs is not None and x_name is not None and y_name is not None:
+      crs, crs_source = met_grid_tools.find_proj_crs(crs_candidates)
 
-         if not _is_lambert_conformal(crs):
+      if crs is not None:
+         if x_name is None or y_name is None:
             dataplane.quit(
                f"read_zarr_dataplane.py -> found CRS metadata in "
-               f"{crs_source} ('{crs.name}'), but its projection is not "
-               "Lambert Conformal Conic; only Lambert Conformal and "
-               "plain latitude/longitude grids are supported in this "
-               "initial release")
-
-         grid, flip_row = build_lambert_conformal_grid_from_crs(
-            ds, da, x_name, y_name, crs, crs_source)
-
-      elif crs is not None:
-         dataplane.quit(
-            f"read_zarr_dataplane.py -> found CRS metadata in "
-            f"{crs_source}, but no projected x/y coordinates were found "
-            f"alongside it (checked for: {X_NAMES} / {Y_NAMES})")
+               f"{crs_source}, but no projected x/y coordinates were "
+               f"found alongside it (checked for: "
+               f"{X_NAMES} / {Y_NAMES})")
+         lat2d_name = find_name(ds, LAT_NAMES)
+         lon2d_name = find_name(ds, LON_NAMES)
+         lat2d = np.asarray(ds[lat2d_name].values) if lat2d_name else None
+         lon2d = np.asarray(ds[lon2d_name].values) if lon2d_name else None
+         grid, flip_row = met_grid_tools.grid_from_crs(
+            crs, crs_source,
+            x=np.asarray(da[x_name].values),
+            y=np.asarray(da[y_name].values),
+            lat2d=lat2d, lon2d=lon2d)
 
       #
-      #  step 4: numeric fit, the last resort
+      #  step 3: 1D lat/lon coordinates
+      #
+      elif lat_name is not None and lon_name is not None and \
+           getattr(da[lat_name], 'ndim', 2) == 1:
+
+         grid, flip_row, flip_col = met_grid_tools.derive_grid(
+            da[lat_name].values, da[lon_name].values)
+
+      #
+      #  step 4: 2D lat/lon numeric fit, the last resort
       #
       elif lat_name is not None and lon_name is not None and \
            getattr(da[lat_name], 'ndim', None) == 2:
@@ -617,18 +456,17 @@ else:
 
       else:
          reason = ""
-         if cf_mapping_type is not None and cf_mapping_type != 'lambert_conformal_conic':
+         if cf_mapping_type is not None and \
+            cf_mapping_type not in SUPPORTED_CF_TYPES:
             reason = (f" A CF grid_mapping variable was found, but its "
                       f"grid_mapping_name ('{cf_mapping_type}') is not "
-                      f"yet supported -- only 'lambert_conformal_conic' "
-                      f"is.")
+                      f"supported.")
          dataplane.quit(
             f"read_zarr_dataplane.py -> could not determine the grid for "
-            f"variable '{var_name}'.{reason} Expected either 1D "
-            f"latitude/longitude coordinates, CF grid_mapping / "
-            f"rioxarray / GeoZarr CRS metadata referencing a supported "
-            f"projection, or 2D latitude/longitude coordinates a "
-            f"projection can be fit to")
+            f"variable '{var_name}'.{reason} Expected either a CF "
+            f"grid_mapping variable, rioxarray / GeoZarr CRS metadata, "
+            f"1D latitude/longitude coordinates, or 2D latitude/longitude "
+            f"coordinates a projection can be fit to")
 
 ########################################################################
 #
