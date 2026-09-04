@@ -53,6 +53,10 @@ jobs:
       - name: Create output directories
         run: mkdir -p ${RUNNER_WORKSPACE}/logs
 
+      - name: Get METbaseimage
+        id: get_met_base_image
+        run: .github/jobs/get_met_base_image.sh
+
       - name: Get branch name
         id: get_branch_name
         run: echo branch_name=${GITHUB_REF#refs/heads/} >> $GITHUB_OUTPUT
@@ -60,8 +64,8 @@ jobs:
       - name: SonarQube Scan in Docker
         run: .github/jobs/build_sonarqube_image.sh
         env:
-          MET_BASE_REPO: met-base
-          MET_BASE_TAG: 3.4-latest
+          MET_BASE_REPO: ${{ steps.get_met_base_image.outputs.met_base_repo }}
+          MET_BASE_TAG: ${{ steps.get_met_base_image.outputs.met_base_tag }}
           SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
           WD_REFERENCE_BRANCH: ${{ github.event.inputs.reference_branch }}
           SONAR_SCANNER_VERSION: 5.0.1.3006
