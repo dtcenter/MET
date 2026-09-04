@@ -81,6 +81,7 @@
 //   048    10/15/24  Halley Gotway  MET #2893 Write individual pair OBTYPE.
 //   049    09/11/25  Halley Gotway  MET #3174 Orographic corrections.
 //   050    01/27/26  Halley Gotway  MET #3298 Add the FULL grid, if needed
+//   051    09/04/26  Halley Gotway  MET #3426 and #3429 Observation error
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -143,7 +144,9 @@ static void process_grid_scores   (int,
                const DataPlane &, const DataPlane &,
                const DataPlane &, const DataPlane &,
                const DataPlane &, const MaskPlane &,
-               ObsErrorEntry *,   PairDataEnsemble &);
+               ObsErrorEntry *,
+               const std::vector<const ObsErrorEntry *> &,
+               PairDataEnsemble &);
 
 static void do_ecnt              (const EnsembleStatVxOpt &,
                                   const SingleThresh &,
@@ -1215,6 +1218,9 @@ static void process_point_scores() {
       VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.ens_info->get_var_info();
       VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
 
+      // Log a summary of any observation error table lookup failures
+      conf_info.vx_opt[i].vx_pd.log_obs_error_lookup_summary();
+
       // Set the description
       shc.set_desc(conf_info.vx_opt[i].vx_pd.desc.c_str());
 
@@ -1608,15 +1614,28 @@ static void process_grid_vx() {
          // Store a copy of the unperturbed observation field
          oraw_dp = obs_dp;
 
+         // When no single entry applies to the whole field, resolve
+         // the observation error entry for each grid point once here
+         // rather than repeating the table lookup for the bias
+         // correction call, for every ensemble member below, and
+         // again in process_grid_scores()
+         vector<const ObsErrorEntry *> oerr_grid;
+         if(conf_info.vx_opt[i].obs_error.flag && !oerr_ptr) {
+            oerr_grid = build_obs_error_entry_grid(
+                           oraw_dp, obs_info->name().c_str(),
+                           conf_info.obtype.c_str());
+         }
+
          // Apply observation error bias correction, if requested
          if(conf_info.vx_opt[i].obs_error.flag) {
             mlog << Debug(3)
                  << "Applying observation error bias correction to "
                  << "gridded observation data.\n";
-            obs_dp = add_obs_error_bc(conf_info.rng_ptr,
-                        FieldType::Obs, oerr_ptr, oraw_dp, oraw_dp,
-                        obs_info->name().c_str(),
-                        conf_info.obtype.c_str());
+            obs_dp = oerr_ptr ?
+               add_obs_error_bc(
+                  FieldType::Obs, oerr_ptr, oraw_dp, oraw_dp,
+                  obs_info->name().c_str(), conf_info.obtype.c_str()) :
+               add_obs_error_bc(FieldType::Obs, oerr_grid, oraw_dp);
          }
 
          // Loop through the ensemble members
@@ -1638,10 +1657,12 @@ static void process_grid_vx() {
                mlog << Debug(3)
                     << "Applying observation error perturbation to "
                     << "ensemble member " << k+1 << ".\n";
-               fcst_dp[k] = add_obs_error_inc(conf_info.rng_ptr,
-                               FieldType::Fcst, oerr_ptr, fraw_dp[k], oraw_dp,
-                               obs_info->name().c_str(),
-                               conf_info.obtype.c_str());
+               fcst_dp[k] = oerr_ptr ?
+                  add_obs_error_inc(conf_info.rng_ptr,
+                     FieldType::Fcst, oerr_ptr, fraw_dp[k], oraw_dp,
+                     obs_info->name().c_str(), conf_info.obtype.c_str()) :
+                  add_obs_error_inc(conf_info.rng_ptr,
+                     FieldType::Fcst, oerr_grid, fraw_dp[k], oraw_dp);
             }
          } // end for k
 
@@ -1668,7 +1689,7 @@ static void process_grid_vx() {
                                 emn_dp,
                                 fcmn_dp, fcsd_dp,
                                 ocmn_dp, ocsd_dp,
-                                mask_mp, oerr_ptr,
+                                mask_mp, oerr_ptr, oerr_grid,
                                 pd_all);
 
             mlog << Debug(2)
@@ -1721,9 +1742,13 @@ static void process_grid_scores(int i_vx,
         const DataPlane &fcmn_dp, const DataPlane &fcsd_dp,
         const DataPlane &ocmn_dp, const DataPlane &ocsd_dp,
         const MaskPlane &mask_mp,
-        ObsErrorEntry *oerr_ptr,  PairDataEnsemble &pd) {
+        ObsErrorEntry *oerr_ptr,
+        const vector<const ObsErrorEntry *> &oerr_grid,
+        PairDataEnsemble &pd) {
    int n_miss;
    auto e = (ObsErrorEntry *) nullptr;
+   int n_try_obs_error  = 0;
+   int n_fail_obs_error = 0;
 
    // Allocate memory in one big chunk based on grid size
    pd.extend(nxy);
@@ -1754,12 +1779,14 @@ static void process_grid_scores(int i_vx,
             e = oerr_ptr;
          }
          else if(conf_info.vx_opt[i_vx].obs_error.flag) {
-            e = obs_error_table.lookup(
-                   conf_info.vx_opt[i_vx].vx_pd.obs_info->name().c_str(),
-                   conf_info.obtype.c_str(), oraw_dp(x,y));
+            n_try_obs_error++;
+
+            // Use the entry cache built once in process_grid_vx()
+            // instead of repeating the table lookup for each point
+            e = (ObsErrorEntry *) oerr_grid[y * obs_dp.nx() + x];
 
             // MET #3429: Skip observation if the table lookup fails
-            if(!e) continue;
+            if(!e) { n_fail_obs_error++; continue; }
          }
          else {
             e = (ObsErrorEntry *) nullptr;
@@ -1783,6 +1810,14 @@ static void process_grid_scores(int i_vx,
 
       } // end for y
    } // end for x
+
+   // Log a summary of any observation error table lookup failures
+   if(n_fail_obs_error > 0) {
+      mlog << Debug(2)
+           << "Skipping " << n_fail_obs_error << " of " << n_try_obs_error
+           << " grid points with no matching observation error "
+           << "table entry.\n";
+   }
 
    // Loop through the observation points
    for(int i=0; i<pd.n_obs; i++) {

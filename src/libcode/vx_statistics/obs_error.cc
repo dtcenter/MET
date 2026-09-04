@@ -17,6 +17,10 @@
 #include <string.h>
 #include <cmath>
 
+#ifdef _OPENMP
+  #include "omp.h"
+#endif
+
 #include "obs_error.h"
 
 using namespace std;
@@ -191,6 +195,18 @@ double ObsErrorEntry::variance() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool ObsErrorEntry::need_bias_correction() const {
+   return !is_bad_data(bias_scale) || !is_bad_data(bias_offset);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool ObsErrorEntry::need_perturbation() const {
+   return dist_type != DistType::None;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool ObsErrorEntry::parse_line(const DataLine &dl) {
 
    // Initialize
@@ -287,10 +303,15 @@ bool ObsErrorEntry::is_match(const char *cur_var_name,
                              int cur_inst,
                              double cur_hgt,
                              double cur_prs,
-                             double cur_val) {
+                             double cur_val,
+                             bool skip_var_name) {
 
    // Check array filters
-   if(var_name.n()    > 0 && !var_name.reg_exp_match(cur_var_name))  return false;
+   // The var_name regex check is the most expensive (recompiles a
+   // POSIX regex on every call), so callers that have already
+   // subsetted on var_name can skip re-checking it here.
+   if(!skip_var_name &&
+      var_name.n()    > 0 && !var_name.reg_exp_match(cur_var_name))  return false;
    if(msg_type.n()    > 0 && !msg_type.has(cur_msg_type))            return false;
    if(sid.n()         > 0 && !sid.has(cur_sid))                      return false;
    if(pb_rpt_type.n() > 0 && !pb_rpt_type.has(cur_pb_rpt))           return false;
@@ -386,6 +407,9 @@ void ObsErrorTable::clear() {
    IsSet      = false;
    N_elements = 0;
    N_alloc    = 0;
+
+   VarSubsetCache.clear();
+   LastMatchIndex = -1;
 
    return;
 }
@@ -527,26 +551,65 @@ bool ObsErrorTable::read(const char * file_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
+//
+// Return the indices of the table rows whose var_name criteria could
+// ever match cur_var_name, computing (and caching) the subset the
+// first time it's requested for a given variable name. This avoids
+// rescanning (and re-running regex matches over) the full table on
+// every lookup() call.
+//
+const vector<int> & ObsErrorTable::var_subset(const char *cur_var_name) {
+   string key(cur_var_name);
+
+   auto it = VarSubsetCache.find(key);
+   if(it != VarSubsetCache.end()) return it->second;
+
+   vector<int> subset;
+   for(int i=0; i<N_elements; i++) {
+      if(e[i].var_name.n() == 0 || e[i].var_name.reg_exp_match(cur_var_name)) {
+         subset.push_back(i);
+      }
+   }
+
+   auto result = VarSubsetCache.emplace(std::move(key), std::move(subset));
+   return result.first->second;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 ObsErrorEntry *ObsErrorTable::lookup(
    const char *cur_var_name, const char *cur_msg_type, const char *cur_sid,
    int cur_pb_rpt,           int cur_in_rpt,           int cur_inst,
    double cur_hgt,           double cur_prs,           double cur_val) {
-   int i;
    ObsErrorEntry * e_match = (ObsErrorEntry *) nullptr;
 
-   for(i=0; i<N_elements; i++) {
+   // Check the most recently matched entry first since consecutive
+   // lookups often resolve to the same table row
+   if(LastMatchIndex >= 0 && LastMatchIndex < N_elements &&
+      e[LastMatchIndex].is_match(cur_var_name, cur_msg_type, cur_sid,
+                                 cur_pb_rpt,   cur_in_rpt,   cur_inst,
+                                 cur_hgt,      cur_prs,      cur_val)) {
+      e_match = &e[LastMatchIndex];
+   }
+   else {
 
-      if(e[i].is_match(cur_var_name, cur_msg_type, cur_sid,
-                       cur_pb_rpt,   cur_in_rpt,   cur_inst,
-                       cur_hgt,      cur_prs,      cur_val)) {
-         e_match = &e[i];
-         break;
+      // Otherwise, scan only the rows whose var_name criteria could
+      // match, skipping the (already-verified) var_name regex check
+      const vector<int> &subset = var_subset(cur_var_name);
+      for(int idx : subset) {
+         if(e[idx].is_match(cur_var_name, cur_msg_type, cur_sid,
+                            cur_pb_rpt,   cur_in_rpt,   cur_inst,
+                            cur_hgt,      cur_prs,      cur_val, true)) {
+            e_match = &e[idx];
+            LastMatchIndex = idx;
+            break;
+         }
       }
    }
 
    // Check for no match
-   if(e_match == (ObsErrorEntry *) 0) {
-      mlog << Warning << "\nObsErrorTable::lookup() -> "
+   if(e_match == (ObsErrorEntry *) 0 && mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << "\nObsErrorTable::lookup() -> "
            << "skipping observation since no match found for "
            << "var_name = \"" << cur_var_name
            << "\", msg_type = \"" << cur_msg_type
@@ -566,22 +629,36 @@ ObsErrorEntry *ObsErrorTable::lookup(
 
 ObsErrorEntry *ObsErrorTable::lookup(
    const char *cur_var_name, const char *cur_msg_type, double cur_val) {
-   int i;
    ObsErrorEntry * e_match = (ObsErrorEntry *) nullptr;
 
-   for(i=0; i<N_elements; i++) {
+   // Check the most recently matched entry first since consecutive
+   // lookups (e.g. adjacent grid points) often resolve to the same
+   // table row
+   if(LastMatchIndex >= 0 && LastMatchIndex < N_elements &&
+      e[LastMatchIndex].is_match(   cur_var_name,    cur_msg_type, bad_data_str,
+                                    bad_data_int,    bad_data_int, bad_data_int,
+                                 bad_data_double, bad_data_double, cur_val)) {
+      e_match = &e[LastMatchIndex];
+   }
+   else {
 
-      if(e[i].is_match(   cur_var_name,    cur_msg_type, bad_data_str,
-                          bad_data_int,    bad_data_int, bad_data_int,
-                       bad_data_double, bad_data_double, cur_val)) {
-         e_match = &e[i];
-         break;
+      // Otherwise, scan only the rows whose var_name criteria could
+      // match, skipping the (already-verified) var_name regex check
+      const vector<int> &subset = var_subset(cur_var_name);
+      for(int idx : subset) {
+         if(e[idx].is_match(   cur_var_name,    cur_msg_type, bad_data_str,
+                               bad_data_int,    bad_data_int, bad_data_int,
+                            bad_data_double, bad_data_double, cur_val, true)) {
+            e_match = &e[idx];
+            LastMatchIndex = idx;
+            break;
+         }
       }
    }
 
    // Check for no match
-   if(e_match == (ObsErrorEntry *) 0) {
-      mlog << Warning << "\nObsErrorTable::lookup() -> "
+   if(e_match == (ObsErrorEntry *) 0 && mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << "\nObsErrorTable::lookup() -> "
            << "no observation error table match found for "
            << "var_name = \"" << cur_var_name
            << "\", msg_type = \"" << cur_msg_type
@@ -707,7 +784,7 @@ ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *rng_ptr) {
 
 double add_obs_error_inc(const gsl_rng *r, FieldType t,
                          const ObsErrorEntry *e, const double obs,
-                         double v) {
+                         double v, bool log_detail) {
    double v_new = v;
 
    // Check for null pointer or bad input value
@@ -724,7 +801,7 @@ double add_obs_error_inc(const gsl_rng *r, FieldType t,
    if(!is_bad_data(e->v_max) && v_new > e->v_max) v_new = e->v_max;
 
    // Detailed debug information
-   if(mlog.verbosity_level() >= 4) {
+   if(log_detail && mlog.verbosity_level() >= 4) {
 
       // Check for no updates
       if(e->dist_type == DistType::None) {
@@ -755,34 +832,86 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
                             const DataPlane &obs_dp,
                             const char *var_name, const char *obtype) {
    DataPlane out_dp(in_dp);
+   int nx = in_dp.nx();
+   int ny = in_dp.ny();
 
    // Check for matching dimensions
-   if(in_dp.nx() != obs_dp.nx() || in_dp.ny() != obs_dp.ny()) {
+   if(nx != obs_dp.nx() || ny != obs_dp.ny()) {
       mlog << Error << "\nadd_obs_error_inc() -> "
-           << "the data dimensions must match (" << in_dp.nx()
-           << ", " << in_dp.ny() << ") != (" << obs_dp.nx()
+           << "the data dimensions must match (" << nx
+           << ", " << ny << ") != (" << obs_dp.nx()
            << ", " << obs_dp.ny() << ")!\n\n";
       exit(1);
    }
 
-   // Apply random perturbation to each grid point
-   // Do not parallelize loops that use the random number generator
-   for(int x=0; x<out_dp.nx(); x++) {
-      for(int y=0; y<out_dp.ny(); y++) {
+   // A single, resolved entry applies to every point: skip the loop
+   // entirely when it requires no perturbation and no range clamp
+   if(in_e && !in_e->need_perturbation() &&
+      is_bad_data(in_e->v_min) && is_bad_data(in_e->v_max)) {
+      return out_dp;
+   }
 
-         // Current observation value
-         double obs_v = obs_dp.get(x, y);
+   const double *in_buf  = in_dp.data();
+   const double *obs_buf = obs_dp.data();
+   vector<double> &out_buf = out_dp.buf();
 
-         // For a nullptr pointer, do a table lookup
-         const ObsErrorEntry *e = (in_e ? in_e :
-                  obs_error_table.lookup(var_name, obtype,
-                                         obs_v));
+   if(in_e) {
 
-         // Get current data value
-         double in_v = in_dp.get(x, y);
+      // The entry is fixed for every point, so no table lookup (and
+      // therefore no shared, mutable table state) is touched here -
+      // safe to parallelize. Preserve the same x-outer, y-inner
+      // traversal order used historically so that, run single
+      // threaded, the exact same sequence of RNG draws lands on the
+      // exact same grid points as before.
+      int n_threads = 1;
+#ifdef _OPENMP
+      n_threads = omp_get_max_threads();
+#endif
 
-         // Store perturbed value
-         out_dp.set(add_obs_error_inc(r, t, e, obs_v, in_v), x, y);
+      if(n_threads <= 1) {
+         for(int x=0; x<nx; x++) {
+            for(int y=0; y<ny; y++) {
+               int j = y*nx + x;
+               out_buf[j] = add_obs_error_inc(r, t, in_e, obs_buf[j],
+                                              in_buf[j], false);
+            }
+         }
+      }
+      else {
+
+         // One independent RNG clone per thread
+         vector<gsl_rng *> thread_rngs = rng_set_omp(r, n_threads);
+
+#pragma omp parallel default(none) \
+         shared(in_buf, obs_buf, out_buf, nx, ny, in_e, t, thread_rngs)
+         {
+            gsl_rng *my_r = thread_rngs[omp_get_thread_num()];
+
+#pragma omp for collapse(2) schedule(static)
+            for(int x=0; x<nx; x++) {
+               for(int y=0; y<ny; y++) {
+                  int j = y*nx + x;
+                  out_buf[j] = add_obs_error_inc(my_r, t, in_e, obs_buf[j],
+                                                 in_buf[j], false);
+               }
+            }
+         }
+
+         rng_free_omp(thread_rngs);
+      }
+   }
+   else {
+
+      // Do a table lookup for each point. ObsErrorTable::lookup()
+      // mutates shared cache state, so this loop must stay serial,
+      // in the same x-outer, y-inner order used historically.
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
+            int j = y*nx + x;
+            const ObsErrorEntry *e = obs_error_table.lookup(
+                                         var_name, obtype, obs_buf[j]);
+            out_buf[j] = add_obs_error_inc(r, t, e, obs_buf[j], in_buf[j]);
+         }
       }
    }
 
@@ -791,8 +920,9 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
 
 ////////////////////////////////////////////////////////////////////////
 
-double add_obs_error_bc(const gsl_rng *r, FieldType t,
-                        const ObsErrorEntry *e, double v) {
+double add_obs_error_bc(FieldType t,
+                        const ObsErrorEntry *e, double v,
+                        bool log_detail) {
    double v_new = v;
 
    // Check for null pointer or bad input value
@@ -807,7 +937,7 @@ double add_obs_error_bc(const gsl_rng *r, FieldType t,
    if(!is_bad_data(e->v_max) && v_new > e->v_max) v_new = e->v_max;
 
    // Detailed debug information
-   if(mlog.verbosity_level() >= 4) {
+   if(log_detail && mlog.verbosity_level() >= 4) {
 
       // Check for no updates
       if(is_bad_data(e->bias_scale) &&
@@ -831,12 +961,13 @@ double add_obs_error_bc(const gsl_rng *r, FieldType t,
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlane add_obs_error_bc(const gsl_rng *r, FieldType t,
+DataPlane add_obs_error_bc(FieldType t,
                            const ObsErrorEntry *in_e,
                            const DataPlane &in_dp,
                            const DataPlane &obs_dp,
                            const char *var_name, const char *obtype) {
    DataPlane out_dp(in_dp);
+   int nxy = in_dp.nxy();
 
    // Check for matching dimensions
    if(in_dp.nx() != obs_dp.nx() || in_dp.ny() != obs_dp.ny()) {
@@ -847,22 +978,161 @@ DataPlane add_obs_error_bc(const gsl_rng *r, FieldType t,
       exit(1);
    }
 
-   // Apply bias correction to each grid point
-   // Do not parallelize loops that use the random number generator
-   for(int x=0; x<out_dp.nx(); x++) {
-      for(int y=0; y<out_dp.ny(); y++) {
+   // A single, resolved entry applies to every point: skip the loop
+   // entirely when it requires no bias correction and no range clamp
+   if(in_e && !in_e->need_bias_correction() &&
+      is_bad_data(in_e->v_min) && is_bad_data(in_e->v_max)) {
+      return out_dp;
+   }
 
-         // For a nullptr pointer, do a table lookup
-         const ObsErrorEntry *e = (in_e ? in_e :
-                  obs_error_table.lookup(var_name, obtype,
-                                         obs_dp.get(x,y)));
+   const double *in_buf  = in_dp.data();
+   const double *obs_buf = obs_dp.data();
+   vector<double> &out_buf = out_dp.buf();
 
-         // Get current data value
-         double v = in_dp.get(x, y);
+   if(in_e) {
 
-         // Store perturbed value
-         out_dp.set(add_obs_error_bc(r, t, e, v), x, y);
+      // The entry is fixed for every point - no table lookup, so no
+      // shared, mutable table state is touched here - safe to
+      // parallelize with no RNG involved
+#pragma omp parallel for default(none) \
+      shared(in_buf, out_buf, nxy, in_e, t) schedule(static)
+      for(int j=0; j<nxy; j++) {
+         out_buf[j] = add_obs_error_bc(t, in_e, in_buf[j], false);
       }
+   }
+   else {
+
+      // Do a table lookup for each point. ObsErrorTable::lookup()
+      // mutates shared cache state, so this loop must stay serial.
+      for(int j=0; j<nxy; j++) {
+         const ObsErrorEntry *e = obs_error_table.lookup(
+                                      var_name, obtype, obs_buf[j]);
+         out_buf[j] = add_obs_error_bc(t, e, in_buf[j]);
+      }
+   }
+
+   return out_dp;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+vector<const ObsErrorEntry *> build_obs_error_entry_grid(
+      const DataPlane &val_dp, const char *var_name, const char *obtype) {
+
+   int nxy = val_dp.nxy();
+   vector<const ObsErrorEntry *> entry_grid(
+      nxy, (const ObsErrorEntry *) nullptr);
+   const double *val_buf = val_dp.data();
+
+   // Serial: ObsErrorTable::lookup() mutates internal cache state
+   for(int j=0; j<nxy; j++) {
+      if(!is_bad_data(val_buf[j])) {
+         entry_grid[j] = obs_error_table.lookup(var_name, obtype,
+                                                val_buf[j]);
+      }
+   }
+
+   return entry_grid;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
+                            const vector<const ObsErrorEntry *> &entry_grid,
+                            const DataPlane &in_dp,
+                            const DataPlane &obs_dp) {
+   DataPlane out_dp(in_dp);
+   int nx  = in_dp.nx();
+   int ny  = in_dp.ny();
+   int nxy = in_dp.nxy();
+
+   // Check for matching dimensions
+   if(nx != obs_dp.nx() || ny != obs_dp.ny() ||
+      (int) entry_grid.size() != nxy) {
+      mlog << Error << "\nadd_obs_error_inc() -> "
+           << "the data dimensions must match (" << nx
+           << ", " << ny << ") != (" << obs_dp.nx()
+           << ", " << obs_dp.ny() << ") or the entry_grid size ("
+           << entry_grid.size() << ") does not match (" << nxy
+           << ")!\n\n";
+      exit(1);
+   }
+
+   const double *in_buf   = in_dp.data();
+   const double *obs_buf  = obs_dp.data();
+   vector<double> &out_buf = out_dp.buf();
+   const ObsErrorEntry * const *entry_buf = entry_grid.data();
+
+   // Entries are precomputed and read-only here, so it's safe to
+   // parallelize. Preserve the same x-outer, y-inner traversal order
+   // used historically so that, run single threaded, the exact same
+   // sequence of RNG draws lands on the exact same grid points.
+   int n_threads = 1;
+#ifdef _OPENMP
+   n_threads = omp_get_max_threads();
+#endif
+
+   if(n_threads <= 1) {
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
+            int j = y*nx + x;
+            out_buf[j] = add_obs_error_inc(r, t, entry_buf[j], obs_buf[j],
+                                           in_buf[j], false);
+         }
+      }
+   }
+   else {
+
+      // One independent RNG clone per thread
+      vector<gsl_rng *> thread_rngs = rng_set_omp(r, n_threads);
+
+#pragma omp parallel default(none) \
+      shared(in_buf, obs_buf, out_buf, entry_buf, nx, ny, t, thread_rngs)
+      {
+         gsl_rng *my_r = thread_rngs[omp_get_thread_num()];
+
+#pragma omp for collapse(2) schedule(static)
+         for(int x=0; x<nx; x++) {
+            for(int y=0; y<ny; y++) {
+               int j = y*nx + x;
+               out_buf[j] = add_obs_error_inc(my_r, t, entry_buf[j], obs_buf[j],
+                                              in_buf[j], false);
+            }
+         }
+      }
+
+      rng_free_omp(thread_rngs);
+   }
+
+   return out_dp;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DataPlane add_obs_error_bc(FieldType t,
+                           const vector<const ObsErrorEntry *> &entry_grid,
+                           const DataPlane &in_dp) {
+   DataPlane out_dp(in_dp);
+   int nxy = in_dp.nxy();
+
+   // Check for matching size
+   if((int) entry_grid.size() != nxy) {
+      mlog << Error << "\nadd_obs_error_bc() -> "
+           << "the entry_grid size (" << entry_grid.size()
+           << ") does not match the data size (" << nxy << ")!\n\n";
+      exit(1);
+   }
+
+   const double *in_buf   = in_dp.data();
+   vector<double> &out_buf = out_dp.buf();
+   const ObsErrorEntry * const *entry_buf = entry_grid.data();
+
+   // Entries are precomputed and read-only here, so it's safe to
+   // parallelize with no RNG involved
+#pragma omp parallel for default(none) \
+   shared(in_buf, out_buf, entry_buf, nxy, t) schedule(static)
+   for(int j=0; j<nxy; j++) {
+      out_buf[j] = add_obs_error_bc(t, entry_buf[j], in_buf[j], false);
    }
 
    return out_dp;

@@ -195,6 +195,11 @@ class VxPairDataEnsemble : public VxPairBase {
       ObsErrorInfo *obs_error_info; // Pointer for observation error
                                     // Not allocated
 
+      // Counts of observation error table lookups attempted and failed,
+      // accumulated across calls to add_point_obs()
+      int n_try_obs_error;
+      int n_fail_obs_error;
+
       //////////////////////////////////////////////////////////////////
 
       // 3-Dim vector of PairDataEnsemble objects [n_msg_typ][n_mask][n_interp]
@@ -219,6 +224,9 @@ class VxPairDataEnsemble : public VxPairBase {
                          const char *, unixtime, const char *,
                          const float *, const Grid &, const char *);
       void add_ens(int, bool mn, const Grid &);
+
+      // Log and reset the accumulated observation error lookup counts
+      void log_obs_error_lookup_summary();
 };
 
 ////////////////////////////////////////////////////////////////////////
