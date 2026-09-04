@@ -14,6 +14,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <vector>
+
 #include "vx_util.h"
 #include "gsl/gsl_randist.h"
 
@@ -41,6 +43,11 @@ enum class DistType {
 
 extern void rng_set(gsl_rng *&r, const char *, const char *);
 extern void rng_free(gsl_rng *r);
+
+// Create random number generator copies for each OpenMP thread.
+// Free with rng_free_omp() when done.
+extern std::vector<gsl_rng *> rng_set_omp(const gsl_rng *base_r, int n_threads);
+extern void                   rng_free_omp(std::vector<gsl_rng *> &rngs);
 
 ////////////////////////////////////////////////////////////////////////
 //
