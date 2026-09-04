@@ -245,6 +245,37 @@
     </output>
   </test>
 
+  <!--  MET #3429 use a truncated observation error table to cause bad lookups.  -->
+
+  <test name="ensemble_stat_OBSERR_BAD_LOOKUP">
+    <exec>grep -E "OBS_VAR|APCP" &MET_BASE;/table_files/obs_error_table.txt | head -2 \
+          > &OUTPUT_DIR;/ensemble_stat/obs_error_table_truncated.txt; \
+          &MET_BIN;/ensemble_stat</exec>
+    <env>
+      <pair><name>DESC</name>                <value>OBSERR</value></pair>
+      <pair><name>OBS_ERROR_FLAG</name>      <value>TRUE</value></pair>
+      <pair><name>MET_OBS_ERROR_TABLE</name> <value>&OUTPUT_DIR;/ensemble_stat/obs_error_table_truncated.txt</value></pair>
+      <pair><name>SKIP_CONST</name>          <value>TRUE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>       <value>OBSERR_BAD_LOOKUP</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/ensemble_stat/input_file_list \
+      &CONFIG_DIR;/EnsembleStatConfig \
+      -grid_obs &DATA_DIR_OBS;/laps/laps_2012041012_F000.grib \
+      -point_obs &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
+      -outdir &OUTPUT_DIR;/ensemble_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_BAD_LOOKUP_20120410_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_BAD_LOOKUP_20120410_120000V_ecnt.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_BAD_LOOKUP_20120410_120000V_rhist.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_BAD_LOOKUP_20120410_120000V_phist.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_BAD_LOOKUP_20120410_120000V_orank.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_BAD_LOOKUP_20120410_120000V_ssvar.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_BAD_LOOKUP_20120410_120000V_orank.nc</grid_nc>
+    </output>
+  </test>
+
   <!--  Single NetCDF input file with all ensembles - no control member.  -->
 
   <test name="ensemble_stat_SINGLE_FILE_NC_NO_CTRL">
