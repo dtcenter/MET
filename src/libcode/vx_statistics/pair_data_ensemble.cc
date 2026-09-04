@@ -1035,6 +1035,9 @@ void VxPairDataEnsemble::clear() {
 
    obs_error_info = (ObsErrorInfo *) nullptr;
 
+   n_try_obs_error  = 0;
+   n_fail_obs_error = 0;
+
    pd.clear();
 
    return;
@@ -1052,6 +1055,9 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
    set_obs_info(vx_pd.obs_info);
 
    obs_error_info = vx_pd.obs_error_info;
+
+   n_try_obs_error  = vx_pd.n_try_obs_error;
+   n_fail_obs_error = vx_pd.n_fail_obs_error;
 
    set_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
 
@@ -1270,13 +1276,14 @@ void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
             obs_error_info->flag = false;
          }
          else {
+            n_try_obs_error++;
             oerr_ptr = obs_error_table.lookup(
                obs_info->name().c_str(), hdr_typ_str, hdr_sid_str,
                hdr_typ_arr[0], hdr_typ_arr[1], hdr_typ_arr[2],
                obs_lvl, obs_hgt, obs_v);
 
             // MET #3429: Skip observation if the table lookup fails
-            if(!oerr_ptr) return;
+            if(!oerr_ptr) { n_fail_obs_error++; return; }
          }
       }
    }
@@ -1284,7 +1291,7 @@ void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
    // Apply observation error additive and multiplicative
    // bias correction, if requested
    if(obs_error_info->flag) {
-      obs_v = add_obs_error_bc(obs_error_info->rng_ptr,
+      obs_v = add_obs_error_bc(
                                FieldType::Obs, oerr_ptr, obs_v);
    }
 
@@ -1339,6 +1346,23 @@ void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
          } // end for k
       } // end for j
    } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::log_obs_error_lookup_summary() {
+
+   if(n_fail_obs_error > 0) {
+      mlog << Debug(2)
+           << "Skipping " << n_fail_obs_error << " of " << n_try_obs_error
+           << " observations with no matching observation error "
+           << "table entry.\n";
+   }
+
+   n_try_obs_error  = 0;
+   n_fail_obs_error = 0;
 
    return;
 }

@@ -13,6 +13,10 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <map>
+#include <string>
+#include <vector>
+
 #include "vx_config.h"
 #include "vx_util.h"
 
@@ -71,6 +75,11 @@ class ObsErrorEntry {
 
       double variance() const;
 
+      // Check whether this entry actually requires bias correction
+      // and/or perturbation
+      bool need_bias_correction() const;
+      bool need_perturbation() const;
+
          //
          //  do stuff
          //
@@ -80,7 +89,8 @@ class ObsErrorEntry {
       bool is_header(const DataLine &);
 
       bool is_match(const char *, const char *, const char *,
-                    int, int, int, double, double, double);
+                    int, int, int, double, double, double,
+                    bool skip_var_name = false);
 
       void validate();
 };
@@ -104,6 +114,17 @@ class ObsErrorTable {
       int N_alloc;
 
       bool IsSet;
+
+      // Cache of table row indices, subsetted by variable name, to
+      // avoid rescanning (and re-running regex matches over) the full
+      // table on every lookup() call for a given variable name
+      std::map<std::string, std::vector<int>> VarSubsetCache;
+
+      // Index of the most recently matched table row which is checked
+      // first since consecutive lookups often produce the same match
+      int LastMatchIndex;
+
+      const std::vector<int> & var_subset(const char *cur_var_name);
 
    public:
 
@@ -188,20 +209,39 @@ extern ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *);
 
 extern double       add_obs_error_inc(const gsl_rng *, FieldType,
                                       const ObsErrorEntry *, const double,
-                                      double);
+                                      double, bool log_detail = true);
 extern DataPlane    add_obs_error_inc(const gsl_rng *, FieldType,
                                       const ObsErrorEntry *,
                                       const DataPlane &in_dp,
                                       const DataPlane &obs_dp,
                                       const char *, const char *);
 
-extern double       add_obs_error_bc(const gsl_rng *, FieldType,
-                                     const ObsErrorEntry *, double);
-extern DataPlane    add_obs_error_bc(const gsl_rng *, FieldType,
+extern double       add_obs_error_bc(FieldType,
+                                     const ObsErrorEntry *, double,
+                                     bool log_detail = true);
+extern DataPlane    add_obs_error_bc(FieldType,
                                      const ObsErrorEntry *,
                                      const DataPlane &in_dp,
                                      const DataPlane &obs_dp,
                                      const char *, const char *);
+
+// Build a per-gridpoint cache of resolved ObsErrorEntry pointers by
+// doing one table lookup per point to avoid repeating the table
+// lookup for each ensemble member.
+extern std::vector<const ObsErrorEntry *> build_obs_error_entry_grid(
+                                      const DataPlane &val_dp,
+                                      const char *var_name,
+                                      const char *obtype);
+
+// Variants that consume a precomputed per-gridpoint entry cache
+// instead of a single entry or a var_name/obtype table lookup
+extern DataPlane    add_obs_error_inc(const gsl_rng *, FieldType,
+                                      const std::vector<const ObsErrorEntry *> &entry_grid,
+                                      const DataPlane &in_dp,
+                                      const DataPlane &obs_dp);
+extern DataPlane    add_obs_error_bc(FieldType,
+                                     const std::vector<const ObsErrorEntry *> &entry_grid,
+                                     const DataPlane &in_dp);
 
 ////////////////////////////////////////////////////////////////////////
 
