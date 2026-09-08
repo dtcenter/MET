@@ -111,6 +111,8 @@ ________________________
   model             = "FCST";
   desc              = "NA";
   point_weight_flag = NONE;
+  kde_ref_angle     = 0.75;
+  write_weights     = FALSE;
   tmp_dir           = "/tmp";
   version           = "VN.N";
 

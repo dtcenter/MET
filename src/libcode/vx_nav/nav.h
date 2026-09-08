@@ -17,6 +17,7 @@
 //////////////////////////////////////////////////////////////////
 
 extern double            gc_dist(double lat1, double lon1, double lat2, double lon2);
+extern double           gc_angle(double lat1, double lon1, double lat2, double lon2);
 extern double         gc_bearing(double lat1, double lon1, double lat2, double lon2);
 
 extern double            rl_dist(double lat1, double lon1, double lat2, double lon2);
@@ -49,5 +50,3 @@ extern double  gc_dist_to_line(double lat1, double lon1,
 
 
 //////////////////////////////////////////////////////////////////
-
-

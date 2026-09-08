@@ -245,8 +245,8 @@ nc_pairs_flag = {
 seeps_p1_thresh = NA;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Unstructured Grid (optional ecept ugrid_dataset)
 
+// Unstructured Grid (optional except ugrid_dataset)
 ugrid_dataset = "mpas";
 //ugrid_max_distance_km = 30;
 //ugrid_map_config = "";

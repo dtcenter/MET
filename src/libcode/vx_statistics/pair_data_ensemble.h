@@ -215,7 +215,7 @@ class VxPairDataEnsemble : public VxPairBase {
       void set_ctrl_index(int);
       void set_skip_const(bool);
 
-      void add_point_obs(const float *, const int *, const char *,
+      bool add_point_obs(const float *, const int *, const char *,
                          const char *, unixtime, const char *,
                          const float *, const Grid &, const char *);
       void add_ens(int, bool mn, const Grid &);

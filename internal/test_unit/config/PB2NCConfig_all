@@ -91,7 +91,7 @@ obs_bufr_map = [];
 // Mapping of report_type (header_type)
 //
 message_type_map = []; 
-   
+
 ////////////////////////////////////////////////////////////////////////////////
 
 quality_mark_thresh = ${QUALITY_MARK_THRESH};
