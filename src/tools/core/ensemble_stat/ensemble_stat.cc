@@ -1325,7 +1325,7 @@ static void process_grid_vx() {
    DataPlane ocsd_dp;
    PairDataEnsemble pd;
    PairDataEnsemble pd_all;
-   auto oerr_ptr = (ObsErrorEntry *) nullptr;
+   ObsErrorEntry * oerr_ptr = nullptr;
    VarInfo * var_info;
    ConcatString fcst_file;
 
@@ -1413,7 +1413,7 @@ static void process_grid_vx() {
                      mlog << Debug(3)
                           << "Observation error for gridded verification is "
                           << "defined by a table lookup for each point.\n";
-                     oerr_ptr = (ObsErrorEntry *) nullptr;
+                     oerr_ptr = nullptr;
                   }
                }
             }
@@ -1746,7 +1746,7 @@ static void process_grid_scores(int i_vx,
         const vector<const ObsErrorEntry *> &oerr_grid,
         PairDataEnsemble &pd) {
    int n_miss;
-   auto e = (ObsErrorEntry *) nullptr;
+   ObsErrorEntry * e = nullptr;
    int n_try_obs_error  = 0;
    int n_fail_obs_error = 0;
 
@@ -1783,13 +1783,13 @@ static void process_grid_scores(int i_vx,
 
             // Use the entry cache built once in process_grid_vx()
             // instead of repeating the table lookup for each point
-            e = (ObsErrorEntry *) oerr_grid[y * obs_dp.nx() + x];
+            e = oerr_grid[y * obs_dp.nx() + x];
 
             // MET #3429: Skip observation if the table lookup fails
             if(!e) { n_fail_obs_error++; continue; }
          }
          else {
-            e = (ObsErrorEntry *) nullptr;
+            e = nullptr;
          }
 
          // Get current climatology values

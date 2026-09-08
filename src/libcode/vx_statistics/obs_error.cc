@@ -559,10 +559,13 @@ bool ObsErrorTable::read(const char * file_name) {
 // every lookup() call.
 //
 const vector<int> & ObsErrorTable::var_subset(const char *cur_var_name) {
-   string key(cur_var_name);
 
-   auto it = VarSubsetCache.find(key);
-   if(it != VarSubsetCache.end()) return it->second;
+   // Transparent comparator lets find() compare directly against
+   // cur_var_name, without constructing a temporary std::string key
+   // on the (common) cache-hit path
+   if(auto it = VarSubsetCache.find(cur_var_name); it != VarSubsetCache.end()) {
+      return it->second;
+   }
 
    vector<int> subset;
    for(int i=0; i<N_elements; i++) {
@@ -571,8 +574,9 @@ const vector<int> & ObsErrorTable::var_subset(const char *cur_var_name) {
       }
    }
 
-   auto result = VarSubsetCache.emplace(std::move(key), std::move(subset));
-   return result.first->second;
+   auto [result_it, inserted] = VarSubsetCache.try_emplace(cur_var_name, std::move(subset));
+   (void) inserted;
+   return result_it->second;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -608,7 +612,7 @@ ObsErrorEntry *ObsErrorTable::lookup(
    }
 
    // Check for no match
-   if(e_match == (ObsErrorEntry *) 0 && mlog.verbosity_level() >= 4) {
+   if(e_match == nullptr && mlog.verbosity_level() >= 4) {
       mlog << Debug(4) << "\nObsErrorTable::lookup() -> "
            << "skipping observation since no match found for "
            << "var_name = \"" << cur_var_name
@@ -657,7 +661,7 @@ ObsErrorEntry *ObsErrorTable::lookup(
    }
 
    // Check for no match
-   if(e_match == (ObsErrorEntry *) 0 && mlog.verbosity_level() >= 4) {
+   if(e_match == nullptr && mlog.verbosity_level() >= 4) {
       mlog << Debug(4) << "\nObsErrorTable::lookup() -> "
            << "no observation error table match found for "
            << "var_name = \"" << cur_var_name
@@ -1020,8 +1024,7 @@ vector<const ObsErrorEntry *> build_obs_error_entry_grid(
       const DataPlane &val_dp, const char *var_name, const char *obtype) {
 
    int nxy = val_dp.nxy();
-   vector<const ObsErrorEntry *> entry_grid(
-      nxy, (const ObsErrorEntry *) nullptr);
+   vector entry_grid(nxy, (const ObsErrorEntry *) nullptr);
    const double *val_buf = val_dp.data();
 
    // Serial: ObsErrorTable::lookup() mutates internal cache state

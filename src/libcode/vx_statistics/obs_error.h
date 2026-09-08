@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <functional>
 #include <map>
 #include <string>
 #include <vector>
@@ -118,7 +119,7 @@ class ObsErrorTable {
       // Cache of table row indices, subsetted by variable name, to
       // avoid rescanning (and re-running regex matches over) the full
       // table on every lookup() call for a given variable name
-      std::map<std::string, std::vector<int>> VarSubsetCache;
+      std::map<std::string, std::vector<int>, std::less<>> VarSubsetCache;
 
       // Index of the most recently matched table row which is checked
       // first since consecutive lookups often produce the same match
