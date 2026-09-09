@@ -358,7 +358,7 @@ void PairDataEnsemble::set_ens_size(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataEnsemble::add_obs_error_entry(ObsErrorEntry *e) {
+void PairDataEnsemble::add_obs_error_entry(const ObsErrorEntry *e) {
 
    obs_error_entry.add(e);
 

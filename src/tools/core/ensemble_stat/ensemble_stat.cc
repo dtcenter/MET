@@ -1746,7 +1746,7 @@ static void process_grid_scores(int i_vx,
         const vector<const ObsErrorEntry *> &oerr_grid,
         PairDataEnsemble &pd) {
    int n_miss;
-   ObsErrorEntry * e = nullptr;
+   const ObsErrorEntry * e = nullptr;
    int n_try_obs_error  = 0;
    int n_fail_obs_error = 0;
 
@@ -1782,11 +1782,8 @@ static void process_grid_scores(int i_vx,
             n_try_obs_error++;
 
             // Use the entry cache built once in process_grid_vx()
-            // instead of repeating the table lookup for each point.
-            // oerr_grid holds read-only entries; e must stay
-            // non-const since it's later passed to
-            // PairDataEnsemble::add_obs_error_entry(ObsErrorEntry *).
-            e = const_cast<ObsErrorEntry *>(oerr_grid[y * obs_dp.nx() + x]);
+            // instead of repeating the table lookup for each point
+            e = oerr_grid[y * obs_dp.nx() + x];
 
             // MET #3429: Skip observation if the table lookup fails
             if(!e) { n_fail_obs_error++; continue; }
