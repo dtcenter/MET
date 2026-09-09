@@ -102,19 +102,13 @@ class ObsErrorTable {
 
    private:
 
-      void init_from_scratch();
-
       void assign(const ObsErrorTable &);
 
       void extend(int);
 
-      ObsErrorEntry * e;   //  elements ... allocated
+      std::vector<ObsErrorEntry> e;   //  elements
 
-      int N_elements;
-
-      int N_alloc;
-
-      bool IsSet;
+      bool IsSet = false;
 
       // Cache of table row indices, subsetted by variable name, to
       // avoid rescanning (and re-running regex matches over) the full
@@ -123,7 +117,7 @@ class ObsErrorTable {
 
       // Index of the most recently matched table row which is checked
       // first since consecutive lookups often produce the same match
-      int LastMatchIndex;
+      int LastMatchIndex = -1;
 
       const std::vector<int> & var_subset(const char *cur_var_name);
 
@@ -132,7 +126,9 @@ class ObsErrorTable {
       ObsErrorTable();
      ~ObsErrorTable();
       ObsErrorTable(const ObsErrorTable &);
+      ObsErrorTable(ObsErrorTable &&) noexcept;
       ObsErrorTable & operator=(const ObsErrorTable &);
+      ObsErrorTable & operator=(ObsErrorTable &&) noexcept;
 
       void clear();
 
@@ -171,7 +167,7 @@ class ObsErrorTable {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int  ObsErrorTable::n()      const { return N_elements; }
+inline int  ObsErrorTable::n()      const { return (int) e.size(); }
 inline bool ObsErrorTable::is_set() const { return IsSet;      }
 
 ////////////////////////////////////////////////////////////////////////

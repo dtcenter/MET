@@ -368,10 +368,7 @@ void ObsErrorEntry::validate() {
 //
 ////////////////////////////////////////////////////////////////////////
 
-ObsErrorTable::ObsErrorTable() {
-
-   init_from_scratch();
-}
+ObsErrorTable::ObsErrorTable() { }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -384,29 +381,27 @@ ObsErrorTable::~ObsErrorTable() {
 
 ObsErrorTable::ObsErrorTable(const ObsErrorTable &f) {
 
-   init_from_scratch();
-
    assign(f);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void ObsErrorTable::init_from_scratch() {
+ObsErrorTable::ObsErrorTable(ObsErrorTable &&f) noexcept :
+   e(std::move(f.e)), IsSet(f.IsSet),
+   VarSubsetCache(std::move(f.VarSubsetCache)),
+   LastMatchIndex(f.LastMatchIndex) {
 
-   e = (ObsErrorEntry *) nullptr;
-
-   clear();
+   f.IsSet = false;
+   f.LastMatchIndex = -1;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void ObsErrorTable::clear() {
 
-   if(e) { delete [] e; e = (ObsErrorEntry *) nullptr; }
+   e.clear();
 
-   IsSet      = false;
-   N_elements = 0;
-   N_alloc    = 0;
+   IsSet = false;
 
    VarSubsetCache.clear();
    LastMatchIndex = -1;
@@ -417,12 +412,11 @@ void ObsErrorTable::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void ObsErrorTable::dump(ostream & out, int depth) const {
-   int i;
    Indent prefix(depth);
 
-   out << prefix << "N_elements = " << N_elements << "\n";
+   out << prefix << "N_elements = " << n() << "\n";
 
-   for(i=0; i<N_elements; i++) {
+   for(int i=0; i<n(); i++) {
       out << prefix << "ObsErrorTable Entry # " << i+1 << " ...\n";
       e[i].dump(out, depth + 1);
    }
@@ -433,19 +427,12 @@ void ObsErrorTable::dump(ostream & out, int depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 void ObsErrorTable::assign(const ObsErrorTable & f) {
-   int i;
 
    clear();
 
-   if(f.N_elements != 0 )  {
-
+   if(!f.e.empty()) {
       IsSet = true;
-
-      N_elements = N_alloc = f.N_elements;
-
-      e = new ObsErrorEntry [N_elements];
-
-      for(i=0; i<N_elements; i++) e[i] = f.e[i];
+      e = f.e;
    }
 
    return;
@@ -453,22 +440,37 @@ void ObsErrorTable::assign(const ObsErrorTable & f) {
 
 ////////////////////////////////////////////////////////////////////////
 
+ObsErrorTable & ObsErrorTable::operator=(const ObsErrorTable &f) {
+
+   if(this == &f) return *this;
+
+   assign(f);
+
+   return *this;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ObsErrorTable & ObsErrorTable::operator=(ObsErrorTable &&f) noexcept {
+
+   if(this == &f) return *this;
+
+   e = std::move(f.e);
+   IsSet = f.IsSet;
+   VarSubsetCache = std::move(f.VarSubsetCache);
+   LastMatchIndex = f.LastMatchIndex;
+
+   f.IsSet = false;
+   f.LastMatchIndex = -1;
+
+   return *this;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void ObsErrorTable::extend(int len) {
 
-   if(len <= N_alloc )  return;
-
-   int i;
-   ObsErrorEntry * u = (ObsErrorEntry *) nullptr;
-
-   u = new ObsErrorEntry [len];
-
-   for(i=0; i<N_elements; i++) u[i] = e[i];
-
-   e = u;
-
-   u = (ObsErrorEntry *) nullptr;
-
-   N_alloc = len;
+   e.reserve(len);
 
    return;
 }
@@ -532,15 +534,14 @@ bool ObsErrorTable::read(const char * file_name) {
    //
    // Allocate space for all the lines in this file
    //
-   extend(N_elements + file_linecount(file_name));
+   extend(n() + file_linecount(file_name));
 
    //
    // Read each line of the file
    //
    while(f >> dl) {
       if(cur.parse_line(dl)) {
-         e[N_elements] = cur;
-         N_elements++;
+         e.push_back(cur);
       }
    }
 
@@ -568,7 +569,7 @@ const vector<int> & ObsErrorTable::var_subset(const char *cur_var_name) {
    }
 
    vector<int> subset;
-   for(int i=0; i<N_elements; i++) {
+   for(int i=0; i<n(); i++) {
       if(e[i].var_name.n() == 0 || e[i].var_name.reg_exp_match(cur_var_name)) {
          subset.push_back(i);
       }
@@ -589,7 +590,7 @@ const ObsErrorEntry *ObsErrorTable::lookup(
 
    // Check the most recently matched entry first since consecutive
    // lookups often resolve to the same table row
-   if(LastMatchIndex >= 0 && LastMatchIndex < N_elements &&
+   if(LastMatchIndex >= 0 && LastMatchIndex < n() &&
       e[LastMatchIndex].is_match(cur_var_name, cur_msg_type, cur_sid,
                                  cur_pb_rpt,   cur_in_rpt,   cur_inst,
                                  cur_hgt,      cur_prs,      cur_val)) {
@@ -638,7 +639,7 @@ const ObsErrorEntry *ObsErrorTable::lookup(
    // Check the most recently matched entry first since consecutive
    // lookups (e.g. adjacent grid points) often resolve to the same
    // table row
-   if(LastMatchIndex >= 0 && LastMatchIndex < N_elements &&
+   if(LastMatchIndex >= 0 && LastMatchIndex < n() &&
       e[LastMatchIndex].is_match(   cur_var_name,    cur_msg_type, bad_data_str,
                                     bad_data_int,    bad_data_int, bad_data_int,
                                  bad_data_double, bad_data_double, cur_val)) {
@@ -677,7 +678,7 @@ const ObsErrorEntry *ObsErrorTable::lookup(
 bool ObsErrorTable::has(const char *cur_var_name,
                         const char *cur_msg_type) {
 
-   for(int i=0; i<N_elements; i++) {
+   for(int i=0; i<n(); i++) {
       if( (e[i].var_name.n() == 0 || e[i].var_name.reg_exp_match(cur_var_name)) &&
           (e[i].msg_type.n() == 0 || e[i].msg_type.has(cur_msg_type)) ) return true;
    }
