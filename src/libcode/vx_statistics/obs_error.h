@@ -123,7 +123,7 @@ class ObsErrorTable {
 
    public:
 
-      ObsErrorTable();
+      ObsErrorTable() = default;
      ~ObsErrorTable();
       ObsErrorTable(const ObsErrorTable &);
       ObsErrorTable(ObsErrorTable &&) noexcept;
