@@ -581,11 +581,11 @@ const vector<int> & ObsErrorTable::var_subset(const char *cur_var_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ObsErrorEntry *ObsErrorTable::lookup(
+const ObsErrorEntry *ObsErrorTable::lookup(
    const char *cur_var_name, const char *cur_msg_type, const char *cur_sid,
    int cur_pb_rpt,           int cur_in_rpt,           int cur_inst,
    double cur_hgt,           double cur_prs,           double cur_val) {
-   ObsErrorEntry * e_match = (ObsErrorEntry *) nullptr;
+   const ObsErrorEntry * e_match = nullptr;
 
    // Check the most recently matched entry first since consecutive
    // lookups often resolve to the same table row
@@ -631,9 +631,9 @@ ObsErrorEntry *ObsErrorTable::lookup(
 
 ////////////////////////////////////////////////////////////////////////
 
-ObsErrorEntry *ObsErrorTable::lookup(
+const ObsErrorEntry *ObsErrorTable::lookup(
    const char *cur_var_name, const char *cur_msg_type, double cur_val) {
-   ObsErrorEntry * e_match = (ObsErrorEntry *) nullptr;
+   const ObsErrorEntry * e_match = nullptr;
 
    // Check the most recently matched entry first since consecutive
    // lookups (e.g. adjacent grid points) often resolve to the same
@@ -830,6 +830,57 @@ double add_obs_error_inc(const gsl_rng *r, FieldType t,
 
 ////////////////////////////////////////////////////////////////////////
 
+// Apply the perturbation for a single, resolved entry across every
+// grid point, serially or in parallel with one RNG clone per thread.
+// Preserve the same x-outer, y-inner traversal order used
+// historically so that, run single threaded, the exact same sequence
+// of RNG draws lands on the exact same grid points as before.
+static void apply_obs_error_inc_fixed_entry(
+      const gsl_rng *r, FieldType t, const ObsErrorEntry *in_e,
+      const double *in_buf, const double *obs_buf,
+      vector<double> &out_buf, int nx, int ny) {
+
+   int n_threads = 1;
+#ifdef _OPENMP
+   n_threads = omp_get_max_threads();
+#endif
+
+   if(n_threads <= 1) {
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
+            int j = y*nx + x;
+            out_buf[j] = add_obs_error_inc(r, t, in_e, obs_buf[j],
+                                           in_buf[j], false);
+         }
+      }
+      return;
+   }
+
+   // One independent RNG clone per thread
+   vector<gsl_rng *> thread_rngs = rng_set_omp(r, n_threads);
+
+#pragma omp parallel default(none) \
+   shared(in_buf, obs_buf, out_buf, nx, ny, in_e, t, thread_rngs)
+   {
+      gsl_rng *my_r = thread_rngs[omp_get_thread_num()];
+
+#pragma omp for collapse(2) schedule(static)
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
+            int j = y*nx + x;
+            out_buf[j] = add_obs_error_inc(my_r, t, in_e, obs_buf[j],
+                                           in_buf[j], false);
+         }
+      }
+   }
+
+   rng_free_omp(thread_rngs);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
                             const ObsErrorEntry *in_e,
                             const DataPlane &in_dp,
@@ -863,46 +914,9 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
 
       // The entry is fixed for every point, so no table lookup (and
       // therefore no shared, mutable table state) is touched here -
-      // safe to parallelize. Preserve the same x-outer, y-inner
-      // traversal order used historically so that, run single
-      // threaded, the exact same sequence of RNG draws lands on the
-      // exact same grid points as before.
-      int n_threads = 1;
-#ifdef _OPENMP
-      n_threads = omp_get_max_threads();
-#endif
-
-      if(n_threads <= 1) {
-         for(int x=0; x<nx; x++) {
-            for(int y=0; y<ny; y++) {
-               int j = y*nx + x;
-               out_buf[j] = add_obs_error_inc(r, t, in_e, obs_buf[j],
-                                              in_buf[j], false);
-            }
-         }
-      }
-      else {
-
-         // One independent RNG clone per thread
-         vector<gsl_rng *> thread_rngs = rng_set_omp(r, n_threads);
-
-#pragma omp parallel default(none) \
-         shared(in_buf, obs_buf, out_buf, nx, ny, in_e, t, thread_rngs)
-         {
-            gsl_rng *my_r = thread_rngs[omp_get_thread_num()];
-
-#pragma omp for collapse(2) schedule(static)
-            for(int x=0; x<nx; x++) {
-               for(int y=0; y<ny; y++) {
-                  int j = y*nx + x;
-                  out_buf[j] = add_obs_error_inc(my_r, t, in_e, obs_buf[j],
-                                                 in_buf[j], false);
-               }
-            }
-         }
-
-         rng_free_omp(thread_rngs);
-      }
+      // safe to parallelize
+      apply_obs_error_inc_fixed_entry(r, t, in_e, in_buf, obs_buf,
+                                      out_buf, nx, ny);
    }
    else {
 

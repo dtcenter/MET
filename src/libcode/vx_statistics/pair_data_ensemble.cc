@@ -1183,6 +1183,52 @@ void VxPairDataEnsemble::set_skip_const(bool tf) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool VxPairDataEnsemble::resolve_obs_error_entry(const char *hdr_typ_str,
+                                                 const char *hdr_sid_str,
+                                                 const int *hdr_typ_arr,
+                                                 double obs_lvl, double obs_hgt,
+                                                 double obs_v,
+                                                 const ObsErrorEntry *&oerr_ptr) {
+
+   oerr_ptr = nullptr;
+
+   // Use config file setting, if specified
+   if(obs_error_info->entry.dist_type != DistType::None) {
+      oerr_ptr = &(obs_error_info->entry);
+      return true;
+   }
+
+   // Otherwise, do a table lookup.
+   // Check for table entries for this variable and message type
+   if(!obs_error_table.has(obs_info->name().c_str(), hdr_typ_str)) {
+      mlog << Warning << "\nVxPairDataEnsemble::add_point_obs() -> "
+           << "Disabling observation error logic since the "
+           << "obs error table contains no entry for OBS_VAR("
+           << obs_info->name() << ") and MESSAGE_TYPE("
+           << hdr_typ_str << ").\nSpecify a custom obs error "
+           << "table using the MET_OBS_ERROR_TABLE environment "
+           << "variable.\n\n";
+      obs_error_info->flag = false;
+      return true;
+   }
+
+   n_try_obs_error++;
+   oerr_ptr = obs_error_table.lookup(
+      obs_info->name().c_str(), hdr_typ_str, hdr_sid_str,
+      hdr_typ_arr[0], hdr_typ_arr[1], hdr_typ_arr[2],
+      obs_lvl, obs_hgt, obs_v);
+
+   // MET #3429: Skip observation if the table lookup fails
+   if(!oerr_ptr) {
+      n_fail_obs_error++;
+      return false;
+   }
+
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
                                        const int *hdr_typ_arr,
                                        const char *hdr_typ_str,
@@ -1254,38 +1300,11 @@ void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
    }
 
    // Store pointer to ObsErrorEntry
-   ObsErrorEntry *oerr_ptr = nullptr;
-   if(obs_error_info->flag) {
-
-      // Use config file setting, if specified
-      if(obs_error_info->entry.dist_type != DistType::None) {
-         oerr_ptr = &(obs_error_info->entry);
-      }
-      // Otherwise, do a table lookup
-      else {
-
-         // Check for table entries for this variable and message type
-         if(!obs_error_table.has(obs_info->name().c_str(), hdr_typ_str)) {
-            mlog << Warning << "\nVxPairDataEnsemble::add_point_obs() -> "
-                 << "Disabling observation error logic since the "
-                 << "obs error table contains no entry for OBS_VAR("
-                 << obs_info->name() << ") and MESSAGE_TYPE("
-                 << hdr_typ_str << ").\nSpecify a custom obs error "
-                 << "table using the MET_OBS_ERROR_TABLE environment "
-                 << "variable.\n\n";
-            obs_error_info->flag = false;
-         }
-         else {
-            n_try_obs_error++;
-            oerr_ptr = obs_error_table.lookup(
-               obs_info->name().c_str(), hdr_typ_str, hdr_sid_str,
-               hdr_typ_arr[0], hdr_typ_arr[1], hdr_typ_arr[2],
-               obs_lvl, obs_hgt, obs_v);
-
-            // MET #3429: Skip observation if the table lookup fails
-            if(!oerr_ptr) { n_fail_obs_error++; return; }
-         }
-      }
+   const ObsErrorEntry *oerr_ptr = nullptr;
+   if(obs_error_info->flag &&
+      !resolve_obs_error_entry(hdr_typ_str, hdr_sid_str, hdr_typ_arr,
+                               obs_lvl, obs_hgt, obs_v, oerr_ptr)) {
+      return;
    }
 
    // Apply observation error additive and multiplicative

@@ -159,12 +159,12 @@ class ObsErrorTable {
       bool read(const char * filename);
 
       // for point observations
-      ObsErrorEntry * lookup(const char *, const char *, const char *,
-                             int, int, int, double, double, double);
+      const ObsErrorEntry * lookup(const char *, const char *, const char *,
+                                   int, int, int, double, double, double);
 
       // for gridded analyses
-      ObsErrorEntry * lookup(const char *, const char *,
-                             double cur_val = bad_data_double);
+      const ObsErrorEntry * lookup(const char *, const char *,
+                                   double cur_val = bad_data_double);
 
       bool has(const char *, const char *);
 };
