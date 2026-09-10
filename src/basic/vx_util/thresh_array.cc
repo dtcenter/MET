@@ -334,7 +334,8 @@ int ThreshArray::check_bins(double v, const ClimoPntInfo *cpi) const {
    if(t[0].get_type() == thresh_lt ||
       t[0].get_type() == thresh_le) {
 
-      for(int i=0, bin=-1; i<n(); i++) {
+      bin = -1;
+      for(int i=0; i<n(); i++) {
          if(t[i].check(v, cpi)) {
             bin = i;
             break;
@@ -345,7 +346,8 @@ int ThreshArray::check_bins(double v, const ClimoPntInfo *cpi) const {
    // For > and >=, check thresholds right to left
    else {
 
-      for(int i=n()-1, bin=-1; i>=0; i--) {
+      bin = -1;
+      for(int i=n()-1; i>=0; i--) {
          if(t[i].check(v, cpi)) {
             bin = i+1;
             break;

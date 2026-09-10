@@ -277,7 +277,9 @@ if ( prefix )  regex1 << "^" << prefix;
 
 if ( suffix )  regex2 << suffix << "$";
 
-return check_filename_regex(path, regex1.c_str(), regex2.c_str());
+return check_filename_regex(path,
+                             prefix ? regex1.c_str() : nullptr,
+                             suffix ? regex2.c_str() : nullptr);
 
 }
 
