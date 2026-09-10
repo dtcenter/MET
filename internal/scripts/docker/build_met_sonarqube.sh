@@ -103,7 +103,6 @@ time_command ./configure \
   BUFRLIB_NAME=${BUFRLIB_NAME} \
   GRIB2CLIB_NAME=${GRIB2CLIB_NAME} \
   --enable-all \
-  MET_CXX_STANDARD=11 \
   CPPFLAGS="-I/usr/local/include" \
   LIBS="-ltirpc"
 
