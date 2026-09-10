@@ -24,6 +24,17 @@
 # (if a single severity is still too large) further by type, fetching
 # each slice separately and merging the results back together.
 #
+# Deep pagination against Elasticsearch (large "from" offsets) gets more
+# expensive the deeper you page, and this endpoint is backed by an
+# embedded, often memory-constrained Elasticsearch node. Hammering it
+# with many such requests back-to-back has been observed to destabilize
+# a SonarQube server. To keep this script a good citizen:
+#   - Requests are rate-limited (SONAR_REQUEST_DELAY between requests).
+#   - The page size defaults to a modest value, not the API's max of 500.
+#   - SONAR_SEVERITIES / SONAR_TYPES let you fetch only what you need
+#     right now (e.g. just BLOCKER) instead of every issue on the branch,
+#     which avoids deep pagination altogether for small slices.
+#
 # Usage: fetch_sonarqube_findings.sh branch [outdir]
 #    where "branch"  specifies the sonar.branch.name that was analyzed
 #          "outdir"  specifies the output directory (default: .)
@@ -34,6 +45,12 @@
 #
 # Optional Environment Variables:
 #   SONAR_COMPONENT_KEY   (default: MET)
+#   SONAR_SEVERITIES      Comma-separated subset of BLOCKER, CRITICAL,
+#                         MAJOR, MINOR, INFO to fetch (default: all)
+#   SONAR_TYPES           Comma-separated subset of BUG, VULNERABILITY,
+#                         CODE_SMELL to fetch (default: all)
+#   SONAR_PAGE_SIZE       Issues per request, max 500 (default: 100)
+#   SONAR_REQUEST_DELAY   Seconds to sleep between requests (default: 1)
 #
 # Requires: curl, jq
 #
@@ -53,11 +70,12 @@ if [[ $# -lt 1 ]]; then usage; exit 1; fi
 BRANCH=$1
 OUTDIR=${2:-.}
 COMPONENT_KEY=${SONAR_COMPONENT_KEY:-MET}
-PAGE_SIZE=500
+PAGE_SIZE=${SONAR_PAGE_SIZE:-100}
+REQUEST_DELAY=${SONAR_REQUEST_DELAY:-1}
 MAX_RESULT_WINDOW=10000
 
-# SonarQube's fixed sets of severity and type values, used to split up
-# queries that would otherwise exceed MAX_RESULT_WINDOW.
+# SonarQube's fixed sets of severity and type values, used only to split
+# up an *unfiltered* query that turns out to exceed MAX_RESULT_WINDOW.
 SEVERITIES=(BLOCKER CRITICAL MAJOR MINOR INFO)
 TYPES=(BUG VULNERABILITY CODE_SMELL)
 
@@ -84,12 +102,30 @@ RAW_FILE=$(mktemp)
 
 BASE_QUERY="componentKeys=${COMPONENT_KEY}&branch=${BRANCH}&resolved=false"
 
+# Fold a caller-requested severity/type filter directly into every
+# request (the API accepts comma-separated values for both params). This
+# both narrows the result set and, when it's small enough, sidesteps
+# the deep-pagination splitting logic below entirely.
+FILTERED=0
+if [ -n "${SONAR_SEVERITIES}" ]; then
+  BASE_QUERY="${BASE_QUERY}&severities=${SONAR_SEVERITIES}"
+  FILTERED=1
+fi
+if [ -n "${SONAR_TYPES}" ]; then
+  BASE_QUERY="${BASE_QUERY}&types=${SONAR_TYPES}"
+  FILTERED=1
+fi
+
 # api_get extra_params -> prints the JSON response on stdout, returns
-# non-zero on failure (after printing the server's error body to stderr)
+# non-zero on failure (after printing the server's error body to stderr).
+# Rate-limited by SONAR_REQUEST_DELAY to avoid overloading the server.
 function api_get {
   local extra="$1"
   local url="${SONAR_HOST_URL}/api/issues/search?${BASE_QUERY}&${extra}"
   local response
+
+  sleep ${REQUEST_DELAY}
+
   response=$(curl -s -f -u "${SONAR_TOKEN}:" "${url}")
   if [ $? -ne 0 ]; then
     echo "ERROR: $(basename $0) -> request failed: ${url}" >&2
@@ -179,8 +215,20 @@ function fetch_partition {
 }
 
 echo "Fetching SonarQube findings for component '${COMPONENT_KEY}' branch '${BRANCH}' from ${SONAR_HOST_URL}"
+if [ ${FILTERED} -eq 1 ]; then
+  echo "Filter: severities=[${SONAR_SEVERITIES:-all}] types=[${SONAR_TYPES:-all}]"
+fi
 
-fetch_partition "" "all" "severity"
+# When the caller already narrowed the query with SONAR_SEVERITIES /
+# SONAR_TYPES, don't also auto-split by severity/type -- that filter is
+# already baked into BASE_QUERY, and appending another severities= or
+# types= param on top of it would conflict. Just warn if it's still too
+# big rather than fetching everything to find a further split.
+if [ ${FILTERED} -eq 1 ]; then
+  fetch_partition "" "all" "none"
+else
+  fetch_partition "" "all" "severity"
+fi
 STATUS=$?
 if [ ${STATUS} -ne 0 ]; then
   rm -f ${RAW_FILE}
