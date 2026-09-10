@@ -426,6 +426,13 @@ StringArray TrackInfo::track_lines() const {
 void TrackInfo::add(const TrackPoint &p) {
 
    extend(NPoints + 1, false);
+
+   if(NPoints < 0 || NPoints >= NAlloc) {
+      mlog << Error << "\nTrackInfo::add(const TrackPoint &) -> "
+           << "index out of range (" << NPoints << ")!\n\n";
+      exit(1);
+   }
+
    Point[NPoints] = p;
    NPoints++;
 
