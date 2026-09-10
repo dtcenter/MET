@@ -1735,43 +1735,6 @@ static void process_grid_vx() {
 
 ////////////////////////////////////////////////////////////////////////
 
-// Resolve the observation error entry pointer to use for one grid
-// point. Returns false only when a per-point table lookup found no
-// matching entry (this point should be skipped); otherwise true,
-// including when obs_error is disabled, in which case e is nullptr.
-static bool resolve_grid_obs_error_entry(
-      int i_vx, const ObsErrorEntry *oerr_ptr,
-      const vector<const ObsErrorEntry *> &oerr_grid, int idx,
-      int &n_try_obs_error, int &n_fail_obs_error,
-      const ObsErrorEntry *&e) {
-
-   if(oerr_ptr) {
-      e = oerr_ptr;
-      return true;
-   }
-
-   if(!conf_info.vx_opt[i_vx].obs_error.flag) {
-      e = nullptr;
-      return true;
-   }
-
-   n_try_obs_error++;
-
-   // Use the entry cache built once in process_grid_vx() instead of
-   // repeating the table lookup for each point
-   e = oerr_grid[idx];
-
-   // MET #3429: Skip observation if the table lookup fails
-   if(!e) {
-      n_fail_obs_error++;
-      return false;
-   }
-
-   return true;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 static void process_grid_scores(int i_vx,
         const DataPlane *fcst_dp, const DataPlane *fraw_dp,
         const DataPlane &obs_dp,  const DataPlane &oraw_dp,
@@ -1812,10 +1775,21 @@ static void process_grid_scores(int i_vx,
             !mask_mp.s_is_on(x, y)) continue;
 
          // Get the observation error entry pointer
-         if(!resolve_grid_obs_error_entry(
-               i_vx, oerr_ptr, oerr_grid, y * obs_dp.nx() + x,
-               n_try_obs_error, n_fail_obs_error, e)) {
-            continue;
+         if(oerr_ptr) {
+            e = oerr_ptr;
+         }
+         else if(conf_info.vx_opt[i_vx].obs_error.flag) {
+            n_try_obs_error++;
+
+            // Use the entry cache built once in process_grid_vx()
+            // instead of repeating the table lookup for each point
+            e = oerr_grid[y * obs_dp.nx() + x];
+
+            // MET #3429: Skip observation if the table lookup fails
+            if(!e) { n_fail_obs_error++; continue; }
+         }
+         else {
+            e = nullptr;
          }
 
          // Get current climatology values

@@ -175,18 +175,6 @@ class VxPairDataEnsemble : public VxPairBase {
       void init_from_scratch();
       void assign(const VxPairDataEnsemble &);
 
-      // Resolve the ObsErrorEntry pointer to use for one observation,
-      // per the config file/table settings. Returns false only when
-      // this specific observation should be skipped (a table lookup
-      // found no matching entry); an empty table for this
-      // variable/message type instead disables obs_error_info->flag
-      // for subsequent observations and returns true.
-      bool resolve_obs_error_entry(const char *hdr_typ_str,
-                                   const char *hdr_sid_str,
-                                   const int *hdr_typ_arr,
-                                   double obs_lvl, double obs_hgt,
-                                   double obs_v, const ObsErrorEntry *&oerr_ptr);
-
    public:
 
       VxPairDataEnsemble();
