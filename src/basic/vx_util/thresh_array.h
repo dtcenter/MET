@@ -30,7 +30,7 @@ class ThreshArray {
 
    public:
 
-      ThreshArray();
+      ThreshArray() = default;
      ~ThreshArray();
       ThreshArray(const ThreshArray &);
       ThreshArray(ThreshArray &&) noexcept;

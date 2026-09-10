@@ -191,7 +191,9 @@ class DataPlaneArray {
       DataPlaneArray();
      ~DataPlaneArray();
       DataPlaneArray(const DataPlaneArray &);
+      DataPlaneArray(DataPlaneArray &&) noexcept;
       DataPlaneArray & operator=(const DataPlaneArray &);
+      DataPlaneArray & operator=(DataPlaneArray &&) noexcept;
       DataPlaneArray & operator+=(const DataPlaneArray &);
       DataPlaneArray & operator/=(const double);
 
