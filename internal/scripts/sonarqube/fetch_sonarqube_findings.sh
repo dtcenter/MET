@@ -62,6 +62,7 @@ function usage {
   echo "   where \"branch\" specifies the sonar.branch.name that was analyzed"
   echo "         \"outdir\" specifies the output directory (default: .)"
   echo
+  return 0
 }
 
 # Check for arguments
@@ -80,16 +81,16 @@ SEVERITIES=(BLOCKER CRITICAL MAJOR MINOR INFO)
 TYPES=(BUG VULNERABILITY CODE_SMELL)
 
 # Check required environment variables
-if [ -z "$SONAR_HOST_URL" ]; then
-  echo "ERROR: $(basename $0) -> \$SONAR_HOST_URL not defined!"
+if [[ -z "$SONAR_HOST_URL" ]]; then
+  echo "ERROR: $(basename $0) -> \$SONAR_HOST_URL not defined!" >&2
   exit 1
 fi
-if [ -z "$SONAR_TOKEN" ]; then
-  echo "ERROR: $(basename $0) -> \$SONAR_TOKEN not defined!"
+if [[ -z "$SONAR_TOKEN" ]]; then
+  echo "ERROR: $(basename $0) -> \$SONAR_TOKEN not defined!" >&2
   exit 1
 fi
 if ! command -v jq >/dev/null 2>&1; then
-  echo "ERROR: $(basename $0) -> jq is required but was not found in PATH"
+  echo "ERROR: $(basename $0) -> jq is required but was not found in PATH" >&2
   exit 1
 fi
 
@@ -107,11 +108,11 @@ BASE_QUERY="componentKeys=${COMPONENT_KEY}&branch=${BRANCH}&resolved=false"
 # both narrows the result set and, when it's small enough, sidesteps
 # the deep-pagination splitting logic below entirely.
 FILTERED=0
-if [ -n "${SONAR_SEVERITIES}" ]; then
+if [[ -n "${SONAR_SEVERITIES}" ]]; then
   BASE_QUERY="${BASE_QUERY}&severities=${SONAR_SEVERITIES}"
   FILTERED=1
 fi
-if [ -n "${SONAR_TYPES}" ]; then
+if [[ -n "${SONAR_TYPES}" ]]; then
   BASE_QUERY="${BASE_QUERY}&types=${SONAR_TYPES}"
   FILTERED=1
 fi
@@ -127,7 +128,7 @@ function api_get {
   sleep ${REQUEST_DELAY}
 
   response=$(curl -s -f -u "${SONAR_TOKEN}:" "${url}")
-  if [ $? -ne 0 ]; then
+  if [[ $? -ne 0 ]]; then
     echo "ERROR: $(basename $0) -> request failed: ${url}" >&2
     curl -s -u "${SONAR_TOKEN}:" "${url}" >&2
     return 1
@@ -156,7 +157,7 @@ function fetch_all_pages {
   while :; do
     response=$(api_get "${extra}&ps=${PAGE_SIZE}&p=${page}") || return 1
 
-    if [ ${total} -eq -1 ]; then
+    if [[ ${total} -eq -1 ]]; then
       total=$(echo "${response}" | jq '.total')
     fi
 
@@ -166,7 +167,7 @@ function fetch_all_pages {
     fetched=$(( fetched + n ))
     echo "  [${label}] page ${page}: ${n} issue(s), ${fetched}/${total}"
 
-    if [ ${n} -eq 0 ] || [ ${fetched} -ge ${total} ]; then
+    if [[ ${n} -eq 0 || ${fetched} -ge ${total} ]]; then
       break
     fi
     page=$(( page + 1 ))
@@ -184,11 +185,11 @@ function fetch_partition {
 
   total=$(get_total "${extra}") || return 1
 
-  if [ "${total}" -eq 0 ]; then
+  if [[ "${total}" -eq 0 ]]; then
     return 0
   fi
 
-  if [ "${total}" -le ${MAX_RESULT_WINDOW} ]; then
+  if [[ "${total}" -le ${MAX_RESULT_WINDOW} ]]; then
     echo "[${label}] ${total} issue(s)"
     fetch_all_pages "${extra}" "${label}"
     return $?
@@ -211,11 +212,15 @@ function fetch_partition {
       echo "WARNING: [${label}] has ${total} issue(s), still exceeding the ${MAX_RESULT_WINDOW} API limit after splitting by severity and type. Only the first ${MAX_RESULT_WINDOW} will be fetched -- some findings will be MISSING from the output." >&2
       fetch_all_pages "${extra}" "${label}"
       ;;
+    *)
+      echo "ERROR: $(basename $0) -> fetch_partition() called with unknown split_dim: '${split_dim}'" >&2
+      return 1
+      ;;
   esac
 }
 
 echo "Fetching SonarQube findings for component '${COMPONENT_KEY}' branch '${BRANCH}' from ${SONAR_HOST_URL}"
-if [ ${FILTERED} -eq 1 ]; then
+if [[ ${FILTERED} -eq 1 ]]; then
   echo "Filter: severities=[${SONAR_SEVERITIES:-all}] types=[${SONAR_TYPES:-all}]"
 fi
 
@@ -224,13 +229,13 @@ fi
 # already baked into BASE_QUERY, and appending another severities= or
 # types= param on top of it would conflict. Just warn if it's still too
 # big rather than fetching everything to find a further split.
-if [ ${FILTERED} -eq 1 ]; then
+if [[ ${FILTERED} -eq 1 ]]; then
   fetch_partition "" "all" "none"
 else
   fetch_partition "" "all" "severity"
 fi
 STATUS=$?
-if [ ${STATUS} -ne 0 ]; then
+if [[ ${STATUS} -ne 0 ]]; then
   rm -f ${RAW_FILE}
   exit ${STATUS}
 fi
