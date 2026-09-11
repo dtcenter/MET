@@ -142,6 +142,7 @@ void VarInfo::assign(const VarInfo &v) {
    SetAttrIsGridRelative = v.SetAttrIsGridRelative;
    SetAttrIsWindSpeed = v.SetAttrIsWindSpeed;
    SetAttrIsWindDirection = v.SetAttrIsWindDirection;
+   SetAttrIsKineticEnergy = v.SetAttrIsKineticEnergy;
    SetAttrIsProb = v.SetAttrIsProb;
 
    return;
@@ -207,6 +208,7 @@ void VarInfo::clear() {
    SetAttrIsGridRelative = bad_data_int;
    SetAttrIsWindSpeed = bad_data_int;
    SetAttrIsWindDirection = bad_data_int;
+   SetAttrIsKineticEnergy = bad_data_int;
    SetAttrIsProb = bad_data_int;
 
    return;
@@ -625,12 +627,14 @@ bool VarInfo::set_dict(Dictionary &dict, bool do_exit) {
       parse_set_attr_flag(dict, conf_key_is_u_wind);
    SetAttrIsVWind =
       parse_set_attr_flag(dict, conf_key_is_v_wind);
+   SetAttrIsGridRelative =
+      parse_set_attr_flag(dict, conf_key_is_grid_relative);
    SetAttrIsWindSpeed =
       parse_set_attr_flag(dict, conf_key_is_wind_speed);
    SetAttrIsWindDirection =
       parse_set_attr_flag(dict, conf_key_is_wind_direction);
-   SetAttrIsGridRelative =
-      parse_set_attr_flag(dict, conf_key_is_grid_relative);
+   SetAttrIsKineticEnergy =
+      parse_set_attr_flag(dict, conf_key_is_kinetic_energy);
    SetAttrIsProb =
       parse_set_attr_flag(dict, conf_key_is_prob);
 
@@ -972,13 +976,17 @@ bool VarInfo::validate_wind_attributes(bool do_exit, const char *caller_name) co
    if(SetAttrIsVWind         == 1) n++;
    if(SetAttrIsWindSpeed     == 1) n++;
    if(SetAttrIsWindDirection == 1) n++;
+   if(SetAttrIsKineticEnergy == 1) n++;
 
    if(n > 1) {
       ConcatString msg;
       msg << "\n" << (caller_name == nullptr ? "" : caller_name)
           << "At most one wind attribute flag ("
-          << conf_key_is_u_wind << ", " << conf_key_is_v_wind << ", "
-          << conf_key_is_wind_speed << ", " << conf_key_is_wind_direction
+          << conf_key_is_u_wind << ", "
+          << conf_key_is_v_wind << ", "
+          << conf_key_is_wind_speed << ", "
+          << conf_key_is_wind_direction << ", "
+          << conf_key_is_kinetic_energy
           << ") can be set to true for each field.\n\n";
       handle_config_error(msg, do_exit);
       return false;

@@ -214,3 +214,7 @@ CLIMO_STD_ANOM = 3;
 FCST_ANOM      = 4;
 FCST_STD_ANOM  = 5;
 
+// Power spectrum missing flag types
+NONE  = 1;
+MEAN  = 2;
+VALUE = 3;

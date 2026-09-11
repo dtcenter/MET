@@ -83,6 +83,7 @@ class VarInfo
       int           SetAttrIsGridRelative;
       int           SetAttrIsWindSpeed;
       int           SetAttrIsWindDirection;
+      int           SetAttrIsKineticEnergy;
       int           SetAttrIsProb;
 
       void init_from_scratch();

@@ -33,6 +33,15 @@ censor_thresh = [];
 censor_val    = [];
 
 //
+// Specify the handling of missing data for power spectra
+//
+power_spectrum = {
+   missing_flag  = NONE;
+   missing_value = 0.0;
+   vld_thresh    = 0.5;
+}
+
+//
 // Data fields
 //
 data = {
@@ -74,9 +83,10 @@ mask = {
 // Diagnostic output types
 //
 output_flag = {
-   histogram_1d = TRUE;
-   histogram_2d = TRUE;
-   info_theory  = FALSE;
+   histogram_1d   = TRUE;
+   histogram_2d   = TRUE;
+   info_theory    = FALSE;
+   power_spectrum = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

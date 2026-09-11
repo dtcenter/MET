@@ -87,6 +87,7 @@ static GridDiagConfInfo conf_info;
 // Output NetCDF file
 static netCDF::NcFile *nc_out = nullptr;
 netCDF::NcDim mask_dim;
+netCDF::NcDim wavenumber_dim;
 std::vector<netCDF::NcDim> data_var_dims;
 int deflate_level;
 
@@ -108,6 +109,14 @@ static Grid grid;
 // Input files
 static Met2dDataFile *data_mtddf = nullptr;
 
+// Struct to store scalar and vector input data
+struct InputDataInfo {
+   DataPlane dp;
+   DataPlane u_dp;
+   DataPlane v_dp;
+   bool uv_flag = false;
+};
+
 // Struct to store diagnostic info for each field and masking region
 struct DiagInfo {
 
@@ -117,7 +126,7 @@ struct DiagInfo {
    std::vector<double> bin_mid;
    double bin_delta;
 
-   // Input data info
+   // Range of input data values
    double var_min;
    double var_max;
 
@@ -131,8 +140,19 @@ struct DiagInfo {
    std::map<int, double> mutual_information;
 };
 
-// DiagInfo objects [n_data][n_mask]
+// DiagInfo objects, sized as n_data by n_mask
 std::vector<std::vector<DiagInfo> > diag_info; 
+
+// Struct to store power spectrum information
+struct PowerInfo {
+
+   // Power spectrum
+   std::vector<double> power;
+   std::map<int, std::vector<double> > error_power;
+};
+
+// PowerInfo objects, sized as n_data
+std::vector<PowerInfo> power_info;
 
 // Series length
 static int n_series = bad_data_int;

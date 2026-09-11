@@ -109,6 +109,7 @@ libvx_gsl_prob_a_AR = $(AR) $(ARFLAGS)
 libvx_gsl_prob_a_LIBADD =
 am_libvx_gsl_prob_a_OBJECTS = libvx_gsl_prob_a-gsl_bvn.$(OBJEXT) \
 	libvx_gsl_prob_a-gsl_cdf.$(OBJEXT) \
+	libvx_gsl_prob_a-gsl_fft2d.$(OBJEXT) \
 	libvx_gsl_prob_a-gsl_randist.$(OBJEXT) \
 	libvx_gsl_prob_a-gsl_statistics.$(OBJEXT) \
 	libvx_gsl_prob_a-gsl_wavelet2d.$(OBJEXT)
@@ -130,6 +131,7 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/libvx_gsl_prob_a-gsl_bvn.Po \
 	./$(DEPDIR)/libvx_gsl_prob_a-gsl_cdf.Po \
+	./$(DEPDIR)/libvx_gsl_prob_a-gsl_fft2d.Po \
 	./$(DEPDIR)/libvx_gsl_prob_a-gsl_randist.Po \
 	./$(DEPDIR)/libvx_gsl_prob_a-gsl_statistics.Po \
 	./$(DEPDIR)/libvx_gsl_prob_a-gsl_wavelet2d.Po
@@ -349,6 +351,7 @@ noinst_LIBRARIES = libvx_gsl_prob.a
 libvx_gsl_prob_a_SOURCES = \
               gsl_bvn.cc gsl_bvn.h \
               gsl_cdf.cc gsl_cdf.h \
+              gsl_fft2d.cc gsl_fft2d.h \
               gsl_randist.cc gsl_randist.h \
               gsl_statistics.cc gsl_statistics.h \
               gsl_wavelet2d.cc gsl_wavelet2d.h \
@@ -405,6 +408,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_gsl_prob_a-gsl_bvn.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_gsl_prob_a-gsl_cdf.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_gsl_prob_a-gsl_fft2d.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_gsl_prob_a-gsl_randist.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_gsl_prob_a-gsl_statistics.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_gsl_prob_a-gsl_wavelet2d.Po@am__quote@ # am--include-marker
@@ -456,6 +460,20 @@ libvx_gsl_prob_a-gsl_cdf.obj: gsl_cdf.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gsl_cdf.cc' object='libvx_gsl_prob_a-gsl_cdf.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_gsl_prob_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_gsl_prob_a-gsl_cdf.obj `if test -f 'gsl_cdf.cc'; then $(CYGPATH_W) 'gsl_cdf.cc'; else $(CYGPATH_W) '$(srcdir)/gsl_cdf.cc'; fi`
+
+libvx_gsl_prob_a-gsl_fft2d.o: gsl_fft2d.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_gsl_prob_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_gsl_prob_a-gsl_fft2d.o -MD -MP -MF $(DEPDIR)/libvx_gsl_prob_a-gsl_fft2d.Tpo -c -o libvx_gsl_prob_a-gsl_fft2d.o `test -f 'gsl_fft2d.cc' || echo '$(srcdir)/'`gsl_fft2d.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_gsl_prob_a-gsl_fft2d.Tpo $(DEPDIR)/libvx_gsl_prob_a-gsl_fft2d.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gsl_fft2d.cc' object='libvx_gsl_prob_a-gsl_fft2d.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_gsl_prob_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_gsl_prob_a-gsl_fft2d.o `test -f 'gsl_fft2d.cc' || echo '$(srcdir)/'`gsl_fft2d.cc
+
+libvx_gsl_prob_a-gsl_fft2d.obj: gsl_fft2d.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_gsl_prob_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_gsl_prob_a-gsl_fft2d.obj -MD -MP -MF $(DEPDIR)/libvx_gsl_prob_a-gsl_fft2d.Tpo -c -o libvx_gsl_prob_a-gsl_fft2d.obj `if test -f 'gsl_fft2d.cc'; then $(CYGPATH_W) 'gsl_fft2d.cc'; else $(CYGPATH_W) '$(srcdir)/gsl_fft2d.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_gsl_prob_a-gsl_fft2d.Tpo $(DEPDIR)/libvx_gsl_prob_a-gsl_fft2d.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gsl_fft2d.cc' object='libvx_gsl_prob_a-gsl_fft2d.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_gsl_prob_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_gsl_prob_a-gsl_fft2d.obj `if test -f 'gsl_fft2d.cc'; then $(CYGPATH_W) 'gsl_fft2d.cc'; else $(CYGPATH_W) '$(srcdir)/gsl_fft2d.cc'; fi`
 
 libvx_gsl_prob_a-gsl_randist.o: gsl_randist.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_gsl_prob_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_gsl_prob_a-gsl_randist.o -MD -MP -MF $(DEPDIR)/libvx_gsl_prob_a-gsl_randist.Tpo -c -o libvx_gsl_prob_a-gsl_randist.o `test -f 'gsl_randist.cc' || echo '$(srcdir)/'`gsl_randist.cc
@@ -625,6 +643,7 @@ clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/libvx_gsl_prob_a-gsl_bvn.Po
 	-rm -f ./$(DEPDIR)/libvx_gsl_prob_a-gsl_cdf.Po
+	-rm -f ./$(DEPDIR)/libvx_gsl_prob_a-gsl_fft2d.Po
 	-rm -f ./$(DEPDIR)/libvx_gsl_prob_a-gsl_randist.Po
 	-rm -f ./$(DEPDIR)/libvx_gsl_prob_a-gsl_statistics.Po
 	-rm -f ./$(DEPDIR)/libvx_gsl_prob_a-gsl_wavelet2d.Po
@@ -675,6 +694,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/libvx_gsl_prob_a-gsl_bvn.Po
 	-rm -f ./$(DEPDIR)/libvx_gsl_prob_a-gsl_cdf.Po
+	-rm -f ./$(DEPDIR)/libvx_gsl_prob_a-gsl_fft2d.Po
 	-rm -f ./$(DEPDIR)/libvx_gsl_prob_a-gsl_randist.Po
 	-rm -f ./$(DEPDIR)/libvx_gsl_prob_a-gsl_statistics.Po
 	-rm -f ./$(DEPDIR)/libvx_gsl_prob_a-gsl_wavelet2d.Po
