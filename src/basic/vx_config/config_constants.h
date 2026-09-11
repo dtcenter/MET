@@ -270,8 +270,10 @@ struct BootInfo {
 
    BootInfo() { clear(); }
    ~BootInfo() { clear(); }
-   BootInfo(BootInfo const &i) { *this = i; }
-   BootInfo &operator=(const BootInfo &a) noexcept;  // SonarQube findings
+   BootInfo(const BootInfo &);
+   BootInfo(BootInfo &&) noexcept;
+   BootInfo &operator=(const BootInfo &);
+   BootInfo &operator=(BootInfo &&) noexcept;
    void clear();
 };
 
@@ -356,8 +358,10 @@ struct ClimoCDFInfo {
 
    ClimoCDFInfo() { clear(); }
    ~ClimoCDFInfo() { clear(); }
-   ClimoCDFInfo(ClimoCDFInfo const &i) { *this = i; }
-   ClimoCDFInfo &operator=(const ClimoCDFInfo &a) noexcept; // SonarQube findings
+   ClimoCDFInfo(const ClimoCDFInfo &);
+   ClimoCDFInfo(ClimoCDFInfo &&) noexcept;
+   ClimoCDFInfo &operator=(const ClimoCDFInfo &);
+   ClimoCDFInfo &operator=(ClimoCDFInfo &&) noexcept;
    void clear();
    void set_cdf_ta(int, bool &); // Construct equally-likely thresholds
 };
@@ -456,8 +460,10 @@ struct MaskLatLon {
 
    MaskLatLon() { clear(); }
    ~MaskLatLon() { clear(); }
-   MaskLatLon(MaskLatLon const &i) { *this = i; }
-   MaskLatLon &operator=(const MaskLatLon &a) noexcept;
+   MaskLatLon(const MaskLatLon &);
+   MaskLatLon(MaskLatLon &&) noexcept;
+   MaskLatLon &operator=(const MaskLatLon &);
+   MaskLatLon &operator=(MaskLatLon &&) noexcept;
    void clear();
 
    friend bool operator==(const MaskLatLon &lhs, const MaskLatLon &rhs) {

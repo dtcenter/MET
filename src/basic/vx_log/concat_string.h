@@ -69,9 +69,11 @@ class ConcatString {
       ConcatString();
      ~ConcatString();
       ConcatString(const ConcatString &);
+      ConcatString(ConcatString &&) noexcept;
       ConcatString(const std::string &);
       ConcatString(const char *);
       ConcatString & operator=(const ConcatString &);
+      ConcatString & operator=(ConcatString &&) noexcept;
       ConcatString & operator=(const std::string &);
       ConcatString & operator=(const char *);
       ConcatString & operator=(const char);

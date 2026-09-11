@@ -223,7 +223,9 @@ class Grid : public GridInterface {
 #endif
       virtual ~Grid();
       Grid(const Grid &);
+      Grid(Grid &&) noexcept;
       Grid & operator=(const Grid &);
+      Grid & operator=(Grid &&) noexcept;
 
       void clear();
 

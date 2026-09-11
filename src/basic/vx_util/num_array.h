@@ -42,9 +42,11 @@ class NumArray {
       NumArray() = default;
      ~NumArray();
       NumArray(const NumArray &);
+      NumArray(NumArray &&) noexcept;
       explicit NumArray(const std::vector<double> &a) : e(a) {};
 
       NumArray & operator=(const NumArray &);
+      NumArray & operator=(NumArray &&) noexcept;
       bool operator==(const NumArray &) const;
 
       void clear();

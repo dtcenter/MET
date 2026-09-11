@@ -1117,9 +1117,32 @@ DataPlaneArray::DataPlaneArray(const DataPlaneArray & a) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+DataPlaneArray::DataPlaneArray(DataPlaneArray &&a) noexcept
+   : Lower(move(a.Lower)),
+     Upper(move(a.Upper)),
+     Plane(move(a.Plane)),
+     Nplanes(a.Nplanes) {
+   a.Nplanes = 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 DataPlaneArray & DataPlaneArray::operator=(const DataPlaneArray & a) {
    if(this == &a) return *this;
    assign(a);
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+DataPlaneArray & DataPlaneArray::operator=(DataPlaneArray &&a) noexcept {
+   if (this != &a) {
+      Lower   = move(a.Lower);
+      Upper   = move(a.Upper);
+      Plane   = move(a.Plane);
+      Nplanes = a.Nplanes;
+      a.Nplanes = 0;
+   }
    return *this;
 }
 

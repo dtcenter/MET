@@ -91,23 +91,16 @@ int met_main(int argc, char * argv [])
   {
     // Construct the time string
 
-    struct tm *time_struct = gmtime(&time_obs);
-    if (time_struct == 0)
-    {
-//      mlog << Error << "\n" << method_name << " -> "
-//           << "error converting time value to time structure" << endl;
-      cerr << "Error converting time value to time structure" << endl;
-      fclose(output_file);
-      exit(1);
-    }
+    struct tm time_struct;
+    gmtime_r(&time_obs, &time_struct);
 
     char time_obs_string[80];
     
-    snprintf(time_obs_string, sizeof(time_obs_string), 
-         "%04d%02d%02d_%02d%02d%02d",
-            time_struct->tm_year + 1900, time_struct->tm_mon + 1,
-            time_struct->tm_mday,
-            time_struct->tm_hour, time_struct->tm_min, time_struct->tm_sec);
+    snprintf(time_obs_string, sizeof(time_obs_string),
+            "%04d%02d%02d_%02d%02d%02d",
+            time_struct.tm_year + 1900, time_struct.tm_mon + 1,
+            time_struct.tm_mday,
+            time_struct.tm_hour, time_struct.tm_min, time_struct.tm_sec);
     
     // Write the observations.
 
