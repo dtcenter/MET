@@ -18,7 +18,8 @@ ugrid_metadata_map = [
    { key = "lat_face";  val = "latCell"; },
    { key = "lon_face";  val = "lonCell"; },
    { key = "vert_face"; val = "zCell"; },       // optional
-   { key = "time";      val = "xtime"; }
+   { key = "time";      val = "xtime"; },
+   { key = "init_time"; val = "initial_time"; } // optional
 ];
 
 //
