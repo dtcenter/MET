@@ -1,8 +1,9 @@
+# check=skip=InvalidDefaultArgInFrom
 ARG MET_BASE_REPO=met-base
 ARG MET_BASE_TAG
 
 FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_TAG}
-MAINTAINER John Halley Gotway <johnhg@ucar.edu>
+LABEL maintainer="John Halley Gotway <johnhg@ucar.edu>"
 
 #
 # This Dockerfile checks out MET from GitHub and runs the

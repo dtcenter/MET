@@ -59,7 +59,10 @@ jobs:
 
       - name: Get branch name
         id: get_branch_name
-        run: echo branch_name=${GITHUB_REF#refs/heads/} >> $GITHUB_OUTPUT
+        # For pull_request events, GITHUB_REF is refs/pull/<N>/merge, not
+        # refs/heads/<branch>, so fall back to GITHUB_HEAD_REF (the real
+        # source branch name) which is only set for pull_request events.
+        run: echo branch_name=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}} >> $GITHUB_OUTPUT
 
       - name: SonarQube Scan in Docker
         run: .github/jobs/build_sonarqube_image.sh
