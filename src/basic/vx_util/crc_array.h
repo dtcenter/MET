@@ -75,7 +75,17 @@ class CRC_Array {
 
       CRC_Array <T> & operator=(const NumArray &);
 
-      bool operator==(const CRC_Array <T> &) const;
+      friend bool operator==(const CRC_Array <T> & a, const CRC_Array <T> & b) {
+
+         if ( a.n() != b.n() )  return false;
+
+         for(int j=0; j<a.n(); ++j)  {
+            if(a.e[j] != b.e[j])  return false;
+         }
+
+         return true;
+
+      }
 
       void clear();
 
@@ -147,26 +157,6 @@ clear();
 for(int j=0; j<a.n_elements(); ++j) add(nint(a[j]));
 
 return *this;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-template <typename T>
-
-bool CRC_Array<T>::operator==(const CRC_Array<T> & a) const
-
-{
-
-if ( n() != a.n() )  return false;
-
-for(int j=0; j<n(); ++j)  {
-   if(e[j] != a.e[j])  return false;
-}
-
-return true;
 
 }
 
@@ -280,12 +270,11 @@ void CRC_Array<T>::dump_one_line(std::ostream & out, int depth) const
 
 {
 
-int j;
 Indent prefix(depth);
 
 out << prefix << '(' << n() << ") ";
 
-for (j=0; j<n(); ++j)  {
+for (int j=0; j<n(); ++j)  {
 
    if ( j > 0 )  out << ' ';
 
@@ -500,9 +489,7 @@ sa.parse_css(text);
 
 extend(n() + sa.n());
 
-int j;
-
-for (j=0; j<(sa.n()); j++)  {
+for (int j=0; j<(sa.n()); j++)  {
 
   add(timestring_to_sec(sa[j].c_str()));
 
@@ -542,9 +529,9 @@ T CRC_Array<T>::sum() const
 
 T s = 0;
 
-int count;
+int count = 0;
 
-for(int j=0, count=0; j<n(); j++) {
+for(int j=0; j<n(); j++) {
 
    if ( is_bad_data(e[j]) ) continue;
 
@@ -553,7 +540,7 @@ for(int j=0, count=0; j<n(); j++) {
    count++;
 }
 
-if ( count == 0 )  s = bad_data_double;
+if ( count == 0 )  s = bad_data_int;
 
 return s;
 
