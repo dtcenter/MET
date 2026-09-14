@@ -547,7 +547,7 @@ ObsErrorEntry *ObsErrorTable::lookup(
    // Check for no match
    if(e_match == (ObsErrorEntry *) 0) {
       mlog << Warning << "\nObsErrorTable::lookup() -> "
-           << "no observation error table match found for "
+           << "skipping observation since no match found for "
            << "var_name = \"" << cur_var_name
            << "\", msg_type = \"" << cur_msg_type
            << "\", sid = \"" << cur_sid
