@@ -38,8 +38,9 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-double scaled2dbl(int scale_factor, int scale_value);
-int    parse_int4(g2int);
+static bool is_grid_relative(const Grib2Record *);
+static double scaled2dbl(int scale_factor, int scale_value);
+static int    parse_int4(g2int);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -82,19 +83,12 @@ MetGrib2DataFile & MetGrib2DataFile::operator=(const MetGrib2DataFile &) {
 
 void MetGrib2DataFile::grib2_init_from_scratch() {
    ScanMode = -1;
-
-   PairMap[ugrd_abbr_str] = vgrd_abbr_str;
-   PairMap[vgrd_abbr_str] = ugrd_abbr_str;
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void MetGrib2DataFile::close() {
    fclose(FileGrib2);
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -148,7 +142,8 @@ void MetGrib2DataFile::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
+bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
+                                  bool do_winds) {
 
    //  narrow the vinfo pointer
    auto vinfo_g2 = (VarInfoGrib2*)(&vinfo);
@@ -159,26 +154,24 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    find_record_matches(vinfo_g2, listMatch, listMatchRange);
 
    //  if no matches were found, check for derived records
-   if( 1 > listMatch.size() ){
-
-      DataPlaneArray plane_array = check_derived(vinfo_g2);
+   if(listMatch.empty() && do_winds) {
+      DataPlaneArray plane_array;
+      derive_winds(vinfo_g2, plane_array);
 
       //  verify that only a single data_plane was found
-      if( 1 > plane_array.n_planes() ){
+      if(plane_array.n_planes() < 1){
 
          mlog << Warning << "\nMetGrib2DataFile::data_plane() -> "
               << "No matching record found for '"
               << vinfo_g2->magic_str() << "'\n\n";
          return false;
 
-      } else if( 1 < plane_array.n_planes() ){
+      } else if(plane_array.n_planes() > 1) {
 
          mlog << Warning << "\nMetGrib2DataFile::data_plane() -> "
-              << "Wind speed/direction derivation found "
-              << plane_array.n_planes()
-              << " matching records found for '"
+              << "found " << plane_array.n_planes()
+              << " matching derived records for '"
               << vinfo_g2->magic_str() << "'\n\n";
-
       }
 
       //  report the matched record
@@ -189,12 +182,21 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
       plane = plane_array[0];
 
-      return process_data_plane(vinfo_g2, plane);
+      //  handle wind rotation
+      bool status = true;
+      if(do_winds) status = rotate_winds(vinfo_g2, plane);
+
+      if(status) status = process_data_plane(vinfo_g2, plane);
+
+      return status;
 
    }  //  END: if( 1 > listMatch.size() )
 
    //  verify that a only single record was found
-   if( 1 < listMatch.size() ){
+   if(listMatch.empty()) {
+      return false;
+   }
+   else if( 1 < listMatch.size() ){
       ConcatString msg;
       for(size_t i=0; i < listMatch.size(); i++) {
          msg << "  Record " << listMatch[i]->RecNum
@@ -226,21 +228,25 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
         << Filename << "'\n";
 
    //  read the data plane for the matched record
-   bool read_success = read_grib2_record_data_plane(listMatch[0],
-                                                    plane);
+   bool status = read_grib2_record_data_plane(listMatch[0], plane);
 
-   //  check the data plane for wind rotation
-   plane = check_uv_rotation(vinfo_g2, listMatch[0], plane);
+   if(status) {
 
-   if(read_success) read_success = process_data_plane(vinfo_g2, plane);
+      //  handle wind rotation
+      vinfo_g2->set_grid_relative_flag(is_grid_relative(listMatch[0]));
+      if(status && do_winds) status = rotate_winds(vinfo_g2, plane);
 
-   return read_success;
+      if(status) status = process_data_plane(vinfo_g2, plane);
+   }
+
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
-                                       DataPlaneArray &plane_array) {
+                                       DataPlaneArray &plane_array,
+                                       bool do_winds) {
 
    // Initialize
    plane_array.clear();
@@ -307,12 +313,12 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
    }
 
    //  if nothing was found, try to build derived records
-   else {
+   else if(do_winds) {
 
-      plane_array = check_derived(vinfo_g2);
+      derive_winds(vinfo_g2, plane_array);
 
       //  if no matches were found, bail
-      if( 1 > plane_array.n_planes() ){
+      if(plane_array.n_planes() < 1) {
          mlog << Warning << "\nMetGrib2DataFile::data_plane_array() -> "
               << "No matching records found for '"
               << vinfo_g2->magic_str() << "'\n\n";
@@ -321,9 +327,8 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
 
       //  report the matched record
       mlog << Debug(3) << "\nMetGrib2DataFile::data_plane_array() -> "
-           << "Wind speed/direction derivation "
            << "found " << plane_array.n_planes()
-           << " matching records found for '"
+           << " matching derived records for '"
            << vinfo_g2->magic_str() << "'\n\n";
 
       return plane_array.n_planes();
@@ -337,9 +342,6 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
       DataPlane plane;
       num_read += ( read_grib2_record_data_plane(*it, plane) ? 1 : 0 );
 
-      //  check the data plane for wind rotation
-      plane = check_uv_rotation(vinfo_g2, *it, plane);
-
       //  add the data plane to the array at the specified level(s)
       double lvl_lower = (double)(*it)->LvlVal1;
       double lvl_upper = (double)(*it)->LvlVal2;
@@ -348,9 +350,19 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
          lvl_upper = ( (double)(*it)->LvlVal2 ) / 100.0;
       }
 
-      if(process_data_plane(vinfo_g2, plane)) {
-         plane_array.add(plane, lvl_lower, lvl_upper);
-      }
+      //  store grid relative status
+      vinfo_g2->set_grid_relative_flag(is_grid_relative(*it));
+
+      //  add current plane to the data plane array
+      plane_array.add(plane, lvl_lower, lvl_upper);
+   }
+
+   //  handle wind rotation
+   if(do_winds) rotate_winds(vinfo_g2, plane_array);
+
+   //  post-process each data plane
+   for(int i=0; i<plane_array.n_planes(); i++) {
+      process_data_plane(vinfo_g2, plane_array.at(i));
    }
 
    return num_read;
@@ -483,12 +495,10 @@ void MetGrib2DataFile::find_record_matches(const VarInfoGrib2* vinfo,
       }
 
       //  test for an index or field name match
-      else if(
-               ( vinfo->discipline() == (*it)->Discipline &&
-                 vinfo->parm_cat()   == (*it)->ParmCat    &&
-                 vinfo->parm()       == (*it)->Parm       ) ||
-               vinfo->name().text()  == (*it)->ParmName
-             ){
+      else if ( ( vinfo->discipline()      == (*it)->Discipline &&
+                  vinfo->parm_cat()        == (*it)->ParmCat    &&
+                  vinfo->parm()            == (*it)->Parm     ) ||
+                ( vinfo->req_name().text() == (*it)->ParmName ) ){
 
          //  test the level type number, if specified
          if ( !is_bad_data(vinfo->level().type_num()) &&
@@ -575,115 +585,6 @@ void MetGrib2DataFile::find_record_matches(const VarInfoGrib2* vinfo,
    }  //  END:  for( vector<Grib2Record*>::iterator it = RecList.begin(); ...)
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-DataPlane MetGrib2DataFile::check_uv_rotation(const VarInfoGrib2 *vinfo, Grib2Record *rec, DataPlane plane){
-
-   //  check that the field is present in the pair map
-   string parm_name = vinfo->name().text();
-   if( 0 == PairMap.count( parm_name ) ||
-       0 == (rec->ResCompFlag & 8) ) {
-      return plane;
-   }
-
-   //  build the magic string of the pair field, and check it
-   ConcatString pair_mag = build_magic( rec );
-   pair_mag.replace(parm_name.data(), PairMap[parm_name].data());
-   if( 0 == NameRecMap.count( string(pair_mag.text()) ) ){
-      mlog << Debug(3) << "MetGrib2DataFile::check_uv_rotation -> "
-           << "UV rotation pair record not found: '" << pair_mag
-           << "'\n";
-      return plane;
-   }
-
-   //  read the data plane for the pair record
-   Grib2Record *rec_pair = NameRecMap[pair_mag.text()];
-   DataPlane plane_pair;
-   read_grib2_record_data_plane(NameRecMap[pair_mag.text()],
-                                plane_pair);
-
-   mlog << Debug(3) << "MetGrib2DataFile::check_uv_rotation() -> "
-        << "Found pair match \"" << pair_mag << "\" in GRIB2 record "
-        << rec_pair->RecNum << " field " << rec_pair->FieldNum << "\n";
-
-   //  rotate the winds
-   DataPlane u2d;
-   DataPlane v2d;
-   DataPlane u2d_rot;
-   DataPlane v2d_rot;
-   if( 'U' == parm_name.at(0) ){ u2d = plane;  v2d = plane_pair; }
-   else                        { v2d = plane;  u2d = plane_pair; }
-   rotate_uv_grid_to_earth(u2d, v2d, *Raw_Grid, u2d_rot, v2d_rot);
-   if( 'U' == parm_name.at(0) ){ plane = u2d_rot; }
-   else                        { plane = v2d_rot; }
-
-   return plane;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-DataPlaneArray MetGrib2DataFile::check_derived( const VarInfoGrib2 *vinfo ){
-   DataPlaneArray array_ret;
-
-   //  if the requested field cannot be derived, bail
-   if( vinfo->name() != "WIND" &&
-       vinfo->name() != "WDIR" ) {
-      return array_ret;
-   }
-
-   //  read the data_plane objects for each constituent
-   DataPlaneArray array_u, array_v;
-   VarInfoGrib2 vinfo_cons(*vinfo);
-   vinfo_cons.set_name( ugrd_abbr_str );
-   data_plane_array(vinfo_cons, array_u);
-   vinfo_cons.set_name( vgrd_abbr_str );
-   data_plane_array(vinfo_cons, array_v);
-
-   //  derive wind speed or direction
-   if( array_u.n_planes() != array_v.n_planes() ){
-      mlog << Warning << "\nMetGrib2DataFile::data_plane_array() -> "
-           << "when deriving winds, the number of U-wind records ("
-           << array_u.n_planes()
-           << ") does not match the number of V-wind record ("
-           << array_v.n_planes()
-           << ") for GRIB2 file '" << filename() << "'\n\n";
-
-      return array_ret;
-   }
-
-   //  loop through each of the data planes
-   for(int i=0; i < array_u.n_planes(); i++) {
-
-      //  check that the current level values match
-      if( !is_eq(array_u.lower(i), array_v.lower(i)) ||
-          !is_eq(array_u.upper(i), array_v.upper(i)) ){
-
-         mlog << Warning << "\nMetGrib1DataFile::data_plane_array() -> "
-              << "when deriving winds for level " << i+1
-              << ", the U-wind levels (" << array_u.lower(i)
-              << ", " << array_u.upper(i)
-              << ") do not match the V-wind levels ("
-              << array_v.lower(i) << ", " << array_v.upper(i)
-              << ") in GRIB file '" << filename() << "'\n\n";
-
-         return array_ret;
-      }
-
-      //  perform the derivation
-      DataPlane plane_deriv;
-      if(vinfo->name() == "WIND") derive_wind(array_u[i], array_v[i],
-                                              plane_deriv);
-      else                        derive_wdir(array_u[i], array_v[i],
-                                              plane_deriv);
-
-      //  add the current data plane
-      array_ret.add(plane_deriv, array_u.lower(i), array_u.upper(i));
-
-   }
-
-   return array_ret;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -947,24 +848,21 @@ void MetGrib2DataFile::read_grib2_record_list() {
          id << rec->Discipline << "_" << rec->ParmCat << "_" << rec->Parm;
 
          //  use the index to look up the parameter name
-         Grib2TableEntry tab;
-         if( !GribTable.lookup_grib2(rec->Discipline, rec->ParmCat, rec->Parm,
-                                     gfld->idsect[2], gfld->idsect[0], gfld->idsect[3], tab) ){
+         vector<Grib2TableEntry> matches;
+         if(GribTable.lookup_grib2(rec->Discipline, rec->ParmCat, rec->Parm,
+                                   (int) gfld->idsect[2], (int) gfld->idsect[0], (int) gfld->idsect[3],
+                                   matches) == 0){
             mlog << Debug(4) << "MetGrib2DataFile::read_grib2_record_list() - unrecognized GRIB2 "
                  << "field indexes - disc: " << rec->Discipline << ", master table: " << gfld->idsect[2]
                  << ", center: " << gfld->idsect[0] << ", local table: " << gfld->idsect[3]
                  << ", parm_cat: " << rec->ParmCat << ", parm: " << rec->Parm << "\n";
             rec->ParmName = str_format("DISC%d_CAT%d_PARM%d", rec->Discipline, rec->ParmCat, rec->Parm);
          } else {
-            rec->ParmName = tab.parm_name.text();
+            rec->ParmName = matches[0].parm_name.text();
          }
 
          //  add the record to the list
          RecList.emplace_back(rec);
-
-         //  build data structure for U/V wind pairs
-         string rec_mag = build_magic(rec).text();
-         NameRecMap[rec_mag] = rec;
 
          g2_free(gfld);
 
@@ -1682,7 +1580,13 @@ int MetGrib2DataFile::index( VarInfo &vinfo ){
 //
 ////////////////////////////////////////////////////////////////////////
 
-double scaled2dbl(int scale_factor, int scale_value) {
+static bool is_grid_relative(const Grib2Record *r) {
+   return (r->ResCompFlag & 8) != 0;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static double scaled2dbl(int scale_factor, int scale_value) {
    if (scale_factor == 0) return (double) scale_value;
    if (scale_factor < 0)  return ( scale_value * pow(10.0, -scale_factor) );
    return                        ( scale_value / pow(10.0,  scale_factor) );
@@ -1690,7 +1594,7 @@ double scaled2dbl(int scale_factor, int scale_value) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int parse_int4(g2int i) {
+static int parse_int4(g2int i) {
    unsigned char c[4];
    unsigned long n = i;
  

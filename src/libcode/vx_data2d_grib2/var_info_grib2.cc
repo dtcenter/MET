@@ -77,11 +77,8 @@ VarInfoGrib2 & VarInfoGrib2::operator=(const VarInfoGrib2 &f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo *VarInfoGrib2::clone() const {
-
-   VarInfoGrib2 *ret = new VarInfoGrib2(*this);
-
-   return (VarInfo *)ret;
+unique_ptr<VarInfo> VarInfoGrib2::clone() const {
+   return unique_ptr<VarInfo>(new VarInfoGrib2(*this));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -324,8 +321,6 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
 
    VarInfo::set_dict(dict);
 
-   int tab_match = -1;
-   Grib2TableEntry tab;
    ConcatString field_name = dict.lookup_string(conf_key_name,            false);
    ConcatString ens_str    = dict.lookup_string(conf_key_GRIB_ens,        false);
    int field_disc          = dict.lookup_int   (conf_key_GRIB2_disc,      false);
@@ -362,6 +357,8 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
       handle_config_error(msg, do_exit);
    }
 
+   vector<Grib2TableEntry> matches;
+
    //  if the name is specified, use it
    if( !field_name.empty() ){
 
@@ -369,9 +366,10 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
       set_req_name( field_name.c_str() );
 
       //  look up the name in the grib tables
-      if( !GribTable.lookup_grib2(field_name.c_str(), field_disc, field_parm_cat, field_parm, mtab, cntr, ltab,
-                                  tab, tab_match) &&
-          field_name != "PROB" ){
+      if(GribTable.lookup_grib2(field_name.c_str(),
+                                field_disc, field_parm_cat, field_parm,
+                                mtab, cntr, ltab, matches) == 0 &&
+         field_name != "PROB"){
          ConcatString msg;
          msg << "\nVarInfoGrib2::set_dict() -> "
              << "unrecognized GRIB2 field abbreviation '" << field_name
@@ -395,8 +393,8 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
       }
 
       //  use the specified indexes to look up the field name
-      if( !GribTable.lookup_grib2(field_disc, field_parm_cat,
-                                  field_parm, mtab, cntr, ltab, tab) ){
+      if(GribTable.lookup_grib2(field_disc, field_parm_cat, field_parm,
+                                mtab, cntr, ltab, matches) == 0){
          ConcatString msg;
          msg << "\nVarInfoGrib2::set_dict() -> "
              << "no parameter found with matching "
@@ -408,20 +406,20 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
          handle_config_error(msg, do_exit);
       }
 
-      //  use the lookup parameter name
-      field_name = tab.parm_name;
+      //  use the first lookup parameter name
+      field_name = matches[0].parm_name;
    }
 
    set_ens          (ens_str.c_str());
    //  set the matched parameter lookup information
-   set_name         ( field_name    );
-   set_req_name     ( field_name.c_str()    );
+   set_name         ( field_name );
+   set_req_name     ( field_name.c_str() );
    if( field_name != "PROB" ){
-      set_discipline( tab.index_a   );
-      set_parm_cat  ( tab.index_b   );
-      set_parm      ( tab.index_c   );
-      set_units     ( tab.units.c_str()     );
-      set_long_name ( tab.full_name.c_str() );
+      set_discipline( matches[0].disc );
+      set_parm_cat  ( matches[0].pcat );
+      set_parm      ( matches[0].pnum );
+      set_units     ( matches[0].units.c_str() );
+      set_long_name ( matches[0].full_name.c_str() );
    }
 
    //  call the parent to set the level information
@@ -453,8 +451,8 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
    double thresh_hi = dict_prob->lookup_double(conf_key_thresh_hi,      false);
 
    //  look up the probability field abbreviation
-   if(!GribTable.lookup_grib2(prob_name.c_str(), field_disc, field_parm_cat,
-                              field_parm, mtab, cntr, ltab, tab, tab_match)){
+   if(GribTable.lookup_grib2(prob_name.c_str(), field_disc, field_parm_cat,
+                             field_parm, mtab, cntr, ltab, matches) == 0){
       ConcatString msg;
       msg << "\nVarInfoGrib2::set_dict() -> "
           << "unrecognized GRIB2 probability field abbreviation '"
@@ -463,12 +461,12 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
       return false;
    }
 
-   set_discipline ( tab.index_a );
-   set_parm_cat   ( tab.index_b );
-   set_parm       ( tab.index_c );
-   set_p_flag     ( true        );
-   set_p_units    ( tab.units.c_str() );
-   set_units      ( "%" );
+   set_discipline ( matches[0].disc );
+   set_parm_cat   ( matches[0].pcat );
+   set_parm       ( matches[0].pnum );
+   set_p_flag     ( true );
+   set_p_units    ( matches[0].units.c_str() );
+   set_units      ( "%" );  
 
    set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
 
@@ -482,9 +480,8 @@ bool VarInfoGrib2::is_precipitation() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsPrecipitation)) {
-      return(SetAttrIsPrecipitation != 0);
-   }
+   int flag = SetAttrIsPrecipitation;
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Reference:
@@ -507,9 +504,8 @@ bool VarInfoGrib2::is_specific_humidity() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsSpecificHumidity)) {
-      return(SetAttrIsSpecificHumidity != 0);
-   }
+   int flag = SetAttrIsSpecificHumidity;
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Reference:
@@ -527,9 +523,8 @@ bool VarInfoGrib2::is_u_wind() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsUWind)) {
-      return(SetAttrIsUWind != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsUWind, WindInfo.u_wind);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Reference:
@@ -549,9 +544,8 @@ bool VarInfoGrib2::is_v_wind() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsVWind)) {
-      return(SetAttrIsVWind != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsVWind, WindInfo.v_wind);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Reference:
@@ -571,9 +565,8 @@ bool VarInfoGrib2::is_wind_speed() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsWindSpeed)) {
-      return(SetAttrIsWindSpeed != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsWindSpeed, WindInfo.wind_speed);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Reference:
@@ -593,9 +586,8 @@ bool VarInfoGrib2::is_wind_direction() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsWindDirection)) {
-      return(SetAttrIsWindDirection != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsWindDirection, WindInfo.wind_direction);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // Reference:

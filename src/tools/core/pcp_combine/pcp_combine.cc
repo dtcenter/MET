@@ -1308,18 +1308,19 @@ static bool get_field(const char *filename,
    ConcatString config_str = parse_config_str(cur_field);
 
    mlog << Debug(1)
-        << "Reading data (" << config_str
+        << "\nReading data (" << config_str
         << ") from input file: " << filename << "\n";
 
    //
-   // Parse the config string.
+   // Parse the config string into a local copy.
    //
-   config.read_string(config_str.c_str());
+   MetConfig cur_config = config;
+   cur_config.read_string(config_str.c_str());
 
    //
    // Get the gridded file type from config string, if present.
    //
-   ftype = parse_conf_file_type(&config);
+   ftype = parse_conf_file_type(&cur_config);
 
    //
    // If not set by the config string, use the file list type.
@@ -1368,7 +1369,7 @@ static bool get_field(const char *filename,
       //
       // Initialize the VarInfo object with a config.
       //
-      cur_var->set_dict(config);
+      cur_var->set_dict(cur_config);
 
       //
       // Set the VarInfo timing object.

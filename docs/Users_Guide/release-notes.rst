@@ -182,6 +182,14 @@ MET Version 13.0.0 Upgrade Instructions
      * The "ensemble_flag.eas" and "ensemble_flag.eas_width" entries are added to enable the
        writing of EAS output fields.
 
+   * ConfigConstanst configuration file
+
+     * The "u_wind_field_name", "v_wind_field_name", "wind_speed_field_name", and "wind_direction_field_name"
+       entries are comma-separated lists of field names to search when read wind data needed to derive winds
+       or rotate them from being grid-relative to earth-relative. See :numref:`PS_wind_rotation_derivation`
+       for a description of wind rotation and derivation and :numref:`config_wind_field_names` for the
+       corresponding configuration options.
+
 .. dropdown:: Output format changes - NONE
 
 .. dropdown:: Output format changes - NONE

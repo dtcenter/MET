@@ -187,7 +187,7 @@ void process_binary() {
 
    // Read Nx*Ny records
    nxy = grid.nx()*grid.ny();
-   mlog << "Processing " << nxy << " grid points.\n";
+   mlog << Debug(2) << "Processing " << nxy << " grid points.\n";
 
    // Loop over grid points
    for(i=0; i<nxy; i++) {

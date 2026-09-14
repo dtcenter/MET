@@ -922,7 +922,7 @@ Q. How do I use “-sum”, “-add”, and “-subtract“ to achieve the same 
      for comparison against 24-hourly StageIV precipitation with GFS data
      through the pcp_combine tool. Be aware that the 24-hour StageIV data is
      defined as an accumulation from 12Z on one day to 12Z on the next day:
-     http://www.emc.ncep.noaa.gov/mmb/ylin/pcpanl/stage4/
+     https://water.noaa.gov/about/precipitation-data-access
 
      Therefore, only the 24-hour StageIV data can be used to evaluate 12Z to
      12Z accumulations from the model. Alternatively, the 6- hour StageIV

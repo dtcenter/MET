@@ -14,7 +14,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "var_info.h"
+#include "var_info_nc.h"
 
 #include "data_file_type.h"
 #include "long_array.h"
@@ -24,7 +24,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class VarInfoUGrid : public VarInfo
+class VarInfoUGrid : public VarInfoNC
 {
    private:
 
@@ -32,20 +32,18 @@ class VarInfoUGrid : public VarInfo
       // NetCDF-specific parameters
       //
 
-      LongArray Dimension; // Dimension values for extracting 2D field
-      BoolArray Is_offset; // boolean for Dimension value (true: offset, false: value to be an offset (false for value)
-      NumArray  Dim_value; // Dimension values as float for extracting 2D field
-
       void init_from_scratch();
       void assign(const VarInfoUGrid &);
-      void clear_dimension();
+
+   protected:
+      void set_default_levels(const ConcatString &lstr) override;
 
    public:
       VarInfoUGrid();
       ~VarInfoUGrid() override;
       VarInfoUGrid(const VarInfoUGrid &);
       VarInfoUGrid & operator=(const VarInfoUGrid &);
-      VarInfo *clone() const override;
+      std::unique_ptr<VarInfo> clone() const override;
 
       void dump(std::ostream &) const override;
       void clear();
@@ -55,13 +53,6 @@ class VarInfoUGrid : public VarInfo
       //
 
       GrdFileType       file_type()      const override;
-      const LongArray & dimension()      const;
-      long              dimension(int i) const;
-      const NumArray  & dim_value()      const;
-      double            dim_value(int i) const;
-      const BoolArray & is_offset()      const;
-      bool              is_offset(int i) const;
-      int               n_dimension()    const;
 
       //
       // set stuff
@@ -69,8 +60,6 @@ class VarInfoUGrid : public VarInfo
 
       void set_magic(const ConcatString &, const ConcatString &) override;
       bool set_dict(Dictionary &s, bool do_exit=true) override;
-
-      void add_dimension(long dim, bool as_offset=true, double dim_value=bad_data_double);
 
       //
       // do stuff
@@ -87,13 +76,6 @@ class VarInfoUGrid : public VarInfo
 ///////////////////////////////////////////////////////////////////////////////
 
 inline GrdFileType       VarInfoUGrid::file_type()      const { return FileType_UGrid;         }
-inline const LongArray & VarInfoUGrid::dimension()      const { return Dimension;              }
-inline long              VarInfoUGrid::dimension(int i) const { return Dimension[i];           }
-inline int               VarInfoUGrid::n_dimension()    const { return Dimension.n_elements(); }
-inline const NumArray  & VarInfoUGrid::dim_value()      const { return Dim_value;              }
-inline double            VarInfoUGrid::dim_value(int i) const { return Dim_value[i];           }
-inline const BoolArray & VarInfoUGrid::is_offset()      const { return Is_offset;              }
-inline bool              VarInfoUGrid::is_offset(int i) const { return Is_offset[i];           }
 
 ///////////////////////////////////////////////////////////////////////////////
 

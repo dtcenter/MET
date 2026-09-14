@@ -41,7 +41,7 @@ class VarInfoPython : public VarInfo
       ~VarInfoPython();
       VarInfoPython(const VarInfoPython &);
       VarInfoPython & operator=(const VarInfoPython &);
-      VarInfo *clone() const;
+      std::unique_ptr<VarInfo> clone() const override;
 
       void dump(std::ostream &) const;
       void clear();

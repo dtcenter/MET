@@ -75,11 +75,8 @@ VarInfoGrib & VarInfoGrib::operator=(const VarInfoGrib &f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo *VarInfoGrib::clone() const {
-
-   VarInfoGrib *ret = new VarInfoGrib(*this);
-
-   return (VarInfo *)ret;
+unique_ptr<VarInfo> VarInfoGrib::clone() const {
+   return unique_ptr<VarInfo>(new VarInfoGrib(*this));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -102,14 +99,14 @@ void VarInfoGrib::assign(const VarInfoGrib &v) {
    VarInfo::assign(v);
 
    // Copy
-   PTV       = v.ptv();
-   Code      = v.code();
-   LvlType   = v.lvl_type();
-   PCode     = v.p_code();
-   Center    = v.center ();
-   Subcenter = v.subcenter ();
-   FieldRec  = v.field_rec ();
-   TRI       = v.tri();
+   PTV       = v.PTV;
+   Code      = v.Code;
+   LvlType   = v.LvlType;
+   PCode     = v.PCode;
+   Center    = v.Center;
+   Subcenter = v.Subcenter;
+   FieldRec  = v.FieldRec;
+   TRI       = v.TRI;
 
    return;
 }
@@ -122,13 +119,14 @@ void VarInfoGrib::clear() {
    VarInfo::clear();
 
    // Initialize
-   PTV          = bad_data_int;
-   Code         = bad_data_int;
-   LvlType      = bad_data_int;
-   PCode        = bad_data_int;
-   Center       = bad_data_int;
-   Subcenter    = bad_data_int;
-   FieldRec    = bad_data_int;
+   PTV       = bad_data_int;
+   Code      = bad_data_int;
+   LvlType   = bad_data_int;
+   PCode     = bad_data_int;
+   Center    = bad_data_int;
+   Subcenter = bad_data_int;
+   FieldRec  = bad_data_int;
+   TRI       = bad_data_int;
 
    return;
 }
@@ -139,12 +137,13 @@ void VarInfoGrib::dump(ostream &out) const {
 
    // Dump out the contents
    out << "VarInfoGrib::dump():\n"
-       << "  PTV       = " << PTV       << "\n"
-       << "  Code      = " << Code      << "\n"
-       << "  LvlType   = " << LvlType   << "\n"
-       << "  PCode     = " << PCode     << "\n"
-       << "  Center    = " << Center    << "\n"
-       << "  Subcenter = " << Subcenter << "\n";
+       << "  PTV          = " << PTV       << "\n"
+       << "  Code         = " << Code      << "\n"
+       << "  LvlType      = " << LvlType   << "\n"
+       << "  PCode        = " << PCode     << "\n"
+       << "  Center       = " << Center    << "\n"
+       << "  Subcenter    = " << Subcenter << "\n"
+       << "  TRI          = " << TRI       << "\n";
 
    return;
 }
@@ -210,7 +209,6 @@ void VarInfoGrib::set_tri(int v) {
 void VarInfoGrib::add_grib_code (Dictionary &dict)
 {
    ConcatString field_name = dict.lookup_string(conf_key_name,            false);
-   int tab_match = -1;
    int field_ptv           = dict.lookup_int   (conf_key_GRIB1_ptv,       false);
    int field_code          = dict.lookup_int   (conf_key_GRIB1_code,      false);
 
@@ -221,27 +219,30 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
    }
    int field_center        = dict.lookup_int   (conf_key_GRIB1_center,    false);
    int field_subcenter     = dict.lookup_int   (conf_key_GRIB1_subcenter, false);
-   Grib1TableEntry tab;
+
+   vector<Grib1TableEntry> matches;
 
    //  if the name is specified, use it
    if( !field_name.empty() ){
 
       //  look up the name in the grib tables
-      if( !GribTable.lookup_grib1(field_name.c_str(), field_ptv, field_code, field_center, field_subcenter, tab, tab_match) )
+      //  if did not find with params from the header - try default
+      if(GribTable.lookup_grib1(field_name.c_str(), field_ptv, field_code,
+                                field_center, field_subcenter,
+                                matches) == 0 &&
+         GribTable.lookup_grib1(field_name.c_str(), default_grib1_ptv, field_code,
+                                default_grib1_center, default_grib1_subcenter,
+                                matches) == 0)
       {
-         //  if did not find with params from the header - try default
-         if( !GribTable.lookup_grib1(field_name.c_str(), default_grib1_ptv, field_code, default_grib1_center, default_grib1_subcenter, tab, tab_match) )
-         {
-            mlog << Error << "\nVarInfoGrib::add_grib_code() -> "
-                 << "unrecognized GRIB1 field abbreviation '" << field_name
-                 << "' for table version (" << field_ptv
-                 << "), center (" << field_center
-                 << "), and subcenter (" << field_subcenter
-                 << ") or default table version (" << default_grib1_ptv
-                 << "), center (" << default_grib1_center
-                 << "), and subcenter (" << default_grib1_subcenter << ").\n\n";
-            exit(1);
-         }
+         mlog << Error << "\nVarInfoGrib::add_grib_code() -> "
+              << "unrecognized GRIB1 field abbreviation '" << field_name
+              << "' for table version (" << field_ptv
+              << "), center (" << field_center
+              << "), and subcenter (" << field_subcenter
+              << ") or default table version (" << default_grib1_ptv
+              << "), center (" << default_grib1_center
+              << "), and subcenter (" << default_grib1_subcenter << ").\n\n";
+         exit(1);
       }
    }
 
@@ -257,22 +258,25 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
       }
 
       //  use the specified indexes to look up the field name
-      if( !GribTable.lookup_grib1(field_code, field_ptv, field_center, field_subcenter,tab) ){
-         //if did not find with params from the header - try default
-         if( !GribTable.lookup_grib1(field_code, default_grib1_ptv, default_grib1_center, default_grib1_subcenter,tab) )
-         {
-            mlog << Error << "\nVarInfoGrib::add_grib_code() -> "
-                 << "no parameter found with matching GRIB1_ptv ("
-                 << field_ptv << ") " << "GRIB1_code (" << field_code
-                 << "). Use the MET_GRIB_TABLES environment variable "
-                 << "to define custom GRIB tables.\n\n";
-            exit(1);
-         }
+      //  if did not find with params from the header - try default
+      if(GribTable.lookup_grib1(field_code, field_ptv,
+                                field_center, field_subcenter,
+                                matches) == 0 && 
+         GribTable.lookup_grib1(field_code, default_grib1_ptv,
+                                default_grib1_center, default_grib1_subcenter,
+                                matches) == 0)
+      {
+         mlog << Error << "\nVarInfoGrib::add_grib_code() -> "
+              << "no parameter found with matching GRIB1_ptv ("
+              << field_ptv << ") " << "GRIB1_code (" << field_code
+              << "). Use the MET_GRIB_TABLES environment variable "
+              << "to define custom GRIB tables.\n\n";
+         exit(1);
       }
    }
-   set_code      ( tab.code      );
-   set_long_name ( tab.full_name.c_str() );
-   set_units     ( tab.units.c_str()     );
+   set_code      ( matches[0].code );
+   set_long_name ( matches[0].full_name.c_str() );
+   set_units     ( matches[0].units.c_str() );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -281,8 +285,6 @@ bool VarInfoGrib::set_dict(Dictionary & dict, bool do_exit) {
 
    VarInfo::set_dict(dict);
 
-   int tab_match = -1;
-   Grib1TableEntry tab;
    ConcatString field_name = dict.lookup_string(conf_key_name,            false);
    int field_ptv           = dict.lookup_int   (conf_key_GRIB1_ptv,       false);
    int field_code          = dict.lookup_int   (conf_key_GRIB1_code,      false);
@@ -327,8 +329,11 @@ bool VarInfoGrib::set_dict(Dictionary & dict, bool do_exit) {
    double thresh_lo       = dict_prob->lookup_double(conf_key_thresh_lo, false);
    double thresh_hi       = dict_prob->lookup_double(conf_key_thresh_hi, false);
 
+   vector<Grib1TableEntry> matches;
+
    //  look up the probability field abbreviation
-   if( !GribTable.lookup_grib1(prob_name.c_str(), field_ptv, field_code, tab, tab_match) ){
+   if(GribTable.lookup_grib1(prob_name.c_str(), field_ptv, field_code,
+                             matches) == 0){
       ConcatString msg;
       msg << "\nVarInfoGrib::set_dict() -> "
           << "unrecognized GRIB1 probability field abbreviation '"
@@ -337,10 +342,9 @@ bool VarInfoGrib::set_dict(Dictionary & dict, bool do_exit) {
       return false;
    }
 
-   set_p_flag  ( true      );
-   set_p_code  ( tab.code  );
-   set_p_units ( tab.units.c_str() );
-
+   set_p_flag        ( true );
+   set_p_code        ( matches[0].code  );
+   set_p_units       ( matches[0].units.c_str() );
    set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
 
    return true;
@@ -353,9 +357,8 @@ bool VarInfoGrib::is_precipitation() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsPrecipitation)) {
-      return(SetAttrIsPrecipitation != 0);
-   }
+   int flag = SetAttrIsPrecipitation;
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // The ReqName member contains the requested GRIB code abbreviation.
@@ -379,9 +382,8 @@ bool VarInfoGrib::is_specific_humidity() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsSpecificHumidity)) {
-      return(SetAttrIsSpecificHumidity != 0);
-   }
+   int flag = SetAttrIsSpecificHumidity;
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    //
    // The ReqName member contains the requested GRIB code abbreviation.
@@ -405,9 +407,8 @@ bool VarInfoGrib::is_u_wind() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsUWind)) {
-      return(SetAttrIsUWind != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsUWind, WindInfo.u_wind);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    return Code == ugrd_grib_code ||
           ReqName == ugrd_abbr_str;
@@ -420,9 +421,8 @@ bool VarInfoGrib::is_v_wind() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsVWind)) {
-      return(SetAttrIsVWind != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsVWind, WindInfo.v_wind);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    return Code == vgrd_grib_code ||
           ReqName == vgrd_abbr_str;
@@ -435,9 +435,8 @@ bool VarInfoGrib::is_wind_speed() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsWindSpeed)) {
-      return(SetAttrIsWindSpeed != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsWindSpeed, WindInfo.wind_speed);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    return Code == wind_grib_code ||
           ReqName == wind_abbr_str;
@@ -450,9 +449,8 @@ bool VarInfoGrib::is_wind_direction() const {
    //
    // Check set_attrs entry
    //
-   if(!is_bad_data(SetAttrIsWindDirection)) {
-      return(SetAttrIsWindDirection != 0);
-   }
+   int flag = get_wind_flag(SetAttrIsWindDirection, WindInfo.wind_direction);
+   if(!is_bad_data(flag)) return is_flag_set(flag);
 
    return Code == wdir_grib_code ||
           ReqName == wdir_abbr_str;

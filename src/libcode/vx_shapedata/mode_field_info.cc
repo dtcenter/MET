@@ -122,7 +122,7 @@ dict = 0;
 
 conf = 0;
 
-var_info = 0;
+var_info.reset();
 
 clear();
 
@@ -155,7 +155,7 @@ conv_radius = 0;
 
 vld_thresh = 0.0;
 
-if ( var_info )  { delete var_info;  var_info = 0; }
+var_info.reset();
 
 conv_radius_array.clear();
 
@@ -207,7 +207,7 @@ dict = _dict;
 
 conf = _conf;
 
-var_info = VarInfoFactory::new_var_info(type);
+var_info = std::unique_ptr<VarInfo>(VarInfoFactory::new_var_info(type));
 
 if ( _multivar )  {
 

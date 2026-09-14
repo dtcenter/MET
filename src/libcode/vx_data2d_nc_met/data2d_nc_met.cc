@@ -209,7 +209,8 @@ void MetNcMetDataFile::set_range_azimuth_times(int i_track_point, DataPlane &pla
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
+bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
+                                  bool do_winds) {
    bool status = false;
    ConcatString req_time_str, data_time_str;
    VarInfoNcMet * vinfo_nc = (VarInfoNcMet *) &vinfo;
@@ -236,6 +237,14 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    status = MetNc->data(vinfo_nc->req_name().c_str(),
                         vinfo_nc->dimension(),
                         plane, info);
+
+   // Assume that winds in MET output files are earth-relative
+   vinfo_nc->set_grid_relative_flag(false);
+
+   // Attempt to derive the data
+   if(!status && do_winds) {
+      status = derive_winds(vinfo_nc, plane);
+   }
 
    // Check that the times match those requested
    if(status) {
@@ -277,7 +286,10 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
          status = false;
       }
 
-      status = process_data_plane(&vinfo, plane);
+      // Handle wind rotation
+      if(status && do_winds) status = rotate_winds(&vinfo, plane);
+
+      if(status) status = process_data_plane(&vinfo, plane);
 
       // Set the VarInfo object's name, long_name, level, and units strings
       if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
@@ -293,7 +305,8 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 ////////////////////////////////////////////////////////////////////////
 
 int MetNcMetDataFile::data_plane_array(VarInfo &vinfo,
-                                       DataPlaneArray &plane_array) {
+                                       DataPlaneArray &plane_array,
+                                       bool do_winds) {
    bool status = false;
    int n_rec = 0;
    DataPlane plane;
@@ -302,7 +315,7 @@ int MetNcMetDataFile::data_plane_array(VarInfo &vinfo,
    plane_array.clear();
 
    // Can only read a single 2D data plane from a MET NetCDF file
-   status = data_plane(vinfo, plane);
+   status = data_plane(vinfo, plane, do_winds);
 
    // Add the data plane to the DataPlaneArray with no level values
    if(status) {

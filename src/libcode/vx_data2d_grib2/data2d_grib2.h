@@ -86,16 +86,11 @@ class MetGrib2DataFile : public Met2dDataFile {
 
       std::vector<Grib2Record*> RecList;
 
-      std::map<std::string,std::string> PairMap;
-      std::map<std::string,Grib2Record*> NameRecMap;
-
       int ScanMode;
-
 
       //
       //  utilities to read a GRIB2 information
       //
-
 
       void find_record_matches( const VarInfoGrib2* vinfo,
                                 std::vector<Grib2Record*> &listMatchExact,
@@ -110,14 +105,6 @@ class MetGrib2DataFile : public Met2dDataFile {
                              gribfield* &gfld, g2int &numfields);
 
       void read_grib2_record_list();
-
-      DataPlane check_uv_rotation( const VarInfoGrib2 *vinfo,
-                                   Grib2Record *rec,
-                                   DataPlane plane
-                                 );
-
-      DataPlaneArray check_derived( const VarInfoGrib2 *vinfo );
-
 
    public:
 
@@ -136,15 +123,15 @@ class MetGrib2DataFile : public Met2dDataFile {
 
          //  retrieve the first matching data plane
 
-      bool data_plane(VarInfo &, DataPlane &);
+      bool data_plane(VarInfo &, DataPlane &, bool do_winds = true) override;
 
          //  retrieve all matching data planes
 
-      int data_plane_array(VarInfo &, DataPlaneArray &);
+      int data_plane_array(VarInfo &, DataPlaneArray &, bool do_winds = true) override;
 
          //  retrieve the index of the first matching record
 
-      int index(VarInfo &);
+      int index(VarInfo &) override;
 
          //
          //  do stuff

@@ -24,8 +24,21 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-bool build_grid_by_grid_string(const char *grid_str, Grid &grid,
-                               const char *caller_name, bool do_warning) {
+static bool derive_wind_speed_and_direction(
+               const DataPlane &u2d, const DataPlane &v2d,
+               bool want_wspd,
+               DataPlane &dp);
+
+static bool derive_u_and_v_wind(
+               const DataPlane &spd, const DataPlane &dir,
+               bool want_uwnd,
+               DataPlane &dp);
+
+////////////////////////////////////////////////////////////////////////
+
+bool build_grid_by_grid_string(
+        const char *grid_str, Grid &grid,
+        const char *caller_name, bool do_warning) {
    bool status = false;
 
    if (nullptr != grid_str && m_strlen(grid_str) > 0) {
@@ -58,8 +71,9 @@ bool build_grid_by_grid_string(const char *grid_str, Grid &grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool build_grid_by_grid_string(const ConcatString &grid_str, Grid &grid,
-                               const char *caller_name, bool do_warning) {
+bool build_grid_by_grid_string(
+        const ConcatString &grid_str, Grid &grid,
+        const char *caller_name, bool do_warning) {
    bool status = false;
 
    if(grid_str.nonempty()) {
@@ -72,104 +86,59 @@ bool build_grid_by_grid_string(const ConcatString &grid_str, Grid &grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
-                 DataPlane &wdir2d) {
-   const int nx = u2d.nx();
-   const int ny = u2d.ny();
-
-   mlog << Debug(3)
-        << "Deriving wind direction from U and V wind components.\n";
-
-   //
-   // Check that the dimensions match
-   //
-   if(u2d.nx() != v2d.nx() || u2d.ny() != v2d.ny()) {
-      mlog << Warning << "\nderive_wdir() -> "
-           << "the dimensions for U and V do not match: ("
-           << u2d.nx() << ", " << u2d.ny() << ") != ("
-           << v2d.nx() << ", " << v2d.ny() << ")\n\n";
-      return false;
-   }
-
-   //
-   // Initialize by setting to u2d
-   //
-   wdir2d = u2d;
-   wdir2d.set_constant(bad_data_double);
-
-#pragma omp parallel default(shared) \
-   shared(u2d, v2d, wdir2d)
-   {
-
-      //
-      // Compute the wind direction
-      //
-#pragma omp for schedule(static) \
-                collapse(2)
-      for(int x=0; x<nx; x++) {
-         for(int y=0; y<ny; y++) {
-
-            //
-            // Get the U and V components for this grid point
-            //
-            double u = u2d.get(x, y);
-            double v = v2d.get(x, y);
-
-            double wdir = bad_data_double;
-
-            //
-            // Compute wind direction and rescale to [0, 360)
-            //
-            if(!is_bad_data(u) && !is_bad_data(v)) {
-               wdir = rescale_deg(atan2d(-1.0*u, -1.0*v), 0.0, 360.0);
-            }
-
-            //
-            // Store the current value
-            //
-            wdir2d.set(wdir, x, y);
-
-         } // end for y
-      } // end for x
-   } // End omp parallel
-
-   return true;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
-                 DataPlane &wind2d) {
-   const int nx = u2d.nx();
-   const int ny = u2d.ny();
+bool derive_wind_speed(
+        const DataPlane &uwnd, const DataPlane &vwnd,
+        DataPlane &wspd) {
 
    mlog << Debug(3)
         << "Deriving wind speed from U and V wind components.\n";
 
+   return derive_wind_speed_and_direction(uwnd, vwnd, true, wspd);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool derive_wind_direction(
+        const DataPlane &uwnd, const DataPlane &vwnd,
+        DataPlane &wdir) {
+
+   mlog << Debug(3)
+        << "Deriving wind direction from U and V wind components.\n";
+
+   return derive_wind_speed_and_direction(uwnd, vwnd, false, wdir);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static bool derive_wind_speed_and_direction(
+               const DataPlane &uwnd, const DataPlane &vwnd,
+               bool want_wspd,
+               DataPlane &dp) {
+
    //
    // Check that the dimensions match
    //
-   if(u2d.nx() != v2d.nx() || u2d.ny() != v2d.ny()) {
-      mlog << Warning << "\nderive_wind() -> "
+   if(uwnd.nx() != vwnd.nx() || uwnd.ny() != vwnd.ny()) {
+      mlog << Warning << "\nderive_wind_speed_and_direction() -> "
            << "the dimensions for U and V do not match: ("
-           << u2d.nx() << ", " << u2d.ny() << ") != ("
-           << v2d.nx() << ", " << v2d.ny() << ")\n\n";
+           << uwnd.nx() << ", " << uwnd.ny() << ") != ("
+           << vwnd.nx() << ", " << vwnd.ny() << ")\n\n";
       return false;
    }
 
    //
-   // Initialize by setting to u2d
+   // Initialize output
    //
-   wind2d = u2d;
-   wind2d.set_constant(bad_data_double);
+   dp = uwnd;
+   dp.set_constant(bad_data_double);
+
+   const int nx = uwnd.nx();
+   const int ny = uwnd.ny();
 
 #pragma omp parallel default(shared) \
-   shared(u2d, v2d, wind2d)
+   shared(uwnd, vwnd, dp)
    {
 
-      //
-      // Compute the wind direction
-      //
 #pragma omp for schedule(static) \
                 collapse(2)
       for(int x=0; x<nx; x++) {
@@ -178,22 +147,27 @@ bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
             //
             // Get the U and V components for this grid point
             //
-            double u = u2d.get(x, y);
-            double v = v2d.get(x, y);
+            double u = uwnd.get(x, y);
+            double v = vwnd.get(x, y);
 
-            double wind = bad_data_double;
+            double der_v = bad_data_double;
 
             //
-            // Compute wind direction and rescale to [0, 360)
+            // Derive value
             //
             if(!is_bad_data(u) && !is_bad_data(v)) {
-               wind = sqrt(u*u + v*v);
+               if(want_wspd) {
+                  der_v = sqrt(u*u + v*v);
+               }
+               else {
+                  der_v = rescale_deg(atan2d(-1.0*u, -1.0*v), 0.0, 360.0);
+               }
             }
 
             //
-            // Store the current value
+            // Store the derived value
             //
-            wind2d.set(wind, x, y);
+            dp.set(der_v, x, y);
 
          } // end for y
       } // end for x
@@ -204,13 +178,160 @@ bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
 
 ////////////////////////////////////////////////////////////////////////
 
-void rotate_wdir_grid_to_earth(const DataPlane &wdir2d, const Grid &g,
-                               DataPlane &wdir2d_rot) {
-   const int nx = wdir2d.nx();
-   const int ny = wdir2d.ny();
+bool derive_kinetic_energy(
+        const DataPlane &uwnd, const DataPlane &vwnd,
+        DataPlane &keng) {
 
    mlog << Debug(3)
-        << "Rotating wind direction from grid-relative to earth-relative.\n";
+        << "Deriving kinetic energy from U and V wind components.\n";
+
+   //
+   // Check that the dimensions match
+   //
+   if(uwnd.nx() != vwnd.nx() || uwnd.ny() != vwnd.ny()) {
+      mlog << Warning << "\nderive_kinetic_energy() -> "
+           << "the dimensions for U and V do not match: ("
+           << uwnd.nx() << ", " << uwnd.ny() << ") != ("
+           << vwnd.nx() << ", " << vwnd.ny() << ")\n\n";
+      return false;
+   }
+
+   //
+   // Initialize output
+   //
+   keng = uwnd;
+   keng.set_constant(bad_data_double);
+
+   const int nx = uwnd.nx();
+   const int ny = uwnd.ny();
+
+#pragma omp parallel default(shared) \
+   shared(uwnd, vwnd, keng)
+   {
+
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
+
+            //
+            // Get the U and V components for this grid point
+            //
+            double u = uwnd.get(x, y);
+            double v = vwnd.get(x, y);
+
+            double der_v = bad_data_double;
+
+            //
+            // Derive value
+            //
+            if(!is_bad_data(u) && !is_bad_data(v)) {
+               der_v = (u*u + v*v)/2.0;
+               keng.set(der_v, x, y);
+            }
+
+         } // end for y
+      } // end for x
+   } // End omp parallel
+
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool derive_u_wind(
+        const DataPlane &wspd, const DataPlane &wdir,
+        DataPlane &uwnd) {
+
+   mlog << Debug(3)
+        << "Deriving U wind from wind speed and direction.\n";
+
+   return derive_u_and_v_wind(wspd, wdir, true, uwnd);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool derive_v_wind(
+        const DataPlane &wspd, const DataPlane &wdir,
+        DataPlane &vwnd) {
+
+   mlog << Debug(3)
+        << "Deriving V wind from wind speed and direction.\n";
+
+   return derive_u_and_v_wind(wspd, wdir, false, vwnd);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static bool derive_u_and_v_wind(
+               const DataPlane &wspd, const DataPlane &wdir,
+               bool want_uwnd,
+               DataPlane &dp) {
+
+   //
+   // Check that the dimensions match
+   //
+   if(wspd.nx() != wdir.nx() || wspd.ny() != wdir.ny()) {
+      mlog << Warning << "\nderive_u_and_v_wind() -> "
+           << "the dimensions for wind speed and direction do not match: ("
+           << wspd.nx() << ", " << wspd.ny() << ") != ("
+           << wdir.nx() << ", " << wdir.ny() << ")\n\n";
+      return false;
+   }
+
+   //
+   // Initialize output
+   //
+   dp = wspd;
+   dp.set_constant(bad_data_double);
+
+   const int nx = wspd.nx();
+   const int ny = wspd.ny();
+
+#pragma omp parallel default(shared) \
+   shared(wspd, wdir, dp)
+   {
+
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
+
+            //
+            // Get the wind speed and direction for this grid point
+            //
+            double s = wspd.get(x, y);
+            double d = wdir.get(x, y);
+
+            double der_v = bad_data_double;
+
+            //
+            // Derive value
+            //
+            if(!is_bad_data(s) && !is_bad_data(d)) {
+               if(want_uwnd) der_v = s * cosd(270.0 - d);
+               else          der_v = s * sind(270.0 - d);
+            }
+
+            //
+            // Store the derived value
+            //
+            dp.set(der_v, x, y);
+
+         } // end for y
+      } // end for x
+   } // End omp parallel
+
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void rotate_wind_direction_grid_to_earth(
+        const DataPlane &wdir2d, const Grid &g,
+        DataPlane &wdir2d_rot) {
+   const int nx = wdir2d.nx();
+   const int ny = wdir2d.ny();
 
    //
    // Initialize by setting to u2d
@@ -263,14 +384,12 @@ void rotate_wdir_grid_to_earth(const DataPlane &wdir2d, const Grid &g,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool rotate_uv_grid_to_earth(const DataPlane &u2d, const DataPlane &v2d,
-                             const Grid &g,
-                             DataPlane &u2d_rot, DataPlane &v2d_rot) {
+bool rotate_uv_grid_to_earth(
+        const DataPlane &u2d, const DataPlane &v2d,
+        const Grid &g,
+        DataPlane &u2d_rot, DataPlane &v2d_rot) {
    const int nx = u2d.nx();
    const int ny = u2d.ny();
-
-   mlog << Debug(3)
-        << "Rotating U and V wind components from grid-relative to earth-relative.\n";
 
    //
    // Check that the dimensions match

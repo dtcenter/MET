@@ -72,7 +72,7 @@ class VarInfoGrib2 : public VarInfo
       ~VarInfoGrib2() override;
       VarInfoGrib2(const VarInfoGrib2 &);
       VarInfoGrib2 & operator=(const VarInfoGrib2 &);
-      VarInfo *clone() const override;
+      std::unique_ptr<VarInfo> clone() const override;
 
       void dump(std::ostream &) const override;
       void clear();
