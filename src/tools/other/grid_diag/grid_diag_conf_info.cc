@@ -54,6 +54,12 @@ bool GridDiagNcOutInfo::all_false() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool GridDiagNcOutInfo::do_hist() const {
+   return do_hist1d || do_hist2d || do_info_theory;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void GridDiagNcOutInfo::set_all_false() {
 
    do_hist1d         = false;

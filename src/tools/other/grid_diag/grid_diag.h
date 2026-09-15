@@ -94,9 +94,6 @@ int deflate_level;
 static bool multiple_data_sources = false;
 static bool unique_variable_names = true;
 
-// List of output NetCDF variable names
-static StringArray nc_var_sa;
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Miscellaneous Variables

@@ -39,6 +39,7 @@ struct GridDiagNcOutInfo {
    void clear();   // sets everything to true
 
    bool all_false() const;
+   bool do_hist() const;
 
    void set_all_false();
    void set_all_true();

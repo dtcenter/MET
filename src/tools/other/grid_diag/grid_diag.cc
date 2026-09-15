@@ -124,7 +124,7 @@ int met_main(int argc, char *argv[]) {
    setup_nc_file();
 
    // Write histogram bins
-   write_hist_bins();
+   if(conf_info.nc_info.do_hist()) write_hist_bins();
 
    // Write 1D variable histograms
    if(conf_info.nc_info.do_hist1d) write_hist1d();
@@ -296,10 +296,26 @@ static void setup_diag_info(void) {
    CTRACK;
 #endif
 
-   // Resize based on the number of variables and masks
+   // Resize based on the number of variables, masks, and outputs
+
+   // Check for unique field strings
+   StringArray sa;
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+      ConcatString magic_str(conf_info.data_info[i_var]->magic_str_attr());
+      if(sa.has(magic_str)) unique_variable_names = false;
+      sa.add(magic_str);
+   }
+
+   // Power spectrum output
+   if(conf_info.nc_info.do_power_spectrum) {
+      power_info.resize(conf_info.get_n_data());
+   }
+
+   // Histogram outputs
+   if(!conf_info.nc_info.do_hist()) return;
+
    diag_info.resize(conf_info.get_n_data());
    for(auto &info : diag_info) info.resize(conf_info.get_n_mask());
-   power_info.resize(conf_info.get_n_data());
 
    // Loop over variables
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
@@ -329,10 +345,6 @@ static void setup_diag_info(void) {
            << var_min << " to " << var_max << ".\n";
       vector<long long> hist1d;
       init_pdf(i_n_bins, hist1d);
-
-      // Keep track of unique output variable names
-      if(nc_var_sa.has(i_vinfo->magic_str_attr())) unique_variable_names = false;
-      nc_var_sa.add(i_vinfo->magic_str_attr());
 
       // 2D histograms
       map<int, vector<long long> > hist2d; 
@@ -413,11 +425,15 @@ static void process_series(void) {
 
       } // end for i_var
 
-      // Process the 1D histograms
-      process_hist1d(in_data);
+      // Process histograms
+      if(conf_info.nc_info.do_hist()) {
 
-      // Process the 2D histograms
-      process_hist2d(in_data);
+         // Process the 1D histograms
+         process_hist1d(in_data);
+
+         // Process the 2D histograms
+         process_hist2d(in_data);
+      }
 
       // Process the power spectrum
       if(conf_info.nc_info.do_power_spectrum) {
@@ -1041,31 +1057,35 @@ static void setup_nc_file(void) {
    deflate_level = compress_level;
    if(deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
 
-   // Create the mask dimension
-   mask_dim = add_dim(nc_out, "mask",
-                      (long) conf_info.get_n_mask());
+   // Masks are applied to histograms but not power spectrum outputs
+   if(conf_info.nc_info.do_hist()) {
 
-   // Create the mask name variable
-   NcVar mask_name_var = add_var(nc_out, "mask_name", ncString, mask_dim, deflate_level);
-   add_att(&mask_name_var, "long_name", "Name of masking region");
+      // Create the mask dimension
+      mask_dim = add_dim(nc_out, "mask",
+                         (long) conf_info.get_n_mask());
 
-   // Create the mask size variable
-   NcVar mask_size_var = add_var(nc_out, "mask_size", ncInt64, mask_dim, deflate_level);
-   add_att(&mask_size_var, "long_name", "Number of mask points");
+      // Create the mask name variable
+      NcVar mask_name_var = add_var(nc_out, "mask_name", ncString, mask_dim, deflate_level);
+      add_att(&mask_name_var, "long_name", "Name of masking region");
 
-   // Write the mask names and sizes
-   vector<size_t> offsets(1);
-   vector<size_t> counts(1);
-   for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
-      offsets[0] = i_mask;
-      counts[0] = 1;
-      string mask_name(conf_info.mask_name[i_mask]);
-      mask_name_var.putVar(offsets, counts, &mask_name);
-      int mask_size = conf_info.mask_mp[i_mask].count();
-      mask_size_var.putVar(offsets, counts, &mask_size);
+      // Create the mask size variable
+      NcVar mask_size_var = add_var(nc_out, "mask_size", ncInt64, mask_dim, deflate_level);
+      add_att(&mask_size_var, "long_name", "Number of mask points");
+
+      // Write the mask names and sizes
+      vector<size_t> offsets(1);
+      vector<size_t> counts(1);
+      for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
+         offsets[0] = i_mask;
+         counts[0] = 1;
+         string mask_name(conf_info.mask_name[i_mask]);
+         mask_name_var.putVar(offsets, counts, &mask_name);
+         int mask_size = conf_info.mask_mp[i_mask].count();
+         mask_size_var.putVar(offsets, counts, &mask_size);
+      }
    }
 
-   // Add the power spectra dimension
+   // Add the power spectrum dimension
    if(conf_info.nc_info.do_power_spectrum) {
       wavenumber_dim = add_dim(nc_out, "wavenumber",
                                (long) min(grid.nx(), grid.ny())-1);
