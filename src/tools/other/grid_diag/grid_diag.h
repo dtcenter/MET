@@ -28,6 +28,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <map>
+#include <memory>
 #include <ctype.h>
 #include <dirent.h>
 #include <iostream>
@@ -85,7 +86,7 @@ static GridDiagConfInfo conf_info;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static netCDF::NcFile *nc_out = nullptr;
+static std::unique_ptr<netCDF::NcFile> nc_out;
 netCDF::NcDim mask_dim;
 netCDF::NcDim wavenumber_dim;
 std::vector<netCDF::NcDim> data_var_dims;
@@ -104,7 +105,7 @@ static bool unique_variable_names = true;
 static Grid grid;
 
 // Input files
-static Met2dDataFile *data_mtddf = nullptr;
+static std::unique_ptr<Met2dDataFile> data_mtddf;
 
 // Struct to store scalar and vector input data
 struct InputDataInfo {

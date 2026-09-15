@@ -99,7 +99,7 @@ static void clean_up(void);
 
 static double get_grid_res_km(const Grid &);
 
-static Met2dDataFile *get_mtddf(const StringArray &, const int);
+static std::unique_ptr<Met2dDataFile> get_mtddf(const StringArray &, const int);
 
 static void usage(int exit_code=1);
 static void set_data_files(const StringArray &);
@@ -251,19 +251,25 @@ static void process_command_line(int argc, char **argv) {
       // Store the input data file types
       file_types.emplace_back(data_mtddf->file_type());
 
-      // Store the grid
-      data_grid = data_mtddf->grid();
-
-      // Deallocate memory for data files
-      if(data_mtddf) {
-         delete data_mtddf;
-         data_mtddf = (Met2dDataFile *) nullptr;
-      }
-
    } // end for i
 
-   // Process the configuration
+   // Process the configuration. Note that the grid may be set
+   // by the grid_attr configuration option.
    conf_info.process_config(file_types, data_grid);
+
+   // If not already set, determine the grid from the data source,
+   // reading the data if needed.
+   for(int i=0; i < data_files.size() && !data_grid.is_set(); i++) {
+
+      // When a single "-data" option is used for all fields, use field 0.
+      // Otherwise each "-data" options and fields correspond.
+      int i_field = (data_files.size() > 1 ? i : 0);
+
+      data_mtddf = get_mtddf(data_files[i], i);
+      update_mtddf_grid(data_mtddf.get(), conf_info.data_info[i_field]);
+      data_grid = data_mtddf->grid();
+
+   } // end for i
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.data_info[0]->regrid(),
@@ -1028,7 +1034,7 @@ static ConcatString get_nc_att_str(const ConcatString &cs1,
 static void setup_nc_file(void) {
 
    // Create NetCDF file
-   nc_out = open_ncfile(out_file.c_str(), true);
+   nc_out.reset(open_ncfile(out_file.c_str(), true));
 
    if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
@@ -1038,16 +1044,16 @@ static void setup_nc_file(void) {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_file.c_str(), program_name,
+   write_netcdf_global(nc_out.get(), out_file.c_str(), program_name,
                        nullptr, nullptr, conf_info.desc.c_str());
 
    // Add time range information to the global attributes
-   add_att(nc_out, "init_beg",  (string)unix_to_yyyymmdd_hhmmss(init_beg));
-   add_att(nc_out, "init_end",  (string)unix_to_yyyymmdd_hhmmss(init_end));
-   add_att(nc_out, "valid_beg", (string)unix_to_yyyymmdd_hhmmss(valid_beg));
-   add_att(nc_out, "valid_end", (string)unix_to_yyyymmdd_hhmmss(valid_end));
-   add_att(nc_out, "lead_beg",  (string)sec_to_hhmmss(lead_beg));
-   add_att(nc_out, "lead_end",  (string)sec_to_hhmmss(lead_end));
+   add_att(nc_out.get(), "init_beg",  (string)unix_to_yyyymmdd_hhmmss(init_beg));
+   add_att(nc_out.get(), "init_end",  (string)unix_to_yyyymmdd_hhmmss(init_end));
+   add_att(nc_out.get(), "valid_beg", (string)unix_to_yyyymmdd_hhmmss(valid_beg));
+   add_att(nc_out.get(), "valid_end", (string)unix_to_yyyymmdd_hhmmss(valid_end));
+   add_att(nc_out.get(), "lead_beg",  (string)sec_to_hhmmss(lead_beg));
+   add_att(nc_out.get(), "lead_end",  (string)sec_to_hhmmss(lead_end));
 
    // Write the grid size and series length
    write_nc_var_int("grid_size", "number of grid points", grid.nxy());
@@ -1061,15 +1067,15 @@ static void setup_nc_file(void) {
    if(conf_info.nc_info.do_hist()) {
 
       // Create the mask dimension
-      mask_dim = add_dim(nc_out, "mask",
+      mask_dim = add_dim(nc_out.get(), "mask",
                          (long) conf_info.get_n_mask());
 
       // Create the mask name variable
-      NcVar mask_name_var = add_var(nc_out, "mask_name", ncString, mask_dim, deflate_level);
+      NcVar mask_name_var = add_var(nc_out.get(), "mask_name", ncString, mask_dim, deflate_level);
       add_att(&mask_name_var, "long_name", "Name of masking region");
 
       // Create the mask size variable
-      NcVar mask_size_var = add_var(nc_out, "mask_size", ncInt64, mask_dim, deflate_level);
+      NcVar mask_size_var = add_var(nc_out.get(), "mask_size", ncInt64, mask_dim, deflate_level);
       add_att(&mask_size_var, "long_name", "Number of mask points");
 
       // Write the mask names and sizes
@@ -1087,7 +1093,7 @@ static void setup_nc_file(void) {
 
    // Add the power spectrum dimension
    if(conf_info.nc_info.do_power_spectrum) {
-      wavenumber_dim = add_dim(nc_out, "wavenumber",
+      wavenumber_dim = add_dim(nc_out.get(), "wavenumber",
                                (long) min(grid.nx(), grid.ny())-1);
    }
 }
@@ -1098,7 +1104,7 @@ static void write_nc_var_int(const char *var_name,
                              const char *long_name, int n) {
 
    // Add the variable
-   NcVar var = add_var(nc_out, var_name, ncInt64);
+   NcVar var = add_var(nc_out.get(), var_name, ncInt64);
    add_att(&var, "long_name", long_name);
 
    if(!put_nc_data(&var, &n)) {
@@ -1144,7 +1150,7 @@ static void write_hist_bins(void) {
       ConcatString var_str(get_nc_var_str(i_vinfo, i_var+1));
 
       // Define NetCDF dimensions
-      NcDim var_dim = add_dim(nc_out, var_str,
+      NcDim var_dim = add_dim(nc_out.get(), var_str,
                               (long) i_vinfo->n_bins());
       data_var_dims.emplace_back(var_dim);
       
@@ -1153,13 +1159,13 @@ static void write_hist_bins(void) {
       ConcatString max_var_name(var_str);
       min_var_name.add("_min");
       max_var_name.add("_max");
-      NcVar var_min = add_var(nc_out, min_var_name, ncFloat,
+      NcVar var_min = add_var(nc_out.get(), min_var_name, ncFloat,
                               var_dim, deflate_level);
-      NcVar var_max = add_var(nc_out, max_var_name, ncFloat,
+      NcVar var_max = add_var(nc_out.get(), max_var_name, ncFloat,
                               var_dim, deflate_level);
 
       // Write a coordinate variable using the bin midpoint
-      NcVar var_mid = add_var(nc_out, var_str, ncFloat,
+      NcVar var_mid = add_var(nc_out.get(), var_str, ncFloat,
                               var_dim, deflate_level);
 
       // Add variable attributes
@@ -1199,7 +1205,7 @@ static void write_hist1d(void) {
       vector<NcDim> dims(2);
       dims[0] = mask_dim;
       dims[1] = data_var_dims[i_var];
-      NcVar var = add_var(nc_out, var_name, ncInt64, dims,
+      NcVar var = add_var(nc_out.get(), var_name, ncInt64, dims,
                           deflate_level);
 
       // Add variable attributes
@@ -1250,7 +1256,7 @@ static void write_hist2d(void) {
          dims[0] = mask_dim;
          dims[1] = data_var_dims[i_var];
          dims[2] = data_var_dims[j_var];
-         NcVar var = add_var(nc_out, var_name, ncInt64, dims,
+         NcVar var = add_var(nc_out.get(), var_name, ncInt64, dims,
                              deflate_level);
 
          // Add variable attributes
@@ -1297,7 +1303,7 @@ static void write_info_theory(void) {
       var_name << var_str;
 
       // Create NetCDF variable
-      NcVar var = add_var(nc_out, var_name, ncFloat,
+      NcVar var = add_var(nc_out.get(), var_name, ncFloat,
                           mask_dim, deflate_level);
 
       // Add variable attributes
@@ -1336,9 +1342,9 @@ static void write_info_theory(void) {
          mi_var_name << var_str;
 
          // Create NetCDF variables
-         NcVar je_var = add_var(nc_out, je_var_name, ncFloat,
+         NcVar je_var = add_var(nc_out.get(), je_var_name, ncFloat,
                                 mask_dim, deflate_level);
-         NcVar mi_var = add_var(nc_out, mi_var_name, ncFloat,
+         NcVar mi_var = add_var(nc_out.get(), mi_var_name, ncFloat,
                                 mask_dim, deflate_level);
 
          // Level attribute
@@ -1387,13 +1393,13 @@ static void write_wavelengths(void) {
    }
 
    // Add wavenumber coordinate variable
-   NcVar num_var = add_var(nc_out, "wavenumber", ncInt64, wavenumber_dim);
+   NcVar num_var = add_var(nc_out.get(), "wavenumber", ncInt64, wavenumber_dim);
    add_var_att_local(&num_var, "long_name", "Wavenumber");
    add_var_att_local(&num_var, "units", "1");
    num_var.putVar(wavenumber.data());
 
    // Add wavelength variable
-   NcVar len_var = add_var(nc_out, "wavelength", ncFloat, wavenumber_dim);
+   NcVar len_var = add_var(nc_out.get(), "wavelength", ncFloat, wavenumber_dim);
    add_var_att_local(&len_var, "long_name", "Wavelength");
    add_var_att_local(&len_var, "units", "km");
    ConcatString cs;
@@ -1425,7 +1431,7 @@ static void write_power_spectrum(void) {
       var_name << var_str;
 
       // Create NetCDF variable
-      NcVar var = add_var(nc_out, var_name, ncFloat, wavenumber_dim,
+      NcVar var = add_var(nc_out.get(), var_name, ncFloat, wavenumber_dim,
                           deflate_level);
 
       // Add variable attributes
@@ -1474,7 +1480,7 @@ static void write_error_power_spectrum(void) {
          var_name << i_var_str << "_" << j_var_str;
 
          // Create NetCDF variable
-         NcVar var = add_var(nc_out, var_name, ncFloat, wavenumber_dim,
+         NcVar var = add_var(nc_out.get(), var_name, ncFloat, wavenumber_dim,
                              deflate_level);
 
          // Level attribute
@@ -1507,8 +1513,8 @@ static void write_error_power_spectrum(void) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static Met2dDataFile *get_mtddf(const StringArray &file_list,
-                                const int i_field) {
+static std::unique_ptr<Met2dDataFile> get_mtddf(const StringArray &file_list,
+                                                const int i_field) {
    int i;
 
    // Conf: data.field
@@ -1533,9 +1539,9 @@ static Met2dDataFile *get_mtddf(const StringArray &file_list,
    }
 
    // Read first valid file
-   Met2dDataFile *mtddf = nullptr;
-   if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(
-                   file_list[i].c_str(), file_type))) {
+   std::unique_ptr<Met2dDataFile> mtddf(
+      Met2dDataFileFactory::new_met_2d_data_file(file_list[i].c_str(), file_type));
+   if(!mtddf) {
       mlog << Error << "\nget_mtddf() -> "
            << "trouble reading data file \""
            << file_list[i] << "\"\n\n";
@@ -1555,8 +1561,7 @@ static void clean_up(void) {
       // List the NetCDF file after it is finished
       mlog << Debug(1) << "Output file: " << out_file << "\n";
 
-      delete nc_out;
-      nc_out = (NcFile *) nullptr;
+      nc_out.reset();
     }
 
    return;
