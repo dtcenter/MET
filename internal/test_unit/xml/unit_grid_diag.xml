@@ -73,13 +73,13 @@
                 > &OUTPUT_DIR;/grid_diag/obs_file_list; \
          &MET_BIN;/grid_diag</exec>
     <env>
-      <pair><name>FIELD1</name> <value>set_attr_name = "FCST_APCP";</value></pair>
-      <pair><name>FIELD2</name> <value>set_attr_name = "OBS_APCP";</value></pair>
+      <pair><name>FIELD1</name> <value>set_attr_name = "FCST_APCP"; name = "APCP"; level = "A06"; n_bins = 50; range = [0,25];</value></pair>
+      <pair><name>FIELD2</name> <value>set_attr_name = "OBS_APCP"; name = "APCP"; level = "A06"; n_bins = 50; range = [0,25];</value></pair>
     </env>
     <param> \
       -data &OUTPUT_DIR;/grid_diag/fcst_file_list \
       -data &OUTPUT_DIR;/grid_diag/obs_file_list \
-      -config &CONFIG_DIR;/GridDiagConfig_APCP_06_FCST_OBS \
+      -config &CONFIG_DIR;/GridDiagConfig_FCST_OBS \
       -out &OUTPUT_DIR;/grid_diag/grid_diag_APCP_06_FCST_OBS.nc \
       -v 3
     </param>
@@ -109,18 +109,74 @@
                 > &OUTPUT_DIR;/grid_diag/obs_file_list; \
          &MET_BIN;/grid_diag</exec>
     <env>
-      <pair><name>FIELD1</name> <value>name = "APCP";</value></pair>
-      <pair><name>FIELD2</name> <value>name = "APCP";</value></pair>
+      <pair><name>FIELD1</name> <value>name = "APCP"; level = "A06"; n_bins = 50; range = [0,25];</value></pair>
+      <pair><name>FIELD2</name> <value>name = "APCP"; level = "A06"; n_bins = 50; range = [0,25];</value></pair>
     </env>
     <param> \
       -data &OUTPUT_DIR;/grid_diag/fcst_file_list \
       -data &OUTPUT_DIR;/grid_diag/obs_file_list \
-      -config &CONFIG_DIR;/GridDiagConfig_APCP_06_FCST_OBS \
+      -config &CONFIG_DIR;/GridDiagConfig_FCST_OBS \
       -out &OUTPUT_DIR;/grid_diag/grid_diag_APCP_06_VARN.nc \
       -v 3
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_APCP_06_VARN.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="grid_diag_WIND_FCST_OBS">
+    <exec>echo "&DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F006.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F018.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2" \
+                > &OUTPUT_DIR;/grid_diag/uv_wind_fcst_file_list; \
+          echo "&DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_0600_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1800_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2" \
+                > &OUTPUT_DIR;/grid_diag/uv_wind_anly_file_list; \
+         &MET_BIN;/grid_diag</exec>
+    <env>
+      <pair><name>FIELD1</name> <value>name = "WIND"; level = "Z10"; n_bins = 200; range = [0,20];</value></pair>
+      <pair><name>FIELD2</name> <value>name = "WIND"; level = "Z10"; n_bins = 200; range = [0,20];</value></pair>
+    </env>
+    <param> \
+      -data &OUTPUT_DIR;/grid_diag/uv_wind_fcst_file_list \
+      -data &OUTPUT_DIR;/grid_diag/uv_wind_anly_file_list \
+      -config &CONFIG_DIR;/GridDiagConfig_FCST_OBS \
+      -out &OUTPUT_DIR;/grid_diag/grid_diag_WIND_Z10.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_WIND_Z10.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="grid_diag_KENG_FCST_OBS">
+    <exec>echo "&DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F006.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F018.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2" \
+                > &OUTPUT_DIR;/grid_diag/keng_fcst_file_list; \
+          echo "&DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_0600_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1800_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2" \
+                > &OUTPUT_DIR;/grid_diag/keng_anly_file_list; \
+         &MET_BIN;/grid_diag</exec>
+    <env>
+      <pair><name>FIELD1</name> <value>name = "KENG"; level = "Z10"; n_bins = 140; range = [0,140];</value></pair>
+      <pair><name>FIELD2</name> <value>name = "KENG"; level = "Z10"; n_bins = 140; range = [0,140];</value></pair>
+    </env>
+    <param> \
+      -data &OUTPUT_DIR;/grid_diag/keng_fcst_file_list \
+      -data &OUTPUT_DIR;/grid_diag/keng_anly_file_list \
+      -config &CONFIG_DIR;/GridDiagConfig_FCST_OBS \
+      -out &OUTPUT_DIR;/grid_diag/grid_diag_KENG_Z10.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_KENG_Z10.nc</grid_nc>
     </output>
   </test>
 

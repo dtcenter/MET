@@ -89,6 +89,39 @@ void rng_free(gsl_rng *r) {
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Clone a base random number generator into one independent copy per
+// OpenMP thread, each seeded off the base generator's current state
+// so their streams are decorrelated.
+//
+////////////////////////////////////////////////////////////////////////
+
+vector<gsl_rng *> rng_set_omp(const gsl_rng *base_r, int n_threads) {
+   vector<gsl_rng *> rngs;
+
+   if(n_threads < 1) n_threads = 1;
+
+   for(int i=0; i<n_threads; i++) {
+      gsl_rng *r = gsl_rng_clone(base_r);
+      gsl_rng_set(r, gsl_rng_get(base_r) + i + 1);
+      rngs.push_back(r);
+   }
+
+   return rngs;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void rng_free_omp(vector<gsl_rng *> &rngs) {
+
+   for(auto r : rngs) gsl_rng_free(r);
+
+   rngs.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // Produce a random permutation of the values in the array base.
 //
 ////////////////////////////////////////////////////////////////////////
