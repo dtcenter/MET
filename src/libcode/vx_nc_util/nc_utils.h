@@ -340,16 +340,17 @@ extern int    get_index_at_nc_data(netCDF::NcVar *var, double value_min, double 
 extern netCDF::NcFile* open_ncfile(const char * nc_name, bool write = false);
 
 // Moved from nc_cf_file.cc
-extern unixtime get_init_time(netCDF::NcFile *nc_file);
+extern unixtime get_init_time(netCDF::NcVar *var);
+extern unixtime get_init_time(netCDF::NcFile *nc_file, const char *time_var_name=nullptr);
 
 extern unixtime get_reference_unixtime(netCDF::NcVar *time_var, int &sec_per_unit,
-                                       bool &no_leap_year);
+                                       bool &no_leap_year, const char *caller=nullptr);
 
 extern bool is_nc_unit_time(const char *units);
 extern bool is_nc_unit_longitude(const char *units);
 extern bool is_nc_unit_latitude(const char *units);
 
-extern void parse_cf_time_string(const char *str, unixtime &ref_ut,
+extern bool parse_cf_time_string(const char *str, unixtime &ref_ut,
                                  int &sec_per_unit);
 extern void parse_time_string(const char *str, unixtime &ut);
 
