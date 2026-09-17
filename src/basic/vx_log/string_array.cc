@@ -87,6 +87,21 @@ assign(a);
 ////////////////////////////////////////////////////////////////////////
 
 
+StringArray::StringArray(StringArray && a) noexcept
+   : s(move(a.s)), MaxLength(a.MaxLength), IgnoreCase(a.IgnoreCase), Sorted(a.Sorted)
+
+{
+
+a.MaxLength = 0;
+a.IgnoreCase = false;
+a.Sorted = false;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 StringArray::StringArray(const vector<string> & a) : s(a)
 
 {
@@ -107,6 +122,25 @@ if ( this == &a )  return *this;
 
 assign(a);
 
+
+return *this;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+StringArray & StringArray::operator=(StringArray && a) noexcept
+
+{
+
+if ( this == &a )  return *this;
+
+s = move(a.s);
+MaxLength = a.MaxLength;
+IgnoreCase = a.IgnoreCase;
+Sorted = a.Sorted;
 
 return *this;
 
