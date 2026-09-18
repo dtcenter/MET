@@ -20,6 +20,7 @@
 #include "ascii_table.h"
 #include "fo_graph.h"
 #include "vx_log.h"
+#include <vector>
 
 using namespace std;
 
@@ -93,8 +94,6 @@ void FO_Graph::init_from_scratch()
 
 {
 
-TheGraph = 0;
-
 clear();
 
 return;
@@ -109,7 +108,7 @@ void FO_Graph::clear()
 
 {
 
-if ( TheGraph )  { delete [] TheGraph;  TheGraph = 0; }
+TheGraph.clear();
 
 N_fcst = 0;
 N_obs  = 0;
@@ -132,13 +131,13 @@ void FO_Graph::assign(const FO_Graph & g)
 
 clear();
 
-if ( ! (g.TheGraph) )  return;
+if ( g.TheGraph.empty() )  return;
 
 const int N = g.N_fcst + g.N_obs;
 
 N_nodes = N*N;
 
-TheGraph = new FO_Node [N_nodes];
+TheGraph.resize(N_nodes);
 
 for (int idx=0; idx<N_nodes; idx++) {
    TheGraph[idx] = g.TheGraph[idx];
@@ -229,7 +228,7 @@ N_obs  = n_o;
 
 N_total  = N_fcst + N_obs;
 
-TheGraph = new FO_Node [N_total*N_total];
+TheGraph.resize(N_total*N_total);
 
    //
    //  done
@@ -362,7 +361,7 @@ void FO_Graph::erase_edges()
 
 {
 
-if ( ! TheGraph )  {
+if ( TheGraph.empty() )  {
 
    mlog << Error << "\nFO_Graph::erase_edges() -> "
         << "empty graph!\n\n";
@@ -392,7 +391,7 @@ void FO_Graph::do_dump_table(AsciiTable & table) const
 
 {
 
-if ( ! TheGraph )  {
+if ( TheGraph.empty() )  {
 
    mlog << Error << "\nO_Graph::dump_as_table() -> "
         << "empty graph!\n\n";

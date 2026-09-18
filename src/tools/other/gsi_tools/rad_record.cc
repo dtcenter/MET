@@ -336,7 +336,6 @@ void RadFile::init_from_scratch()
 
 Fd = -1;
 
-C_params = 0;
 
 close();
 
@@ -354,7 +353,7 @@ void RadFile::close()
 
 if ( Fd >= 0 )  { ::close(Fd);  Fd = -1; }
 
-if ( C_params )  { delete [] C_params;  C_params = 0; }
+C_params.clear();
 
 SwapEndian = true;
 
@@ -611,7 +610,7 @@ N2 = R_params.nchanl;
    //  channel params
    //
 
-C_params = new ChannelParams [Nchannels];
+C_params.resize(Nchannels);
 
 for (k=0; k<Nchannels; ++k)  {
 

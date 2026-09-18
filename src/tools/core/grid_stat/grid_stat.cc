@@ -170,13 +170,13 @@ static void get_mask_points(const GridStatVxOpt &,
                             const DataPlane *, const DataPlane *,
                             PairDataPoint &);
 
-static void do_cts       (CTSInfo *&,   int, const PairDataPoint *);
+static void do_cts       (CTSInfo *,    int, const PairDataPoint *);
 static void do_mcts      (MCTSInfo &,   int, const PairDataPoint *);
 static void do_cnt_sl1l2 (const GridStatVxOpt &, const PairDataPoint *);
-static void do_vl1l2     (VL1L2Info *&, int, const PairDataPoint *, const PairDataPoint *);
+static void do_vl1l2     (VL1L2Info *,  int, const PairDataPoint *, const PairDataPoint *);
 static void do_pct       (const GridStatVxOpt &, const PairDataPoint *);
 
-static void do_nbrcts(NBRCTSInfo *&, int, int, int, const PairDataPoint *);
+static void do_nbrcts(NBRCTSInfo *, int, int, int, const PairDataPoint *);
 static void do_nbrcnt(NBRCNTInfo &,  int, int, int, const PairDataPoint *, const PairDataPoint *);
 
 static void write_nc(const ConcatString &, const DataPlane &, int,
@@ -683,11 +683,8 @@ void process_scores() {
 
    DataPlane seeps_dp, seeps_dp_fcat, seeps_dp_ocat;
 
-   CTSInfo    *cts_info    = (CTSInfo *) nullptr;
    MCTSInfo    mcts_info;
-   VL1L2Info  *vl1l2_info  = (VL1L2Info *) nullptr;
    NBRCNTInfo  nbrcnt_info;
-   NBRCTSInfo *nbrcts_info = (NBRCTSInfo *) nullptr;
    GRADInfo    grad_info;
    DMAPInfo    dmap_info;
 
@@ -697,9 +694,9 @@ void process_scores() {
    n_cov  = conf_info.get_max_n_cov_thresh();
 
    // Allocate space for output statistics types
-   cts_info    = new CTSInfo    [n_cat];
-   vl1l2_info  = new VL1L2Info  [n_wind];
-   nbrcts_info = new NBRCTSInfo [n_cov];
+   vector<CTSInfo>    cts_info   (n_cat);
+   vector<VL1L2Info>  vl1l2_info (n_wind);
+   vector<NBRCTSInfo> nbrcts_info(n_cov);
 
    // Compute scores for each verification task and write output_flag
    for(i=0; i<conf_info.get_n_vx(); i++) {
@@ -928,7 +925,7 @@ void process_scores() {
                for(m=0; m<n_cat; m++) cts_info[m].clear();
 
                // Compute CTS
-               do_cts(cts_info, i, &pd);
+               do_cts(cts_info.data(), i, &pd);
 
                // Loop through all of the thresholds
                for(m=0; m<conf_info.vx_opt[i].fcat_ta.n(); m++) {
@@ -1097,7 +1094,7 @@ void process_scores() {
                                &wgt_dp, pd_u);
 
                // Compute VL1L2
-               do_vl1l2(vl1l2_info, i, &pd_u, &pd);
+               do_vl1l2(vl1l2_info.data(), i, &pd_u, &pd);
 
                // Loop through all of the wind speed thresholds
                for(m=0; m<conf_info.vx_opt[i].fwind_ta.n(); m++) {
@@ -1692,7 +1689,7 @@ void process_scores() {
                         nbrcts_info[n].clear();
                      }
 
-                     do_nbrcts(nbrcts_info, i, j, k, &pd);
+                     do_nbrcts(nbrcts_info.data(), i, j, k, &pd);
 
                      // Loop through all of the thresholds
                      for(n=0; n<conf_info.vx_opt[i].get_n_cov_thresh(); n++) {
@@ -1955,7 +1952,7 @@ void process_scores() {
                                &wgt_dp, pd_u);
 
                // Compute VL1L2
-               do_vl1l2(vl1l2_info, i, &pd_u, &pd);
+               do_vl1l2(vl1l2_info.data(), i, &pd_u, &pd);
 
                // Loop through all of the wind speed thresholds
                for(m=0; m<conf_info.vx_opt[i].fwind_ta.n(); m++) {
@@ -2044,9 +2041,6 @@ void process_scores() {
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
    // Deallocate memory
-   if(cts_info)    { delete [] cts_info;    cts_info    = (CTSInfo *)    nullptr; }
-   if(vl1l2_info)  { delete [] vl1l2_info;  vl1l2_info  = (VL1L2Info *)  nullptr; }
-   if(nbrcts_info) { delete [] nbrcts_info; nbrcts_info = (NBRCTSInfo *) nullptr; }
 
    return;
 }
@@ -2089,7 +2083,7 @@ void get_mask_points(const GridStatVxOpt &vx_opt,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cts(CTSInfo *&cts_info, int i_vx,
+void do_cts(CTSInfo *cts_info, int i_vx,
             const PairDataPoint *pd_ptr) {
    int i, j, n_cts;
 
@@ -2187,8 +2181,6 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
 void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    int i, j, k, n_bin;
    PairDataPoint pd_thr, pd;
-   SL1L2Info *sl1l2_info = (SL1L2Info *) nullptr;
-   CNTInfo   *cnt_info   = (CNTInfo *)   nullptr;
 
    mlog << Debug(2)
         << "Computing Scalar Partial Sums and Continuous Statistics.\n";
@@ -2211,8 +2203,8 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
                        vx_opt.obs_info->is_precipitation());
 
    // Allocate memory
-   cnt_info   = new CNTInfo   [n_bin];
-   sl1l2_info = new SL1L2Info [n_bin];
+   vector<CNTInfo>   cnt_info  (n_bin);
+   vector<SL1L2Info> sl1l2_info(n_bin);
 
    // Process each continuous filtering threshold
    for(i=0; i<vx_opt.fcnt_ta.n(); i++) {
@@ -2324,7 +2316,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
             vx_opt.output_flag[i_sal1l2] != STATOutputType::None) {
 
             SL1L2Info sl1l2_mean;
-            compute_sl1l2_mean(sl1l2_info, n_bin, sl1l2_mean);
+            compute_sl1l2_mean(sl1l2_info.data(), n_bin, sl1l2_mean);
 
             // Write out SL1L2
             if(vx_opt.output_flag[i_sl1l2]  != STATOutputType::None &&
@@ -2351,7 +2343,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          if(vx_opt.output_flag[i_cnt] != STATOutputType::None) {
 
             CNTInfo cnt_mean;
-            compute_cnt_mean(cnt_info, n_bin, cnt_mean);
+            compute_cnt_mean(cnt_info.data(), n_bin, cnt_mean);
 
             if(cnt_mean.n > 0) {
 
@@ -2366,15 +2358,13 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    } // end for i (fcnt_ta)
 
    // Dealloate memory
-   if(sl1l2_info) { delete [] sl1l2_info; sl1l2_info = (SL1L2Info *) nullptr; }
-   if(cnt_info)   { delete [] cnt_info;   cnt_info   = (CNTInfo *)   nullptr; }
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_vl1l2(VL1L2Info *&v_info, int i_vx,
+void do_vl1l2(VL1L2Info *v_info, int i_vx,
               const PairDataPoint *pd_u_ptr,
               const PairDataPoint *pd_v_ptr) {
    int i, j;
@@ -2424,7 +2414,6 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
 void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    int i, j, k, n_bin;
    PairDataPoint pd;
-   PCTInfo *pct_info = (PCTInfo *) nullptr;
 
    mlog << Debug(2)
         << "Computing Probabilistic Statistics.\n";
@@ -2440,7 +2429,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    }
 
    // Allocate memory
-   pct_info = new PCTInfo [n_bin];
+   vector<PCTInfo> pct_info(n_bin);
 
    // Process each probabilistic observation threshold
    for(i=0; i<vx_opt.ocat_ta.n(); i++) {
@@ -2521,7 +2510,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
       if(n_bin > 1) {
 
          PCTInfo pct_mean;
-         compute_pct_mean(pct_info, n_bin, pct_mean);
+         compute_pct_mean(pct_info.data(), n_bin, pct_mean);
 
          // Write out PSTD
          if(vx_opt.output_flag[i_pstd] != STATOutputType::None) {
@@ -2535,14 +2524,13 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    } // end for i (ocnt_ta)
 
    // Dealloate memory
-   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) nullptr; }
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_nbrcts(NBRCTSInfo *&nbrcts_info,
+void do_nbrcts(NBRCTSInfo *nbrcts_info,
                int i_vx, int i_wdth, int i_thresh,
                const PairDataPoint *pd_ptr) {
    int i, j, n_nbrcts;

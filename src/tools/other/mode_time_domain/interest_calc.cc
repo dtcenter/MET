@@ -97,11 +97,6 @@ void InterestCalculator::init_from_scratch()
 
 {
 
-W = 0;
-
-F = 0;
-
-A = 0;
 
 
 clear();
@@ -118,13 +113,13 @@ void InterestCalculator::clear()
 
 {
 
-if ( W )  { delete [] W;  W = 0; }
+W.clear();
 
-if ( F )  { delete [] F;  F = 0; }
+F.clear();
 
-if ( A )  { delete [] A;  A = 0; }
+A.clear();
 
-Nalloc = Nelements = 0;
+Nelements = 0;
 
 Scale = 0.0;
 
@@ -144,21 +139,13 @@ clear();
 
 if ( i.Nelements <= 0 )  return;
 
-extend(i.Nelements);
-
 Nelements = i.Nelements;
 
-int j;
+W = i.W;
 
-for (j=0; j<Nelements; ++j)  {
+F = i.F;
 
-   W[j] = i.W[j];
-
-   F[j] = i.F[j];
-
-   A[j] = i.A[j];
-
-}
+A = i.A;
 
 Scale = i.Scale;
 
@@ -174,64 +161,15 @@ void InterestCalculator::extend(int N)
 
 {
 
-if ( N <= Nalloc )  return;
-
 N = (N + ic_alloc_inc - 1)/ic_alloc_inc;
 
 N *= ic_alloc_inc;
 
-int j;
-double   * ww = new double   [N];
-PWL      * ff = new PWL      [N];
-Argument * aa = new Argument [N];
+W.reserve(N);
 
-for (j=0; j<N; ++j)  {
+F.reserve(N);
 
-   ww[j] = 0;
-
-   ff[j] = 0;
-
-   aa[j] = 0;
-
-}
-
-if ( Nelements > 0 )  {
-
-   for (j=0; j<Nelements; ++j)  {
-
-      ww[j] = W[j];
-
-      ff[j] = F[j];
-
-      aa[j] = A[j];
-
-   }
-
-}
-
-delete [] W;  W = nullptr;
-
-delete [] F;  F = nullptr;
-
-delete [] A;  A = nullptr;
-
-W = ww;
-
-F = ff;
-
-A = aa;
-
-ww = nullptr;
-
-ff = nullptr;
-
-aa = nullptr;
-
-   //
-   //  done
-   //
-
-Nalloc = N;
+A.reserve(N);
 
 return;
 
@@ -259,11 +197,11 @@ if (Nelements < 0) Nelements = 0;   // SonarQube findings
 
 extend(Nelements + 1);
 
-W[Nelements] = _weight;
+W.push_back(_weight);
 
-F[Nelements] = _func;
+F.push_back(_func);
 
-A[Nelements] = _a;
+A.push_back(_a);
 
 ++Nelements;
 

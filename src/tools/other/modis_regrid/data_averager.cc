@@ -64,11 +64,8 @@ void DataAverager::init_from_scratch()
 
 grid = 0;
 
-Counts = 0;
 
-Sum = 0;
 
-DataOk = (bool *) nullptr;
 
 clear();
 
@@ -86,11 +83,11 @@ void DataAverager::clear()
 
 grid = 0;
 
-if ( Sum )  { delete [] Sum;   Sum = 0; }
+Sum.clear();
 
-if ( Counts )  { delete [] Counts;   Counts = 0; }
+Counts.clear();
 
-if ( DataOk )  { delete [] DataOk;   DataOk = 0; }
+DataOk.clear();
 
 Nx = Ny = 0;
 
@@ -118,11 +115,11 @@ Ny = grid->ny();
 
 const int nxy = Nx*Ny;
 
-Sum = new double [nxy];
+Sum.resize(nxy);
 
-Counts = new int [nxy];
+Counts.resize(nxy);
 
-DataOk = new bool [nxy];
+DataOk.resize(nxy);
 
 for (j=0; j<nxy; ++j)  {
 

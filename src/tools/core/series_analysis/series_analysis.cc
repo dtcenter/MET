@@ -902,11 +902,11 @@ static void process_scores() {
 
          // Store the current VarInfo objects
          fcst_info = (conf_info.get_n_fcst() > 1 ?
-                      conf_info.fcst_info[i_series] :
-                      conf_info.fcst_info[0]);
+                      conf_info.fcst_info[i_series].get() :
+                      conf_info.fcst_info[0].get());
          obs_info  = (conf_info.get_n_obs() > 1 ?
-                      conf_info.obs_info[i_series] :
-                      conf_info.obs_info[0]);
+                      conf_info.obs_info[i_series].get() :
+                      conf_info.obs_info[0].get());
 
          // Retrieve the data planes for the current series entry
          get_series_data(i_series, fcst_info, obs_info, fcst_dp, obs_dp);
@@ -1220,7 +1220,7 @@ static void do_categorical(int n, const PairDataPoint *pd_ptr) {
 
    // Allocate objects to store categorical statistics
    int n_cts = conf_info.fcat_ta.n();
-   CTSInfo *cts_info = new CTSInfo [n_cts];
+   vector<CTSInfo> cts_info(n_cts);
 
    // Setup CTSInfo objects
    for(int i=0; i<n_cts; i++) {
@@ -1265,13 +1265,13 @@ static void do_categorical(int n, const PairDataPoint *pd_ptr) {
    else if(conf_info.boot_interval == BootIntervalType::BCA) {
       compute_cts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.n_boot_rep,
-         cts_info, n_cts, true,
+         cts_info.data(), n_cts, true,
          conf_info.rank_corr_flag, conf_info.tmp_dir.c_str());
    }
    else {
       compute_cts_stats_ci_perc(rng_ptr, *pd_ptr,
          conf_info.n_boot_rep, conf_info.boot_rep_prop,
-         cts_info, n_cts, true,
+         cts_info.data(), n_cts, true,
          conf_info.rank_corr_flag, conf_info.tmp_dir.c_str());
    }
 
@@ -1301,7 +1301,6 @@ static void do_categorical(int n, const PairDataPoint *pd_ptr) {
    } // end for i
 
    // Deallocate memory
-   if(cts_info) { delete [] cts_info; cts_info = nullptr; }
 
    return;
 }

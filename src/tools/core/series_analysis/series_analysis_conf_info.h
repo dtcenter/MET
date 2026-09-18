@@ -24,6 +24,8 @@
 #include "vx_gsl_prob.h"
 #include "vx_statistics.h"
 #include "vx_stat_out.h"
+#include <vector>
+#include <memory>
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -47,8 +49,8 @@ class SeriesAnalysisConfInfo {
       ConcatString     desc;               // Description
       ConcatString     obtype;             // Observation type
 
-      VarInfo **       fcst_info;          // Array of pointers for fcst VarInfo [n_fcst]
-      VarInfo **       obs_info;           // Array of pointers for obs VarInfo [n_obs]
+      std::vector<std::unique_ptr<VarInfo>> fcst_info;          // Array of pointers for fcst VarInfo [n_fcst]
+      std::vector<std::unique_ptr<VarInfo>> obs_info;           // Array of pointers for obs VarInfo [n_obs]
 
       ThreshArray      fcat_ta;            // Categorical fcst thresholds
       ThreshArray      ocat_ta;            // Categorical obs thresholds

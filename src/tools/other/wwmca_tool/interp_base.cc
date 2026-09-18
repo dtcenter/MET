@@ -17,6 +17,7 @@
 
 #include "vx_log.h"
 #include "interp_base.h"
+#include <vector>
 
 using namespace std;
 
@@ -202,8 +203,6 @@ void Interpolator::init_from_scratch()
 
 {
 
-Data = (InterpolationValue *) nullptr;
-
 clear();
 
 return;
@@ -218,7 +217,7 @@ void Interpolator::clear()
 
 {
 
-if ( Data )  { delete [] Data;  Data = (InterpolationValue *) nullptr; }
+Data.clear();
 
 Width = 0;
 
@@ -246,13 +245,13 @@ Wm1o2 = I.Wm1o2;
 
 NgoodNeeded = I.NgoodNeeded;
 
-if ( !(I.Data) )  return;
+if ( I.Data.empty() )  return;
 
 int j, n;
 
 n = Width*Width;
 
-Data = new InterpolationValue [n];
+Data.resize(n);
 
 for (j=0; j<n; ++j)  Data[j] = I.Data[j];
 
@@ -278,7 +277,7 @@ out << prefix << "Width       = " << Width       << "\n";
 out << prefix << "Wm1o2       = " << Wm1o2       << "\n";
 out << prefix << "NgoodNeeded = " << NgoodNeeded << "\n";
 
-if ( Data )  out << prefix << "Data has been allocated\n";
+if ( !Data.empty() )  out << prefix << "Data has been allocated\n";
 else         out << prefix << "Data not allocated\n";
 
    //
@@ -325,7 +324,7 @@ void Interpolator::put_good(int x, int y, double value)
 
 {
 
-if ( !Data )  {
+if ( Data.empty() )  {
 
    mlog << Error << "\nInterpolator::put_good(int x, int y, double value) -> null data pointer!\n\n";
 
@@ -349,7 +348,7 @@ void Interpolator::put_bad(int x, int y)
 
 {
 
-if ( !Data )  {
+if ( Data.empty() )  {
 
    mlog << Error << "\nInterpolator::put_bad(int x, int y, double value) -> null data pointer!\n\n";
 
@@ -387,7 +386,7 @@ Width = W;
 
 Wm1o2 = (W - 1)/2;
 
-Data = new InterpolationValue [Width*Width];
+Data.resize(Width*Width);
 
 return;
 
@@ -423,7 +422,7 @@ int Interpolator::n_good() const
 
 {
 
-if ( !Data )  {
+if ( Data.empty() )  {
 
    mlog << Error << "\nInterpolator::n_good() -> null data pointer!\n\n";
 
@@ -455,7 +454,7 @@ int Interpolator::n_bad() const
 
 {
 
-if ( !Data )  {
+if ( Data.empty() )  {
 
    mlog << Error << "\nInterpolator::n_bad() -> null data pointer!\n\n";
 

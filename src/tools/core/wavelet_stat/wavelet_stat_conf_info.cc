@@ -48,10 +48,6 @@ WaveletStatConfInfo::~WaveletStatConfInfo() {
 void WaveletStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   fcst_info     = (VarInfo **)    nullptr;
-   obs_info      = (VarInfo **)    nullptr;
-   fcat_ta       = (ThreshArray *) nullptr;
-   ocat_ta       = (ThreshArray *) nullptr;
    wvlt_ptr      = (gsl_wavelet *) nullptr;
    wvlt_work_ptr = (gsl_wavelet_workspace *) nullptr;
 
@@ -92,22 +88,10 @@ void WaveletStatConfInfo::clear() {
    // Deallocate memory
    if(wvlt_ptr)      { wavelet_free(wvlt_ptr);                }
    if(wvlt_work_ptr) { wavelet_workspace_free(wvlt_work_ptr); }
-   if(fcat_ta)       { delete [] fcat_ta;   fcat_ta   = (ThreshArray *) nullptr; }
-   if(ocat_ta)       { delete [] ocat_ta;   ocat_ta   = (ThreshArray *) nullptr; }
-
-   // Clear fcst_info
-   if(fcst_info) {
-      for(i=0; i<n_vx; i++)
-         if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) nullptr; }
-      delete fcst_info; fcst_info = (VarInfo **) nullptr;
-   }
-
-   // Clear obs_info
-   if(obs_info) {
-      for(i=0; i<n_vx; i++)
-         if(obs_info[i]) { delete obs_info[i]; obs_info[i] = (VarInfo *) nullptr; }
-      delete obs_info; obs_info = (VarInfo **) nullptr;
-   }
+   fcat_ta.clear();
+   ocat_ta.clear();
+   fcst_info.clear();
+   obs_info.clear();
 
    // Reset count
    n_vx = 0;
@@ -196,21 +180,18 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    }
 
    // Allocate space based on the number of verification tasks
-   fcst_info = new VarInfo *   [n_vx];
-   obs_info  = new VarInfo *   [n_vx];
-   fcat_ta   = new ThreshArray [n_vx];
-   ocat_ta   = new ThreshArray [n_vx];
-
-   // Initialize pointers
-   for(i=0; i<n_vx; i++) fcst_info[i] = obs_info[i] = (VarInfo *) nullptr;
+   fcst_info.resize(n_vx);
+   obs_info.resize(n_vx);
+   fcat_ta.resize(n_vx);
+   ocat_ta.resize(n_vx);
 
    // Parse the fcst and obs field information
    max_n_thresh = 0;
    for(i=0; i<n_vx; i++) {
 
       // Allocate new VarInfo objects
-      fcst_info[i] = VarInfoFactory::new_var_info(ftype);
-      obs_info[i]  = VarInfoFactory::new_var_info(otype);
+      fcst_info[i].reset(VarInfoFactory::new_var_info(ftype));
+      obs_info[i].reset(VarInfoFactory::new_var_info(otype));
 
       // Get the current dictionaries
       i_fdict = parse_conf_i_vx_dict(fcst_dict, i);
@@ -426,7 +407,7 @@ void WaveletStatConfInfo::set_perc_thresh(const DataPlane &f_dp,
    // Compute percentiles for forecast and observation thresholds,
    // but not for wind speed or climatology CDF thresholds.
    //
-   if(!fcat_ta->need_perc() && !ocat_ta->need_perc()) return;
+   if(!fcat_ta[0].need_perc() && !ocat_ta[0].need_perc()) return;
 
    //
    // Sort the input arrays
@@ -448,8 +429,8 @@ void WaveletStatConfInfo::set_perc_thresh(const DataPlane &f_dp,
    //
    // Compute percentiles
    //
-   fcat_ta->set_perc(&fsort, &osort, nullptr, nullptr, fcat_ta, ocat_ta);
-   ocat_ta->set_perc(&fsort, &osort, nullptr, nullptr, fcat_ta, ocat_ta);
+   fcat_ta[0].set_perc(&fsort, &osort, nullptr, nullptr, fcat_ta.data(), ocat_ta.data());
+   ocat_ta[0].set_perc(&fsort, &osort, nullptr, nullptr, fcat_ta.data(), ocat_ta.data());
 
    return;
 }

@@ -47,7 +47,6 @@ PointStatConfInfo::~PointStatConfInfo() {
 void PointStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   vx_opt = (PointStatVxOpt *) nullptr;
 
 #ifdef WITH_UGRID
    ignore_ugrid_dataset = false;
@@ -85,7 +84,7 @@ void PointStatConfInfo::clear() {
    seeps_p1_thresh.clear();
 
    // Deallocate memory
-   if(vx_opt) { delete [] vx_opt; vx_opt = (PointStatVxOpt *) nullptr; }
+   vx_opt.clear();
 
    // Set count to zero
    n_vx = 0;
@@ -204,7 +203,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
    // Allocate memory for the verification task options
    n_vx   = n_fvx;
-   vx_opt = new PointStatVxOpt [n_vx];
+   vx_opt.resize(n_vx);
 
    // Check for consistent number of climatology fields
    check_climo_n_vx(fdict, n_vx);

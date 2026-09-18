@@ -45,7 +45,6 @@ RMWAnalysisConfInfo::~RMWAnalysisConfInfo() {
 void RMWAnalysisConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   data_info = (VarInfo**) nullptr;
 
    clear();
 
@@ -90,15 +89,7 @@ void RMWAnalysisConfInfo::clear() {
    InitThreshMap.clear();
 
    // Clear data_info
-   if(data_info) {
-      for(int i = 0; i < n_data; i++) {
-         if(data_info[i]) {
-            data_info[i] = (VarInfo*) nullptr;
-         }
-      }
-      delete data_info;
-      data_info = (VarInfo**) nullptr;
-   }
+   data_info.clear();
 
    // Reset field count
    n_data = 0;
@@ -246,19 +237,14 @@ void RMWAnalysisConfInfo::process_config() {
    }
 
    // Allocate space based on number of fields
-   data_info = new VarInfo*[n_data];
-
-   // Initialize pointers
-   for(int i = 0; i < n_data; i++) {
-      data_info[i] = (VarInfo*) nullptr;
-   }
+   data_info.resize(n_data);
 
    // Parse data field information
    ConcatString field_cs;
    for(int i = 0; i < n_data; i++) {
 
       // Allocate new VarInfo objects
-      data_info[i] = VarInfoFactory::new_var_info(ftype);
+      data_info[i].reset(VarInfoFactory::new_var_info(ftype));
 
       // Get current dictionary
       Dictionary i_fdict = parse_conf_i_vx_dict(fdict, i);

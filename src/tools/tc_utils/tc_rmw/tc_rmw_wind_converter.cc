@@ -76,7 +76,7 @@ void TCRMWWindConverter::init(const TCRMWConfInfo *conf) {
 
   VarInfo* data_info = (VarInfo*) nullptr;
   for(int i_var = 0; i_var < _conf->get_n_data(); i_var++) {
-    data_info = _conf->data_info[i_var];
+    data_info = _conf->data_info[i_var].get();
     string varname = data_info->name_attr().string();
     string varlevel = data_info->level_attr().string();
     if (varname == _conf->u_wind_field_name.string()) {
@@ -174,7 +174,7 @@ bool TCRMWWindConverter::compute_winds_if_input_is_u(int i_point,
   if (varName == _conf->u_wind_field_name.string()) {
     uIndex = _uIndexMap[varLevel];
     vIndex = _vIndexMap[varLevel];
-    v_wind_info = _conf->data_info[vIndex];
+    v_wind_info = _conf->data_info[vIndex].get();
     v_wind_info->set_valid(valid_time);
   }
   else {

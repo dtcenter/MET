@@ -103,7 +103,7 @@ void Calculator::do_negate()
 
 {
 
-Number & n = e[Nelements - 1];
+Number & n = e.back();
 
 if ( n.is_int )  n.i = -(n.i);
 else             n.d = -(n.d);
@@ -329,7 +329,7 @@ void Calculator::do_nint()
 
 {
 
-Number & n = e[Nelements - 1];
+Number & n = e.back();
 
 if ( n.is_int )  return;
 

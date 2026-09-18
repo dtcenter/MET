@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <vector>
 
 #include "vx_config.h"
 #include "vx_data2d.h"
@@ -274,7 +275,7 @@ class GridStatConfInfo {
       ConcatString model;                   // Model name
       ConcatString obtype;                  // Observation type
 
-      GridStatVxOpt * vx_opt;               // Array of vx task options [n_vx] (allocated)
+      std::vector<GridStatVxOpt> vx_opt;               // Array of vx task options [n_vx] (allocated)
 
       std::map<ConcatString,MaskPlane> mask_map; // Mapping of mask names to MaskPlanes
 

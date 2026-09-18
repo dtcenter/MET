@@ -169,7 +169,7 @@ InterpolationValue Ave_Interp::operator()(double x, double y) const
 
 {
 
-if ( !Data )  {
+if ( Data.empty() )  {
 
    mlog << Error << "\nAve_Interp::operator()(double x, double y) const -> no data!\n\n";
 

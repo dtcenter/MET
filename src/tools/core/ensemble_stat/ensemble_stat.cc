@@ -1314,8 +1314,6 @@ static void process_grid_vx() {
    int n_miss;
    bool found;
    MaskPlane  mask_mp;
-   auto fcst_dp = (DataPlane *) nullptr;
-   auto fraw_dp = (DataPlane *) nullptr;
    DataPlane obs_dp;
    DataPlane oraw_dp;
    DataPlane emn_dp;
@@ -1337,8 +1335,8 @@ static void process_grid_vx() {
 
    // Allocate space to store the forecast fields
    int num_dp = conf_info.vx_opt[0].vx_pd.ens_info->inputs_n();
-   fcst_dp = new DataPlane [num_dp];
-   fraw_dp = new DataPlane [num_dp];
+   vector<DataPlane> fcst_dp(num_dp);
+   vector<DataPlane> fraw_dp(num_dp);
 
    // Loop through each of the fields to be verified
    for(int i=0; i<conf_info.get_n_vx(); i++) {
@@ -1684,7 +1682,7 @@ static void process_grid_vx() {
 
             // Apply the current mask to the fields and compute the pairs
             process_grid_scores(i,
-                                fcst_dp, fraw_dp,
+                                fcst_dp.data(), fraw_dp.data(),
                                 obs_dp, oraw_dp,
                                 emn_dp,
                                 fcmn_dp, fcsd_dp,
@@ -1720,10 +1718,6 @@ static void process_grid_vx() {
          } // end for k
       } // end for j
    } // end for i
-
-   // Delete allocated DataPlane objects
-   if(fcst_dp) { delete [] fcst_dp; fcst_dp = (DataPlane *) nullptr; }
-   if(fraw_dp) { delete [] fraw_dp; fraw_dp = (DataPlane *) nullptr; }
 
    // Close the output NetCDF file
    if(nc_out) {
@@ -2384,7 +2378,6 @@ static void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
    int n_bin;
    int n_evt;
    int n_vld;
-   auto pct_info = (PCTInfo *) nullptr;
    PairDataPoint pd;
    PairDataPoint pd_pnt;
    ConcatString cs;
@@ -2408,7 +2401,7 @@ static void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
    }
 
    // Allocate memory
-   pct_info = new PCTInfo [n_bin];
+   vector<PCTInfo> pct_info(n_bin);
 
    // Store the current fcst_var value
    fcst_var_cs = shc.get_fcst_var();
@@ -2479,7 +2472,7 @@ static void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
       } // end for i_bin
 
       // Write the probabilistic output
-      write_pct_info(vx_opt, pct_info, n_bin, false);
+      write_pct_info(vx_opt, pct_info.data(), n_bin, false);
 
    } // end for i_ta
 
@@ -2487,7 +2480,6 @@ static void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
    shc.set_fcst_var(fcst_var_cs);
 
    // Dealloate memory
-   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) nullptr; }
 
    return;
 }
@@ -2499,7 +2491,6 @@ static void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
    int n_vld;
    int n_evt;
    int n_bin;
-   auto pct_info = (PCTInfo *) nullptr;
    PairDataPoint pd;
    PairDataPoint pd_pnt;
    ThreshArray ocdp_thresh;
@@ -2517,7 +2508,7 @@ static void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
         << "distribution percentile thresholds.\n";
 
    // Allocate memory
-   pct_info = new PCTInfo [n_bin];
+   vector<PCTInfo> pct_info(n_bin);
 
    // Process each probability threshold
    for(int i_bin=0; i_bin<n_bin; i_bin++) {
@@ -2574,10 +2565,9 @@ static void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
    } // end for i_bin
 
    // Write the probabilistic output
-   write_pct_info(vx_opt, pct_info, n_bin, true);
+   write_pct_info(vx_opt, pct_info.data(), n_bin, true);
 
    // Dealloate memory
-   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) nullptr; }
 
    return;
 }

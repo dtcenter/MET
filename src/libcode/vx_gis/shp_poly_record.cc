@@ -123,7 +123,7 @@ n_points = i[1];
 
 bytes = n_parts*sizeof(int);
 
-parts.extend(n_parts);
+parts.set_n_elements(n_parts);
 
 memcpy(parts.buf(), buf + 44, bytes);
 
@@ -135,8 +135,6 @@ if ( is_big_endian() )  {
 
 }
 
-parts.set_n_elements(n_parts);
-
    //
    //  read points array
    //
@@ -145,7 +143,7 @@ offset = 44 + bytes;
 
 bytes = n_points*2*sizeof(double);
 
-points.extend(n_points);
+points.set_n_elements(n_points);
 
 memcpy(points.buf(), buf + offset, bytes);
 
@@ -156,8 +154,6 @@ if ( is_big_endian() )  {
    for (j=0; j<(2*n_points); ++j)  shuffle_8(d + j);
 
 }
-
-points.set_n_elements(n_points);
 
    //
    //  done

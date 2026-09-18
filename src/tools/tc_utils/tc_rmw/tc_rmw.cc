@@ -616,7 +616,7 @@ static void setup_nc_file() {
     // Find all variable levels, long names, and units
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
         // Get VarInfo
-        data_info = conf_info.data_info[i_var];
+        data_info = conf_info.data_info[i_var].get();
         mlog << Debug(4) << "Processing field: " << data_info->magic_str() << "\n";
         string fname = data_info->name_attr();
         variable_levels[fname].emplace_back(data_info->level_attr());
@@ -730,7 +730,7 @@ static void process_fields(const TrackInfoArray& tracks) {
         for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
 
             // Update the variable info with the valid time of the track point
-            data_info = conf_info.data_info[i_var];
+            data_info = conf_info.data_info[i_var].get();
 
             string sname = data_info->name_attr().string();
             string slevel = data_info->level_attr().string();

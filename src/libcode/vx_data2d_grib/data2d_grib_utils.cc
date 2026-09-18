@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <cmath>
 #include <vx_data2d.h>
+#include <vector>
 
 #include "data2d_grib_utils.h"
 #include "angles.h"
@@ -111,16 +112,15 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
             vinfo_ens_type = 2;
          }
 
-         char *ens_number_str = new char[vinfo_ens.length()];
-         m_strncpy(ens_number_str, vinfo_ens.text()+1,
+         vector<char> ens_number_str(vinfo_ens.length());
+         m_strncpy(ens_number_str.data(), vinfo_ens.text()+1,
                  (size_t) vinfo_ens.length(), method_name);
          ens_number_str[vinfo_ens.length()-1] = (char) 0;
 
          // if the string is numeric
-         if( check_reg_exp("^[0-9]*$", ens_number_str) ) {
-            vinfo_ens_number= atoi(ens_number_str);
+         if( check_reg_exp("^[0-9]*$", ens_number_str.data()) ) {
+            vinfo_ens_number= atoi(ens_number_str.data());
          }
-         delete[] ens_number_str;
 
          // if one of the parameters was not set - error
          if( is_bad_data(vinfo_ens_number) ||

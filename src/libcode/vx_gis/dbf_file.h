@@ -11,6 +11,9 @@
 #ifndef  __VX_SHAPEFILES_DBF_FILE_H__
 #define  __VX_SHAPEFILES_DBF_FILE_H__
 
+
+#include <vector>
+
 ////////////////////////////////////////////////////////////////////////
 
    //
@@ -59,7 +62,7 @@ class DbfHeader {
 
       int code_page_mark;
 
-      DbfSubRecord * subrec;   //  allocated
+      std::vector<DbfSubRecord> subrec;
 
       int n_subrecs;   //  inferred
 

@@ -21,6 +21,7 @@
 
 #include "vx_math.h"
 #include "vx_util.h"
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -80,7 +81,7 @@ class Interpolator {
       int NgoodNeeded;   //  # of good data values needed 
                          //  to produce good interpolated value
 
-      InterpolationValue * Data;
+      std::vector<InterpolationValue> Data;
 
    public:
 

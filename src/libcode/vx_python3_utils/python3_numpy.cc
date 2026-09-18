@@ -75,7 +75,7 @@ Object = 0;
 
 Name.clear();
 
-if ( Dim )  { delete [] Dim;  Dim = 0; }
+Dim.clear();
 
 N_Dims = 0;
 
@@ -103,7 +103,6 @@ void Python3_Numpy::init_from_scratch()
 
 {
 
-Dim = 0;
 
 Buffer = 0;
 
@@ -271,7 +270,7 @@ PyObject * shape_tuple = PyObject_GetAttrString (Object, "shape");
 
 N_Dims = PyTuple_Size (shape_tuple);
 
-Dim = new int [N_Dims];
+Dim.resize(N_Dims);
 
 int j;
 PyObject * item = 0;

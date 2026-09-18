@@ -11,6 +11,7 @@
 
 
 #include <netcdf>
+#include <vector>
 
 #include "objects_from_netcdf.h"
 
@@ -54,7 +55,6 @@ void objects_from_netcdf(const char * netcdf_filename,
 
 {
 
-   int * buf = 0;
    const string * fcst_var_name = 0;
    const string *  obs_var_name = 0;
 
@@ -95,7 +95,7 @@ void objects_from_netcdf(const char * netcdf_filename,
    const int nx    = n_lon;
    const int ny    = n_lat;
 
-   buf = new int [nx*ny];
+   vector<int> buf(nx*ny);
 
    //
    //  grab the netcdf variables
@@ -110,19 +110,18 @@ void objects_from_netcdf(const char * netcdf_filename,
    //  populate the bool planes
    //
 
-   f_var.getVar(buf);
+   f_var.getVar(buf.data());
 
-   populate_bool_plane(buf, nx, ny, fcst_out);
+   populate_bool_plane(buf.data(), nx, ny, fcst_out);
 
-   o_var.getVar(buf);
+   o_var.getVar(buf.data());
 
-   populate_bool_plane(buf, nx, ny, obs_out);
+   populate_bool_plane(buf.data(), nx, ny, obs_out);
 
    //
    //  done
    //
 
-   if ( buf )  { delete [] buf;  buf = 0; }
 
    return;
 

@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
+#include <vector>
 
 #include "gsl_statistics.h"
 #include "gsl/gsl_errno.h"
@@ -26,17 +27,14 @@ using namespace std;
 
 double stats_lag1_autocorrelation(const NumArray &na) {
    double corr;
-   double *src = (double *) nullptr;
    int n, i;
 
-   n   = na.n_elements();
-   src = new double [n];
+   n = na.n_elements();
+   vector<double> src(n);
 
    for(i=0; i<n; i++) src[i] = na[i];
 
-   corr = gsl_stats_lag1_autocorrelation(src, 1, n);
-
-   if(src) { delete [] src; src = (double *) nullptr; }
+   corr = gsl_stats_lag1_autocorrelation(src.data(), 1, n);
 
    return corr;
 }

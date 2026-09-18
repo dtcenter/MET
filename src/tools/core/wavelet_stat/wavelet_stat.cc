@@ -231,8 +231,8 @@ static void process_command_line(int argc, char **argv) {
    conf_info.process_config(ftype, otype);
 
    // Update the input grid, if needed
-   update_mtddf_grid(fcst_mtddf, conf_info.fcst_info[0]);
-   update_mtddf_grid(obs_mtddf, conf_info.obs_info[0]);
+   update_mtddf_grid(fcst_mtddf, conf_info.fcst_info[0].get());
+   update_mtddf_grid(obs_mtddf, conf_info.obs_info[0].get());
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.fcst_info[0]->regrid(),
@@ -1161,13 +1161,13 @@ static void do_intensity_scale(const NumArray &f_na,
       }
 
       msg << "MSE_SUM[" << thresh_str << "]\t= "
-          << sum_array(isc_info[i].mse_scale, isc_info[i].n_scale+1) << "\n"
+          << sum_array(isc_info[i].mse_scale.data(), isc_info[i].n_scale+1) << "\n"
           << "ISC_MEAN[" << thresh_str << "]\t= "
-          << mean_array(isc_info[i].isc_scale, isc_info[i].n_scale+1) << "\n"
+          << mean_array(isc_info[i].isc_scale.data(), isc_info[i].n_scale+1) << "\n"
           << "FEN_SUM[" << thresh_str << "]\t= "
-          << sum_array(isc_info[i].fen_scale, isc_info[i].n_scale+1) << "\n"
+          << sum_array(isc_info[i].fen_scale.data(), isc_info[i].n_scale+1) << "\n"
           << "OEN_SUM[" << thresh_str << "]\t= "
-          << sum_array(isc_info[i].oen_scale, isc_info[i].n_scale+1) << "\n";
+          << sum_array(isc_info[i].oen_scale.data(), isc_info[i].n_scale+1) << "\n";
 
       mlog << Debug(3) << msg;
 
@@ -1270,13 +1270,13 @@ static void aggregate_isc_info(ISCInfo **isc_info, int i_vx,
    }
 
    msg << "MSE_SUM[" << fcst_thresh_str << ", " << obs_thresh_str << "]\t= "
-        << sum_array(isc_aggr.mse_scale, isc_aggr.n_scale+1) << "\n"
+        << sum_array(isc_aggr.mse_scale.data(), isc_aggr.n_scale+1) << "\n"
         << "ISC_MEAN[" << fcst_thresh_str << ", " << obs_thresh_str << "]\t= "
-        << mean_array(isc_aggr.isc_scale, isc_aggr.n_scale+1) << "\n"
+        << mean_array(isc_aggr.isc_scale.data(), isc_aggr.n_scale+1) << "\n"
         << "FEN_SUM[" << fcst_thresh_str << ", " << obs_thresh_str << "]\t= "
-        << sum_array(isc_aggr.fen_scale, isc_aggr.n_scale+1) << "\n"
+        << sum_array(isc_aggr.fen_scale.data(), isc_aggr.n_scale+1) << "\n"
         << "OEN_SUM[" << fcst_thresh_str << ", " << obs_thresh_str << "]\t= "
-        << sum_array(isc_aggr.oen_scale, isc_aggr.n_scale+1) << "\n";
+        << sum_array(isc_aggr.oen_scale.data(), isc_aggr.n_scale+1) << "\n";
 
    mlog << Debug(2) << msg;
 
