@@ -116,6 +116,7 @@
 #ifdef WITH_PYTHON
 #include "data2d_nc_met.h"
 #include "pointdata_python.h"
+#include <memory>
 #endif
 
 using namespace std;
@@ -537,7 +538,7 @@ static void process_grid(const Grid &fcst_grid) {
       // Store the observation grid
       obs_grid = mtddf->grid();
 
-      if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
+      mtddf.reset();
    }
    else {
       obs_grid = fcst_grid;
@@ -680,7 +681,7 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
    } // end if found
 
    // Cleanup
-   if(mtddf) { delete mtddf; mtddf = nullptr; }
+   mtddf.reset();
 
    return found;
 }
@@ -749,7 +750,7 @@ static bool get_data_plane_array(const char *infile, GrdFileType ftype,
    } // end if found
 
    // Cleanup
-   if(mtddf) { delete mtddf; mtddf = nullptr; }
+   mtddf.reset();
 
    return found;
 }

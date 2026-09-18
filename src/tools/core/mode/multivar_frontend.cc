@@ -489,9 +489,7 @@ void MultivarFrontEnd::_read_input(
       config.process_config_field(other_t, ft, type, index);
       f->data_plane(*(config.Obs->var_info), dp);
       obsInput.emplace_back(ModeInputData(name, dp, f->grid()));
-   }         
-      
-   delete f;
+   }
 }
       
 ////////////////////////////////////////////////////////////////////////

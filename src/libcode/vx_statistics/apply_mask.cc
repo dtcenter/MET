@@ -94,10 +94,9 @@ Grid parse_grid_string(const char *grid_str) {
       mlog << Debug(3) << "Use the grid defined by file \""
            << grid_str << "\".\n";
 
-      Met2dDataFile *met_ptr = nullptr;
-
       // Open the data file
-      if(!(met_ptr = Met2dDataFileFactory::new_met_2d_data_file(grid_str))) {
+      auto met_ptr = Met2dDataFileFactory::new_met_2d_data_file(grid_str);
+      if(!met_ptr) {
          mlog << Error << "\nparse_grid_string() -> "
               << "can't open file \"" << grid_str
               << "\"\n\n";
@@ -108,7 +107,6 @@ Grid parse_grid_string(const char *grid_str) {
       grid = met_ptr->grid();
 
       // Cleanup
-      if(met_ptr) { delete met_ptr; met_ptr = 0; }
    }
 
    return grid;
@@ -229,17 +227,15 @@ void parse_grid_mask(const ConcatString &mask_grid_str, Grid &grid) {
            << "Use the grid defined by file \""
            << mask_grid_str << "\".\n";
 
-      Met2dDataFile *mtddf = nullptr;
-
       // Attempt to open the data file
-      if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(
-                      replace_path(mask_grid_str.c_str()).c_str()))) {
+      auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(
+                      replace_path(mask_grid_str.c_str()).c_str());
+      if(!mtddf) {
          mlog << Error << "\nparse_grid_mask() -> "
               << "can't open file \"" << mask_grid_str << "\"\n\n";
          exit(1);
       }
       grid = mtddf->grid();
-      delete mtddf;
    }
 
    return;
@@ -474,7 +470,6 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    if(append_thresh) mask_name << st.get_str();
 
    // Clean up
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
    if(info)  { delete info;  info  = (VarInfo *)       nullptr; }
 
    return;
@@ -581,7 +576,7 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
       exit(1);
    }
 
-   Met2dDataFile *mtddf = nullptr;
+   std::unique_ptr<Met2dDataFile> mtddf;
 
    // Parse the file names and append the forecast file
    StringArray geog_files(dict->lookup_string_array(conf_key_file_name, false));
@@ -604,7 +599,8 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
    for(int i=0; i<geog_files.n(); i++) {
 
       // Allocate memory for data file
-      if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(geog_files[i].c_str(), ftype))) {
+      mtddf = Met2dDataFileFactory::new_met_2d_data_file(geog_files[i].c_str(), ftype);
+      if(!mtddf) {
          mlog << Error << "\nparse_geog_data() -> "
               << "Trouble reading geography mask file \""
               << geog_files[i] << "\"\n\n";
@@ -641,7 +637,7 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
       }
 
       // Deallocate memory
-      if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
+      mtddf.reset();
       if(info)  { delete info;  info  = (VarInfo       *) nullptr; }
 
       if(found) break;

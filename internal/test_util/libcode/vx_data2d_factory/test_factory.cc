@@ -33,7 +33,6 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
    // Pointers for the current objects
-   Met2dDataFile * mtddf_cur = nullptr;
    VarInfo       * vinfo_cur = nullptr; 
 
    // DataPlane objects for storing the data
@@ -59,7 +58,7 @@ int main(int argc, char *argv[]) {
    in_file_name << argv[1];
 
    // Create an instance of this file type
-   mtddf_cur = Met2dDataFileFactory::new_met_2d_data_file(in_file_name.c_str());
+   auto mtddf_cur = Met2dDataFileFactory::new_met_2d_data_file(in_file_name.c_str());
    if(!mtddf_cur) {
       mlog << "\n\n  test_factory() -> "
            << "trouble reading input file \"" << in_file_name << "\"\n\n";
@@ -146,7 +145,6 @@ int main(int argc, char *argv[]) {
    } // end while loop
 
    // Clean up
-   if(mtddf_cur) { delete mtddf_cur; mtddf_cur = (Met2dDataFile *) 0; }
    if(vinfo_cur) { delete vinfo_cur; vinfo_cur = (VarInfo       *) 0; }
 
    return(0);

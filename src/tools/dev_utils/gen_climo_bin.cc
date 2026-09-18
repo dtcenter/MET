@@ -412,7 +412,7 @@ void get_field(const char *file, const char *config_str, DataPlane &dp) {
    }
 
    // Clean up
-   if(mtddf_ptr) { delete mtddf_ptr; mtddf_ptr = (Met2dDataFile * ) nullptr; }
+   mtddf_ptr.reset();
    if(vi_ptr)    { delete vi_ptr;    vi_ptr    =        (VarInfo *) nullptr; }
 
    return;

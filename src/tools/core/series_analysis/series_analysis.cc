@@ -63,6 +63,7 @@
 #include "vx_regrid.h"
 #include "vx_log.h"
 #include "enum_as_int.hpp"
+#include <memory>
 
 using namespace std;
 using namespace netCDF;
@@ -452,8 +453,9 @@ static GrdFileType get_mtddf_file_type(const StringArray &file_list,
    }
 
    // Read first valid file
-   Met2dDataFile *mtddf = nullptr;
-   if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(file_list[i].c_str(), type))) {
+   std::unique_ptr<Met2dDataFile> mtddf;
+   mtddf = Met2dDataFileFactory::new_met_2d_data_file(file_list[i].c_str(), type);
+   if(!mtddf) {
       mlog << Error << "\nTrouble reading data file: "
            << file_list[i] << "\n\n";
       exit(1);
@@ -462,7 +464,7 @@ static GrdFileType get_mtddf_file_type(const StringArray &file_list,
    GrdFileType file_type = mtddf->file_type();
 
    // Clean up 
-   if(mtddf) { delete mtddf; mtddf = nullptr; }
+   mtddf.reset();
 
    return file_type;
 }
@@ -750,7 +752,7 @@ static bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
    if(found) cur_grid = mtddf->grid();
 
    // Close the data file
-   delete mtddf; mtddf = nullptr;
+   mtddf.reset();
 
    return found;
 }

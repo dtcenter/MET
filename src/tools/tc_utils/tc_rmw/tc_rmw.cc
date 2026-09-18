@@ -53,6 +53,7 @@
 #include "vx_math.h"
 
 #include "met_file.h"
+#include <memory>
 
 using namespace std;
 using namespace netCDF;
@@ -214,7 +215,7 @@ static void process_command_line(int argc, char **argv) {
 static GrdFileType get_file_type(const StringArray &file_list,
                                  const GrdFileType in_ftype) {
     int i;
-    Met2dDataFile *mtddf = nullptr;
+    std::unique_ptr<Met2dDataFile> mtddf;
     GrdFileType out_ftype;
 
     // Find the first file that actually exists
@@ -229,7 +230,8 @@ static GrdFileType get_file_type(const StringArray &file_list,
     }
 
     // Read first valid file
-    if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(file_list[i].c_str(), in_ftype))) {
+    mtddf = Met2dDataFileFactory::new_met_2d_data_file(file_list[i].c_str(), in_ftype);
+   if(!mtddf) {
         mlog << Error << "\nTrouble reading data file \""
              << file_list[i] << "\"\n\n";
         exit(1);
@@ -239,7 +241,7 @@ static GrdFileType get_file_type(const StringArray &file_list,
     out_ftype = mtddf->file_type();
 
     // Clean up
-    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
+    mtddf.reset();
 
     return out_ftype;
 }

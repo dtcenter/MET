@@ -210,7 +210,7 @@ int met_main(int argc, char * argv[]) {
    //
    // clean up
    //
-   if(met_ptr) { delete met_ptr;  met_ptr = nullptr; }
+   met_ptr.reset();
    if(var_ptr) { delete var_ptr;  var_ptr = nullptr; }
 
    #ifdef  WITH_PYTHON

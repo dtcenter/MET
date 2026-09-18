@@ -65,6 +65,7 @@
 #include "dbf_file.h"
 #include "shp_file.h"
 #include "grid_closed_poly.h"
+#include <memory>
 
 using namespace std;
 using namespace netCDF;
@@ -478,7 +479,7 @@ static void get_data_plane(const ConcatString &file_name,
    if(read_gen_vx_mask_output &&
       local_cs.empty() &&
       mtddf_ptr->file_type() == FileType_NcMet &&
-      get_gen_vx_mask_config_str((MetNcMetDataFile *) mtddf_ptr, local_cs)) {
+      get_gen_vx_mask_config_str((MetNcMetDataFile *) mtddf_ptr.get(), local_cs)) {
       local_config.read_string(local_cs.c_str());
    }
 
@@ -528,7 +529,7 @@ static void get_data_plane(const ConcatString &file_name,
    dp_grid = mtddf_ptr->grid();
 
    // Clean up
-   if(mtddf_ptr) { delete mtddf_ptr; mtddf_ptr = (Met2dDataFile *) nullptr; }
+   mtddf_ptr.reset();
 
    return;
 }

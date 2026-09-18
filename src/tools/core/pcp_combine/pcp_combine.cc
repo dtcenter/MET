@@ -108,6 +108,7 @@
 #include "vx_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"
+#include <memory>
 
 using namespace std;
 using namespace netCDF;
@@ -802,7 +803,7 @@ static int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          auto cur_var = VarInfoFactory::new_var_info(mtddf->file_type());
          if(!cur_var) {
-            delete mtddf;  mtddf = nullptr;
+            mtddf.reset();
             mlog << Warning << "search_pcp_dir() -> "
                  << "unable to determine filetype of \"" << cur_file
                  << "\"\n";
@@ -831,7 +832,7 @@ static int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          // Cleanup.
          //
-         if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) nullptr; }
+         mtddf.reset();
          if(cur_var) { delete cur_var; cur_var = (VarInfo *)       nullptr; }
 
          // Check for a valid match
@@ -1292,7 +1293,7 @@ static bool get_field(const char *filename,
                       Grid & grid,
                       DataPlane & plane,
                       bool error_out) {
-   Met2dDataFile *mtddf = nullptr;
+   std::unique_ptr<Met2dDataFile> mtddf;
    GrdFileType ftype;
    VarInfo *cur_var = nullptr;
    const char *method_name = "get_field() -> ";
@@ -1404,7 +1405,7 @@ static bool get_field(const char *filename,
    //
    // Cleanup.
    //
-   if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) nullptr; }
+   mtddf.reset();
    if(cur_var) { delete cur_var; cur_var = (VarInfo *)       nullptr; }
 
    //

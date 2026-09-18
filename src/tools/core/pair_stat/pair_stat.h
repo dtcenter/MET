@@ -43,6 +43,7 @@
 #include "vx_util.h"
 #include "vx_stat_out.h"
 #include "vx_gsl_prob.h"
+#include <memory>
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -137,7 +138,7 @@ static int              i_txt_row[n_txt];
 ///////////////////////////////////////////////////////////////////////////////
 
 // Data file factory and input files
-static Met2dDataFile *fcst_mtddf = nullptr;
+static std::unique_ptr<Met2dDataFile> fcst_mtddf;
 
 // Pointer to the random number generator to be used
 static gsl_rng *rng_ptr = nullptr;

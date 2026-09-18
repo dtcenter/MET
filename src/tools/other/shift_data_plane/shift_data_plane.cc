@@ -55,6 +55,7 @@
 
 #ifdef WITH_PYTHON
 #include "data2d_python.h"
+#include <memory>
 #endif
 
 using namespace std;
@@ -277,7 +278,7 @@ void process_data_file() {
    write_netcdf(dp_shift, grid, vinfo, mtddf->file_type());
 
    // Clean up
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
+   mtddf.reset();
    if(vinfo) { delete vinfo; vinfo = (VarInfo *)       nullptr; }
 
    #ifdef  WITH_PYTHON

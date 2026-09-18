@@ -145,6 +145,7 @@
 #ifdef WITH_PYTHON
 #include "data2d_nc_met.h"
 #include "pointdata_python.h"
+#include <memory>
 #endif
 
 using namespace std;
@@ -300,7 +301,8 @@ static void process_command_line(int argc, char **argv) {
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
 
    // Read forecast file
-   if(!(fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype))) {
+   fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype);
+   if(!fcst_mtddf) {
       mlog << Error << "\n" << method_name << "Trouble reading forecast file \""
            << fcst_file << "\". Override the FileType with \"file_type = FileType_<type>;\"\n\n";
       exit(1);
@@ -322,7 +324,7 @@ static void process_command_line(int argc, char **argv) {
          double max_distance_km = conf_info.ugrid_max_distance_km;
          ConcatString ugrid_nc = conf_info.ugrid_nc;
          ConcatString ugrid_map_config_filename = conf_info.ugrid_map_config;
-         auto ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
+         auto ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf.get();
 
          ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
                                         ugrid_map_config_filename);
@@ -2267,7 +2269,7 @@ static void clean_up() {
    finish_txt_files();
 
    // Deallocate memory for data files
-   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) nullptr; }
+   fcst_mtddf.reset();
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);

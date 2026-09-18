@@ -99,7 +99,6 @@ bool read_single_entry(VarInfo* info, const ConcatString& filename,
    if(found) grid = mtddf->grid();
 
    // Cleanup
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
    return found;
 }
@@ -178,7 +177,6 @@ bool read_all_entries(vector<VarInfo*> &vi_list, const ConcatString &filename,
    if(n_valid > 0) grid = mtddf->grid();
 
    // Cleanup
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
    return(n_valid > 0);
 }

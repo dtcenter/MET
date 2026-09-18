@@ -703,7 +703,7 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
    } // end if found
 
    // Cleanup
-   if(mtddf) { delete mtddf; mtddf = nullptr; }
+   mtddf.reset();
 
    return found;
 }

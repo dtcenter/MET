@@ -67,6 +67,7 @@
 #include "vx_regrid.h"
 #include "vx_log.h"
 #include "vx_plot_util.h"
+#include <memory>
 
 using namespace std;
 using namespace netCDF;
@@ -210,14 +211,16 @@ static void process_command_line(int argc, char **argv) {
    otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
    // Read forecast file
-   if(!(fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype))) {
+   fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype);
+   if(!fcst_mtddf) {
       mlog << Error << "\nTrouble reading forecast file \""
            << fcst_file << "\"\n\n";
       exit(1);
    }
 
    // Read observation file
-   if(!(obs_mtddf = Met2dDataFileFactory::new_met_2d_data_file(obs_file.c_str(), otype))) {
+   obs_mtddf = Met2dDataFileFactory::new_met_2d_data_file(obs_file.c_str(), otype);
+   if(!obs_mtddf) {
       mlog << Error << "\nTrouble reading observation file \""
            << obs_file << "\"\n\n";
       exit(1);
@@ -231,8 +234,8 @@ static void process_command_line(int argc, char **argv) {
    conf_info.process_config(ftype, otype);
 
    // Update the input grid, if needed
-   update_mtddf_grid(fcst_mtddf, conf_info.fcst_info[0].get());
-   update_mtddf_grid(obs_mtddf, conf_info.obs_info[0].get());
+   update_mtddf_grid(fcst_mtddf.get(), conf_info.fcst_info[0].get());
+   update_mtddf_grid(obs_mtddf.get(), conf_info.obs_info[0].get());
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.fcst_info[0]->regrid(),

@@ -20,6 +20,7 @@
 #include "mode_exec.h"
 #include "nc_utils.h"
 #include "vx_regrid.h"
+#include <memory>
 
 using namespace std;
 using namespace netCDF;
@@ -87,9 +88,6 @@ void ModeExecutive::init_from_scratch()
 
 {
 
-   fcst_mtddf = (Met2dDataFile *) nullptr;
-   obs_mtddf = (Met2dDataFile *) nullptr;
-
    clear();
 
    return;
@@ -111,8 +109,8 @@ void ModeExecutive::clear()
    fcst_file.clear();
    obs_file.clear();
 
-   if ( fcst_mtddf )  { delete fcst_mtddf;  fcst_mtddf = (Met2dDataFile *) nullptr; }
-   if (  obs_mtddf )  { delete  obs_mtddf;   obs_mtddf = (Met2dDataFile *) nullptr; }
+   fcst_mtddf.reset();
+   obs_mtddf.reset();
 
    for (int j=0; j<n_cts; ++j)  cts[j].zero_out();
 
@@ -156,14 +154,16 @@ void ModeExecutive::init_traditional(int n_files)
 
 
    // Read observation file
-   if(!(obs_mtddf = Met2dDataFileFactory::new_met_2d_data_file(obs_file.c_str(), otype))) {
+   obs_mtddf = Met2dDataFileFactory::new_met_2d_data_file(obs_file.c_str(), otype);
+   if(!obs_mtddf) {
       mlog << Error << "\nTrouble reading observation file \""
            << obs_file << "\"\n\n";
       exit(1);
    }
 
    // Read forecast file
-   if(!(fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype))) {
+   fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype);
+   if(!fcst_mtddf) {
       mlog << Error << "\nTrouble reading forecast file \""
            << fcst_file << "\"\n\n";
       exit(1);
