@@ -833,7 +833,6 @@ static int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          // Cleanup.
          //
          mtddf.reset();
-         if(cur_var) { delete cur_var; cur_var = (VarInfo *)       nullptr; }
 
          // Check for a valid match
          if(i_rec != -1) {
@@ -1295,7 +1294,7 @@ static bool get_field(const char *filename,
                       bool error_out) {
    std::unique_ptr<Met2dDataFile> mtddf;
    GrdFileType ftype;
-   VarInfo *cur_var = nullptr;
+   std::unique_ptr<VarInfo> cur_var;
    const char *method_name = "get_field() -> ";
 
    //
@@ -1397,7 +1396,7 @@ static bool get_field(const char *filename,
       grid = mtddf->grid();
 
       if(!var_info) {
-         var_info = VarInfoFactory::new_var_info(mtddf->file_type());
+         var_info = VarInfoFactory::new_var_info(mtddf->file_type()).release();
          *var_info = *cur_var;
       }
    }
@@ -1406,7 +1405,6 @@ static bool get_field(const char *filename,
    // Cleanup.
    //
    mtddf.reset();
-   if(cur_var) { delete cur_var; cur_var = (VarInfo *)       nullptr; }
 
    //
    // Error out and exit, if requested.

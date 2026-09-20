@@ -275,11 +275,10 @@ void process_data_file() {
    } // End omp parallel
 
    // Write the shifted data
-   write_netcdf(dp_shift, grid, vinfo, mtddf->file_type());
+   write_netcdf(dp_shift, grid, vinfo.get(), mtddf->file_type());
 
    // Clean up
    mtddf.reset();
-   if(vinfo) { delete vinfo; vinfo = (VarInfo *)       nullptr; }
 
    #ifdef  WITH_PYTHON
       GP.finalize();

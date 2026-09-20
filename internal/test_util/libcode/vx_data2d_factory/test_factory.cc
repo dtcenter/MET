@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
    mtddf_cur->dump(cout);
 
    // Create a VarInfo object based on the gridded data file type
-   vinfo_cur = VarInfoFactory::new_var_info(mtddf_cur->file_type());
+   vinfo_cur = VarInfoFactory::new_var_info(mtddf_cur->file_type()).release();
 
    mlog << Debug(1) << "\nCALLING: vinfo_cur->VarInfo::dump(cout);\n";
    vinfo_cur->VarInfo::dump(cout);

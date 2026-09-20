@@ -413,7 +413,6 @@ void get_field(const char *file, const char *config_str, DataPlane &dp) {
 
    // Clean up
    mtddf_ptr.reset();
-   if(vi_ptr)    { delete vi_ptr;    vi_ptr    =        (VarInfo *) nullptr; }
 
    return;
 }

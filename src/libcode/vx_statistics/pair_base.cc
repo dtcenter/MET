@@ -1199,7 +1199,10 @@ void VxPairBase::copy_var_info(const VarInfo *info, VarInfo *&copy) {
    if(copy) { delete copy; copy = (VarInfo *) nullptr; }
 
    // Perform a deep copy
-   copy = VarInfoFactory::new_var_info(info->file_type());
+   // NOTE: VxPairBase still owns its VarInfo members as raw pointers and
+   // deletes them above, so take ownership out of the unique_ptr here. Those
+   // members become unique_ptr in their own pass.
+   copy = VarInfoFactory::new_var_info(info->file_type()).release();
    *copy = *info;
 
    return;

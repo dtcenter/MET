@@ -207,7 +207,7 @@ dict = _dict;
 
 conf = _conf;
 
-var_info = std::unique_ptr<VarInfo>(VarInfoFactory::new_var_info(type));
+var_info = VarInfoFactory::new_var_info(type);
 
 if ( _multivar )  {
 

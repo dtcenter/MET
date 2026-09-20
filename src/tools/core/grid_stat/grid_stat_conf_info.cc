@@ -659,8 +659,8 @@ void GridStatVxOpt::process_config(
    clear();
 
    // Allocate new VarInfo objects
-   fcst_info = VarInfoFactory::new_var_info(ftype);
-   obs_info  = VarInfoFactory::new_var_info(otype);
+   fcst_info = VarInfoFactory::new_var_info(ftype).release();
+   obs_info  = VarInfoFactory::new_var_info(otype).release();
 
    // Set the top-level regrid as the default 
    RegridInfo regrid_info = parse_conf_regrid(fdict.parent());

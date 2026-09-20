@@ -521,7 +521,6 @@ static void get_data_plane(const ConcatString &file_name,
       data_desc_cs = vi_ptr->magic_str();
 
       // Clean up
-      if(vi_ptr) { delete vi_ptr; vi_ptr = (VarInfo *) nullptr; }
 
    } // end if
 

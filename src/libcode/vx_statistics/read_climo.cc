@@ -290,7 +290,6 @@ static void read_climo_file(const char *climo_file, GrdFileType ctype,
    } // end for i
 
    // Deallocate memory
-   if(info)  { delete info;  info  = (VarInfo       *) nullptr; }
 
    return;
 }

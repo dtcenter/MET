@@ -195,7 +195,7 @@ void GridDiagConfInfo::process_config(vector<GrdFileType> file_types,
                    file_types[i] : file_types[0]);
 
       // Allocate new VarInfo objects
-      data_info[i] = VarInfoFactory::new_var_info(file_type);
+      data_info[i] = VarInfoFactory::new_var_info(file_type).release();
 
       // Get the current dictionaries
       i_dict = parse_conf_i_vx_dict(dict, i);

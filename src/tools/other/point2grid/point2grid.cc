@@ -381,7 +381,6 @@ static void process_command_line(int argc, char **argv) {
          else var_names.add(vname);
       }
       // Clean up
-      if(vinfo) { delete vinfo; vinfo = (VarInfo *) nullptr; }
    }
    // Check that the number of output names and fields match
    else if(VarNameSA.n() != FieldSA.n()) {
@@ -510,18 +509,18 @@ static void process_data_file() {
    open_nc(to_grid, run_cs);
 
    if (goes_data) {
-      process_goes_file(nc_in, config, vinfo, fr_grid, to_grid);
+      process_goes_file(nc_in, config, vinfo.get(), fr_grid, to_grid);
    }
    else if (TYPE_OBS == obs_type) {
-      process_point_file(nc_in, config, vinfo, to_grid);
+      process_point_file(nc_in, config, vinfo.get(), to_grid);
    }
    else if (TYPE_NCCF == obs_type) {
-      process_point_nccf_file(nc_in, config, vinfo, fr_mtddf.get(), to_grid);
+      process_point_nccf_file(nc_in, config, vinfo.get(), fr_mtddf.get(), to_grid);
       unsetenv(nc_att_met_point_nccf);
    }
 #ifdef WITH_PYTHON
    else if (TYPE_PYTHON == obs_type) {
-      process_point_python(python_command, config, vinfo, to_grid, use_xarray);
+      process_point_python(python_command, config, vinfo.get(), to_grid, use_xarray);
    }
 #endif
    else {
@@ -537,7 +536,6 @@ static void process_data_file() {
    // Clean up
    if(nc_in)    { delete nc_in;    nc_in  = nullptr; }
    fr_mtddf.reset();
-   if(vinfo)    { delete vinfo;    vinfo    = (VarInfo *)       nullptr; }
 
    return;
 }
@@ -648,7 +646,6 @@ static int get_obs_type(NcFile *nc) {
          break;
       }
    }
-   if (vinfo) { delete vinfo; vinfo = (VarInfo *) nullptr; }
 
    if (has_attr_grid) {
       obs_type = TYPE_NCCF;

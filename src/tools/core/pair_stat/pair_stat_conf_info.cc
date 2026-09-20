@@ -710,8 +710,8 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    clear();
 
    // Allocate new VarInfo objects
-   vx_pd.set_fcst_info(VarInfoFactory::new_var_info(FileType_Pairs));
-   vx_pd.set_obs_info(VarInfoFactory::new_var_info(FileType_Pairs));
+   vx_pd.set_fcst_info(VarInfoFactory::new_var_info(FileType_Pairs).get());
+   vx_pd.set_obs_info(VarInfoFactory::new_var_info(FileType_Pairs).get());
 
    // Set the VarInfo objects
    vx_pd.fcst_info->set_dict(fdict);

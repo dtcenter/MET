@@ -881,7 +881,7 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    clear();
 
    // Allocate new VarInfo objects
-   vx_pd.set_fcst_info(VarInfoFactory::new_var_info(ftype));
+   vx_pd.set_fcst_info(VarInfoFactory::new_var_info(ftype).get());
    vx_pd.set_obs_info(new VarInfoGrib);
 
    // Set the VarInfo objects

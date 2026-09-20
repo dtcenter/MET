@@ -761,7 +761,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       setenv(met_ens_member_id, ens_member_ids[i].c_str(), 1);
 
       // Allocate new VarInfo object
-      next_var = VarInfoFactory::new_var_info(ftype);
+      next_var = VarInfoFactory::new_var_info(ftype).release();
 
       // Set the current dictionary
       next_var->set_dict(fdict);
@@ -792,7 +792,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       setenv(met_ens_member_id, control_id.c_str(), 1);
 
       // Allocate new VarInfo object
-      next_var = VarInfoFactory::new_var_info(ftype);
+      next_var = VarInfoFactory::new_var_info(ftype).release();
 
       // Set the current dictionary
       next_var->set_dict(fdict);
@@ -804,7 +804,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    }
 
    // Allocate new VarInfo object for obs
-   vx_pd.obs_info = VarInfoFactory::new_var_info(otype);
+   vx_pd.obs_info = VarInfoFactory::new_var_info(otype).release();
 
    // Set the VarInfo objects
    vx_pd.obs_info->set_dict(odict);

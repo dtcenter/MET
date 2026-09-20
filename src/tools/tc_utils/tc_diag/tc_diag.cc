@@ -982,7 +982,7 @@ void process_fields(const TrackInfoArray &tracks,
    for(i=0; i<di.var_info_ptr.size(); i++) {
 
       // Make a local VarInfo copy to store the valid time
-      vi = vi_factory.new_copy(di.var_info_ptr[i]);
+      vi = vi_factory.new_copy(di.var_info_ptr[i]).release();
       vi->set_valid(vld_ut);
       vi_list.emplace_back(vi);
    }

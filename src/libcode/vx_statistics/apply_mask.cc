@@ -470,7 +470,6 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    if(append_thresh) mask_name << st.get_str();
 
    // Clean up
-   if(info)  { delete info;  info  = (VarInfo *)       nullptr; }
 
    return;
 }
@@ -638,7 +637,6 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
 
       // Deallocate memory
       mtddf.reset();
-      if(info)  { delete info;  info  = (VarInfo       *) nullptr; }
 
       if(found) break;
    }

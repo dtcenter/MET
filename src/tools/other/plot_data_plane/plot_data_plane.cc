@@ -211,7 +211,6 @@ int met_main(int argc, char * argv[]) {
    // clean up
    //
    met_ptr.reset();
-   if(var_ptr) { delete var_ptr;  var_ptr = nullptr; }
 
    #ifdef  WITH_PYTHON
       GP.finalize();

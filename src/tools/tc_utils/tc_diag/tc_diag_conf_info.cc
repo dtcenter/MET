@@ -303,7 +303,11 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
       Dictionary i_dict = parse_conf_i_vx_dict(dict, i);
 
       // Conf: field.name and field.level
-      auto vi = VarInfoFactory::new_var_info(file_type);
+      // NOTE: TCDiagConfInfo::var_info is a vector<VarInfo *> that owns its
+      // entries and deletes them in clear(), so hand ownership over here. It
+      // becomes a vector<unique_ptr<VarInfo>> in its own pass. Keep using the
+      // raw pointer below - releasing first would leave vi empty.
+      VarInfo *vi = VarInfoFactory::new_var_info(file_type).release();
       vi->set_dict(i_dict);
       var_info.emplace_back(vi);
 

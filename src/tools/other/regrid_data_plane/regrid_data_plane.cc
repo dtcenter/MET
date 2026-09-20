@@ -274,7 +274,7 @@ void static process_data_file() {
    }
 
    // Update the input grid, if needed
-   update_mtddf_grid(fr_mtddf.get(), vinfo);
+   update_mtddf_grid(fr_mtddf.get(), vinfo.get());
 
    fr_grid = fr_mtddf->grid();
    mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
@@ -343,7 +343,7 @@ void static process_data_file() {
       }
 
       // Write the regridded data
-      write_nc(to_dp, vinfo, vname.c_str());
+      write_nc(to_dp, vinfo.get(), vname.c_str());
 
    } // end for i
 
@@ -364,7 +364,6 @@ void static process_data_file() {
 
    // Clean up
    fr_mtddf.reset();
-   if(vinfo)    { delete vinfo;    vinfo    = (VarInfo *)       nullptr; }
 
    return;
 }
