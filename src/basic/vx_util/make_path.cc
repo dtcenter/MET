@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <string>
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -43,40 +44,30 @@ int make_path(const char * path, int mode)
 
 if ( path_exists(path) )  return 1;
 
-int j;
 int status;
 const char *method_name = "make_path() ";
 
 
    //
-   //  make subpath
+   //  make subpath: everything up to, but not including, the last '/'
    //
 
-char *subpath = m_strcpy2(path, method_name);
-
-if (subpath) {
-   j = m_strlen(subpath) - 1;
-
-   while ( (j >= 0) && (subpath[j] != '/') )  subpath[j--] = (char) 0;
-
-   if ( j >= 0 ) subpath[j] = (char) 0;
+if ( path )  {
+   std::string subpath(path);
+   auto slash = subpath.find_last_of('/');
+   subpath = (slash == std::string::npos) ? std::string() : subpath.substr(0, slash);
 
    mlog << Debug(1) << "\n\n  " << method_name << "subpath = \"" << subpath << "\"\n\n";
 
-   if ( m_strlen(subpath) == 0 ) {
-      if (subpath) { delete [] subpath; subpath = (char *) nullptr; }
-      return 0;
-   }
+   if ( subpath.empty() )  return 0;
 
-   if ( !(path_exists(subpath)) )  {
-      make_path(subpath, mode);
+   if ( !(path_exists(subpath.c_str())) )  {
+      make_path(subpath.c_str(), mode);
    }
 
 }
 
 status = mkdir(path, mode);
-
-if (subpath) { delete [] subpath; subpath = (char *) nullptr; }
 
 if ( status < 0 )   return 0;
 
