@@ -36,7 +36,6 @@ extern void append_char(char *, const char);
 
 extern void strip_char(char *, const char);
 
-extern int num_tokens(const char *, const char *);
 
 extern bool has_prefix(const char **prefix_list, int n_prefix,
                        const char *str);

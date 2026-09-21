@@ -202,40 +202,6 @@ void strip_char(char *str, const char c)
 ////////////////////////////////////////////////////////////////////////
 
 
-int num_tokens(const char *test_str, const char *separator)
-
-{
-   int n = 0;
-   char *temp_str = (char *) nullptr;
-   char *temp_ptr = (char *) nullptr;
-   char *c = (char *) nullptr;
-   const char *method_name = "num_tokens() -> ";
-
-   //
-   // Check for an empty string
-   //
-   if(!test_str) return 0;
-   
-   int buf_len = m_strlen(test_str);
-   if(buf_len <= 0) return 0;
-
-   //
-   // Initialize the temp string for use in tokenizing
-   //
-   temp_str = m_strcpy2(test_str, method_name);
-   if (temp_str) {
-
-      //
-      // Compute the number of tokens in the string
-      //
-      while((c = strtok_r(temp_str, separator, &temp_ptr)) != nullptr) n++;
-
-   }
-
-   if(temp_str) { delete [] temp_str; temp_str = (char *) nullptr; }
-
-   return n;
-}
 
 
 ////////////////////////////////////////////////////////////////////////
