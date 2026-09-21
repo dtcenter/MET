@@ -48,7 +48,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    int code_for_lookup = vinfo.field_rec();
    double p_thresh_lo, p_thresh_hi;
 
-   Section1_Header *pds = (Section1_Header *) g.pds;
+   Section1_Header *pds = (Section1_Header *) g.pds.data();
 
    ConcatString field_name = vinfo.name();
 
@@ -580,7 +580,7 @@ void read_pds(const GribRecord &r, int &bms_flag,
    unsigned char pp1[2];
    Section1_Header *pds = (Section1_Header *) nullptr;
 
-   pds = (Section1_Header *) r.pds;
+   pds = (Section1_Header *) r.pds.data();
 
    //
    // Check PDS for flag for the presence of a GDS and BMS section
@@ -754,7 +754,7 @@ void read_pds_prob(const GribRecord &r, int &p_code,
    int len;
    double t1, t2;
 
-   Section1_Header *pds = (Section1_Header *) r.pds;
+   Section1_Header *pds = (Section1_Header *) r.pds.data();
 
    // Initialize
    p_code = 0;
@@ -790,7 +790,7 @@ void read_pds_level(const GribRecord & g, int &lower, int &upper, int &type)
 {
 int j;
 
-Section1_Header *pds = (Section1_Header *) g.pds;
+Section1_Header *pds = (Section1_Header *) g.pds.data();
 
    //
    //  find the level information for this record
