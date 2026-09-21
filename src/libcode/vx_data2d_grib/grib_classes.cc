@@ -1491,7 +1491,7 @@ file.setf(ios::fixed);
 file << separator << "\n\n";
 file << *(g.is);
 file << separator << "\n\n";
-file << g.pds[0];   // NOTE: streams one byte, not the Section1_Header - see commit message
+if ( !g.pds.empty() )  file << *((const Section1_Header *) g.pds.data());
 file << separator << "\n\n";
 
 if ( g.gds_flag )   { file << *(g.gds);  file << separator << "\n\n"; }
