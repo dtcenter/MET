@@ -264,7 +264,7 @@ bool MetNcFile::open(const char * filename)
       int dim_count = GET_NC_DIM_COUNT(v);
       Var[j].Ndims = dim_count;
 
-      Var[j].Dims = new NcDim * [Var[j].Ndims];
+      Var[j].Dims.resize(Var[j].Ndims);
 
       //
       //  parse the variable attributes

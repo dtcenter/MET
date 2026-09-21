@@ -317,7 +317,7 @@ InitTime = parse_init_time(att_value.c_str());
       int dim_count = GET_NC_DIM_COUNT(v);
       Var[j].Ndims = dim_count;
 
-      Var[j].Dims = new NcDim * [dim_count];
+      Var[j].Dims.resize(dim_count);
 
       //
       //  parse the variable attributes

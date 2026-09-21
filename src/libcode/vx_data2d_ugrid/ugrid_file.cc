@@ -140,7 +140,6 @@ void UGridFile::close()
   if (Var) {
     for (int j = 0; j < Nvars; ++j) {
       if (Var[j].var) { delete Var[j].var; Var[j].var = nullptr; }
-      if (Var[j].Dims) { delete[] Var[j].Dims; Var[j].Dims = nullptr; }
     }
     delete [] Var;
     Var = (NcVarInfo *)nullptr;
@@ -148,10 +147,8 @@ void UGridFile::close()
 
   Nvars = 0;
 
-  // Delete MetaVar Dims arrays
   for (int j = 0; j < UG_META_VAR_COUNT; ++j) {
     if (MetaVar[j].var) { delete MetaVar[j].var; MetaVar[j].var = nullptr; }
-    if (MetaVar[j].Dims) { delete[] MetaVar[j].Dims; MetaVar[j].Dims = nullptr; }
   }
 
   // Clear other members
@@ -709,7 +706,7 @@ bool UGridFile::get_var_info() {
     int dim_count = GET_NC_DIM_COUNT(v);
     Var[j].Ndims = dim_count;
 
-    Var[j].Dims = new NcDim * [dim_count];
+    Var[j].Dims.resize(dim_count);
 
     //  parse the variable attributes
     get_att_str( Var[j], long_name_att_name, Var[j].long_name_att );
@@ -777,7 +774,7 @@ void UGridFile::metadata_coord_variables() {
 
       int dim_count = GET_NC_DIM_COUNT(v);
       MetaVar[j].Ndims = dim_count;
-      MetaVar[j].Dims = new NcDim * [dim_count];
+      MetaVar[j].Dims.resize(dim_count);
 
       //  parse the variable attributes
       get_att_str( MetaVar[j], long_name_att_name, MetaVar[j].long_name_att );

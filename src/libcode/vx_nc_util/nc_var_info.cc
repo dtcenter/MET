@@ -114,7 +114,7 @@ return *this;
 
 void NcVarInfo::init_from_scratch() {
 
-Dims = (NcDim **) nullptr;
+Dims.clear();
 
 clear();
 
@@ -148,7 +148,7 @@ AccumTime = 0;
 
 Ndims = 0;
 
-if ( Dims )  { delete [] Dims;  Dims = (NcDim **) nullptr; }
+Dims.clear();
 
 x_slot = y_slot = z_slot = t_slot = -1;
 
@@ -208,7 +208,7 @@ out << "\n";
 
 out << prefix << "Ndims = " << Ndims;
 
-if ( Dims )  {
+if ( !Dims.empty() )  {
 
    int j;
 
@@ -295,13 +295,7 @@ y_subgrid = i.y_subgrid;
 
 is_pressure = i.is_pressure;
 
-if ( i.Dims )  {
-
-   Dims = new NcDim * [i.Ndims];
-
-   for (int j=0; j<(i.Ndims); ++j)  Dims[j] = i.Dims[j];
-
-}
+Dims = i.Dims;
 
    //
    //  done

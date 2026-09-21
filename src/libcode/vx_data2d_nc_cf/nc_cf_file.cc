@@ -438,7 +438,7 @@ void NcCfFile::parse_vars_from_file(ConcatString& att_value, int& max_dim_count,
     Var[j].Ndims = dim_count;
     if (dim_count > max_dim_count) max_dim_count = dim_count;
 
-    Var[j].Dims = new NcDim * [dim_count];
+    Var[j].Dims.resize(dim_count);
 
     //  parse the variable attributes
     get_att_str(Var[j], long_name_att_name, Var[j].long_name_att );

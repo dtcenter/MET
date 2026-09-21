@@ -21,6 +21,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
 #include <netcdf>
 
 #include "vx_util.h"
@@ -81,7 +82,7 @@ class NcVarInfo {
 
       int Ndims;
 
-      netCDF::NcDim ** Dims; //  allocated
+      std::vector<netCDF::NcDim *> Dims;   //  the array is owned; the NcDims are not
 
       int x_slot;       //   starting from zero
       int y_slot;       //
