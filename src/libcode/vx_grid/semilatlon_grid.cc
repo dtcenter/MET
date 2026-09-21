@@ -495,16 +495,8 @@ void Grid::set(const SemiLatLonData & data)
 
 clear();
 
-rep = new SemiLatLonGrid (data);
+rep.reset(new SemiLatLonGrid(data));
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const SemiLatLonData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 

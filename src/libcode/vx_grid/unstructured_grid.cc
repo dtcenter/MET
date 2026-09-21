@@ -339,7 +339,7 @@ Grid::Grid(const UnstructuredData &data) {
 void Grid::set(const UnstructuredData &data) {
    clear();
 
-   rep = new UnstructuredGrid ( data );
+   rep.reset(new UnstructuredGrid(data));
    if ( !rep )  {
       mlog << Error << "\nGrid::set(const Unstructured &) -> memory allocation error\n\n";
       exit ( 1 );

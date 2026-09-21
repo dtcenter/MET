@@ -439,15 +439,8 @@ void Grid::set(const LatLonData & data)
 
 clear();
 
-rep = new LatLonGrid ( data );
+rep.reset(new LatLonGrid(data));
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const LatLonData &) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 

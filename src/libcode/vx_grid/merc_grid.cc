@@ -769,16 +769,8 @@ void Grid::set(const MercatorData & data)
 
 clear();
 
-rep = new MercatorGrid (data);
+rep.reset(new MercatorGrid(data));
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const MercatorData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 

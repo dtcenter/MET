@@ -659,16 +659,8 @@ void Grid::set(const GoesImagerData & data)
 
 clear();
 
-rep = new GoesImagerGrid (data);
+rep.reset(new GoesImagerGrid(data));
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const GoesImagerData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 }
 

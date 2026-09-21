@@ -807,16 +807,8 @@ void Grid::set(const LaeaData & data)
 
 clear();
 
-rep = new LaeaGrid (data);
+rep.reset(new LaeaGrid(data));
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const LaeaData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 
@@ -846,16 +838,8 @@ void Grid::set(const LaeaNetcdfData & data)
 
 clear();
 
-rep = new LaeaGrid (data);
+rep.reset(new LaeaGrid(data));
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const LaeaNetcdfData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 

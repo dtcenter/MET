@@ -433,7 +433,7 @@ void Grid::set(const RotatedLatLonData & rdata)
 
 clear();
 
-rep = new RotatedLatLonGrid ( rdata );
+rep.reset(new RotatedLatLonGrid(rdata));
 
 if ( !rep )  {
 

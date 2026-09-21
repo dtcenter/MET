@@ -489,18 +489,18 @@ void GridInfo::init_from_scratch()
 
 {
 
-lc  = (const LambertData *)       nullptr;
-st  = (const StereographicData *) nullptr;
-ll  = (const LatLonData *)        nullptr;
-rll = (const RotatedLatLonData *) nullptr;
-m   = (const MercatorData *)      nullptr;
-g   = (const GaussianData *)      nullptr;
-gi  = (const GoesImagerData *)    nullptr;
-la  = (const LaeaData *)          nullptr;
-ra  = (const RngAziData *)        nullptr;
-sl  = (const SemiLatLonData *)    nullptr;
+lc  .reset();
+st  .reset();
+ll  .reset();
+rll .reset();
+m   .reset();
+g   .reset();
+gi  .reset();
+la  .reset();
+ra  .reset();
+sl  .reset();
 #ifdef WITH_UGRID
-us  = (const UnstructuredData *)  nullptr;
+us  .reset();
 #endif
 
 clear();
@@ -517,18 +517,18 @@ void GridInfo::clear()
 
 {
 
-if ( lc  )  { delete lc;   lc  = (const LambertData *)       nullptr; }
-if ( st  )  { delete st;   st  = (const StereographicData *) nullptr; }
-if ( ll  )  { delete ll;   ll  = (const LatLonData *)        nullptr; }
-if ( rll )  { delete rll;  rll = (const RotatedLatLonData *) nullptr; }
-if ( m   )  { delete m;    m   = (const MercatorData *)      nullptr; }
-if ( g   )  { delete g;    g   = (const GaussianData *)      nullptr; }
-if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    nullptr; }
-if ( la  )  { delete la;   la  = (const LaeaData *)          nullptr; }
-if ( ra  )  { delete ra;   ra  = (const RngAziData *)        nullptr; }
-if ( sl  )  { delete sl;   sl  = (const SemiLatLonData *)    nullptr; }
+lc.reset();
+st.reset();
+ll.reset();
+rll.reset();
+m.reset();
+g.reset();
+gi.reset();
+la.reset();
+ra.reset();
+sl.reset();
 #ifdef WITH_UGRID
-if ( us  )  { delete us;   us  = (const UnstructuredData *)  nullptr; }
+us.reset();
 #endif
 
 return;
@@ -633,13 +633,11 @@ void GridInfo::set(const LambertData & data)
 
 clear();
 
-LambertData * D = nullptr;
+auto D = std::make_unique<LambertData>();
 
-D = new LambertData;
+memcpy(D.get(), &data, sizeof(data));
 
-memcpy(D, &data, sizeof(data));
-
-lc = D;  D = nullptr;
+lc = std::move(D);
 
 return;
 
@@ -655,13 +653,11 @@ void GridInfo::set(const StereographicData & data)
 
 clear();
 
-StereographicData * D = nullptr;
+auto D = std::make_unique<StereographicData>();
 
-D = new StereographicData;
+memcpy(D.get(), &data, sizeof(data));
 
-memcpy(D, &data, sizeof(data));
-
-st = D;  D = nullptr;
+st = std::move(D);
 
 return;
 
@@ -677,13 +673,11 @@ void GridInfo::set(const LatLonData & data)
 
 clear();
 
-LatLonData * D = nullptr;
+auto D = std::make_unique<LatLonData>();
 
-D = new LatLonData;
+memcpy(D.get(), &data, sizeof(data));
 
-memcpy(D, &data, sizeof(data));
-
-ll = D;  D = nullptr;
+ll = std::move(D);
 
 return;
 
@@ -699,13 +693,11 @@ void GridInfo::set(const RotatedLatLonData & data)
 
 clear();
 
-RotatedLatLonData * D = nullptr;
+auto D = std::make_unique<RotatedLatLonData>();
 
-D = new RotatedLatLonData;
+memcpy(D.get(), &data, sizeof(data));
 
-memcpy(D, &data, sizeof(data));
-
-rll = D;  D = nullptr;
+rll = std::move(D);
 
 return;
 
@@ -721,13 +713,11 @@ void GridInfo::set(const MercatorData & data)
 
 clear();
 
-MercatorData * D = nullptr;
+auto D = std::make_unique<MercatorData>();
 
-D = new MercatorData;
+memcpy(D.get(), &data, sizeof(data));
 
-memcpy(D, &data, sizeof(data));
-
-m = D;  D = nullptr;
+m = std::move(D);
 
 return;
 
@@ -743,13 +733,11 @@ void GridInfo::set(const GaussianData & data)
 
 clear();
 
-GaussianData * D = nullptr;
+auto D = std::make_unique<GaussianData>();
 
-D = new GaussianData;
+memcpy(D.get(), &data, sizeof(data));
 
-memcpy(D, &data, sizeof(data));
-
-g = D;  D = nullptr;
+g = std::move(D);
 
 return;
 
@@ -765,13 +753,11 @@ void GridInfo::set(const GoesImagerData & data)
 
 clear();
 
-GoesImagerData * D = nullptr;
+auto D = std::make_unique<GoesImagerData>();
 
-D = new GoesImagerData;
+memcpy(D.get(), &data, sizeof(data));
 
-memcpy(D, &data, sizeof(data));
-
-gi = D;  D = nullptr;
+gi = std::move(D);
 
 return;
 
@@ -787,13 +773,11 @@ void GridInfo::set(const RngAziData & data)
 
 clear();
 
-RngAziData * D = nullptr;
+auto D = std::make_unique<RngAziData>();
 
-D = new RngAziData;
+memcpy(D.get(), &data, sizeof(data));
 
-memcpy(D, &data, sizeof(data));
-
-ra = D;  D = nullptr;
+ra = std::move(D);
 
 return;
 
@@ -809,9 +793,7 @@ void GridInfo::set(const LaeaData & data)
 
 clear();
 
-LaeaData * D = nullptr;
-
-D = new LaeaData;
+auto D = std::make_unique<LaeaData>();
 
    //
    //  deep copy instead of memcpy because the struct
@@ -820,7 +802,7 @@ D = new LaeaData;
 
 *D = data;
 
-la = D;  D = nullptr;
+la = std::move(D);
 
 return;
 
@@ -836,9 +818,7 @@ void GridInfo::set(const SemiLatLonData & data)
 
 clear();
 
-SemiLatLonData * D = nullptr;
-
-D = new SemiLatLonData;
+auto D = std::make_unique<SemiLatLonData>();
 
    //
    //  deep copy instead of memcpy because the struct
@@ -847,7 +827,7 @@ D = new SemiLatLonData;
 
 *D = data;
 
-sl = D;  D = nullptr;
+sl = std::move(D);
 
 return;
 
@@ -864,9 +844,7 @@ void GridInfo::set(const UnstructuredData & data)
 
 clear();
 
-UnstructuredData * D = nullptr;
-
-D = new UnstructuredData;
+auto D = std::make_unique<UnstructuredData>();
 
 D->n_edge = data.n_edge;
 D->n_node = data.n_node;
@@ -877,8 +855,7 @@ if (data.has_PointLatLon()) {
 else {
    D->set_points(data.n_face, data.points_XYZ);
 }
-us = D;
-D = nullptr;
+us = std::move(D);
 
 }
 #endif
@@ -986,11 +963,9 @@ assign(g);
 
 
 Grid::Grid(Grid && g) noexcept
-   : rep(g.rep), swap_to_north(g.swap_to_north)
+   : rep(std::move(g.rep)), swap_to_north(g.swap_to_north)
 
 {
-
-g.rep = nullptr;
 
 }
 
@@ -1018,10 +993,8 @@ Grid & Grid::operator=(Grid && g) noexcept
 
 if ( this != &g ) {
 
-   if(rep) delete rep;
-   rep = g.rep;
+   rep = std::move(g.rep);
    swap_to_north = g.swap_to_north;
-   g.rep = nullptr;
 
 }
 
@@ -1051,7 +1024,7 @@ void Grid::init_from_scratch()
 
 {
 
-rep = (GridRep *) nullptr;
+rep.reset();
 
 clear();
 
@@ -1065,7 +1038,7 @@ void Grid::clear()
 
 {
 
-if ( rep )  { delete rep;  rep = (GridRep *) nullptr; }
+rep.reset();
 set_swap_to_north(false);
 
 return;
@@ -1084,7 +1057,7 @@ clear();
 
 if ( ! (g.rep) )  return;
 
-rep = g.rep->copy();
+rep.reset(g.rep->copy());
 set_swap_to_north(g.get_swap_to_north());
 
 return;
@@ -1286,14 +1259,6 @@ GridInfo Grid::info() const
 
 {
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::info() const -> "
-        << "empty grid!\n\n";
-
-   exit ( 1 );
-
-}
 
 return rep->info();
 
@@ -1307,14 +1272,6 @@ double Grid::rot_grid_to_earth(int x, int y) const
 
 {
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::rot_grid_to_earth() const -> "
-        << "empty grid!\n\n";
-
-   exit ( 1 );
-
-}
 
 
 return rep->rot_grid_to_earth(x, y);
@@ -1329,14 +1286,6 @@ bool Grid::wrap_lon() const
 
 {
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::wrap_lon() const -> "
-        << "empty grid!\n\n";
-
-   exit ( 1 );
-
-}
 
 return rep->wrap_lon();
 
@@ -1350,14 +1299,6 @@ void Grid::shift_right(int N)
 
 {
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::shift_right() -> "
-        << "empty grid!\n\n";
-
-   exit ( 1 );
-
-}
 
 return rep->shift_right(N);
 
@@ -1562,18 +1503,18 @@ bool operator==(const GridInfo & i1, const GridInfo & i2)
 
 {
 
-     if ( i1.lc  && i2.lc  )  return ( is_eq(i1.lc,  i2.lc ) );
-else if ( i1.st  && i2.st  )  return ( is_eq(i1.st,  i2.st ) );
-else if ( i1.ll  && i2.ll  )  return ( is_eq(i1.ll,  i2.ll ) );
-else if ( i1.rll && i2.rll )  return ( is_eq(i1.rll, i2.rll) );
-else if ( i1.m   && i2.m   )  return ( is_eq(i1.m,   i2.m  ) );
-else if ( i1.g   && i2.g   )  return ( is_eq(i1.g,   i2.g  ) );
-else if ( i1.gi  && i2.gi  )  return ( is_eq(i1.gi,  i2.gi ) );
-else if ( i1.ra  && i2.ra  )  return ( is_eq(i1.ra,  i2.ra ) );
-else if ( i1.la  && i2.la  )  return ( is_eq(i1.la,  i2.la ) );
-else if ( i1.sl  && i2.sl  )  return ( is_eq(i1.sl,  i2.sl ) );
+     if ( i1.lc  && i2.lc  )  return ( is_eq(i1.lc.get(),  i2.lc.get() ) );
+else if ( i1.st  && i2.st  )  return ( is_eq(i1.st.get(),  i2.st.get() ) );
+else if ( i1.ll  && i2.ll  )  return ( is_eq(i1.ll.get(),  i2.ll.get() ) );
+else if ( i1.rll && i2.rll )  return ( is_eq(i1.rll.get(), i2.rll.get()) );
+else if ( i1.m   && i2.m   )  return ( is_eq(i1.m.get(),   i2.m.get()  ) );
+else if ( i1.g   && i2.g   )  return ( is_eq(i1.g.get(),   i2.g.get()  ) );
+else if ( i1.gi  && i2.gi  )  return ( is_eq(i1.gi.get(),  i2.gi.get() ) );
+else if ( i1.ra  && i2.ra  )  return ( is_eq(i1.ra.get(),  i2.ra.get() ) );
+else if ( i1.la  && i2.la  )  return ( is_eq(i1.la.get(),  i2.la.get() ) );
+else if ( i1.sl  && i2.sl  )  return ( is_eq(i1.sl.get(),  i2.sl.get() ) );
 #ifdef WITH_UGRID
-else if ( i1.us  && i2.us  )  return ( is_eq(i1.us,  i2.us ) );
+else if ( i1.us  && i2.us  )  return ( is_eq(i1.us.get(),  i2.us.get() ) );
 #endif
 
 return false;

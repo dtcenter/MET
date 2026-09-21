@@ -497,16 +497,8 @@ void Grid::set(const GaussianData & data)
 
 clear();
 
-rep = new GaussianGrid ( data );
+rep.reset(new GaussianGrid(data));
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const GaussianData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 

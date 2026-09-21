@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 
 
@@ -84,18 +85,18 @@ class GridInfo {
          //  at most ONE of these should be nonzero
          //
 
-      const LambertData       * lc;   //  allocated
-      const StereographicData * st;   //  allocated
-      const LatLonData        * ll;   //  allocated
-      const RotatedLatLonData * rll;  //  allocated
-      const MercatorData      * m;    //  allocated
-      const GaussianData      * g;    //  allocated
-      const GoesImagerData    * gi;   //  allocated
-      const RngAziData        * ra;   //  allocated
-      const LaeaData          * la;   //  allocated
-      const SemiLatLonData    * sl;   //  allocated
+      std::unique_ptr<const LambertData>       lc;
+      std::unique_ptr<const StereographicData> st;
+      std::unique_ptr<const LatLonData>        ll;
+      std::unique_ptr<const RotatedLatLonData> rll;
+      std::unique_ptr<const MercatorData>      m;
+      std::unique_ptr<const GaussianData>      g;
+      std::unique_ptr<const GoesImagerData>    gi;
+      std::unique_ptr<const RngAziData>        ra;
+      std::unique_ptr<const LaeaData>          la;
+      std::unique_ptr<const SemiLatLonData>    sl;
 #ifdef WITH_UGRID
-      const UnstructuredData  * us;   //  allocated
+      std::unique_ptr<const UnstructuredData>  us;
 #endif
 
 };
@@ -200,7 +201,7 @@ class Grid : public GridInterface {
 
       void assign(const Grid &);
 
-      GridRep * rep;
+      std::unique_ptr<GridRep> rep;
       bool swap_to_north;       // The raw latitude data is north to south
 
    public:

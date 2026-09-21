@@ -522,16 +522,8 @@ void Grid::set(const RngAziData & data)
 
 clear();
 
-rep = new RngAziGrid ( data );
+rep.reset(new RngAziGrid(data));
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const RngAziData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 

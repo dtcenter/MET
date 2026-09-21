@@ -1066,7 +1066,7 @@ void UGridFile::set_max_distance_km(double max_distance) {
   max_distance_km = max_distance;
   if (grid.is_set()) {
     UnstructuredData D;
-    D.copy_from(grid.info().us);
+    D.copy_from(grid.info().us.get());
     D.max_distance_km = max_distance;
     grid.set(D);
   }

@@ -904,16 +904,8 @@ void Grid::set(const LambertData & data)
 
 clear();
 
-rep = new LambertGrid (data);
+rep.reset(new LambertGrid(data));
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const LambertData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 }
 

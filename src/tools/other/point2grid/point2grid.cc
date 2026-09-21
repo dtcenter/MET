@@ -2376,8 +2376,8 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
             fclose (pFile);
 
             bool compare_binary_and_computation = false;
-            if (compare_binary_and_computation && fr_grid.info().gi) {
-               grid_data.copy(fr_grid.info().gi);
+            if (compare_binary_and_computation && fr_grid.info().gi.get()) {
+               grid_data.copy(fr_grid.info().gi.get());
                grid_data.compute_lat_lon();
                grid_data.test();
 
@@ -2421,8 +2421,8 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
             }
          }
       }
-      else if (fr_grid.info().gi) {
-         grid_data.copy(fr_grid.info().gi);
+      else if (fr_grid.info().gi.get()) {
+         grid_data.copy(fr_grid.info().gi.get());
          grid_data.compute_lat_lon();
          latitudes = grid_data.lat_values;
          longitudes = grid_data.lon_values;

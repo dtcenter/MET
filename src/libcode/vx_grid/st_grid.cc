@@ -871,16 +871,8 @@ void Grid::set(const StereographicData & data)
 
 clear();
 
-rep = new StereographicGrid (data);
+rep.reset(new StereographicGrid(data));
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const StereographicData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 
