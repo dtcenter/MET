@@ -178,7 +178,7 @@ void do_job(const ConcatString &jobstring, const StringArray &in_files,
    //
    // If the -dump_row option was supplied, open the file
    //
-   if(job.dump_row) {
+   if(!job.dump_row.empty()) {
       mlog << Debug(1) << "Creating dump row output file \"" << job.dump_row
            << "\"\n";
       job.open_dump_row_file();
@@ -187,7 +187,7 @@ void do_job(const ConcatString &jobstring, const StringArray &in_files,
    //
    // If the -out_stat option was supplied, open the file
    //
-   if(job.stat_file) {
+   if(!job.stat_file.empty()) {
       mlog << Debug(1) << "Creating STAT output file \"" << job.stat_file
            << "\"\n";
       job.open_stat_file();
@@ -214,7 +214,7 @@ void do_job(const ConcatString &jobstring, const StringArray &in_files,
    //
    if(job.job_type == STATJobType::summary ||
       job.job_type == STATJobType::aggr_stat) {
-      rng_set(rng_ptr, job.boot_rng, job.boot_seed);
+      rng_set(rng_ptr, job.boot_rng.c_str(), job.boot_seed.c_str());
    }
 
    //
@@ -296,7 +296,7 @@ void do_job_filter(const ConcatString &jobstring, LineDataFiles &f,
    //
    // Check that the -dump_row option has been supplied
    //
-   if(!job.dump_row) {
+   if(job.dump_row.empty()) {
       mlog << Error << "\ndo_job_filter() -> "
            << "this function may only be called when using the "
            << "-dump_row option in the job command line: "
