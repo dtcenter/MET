@@ -899,10 +899,10 @@ The "method" entry defines the regridding method to be used.
 
     * AW_MEAN_CNTR for an area-weighted mean when regridding from
       high to low resolution grids (width = 1), weighting each input
-      point by the area of the grid box centered on that point. Input
-      points lying exactly on the boundary between output grid boxes
-      are split evenly between them. This option is recommended over
-      AW_MEAN.
+      point by the area of the grid box centered on that point. When an
+      input grid box overlaps multiple output grid boxes, its weight is
+      divided among them in proportion to the overlap. This option is
+      recommended over AW_MEAN.
 
     * LS_FIT       for a least-squares fit
 
