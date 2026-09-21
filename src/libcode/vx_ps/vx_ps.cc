@@ -1780,7 +1780,7 @@ if ( j < 0 )  {
 
 }
 
-AfmCharMetrics & cm = afm.cm[j];
+const AfmCharMetrics & cm = afm.cm[j];
 
 if (m_strlen(c) > 1) {
 
