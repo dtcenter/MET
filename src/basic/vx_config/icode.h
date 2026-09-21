@@ -23,6 +23,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <string>
 #include <iostream>
 #include <vector>
 
@@ -138,8 +139,8 @@ class IcodeCell {
 
       double d;
 
-      char * name;   //  allocated if needed
-      char * text;   //  allocated if needed
+      std::string name;
+      std::string text;
 
       const DictionaryEntry * e;   //  not allocated
 

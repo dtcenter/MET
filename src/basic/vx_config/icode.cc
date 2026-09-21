@@ -114,9 +114,9 @@ d = 0.0;
 
 type = no_cell_type;
 
-name = (char *) nullptr;
+name.clear();
 
-text = (char *) nullptr;
+text.clear();
 
 e = 0;
 
@@ -137,9 +137,9 @@ i = 0;
 
 d = 0.0;
 
-if ( name )  { delete [] name;   name = (char *) nullptr; }
+name.clear();
 
-if ( text )  { delete [] text;   text = (char *) nullptr; }
+text.clear();
 
 e = 0;
 
@@ -160,8 +160,6 @@ void IcodeCell::assign(const IcodeCell & icc)
 
 {
 
-const char *method_name = "IcodeCell::assign() -> ";
-
 i = icc.i;
 
 d = icc.d;
@@ -170,13 +168,13 @@ type = icc.type;
 
 if ( type == identifier )  {
 
-   name = m_strcpy2(icc.name, method_name, "name");
+   name = icc.name;
 
 }
 
 if ( type == character_string )  {
 
-   text = m_strcpy2(icc.text, method_name, "text");
+   text = icc.text;
 
 }
 
@@ -408,13 +406,11 @@ void IcodeCell::set_identifier(const char * Text)
 
 {
 
-const char *method_name = "IcodeCell::set_identifier() -> ";
-
 clear();
 
 type = identifier;
 
-name = m_strcpy2(Text, method_name);
+name = (Text ? Text : "");
 
 
 return;
@@ -429,13 +425,11 @@ void IcodeCell::set_string(const char * Text)
 
 {
 
-const char *method_name = "IcodeCell::set_string() -> ";
-
 clear();
 
 type = character_string;
 
-text = m_strcpy2(Text, method_name);
+text = (Text ? Text : "");
 
 
 return;
