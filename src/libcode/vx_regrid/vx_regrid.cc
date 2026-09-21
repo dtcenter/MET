@@ -188,9 +188,16 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
       for(int xf=0; xf<(from_grid.nx()); xf++) {
          for(int yf=0; yf<(from_grid.ny()); yf++) {
 
+            auto xf_dbl = (double) xf;
+            auto yf_dbl = (double) yf;
+            if(info.method == InterpMthd::AW_Mean_Cntr) {
+               xf_dbl += 0.5;
+               yf_dbl += 0.5;
+            }
+
             double lat;
             double lon;
-            from_grid.xy_to_latlon(xf, yf, lat, lon);
+            from_grid.xy_to_latlon(xf_dbl, yf_dbl, lat, lon);
 
             double x_to;
             double y_to;
@@ -206,7 +213,7 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
             }
             else {
                if(is_bad_data(value = from_data(xf, yf))) continue;
-               double weight = from_grid.calc_area(xf, yf,
+               double weight = from_grid.calc_area(xf_dbl, yf_dbl,
                                   info.method == InterpMthd::AW_Mean_Cntr);
 
                int n = to_data.two_to_one(xt, yt);
