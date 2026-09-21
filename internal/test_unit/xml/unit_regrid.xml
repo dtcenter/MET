@@ -196,6 +196,38 @@
     </output>
   </test>
 
+  <test name="regrid_data_plane_GFS_TO_1DEG_AW_MEAN">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2 \
+      'latlon 360 181 -90 0 1 1' \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_1DEG_AW_MEAN.nc \
+      -field 'name="TMP";  level="Z2";' \
+      -field 'name="HGT";  level="P500";' \
+      -method AW_MEAN -width 1 \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_1DEG_AW_MEAN.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="regrid_data_plane_GFS_TO_1DEG_AW_MEAN_CNTR">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2 \
+      'latlon 360 181 -90 0 1 1' \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_1DEG_AW_MEAN_CNTR.nc \
+      -field 'name="TMP";  level="Z2";' \
+      -field 'name="HGT";  level="P500";' \
+      -method AW_MEAN_CNTR -width 1 \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_1DEG_AW_MEAN_CNTR.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="regrid_data_plane_GFS_TO_HMT_MIN_3">
     <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \

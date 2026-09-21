@@ -141,6 +141,28 @@ DataPlane met_regrid_generic(const DataPlane & from_data,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// For AW_MEAN_CNTR, a from_grid point lying on the boundary between
+// two to_grid boxes is split evenly between them. Otherwise, it is
+// assigned to the nearest to_grid box. Returns the number of to_grid
+// indices (1 or 2) stored in the index and weight arrays.
+//
+////////////////////////////////////////////////////////////////////////
+
+static int aw_mean_split(double v, bool split, int i[2], double w[2]) {
+   static const double boundary_tol = 1.0e-5;
+
+   if(split && fabs(v - floor(v) - 0.5) < boundary_tol) {
+      i[0] = (int) floor(v); w[0] = 0.5;
+      i[1] = i[0] + 1;       w[1] = 0.5;
+      return 2;
+   }
+
+   i[0] = nint(v); w[0] = 1.0;
+   return 1;
+}
+
+////////////////////////////////////////////////////////////////////////
 
 DataPlane met_regrid_area_weighted(const DataPlane & from_data,
                                    const Grid & from_grid,
@@ -188,37 +210,42 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
       for(int xf=0; xf<(from_grid.nx()); xf++) {
          for(int yf=0; yf<(from_grid.ny()); yf++) {
 
-            auto xf_dbl = (double) xf;
-            auto yf_dbl = (double) yf;
-            if(info.method == InterpMthd::AW_Mean_Cntr) {
-               xf_dbl += 0.5;
-               yf_dbl += 0.5;
-            }
+            double value = from_data(xf, yf);
+            if(is_bad_data(value)) continue;
 
             double lat;
             double lon;
-            from_grid.xy_to_latlon(xf_dbl, yf_dbl, lat, lon);
+            from_grid.xy_to_latlon(xf, yf, lat, lon);
 
             double x_to;
             double y_to;
             to_grid.latlon_to_xy(lat, lon, x_to, y_to);
 
-            int xt = nint(x_to);
-            int yt = nint(y_to);
+            bool centered = (info.method == InterpMthd::AW_Mean_Cntr);
+            double weight = from_grid.calc_area(xf, yf, centered);
 
-            double value;
-            if((xt < 0) || (xt >= to_grid.nx()) ||
-               (yt < 0) || (yt >= to_grid.ny()) ) {
-               continue;
-            }
-            else {
-               if(is_bad_data(value = from_data(xf, yf))) continue;
-               double weight = from_grid.calc_area(xf_dbl, yf_dbl,
-                                  info.method == InterpMthd::AW_Mean_Cntr);
+            int xt[2], yt[2];
+            double xw[2], yw[2];
+            int n_xt = aw_mean_split(x_to, centered, xt, xw);
+            int n_yt = aw_mean_split(y_to, centered, yt, yw);
 
-               int n = to_data.two_to_one(xt, yt);
-               to_data_sum[n] += value*weight;
-               wt_data_sum[n] += weight;
+            for(int i=0; i<n_xt; i++) {
+
+               // Wrap longitudes for AW_MEAN_CNTR
+               int x = xt[i];
+               if(centered && to_grid.wrap_lon()) {
+                  x = ((x % to_grid.nx()) + to_grid.nx()) % to_grid.nx();
+               }
+               if(x < 0 || x >= to_grid.nx()) continue;
+
+               for(int j=0; j<n_yt; j++) {
+                  if(yt[j] < 0 || yt[j] >= to_grid.ny()) continue;
+
+                  double w = weight*xw[i]*yw[j];
+                  int n = to_data.two_to_one(x, yt[j]);
+                  to_data_sum[n] += value*w;
+                  wt_data_sum[n] += w;
+               }
             }
          } // for yf
       } // for xf

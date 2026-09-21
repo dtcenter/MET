@@ -890,12 +890,19 @@ The "method" entry defines the regridding method to be used.
       distance^-2)
 
     * AW_MEAN      for an area-weighted mean when regridding from
-      high to low resolution grids (width = 1) computed using the
-      lower-left corner of each grid box
+      high to low resolution grids (width = 1), weighting each input
+      point by the area of the grid box whose lower-left corner is that
+      point. Input points lying exactly on the boundary between output
+      grid boxes are all assigned to the same side, which can shift
+      the result by a fraction of a grid box when the input and output
+      grids are aligned (e.g. 0.25 to 1.0 degree lat/lon).
 
     * AW_MEAN_CNTR for an area-weighted mean when regridding from
-      high to low resolution grids (width = 1) computed using the
-      center of each grid box
+      high to low resolution grids (width = 1), weighting each input
+      point by the area of the grid box centered on that point. Input
+      points lying exactly on the boundary between output grid boxes
+      are split evenly between them. This option is recommended over
+      AW_MEAN.
 
     * LS_FIT       for a least-squares fit
 
@@ -2775,6 +2782,11 @@ Three grid weighting options are currently supported:
 
 * AREA_CNTR to define the weight as the true area of the grid box (km^2)
   defined by the center point of each grid box.
+
+.. note::
+   Prior to version 13.0.0, the AREA option computed centered grid box
+   areas for Lambert Azimuthal Equal Area grids, unlike all other grid
+   projections. Use AREA_CNTR to reproduce that behavior.
 
 If requested in the config file, the raw grid weights can be written to
 the NetCDF output from Grid-Stat and Ensemble-Stat.

@@ -280,7 +280,7 @@ double area;
 
 if ( centered ) {
    lat_top = (y == (Ny - 1) ? 90.0 : (Latitudes[y] + Latitudes[y+1]) / 2.0);
-   lat_bot = (y == 0        ?  0.0 : (Latitudes[y] + Latitudes[y-1]) / 2.0);
+   lat_bot = (y == 0        ? -90.0 : (Latitudes[y] + Latitudes[y-1]) / 2.0);
 }
 else {
    lat_top = (y == (Ny - 1) ? 90.0 : Latitudes[y+1]);
