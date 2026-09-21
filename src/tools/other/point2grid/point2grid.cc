@@ -2385,8 +2385,8 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
                int lat_mis_matching_count = 0;
                int lon_matching_count = 0;
                int lon_mis_matching_count = 0;
-               const float *tmp_lats = grid_data.lat_values;
-               const float *tmp_lons = grid_data.lon_values;
+               const float *tmp_lats = grid_data.lat_values.data();
+               const float *tmp_lons = grid_data.lon_values.data();
 
                for (int idx=0; idx<data_size; idx++) {
                    if ((latitudes[idx] > MISSING_LATLON) && (tmp_lats[idx] > MISSING_LATLON)) {
@@ -2424,8 +2424,8 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
       else if (fr_grid.info().gi.get()) {
          grid_data.copy(fr_grid.info().gi.get());
          grid_data.compute_lat_lon();
-         latitudes = grid_data.lat_values;
-         longitudes = grid_data.lon_values;
+         latitudes = grid_data.lat_values.data();
+         longitudes = grid_data.lon_values.data();
          if (!file_exists(geostationary_file.c_str())) {
             save_geostationary_data(geostationary_file,
                   latitudes, longitudes, grid_data);

@@ -3046,10 +3046,10 @@ void NcCfFile::get_grid_mapping_geostationary(
   data.dx_rad = (x_values[x_counts-1] - x_values[0]) / ((int)x_counts - 1);
   data.dy_rad = (y_values[y_counts-1] - y_values[0]) / ((int)y_counts - 1);
   if (bound_count > 0) {
-    data.x_image_bounds = new double[bound_count];
-    data.y_image_bounds = new double[bound_count];
-    if (nullptr != var_x_bound) get_nc_data(var_x_bound, data.x_image_bounds);
-    if (nullptr != var_y_bound) get_nc_data(var_y_bound, data.y_image_bounds);
+    data.x_image_bounds.resize(bound_count);
+    data.y_image_bounds.resize(bound_count);
+    if (nullptr != var_x_bound) get_nc_data(var_x_bound, data.x_image_bounds.data());
+    if (nullptr != var_y_bound) get_nc_data(var_y_bound, data.y_image_bounds.data());
   }
 
   double flatten = 1.0/data.inverse_flattening;
@@ -3058,11 +3058,8 @@ void NcCfFile::get_grid_mapping_geostationary(
   data.inv_radius_ratio2 = 1.0/data.radius_ratio2;
   data.H = data.perspective_point_height + data.semi_major_axis;
 
-  data.x_values = new double[x_counts];
-  data.y_values = new double[y_counts];
-
-  memcpy(data.x_values, x_values.data(), sizeof(data.x_values[0])*x_counts);
-  memcpy(data.y_values, y_values.data(), sizeof(data.y_values[0])*y_counts);
+  data.x_values.assign(x_values.begin(), x_values.begin() + x_counts);
+  data.y_values.assign(y_values.begin(), y_values.begin() + y_counts);
 
   // Get scene_id: "Full Disk", "CONUS", or "Mesoscale"
   ConcatString scene_id;
