@@ -84,12 +84,6 @@ void PairDataPoint::clear() {
 
    f_na.clear();
    f_lead_na.clear();
-   for (int idx=0; idx<seeps_mpr.size(); idx++) {
-      if (seeps_mpr[idx]) {
-         delete seeps_mpr[idx];
-         seeps_mpr[idx] = nullptr;
-      }
-   }
    seeps_mpr.clear();
    seeps_agg.clear();
 
@@ -104,12 +98,7 @@ void PairDataPoint::erase() {
 
    f_na.erase();
    f_lead_na.erase();
-   for (int idx=0; idx<seeps_mpr.size(); idx++) {
-      if (seeps_mpr[idx]) {
-         delete seeps_mpr[idx];
-         seeps_mpr[idx] = nullptr;
-      }
-   }
+   for (auto &s : seeps_mpr) s.reset();
 
    return;
 }
@@ -166,7 +155,7 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
                pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
                cpi, pd.wgt_na[i]) &&
             i < pd.seeps_mpr.size()) {
-            set_seeps_score(seeps_mpr[i], i);
+            set_seeps_score(seeps_mpr[i].get(), i);
          }
       }
    }
@@ -221,16 +210,8 @@ void PairDataPoint::set_seeps_score(SeepsScore *seeps, int index) {
       auto seeps_count = (int) seeps_mpr.size();
       if(index < 0) index = seeps_count - 1;
       if(index < seeps_count) {
-         if (seeps) {
-            if (!seeps_mpr[index]) seeps_mpr[index] = new SeepsScore();
-            *seeps_mpr[index] = *seeps;
-         }
-         else {
-            if (seeps_mpr[index]) {
-               delete seeps_mpr[index];
-               seeps_mpr[index] = nullptr;
-            }
-         }
+         if (!seeps_mpr[index]) seeps_mpr[index] = std::make_unique<SeepsScore>();
+         *seeps_mpr[index] = *seeps;
       }
       else {
          mlog << Warning << "\nPairDataPoint::set_seeps_score("
@@ -326,9 +307,9 @@ bool PairDataPoint::add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
 static int seeps_record_count = 0;
 static int seeps_debug_level = 9;
 
-SeepsScore *PairDataPoint::compute_seeps(const char *sid, double f,
+std::unique_ptr<SeepsScore> PairDataPoint::compute_seeps(const char *sid, double f,
                                          double o, unixtime ut) {
-   SeepsScore *seeps = nullptr;
+   std::unique_ptr<SeepsScore> seeps;
    int month;
    int day;
    int year;
@@ -403,7 +384,7 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
                          lvl_na[i], hgt_na[i],
                          f_na[i], o_na[i], o_qc_sa[i].c_str(),
                          cpi, wgt_na[i])) {
-               out_pd.set_seeps_score(seeps_mpr[i], i);
+               out_pd.set_seeps_score(seeps_mpr[i].get(), i);
             }
          }
          // Handle gridded data
@@ -587,7 +568,7 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
                       obs_info->is_precipitation();
    int precip_interval = fcst_dpa[0].accum();
 
-   SeepsScore *seeps = nullptr;
+   std::unique_ptr<SeepsScore> seeps;
 
    // When verifying a vertical level forecast against a surface message
    // type, set the observation level value to bad data so that it's not
@@ -701,10 +682,9 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
                seeps = pd[n].compute_seeps(hdr_sid_str, fcst_v, obs_v, hdr_ut);
             }
             else {
-               seeps = nullptr;
+               seeps.reset();
             }
-            pd[n].set_seeps_score(seeps);
-            if (seeps) { delete seeps; seeps = nullptr; }
+            pd[n].set_seeps_score(seeps.get());
 
             if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                mlog << Debug(REJECT_DEBUG_LEVEL)

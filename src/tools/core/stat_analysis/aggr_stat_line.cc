@@ -3020,10 +3020,8 @@ void aggr_seeps_mpr_lines(LineDataFiles &f, STATAnalysisJob &job,
          m[key].pd.lat_na.add(cur.obs_lat);
          m[key].pd.lon_na.add(cur.obs_lon);
 
-         // Allocated here but deallocated by PairDataPoint
-         SeepsScore *score = new SeepsScore;
-         *score = cur.seeps_mpr;
-         m[key].pd.seeps_mpr.emplace_back(score);
+         m[key].pd.seeps_mpr.push_back(
+            std::make_unique<SeepsScore>(cur.seeps_mpr));
 
          //
          // Keep track of the unique header column entries

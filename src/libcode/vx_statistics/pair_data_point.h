@@ -11,6 +11,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include "pair_base.h"
 
 #include "vx_util.h"
@@ -47,7 +48,7 @@ class PairDataPoint : public PairBase {
       // Forecast values
       NumArray f_na;      // Forecast [n_obs]
       NumArray f_lead_na; // Forecast lead time in seconds [n_obs]
-      std::vector<SeepsScore *> seeps_mpr;
+      std::vector<std::unique_ptr<SeepsScore>> seeps_mpr;
       SeepsAggScore seeps_agg;
 
       //////////////////////////////////////////////////////////////////
@@ -83,7 +84,7 @@ class PairDataPoint : public PairBase {
       PairDataPoint subset_pairs_cnt_thresh(const SingleThresh &ft,
                                             const SingleThresh &ot,
                                             const SetLogic type) const;
-      SeepsScore *compute_seeps(const char *, double, double, unixtime);
+      std::unique_ptr<SeepsScore> compute_seeps(const char *, double, double, unixtime);
 
 };
 

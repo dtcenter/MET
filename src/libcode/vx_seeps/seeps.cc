@@ -321,8 +321,8 @@ SeepsClimoRecord *SeepsClimo::create_climo_record(
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
-   SeepsRecord *record = nullptr;
+std::unique_ptr<SeepsRecord> SeepsClimo::get_record(int sid, int month, int hour) {
+   std::unique_ptr<SeepsRecord> record;
    const char *method_name = "SeepsClimo::get_record() -> ";
 
    if (is_seeps_ready()) {
@@ -339,7 +339,7 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
       if (nullptr != climo_record) {
          double p1 = climo_record->p1[month-1];
          if (check_seeps_p1_thresh(p1)) {
-            record = new SeepsRecord;
+            record = std::make_unique<SeepsRecord>();
             record->sid = climo_record->sid;
             record->lat = climo_record->lat;
             record->lon = climo_record->lon;
@@ -391,7 +391,7 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
 double SeepsClimo::get_seeps_category(int sid, double p_fcst, double p_obs,
                                       int month, int hour) {
    double score = bad_data_double;
-   SeepsRecord *record = get_record(sid, month, hour);
+   auto record = get_record(sid, month, hour);
    const char *method_name = "SeepsClimo::get_seeps_category() -> ";
 
    if (nullptr != record) {
@@ -404,7 +404,6 @@ double SeepsClimo::get_seeps_category(int sid, double p_fcst, double p_obs,
            << "ic, jc, score => "
            << ic << " " << jc << " "
            << score << "\n";
-      delete record;
    }
 
    return score;
@@ -412,14 +411,14 @@ double SeepsClimo::get_seeps_category(int sid, double p_fcst, double p_obs,
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsScore *SeepsClimo::get_seeps_score(int sid, double p_fcst, double p_obs,
+std::unique_ptr<SeepsScore> SeepsClimo::get_seeps_score(int sid, double p_fcst, double p_obs,
                                         int month, int hour) {
-   SeepsScore *score = nullptr;
-   SeepsRecord *record = get_record(sid, month, hour);
+   std::unique_ptr<SeepsScore> score;
+   auto record = get_record(sid, month, hour);
    const char *method_name = "SeepsClimo::get_seeps_score() -> ";
 
    if (nullptr != record) {
-      score = new SeepsScore();
+      score = std::make_unique<SeepsScore>();
       score->p1 = record->p1;
       score->p2 = record->p2;
       score->t1 = record->t1;
@@ -439,7 +438,6 @@ SeepsScore *SeepsClimo::get_seeps_score(int sid, double p_fcst, double p_obs,
            << score->obs_cat << " " << score->fcst_cat
            << " " << score->s_idx << " " << score->score
            << "\n";
-      delete record;
    }
 
    return score;
@@ -727,9 +725,9 @@ void SeepsClimoGrid::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsScore *SeepsClimoGrid::get_record(int ix, int iy,
+std::unique_ptr<SeepsScore> SeepsClimoGrid::get_record(int ix, int iy,
                                        double p_fcst, double p_obs) {
-   SeepsScore *seeps_record = nullptr;
+   std::unique_ptr<SeepsScore> seeps_record;
    const char *method_name = "SeepsClimoGrid::get_record() -> ";
 
    if (!is_eq(p_fcst, -9999.0) && !is_eq(p_obs, -9999.0)) {
@@ -742,7 +740,7 @@ SeepsScore *SeepsClimoGrid::get_record(int ix, int iy,
          int jc = (p_fcst>t1_buf[offset])+(p_fcst>t2_buf[offset]);
          double score = get_seeps_score(offset, ic, jc);
 
-         seeps_record = new SeepsScore();
+         seeps_record = std::make_unique<SeepsScore>();
          seeps_record->obs_cat = ic;
          seeps_record->fcst_cat = jc;
          seeps_record->s_idx = (jc*3)+ic;
