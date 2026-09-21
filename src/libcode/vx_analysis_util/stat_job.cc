@@ -1066,7 +1066,7 @@ double STATAnalysisJob::get_column_double(const STATLine &L,
 ////////////////////////////////////////////////////////////////////////
 
 void STATAnalysisJob::parse_job_command(const char *jobstring) {
-   char *line = (char *)nullptr;
+   std::string line;
    char *c    = (char *)nullptr;
    char *lp   = (char *)nullptr;
    char *temp_ptr = (char *)nullptr;
@@ -1088,10 +1088,9 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    // Create a temporary copy of the jobstring for use in parsing
    //
 
-   line = m_strcpy2(jobstring, method_name);
-   if (!line) return;
+   line = jobstring;
 
-   lp = line;
+   lp = line.data();
 
    //
    // Parse the command line entries into a StringArray object
@@ -1215,7 +1214,6 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
             mlog << Error << "\nSTATAnalysisJob::STATAnalysisJob::parse_job_command() -> "
                  << "unrecognized job type specified \"" << jc_array[i]
                  << "\" in job command line: " << jobstring << "\n\n";
-            if(line) { delete [] line; line = (char *) nullptr; }
             throw 1;
          }
          i++;
@@ -1637,7 +1635,6 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
               << "unrecognized switch \"" << jc_array[i]
               << "\" in job command line: "
               << jobstring << "\n\n";
-         if(line) { delete [] line; line = (char *) nullptr; }
          throw 1;
       } // end if
 
@@ -1659,7 +1656,6 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
                  << "no match found for "
                  << (line_type.n() == 1 ? line_type[0] : "header")
                  << " column named \"" << hdr_name[i] << "\"\n\n";
-            if(line) { delete [] line; line = (char *) nullptr; }
             throw 1;
          }
       } // end for
@@ -1673,7 +1669,6 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    //
    // Deallocate memory
    //
-   if(line) { delete [] line; line = (char *) nullptr; }
    lp = (char *) nullptr;
 
    return;
