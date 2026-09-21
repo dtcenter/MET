@@ -36,31 +36,28 @@ class TimeArray {
 
    private:
 
-      void init_from_scratch();
-
       void assign(const TimeArray &);
 
-      unixtime * e;
+      std::vector<unixtime> e;
 
-      int Nelements;
-
-      int Nalloc;
-
-      bool Sorted;
+      bool Sorted = false;
 
    public:
 
-      TimeArray();
+      TimeArray() = default;
      ~TimeArray();
       TimeArray(const TimeArray &);
+      TimeArray(TimeArray &&) noexcept;
+
       TimeArray & operator=(const TimeArray &);
+      TimeArray & operator=(TimeArray &&) noexcept;
       bool operator==(const TimeArray &) const;
 
       void clear();
 
       void erase();
 
-      void extend(int, bool exact = true);
+      void extend(int);
 
       void dump(std::ostream &, int depth = 0) const;
 
@@ -95,8 +92,8 @@ class TimeArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int TimeArray::n_elements() const { return Nelements; }
-inline int TimeArray::n()          const { return Nelements; }
+inline int TimeArray::n_elements() const { return (int) e.size(); }
+inline int TimeArray::n()          const { return (int) e.size(); }
 
 
 ////////////////////////////////////////////////////////////////////////

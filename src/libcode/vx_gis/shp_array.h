@@ -65,11 +65,39 @@ class Shp_Array {
 
       Shp_Array(const Shp_Array <T> & _a) { init_from_scratch();  assign(_a); }
 
+      Shp_Array(Shp_Array <T> && _a) noexcept
+         : Nelements(_a.Nelements), Nalloc(_a.Nalloc), AllocInc(_a.AllocInc), E(_a.E) {
+
+         _a.E = (T *) nullptr;
+         _a.Nelements = 0;
+         _a.Nalloc = 0;
+
+      }
+
       Shp_Array<T>  & operator=(const Shp_Array <T> & _a) {
 
          if ( this == &_a )  return *this;
 
          assign(_a);
+
+         return *this;
+
+      }
+
+      Shp_Array<T>  & operator=(Shp_Array <T> && _a) noexcept {
+
+         if ( this == &_a )  return *this;
+
+         clear();
+
+         Nelements = _a.Nelements;
+         Nalloc    = _a.Nalloc;
+         AllocInc  = _a.AllocInc;
+         E         = _a.E;
+
+         _a.E = (T *) nullptr;
+         _a.Nelements = 0;
+         _a.Nalloc = 0;
 
          return *this;
 

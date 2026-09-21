@@ -913,21 +913,131 @@ VxPairBase::~VxPairBase() {
 
 ////////////////////////////////////////////////////////////////////////
 
-VxPairBase::VxPairBase(const VxPairBase &vx_pb) {
+VxPairBase::VxPairBase(const VxPairBase &v) {
 
    init_from_scratch();
 
-   assign(vx_pb);
+   assign(v);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-VxPairBase & VxPairBase::operator=(const VxPairBase &vx_pb) {
+VxPairBase::VxPairBase(VxPairBase &&v) noexcept
+   : fcst_info(v.fcst_info),
+     obs_info(v.obs_info),
+     fclm_info(v.fclm_info),
+     oclm_info(v.oclm_info),
+     desc(move(v.desc)),
+     interp_thresh(v.interp_thresh),
+     fcst_dpa(move(v.fcst_dpa)),
+     fcmn_dpa(move(v.fcmn_dpa)),
+     fcsd_dpa(move(v.fcsd_dpa)),
+     ocmn_dpa(move(v.ocmn_dpa)),
+     ocsd_dpa(move(v.ocsd_dpa)),
+     fcst_ut(v.fcst_ut),
+     beg_ut(v.beg_ut),
+     end_ut(v.end_ut),
+     sid_inc_filt(move(v.sid_inc_filt)),
+     sid_exc_filt(move(v.sid_exc_filt)),
+     obs_qty_inc_filt(move(v.obs_qty_inc_filt)),
+     obs_qty_exc_filt(move(v.obs_qty_exc_filt)),
+     mpr_thr_inc_map(move(v.mpr_thr_inc_map)),
+     mpr_str_inc_map(move(v.mpr_str_inc_map)),
+     mpr_str_exc_map(move(v.mpr_str_exc_map)),
+     msg_typ_sfc(move(v.msg_typ_sfc)),
+     msg_typ_lnd(move(v.msg_typ_lnd)),
+     msg_typ_wtr(move(v.msg_typ_wtr)),
+     msg_typ_lapsert(move(v.msg_typ_lapsert)),
+     msg_typ_mslagl(move(v.msg_typ_mslagl)),
+     sfc_info(move(v.sfc_info)),
+     n_msg_typ(v.n_msg_typ),
+     n_mask(v.n_mask),
+     n_interp(v.n_interp),
+     n_vx(v.n_vx),
+     pb_ptr(move(v.pb_ptr)),
+     n_try(v.n_try),
+     rej_sid(v.rej_sid), rej_var(v.rej_var), rej_vld(v.rej_vld),
+     rej_obs(v.rej_obs), rej_grd(v.rej_grd), rej_topo(v.rej_topo),
+     rej_lvl(v.rej_lvl), rej_qty(v.rej_qty),
+     rej_typ(move(v.rej_typ)), rej_mask(move(v.rej_mask)),
+     rej_fcst(move(v.rej_fcst)), rej_cmn(move(v.rej_cmn)),
+     rej_csd(move(v.rej_csd)), rej_mpr(move(v.rej_mpr)),
+     rej_dup(move(v.rej_dup))
+{
+   v.fcst_info = nullptr;
+   v.obs_info  = nullptr;
+   v.fclm_info = nullptr;
+   v.oclm_info = nullptr;
+}
 
-   if(this == &vx_pb) return *this;
+////////////////////////////////////////////////////////////////////////
 
-   assign(vx_pb);
+VxPairBase & VxPairBase::operator=(const VxPairBase &v) {
 
+   if(this == &v) return *this;
+
+   assign(v);
+
+   return *this;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+VxPairBase & VxPairBase::operator=(VxPairBase &&v) noexcept {
+   if (this != &v) {
+      delete fcst_info;  delete obs_info;
+      delete fclm_info;  delete oclm_info;
+
+      fcst_info = v.fcst_info;   v.fcst_info = nullptr;
+      obs_info  = v.obs_info;    v.obs_info  = nullptr;
+      fclm_info = v.fclm_info;   v.fclm_info = nullptr;
+      oclm_info = v.oclm_info;   v.oclm_info = nullptr;
+
+      desc = move(v.desc);
+      interp_thresh = v.interp_thresh;
+
+      fcst_dpa = move(v.fcst_dpa);
+      fcmn_dpa = move(v.fcmn_dpa);
+      fcsd_dpa = move(v.fcsd_dpa);
+      ocmn_dpa = move(v.ocmn_dpa);
+      ocsd_dpa = move(v.ocsd_dpa);
+
+      fcst_ut = v.fcst_ut;
+      beg_ut = v.beg_ut;
+      end_ut = v.end_ut;
+
+      sid_inc_filt = move(v.sid_inc_filt);
+      sid_exc_filt = move(v.sid_exc_filt);
+      obs_qty_inc_filt = move(v.obs_qty_inc_filt);
+      obs_qty_exc_filt = move(v.obs_qty_exc_filt);
+
+      mpr_thr_inc_map = move(v.mpr_thr_inc_map);
+      mpr_str_inc_map = move(v.mpr_str_inc_map);
+      mpr_str_exc_map = move(v.mpr_str_exc_map);
+
+      msg_typ_sfc = move(v.msg_typ_sfc);
+      msg_typ_lnd = move(v.msg_typ_lnd);
+      msg_typ_wtr = move(v.msg_typ_wtr);
+      msg_typ_lapsert = move(v.msg_typ_lapsert);
+      msg_typ_mslagl = move(v.msg_typ_mslagl);
+
+      sfc_info = move(v.sfc_info);
+
+      n_msg_typ = v.n_msg_typ;  n_mask = v.n_mask;
+      n_interp  = v.n_interp;   n_vx   = v.n_vx;
+
+      pb_ptr = move(v.pb_ptr);
+
+      n_try = v.n_try;
+      rej_sid = v.rej_sid;  rej_var = v.rej_var;  rej_vld = v.rej_vld;
+      rej_obs = v.rej_obs;  rej_grd = v.rej_grd;  rej_topo = v.rej_topo;
+      rej_lvl = v.rej_lvl;  rej_qty = v.rej_qty;
+
+      rej_typ  = move(v.rej_typ);   rej_mask = move(v.rej_mask);
+      rej_fcst = move(v.rej_fcst);  rej_cmn  = move(v.rej_cmn);
+      rej_csd  = move(v.rej_csd);   rej_mpr  = move(v.rej_mpr);
+      rej_dup  = move(v.rej_dup);
+   }
    return *this;
 }
 

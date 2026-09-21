@@ -25,13 +25,14 @@ Tagged versions of the MET Docker image are available in the
 [dtcenter/met](https://hub.docker.com/repository/docker/dtcenter/met-base)
 DockerHub repository.  
 ```
-docker build -t dtcenter/met:${TAG_NAME} --build-arg SOURCE_BRANCH=${BRANCH_NAME} internal/scripts/docker
+docker build -t dtcenter/met:${TAG_NAME} --build-arg SOURCE_BRANCH=${BRANCH_NAME} --build-arg MET_BASE_TAG=${MET_BASE_TAG} --build-arg internal/scripts/docker
 docker push dtcenter/met:${TAG_NAME}
 ```
 
 where:
 * `${TAG_NAME}` is the name of the DockerHub tag to create
 * `${BRANCH_NAME}` is the MET branch to checkout
+* `${MET_BASE_TAG}` is the version of [dtcenter/met-base-unit-test](https://hub.docker.com/repository/docker/dtcenter/met-base-unit-test) to be used
 
 2. The second example below shows how to manually build a MET Docker image
 using a specified branch or tag from local source code and using a local
@@ -43,26 +44,6 @@ file for more information on manually creating the Docker image for the base
 compilation environment.) This example uses `Dockerfile.copy`, which compiles
 MET using the specified branch or tag from local source code, sets a working
 directory, and deletes the MET source for tagged releases matching "v"*.
-```
-docker build -t dtcenter/met:${TAG_NAME} --build-arg SOURCE_BRANCH=${BRANCH_NAME} -f internal/scripts/docker/Dockerfile.copy .
-docker push dtcenter/met:${TAG_NAME}
-```
-
-where:
-* `${TAG_NAME}` is the name of the DockerHub tag to create
-* `${BRANCH_NAME}` is the identifier to use for $MET_GIT_NAME inside image
-
-3. The third example below shows how to manually build a MET Docker image
-using a specified branch or tag from local source code and using a local
-Docker image for the base compilation environment along with the additional
-packages required for running the MET unit tests from the
-[METbaseimage](https://github.com/dtcenter/METbaseimage/)
-GitHub repository. (See the
-[METbaseimage README.md](https://github.com/dtcenter/METbaseimage/blob/main/README.md)
-file for more information on manually creating the Docker image with the base
-compilation environment and with the additional packages required for running
-the MET unit tests.) This example also uses `Dockerfile.copy`, which is
-described above.
 ```
 docker build -t dtcenter/met:${TAG_NAME} --build-arg SOURCE_BRANCH=${BRANCH_NAME} --build-arg MET_BASE_TAG=${MET_BASE_TAG} -f internal/scripts/docker/Dockerfile.copy .
 docker push dtcenter/met:${TAG_NAME}

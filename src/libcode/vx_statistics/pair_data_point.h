@@ -105,7 +105,9 @@ class VxPairDataPoint : public VxPairBase {
       VxPairDataPoint();
       ~VxPairDataPoint();
       VxPairDataPoint(const VxPairDataPoint &);
+      VxPairDataPoint(VxPairDataPoint &&) noexcept;
       VxPairDataPoint & operator=(const VxPairDataPoint &);
+      VxPairDataPoint & operator=(VxPairDataPoint &&) noexcept;
 
       //////////////////////////////////////////////////////////////////
       //

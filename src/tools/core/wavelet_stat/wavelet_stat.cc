@@ -91,7 +91,6 @@ static void setup_ps_file   (unixtime, int);
 static void build_outfile_name(unixtime, int, const char *,
                                ConcatString &);
 static double get_fill_value(const DataPlane &, int);
-static void fill_bad_data(DataPlane &, double);
 static void pad_field(DataPlane &, double);
 static void get_tile(const DataPlane &, const DataPlane &, int, int,
                      NumArray &, NumArray &);
@@ -405,10 +404,10 @@ static void process_scores() {
 
       // Replace any bad data in the fields with a fill value
       mlog << Debug(2) << "Forecast field: ";
-      fill_bad_data(fcst_dp_fill, fcst_fill);
+      fcst_dp_fill.replace_bad_data(fcst_fill);
 
       mlog << Debug(2) << "Observation field: ";
-      fill_bad_data(obs_dp_fill,  obs_fill);
+      obs_dp_fill.replace_bad_data(obs_fill);
 
       // Pad the fields out to the nearest power of two if requested
       if(conf_info.grid_decomp_flag == GridDecompType::Pad) {
@@ -769,65 +768,11 @@ static double get_fill_value(const DataPlane &dp, int i_vx) {
    // Otherwise, fill them with the mean of the valid data.
    //
    else {
-      int count = 0;
-      double sum = 0.0;
-      int nxy = dp.nxy();
-
-#pragma omp parallel default(none) \
-      shared(nxy, dp, sum, count)
-      {
-
-#pragma omp for schedule(static) \
-                reduction(+: sum, count)
-         for(int i=0; i<nxy; i++) {
-            double v = dp.data()[i];
-            if(!is_bad_data(v)) {
-               sum += v;
-               count++;
-            }
-         } // end for i
-      } // End omp parallel 
-
-      if(count > 0) fill_val = sum/count;
-      else          fill_val = 0.0;
+      fill_val = dp.mean();
+      if(is_bad_data(fill_val)) fill_val = 0.0;
    }
 
    return fill_val;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-static void fill_bad_data(DataPlane &dp, double fill_val) {
-
-   //
-   // Replace any bad data values with the fill value
-   //
-   int count = 0;
-   int nxy = dp.nxy();
-
-#pragma omp parallel default(none) \
-   shared(nxy, dp, fill_val, count)
-   {
-
-#pragma omp for schedule(static) \
-                reduction(+: count)
-      for(int i=0; i<nxy; i++ ) {
-         double v = dp.data()[i];
-         if(is_bad_data(v)) {
-            dp.buf()[i] = fill_val;
-            count++;
-         }
-      } // end for i 
-   } // Emd omp parallel
-
-   if(count > 0) {
-      mlog << Debug(2) << "Replaced " << count
-           << " bad data values out of " << nxy
-           << " points with fill value of "
-           << fill_val << ".\n";
-   }
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

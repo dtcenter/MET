@@ -434,7 +434,6 @@ map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict,
 ///////////////////////////////////////////////////////////////////////////////
 
 map<STATLineType,StringArray> parse_conf_output_stats(Dictionary *dict) {
-   Dictionary *out_dict = (Dictionary *) nullptr;
    map<STATLineType,StringArray> output_map;
    STATLineType line_type;
    StringArray sa;
@@ -446,7 +445,7 @@ map<STATLineType,StringArray> parse_conf_output_stats(Dictionary *dict) {
    }
 
    // Get the output flag dictionary
-   out_dict = dict->lookup_dictionary(conf_key_output_stats);
+   auto out_dict = dict->lookup_dictionary(conf_key_output_stats);
 
    // Loop over the output flag dictionary entries
    for(int i=0; i<out_dict->n_entries(); i++) {
@@ -737,6 +736,19 @@ StringArray parse_sid_mask_as_list(const ConcatString &mask_sid_str) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+MaskLatLon::MaskLatLon(const MaskLatLon &a) {
+   name = a.name;
+   lat_thresh = a.lat_thresh;
+   lon_thresh = a.lon_thresh;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+MaskLatLon::MaskLatLon(MaskLatLon &&a) noexcept
+   : name(a.name), lat_thresh(a.lat_thresh), lon_thresh(a.lon_thresh) { }
+
+///////////////////////////////////////////////////////////////////////////////
+
 void MaskLatLon::clear() {
    name.clear();
    lat_thresh.clear();
@@ -745,11 +757,25 @@ void MaskLatLon::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-MaskLatLon &MaskLatLon::operator=(const MaskLatLon &a) noexcept {
+MaskLatLon & MaskLatLon::operator=(const MaskLatLon &a) {
    if(this != &a) {
       name = a.name;
       lat_thresh = a.lat_thresh;
       lon_thresh = a.lon_thresh;
+   }
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+MaskLatLon & MaskLatLon::operator=(MaskLatLon &&a) noexcept {
+   if(this != &a) {
+      name = a.name;
+      lat_thresh = a.lat_thresh;
+      lon_thresh = a.lon_thresh;
+      a.name.clear();
+      a.lat_thresh.clear();
+      a.lon_thresh.clear();
    }
    return *this;
 }
@@ -1008,7 +1034,6 @@ NumArray parse_conf_eclv_points(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
-   Dictionary *ts_dict = (Dictionary *) nullptr;
    TimeSummaryInfo info;
    bool is_correct_type = false;
 
@@ -1019,7 +1044,7 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
    }
 
    // Conf: time_summary
-   ts_dict = dict->lookup_dictionary(conf_key_time_summary);
+   auto ts_dict = dict->lookup_dictionary(conf_key_time_summary);
 
    // Conf: flag
    info.flag = ts_dict->lookup_bool(conf_key_flag);
@@ -1162,7 +1187,6 @@ void parse_add_conf_key_values_map(
 
 map<ConcatString,ConcatString> parse_conf_key_value_map(
       Dictionary *dict, const char *conf_key_map_name, const char *caller) {
-   Dictionary *map_dict = (Dictionary *) nullptr;
    map<ConcatString,ConcatString> m;
    ConcatString key, val;
    const char *method_name = (nullptr != caller) ? caller : "parse_conf_key_value_map() -> ";
@@ -1173,7 +1197,7 @@ map<ConcatString,ConcatString> parse_conf_key_value_map(
    }
 
    // Conf: map_name: message_type_map, obs_var_map, etc
-   map_dict = dict->lookup_array(conf_key_map_name);
+   auto map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
    for(int i=0; i<map_dict->n_entries(); i++) {
@@ -1256,7 +1280,6 @@ map<ConcatString,StringArray> parse_conf_obs_to_qc_map(Dictionary *dict) {
 
 map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
       Dictionary *dict, const char *conf_key_map_name, const char *caller) {
-   Dictionary *map_dict = (Dictionary *) nullptr;
    StringArray sa;
    ConcatString key;
    UserFunc_1Arg fx;
@@ -1269,7 +1292,7 @@ map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
    }
 
    // Conf: diag_convert_map
-   map_dict = dict->lookup_array(conf_key_map_name);
+   auto map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
    for(int i=0; i<map_dict->n_entries(); i++) {
@@ -1420,8 +1443,31 @@ void TimeSummaryInfo::clear() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//
+// Code for class BootInfo
+//
+///////////////////////////////////////////////////////////////////////////////
 
-BootInfo & BootInfo::operator=(const BootInfo &a) noexcept {
+BootInfo::BootInfo(BootInfo &&a) noexcept
+   : interval(a.interval), rep_prop(a.rep_prop), n_rep(a.n_rep),
+     rng(a.rng), seed(a.seed) { }
+
+///////////////////////////////////////////////////////////////////////////////
+
+BootInfo & BootInfo::operator=(const BootInfo &a) {
+   if(this != &a) {
+     interval = a.interval;
+     rep_prop = a.rep_prop;
+     n_rep = a.n_rep;
+     rng = a.rng;
+     seed = a.seed;
+   }
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+BootInfo & BootInfo::operator=(BootInfo &&a) noexcept {
    if(this != &a) {
      interval = a.interval;
      rep_prop = a.rep_prop;
@@ -1792,8 +1838,7 @@ InterpInfo & InterpInfo::operator=(const InterpInfo &a) noexcept {
 ///////////////////////////////////////////////////////////////////////////////
 
 InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
-   Dictionary *interp_dict = (Dictionary *) nullptr;
-   Dictionary *type_dict = (Dictionary *) nullptr;
+   Dictionary *type_dict = nullptr;
    InterpInfo info;
    NumArray mthd_na;
    NumArray wdth_na;
@@ -1811,7 +1856,7 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
    }
 
    // Conf: interp
-   interp_dict = dict->lookup_dictionary(conf_key);
+   auto interp_dict = dict->lookup_dictionary(conf_key);
 
    // Conf: field - may be missing
    v = interp_dict->lookup_int(conf_key_field, false);
@@ -1935,6 +1980,26 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//
+// Code for class ClimoCDFInfo
+//
+///////////////////////////////////////////////////////////////////////////////
+
+ClimoCDFInfo::ClimoCDFInfo(const ClimoCDFInfo &a) {
+   flag = a.flag;
+   n_bin = a.n_bin;
+   cdf_ta = a.cdf_ta;
+   write_bins = a.write_bins;
+   direct_prob = a.direct_prob;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ClimoCDFInfo::ClimoCDFInfo(ClimoCDFInfo &&a) noexcept
+   : flag(a.flag), n_bin(a.n_bin), cdf_ta(a.cdf_ta),
+     write_bins(a.write_bins), direct_prob(a.direct_prob) { }
+
+///////////////////////////////////////////////////////////////////////////////
 
 void ClimoCDFInfo::clear() {
    flag = false;
@@ -2004,7 +2069,7 @@ void ClimoCDFInfo::set_cdf_ta(int n_bin, bool &center) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ClimoCDFInfo &ClimoCDFInfo::operator=(const ClimoCDFInfo &a) noexcept {
+ClimoCDFInfo &ClimoCDFInfo::operator=(const ClimoCDFInfo &a) {
    if(this != &a) {
       flag = a.flag;
       n_bin = a.n_bin;
@@ -2015,11 +2080,26 @@ ClimoCDFInfo &ClimoCDFInfo::operator=(const ClimoCDFInfo &a) noexcept {
    return *this;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+ClimoCDFInfo &ClimoCDFInfo::operator=(ClimoCDFInfo &&a) noexcept {
+   if(this != &a) {
+      flag = a.flag;
+      a.flag = false;
+      n_bin = a.n_bin;
+      a.n_bin = 0;
+      cdf_ta = move(a.cdf_ta);
+      write_bins = a.write_bins;
+      a.write_bins = false;
+      direct_prob = a.direct_prob;
+      a.direct_prob = false;
+   }
+   return *this;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
-   Dictionary *cdf_dict = (Dictionary *) nullptr;
    ClimoCDFInfo info;
    NumArray bins;
    bool center;
@@ -2032,7 +2112,7 @@ ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
    }
 
    // Conf: climo_cdf
-   cdf_dict = dict->lookup_dictionary(conf_key_climo_cdf);
+   auto cdf_dict = dict->lookup_dictionary(conf_key_climo_cdf);
 
    // Conf: cdf_bins
    bins = cdf_dict->lookup_num_array(conf_key_cdf_bins);
@@ -2122,7 +2202,6 @@ NbrhdInfo &NbrhdInfo::operator=(const NbrhdInfo &a) noexcept {
 ///////////////////////////////////////////////////////////////////////////////
 
 NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
-   Dictionary *nbrhd_dict = (Dictionary *) nullptr;
    NbrhdInfo info;
    int i;
    int v;
@@ -2134,7 +2213,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
    }
 
    // Conf: nbrhd
-   nbrhd_dict = dict->lookup_dictionary(conf_key);
+   auto nbrhd_dict = dict->lookup_dictionary(conf_key);
 
    // Conf: field - may be missing
 
@@ -2355,7 +2434,6 @@ HiRAInfo &HiRAInfo::operator=(const HiRAInfo &a) noexcept {
 ///////////////////////////////////////////////////////////////////////////////
 
 HiRAInfo parse_conf_hira(Dictionary *dict) {
-   Dictionary *hira_dict = (Dictionary *) nullptr;
    HiRAInfo info;
    int v;
 
@@ -2366,7 +2444,7 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
    }
 
    // Conf: hira
-   hira_dict = dict->lookup_dictionary(conf_key_hira);
+   auto hira_dict = dict->lookup_dictionary(conf_key_hira);
 
    // Conf: flag
    info.flag = hira_dict->lookup_bool(conf_key_flag);
@@ -3148,7 +3226,7 @@ void check_mctc_thresh(const ThreshArray &ta) {
 ///////////////////////////////////////////////////////////////////////////////
 
 const char * statlinetype_to_string(const STATLineType t) {
-   const char *s = (const char *) nullptr;
+   const char *s = nullptr;
 
    switch(t) {
       case STATLineType::sl1l2:      s = stat_sl1l2_str;     break;
@@ -3269,7 +3347,7 @@ STATLineType string_to_statlinetype(const char *s) {
 ///////////////////////////////////////////////////////////////////////////////
 
 const char * bootintervaltype_to_string(const BootIntervalType t) {
-   auto s = (const char *) nullptr;
+   const char *s = nullptr;
 
    switch(t) {
       case BootIntervalType::BCA:    s = conf_val_bca;     break;
@@ -3911,6 +3989,95 @@ NormalizeType parse_conf_normalize(Dictionary *dict) {
    }
 
    return t;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+MissingDataType int_to_missingdatatype(int v) {
+   MissingDataType t = MissingDataType::None;
+
+   // Convert integer to enumerated MissingDataType
+        if(v == conf_const.lookup_int(conf_val_none))  t = MissingDataType::None;
+   else if(v == conf_const.lookup_int(conf_val_mean))  t = MissingDataType::Mean;
+   else if(v == conf_const.lookup_int(conf_val_value)) t = MissingDataType::Value;
+   else {
+      mlog << Error << "\nint_to_missingdatatype() -> "
+           << "Unexpected value of " << v << ".\n\n";
+      exit(1);
+   }
+
+   return t;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString missingdatatype_to_string(MissingDataType type) {
+   ConcatString s;
+
+   // Convert enumerated MissingDataType to string
+   switch(type) {
+      case MissingDataType::None:  s = conf_val_none;  break;
+      case MissingDataType::Mean:  s = conf_val_mean;  break;
+      case MissingDataType::Value: s = conf_val_value; break;
+      default:
+         mlog << Error << "\nmissingdatatype_to_string() -> "
+              << "Unexpected MissingDataType value of "
+              << enum_class_as_int(type) << ".\n\n";
+         exit(1);
+   }
+
+   return s;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Code for PowerSpectrumInfo struct
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void PowerSpectrumInfo::clear() {
+   missing_flag = MissingDataType::None;
+   missing_value = bad_data_double;
+   vld_thresh = bad_data_double;
+   skip = false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PowerSpectrumInfo &PowerSpectrumInfo::operator=(const PowerSpectrumInfo &a) noexcept {
+   if(this != &a) {
+      missing_flag = a.missing_flag;
+      missing_value = a.missing_value;
+      vld_thresh = a.vld_thresh;
+      skip = a.skip;
+   }
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PowerSpectrumInfo parse_conf_power_spectrum(Dictionary *dict) {
+   PowerSpectrumInfo info;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_power_spectrum() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: power_spectrum
+   auto ps_dict = dict->lookup_dictionary(conf_key_power_spectrum);
+
+   // Conf: missing_flag
+   info.missing_flag = int_to_missingdatatype(ps_dict->lookup_int(conf_key_missing_flag));
+
+   // Conf: missing_value
+   info.missing_value = ps_dict->lookup_double(conf_key_missing_value);
+
+   // Conf: vld_thresh
+   info.vld_thresh = ps_dict->lookup_double(conf_key_vld_thresh);
+
+   return info;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

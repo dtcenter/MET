@@ -146,6 +146,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
             ret_ok = (cmd_return.returncode == test['retval'])
             if ret_ok:
                 out_ok = True
+                result = None
 
                 for filepath in test['out_pnc']:
                     result = subprocess.run([mpnc, '-v', filepath], 
@@ -173,7 +174,10 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
                             break
                     except FileNotFoundError:
                         cmd_outs += (f"\nERROR: stat file missing {filepath}\n")
-                        logger.debug(result.stdout)
+                        if result:
+                            logger.debug(result.stdout)
+                        else:
+                            logger.debug(f"No result object, stat file missing {filepath}")
                         out_ok = False
                         break
                     # check stat file has non-header lines

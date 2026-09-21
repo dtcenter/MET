@@ -154,7 +154,7 @@ seeps_p1_thresh = NA;
 ugrid_dataset = "mpas";
 //ugrid_max_distance_km = 30;
 //ugrid_map_config = "";
-ugrid_coordinates_file = "${MET_TEST_INPUT}/ugrid_data/mpas/static.40962_reduced.nc";
+ugrid_coordinates_file = "${MET_TEST_INPUT}/ugrid_data/mpas/static.2025-05-17.9506.OK_reduced.nc";
 
 ////////////////////////////////////////////////////////////////////////////////
 
