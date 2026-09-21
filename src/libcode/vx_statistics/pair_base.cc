@@ -923,10 +923,10 @@ VxPairBase::VxPairBase(const VxPairBase &v) {
 ////////////////////////////////////////////////////////////////////////
 
 VxPairBase::VxPairBase(VxPairBase &&v) noexcept
-   : fcst_info(v.fcst_info),
-     obs_info(v.obs_info),
-     fclm_info(v.fclm_info),
-     oclm_info(v.oclm_info),
+   : fcst_info(move(v.fcst_info)),
+     obs_info(move(v.obs_info)),
+     fclm_info(move(v.fclm_info)),
+     oclm_info(move(v.oclm_info)),
      desc(move(v.desc)),
      interp_thresh(v.interp_thresh),
      fcst_dpa(move(v.fcst_dpa)),
@@ -964,10 +964,6 @@ VxPairBase::VxPairBase(VxPairBase &&v) noexcept
      rej_csd(move(v.rej_csd)), rej_mpr(move(v.rej_mpr)),
      rej_dup(move(v.rej_dup))
 {
-   v.fcst_info = nullptr;
-   v.obs_info  = nullptr;
-   v.fclm_info = nullptr;
-   v.oclm_info = nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -985,13 +981,10 @@ VxPairBase & VxPairBase::operator=(const VxPairBase &v) {
 
 VxPairBase & VxPairBase::operator=(VxPairBase &&v) noexcept {
    if (this != &v) {
-      delete fcst_info;  delete obs_info;
-      delete fclm_info;  delete oclm_info;
-
-      fcst_info = v.fcst_info;   v.fcst_info = nullptr;
-      obs_info  = v.obs_info;    v.obs_info  = nullptr;
-      fclm_info = v.fclm_info;   v.fclm_info = nullptr;
-      oclm_info = v.oclm_info;   v.oclm_info = nullptr;
+      fcst_info = move(v.fcst_info);
+      obs_info  = move(v.obs_info);
+      fclm_info = move(v.fclm_info);
+      oclm_info = move(v.oclm_info);
 
       desc = move(v.desc);
       interp_thresh = v.interp_thresh;
@@ -1045,12 +1038,6 @@ VxPairBase & VxPairBase::operator=(VxPairBase &&v) noexcept {
 
 void VxPairBase::init_from_scratch() {
 
-   fcst_info = (VarInfo *) nullptr;
-   obs_info  = (VarInfo *) nullptr;
-
-   fclm_info = (VarInfo *) nullptr;
-   oclm_info = (VarInfo *) nullptr;
-
    clear();
 
    return;
@@ -1060,11 +1047,11 @@ void VxPairBase::init_from_scratch() {
 
 void VxPairBase::clear() {
 
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) nullptr; }
-   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) nullptr; }
+   fcst_info.reset();
+   obs_info.reset();
 
-   if(fclm_info) { delete fclm_info; fclm_info = (VarInfo *) nullptr; }
-   if(oclm_info) { delete oclm_info; oclm_info = (VarInfo *) nullptr; }
+   fclm_info.reset();
+   oclm_info.reset();
 
    desc.clear();
 
@@ -1131,11 +1118,11 @@ void VxPairBase::assign(const VxPairBase &vx_pb) {
 
    clear();
 
-   set_fcst_info(vx_pb.fcst_info);
-   set_obs_info(vx_pb.obs_info);
+   set_fcst_info(vx_pb.fcst_info.get());
+   set_obs_info(vx_pb.obs_info.get());
 
-   set_fcst_climo_info(vx_pb.fclm_info);
-   set_obs_climo_info(vx_pb.oclm_info);
+   set_fcst_climo_info(vx_pb.fclm_info.get());
+   set_obs_climo_info(vx_pb.oclm_info.get());
 
    desc = vx_pb.desc;
 
@@ -1193,16 +1180,10 @@ void VxPairBase::assign(const VxPairBase &vx_pb) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::copy_var_info(const VarInfo *info, VarInfo *&copy) {
-
-   // Deallocate, if necessary
-   if(copy) { delete copy; copy = (VarInfo *) nullptr; }
+void VxPairBase::copy_var_info(const VarInfo *info, std::unique_ptr<VarInfo> &copy) {
 
    // Perform a deep copy
-   // NOTE: VxPairBase still owns its VarInfo members as raw pointers and
-   // deletes them above, so take ownership out of the unique_ptr here. Those
-   // members become unique_ptr in their own pass.
-   copy = VarInfoFactory::new_var_info(info->file_type()).release();
+   copy = VarInfoFactory::new_var_info(info->file_type());
    *copy = *info;
 
    return;
@@ -1732,7 +1713,7 @@ bool VxPairBase::is_keeper_var(
         const char *pnt_obs_str, const char *var_name, int grib_code) {
    bool keep = true;
 
-   const auto obs_info_grib = (VarInfoGrib *) obs_info;
+   const auto obs_info_grib = (VarInfoGrib *) obs_info.get();
 
    // Check for matching variable name or GRIB code
    if((var_name != nullptr) && (m_strlen(var_name) > 0)) {
@@ -1824,7 +1805,7 @@ bool VxPairBase::is_keeper_obs(
    bool keep = true;
 
    // Apply observation processing logic
-   obs_v = pb_ptr[0]->process_obs(obs_info, obs_v);
+   obs_v = pb_ptr[0]->process_obs(obs_info.get(), obs_v);
 
    // Check whether the observation value contains valid data
    if(is_bad_data(obs_v)) {

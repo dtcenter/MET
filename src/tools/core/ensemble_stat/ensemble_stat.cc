@@ -872,7 +872,7 @@ static void process_point_vx() {
 
       EnsVarInfo *ens_info  = conf_info.vx_opt[i].vx_pd.ens_info;
       VarInfo    *fcst_info = ens_info->get_var_info();
-      VarInfo    *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
+      VarInfo    *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info.get();
       bool print_level_mismatch_warning = true;
 
       // Initialize
@@ -1217,7 +1217,7 @@ static void process_point_scores() {
    for(int i=0; i<conf_info.get_n_vx(); i++) {
 
       VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.ens_info->get_var_info();
-      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
+      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info.get();
 
       // Log a summary of any observation error table lookup failures
       conf_info.vx_opt[i].vx_pd.log_obs_error_lookup_summary();
@@ -1343,7 +1343,7 @@ static void process_grid_vx() {
    for(int i=0; i<conf_info.get_n_vx(); i++) {
 
       VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.ens_info->get_var_info();
-      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
+      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info.get();
 
       // Initialize
       emn_dp.clear();
@@ -1531,7 +1531,7 @@ static void process_grid_vx() {
       for(int j=0; j<grid_obs_file_list.n(); j++) {
 
          found = get_data_plane(grid_obs_file_list[j].c_str(), otype,
-                                conf_info.vx_opt[i].vx_pd.obs_info,
+                                conf_info.vx_opt[i].vx_pd.obs_info.get(),
                                 obs_dp, true);
 
          // If found, break out of the loop

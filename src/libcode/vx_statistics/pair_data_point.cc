@@ -479,9 +479,6 @@ VxPairDataPoint & VxPairDataPoint::operator=(VxPairDataPoint &&vx_pd) noexcept {
 
 void VxPairDataPoint::init_from_scratch() {
 
-   fcst_info = (VarInfo *) nullptr;
-   obs_info  = (VarInfo *) nullptr;
-
    VxPairBase::init_from_scratch();
 
    clear();
@@ -494,9 +491,6 @@ void VxPairDataPoint::init_from_scratch() {
 void VxPairDataPoint::clear() {
 
    VxPairBase::clear();
-
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) nullptr; }
-   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) nullptr; }
 
    pd.clear();
 

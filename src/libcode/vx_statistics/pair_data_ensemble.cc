@@ -1015,7 +1015,6 @@ VxPairDataEnsemble & VxPairDataEnsemble::operator=(const VxPairDataEnsemble &vx_
 void VxPairDataEnsemble::init_from_scratch() {
 
    ens_info = (EnsVarInfo *) nullptr;
-   obs_info = (VarInfo *)    nullptr;
 
    VxPairBase::init_from_scratch();
 
@@ -1031,7 +1030,6 @@ void VxPairDataEnsemble::clear() {
    VxPairBase::clear();
 
    if(ens_info) { delete ens_info; ens_info = (EnsVarInfo *) nullptr; }
-   if(obs_info) { delete obs_info; obs_info = (VarInfo *)    nullptr; }
 
    obs_error_info = (ObsErrorInfo *) nullptr;
 
@@ -1052,7 +1050,7 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
    VxPairBase::assign(vx_pd);
 
    set_ens_info(vx_pd.ens_info);
-   set_obs_info(vx_pd.obs_info);
+   set_obs_info(vx_pd.obs_info.get());
 
    obs_error_info = vx_pd.obs_error_info;
 

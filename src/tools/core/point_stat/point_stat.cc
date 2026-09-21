@@ -624,8 +624,8 @@ static void process_fcst_climo_files() {
    // the forecast and climatological fields for verification
    for(int i=0; i<conf_info.get_n_vx(); i++) {
 
-      VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.fcst_info;
-      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
+      VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.fcst_info.get();
+      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info.get();
 
       // Read the gridded data from the input forecast file
       n_fcst = fcst_mtddf->data_plane_array(*fcst_info, fcst_dpa);

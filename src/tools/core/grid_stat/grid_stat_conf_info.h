@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <iostream>
 #include <vector>
 
@@ -139,11 +140,13 @@ class GridStatVxOpt {
 
       GridStatVxOpt();
      ~GridStatVxOpt();
+      GridStatVxOpt(GridStatVxOpt &&) noexcept = default;
+      GridStatVxOpt & operator=(GridStatVxOpt &&) noexcept = default;
 
       //////////////////////////////////////////////////////////////////
 
-      VarInfo *        fcst_info;        // fcst VarInfo pointer (allocated)
-      VarInfo *        obs_info;         // obs VarInfo pointer (allocated)
+      std::unique_ptr<VarInfo> fcst_info;
+      std::unique_ptr<VarInfo> obs_info;
 
       ConcatString     desc;             // Description string
       ConcatString     var_name;         // nc_pairs_var_name string

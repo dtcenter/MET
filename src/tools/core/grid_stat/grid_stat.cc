@@ -348,8 +348,8 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Update the input grid, if needed
-   update_mtddf_grid(fcst_mtddf.get(), conf_info.vx_opt[0].fcst_info);
-   update_mtddf_grid(obs_mtddf.get(), conf_info.vx_opt[0].obs_info);
+   update_mtddf_grid(fcst_mtddf.get(), conf_info.vx_opt[0].fcst_info.get());
+   update_mtddf_grid(obs_mtddf.get(), conf_info.vx_opt[0].obs_info.get());
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.vx_opt[0].fcst_info->regrid(),
@@ -705,7 +705,7 @@ void process_scores() {
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
       // Read the gridded data from the input forecast file
-      if(!read_data_plane(conf_info.vx_opt[i].fcst_info,
+      if(!read_data_plane(conf_info.vx_opt[i].fcst_info.get(),
                           fcst_dp, fcst_mtddf.get(), fcst_file,
                           "forecast")) continue;
 
@@ -721,7 +721,7 @@ void process_scores() {
       shc.set_fcst_valid_end(fcst_dp.valid());
 
       // Read the gridded data from the input observation file
-      if(!read_data_plane(conf_info.vx_opt[i].obs_info,
+      if(!read_data_plane(conf_info.vx_opt[i].obs_info.get(),
                           obs_dp, obs_mtddf.get(), obs_file,
                           "observation")) continue;
 
@@ -1029,12 +1029,12 @@ void process_scores() {
                int ui = conf_info.vx_opt[i].fcst_info->uv_index();
 
                // Read forecast data for UGRD
-               if(!read_data_plane(conf_info.vx_opt[ui].fcst_info,
+               if(!read_data_plane(conf_info.vx_opt[ui].fcst_info.get(),
                                    fu_dp, fcst_mtddf.get(), fcst_file,
                                    "U-wind forecast")) continue;
 
                // Read observation data for UGRD
-               if(!read_data_plane(conf_info.vx_opt[ui].obs_info,
+               if(!read_data_plane(conf_info.vx_opt[ui].obs_info.get(),
                                    ou_dp, obs_mtddf.get(), obs_file,
                                    "U-wind observation")) continue;
 
@@ -1884,12 +1884,12 @@ void process_scores() {
                int ui = conf_info.vx_opt[i].fcst_info->uv_index();
 
                // Read forecast data for UGRD
-               if(!read_data_plane(conf_info.vx_opt[ui].fcst_info,
+               if(!read_data_plane(conf_info.vx_opt[ui].fcst_info.get(),
                                    fu_dp, fcst_mtddf.get(), fcst_file,
                                    "U-wind forecast")) continue;
 
                // Read observation data for UGRD
-               if(!read_data_plane(conf_info.vx_opt[ui].obs_info,
+               if(!read_data_plane(conf_info.vx_opt[ui].obs_info.get(),
                                    ou_dp, obs_mtddf.get(), obs_file,
                                    "U-wind observation")) continue;
 

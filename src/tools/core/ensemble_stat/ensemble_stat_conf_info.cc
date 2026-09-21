@@ -804,7 +804,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    }
 
    // Allocate new VarInfo object for obs
-   vx_pd.obs_info = VarInfoFactory::new_var_info(otype).release();
+   vx_pd.obs_info = VarInfoFactory::new_var_info(otype);
 
    // Set the VarInfo objects
    vx_pd.obs_info->set_dict(odict);

@@ -574,8 +574,8 @@ GridStatVxOpt::~GridStatVxOpt() {
 void GridStatVxOpt::init_from_scratch() {
 
    // Initialize pointers
-   fcst_info   = (VarInfo *)    nullptr;
-   obs_info    = (VarInfo *)    nullptr;
+   fcst_info.reset();
+   obs_info.reset();
 
    clear();
 
@@ -640,8 +640,8 @@ void GridStatVxOpt::clear() {
    nc_info.clear();
 
    // Deallocate memory
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) nullptr; }
-   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) nullptr; }
+   fcst_info.reset();
+   obs_info.reset();
 
    return;
 }
@@ -659,8 +659,8 @@ void GridStatVxOpt::process_config(
    clear();
 
    // Allocate new VarInfo objects
-   fcst_info = VarInfoFactory::new_var_info(ftype).release();
-   obs_info  = VarInfoFactory::new_var_info(otype).release();
+   fcst_info = VarInfoFactory::new_var_info(ftype);
+   obs_info  = VarInfoFactory::new_var_info(otype);
 
    // Set the top-level regrid as the default 
    RegridInfo regrid_info = parse_conf_regrid(fdict.parent());
