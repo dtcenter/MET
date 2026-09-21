@@ -170,7 +170,7 @@ void process_search_dirs() {
 
 void process_jobs() {
    TCStatJobFactory factory;
-   TCStatJob *cur_job = (TCStatJob *) nullptr;
+   std::unique_ptr<TCStatJob> cur_job;
    ConcatString jobstring;
    int i, n_jobs;
    TCPointCounts n;
@@ -263,7 +263,6 @@ void process_jobs() {
            << "Rejected for out valid mask      = " << n.RejOutValidMask   << "\n";
 
       // Deallocate current job
-      if(cur_job) { delete cur_job; cur_job = (TCStatJob *) nullptr; }
 
    } // end for i
 
