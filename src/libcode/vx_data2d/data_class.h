@@ -160,7 +160,7 @@ class Met2dDataFile : public Met2dData {
 
          //  retrieve a vector of all requested data planes
 
-      int data_planes(std::vector<VarInfo*>&,
+      int data_planes(const std::vector<std::unique_ptr<VarInfo>>&,
                       std::vector<DataPlane>&);
 
          //  derive and rotate wind fields

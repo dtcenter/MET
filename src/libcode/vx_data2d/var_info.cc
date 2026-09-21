@@ -1035,67 +1035,59 @@ int parse_set_attr_flag(Dictionary &dict, const char *key) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-EnsVarInfo::EnsVarInfo() {
-   ctrl_info = nullptr;
-}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
 
-InputInfo &InputInfo::operator=(const InputInfo &a) noexcept {
-   if ( this != &a ) {
-      file_index = a.file_index;
-      ens_member_id = a.ens_member_id;
-
-      var_info = (a.var_info == nullptr) ? nullptr : a.var_info;
-
-      if (file_list == nullptr) file_list = new StringArray();
-      else file_list->clear();
-      if (a.file_list != nullptr) {
-         for (int i=0; i<a.file_list->n(); i++) {
-           file_list->add((*a.file_list)[i]);
-         }
-      }
-   }
-   return *this;
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
 
-EnsVarInfo::~EnsVarInfo() {
-   clear();
-}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
 EnsVarInfo::EnsVarInfo(const EnsVarInfo &f) {
-
-   clear();
 
    assign(f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EnsVarInfo::clear() {
-   vector<InputInfo>::const_iterator it;
-   for(it = inputs.begin(); it != inputs.end(); it++) {
-      if((*it).var_info) { delete (*it).var_info; }
-   }
+EnsVarInfo & EnsVarInfo::operator=(const EnsVarInfo &f) {
 
-   if(ctrl_info) { delete ctrl_info; }
+   if(this != &f) assign(f);
+
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void EnsVarInfo::clear() {
+   inputs.clear();
+   ctrl_info.reset();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void EnsVarInfo::assign(const EnsVarInfo &v) {
 
-   // Copy
-   inputs        = v.inputs;
-   ctrl_info     = v.ctrl_info;
+   clear();
+
+   // Deep copy each input. file_list is not owned, so the alias is intentional.
+   for(const auto &in : v.inputs) {
+      InputInfo copy;
+      if(in.var_info) copy.var_info = in.var_info->clone();
+      copy.file_index    = in.file_index;
+      copy.file_list     = in.file_list;
+      copy.ens_member_id = in.ens_member_id;
+      inputs.push_back(std::move(copy));
+   }
+
+   if(v.ctrl_info) ctrl_info = v.ctrl_info->clone();
 
    nc_var_str    = v.nc_var_str;
    cat_ta        = v.cat_ta;
@@ -1107,7 +1099,7 @@ void EnsVarInfo::assign(const EnsVarInfo &v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void EnsVarInfo::add_input(InputInfo input) {
-   inputs.emplace_back(input);
+   inputs.push_back(std::move(input));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1118,26 +1110,26 @@ int EnsVarInfo::inputs_n() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EnsVarInfo::set_ctrl(VarInfo * ctrl) {
-   ctrl_info = ctrl;
+void EnsVarInfo::set_ctrl(std::unique_ptr<VarInfo> ctrl) {
+   ctrl_info = std::move(ctrl);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 VarInfo * EnsVarInfo::get_ctrl(int index) {
    if(ctrl_info) {
-      return ctrl_info;
+      return ctrl_info.get();
    }
-   return inputs[index].var_info;
+   return inputs[index].var_info.get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 VarInfo * EnsVarInfo::get_var_info(int index) {
    if(inputs[index].var_info) {
-      return inputs[index].var_info;
+      return inputs[index].var_info.get();
    }
-   return inputs[0].var_info;
+   return inputs[0].var_info.get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

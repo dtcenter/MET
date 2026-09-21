@@ -745,7 +745,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *dict;
-   VarInfo * next_var;
+   std::unique_ptr<VarInfo> next_var;
    InputInfo input_info;
 
    // Initialize
@@ -761,18 +761,22 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       setenv(met_ens_member_id, ens_member_ids[i].c_str(), 1);
 
       // Allocate new VarInfo object
-      next_var = VarInfoFactory::new_var_info(ftype).release();
+      next_var = VarInfoFactory::new_var_info(ftype);
 
       // Set the current dictionary
       next_var->set_dict(fdict);
 
-      input_info.var_info = next_var;
+      // Borrowed below: add_input() moves ownership into ens_info, but the
+      // object itself stays put, so this observer remains valid.
+      VarInfo *next_var_ptr = next_var.get();
+
+      input_info.var_info = std::move(next_var);
       input_info.file_index = 0;
       input_info.file_list = ens_files;
-      vx_pd.ens_info->add_input(input_info);
+      vx_pd.ens_info->add_input(std::move(input_info));
 
       // Set the fcst_info, if needed
-      if(!vx_pd.fcst_info) vx_pd.set_fcst_info(next_var); 
+      if(!vx_pd.fcst_info) vx_pd.set_fcst_info(next_var_ptr);
 
       // Add InputInfo to fcst info list for each ensemble file provided
       // set var_info to nullptr to note first VarInfo should be used
@@ -781,7 +785,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
          input_info.var_info = nullptr;
          input_info.file_index = j;
          input_info.file_list = ens_files;
-         vx_pd.ens_info->add_input(input_info);
+         vx_pd.ens_info->add_input(std::move(input_info));
       } // end for j
    } // end for i
 
@@ -792,15 +796,15 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       setenv(met_ens_member_id, control_id.c_str(), 1);
 
       // Allocate new VarInfo object
-      next_var = VarInfoFactory::new_var_info(ftype).release();
+      next_var = VarInfoFactory::new_var_info(ftype);
 
       // Set the current dictionary
       next_var->set_dict(fdict);
 
-      input_info.var_info = next_var;
+      input_info.var_info = std::move(next_var);
       input_info.file_index = ens_files->n() - 1;
       input_info.file_list = ens_files;
-      vx_pd.ens_info->add_input(input_info);
+      vx_pd.ens_info->add_input(std::move(input_info));
    }
 
    // Allocate new VarInfo object for obs

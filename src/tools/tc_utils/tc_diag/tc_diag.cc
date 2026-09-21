@@ -972,8 +972,7 @@ void process_fields(const TrackInfoArray &tracks,
    int i, j, i_pnt;
    Grid grid_dp;
    VarInfoFactory vi_factory;
-   VarInfo *vi = (VarInfo *) nullptr;
-   vector<VarInfo *> vi_list;
+   vector<std::unique_ptr<VarInfo>> vi_list;
    DataPlane dp;
    vector<DataPlane> dp_list;
    StringArray tmp_key_sa, fields_missing;
@@ -982,9 +981,9 @@ void process_fields(const TrackInfoArray &tracks,
    for(i=0; i<di.var_info_ptr.size(); i++) {
 
       // Make a local VarInfo copy to store the valid time
-      vi = vi_factory.new_copy(di.var_info_ptr[i]).release();
+      auto vi = vi_factory.new_copy(di.var_info_ptr[i]);
       vi->set_valid(vld_ut);
-      vi_list.emplace_back(vi);
+      vi_list.push_back(std::move(vi));
    }
 
    // Read all data at the same time if they are all in the same file
@@ -1004,7 +1003,7 @@ void process_fields(const TrackInfoArray &tracks,
       for(i=0; i<vi_list.size(); i++) {
 
          // Find single entry for this track point
-         bool status = get_series_entry(i_vld, vi_list[i],
+         bool status = get_series_entry(i_vld, vi_list[i].get(),
                           di.data_files, file_type,
                           dp, grid_dp,
                           false, false);
@@ -1055,15 +1054,9 @@ void process_fields(const TrackInfoArray &tracks,
          // Perhaps do 2 passes... process the vortex removal first?
 
          // Compute and write the cylindrical coordinate data
-         tmp_file_map[tmp_key].write_nc_data(vi_list[i], dp_list[i], grid_dp);
+         tmp_file_map[tmp_key].write_nc_data(vi_list[i].get(), dp_list[i], grid_dp);
 
       } // end for j
-
-      // Deallocate memory
-      if(vi_list[i]) {
-         delete vi_list[i];
-         vi_list[i] = (VarInfo *) nullptr;
-      }
 
    } // end for i
 

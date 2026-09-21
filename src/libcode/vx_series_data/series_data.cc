@@ -25,7 +25,7 @@ using namespace std;
 static bool read_single_entry(VarInfo*, const ConcatString&, const GrdFileType,
                               DataPlane&, Grid&);
 
-static bool read_all_entries(vector<VarInfo*>&, const ConcatString&, const GrdFileType,
+static bool read_all_entries(const vector<std::unique_ptr<VarInfo>>&, const ConcatString&, const GrdFileType,
                              vector<DataPlane>&, Grid&);
 
 ////////////////////////////////////////////////////////////////////////
@@ -105,7 +105,7 @@ bool read_single_entry(VarInfo* info, const ConcatString& filename,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_series_entries(int i_series, vector<VarInfo*> &vi_list,
+bool get_series_entries(int i_series, const vector<std::unique_ptr<VarInfo>> &vi_list,
         const StringArray &search_files, const GrdFileType type,
         vector<DataPlane> &dp_list, Grid &grid,
         bool error_out, bool print_warning) {
@@ -157,7 +157,7 @@ bool get_series_entries(int i_series, vector<VarInfo*> &vi_list,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool read_all_entries(vector<VarInfo*> &vi_list, const ConcatString &filename,
+bool read_all_entries(const vector<std::unique_ptr<VarInfo>> &vi_list, const ConcatString &filename,
         const GrdFileType type, vector<DataPlane> &dp_list, Grid &grid) {
 
    // Check that file exists

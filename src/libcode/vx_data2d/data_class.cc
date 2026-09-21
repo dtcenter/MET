@@ -320,7 +320,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-int Met2dDataFile::data_planes(vector<VarInfo*> &vi_list,
+int Met2dDataFile::data_planes(const vector<std::unique_ptr<VarInfo>> &vi_list,
                                vector<DataPlane> &dp_list)
 
 {

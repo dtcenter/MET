@@ -106,7 +106,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
    Dictionary *edict = nullptr;
    Dictionary i_edict;
    InterpMthd mthd;
-   VarInfo *next_var;
+   std::unique_ptr<VarInfo> next_var;
 
    int n_ens_files = ens_files->n();
 
@@ -198,7 +198,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
          setenv(met_ens_member_id, ens_member_ids[j].c_str(), 1);
 
          // Allocate new VarInfo object
-         next_var = VarInfoFactory::new_var_info(etype).release();
+         next_var = VarInfoFactory::new_var_info(etype);
 
          // Set the current dictionary
          next_var->set_dict(i_edict);
@@ -212,11 +212,11 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
          }
 
          InputInfo input_info;
-         input_info.var_info = next_var;
+         input_info.var_info = std::move(next_var);
          input_info.file_index = 0;
          input_info.file_list = ens_files;
          input_info.ens_member_id = ens_member_ids[j];
-         ens_info->add_input(input_info);
+         ens_info->add_input(std::move(input_info));
 
          // Add InputInfo to ens info list for each ensemble file provided
          // set var_info to nullptr to note first VarInfo should be used
@@ -225,7 +225,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
             input_info.file_index = k;
             input_info.file_list = ens_files;
             input_info.ens_member_id = ens_member_ids[j];
-            ens_info->add_input(input_info);
+            ens_info->add_input(std::move(input_info));
          } // end for k
 
       } // end for j
@@ -237,12 +237,12 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
          setenv(met_ens_member_id, control_id.c_str(), 1);
 
          // Allocate new VarInfo object
-         next_var = VarInfoFactory::new_var_info(etype).release();
+         next_var = VarInfoFactory::new_var_info(etype);
 
          // Set the current dictionary
          next_var->set_dict(i_edict);
 
-         ens_info->set_ctrl(next_var);
+         ens_info->set_ctrl(std::move(next_var));
       }
 
       // Conf: nc_var_str
