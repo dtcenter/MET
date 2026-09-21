@@ -1848,8 +1848,8 @@ void aggr_isc_lines(LineDataFiles &f, STATAnalysisJob &job,
          //
          if(m.count(key) == 0) {
             aggr.isc_info.clear();
-            aggr.total_na = aggr.mse_na   = aggr.fen_na   = (NumArray *) nullptr;
-            aggr.oen_na   = aggr.baser_na = aggr.fbias_na = (NumArray *) nullptr;
+            aggr.total_na.clear(); aggr.mse_na  .clear(); aggr.fen_na  .clear();
+            aggr.oen_na  .clear(); aggr.baser_na.clear(); aggr.fbias_na.clear();
             aggr.hdr.clear();
             m[key] = aggr;
             mlog << Debug(3) << "[Case " << m.size()
@@ -1878,12 +1878,12 @@ void aggr_isc_lines(LineDataFiles &f, STATAnalysisJob &job,
             m[key].isc_info.tile_yll = cur.tile_yll;
 
             // Allocate room to store values for each scale
-            m[key].total_na = new NumArray [m[key].isc_info.n_scale + 2];
-            m[key].mse_na   = new NumArray [m[key].isc_info.n_scale + 2];
-            m[key].fen_na   = new NumArray [m[key].isc_info.n_scale + 2];
-            m[key].oen_na   = new NumArray [m[key].isc_info.n_scale + 2];
-            m[key].baser_na = new NumArray [m[key].isc_info.n_scale + 2];
-            m[key].fbias_na = new NumArray [m[key].isc_info.n_scale + 2];
+            m[key].total_na.resize(m[key].isc_info.n_scale + 2);
+            m[key].mse_na  .resize(m[key].isc_info.n_scale + 2);
+            m[key].fen_na  .resize(m[key].isc_info.n_scale + 2);
+            m[key].oen_na  .resize(m[key].isc_info.n_scale + 2);
+            m[key].baser_na.resize(m[key].isc_info.n_scale + 2);
+            m[key].fbias_na.resize(m[key].isc_info.n_scale + 2);
          }
 
          //
@@ -2039,12 +2039,12 @@ void aggr_isc_lines(LineDataFiles &f, STATAnalysisJob &job,
       //
       // Deallocate memory
       //
-      if(it->second.total_na) { delete [] it->second.total_na; it->second.total_na = (NumArray *) nullptr; }
-      if(it->second.mse_na  ) { delete [] it->second.mse_na;   it->second.mse_na   = (NumArray *) nullptr; }
-      if(it->second.fen_na  ) { delete [] it->second.fen_na;   it->second.fen_na   = (NumArray *) nullptr; }
-      if(it->second.oen_na  ) { delete [] it->second.oen_na;   it->second.oen_na   = (NumArray *) nullptr; }
-      if(it->second.baser_na) { delete [] it->second.baser_na; it->second.baser_na = (NumArray *) nullptr; }
-      if(it->second.fbias_na) { delete [] it->second.fbias_na; it->second.fbias_na = (NumArray *) nullptr; }
+      it->second.total_na.clear();
+      it->second.mse_na  .clear();
+      it->second.fen_na  .clear();
+      it->second.oen_na  .clear();
+      it->second.baser_na.clear();
+      it->second.fbias_na.clear();
 
    } // end for it
 

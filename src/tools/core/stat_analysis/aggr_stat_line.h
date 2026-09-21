@@ -117,7 +117,7 @@ struct AggrMPRInfo {
 struct AggrISCInfo {
    StatHdrInfo hdr;
    ISCInfo isc_info;
-   NumArray *total_na, *mse_na, *fen_na, *oen_na, *baser_na, *fbias_na;
+   std::vector<NumArray> total_na, mse_na, fen_na, oen_na, baser_na, fbias_na;
 };
 
 struct AggrENSInfo {
