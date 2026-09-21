@@ -178,6 +178,51 @@ static int aw_mean_overlap(double lo, double hi,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// For AW_MEAN_CNTR between grids whose rows follow lines of constant
+// latitude, recompute the y overlap fractions in proportion to true
+// area, which varies with sin(lat), rather than with grid index. This
+// matters most near the poles.
+//
+////////////////////////////////////////////////////////////////////////
+
+static bool is_lat_row_grid(const Grid &grid) {
+   GridInfo gi = grid.info();
+   return (gi.ll != nullptr || gi.g != nullptr);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static double y_to_sin_lat(const Grid &grid, double x, double y) {
+   double lat, lon;
+   grid.xy_to_latlon(x, y, lat, lon);
+   return sind(max(-90.0, min(90.0, lat)));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void aw_mean_lat_weights(const Grid &to_grid, double x_to,
+                                double y_min, double y_max,
+                                int n, const int i[], double w[]) {
+   static const double min_width = 1.0e-10;
+
+   double s1 = y_to_sin_lat(to_grid, x_to, y_min);
+   double s2 = y_to_sin_lat(to_grid, x_to, y_max);
+   double s_lo = min(s1, s2);
+   double s_hi = max(s1, s2);
+
+   // Keep the index-based weights for a degenerate extent
+   if(s_hi - s_lo < min_width) return;
+
+   for(int k=0; k<n; k++) {
+      double b1 = y_to_sin_lat(to_grid, x_to, i[k] - 0.5);
+      double b2 = y_to_sin_lat(to_grid, x_to, i[k] + 0.5);
+      double overlap = min(s_hi, max(b1, b2)) - max(s_lo, min(b1, b2));
+      w[k] = max(0.0, overlap) / (s_hi - s_lo);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
 
 DataPlane met_regrid_area_weighted(const DataPlane & from_data,
                                    const Grid & from_grid,
@@ -195,6 +240,9 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
    vector<double> to_data_sum(to_grid.nxy(), 0.0);
    vector<double> wt_data_sum(to_grid.nxy(), 0.0);
 
+   // Split y overlaps by true area when rows follow constant latitude
+   bool lat_rows = is_lat_row_grid(from_grid) && is_lat_row_grid(to_grid);
+
    //
    // MET #3206 Reduction of vectors needed to prevent data races
    //           when updating to_data values 
@@ -208,7 +256,7 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
 
 #pragma omp parallel default(none) \
    shared(from_data, from_grid, to_grid, info, to_data) \
-   shared(to_data_sum, wt_data_sum)
+   shared(to_data_sum, wt_data_sum, lat_rows)
    { 
 
 #pragma omp single
@@ -267,6 +315,9 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
                }
                n_xt = aw_mean_overlap(x_min, x_max, xt, xw);
                n_yt = aw_mean_overlap(y_min, y_max, yt, yw);
+               if(lat_rows && n_yt > 1) {
+                  aw_mean_lat_weights(to_grid, x_to, y_min, y_max, n_yt, yt, yw);
+               }
             }
 
             // Otherwise, assign to the nearest to_grid box
