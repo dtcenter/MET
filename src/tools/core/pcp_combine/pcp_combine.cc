@@ -139,7 +139,7 @@ static StringArray  req_out_var_name;
 static int          i_out_var = 0;
 static int          n_out_var;
 static MetConfig    config;
-static VarInfo *    var_info = (VarInfo *) nullptr;
+static std::unique_ptr<VarInfo> var_info;
 static double       input_thresh = 1.0;
 static double       vld_thresh = 1.0;
 static int          compress_level = -1;
@@ -226,7 +226,7 @@ int met_main(int argc, char *argv[]) {
       // Reinitialize for the current loop.
       //
       field_string = req_field_list[i];
-      if(var_info) { delete var_info; var_info = (VarInfo *) nullptr; }
+      var_info.reset();
 
       //
       // Reset when reading multiple fields from the same input files.
@@ -1396,7 +1396,7 @@ static bool get_field(const char *filename,
       grid = mtddf->grid();
 
       if(!var_info) {
-         var_info = VarInfoFactory::new_var_info(mtddf->file_type()).release();
+         var_info = VarInfoFactory::new_var_info(mtddf->file_type());
          *var_info = *cur_var;
       }
    }
@@ -1623,7 +1623,7 @@ static void close_nc() {
    // Clean up.
    //
    if(nc_out)    { delete nc_out;   nc_out   = (NcFile *)  nullptr; }
-   if(var_info ) { delete var_info; var_info = (VarInfo *) nullptr; }
+   var_info.reset();
 
    return;
 }

@@ -45,11 +45,8 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid,
       const char * var_long_name, const char * var_units)
 {
 
-  // Initialization
-  VarInfo * var = nullptr; // allocated, need to delete
-  
   //  create a VarInfo object
-  var = VarInfoFactory::new_var_info((string)"FileType_NcMet").release();
+  auto var = VarInfoFactory::new_var_info((string)"FileType_NcMet");
   if( !var )
   {
     mlog << Debug(4) << "write_grid_to_netcdf() - can't switch on file type \"FileType_NcMet\" and instantiate the appropriate class\n";
@@ -62,8 +59,6 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid,
   var->set_units(var_units);
 
   write_grid_to_netcdf(plane, grid, out_filename, *var);
-
-  if(var) { delete var; var   = (VarInfo *) nullptr; }
 
 }
 

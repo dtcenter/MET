@@ -353,7 +353,7 @@ PlotPointObsConfInfo::~PlotPointObsConfInfo() {
 void PlotPointObsConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   grid_data_info = (VarInfo *) nullptr;
+   grid_data_info.reset();
 
    clear();
 
@@ -374,7 +374,7 @@ void PlotPointObsConfInfo::clear() {
    version.clear();
 
    // Delete allocated memory
-   if(grid_data_info) { delete grid_data_info; grid_data_info = 0; }
+   grid_data_info.reset();
 
    return;
 }
@@ -469,7 +469,7 @@ void PlotPointObsConfInfo::process_config(
       if(n_vx > 0 && met_ptr) {
 
          // Allocate and set the VarInfo object
-         grid_data_info = VarInfoFactory::new_var_info(met_ptr->file_type()).release();
+         grid_data_info = VarInfoFactory::new_var_info(met_ptr->file_type());
          i_fdict = parse_conf_i_vx_dict(fdict, 0);
          grid_data_info->set_dict(i_fdict);
 
