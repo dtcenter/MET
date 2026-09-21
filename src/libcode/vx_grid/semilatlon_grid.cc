@@ -267,7 +267,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double SemiLatLonGrid::calc_area(int x, int y) const
+double SemiLatLonGrid::calc_area(int x, int y, bool centered) const
 
 {
 

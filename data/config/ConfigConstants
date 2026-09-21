@@ -118,10 +118,11 @@ PERC           = 17;
 MIN            = 18;
 MAX            = 19;
 AW_MEAN        = 20;
-GAUSSIAN       = 21;
-MAXGAUSS       = 22;
-GEOG_MATCH     = 23;
-HIRA           = 24;
+AW_MEAN_CNTR   = 21;
+GAUSSIAN       = 22;
+MAXGAUSS       = 23;
+GEOG_MATCH     = 24;
+HIRA           = 25;
 
 // Interpolation types
 NONE           = 1;
@@ -157,6 +158,7 @@ BCA            = 2;
 NONE           = 1;
 COS_LAT        = 2;
 AREA           = 3;
+AREA_CNTR      = 4;
 
 // Point weight flag settings
 NONE           = 1;

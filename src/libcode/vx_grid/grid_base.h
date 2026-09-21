@@ -131,7 +131,7 @@ class GridInterface {   //  pure abstract class for grid public interface
 
       virtual void xy_to_latlon(double x, double y, double &lat, double &lon) const = 0;
 
-      virtual double calc_area(int x, int y) const = 0;
+      virtual double calc_area(int x, int y, bool centered) const = 0;
 
       virtual int nx() const = 0;
       virtual int ny() const = 0;
@@ -256,7 +256,7 @@ class Grid : public GridInterface {
 
       void xy_to_latlon(double x, double y, double & lat, double & lon) const;
 
-      double calc_area(int x, int y) const;
+      double calc_area(int x, int y, bool centered) const;
 
       int nx() const;
       int ny() const;

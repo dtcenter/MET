@@ -1184,13 +1184,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double Grid::calc_area(int x, int y) const
+double Grid::calc_area(int x, int y, bool centered) const
 
 {
 
 if ( !rep )  return 0.0;
 
-return rep->calc_area(x, y);
+return rep->calc_area(x, y, centered);
 
 }
 
