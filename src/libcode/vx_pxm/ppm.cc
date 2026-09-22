@@ -165,13 +165,13 @@ Color Ppm::getrc(int r, int c) const
 {
 
 int n;
-unsigned char * u = (unsigned char *) nullptr;
+const unsigned char * u = nullptr;
 Color color;
 
 
 n = rc_to_n(r, c);
 
-u = data + 3*n;
+u = data.data() + 3*n;
 
 color.set_rgb(u[0], u[1], u[2]);
 
@@ -211,7 +211,7 @@ unsigned char * u = (unsigned char *) nullptr;
 
 n = rc_to_n(r, c);
 
-u = data + 3*n;
+u = data.data() + 3*n;
 
 u[0] = color.red();
 u[1] = color.green();
@@ -363,17 +363,9 @@ if ( maxval != 255 )  {
 
 n = 3*Nrows*Ncols;
 
-if ( !(data = new unsigned char [n]) )  {
+data.assign(n, 0);
 
-   mlog << Error << "\nPpm::read() -> memory allocation error\n\n";
-
-   clear();
-
-   return 0;
-
-}
-
-if ( !in.read((char *) data, n) )  {
+if ( !in.read((char *) data.data(), n) )  {
 
    mlog << Error << "\nPpm::read() -> trouble reading image data\n\n";
 
@@ -458,7 +450,7 @@ if ( !out )  {
 
 n = 3*Nrows*Ncols;
 
-out.write((char *) data, n);
+out.write((char *) data.data(), n);
 
 if ( !out )  {
 
@@ -486,9 +478,9 @@ void Ppm::all_black()
 
 {
 
-if ( !data )  return;
+if ( data.empty() )  return;
 
-(void) memset(data, 0, 3*Nrows*Ncols);
+(void) memset(data.data(), 0, 3*Nrows*Ncols);
 
 return;
 
@@ -502,9 +494,9 @@ void Ppm::all_white()
 
 {
 
-if ( !data )  return;
+if ( data.empty() )  return;
 
-(void) memset(data, 255, 3*Nrows*Ncols);
+(void) memset(data.data(), 255, 3*Nrows*Ncols);
 
 return;
 
@@ -520,15 +512,7 @@ void Ppm::set_size_rc(int NR, int NC)
 
 clear();
 
-data = new unsigned char [3*NR*NC];
-
-if ( !data )  {
-
-   mlog << Error << "\nPpm::set_size(int, int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
+data.assign(3*NR*NC, 0);
 
 Nrows = NR;
 Ncols = NC;
@@ -569,7 +553,7 @@ void Ppm::reverse_video()
 
 {
 
-if ( !data )  {
+if ( data.empty() )  {
 
    mlog << Error << "\nvoid Ppm::reverse_video() -> bad image\n\n";
 
@@ -610,7 +594,7 @@ unsigned char * u = (unsigned char *) nullptr;
 
 n = Nrows*Ncols;
 
-u = data;
+u = data.data();
 
 for (j=0; j<n; ++j)  {
 
@@ -644,7 +628,6 @@ int row, col;
 int Nrows_new, Ncols_new, bytes;
 int row_new = 0, col_new = 0;
 int n_new, n_old;
-unsigned char *u = (unsigned char *) nullptr;
 
 
 if ( a == 2 )  {
@@ -661,13 +644,7 @@ if ( a == 2 )  {
 
 bytes = 3*(Nrows)*(Ncols);
 
-if ( !(u = new unsigned char [bytes]) )  {
-
-   mlog << Error << "\nPpm::rotate(int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
+std::vector<unsigned char> u(bytes);
 
 for (row=0; row<Nrows; ++row)  {
 
@@ -708,7 +685,7 @@ for (row=0; row<Nrows; ++row)  {
 Ncols = Ncols_new;
 Nrows = Nrows_new;
 
-delete [] data;  data = u;
+data = std::move(u);
 
 return;
 

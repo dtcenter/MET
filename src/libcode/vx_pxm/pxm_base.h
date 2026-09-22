@@ -18,6 +18,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
 #include <iostream>
 
 #include "vx_color.h"
@@ -38,7 +39,7 @@ class PxmBase {
 
    protected:
 
-      unsigned char * data;
+      std::vector<unsigned char> data;
 
       int Nalloc;
 
@@ -147,7 +148,7 @@ inline int PxmBase::nx() const { return Ncols; }
 
 inline int PxmBase::n_comments() const { return Ncomments; }
 
-inline int PxmBase::ok() const { return ( data ? 1 : 0 ); }
+inline int PxmBase::ok() const { return ( data.empty() ? 0 : 1 ); }
 
 
 ////////////////////////////////////////////////////////////////////////

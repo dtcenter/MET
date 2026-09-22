@@ -64,7 +64,6 @@ void PxmBase::init_from_scratch()
 
 {
 
-data = (unsigned char *) nullptr;
 
 Name = (char *) nullptr;
 
@@ -84,7 +83,7 @@ void PxmBase::clear_common()
 
 {
 
-if ( data )  { delete [] data;  data = (unsigned char *) nullptr; }
+data.clear();
 
 Nalloc = 0;
 
@@ -115,15 +114,9 @@ if ( this == &p )  return;
 
 clear_common();
 
-if ( p.data )  {
+Nalloc = p.Nalloc;
 
-   Nalloc = p.Nalloc;
-
-   data = new unsigned char [Nalloc];
-
-   memcpy(data, p.data, Nalloc);
-
-}
+data   = p.data;
 
 Nrows = p.Nrows;
 Ncols = p.Ncols;
@@ -323,9 +316,9 @@ else         out << "(nul)\n";
 
 out << prefix << "data      = ";
 
-if ( data )  {
+if ( !(data.empty()) )  {
 
-   u = (unsigned long) data;
+   u = (unsigned long) data.data();
 
    out << u << "\n";
 
@@ -371,7 +364,7 @@ void PxmBase::copy_data(unsigned char * out) const
 
 const int n = n_data_bytes();
 
-memcpy(out, data, n);
+memcpy(out, data.data(), n);
 
 
 return;
@@ -390,7 +383,7 @@ int j;
 const int nxy = Nrows*Ncols;
 unsigned char * u = out;
 unsigned int  * i = (unsigned int *) out;
-unsigned char * d = data;
+const unsigned char * d = data.data();
 
 j = 0;
 
