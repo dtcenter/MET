@@ -362,8 +362,8 @@ void NcCfFile::parse_valid_time_var(const char* method_name, NcVar* valid_time_v
   bool use_bounds_var = false;
   ConcatString bounds_var_name;
   nc_time_var = valid_time_var;
-  NcVarAtt *bounds_att = get_nc_att(valid_time_var, bounds_att_name, false);
-  if (get_att_value_chars(bounds_att, bounds_var_name)) {
+  auto bounds_att = get_nc_att(valid_time_var, bounds_att_name, false);
+  if (get_att_value_chars(bounds_att.get(), bounds_var_name)) {
     bounds_time_var = get_nc_var(_ncFile, bounds_var_name.c_str());
     use_bounds_var = IS_VALID_NC(bounds_time_var);
     if (use_bounds_var) {
@@ -372,7 +372,6 @@ void NcCfFile::parse_valid_time_var(const char* method_name, NcVar* valid_time_v
            << "read time from the bounds variable \"" << bounds_var_name << "\"\n";
     }
   }
-  delete bounds_att;
 
   // Determine the number of times present.
   int n_times = get_data_size(valid_time_var);
@@ -1436,16 +1435,14 @@ void NcCfFile::read_netcdf_grid()
   // Pull the grid projection from the variable information.  First, look for
   // a grid_mapping attribute.
 
-  NcVarAtt *grid_mapping_att = get_nc_att(data_var, grid_mapping_att_name);
+  auto grid_mapping_att = get_nc_att(data_var, grid_mapping_att_name);
 
-  if (IS_VALID_NC_P(grid_mapping_att))
+  if (IS_VALID_NC_P(grid_mapping_att.get()))
   {
-    get_grid_from_grid_mapping(grid_mapping_att);
-    if (grid_mapping_att) delete grid_mapping_att;
+    get_grid_from_grid_mapping(grid_mapping_att.get());
     return;
   }
 
-  if (grid_mapping_att) delete grid_mapping_att;
 
   // If the grid mapping isn't provided, see if we can intuit a projection
   // from the given dimensions
@@ -1549,19 +1546,17 @@ void NcCfFile::get_grid_from_grid_mapping(const NcVarAtt *grid_mapping_att)
 
   // Get the name of the grid mapping
 
-  NcVarAtt *grid_mapping_name_att = get_nc_att(grid_mapping_var, grid_mapping_name_att_name);
+  auto grid_mapping_name_att = get_nc_att(grid_mapping_var, grid_mapping_name_att_name);
 
-  if (IS_INVALID_NC_P(grid_mapping_name_att))
+  if (IS_INVALID_NC_P(grid_mapping_name_att.get()))
   {
     mlog << Warning << "\n" << method_name << " -> "
          << "Cannot get coordinate system name from netCDF file.\n\n";
-    if (grid_mapping_name_att) delete grid_mapping_name_att;
     return;
   }
 
   ConcatString grid_mapping_name;
-  get_att_value_chars(grid_mapping_name_att, grid_mapping_name);
-  if (grid_mapping_name_att) delete grid_mapping_name_att;
+  get_att_value_chars(grid_mapping_name_att.get(), grid_mapping_name);
 
   // Handle each mapping type defined in the standard
 
@@ -1878,9 +1873,9 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
 
   // standard_parallel -- there can be 1 or 2 of these
 
-  NcVarAtt *std_parallel_att = get_nc_att(
+  auto std_parallel_att = get_nc_att(
     grid_mapping_var, (string)"standard_parallel");
-  if (IS_INVALID_NC_P(std_parallel_att))
+  if (IS_INVALID_NC_P(std_parallel_att.get()))
   {
     mlog << Warning << "\n" << method_name << " -> "
          << "Cannot get standard_parallel attribute from "
@@ -1890,9 +1885,9 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
 
   // longitude_of_central_meridian
 
-  NcVarAtt *central_lon_att = get_nc_att(
+  auto central_lon_att = get_nc_att(
     grid_mapping_var, (string)"longitude_of_central_meridian");
-  if (IS_INVALID_NC_P(central_lon_att))
+  if (IS_INVALID_NC_P(central_lon_att.get()))
   {
     mlog << Warning << "\n" << method_name << " -> "
          << "Cannot get longitude_of_central_meridian attribute from "
@@ -1902,9 +1897,9 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
 
   // latitude_of_projection_origin
 
-  NcVarAtt *proj_origin_lat_att = get_nc_att(
+  auto proj_origin_lat_att = get_nc_att(
     grid_mapping_var, (string)"latitude_of_projection_origin");
-  if (IS_INVALID_NC_P(proj_origin_lat_att))
+  if (IS_INVALID_NC_P(proj_origin_lat_att.get()))
   {
     mlog << Warning << "\n" << method_name << " -> "
          << "Cannot get latitude_of_projection_origin attribute from "
@@ -2061,15 +2056,15 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   double double_data;
   NumArray double_datas;
   data.name = lambert_proj_type;
-  get_att_value_doubles(std_parallel_att, double_datas);
+  get_att_value_doubles(std_parallel_att.get(), double_datas);
   data.scale_lat_1 = double_datas[0];
   if (std_parallel_att->getAttLength() == 1)
     data.scale_lat_2 = data.scale_lat_1;
   else
     data.scale_lat_2 = double_datas[1];
-  double_data = get_att_value_double(proj_origin_lat_att);
+  double_data = get_att_value_double(proj_origin_lat_att.get());
   data.lat_pin = double_data;
-  get_att_value_doubles(central_lon_att, double_datas);
+  get_att_value_doubles(central_lon_att.get(), double_datas);
   data.lon_pin = -double_datas[0];
   data.hemisphere = (data.lat_pin > 0 ? 'N' : 'S');
   data.x_pin = x_pin;
@@ -2087,9 +2082,6 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   if (dy_m < 0) grid.set_swap_to_north(true);
   grid_ready = true;
 
-  if(std_parallel_att) delete std_parallel_att;
-  if(central_lon_att) delete central_lon_att;
-  if(proj_origin_lat_att) delete proj_origin_lat_att;
 }
 
 
@@ -2253,9 +2245,9 @@ void NcCfFile::get_grid_mapping_orthographic(const NcVar *grid_mapping_var)
 
 double get_nc_var_att_double(const NcVar *nc_var, const char *att_name, bool is_required)
 {
-   NcVarAtt *nc_att = get_nc_att(nc_var, (string)att_name);
+   auto nc_att = get_nc_att(nc_var, (string)att_name);
 
-   if(IS_INVALID_NC_P(nc_att))
+   if(IS_INVALID_NC_P(nc_att.get()))
    {
       if (is_required) {
          mlog << Error << "\nget_nc_var_att_double() -> "
@@ -2265,8 +2257,7 @@ double get_nc_var_att_double(const NcVar *nc_var, const char *att_name, bool is_
       }
       else return bad_data_double;
    }
-   double att_val = get_att_value_double(nc_att);
-   if (nc_att) delete nc_att;
+   double att_val = get_att_value_double(nc_att.get());
 
    return att_val;
 }
@@ -2653,9 +2644,9 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
 
   // grid_north_pole_latitude
 
-  NcVarAtt *grid_np_lat_att = get_nc_att(
+  auto grid_np_lat_att = get_nc_att(
     grid_mapping_var, (string)"grid_north_pole_latitude");
-  if (IS_INVALID_NC_P(grid_np_lat_att))
+  if (IS_INVALID_NC_P(grid_np_lat_att.get()))
   {
     mlog << Warning << "\n" << method_name << " -> "
          << "Cannot get grid_north_pole_latitude attribute from "
@@ -2665,9 +2656,9 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
 
   // grid_north_pole_longitude
 
-  NcVarAtt *grid_np_lon_att = get_nc_att(
+  auto grid_np_lon_att = get_nc_att(
     grid_mapping_var, (string)"grid_north_pole_longitude");
-  if (IS_INVALID_NC_P(grid_np_lon_att))
+  if (IS_INVALID_NC_P(grid_np_lon_att.get()))
   {
     mlog << Warning << "\n" << method_name << " -> "
          << "Cannot get grid_north_pole_longitude attribute from "
@@ -2801,8 +2792,8 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
   // Derive south pole location from the north pole:
   // - Reverse the sign of the latitude
   // - Add 180 to the longitude and switch from degrees east to west
-  data.true_lat_south_pole = -1.0 * get_att_value_double(grid_np_lat_att);
-  double np_lon = rescale_lon(get_att_value_double(grid_np_lon_att));
+  data.true_lat_south_pole = -1.0 * get_att_value_double(grid_np_lat_att.get());
+  double np_lon = rescale_lon(get_att_value_double(grid_np_lon_att.get()));
   data.true_lon_south_pole = rescale_lon(-1.0 * (np_lon + 180.0));
 
   // Copied from the LatLon data structure
@@ -2822,8 +2813,6 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
   grid.set(data);
   grid.set_swap_to_north(swap_to_north);
 
-  if(grid_np_lat_att) delete grid_np_lat_att;
-  if(grid_np_lon_att) delete grid_np_lon_att;
 }
 
 
@@ -2874,9 +2863,9 @@ void NcCfFile::get_grid_mapping_geostationary(
   static const string method_name = "NcCfFile::get_grid_mapping_geostationary() ";
 
   // perspective_point_height
-  NcVarAtt *perspective_point_height_att = get_nc_att(
+  auto perspective_point_height_att = get_nc_att(
     grid_mapping_var, (string)"perspective_point_height");
-  if (IS_INVALID_NC_P(perspective_point_height_att))
+  if (IS_INVALID_NC_P(perspective_point_height_att.get()))
   {
     mlog << Warning << "\n" << method_name
          << "-> Cannot get perspective_point_height attribute from "
@@ -2885,9 +2874,9 @@ void NcCfFile::get_grid_mapping_geostationary(
   }
 
   // semi_major_axis
-  NcVarAtt *semi_major_axis_att = get_nc_att(
+  auto semi_major_axis_att = get_nc_att(
     grid_mapping_var, (string)"semi_major_axis");
-  if (IS_INVALID_NC_P(semi_major_axis_att))
+  if (IS_INVALID_NC_P(semi_major_axis_att.get()))
   {
     mlog << Warning << "\n" << method_name
          << "-> Cannot get semi_major_axis attribute from "
@@ -2896,9 +2885,9 @@ void NcCfFile::get_grid_mapping_geostationary(
   }
 
   // semi_minor_axis
-  NcVarAtt *semi_minor_axis_att = get_nc_att(
+  auto semi_minor_axis_att = get_nc_att(
     grid_mapping_var, (string)"semi_minor_axis");
-  if (IS_INVALID_NC_P(semi_minor_axis_att))
+  if (IS_INVALID_NC_P(semi_minor_axis_att.get()))
   {
     mlog << Warning << "\n" << method_name
          << "-> Cannot get semi_minor_axis attribute from "
@@ -2907,9 +2896,9 @@ void NcCfFile::get_grid_mapping_geostationary(
   }
 
   // inverse_flattening
-  NcVarAtt *inverse_flattening_att = get_nc_att(
+  auto inverse_flattening_att = get_nc_att(
     grid_mapping_var, (string)"inverse_flattening");
-  if (IS_INVALID_NC_P(inverse_flattening_att))
+  if (IS_INVALID_NC_P(inverse_flattening_att.get()))
   {
     mlog << Warning << "\n" << method_name
          << "-> Cannot get inverse_flattening attribute from "
@@ -2918,9 +2907,9 @@ void NcCfFile::get_grid_mapping_geostationary(
   }
 
   // latitude_of_projection_origin
-  NcVarAtt *proj_origin_lat_att = get_nc_att(
+  auto proj_origin_lat_att = get_nc_att(
     grid_mapping_var, (string)"latitude_of_projection_origin");
-  if (IS_INVALID_NC_P(proj_origin_lat_att))
+  if (IS_INVALID_NC_P(proj_origin_lat_att.get()))
   {
     mlog << Warning << "\n" << method_name
          << "-> Cannot get latitude_of_projection_origin attribute from "
@@ -2929,9 +2918,9 @@ void NcCfFile::get_grid_mapping_geostationary(
   }
 
   // longitude_of_projection_origin
-  NcVarAtt *proj_origin_lon_att = get_nc_att(
+  auto proj_origin_lon_att = get_nc_att(
     grid_mapping_var, (string)"longitude_of_projection_origin");
-  if (IS_INVALID_NC_P(proj_origin_lon_att))
+  if (IS_INVALID_NC_P(proj_origin_lon_att.get()))
   {
     mlog << Warning << "\n" << method_name
          << "-> Cannot get longitude_of_projection_origin attribute from "
@@ -2940,9 +2929,9 @@ void NcCfFile::get_grid_mapping_geostationary(
   }
 
   // sweep_angle_axis
-  NcVarAtt *sweep_angle_axis_att = get_nc_att(
+  auto sweep_angle_axis_att = get_nc_att(
     grid_mapping_var, (string)"sweep_angle_axis");
-  if (IS_INVALID_NC_P(sweep_angle_axis_att))
+  if (IS_INVALID_NC_P(sweep_angle_axis_att.get()))
   {
     mlog << Warning << "\n" << method_name
          << "-> Cannot get sweep_angle_axis attribute from "
@@ -3035,12 +3024,12 @@ void NcCfFile::get_grid_mapping_geostationary(
   data.reset();
 
   data.name = grid_mapping_name_geostationary;
-  data.perspective_point_height = get_att_value_double(perspective_point_height_att);
-  data.semi_major_axis = get_att_value_double(semi_major_axis_att);
-  data.semi_minor_axis = get_att_value_double(semi_minor_axis_att);
-  data.inverse_flattening = get_att_value_double(inverse_flattening_att);
-  data.lat_of_projection_origin = get_att_value_double(proj_origin_lat_att);
-  data.lon_of_projection_origin = get_att_value_double(proj_origin_lon_att);
+  data.perspective_point_height = get_att_value_double(perspective_point_height_att.get());
+  data.semi_major_axis = get_att_value_double(semi_major_axis_att.get());
+  data.semi_minor_axis = get_att_value_double(semi_minor_axis_att.get());
+  data.inverse_flattening = get_att_value_double(inverse_flattening_att.get());
+  data.lat_of_projection_origin = get_att_value_double(proj_origin_lat_att.get());
+  data.lon_of_projection_origin = get_att_value_double(proj_origin_lon_att.get());
   data.nx = (int)x_counts;
   data.ny = (int)y_counts;
   data.dx_rad = (x_values[x_counts-1] - x_values[0]) / ((int)x_counts - 1);
@@ -3077,13 +3066,6 @@ void NcCfFile::get_grid_mapping_geostationary(
   grid.set(data);
   grid_ready = true;
 
-  if (perspective_point_height_att) delete perspective_point_height_att;
-  if (semi_major_axis_att)          delete semi_major_axis_att;
-  if (semi_minor_axis_att)          delete semi_minor_axis_att;
-  if (inverse_flattening_att)       delete inverse_flattening_att;
-  if (proj_origin_lat_att)          delete proj_origin_lat_att;
-  if (proj_origin_lon_att)          delete proj_origin_lon_att;
-  if (sweep_angle_axis_att)         delete sweep_angle_axis_att;
 }
 
 
@@ -3099,13 +3081,13 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
   mlog << Debug(6) << "\n" << method_name << " -> "
        << "collect GRID info from \"" << GET_NC_NAME_P(data_var) << "\".\n\n";
 
-  NcVarAtt *coordinates_att = get_nc_att(data_var, coordinates_att_name);
+  auto coordinates_att = get_nc_att(data_var, coordinates_att_name);
 
-  if (IS_VALID_NC_P(coordinates_att)) {
+  if (IS_VALID_NC_P(coordinates_att.get())) {
     ConcatString axis_value;
     ConcatString coordinates_value;
     ConcatString units_value;
-    get_att_value_chars(coordinates_att, coordinates_value);
+    get_att_value_chars(coordinates_att.get(), coordinates_value);
     StringArray sa = coordinates_value.split(" ");
     int count = sa.n_elements();
     if (count >= 2) {
@@ -3159,7 +3141,6 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       mlog << Warning << "\n" << method_name << " -> "
            << "Didn't find X coord variable (" << x_dim_var_name
            << ") in netCDF file.\n\n";
-      if (coordinates_att) delete coordinates_att;
       return false;
     }
 
@@ -3167,7 +3148,6 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       mlog << Warning << "\n" << method_name << " -> "
            << "Didn't find Y coord variable (" << y_dim_var_name
            << ") in netCDF file.\n\n";
-      if (coordinates_att) delete coordinates_att;
       return false;
     }
 
@@ -3200,18 +3180,15 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     {
       mlog << Warning << "\n" << method_name << " -> "
            << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
-      if (coordinates_att) delete coordinates_att;
       return false;
     }
 
     if (coordinates_att) {
-      delete coordinates_att;
-      coordinates_att = (NcVarAtt *)nullptr;
+      coordinates_att.reset();
     }
     get_grid_from_lat_lon_vars(_yCoordVar, _xCoordVar, lat_counts, lon_counts);
   }
 
-  if (coordinates_att) delete coordinates_att;
   return true;
 }
 

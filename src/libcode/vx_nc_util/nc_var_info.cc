@@ -351,17 +351,17 @@ NcVarInfo *find_var_info_by_dim_name(NcVarInfo *vars, const string dim_name,
 bool get_att_str(const NcVarInfo &info, const ConcatString att_name,
                  ConcatString &att_value) {
 
-   NcVarAtt *att ;
+   std::unique_ptr<netCDF::NcAtt> att;
    bool found = false;
    
    att_value.clear();
    
    att = get_nc_att(info.var, att_name, false);
-   if (!IS_INVALID_NC_P(att)) {
-      found = get_att_value_chars(att, att_value);
+   if (!IS_INVALID_NC_P(att.get())) {
+      found = get_att_value_chars(att.get(), att_value);
       if ( !found)  {
          // Check for the correct type
-         if ( GET_NC_TYPE_ID_P(att) != NcType::nc_CHAR ) {
+         if ( GET_NC_TYPE_ID_P(att.get()) != NcType::nc_CHAR ) {
          
             mlog << Error << "\nget_att_str(const NcVarInfo &, const ConcatString &, ConcatString &) -> "
                    << "attribute \"" << att_name << "\" should be a string.\n\n";
@@ -370,7 +370,6 @@ bool get_att_str(const NcVarInfo &info, const ConcatString att_name,
          }
       }
    }
-   if (att) delete att;
 
    //
    //  done
@@ -387,13 +386,13 @@ bool get_att_int(const NcVarInfo &info, const ConcatString att_name,
 
    att_value = bad_data_int;
    
-   NcVarAtt *att = get_nc_att(info.var, att_name, false);
-   bool found = IS_VALID_NC_P(att);
+   auto att = get_nc_att(info.var, att_name, false);
+   bool found = IS_VALID_NC_P(att.get());
    if (found) {
-      att_value = get_att_value_int(att);
+      att_value = get_att_value_int(att.get());
    
       // Check for the correct type
-      nc_type att_type = GET_NC_TYPE_ID_P(att);
+      nc_type att_type = GET_NC_TYPE_ID_P(att.get());
       if ( att_type != NcType::nc_INT && att_type != NcType::nc_INT64
            && att_type != NcType::nc_SHORT && att_type != NcType::nc_BYTE ) {
    
@@ -403,7 +402,6 @@ bool get_att_int(const NcVarInfo &info, const ConcatString att_name,
          exit ( 1 );
       }
    }
-   if (att) delete att;
    
    //
    //  done
@@ -440,11 +438,10 @@ bool get_att_unixtime(const NcVar *var, const ConcatString att_name,
 
    att_value = (unixtime) bad_data_int;
 
-   NcVarAtt *att = get_nc_att(var, att_name, false);
-   bool found = IS_VALID_NC_P(att);
-   if( found ) att_value = get_att_value_unixtime(att);
+   auto att = get_nc_att(var, att_name, false);
+   bool found = IS_VALID_NC_P(att.get());
+   if( found ) att_value = get_att_value_unixtime(att.get());
 
-   if (att) delete att;
    
    //
    //  done
