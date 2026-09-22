@@ -136,11 +136,11 @@ bool MetNcCFDataFile::open(const char * _filename) {
 
    Filename = _filename;
 
-   Raw_Grid = new Grid;
+   Raw_Grid = std::make_unique<Grid>();
 
    (*Raw_Grid) = _file->grid;
 
-   Dest_Grid = new Grid;
+   Dest_Grid = std::make_unique<Grid>();
 
    (*Dest_Grid) = (*Raw_Grid);
 

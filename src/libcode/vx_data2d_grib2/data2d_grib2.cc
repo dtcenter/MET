@@ -895,7 +895,7 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
    int ResCompFlag;
    char hem = 0;
 
-   Raw_Grid = new Grid();
+   Raw_Grid = std::make_unique<Grid>();
 
    //  determine the radius of the earth
    switch( gfld->igdtmpl[0] ){
