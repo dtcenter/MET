@@ -378,10 +378,15 @@ class DictionaryStack {
       DictionaryStack & operator=(const DictionaryStack &);
 
         //
-        //  all but the first one is allocated
+        //  D[0] points at the caller's Dictionary and is NOT owned.  D[1] and
+        //  up are owned by DStore, and D holds a borrowed view of each so that
+        //  every reader can keep using D[j] unchanged.  The two arrays exist
+        //  because the ownership of element zero genuinely differs.
         //
 
       Dictionary * D [max_dictionary_depth];
+
+      std::unique_ptr<Dictionary> DStore [max_dictionary_depth];
 
       int Nelements;
 

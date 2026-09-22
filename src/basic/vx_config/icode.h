@@ -23,6 +23,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <string>
 #include <iostream>
 #include <vector>
@@ -281,7 +282,7 @@ class ICVStack {
 
    private:
 
-      IcodeVector * v [icv_stack_size];
+      std::unique_ptr<IcodeVector> v [icv_stack_size];
 
       int Depth;
 
@@ -327,7 +328,7 @@ class ICVQueue {
 
    private:
 
-      IcodeVector * v [icv_stack_size];
+      std::unique_ptr<IcodeVector> v [icv_stack_size];
 
       int Nelements;
 

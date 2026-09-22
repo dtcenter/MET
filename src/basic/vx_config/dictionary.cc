@@ -2420,7 +2420,7 @@ int j;
 
 for (j=1; j<max_dictionary_depth; ++j)  {   //  j starts at one, here
 
-   if ( D[j] )  { delete D[j];  D[j] = (Dictionary *) nullptr; }
+   DStore[j].reset();  D[j] = (Dictionary *) nullptr;
 
 }
 
@@ -2446,7 +2446,9 @@ int j;
 
 for (j=0; j<(s.Nelements); ++j)  {
 
-   D[j] = new Dictionary;
+   DStore[j] = std::make_unique<Dictionary>();
+
+   D[j] = DStore[j].get();
 
    *(D[j]) = *(s.D[j]);
 
@@ -2605,7 +2607,7 @@ if ( Nelements <= 1 )  {
 
 }
 
-delete D[Nelements - 1];   D[Nelements - 1] = (Dictionary *) nullptr;
+DStore[Nelements - 1].reset();   D[Nelements - 1] = (Dictionary *) nullptr;
 
 --Nelements;
 
@@ -2630,7 +2632,11 @@ if ( Nelements >= max_dictionary_depth )  {
 
 }
 
-D[Nelements++] = new Dictionary;
+DStore[Nelements] = std::make_unique<Dictionary>();
+
+D[Nelements] = DStore[Nelements].get();
+
+++Nelements;
 
 return;
 
@@ -2675,7 +2681,7 @@ entry.set_dict (name, *(D[Nelements - 1]));
 
 D[Nelements - 2]->store(entry);
 
-delete D[Nelements - 1];  D[Nelements - 1] = (Dictionary *) nullptr;
+DStore[Nelements - 1].reset();  D[Nelements - 1] = (Dictionary *) nullptr;
 
 --Nelements;
 
@@ -2715,7 +2721,7 @@ E.set_name(name);
 
 D[Nelements - 2]->store(E);
 
-delete D[Nelements - 1];  D[Nelements - 1] = (Dictionary *) nullptr;
+DStore[Nelements - 1].reset();  D[Nelements - 1] = (Dictionary *) nullptr;
 
 --Nelements;
 

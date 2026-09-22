@@ -1082,8 +1082,6 @@ ICVStack::ICVStack()
 
 {
 
-for (int j=0; j<icv_stack_size; ++j)  v[j] = (IcodeVector *) nullptr;
-
 clear();
 
 }
@@ -1107,8 +1105,6 @@ clear();
 ICVStack::ICVStack(const ICVStack & s)
 
 {
-
-for (int j=0; j<icv_stack_size; ++j)  v[j] = (IcodeVector *) nullptr;
 
 Depth = 0;
 
@@ -1142,7 +1138,7 @@ void ICVStack::clear()
 
 for (int j=0; j<icv_stack_size; ++j)  {
 
-   if ( v[j] )  { delete v[j];  v[j] = (IcodeVector *) nullptr; }
+   v[j].reset();
 
 }
 
@@ -1172,7 +1168,7 @@ Depth = s.Depth;
 
 for (j=0; j<Depth; ++j)  {
 
-   v[j] = new IcodeVector;
+   v[j] = std::make_unique<IcodeVector>();
 
    if ( !(v[j]) )  {
 
@@ -1209,7 +1205,7 @@ if ( Depth >= icv_stack_size )  {
 
 }
 
-v[Depth] = new IcodeVector;
+v[Depth] = std::make_unique<IcodeVector>();
 
 if ( !(v[Depth]) )  {
 
@@ -1247,7 +1243,7 @@ IcodeVector V;
 
 V = *(v[Depth - 1]);
 
-delete v[Depth - 1];   v[Depth - 1] = (IcodeVector *) nullptr;
+v[Depth - 1].reset();
 
 --Depth;
 
@@ -1291,7 +1287,7 @@ if ( Depth <= 0 )  {
 }
 
 
-return v[Depth - 1];
+return v[Depth - 1].get();
 
 }
 
@@ -1435,7 +1431,7 @@ void ICVQueue::clear()
 
 for (int j=0; j<icv_stack_size; ++j)  {
 
-   if ( v[j] )  { delete v[j];  v[j] = (IcodeVector *) nullptr; }
+   v[j].reset();
 
 }
 
@@ -1486,7 +1482,7 @@ if ( Nelements >= icv_stack_size )  {
 
 }
 
-v[Nelements] = new IcodeVector;
+v[Nelements] = std::make_unique<IcodeVector>();
 
 *(v[Nelements]) = icv;
 
@@ -1518,11 +1514,11 @@ icv = *(v[0]);
 
 for (int j=1; j<Nelements; ++j)  {
 
-   v[j - 1] = v[j];
+   v[j - 1] = std::move(v[j]);
 
 }
 
-v[Nelements - 1] = (IcodeVector *) nullptr;
+v[Nelements - 1].reset();
 
 --Nelements;
 
