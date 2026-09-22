@@ -158,8 +158,6 @@ PSfile::~PSfile()
 
 close();
 
-delete afm;  afm = (Afm *) nullptr;
-
 }
 
 
@@ -170,13 +168,11 @@ void PSfile::init_from_scratch()
 
 {
 
-File = (ofstream *) nullptr;
-
 psout.ignore_columns = true;
 
 Head = &psout;
 
-afm = new Afm;
+afm = std::make_unique<Afm>();
 
 showpage_count = 0;
 
@@ -197,7 +193,7 @@ void PSfile::open(const char * filename, DocumentMedia DM, DocumentOrientation D
 
 close();
 
-File = new ofstream;
+File = std::make_unique<ofstream>();
 
 met_open(*File, filename);
 
@@ -212,7 +208,7 @@ if ( !(*File) )  {
 
 OutputFilename = filename;
 
-psout.attach(File);
+psout.attach(File.get());
 
 psout.set_decimal_places(ml_prec);
 
@@ -398,7 +394,7 @@ if ( File )  {
 
    File->close();
 
-   delete File;   File = (ofstream *) nullptr;
+   File.reset();
 
 }
 
@@ -633,7 +629,7 @@ if ( render_flag )  {
 
       x_cur += scale*(n->width());
 
-      n = n->next;
+      n = n->next.get();
 
    }
 
@@ -1208,7 +1204,7 @@ comment("begin flate compression");
 
 pso = new PSOutputFilter();
 pso->ignore_columns = false;
-pso->file = File;
+pso->file = File.get();
 
 *v = pso;
  v = &((*v)->next);
@@ -1244,7 +1240,7 @@ delete fa_bank;  fa_bank = 0;
 
 Head = &psout;
 
-psout.file = File;
+psout.file = File.get();
 
 file() << '\n';
 
@@ -1909,7 +1905,7 @@ if ( !(cur->is_empty()) )  {
 
    cur->add_link();
 
-   cur = cur->next;
+   cur = cur->next.get();
 
 }
 

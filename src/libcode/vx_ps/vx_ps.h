@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 #include "afm.h"
 #include "ps_text.h"
@@ -126,11 +127,11 @@ class PSfile {
       DocumentOrientation Orientation;
       DocumentMedia       Media;
 
-      std::ofstream * File;   //  the output file ... allocated
+      std::unique_ptr<std::ofstream> File;   //  the output file
 
       ConcatString OutputFilename;
 
-      Afm * afm;   //  allocated
+      std::unique_ptr<Afm> afm;
 
       FontFamily Family;   //  defaults to ff_Times
 
