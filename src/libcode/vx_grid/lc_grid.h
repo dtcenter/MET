@@ -93,7 +93,6 @@ class LambertGrid : public GridRep {
       void uv_to_xy(double u, double v, double & x, double & y) const;
 
       double uv_closedpolyline_area(const double * u, const double * v, int n) const;
-      double xy_closedpolyline_area(const double * x, const double * y, int n) const;
 
       void latlon_to_xy(double lat, double lon, double & x, double & y) const;
 

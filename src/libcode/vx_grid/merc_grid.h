@@ -44,8 +44,6 @@ class MercatorGrid : public GridRep {
 
       double uv_closedpolyline_area(const double * u, const double * v, int n) const;
 
-      double xy_closedpolyline_area(const double * x, const double * y, int n) const;
-
       double f(double) const;
 
       double df(double) const;
