@@ -137,11 +137,11 @@ void MetNcMetDataFile::set_range_azimuth_grid_center(int i_track_point) {
    if(i_track_point < 0) {
 
       // RMW-Analysis writes TrackLat_mean and TrackLon_mean variables
-      if(has_var(MetNc->Nc, "TrackLat_mean") &&
-         has_var(MetNc->Nc, "TrackLon_mean")) {
-         NcVar var_lat = get_nc_var(MetNc->Nc, "TrackLat_mean");
+      if(has_var(MetNc->Nc.get(), "TrackLat_mean") &&
+         has_var(MetNc->Nc.get(), "TrackLon_mean")) {
+         NcVar var_lat = get_nc_var(MetNc->Nc.get(), "TrackLat_mean");
          var_lat.getVar(&d.lat_center);
-         NcVar var_lon = get_nc_var(MetNc->Nc, "TrackLon_mean");
+         NcVar var_lon = get_nc_var(MetNc->Nc.get(), "TrackLon_mean");
          var_lon.getVar(&d.lon_center);
          d.lon_center *= -1.0;
       }
@@ -153,20 +153,20 @@ void MetNcMetDataFile::set_range_azimuth_grid_center(int i_track_point) {
       vector<size_t> count(1, 1);
 
       // TC-RMW writes FullTrackLat and FullTrackLon variables
-      if(has_var(MetNc->Nc, "FullTrackLat") &&
-         has_var(MetNc->Nc, "FullTrackLon")) {
-         NcVar var_lat = get_nc_var(MetNc->Nc, "FullTrackLat");
+      if(has_var(MetNc->Nc.get(), "FullTrackLat") &&
+         has_var(MetNc->Nc.get(), "FullTrackLon")) {
+         NcVar var_lat = get_nc_var(MetNc->Nc.get(), "FullTrackLat");
          var_lat.getVar(start, count, &d.lat_center);
-         NcVar var_lon = get_nc_var(MetNc->Nc, "FullTrackLon");
+         NcVar var_lon = get_nc_var(MetNc->Nc.get(), "FullTrackLon");
          var_lon.getVar(start, count, &d.lon_center);
          d.lon_center *= -1.0;
       }
       // TC-Diag writes TrackLat and TrackLon variables
-      else if(has_var(MetNc->Nc, "TrackLat") &&
-              has_var(MetNc->Nc, "TrackLon")) {
-         NcVar var_lat = get_nc_var(MetNc->Nc, "TrackLat");
+      else if(has_var(MetNc->Nc.get(), "TrackLat") &&
+              has_var(MetNc->Nc.get(), "TrackLon")) {
+         NcVar var_lat = get_nc_var(MetNc->Nc.get(), "TrackLat");
          var_lat.getVar(start, count, &d.lat_center);
-         NcVar var_lon = get_nc_var(MetNc->Nc, "TrackLon");
+         NcVar var_lon = get_nc_var(MetNc->Nc.get(), "TrackLon");
          var_lon.getVar(start, count, &d.lon_center);
          d.lon_center *= -1.0;
       }
@@ -191,18 +191,18 @@ void MetNcMetDataFile::set_range_azimuth_times(int i_track_point, DataPlane &pla
    vector<size_t> count(1, 1);
 
    // Initialization time
-   NcVar var_init = get_nc_var(MetNc->Nc, "init_time");
+   NcVar var_init = get_nc_var(MetNc->Nc.get(), "init_time");
    var_init.getVar(&ymd_hms_str);
    plane.set_init(timestring_to_unix(ymd_hms_str.c_str()));
 
    // Valid time
-   NcVar var_valid = get_nc_var(MetNc->Nc, "valid_time");
+   NcVar var_valid = get_nc_var(MetNc->Nc.get(), "valid_time");
    var_valid.getVar(start, count, &ymd_hms_str);
    plane.set_valid(timestring_to_unix(ymd_hms_str.c_str()));
 
    // Lead time
    int lead_sec;
-   NcVar var_lead = get_nc_var(MetNc->Nc, "lead_time_sec");
+   NcVar var_lead = get_nc_var(MetNc->Nc.get(), "lead_time_sec");
    var_lead.getVar(start, count, &lead_sec);
    plane.set_lead(lead_sec);
 }

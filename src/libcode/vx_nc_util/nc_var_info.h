@@ -21,6 +21,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <vector>
 #include <netcdf>
 
@@ -60,7 +61,7 @@ class NcVarInfo {
       void dump(std::ostream &, int = 0) const;
 
 
-      netCDF::NcVar * var;   //  not allocated
+      std::unique_ptr<netCDF::NcVar> var;   //  owned: the readers hand over a copy of the NcVar handle
 
       ConcatString name;
 

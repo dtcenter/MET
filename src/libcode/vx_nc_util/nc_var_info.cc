@@ -128,7 +128,7 @@ return;
 
 void NcVarInfo::clear() {
 
-var = (NcVar *) nullptr;   //  don't delete
+var.reset();
 
 name.clear();
 
@@ -176,7 +176,7 @@ Indent prefix(depth);
 
 out << prefix << "var = ";
 
-if ( var )  out << var << '\n';
+if ( var )  out << var.get() << '\n';
 else        out << "(nul)\n";
 
 out << prefix << "name = ";
@@ -261,7 +261,7 @@ void NcVarInfo::assign(const NcVarInfo & i) {
 
 clear();
 
-var = i.var;
+var = (i.var ? std::make_unique<NcVar>(*i.var) : nullptr);
 
 name = i.name;
 
@@ -334,7 +334,7 @@ NcVarInfo *find_var_info_by_dim_name(NcVarInfo *vars, const string dim_name,
       for (int i=0; i<nvars; i++) {
          if (vars[i].Ndims > 2) continue;
          dim_offset = vars[i].Ndims == 2 ? 1 : 0;
-         NcDim dim = get_nc_dim(vars[i].var, dim_offset);
+         NcDim dim = get_nc_dim(vars[i].var.get(), dim_offset);
          if (IS_VALID_NC(dim) && GET_NC_NAME(dim) == dim_name) {
            var = &vars[i];
            break;
@@ -356,7 +356,7 @@ bool get_att_str(const NcVarInfo &info, const ConcatString att_name,
    
    att_value.clear();
    
-   att = get_nc_att(info.var, att_name, false);
+   att = get_nc_att(info.var.get(), att_name, false);
    if (!IS_INVALID_NC_P(att.get())) {
       found = get_att_value_chars(att.get(), att_value);
       if ( !found)  {
@@ -386,7 +386,7 @@ bool get_att_int(const NcVarInfo &info, const ConcatString att_name,
 
    att_value = bad_data_int;
    
-   auto att = get_nc_att(info.var, att_name, false);
+   auto att = get_nc_att(info.var.get(), att_name, false);
    bool found = IS_VALID_NC_P(att.get());
    if (found) {
       att_value = get_att_value_int(att.get());
@@ -456,7 +456,7 @@ bool get_att_unixtime(const NcVar *var, const ConcatString att_name,
 bool get_att_unixtime(const NcVarInfo &info, const ConcatString att_name,
                       unixtime &att_value) {
 
-   return get_att_unixtime(info.var, att_name, att_value);
+   return get_att_unixtime(info.var.get(), att_name, att_value);
 
 }
 

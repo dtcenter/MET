@@ -864,7 +864,7 @@ long MetNcCFDataFile::convert_generic_to_offset(double value, const string &dim_
    if (offset == (long) bad_data_int && !dim_name.empty()) {
       NcVarInfo *var_info = find_var_info_by_dim_name(_file->Var, dim_name, _file->Nvars);
       if (var_info) {
-         long new_offset = get_index_at_nc_data(var_info->var, value, dim_name);
+         long new_offset = get_index_at_nc_data(var_info->var.get(), value, dim_name);
          if (new_offset != bad_data_int) offset = new_offset;
       }
    }
@@ -1097,10 +1097,10 @@ long MetNcCFDataFile::find_generic_offset(VarInfo &vinfo, const NcVarInfo *data_
    string dim_name = get_dim_name(data_var, index);
    NcVarInfo* dim_var_info = _file->find_var_by_dim_name(dim_name.c_str());
 
-   int dim_size = get_data_size(dim_var_info->var);
+   int dim_size = get_data_size(dim_var_info->var.get());
    vector<double> values(dim_size);
 
-   if( !get_nc_data(dim_var_info->var, values.data()) ) {
+   if( !get_nc_data(dim_var_info->var.get(), values.data()) ) {
       mlog << Error << "\n" << method_name << "failed to get data from " << dim_name << "\n\n";
       exit(1);
    }
@@ -1153,7 +1153,7 @@ NcVarInfo *MetNcCFDataFile::get_data_var(VarInfo &vinfo) {
 string MetNcCFDataFile::get_dim_name(const NcVarInfo *data_var, int index) const {
    string dim_name;
    if (index >= 0) {
-      NcDim dim = get_nc_dim(data_var->var, index);
+      NcDim dim = get_nc_dim(data_var->var.get(), index);
       if (IS_VALID_NC(dim)) dim_name = GET_NC_NAME(dim);
    }
    return dim_name;

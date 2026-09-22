@@ -774,45 +774,45 @@ static void open_aggr_file() {
    // Update timing info based on aggregate file global attributes
    ConcatString cs;
 
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_init_beg", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "fcst_init_beg", cs)) {
       set_range(timestring_to_unix(cs.c_str()), fcst_init_beg, fcst_init_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_init_end", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "fcst_init_end", cs)) {
       set_range(timestring_to_unix(cs.c_str()), fcst_init_beg, fcst_init_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_valid_beg", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "fcst_valid_beg", cs)) {
       set_range(timestring_to_unix(cs.c_str()), fcst_valid_beg, fcst_valid_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_valid_end", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "fcst_valid_end", cs)) {
       set_range(timestring_to_unix(cs.c_str()), fcst_valid_beg, fcst_valid_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_lead_beg", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "fcst_lead_beg", cs)) {
       set_range(timestring_to_sec(cs.c_str()), fcst_lead_beg, fcst_lead_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_lead_end", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "fcst_lead_end", cs)) {
       set_range(timestring_to_sec(cs.c_str()), fcst_lead_beg, fcst_lead_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_init_beg", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "obs_init_beg", cs)) {
       set_range(timestring_to_unix(cs.c_str()), obs_init_beg, obs_init_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_init_end", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "obs_init_end", cs)) {
       set_range(timestring_to_unix(cs.c_str()), obs_init_beg, obs_init_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_valid_beg", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "obs_valid_beg", cs)) {
       set_range(timestring_to_unix(cs.c_str()), obs_valid_beg, obs_valid_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_valid_end", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "obs_valid_end", cs)) {
       set_range(timestring_to_unix(cs.c_str()), obs_valid_beg, obs_valid_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_lead_beg", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "obs_lead_beg", cs)) {
       set_range(timestring_to_sec(cs.c_str()), obs_lead_beg, obs_lead_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_lead_end", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "obs_lead_end", cs)) {
       set_range(timestring_to_sec(cs.c_str()), obs_lead_beg, obs_lead_end);
    }
 
    // Store the aggregate series length
-   n_series_aggr = get_int_var(aggr_nc.MetNc->Nc, n_series_var_name, 0);
+   n_series_aggr = get_int_var(aggr_nc.MetNc->Nc.get(), n_series_var_name, 0);
 
    mlog << Debug(3)
         << "Aggregation series has length " << n_series_aggr << ".\n";
@@ -1538,7 +1538,7 @@ static int read_aggr_total(int n) {
 
       // Retrive all the aggregate file variable names
       StringArray aggr_var_names;
-      get_var_names(aggr_nc.MetNc->Nc, &aggr_var_names);
+      get_var_names(aggr_nc.MetNc->Nc.get(), &aggr_var_names);
 
       // Search for one containing TOTAL
       for(int i=0; i<aggr_var_names.n(); i++) {

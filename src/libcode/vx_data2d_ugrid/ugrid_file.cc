@@ -133,7 +133,6 @@ void UGridFile::close()
 
   if (!Var.empty()) {
     for (int j = 0; j < Nvars; ++j) {
-      if (Var[j].var) { delete Var[j].var; Var[j].var = nullptr; }
     }
     Var.clear();
   }
@@ -141,7 +140,6 @@ void UGridFile::close()
   Nvars = 0;
 
   for (int j = 0; j < UG_META_VAR_COUNT; ++j) {
-    if (MetaVar[j].var) { delete MetaVar[j].var; MetaVar[j].var = nullptr; }
   }
 
   // Clear other members
@@ -281,7 +279,7 @@ bool UGridFile::open_metadata(const char * filepath)
   for (int j=0; j<Nvars; ++j) {
 
     int dim_count = Var[j].Ndims;
-    const NcVar *v = Var[j].var;
+    const NcVar *v = Var[j].var.get();
 
     dimNames.clear();
     get_dim_names(v, &dimNames);
@@ -301,7 +299,7 @@ bool UGridFile::open_metadata(const char * filepath)
   // Find the vertical level variable from dimension name if not found
   if (IS_INVALID_NC_P(_zVar) && (!vert_dim_name.empty())) {
     NcVarInfo *info = find_var_by_dim_name(vert_dim_name.c_str());
-    if (info) _zVar = info->var;
+    if (info) _zVar = info->var.get();
   }
 
   // Pull out the vertical levels
@@ -450,7 +448,7 @@ NcVarInfo* UGridFile::find_var_by_dim_name(const char *dim_name) const
     for (int i=0; i<Nvars; i++) {
       if (1 != Var[i].Ndims) continue;
 
-      NcDim dim = get_nc_dim(Var[i].var, 0);
+      NcDim dim = get_nc_dim(Var[i].var.get(), 0);
       if (GET_NC_NAME(dim) == dim_name) {
         var = const_cast<NcVarInfo *>(&Var[i]);
         break;
@@ -633,7 +631,7 @@ bool UGridFile::getData(const char *var_name,
 {
   info = find_by_name(var_name);
 
-  bool found = getData(info->var, a, plane);
+  bool found = getData(info->var.get(), a, plane);
 
   //  store the times
   unixtime valid_ut;
@@ -690,7 +688,7 @@ bool UGridFile::get_var_info() {
   for (int j=0; j<Nvars; ++j)  {
     NcVar v = get_var(_ncFile.get(), var_names[j].c_str());
 
-    Var[j].var = new NcVar(v);
+    Var[j].var = std::make_unique<NcVar>(v);
     Var[j].name = GET_NC_NAME(v).c_str();
 
     int dim_count = GET_NC_DIM_COUNT(v);
@@ -735,16 +733,16 @@ void UGridFile::metadata_coord_variables() {
   StringArray init_time_names = get_metadata_names(COORD_VAR_KEYS[9]);
   for (int j=0; j<Nvars; ++j) {
     if (time_names.has(Var[j].name)) {
-      _tVar = Var[j].var;
+      _tVar = Var[j].var.get();
     }
-    else if (lat_names.has(Var[j].name)) _latVar = Var[j].var;
-    else if (lon_names.has(Var[j].name)) _lonVar = Var[j].var;
+    else if (lat_names.has(Var[j].name)) _latVar = Var[j].var.get();
+    else if (lon_names.has(Var[j].name)) _lonVar = Var[j].var.get();
     else if (z_names.has(Var[j].name)) {
-      _zVar = Var[j].var;
+      _zVar = Var[j].var.get();
       z_var_name = Var[j].name;
     }
     else if (init_time_names.has(Var[j].name)) {
-      _init_time_var = Var[j].var;
+      _init_time_var = Var[j].var.get();
       mlog << Debug(97) << method_name
            << "found _init_time_var (" << GET_NC_NAME_P(_init_time_var)
            << ") from data file\n";
@@ -759,7 +757,7 @@ void UGridFile::metadata_coord_variables() {
     if (0 < meta_name.length()) {
       NcVar v = get_var(_ncMetaFile.get(), meta_name.c_str());
 
-      MetaVar[j].var = new NcVar(v);
+      MetaVar[j].var = std::make_unique<NcVar>(v);
       MetaVar[j].name = GET_NC_NAME(v).c_str();
 
       int dim_count = GET_NC_DIM_COUNT(v);
@@ -771,13 +769,13 @@ void UGridFile::metadata_coord_variables() {
       get_att_str( MetaVar[j], units_att_name,     MetaVar[j].units_att     );
 
       if (0 == j && nullptr == _tVar) {
-        _tVar = MetaVar[j].var;
+        _tVar = MetaVar[j].var.get();
       }
-      else if (1 == j && nullptr == _latVar) _latVar = MetaVar[j].var;
-      else if (2 == j && nullptr == _lonVar) _lonVar = MetaVar[j].var;
-      else if (3 == j && nullptr == _zVar) _zVar = MetaVar[j].var;
+      else if (1 == j && nullptr == _latVar) _latVar = MetaVar[j].var.get();
+      else if (2 == j && nullptr == _lonVar) _lonVar = MetaVar[j].var.get();
+      else if (3 == j && nullptr == _zVar) _zVar = MetaVar[j].var.get();
       else if (9 == j && nullptr == _init_time_var) {
-        _init_time_var = MetaVar[j].var;
+        _init_time_var = MetaVar[j].var.get();
         mlog << Debug(97) << method_name
              << "found _init_time_var (" << GET_NC_NAME_P(_init_time_var)
              << ") from data file\n";

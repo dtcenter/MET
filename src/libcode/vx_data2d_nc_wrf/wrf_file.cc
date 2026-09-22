@@ -310,7 +310,7 @@ InitTime = parse_init_time(att_value.c_str());
    for (int j=0; j<Nvars; ++j)  {
       v = get_var(Nc.get(), varNames[j].c_str());
 
-      Var[j].var = new NcVar(v);
+      Var[j].var = std::make_unique<NcVar>(v);
 
       Var[j].name = GET_NC_NAME(v).c_str();
 
@@ -632,7 +632,7 @@ pressure = bad_data_double;
 
 for (int j=0; j<Nvars; ++j)  {
 
-   if ( Var[j].var == v )  { found = true;  var = const_cast<NcVarInfo *>(&Var[j]);  break; }
+   if ( Var[j].var.get() == v )  { found = true;  var = const_cast<NcVarInfo *>(&Var[j]);  break; }
 
 }
 
@@ -677,7 +677,7 @@ if ( !found )  {
 
       c.add(a[var->z_slot]);
 
-      pressure = data(P->var, c) * pressure_unit_conversion;
+      pressure = data(P->var.get(), c) * pressure_unit_conversion;
 
    }
 
@@ -787,7 +787,7 @@ void WrfFile::handle_pressure(const NcVarInfo* var, const string& z_name, NcVarI
       }
 
       varDimNames.clear();
-      get_dim_names(Var[j].var, &varDimNames);
+      get_dim_names(Var[j].var.get(), &varDimNames);
 
       // check that the z dimension matches the var to read
       found = false;
@@ -822,7 +822,7 @@ bool WrfFile::parse_dims_for_var(const string& var_name, NcVarInfo* var, string&
    const char *method_name = "WrfFile::parse_dims_for_var(const string& var_name, NcVarInfo* var, string& z_name) const -> ";
    string c;
    StringArray varDimNames;
-   get_dim_names(var->var, &varDimNames);
+   get_dim_names(var->var.get(), &varDimNames);
    for (int k =0; k<(var->Ndims); ++k)  {
       c = to_lower(varDimNames[k]);
 
@@ -957,7 +957,7 @@ bool WrfFile::data(const char * var_name, const LongArray & a, DataPlane & plane
 
    if ( !found )  return false;
 
-   found = data(info->var, a, plane, pressure);
+   found = data(info->var.get(), a, plane, pressure);
 
    //
    //  store the times

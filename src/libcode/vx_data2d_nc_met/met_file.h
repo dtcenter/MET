@@ -16,6 +16,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
+#include <memory>
 #include <ostream>
 
 #include "vx_grid.h"
@@ -58,7 +60,7 @@ class MetNcFile {
 
       void dump(std::ostream &, int = 0) const;
 
-      netCDF::NcFile * Nc;    //  allocated
+      std::unique_ptr<netCDF::NcFile> Nc;
 
          //
          //  dimensions
@@ -66,7 +68,7 @@ class MetNcFile {
 
       int Ndims;
 
-      netCDF::NcDim ** Dim;   //  allocated
+      std::vector<netCDF::NcDim *> Dim;   //  array owned; the NcDims are not
 
       StringArray DimNames;
 
@@ -81,7 +83,7 @@ class MetNcFile {
 
       int Nvars;
 
-      NcVarInfo * Var;    //  allocated
+      std::vector<NcVarInfo> Var;
 
          //
          //  Grid

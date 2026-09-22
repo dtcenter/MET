@@ -544,7 +544,7 @@ static bool get_gen_vx_mask_config_str(const MetNcMetDataFile *mnmdf_ptr,
    if(!mnmdf_ptr) return status;
 
    // Check for the MET_tool global attribute
-   if(!get_global_att(mnmdf_ptr->MetNc->Nc, (string) "MET_tool", tool)) return status;
+   if(!get_global_att(mnmdf_ptr->MetNc->Nc.get(), (string) "MET_tool", tool)) return status;
 
    // Check for gen_vx_mask output
    if(tool != program_name) return status;

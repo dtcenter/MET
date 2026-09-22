@@ -244,7 +244,7 @@ void NcCfFile::set_var_slots(int max_dim_count)
   for (int j=0; j< Nvars; ++j) {
 
     int dim_count = Var[j].Ndims;
-    const NcVar *v = Var[j].var;
+    const NcVar *v = Var[j].var.get();
 
     dimNames.clear();
     get_dim_names(v, &dimNames);
@@ -429,7 +429,7 @@ void NcCfFile::parse_vars_from_file(ConcatString& att_value, int& max_dim_count,
   for (int j =0; j< Nvars; ++j)  {
     NcVar v = get_var(_ncFile, varNames[j].c_str());
 
-    Var[j].var = new NcVar(v);
+    Var[j].var = std::make_unique<NcVar>(v);
 
     Var[j].name = GET_NC_NAME(v).c_str();
 
@@ -443,21 +443,21 @@ void NcCfFile::parse_vars_from_file(ConcatString& att_value, int& max_dim_count,
     get_att_str(Var[j], long_name_att_name, Var[j].long_name_att );
     get_att_str(Var[j], units_att_name, Var[j].units_att     );
 
-    if (get_var_axis(Var[j].var, att_value) && ( "T" == att_value ||  "time" == att_value ) ) {
-        valid_time_var = Var[j].var;
+    if (get_var_axis(Var[j].var.get(), att_value) && ( "T" == att_value ||  "time" == att_value ) ) {
+        valid_time_var = Var[j].var.get();
         _time_var_info = &Var[j];
     }
 
-    if (get_var_standard_name(Var[j].var, att_value)) {
+    if (get_var_standard_name(Var[j].var.get(), att_value)) {
       if ( "time" == att_value ) {
-        valid_time_var = Var[j].var;
+        valid_time_var = Var[j].var.get();
         _time_var_info = &Var[j];
       }
-      else if( "latitude" == att_value ) _latVar = Var[j].var;
-      else if( "longitude" == att_value ) _lonVar = Var[j].var;
+      else if( "latitude" == att_value ) _latVar = Var[j].var.get();
+      else if( "longitude" == att_value ) _lonVar = Var[j].var.get();
     }
     if ( Var[j].name == "time" && (valid_time_var == nullptr)) {
-      valid_time_var = Var[j].var;
+      valid_time_var = Var[j].var.get();
       _time_var_info = &Var[j];
     }
   }   //  for j
@@ -465,7 +465,7 @@ void NcCfFile::parse_vars_from_file(ConcatString& att_value, int& max_dim_count,
   if (nullptr == _time_var_info) {
     for (int j=0; j< Nvars; ++j)  {
       if (is_nc_unit_time(Var[j].units_att.c_str())) {
-        valid_time_var = Var[j].var;
+        valid_time_var = Var[j].var.get();
         _time_var_info = &Var[j];
         break;
       }
@@ -487,7 +487,7 @@ bool NcCfFile::is_z_dim(const ConcatString& dim_name) const
   ConcatString att_value;
 
   // check units attribute
-  if (get_var_units(info->var, att_value)) {
+  if (get_var_units(info->var.get(), att_value)) {
 
     // units must be set to be considered a vertical dimension
     if ( att_value.empty() ) {
@@ -506,12 +506,12 @@ bool NcCfFile::is_z_dim(const ConcatString& dim_name) const
   }
 
   // if the axis attribute is Z (case-insensitive), return true
-  if (get_var_axis(info->var, att_value) && to_lower(att_value) == "z" ) {
+  if (get_var_axis(info->var.get(), att_value) && to_lower(att_value) == "z" ) {
     return true;
   }
 
   // if the standard_name is air_pressure or height (legacy support), return true
-  if (get_var_standard_name(info->var, att_value)
+  if (get_var_standard_name(info->var.get(), att_value)
       && ("air_pressure" == att_value || "height" == att_value)) {
     return true;
   }
@@ -932,7 +932,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   for (int j = 0; j < Nvars; ++j)
   {
-    if (Var[j].var == v)
+    if (Var[j].var.get() == v)
     {
       found = true;
       var = Var + j;
@@ -1129,7 +1129,7 @@ void NcCfFile::set_vlevels(NcVarInfo* var) const
   const string z_dim_name = var->var->getDim(var->z_slot).getName();
   NcVarInfo* info = find_var_by_dim_name(z_dim_name.c_str());
   if(info) {
-    z_var = info->var;
+    z_var = info->var.get();
   }
 
   // Pull out the vertical levels
@@ -1159,7 +1159,7 @@ bool NcCfFile::getData(const char *var_name,
   if (info == nullptr)
     return false;
 
-  bool found = getData(info->var, a, plane);
+  bool found = getData(info->var.get(), a, plane);
 
   //  store the times
   unixtime valid_ut;
@@ -1219,7 +1219,7 @@ void NcCfFile::find_xy_vars(const string &caller_name) {
       {
         if (Var[var_num].name == x_dim_var_name)
         {
-          _xCoordVar = Var[var_num].var;
+          _xCoordVar = Var[var_num].var.get();
           break;
         }
       }
@@ -1234,7 +1234,7 @@ void NcCfFile::find_xy_vars(const string &caller_name) {
       {
         if ( Var[var_num].name == y_dim_var_name)
         {
-          _yCoordVar = Var[var_num].var;
+          _yCoordVar = Var[var_num].var.get();
           break;
         }
       }
@@ -1326,7 +1326,7 @@ NcVarInfo* NcCfFile::find_var_by_dim_name(const char *dim_name) const
   if (!var) {
     for (int i=0; i<Nvars; i++) {
       if (1 == Var[i].Ndims) {
-        NcDim dim = get_nc_dim(Var[i].var, 0);
+        NcDim dim = get_nc_dim(Var[i].var.get(), 0);
         if (GET_NC_NAME(dim) == dim_name) {
           var = &Var[i];
           break;
@@ -1347,9 +1347,9 @@ NcVar *NcCfFile::find_var_by_standard_name(const char *standard_name) const
   NcVar *var = nullptr;
   ConcatString att_value;
   for (int i=0; i<Nvars; i++) {
-    if (get_var_standard_name(Var[i].var, att_value) &&
+    if (get_var_standard_name(Var[i].var.get(), att_value) &&
         (att_value == standard_name)) {
-      var = Var[i].var;
+      var = Var[i].var.get();
       break;
     }
   }
@@ -1378,7 +1378,7 @@ void NcCfFile::read_netcdf_grid()
   {
     // Get a pointer to the variable
 
-    NcVar *var = Var[i].var;
+    NcVar *var = Var[i].var.get();
 
     // A gridded data variable should be at least 2 dimensions.
     // One dimensional variables can be ignored
@@ -1419,7 +1419,7 @@ void NcCfFile::read_netcdf_grid()
       int var_i = var_index_list[i];
       // Exclude with less dimensions
       if (max_dim <= Var[var_i].Ndims) {
-        data_var = Var[var_i].var;
+        data_var = Var[var_i].var.get();
         break;
       }
 
@@ -1531,7 +1531,7 @@ void NcCfFile::get_grid_from_grid_mapping(const NcVarAtt *grid_mapping_att)
   {
     if ( Var[i].name == mapping_name )
     {
-      grid_mapping_var = Var[i].var;
+      grid_mapping_var = Var[i].var.get();
       break;
     }
   } /* endfor - i */
@@ -2130,7 +2130,7 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
         {
           if ( Var[var_num].name == GET_NC_NAME_P(_yDim))
           {
-            _yCoordVar = Var[var_num].var;
+            _yCoordVar = Var[var_num].var.get();
             break;
           }
         }
@@ -2154,7 +2154,7 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
         {
           if ( Var[var_num].name == GET_NC_NAME_P(_xDim))
           {
-            _xCoordVar = Var[var_num].var;
+            _xCoordVar = Var[var_num].var.get();
             break;
           }
         }
@@ -2699,7 +2699,7 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
         {
           if ( Var[var_num].name == GET_NC_NAME_P(_yDim))
           {
-            _yCoordVar = Var[var_num].var;
+            _yCoordVar = Var[var_num].var.get();
             break;
           }
         }
@@ -2723,7 +2723,7 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
         {
           if ( Var[var_num].name == GET_NC_NAME_P(_xDim))
           {
-            _xCoordVar = Var[var_num].var;
+            _xCoordVar = Var[var_num].var.get();
             break;
           }
         }
@@ -3010,8 +3010,8 @@ void NcCfFile::get_grid_mapping_geostationary(
   auto var_x_bound = (NcVar *)nullptr;
   auto var_y_bound = (NcVar *)nullptr;
   for (int j=0; j<Nvars; ++j)  {
-    if ( Var[j].name == "x_image_bounds" ) var_x_bound = Var[j].var;
-    else if ( Var[j].name == "y_image_bounds" ) var_y_bound = Var[j].var;
+    if ( Var[j].name == "x_image_bounds" ) var_x_bound = Var[j].var.get();
+    else if ( Var[j].name == "y_image_bounds" ) var_y_bound = Var[j].var.get();
   }
 
 
@@ -3103,7 +3103,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       is_x_dim_var = is_y_dim_var = false;
       for (int cIdx = 0; cIdx<count; cIdx++) {
         if ( Var[var_num].name == sa[cIdx]) {
-          if (get_var_units(Var[var_num].var, units_value)) {
+          if (get_var_units(Var[var_num].var.get(), units_value)) {
             if (is_nc_unit_latitude(units_value.c_str())) {
               y_dim_var_name = sa[cIdx];
               is_y_dim_var = true;
@@ -3117,7 +3117,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
                    << "found the longitude variable \"" << Var[var_num].name << "\"\n";
             }
             else if (!is_nc_unit_time(units_value.c_str())
-                     && (!get_var_axis(Var[var_num].var, axis_value)
+                     && (!get_var_axis(Var[var_num].var.get(), axis_value)
                          || (axis_value != "Z" && axis_value != "z"))) {
               mlog << Debug(4) << "\n" << method_name << " -> "
                    << "unknown units [" << units_value << "] for the coordinate variable ["
@@ -3128,11 +3128,11 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
         }
       }
       if (is_y_dim_var || Var[var_num].name == y_dim_var_name) {
-        _yCoordVar = Var[var_num].var;
+        _yCoordVar = Var[var_num].var.get();
         get_var_fill_value(_yCoordVar, lat_missing_value);
       }
       else if (is_x_dim_var || Var[var_num].name == x_dim_var_name) {
-        _xCoordVar = Var[var_num].var;
+        _xCoordVar = Var[var_num].var.get();
         get_var_fill_value(_xCoordVar, lon_missing_value);
       }
     }
@@ -3247,12 +3247,12 @@ bool NcCfFile::get_grid_from_dimensions()
         {
           if ( Var[var_num].name == y_dim_var_name)
           {
-            _yCoordVar = Var[var_num].var;
+            _yCoordVar = Var[var_num].var.get();
           }
           else if (( Var[var_num].name == var_lat_nt)
                    && ( y_dim_var_name == dim_lat_nt)) {
             y_dim_var_name = dim_lat_nt;
-            _yCoordVar = Var[var_num].var;
+            _yCoordVar = Var[var_num].var.get();
           }
           else continue;
           break;
@@ -3276,12 +3276,12 @@ bool NcCfFile::get_grid_from_dimensions()
         {
           if ( Var[var_num].name == x_dim_var_name)
           {
-            _xCoordVar = Var[var_num].var;
+            _xCoordVar = Var[var_num].var.get();
           }
           else if (( Var[var_num].name == var_lon_nt)
               && (x_dim_var_name == dim_lon_nt)) {
             x_dim_var_name = dim_lon_nt;
-            _xCoordVar = Var[var_num].var;
+            _xCoordVar = Var[var_num].var.get();
           }
           else continue;
           break;

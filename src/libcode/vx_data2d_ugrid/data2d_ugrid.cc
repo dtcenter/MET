@@ -374,7 +374,7 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
          int tmp_lower = lvl_lower;
          int tmp_upper = lvl_upper;
          if (data_vinfo->z_slot >= 0) {
-            int zdim_size = get_dim_size(data_vinfo->var, data_vinfo->z_slot);
+            int zdim_size = get_dim_size(data_vinfo->var.get(), data_vinfo->z_slot);
             if (tmp_lower >= zdim_size) tmp_lower = zdim_size - 1;
             if (tmp_upper >= zdim_size) tmp_upper = zdim_size - 1;
          }
@@ -667,7 +667,7 @@ long MetUGridDataFile::convert_value_to_offset(double z_value, string z_dim_name
    if (!found && 0 < z_dim_name.length()) {
       NcVarInfo *var_info = find_var_info_by_dim_name(_file->Var, z_dim_name, _file->Nvars);
       if (var_info) {
-         long new_offset = get_index_at_nc_data(var_info->var, z_value, z_dim_name);
+         long new_offset = get_index_at_nc_data(var_info->var.get(), z_value, z_dim_name);
          if (new_offset != bad_data_int) z_offset = new_offset;
       }
    }
