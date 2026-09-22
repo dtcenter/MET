@@ -283,7 +283,7 @@ class PSfile {
          //  zlib compression stuff
          //
 
-      PSFilter * fa_bank;   //  allocated
+      std::unique_ptr<PSFilter> fa_bank;
 
       virtual void begin_flate();
       virtual void end_flate();

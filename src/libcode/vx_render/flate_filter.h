@@ -17,6 +17,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
+#include <memory>
 #include <zlib.h>
 
 #include "ps_filter.h"
@@ -34,13 +36,13 @@ class FlateEncodeFilter : public PSFilter {
 
       int flush_mode;
 
-      z_stream * s;   //  allocated
+      std::unique_ptr<z_stream> s;
 
       unsigned int inbytes;   //  # of bytes stored in the input buffer
 
-      unsigned char *  inbuf;   //  allocated
+      std::vector<unsigned char>  inbuf;
 
-      unsigned char * outbuf;   //  allocated
+      std::vector<unsigned char> outbuf;
 
       virtual void eat(unsigned char);
 
