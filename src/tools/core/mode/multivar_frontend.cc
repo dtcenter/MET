@@ -31,7 +31,7 @@ static const char mode_default_config [] = "MET_BASE/config/MODEMultivarConfig_d
 
 static const int dir_creation_mode = 0755;       
 
-static ModeExecutive *mode_exec = nullptr;
+static std::unique_ptr<ModeExecutive> mode_exec;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -49,7 +49,7 @@ MultivarFrontEnd::MultivarFrontEnd()
 MultivarFrontEnd::~MultivarFrontEnd()
 {
    if ( mode_exec ) {
-      delete mode_exec;  mode_exec = nullptr;
+      mode_exec.reset();
    }
  }
 
@@ -128,10 +128,10 @@ int MultivarFrontEnd::run(const StringArray & Argv)
             SimpleObjects OO;
             _create_simple_objects(ModeDataType::MvMode_Fcst, "forecast", ir, it, n_fcst_files,
                                    fcst_filenames, fcstInput, f_calc, OF);
-            fcstSimple.emplace_back(OF);
+            fcstSimple.emplace_back(std::move(OF));
             _create_simple_objects(ModeDataType::MvMode_Obs, "obs", ir, it, n_obs_files,
                                    obs_filenames, obsInput, o_calc, OO);
-            obsSimple.emplace_back(OO);
+            obsSimple.emplace_back(std::move(OO));
          }
       }
    }
@@ -141,10 +141,10 @@ int MultivarFrontEnd::run(const StringArray & Argv)
          SimpleObjects OO;
          _create_simple_objects(ModeDataType::MvMode_Fcst, "forecast", ir, ir, n_fcst_files,
                                 fcst_filenames, fcstInput, f_calc, OF);
-         fcstSimple.emplace_back(OF);
+         fcstSimple.emplace_back(std::move(OF));
          _create_simple_objects(ModeDataType::MvMode_Obs, "obs", ir, ir, n_obs_files,
                                 obs_filenames, obsInput, o_calc, OO);
-         obsSimple.emplace_back(OO);
+         obsSimple.emplace_back(std::move(OO));
       }
    }
 
@@ -501,7 +501,7 @@ void MultivarFrontEnd::_create_verif_grid()
    _init_exec(ModeExecutive::TRADITIONAL, "None", "None");
    mode_exec->setup_verification_grid(fcstInput[0], obsInput[0], config);
    verification_grid = mode_exec->grid;
-   delete mode_exec;  mode_exec = nullptr;
+   mode_exec.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -519,17 +519,17 @@ void MultivarFrontEnd::_create_simple_objects(
            << "\n" << sep << "\ncreating simple " << name << " objects from " << name << " "
            << (j + 1) << " of " << n_files << " conv_radius[" << rIndex+1 << "] conv_thresh["
            << tIndex+1 << "]\n" << sep << "\n";
-      MultiVarData *mvdi = _create_simple_multivar_data(dtype, rIndex, tIndex, j, n_files, 
+      auto mvdi = _create_simple_multivar_data(dtype, rIndex, tIndex, j, n_files, 
                                                         filenames[j], input[j]);
       mvdi->print();
-      O._mvd.emplace_back(mvdi);
+      O._mvd.emplace_back(std::move(mvdi));
    }
    O.setSuper(dtype == ModeDataType::MvMode_Fcst, n_files, do_clusters, calc);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-MultiVarData *MultivarFrontEnd::_create_simple_multivar_data(
+std::unique_ptr<MultiVarData> MultivarFrontEnd::_create_simple_multivar_data(
                                    ModeDataType dtype,
                                    int rIndex, int tIndex,
                                    int j, int n_files,
@@ -541,16 +541,16 @@ MultiVarData *MultivarFrontEnd::_create_simple_multivar_data(
    //
    _simple_objects(ModeExecutive::MULTIVAR_SIMPLE, dtype, rIndex, tIndex, j, n_files,
                    filename, input);
-   MultiVarData *mvdi = mode_exec->get_multivar_data(dtype);
-   delete mode_exec; mode_exec = nullptr;
+   auto mvdi = mode_exec->get_multivar_data(dtype);
+   mode_exec.reset();
 
    //
    // create simple merged objects
    //
    _simple_objects(ModeExecutive::MULTIVAR_SIMPLE_MERGE, dtype, rIndex, tIndex, j, n_files,
                    filename, input);
-   mode_exec->add_multivar_merge_data(mvdi, dtype);
-   delete mode_exec;  mode_exec = nullptr;
+   mode_exec->add_multivar_merge_data(mvdi.get(), dtype);
+   mode_exec.reset();
    return mvdi;
 }
 
@@ -597,8 +597,8 @@ void MultivarFrontEnd::_create_intensity_comparisons(
                           const string &fcst_filename,
                           const string &obs_filename)
 {
-   MultiVarData *mvdf = fcsts._mvd[findex];
-   MultiVarData *mvdo = obs._mvd[oindex];
+   MultiVarData *mvdf = fcsts._mvd[findex].get();
+   MultiVarData *mvdo = obs._mvd[oindex].get();
    
    // mask the input data to be valid only inside the simple super objects
    fcsts._super.mask_data_simple("Fcst", *mvdf);
@@ -644,7 +644,7 @@ void MultivarFrontEnd::_create_intensity_comparisons(
    _intensity_compare_mode_algorithm(fcsts._rIndex, fcsts._tIndex, obs._rIndex, obs._tIndex, *mvdf, *mvdo,
                                      fcsts._super, obs._super);
 
-   delete mode_exec;  mode_exec = nullptr;
+   mode_exec.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -676,8 +676,8 @@ void MultivarFrontEnd::_process_superobjects(SimpleObjects &fcsts, SimpleObjects
         << "\nRunning mvmode superobject analysis conv_radius[" << fcsts._rIndex+1
         << "] conv_thresh[" << fcsts._tIndex+1 << "]\n" << sep << "\n";
 
-   const MultiVarData *mvdf = fcsts._mvd[0];
-   const MultiVarData *mvdo = obs._mvd[0];
+   const MultiVarData *mvdf = fcsts._mvd[0].get();
+   const MultiVarData *mvdo = obs._mvd[0].get();
    
    // set the data to 0 inside superobjects and missing everywhere else
 
@@ -706,7 +706,7 @@ void MultivarFrontEnd::_process_superobjects(SimpleObjects &fcsts, SimpleObjects
    _superobject_mode_algorithm(fcsts._rIndex, fcsts._tIndex, obs._rIndex, obs._tIndex,
                                fcsts._super, obs._super);
 
-   delete mode_exec;  mode_exec = nullptr;
+   mode_exec.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -738,9 +738,9 @@ void MultivarFrontEnd::_init_exec(
 {
    mlog << Debug(4) << "Running multivar front end for " << ModeExecutive::stype(p) << "\n";
 
-   if ( mode_exec )  { delete mode_exec;  mode_exec = nullptr; }
+   mode_exec.reset();
 
-   mode_exec = new ModeExecutive();
+   mode_exec = std::make_unique<ModeExecutive>();
    mode_exec->fcst_file = ffile;
    mode_exec->obs_file = ofile;
 

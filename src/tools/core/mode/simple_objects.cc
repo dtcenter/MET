@@ -24,12 +24,6 @@ SimpleObjects::SimpleObjects() :
 
 ////////////////////////////////////////////////////////////////////////
 
-SimpleObjects::~SimpleObjects()
-{
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void SimpleObjects::init(ModeDataType dataType, int rIndex, int tIndex)
 {
    _dataType = dataType;
@@ -50,9 +44,5 @@ void SimpleObjects::setSuper(bool isFcst, int n_fcst_files, bool do_clusters,
 
 void SimpleObjects::clear(void)
 {
-   for (auto &x : _mvd) {
-      delete x;
-      x = nullptr;
-   }
    _mvd.clear();
 }

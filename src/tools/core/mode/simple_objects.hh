@@ -17,6 +17,7 @@
 
 
 #include <iostream>
+#include <memory>
 #include <vector>
 #include "multivar_data.h"
 #include "mode_superobject.h"
@@ -27,7 +28,16 @@ class SimpleObjects {
  public:
 
    SimpleObjects();
-   ~SimpleObjects();
+   ~SimpleObjects() = default;
+
+      //
+      //  _mvd owns its MultiVarData, so these objects move rather than copy.
+      //  The destructor is defaulted for the same reason: a user-declared one
+      //  suppresses the implicit move constructor.
+      //
+
+   SimpleObjects(SimpleObjects &&) = default;
+   SimpleObjects & operator=(SimpleObjects &&) = default;
 
    void init(ModeDataType dataType, int rIndex, int tIndex);
    void setSuper(bool isFcst, int n_fcst_files, bool do_clusters, BoolCalc &f_calc);
@@ -36,7 +46,7 @@ class SimpleObjects {
    ModeDataType _dataType;  /**< observations or forecasts */
    int _rIndex;             /**< Convolution radius index */
    int _tIndex;            /**< Convolution threshold index */
-   std::vector<MultiVarData *> _mvd;  /**< The data from each input */
+   std::vector<std::unique_ptr<MultiVarData>> _mvd;  /**< The data from each input */
    ModeSuperObject _super;   /**< The superobject created from the data */
 };
 

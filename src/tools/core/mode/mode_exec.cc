@@ -1654,10 +1654,10 @@ void ModeExecutive::write_obj_stats()
 
 //////////////////////////////////////////////////////////////////////
 
-MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
+std::unique_ptr<MultiVarData> ModeExecutive::get_multivar_data(ModeDataType dtype)
 {
    bool simple=true;
-   MultiVarData *mvd = new MultiVarData();
+   auto mvd = std::make_unique<MultiVarData>();
 
    switch (dtype)
    {

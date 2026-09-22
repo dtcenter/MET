@@ -201,7 +201,7 @@ class ModeExecutive {
       
   
    // owned by caller
-   MultiVarData *get_multivar_data(ModeDataType dtype);
+   std::unique_ptr<MultiVarData> get_multivar_data(ModeDataType dtype);
    void add_multivar_merge_data(MultiVarData *mvdi, ModeDataType dtype);
 
    void plot_engine();
