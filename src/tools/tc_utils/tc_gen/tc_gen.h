@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -106,7 +107,7 @@ static ConcatString out_base;
 
 // Output NetCDF file
 static ConcatString out_nc_file;
-static netCDF::NcFile      *nc_out = (netCDF::NcFile *) nullptr;
+static std::unique_ptr<netCDF::NcFile> nc_out;
 static netCDF::NcDim        lat_dim;
 static netCDF::NcDim        lon_dim;
 

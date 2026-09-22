@@ -168,7 +168,7 @@ bool NcCfFile::open(const char * filepath)
   close();
 
   // Open the file
-  _ncFile.reset(open_ncfile(filepath));
+  _ncFile = open_ncfile(filepath);
 
   if (IS_INVALID_NC_P(_ncFile.get()))
   {

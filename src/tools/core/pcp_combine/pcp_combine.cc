@@ -159,7 +159,7 @@ static StringArray  field_list;
 static StringArray  derive_list;
 
 // Output NetCDF file
-NcFile *nc_out = (NcFile *) nullptr;
+std::unique_ptr<netCDF::NcFile> nc_out;
 NcDim   lat_dim;
 NcDim   lon_dim;
 
@@ -566,7 +566,7 @@ static void do_sum_command() {
    //
    // Write output.
    //
-   if(!nc_out) open_nc(grid);
+   if(!nc_out.get()) open_nc(grid);
    write_nc_data(init_time, valid_time, out_accum, plane, "sum", "");
 
    return;
@@ -969,7 +969,7 @@ static void do_sub_command() {
    //
    // Write output.
    //
-   if(!nc_out) open_nc(grid1);
+   if(!nc_out.get()) open_nc(grid1);
    write_nc_data(nc_init_time, nc_valid_time, nc_accum, diff,
                  "diff", "");
 
@@ -1178,7 +1178,7 @@ static void do_derive_command() {
    //
    // Open the output file, if needed.
    //
-   if(!nc_out) open_nc(grid);
+   if(!nc_out.get()) open_nc(grid);
 
    //
    // Loop through the derived fields.
@@ -1432,17 +1432,16 @@ static void open_nc(const Grid &grid) {
    // Create a new NetCDF file and open it.
    nc_out = open_ncfile(out_filename.c_str(), true);
 
-   if(IS_INVALID_NC_P(nc_out)) {
+   if(IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nopen_nc() -> "
            << "trouble opening output file " << out_filename
            << "\n\n";
-      delete nc_out;
-      nc_out = (NcFile *) nullptr;
+      nc_out.reset();
       exit(1);
    }
 
    // Add global attributes.
-   write_netcdf_global(nc_out, out_filename.c_str(), program_name.c_str());
+   write_netcdf_global(nc_out.get(), out_filename.c_str(), program_name.c_str());
 
    if(run_command == RunCommand::sum) {
       command_str << cs_erase
@@ -1464,13 +1463,13 @@ static void open_nc(const Grid &grid) {
                   << n_files << " files.";
    }
 
-   add_att(nc_out, "RunCommand", command_str.c_str());
+   add_att(nc_out.get(), "RunCommand", command_str.c_str());
 
    // Add the projection information.
-   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(nc_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables.
-   write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+   write_netcdf_latlon(nc_out.get(), &lat_dim, &lon_dim, grid);
 
    return;
 }
@@ -1556,7 +1555,7 @@ static void write_nc_data(unixtime nc_init,
    if(deflate_level < 0) deflate_level = config.nc_compression();
 
    // Define variable.
-   nc_var = add_var(nc_out, var_str.c_str(), ncFloat,
+   nc_var = add_var(nc_out.get(), var_str.c_str(), ncFloat,
                     lat_dim, lon_dim, deflate_level);
 
    // Add variable attributes.
@@ -1622,7 +1621,7 @@ static void close_nc() {
    //
    // Clean up.
    //
-   if(nc_out)    { delete nc_out;   nc_out   = (NcFile *)  nullptr; }
+   nc_out.reset();
    var_info.reset();
 
    return;

@@ -23,6 +23,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -111,6 +112,15 @@ class TmpFileInfo {
       TmpFileInfo();
       ~TmpFileInfo();
 
+         //
+         //  tmp_out owns its NcFile, so these objects move rather than copy.
+         //  The moves are declared explicitly because the user-declared
+         //  destructor above suppresses the implicit ones.
+         //
+
+      TmpFileInfo(TmpFileInfo &&) = default;
+      TmpFileInfo & operator=(TmpFileInfo &&) = default;
+
       //////////////////////////////////////////////////////////////////
 
       // Track information
@@ -148,7 +158,7 @@ class TmpFileInfo {
 
       // NetCDF Cylindrical Coordinates output
       ConcatString    tmp_file;
-      netCDF::NcFile *tmp_out;
+      std::unique_ptr<netCDF::NcFile> tmp_out;
 
       // NetCDF Dimensions
       netCDF::NcDim trk_dim;

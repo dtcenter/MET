@@ -669,12 +669,10 @@ bool get_global_att(const char *nc_name, const ConcatString &att_name,
    // Initialize
    att_val.clear();
 
-   NcFile *nc = open_ncfile(nc_name);
-   if (0 != nc && IS_VALID_NC_P(nc)) {
-      status = get_global_att(nc, att_name, att_val, false);
+   std::unique_ptr<NcFile> nc = open_ncfile(nc_name);
+   if (nc && IS_VALID_NC_P(nc.get())) {
+      status = get_global_att(nc.get(), att_name, att_val, false);
    }
-
-   if(nc) delete nc;
 
    return status;
 }
@@ -686,12 +684,10 @@ bool get_global_att(const char *nc_name, const ConcatString &att_name,
    bool status = false;
 
    // Initialize
-   NcFile *nc = open_ncfile(nc_name);
-   if (0 != nc && IS_VALID_NC_P(nc)) {
-      status = get_global_att(nc, att_name, att_val, false);
+   std::unique_ptr<NcFile> nc = open_ncfile(nc_name);
+   if (nc && IS_VALID_NC_P(nc.get())) {
+      status = get_global_att(nc.get(), att_name, att_val, false);
    }
-
-   if(nc) delete nc;
 
    return status;
 }
@@ -3575,21 +3571,22 @@ NcVar get_nc_var_time(const NcFile *nc) {
 
 ////////////////////////////////////////////////////////////////////////
 
-NcFile *open_ncfile(const char * nc_name, bool write) {
-   NcFile *nc = (NcFile *) nullptr;
+std::unique_ptr<NcFile> open_ncfile(const char * nc_name, bool write) {
+   std::unique_ptr<NcFile> nc;
 
    try {
       if (write) {
-         nc = new NcFile(nc_name, NcFile::replace, NcFile::nc4);
+         nc = std::make_unique<NcFile>(nc_name, NcFile::replace, NcFile::nc4);
       }
       else {
          struct stat fileInfo;
          if (stat(nc_name, &fileInfo) == 0) {
-            nc = new NcFile(nc_name, NcFile::read);
+            nc = std::make_unique<NcFile>(nc_name, NcFile::read);
          }
       }
    }
    catch(NcException& e) {
+      nc.reset();
    }
    return nc;
 }

@@ -1034,7 +1034,7 @@ static ConcatString get_nc_att_str(const ConcatString &cs1,
 static void setup_nc_file(void) {
 
    // Create NetCDF file
-   nc_out.reset(open_ncfile(out_file.c_str(), true));
+   nc_out = open_ncfile(out_file.c_str(), true);
 
    if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "

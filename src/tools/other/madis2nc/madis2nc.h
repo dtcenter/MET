@@ -132,7 +132,7 @@ static int          rej_sid  = 0;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-auto f_out = (netCDF::NcFile *) nullptr;
+std::unique_ptr<netCDF::NcFile> f_out;
 
 int processed_count = 0;
 

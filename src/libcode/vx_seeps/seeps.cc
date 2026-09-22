@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -518,12 +519,11 @@ void SeepsClimo::read_seeps_climo_grid(const ConcatString &filename) {
       double t2_12_buf[SEEPS_MONTH];
       double matrix_00_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
       double matrix_12_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
-      NcFile *nc_file = open_ncfile(filename.c_str());
-
+      std::unique_ptr<netCDF::NcFile> nc_file = open_ncfile(filename.c_str());
       clear();
 
       // dimensions: month = 12 ; nstn = 5293 ; nmatrix = 9 ;
-      get_dim(nc_file, dim_name_nstn, nstn, true);
+      get_dim(nc_file.get(), dim_name_nstn, nstn, true);
       mlog << Debug(6) << method_name
            << "dimensions nstn = " << nstn << "\n";
       if (standalone_debug_seeps) {
@@ -546,20 +546,20 @@ void SeepsClimo::read_seeps_climo_grid(const ConcatString &filename) {
       vector<double> matrix_00_array(nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE);
       vector<double> matrix_12_array(nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE);
 
-      NcVar var_sid       = get_nc_var(nc_file, var_name_sid);
-      NcVar var_lat       = get_nc_var(nc_file, var_name_lat);
-      NcVar var_lon       = get_nc_var(nc_file, var_name_lon);
-      NcVar var_elv       = get_nc_var(nc_file, var_name_elv);
-      NcVar var_p1_00     = get_nc_var(nc_file, var_name_p1_00);
-      NcVar var_p2_00     = get_nc_var(nc_file, var_name_p2_00);
-      NcVar var_t1_00     = get_nc_var(nc_file, var_name_t1_00);
-      NcVar var_t2_00     = get_nc_var(nc_file, var_name_t2_00);
-      NcVar var_p1_12     = get_nc_var(nc_file, var_name_p1_12);
-      NcVar var_p2_12     = get_nc_var(nc_file, var_name_p2_12);
-      NcVar var_t1_12     = get_nc_var(nc_file, var_name_t1_12);
-      NcVar var_t2_12     = get_nc_var(nc_file, var_name_t2_12);
-      NcVar var_matrix_00 = get_nc_var(nc_file, var_name_matrix_00);
-      NcVar var_matrix_12 = get_nc_var(nc_file, var_name_matrix_12);
+      NcVar var_sid       = get_nc_var(nc_file.get(), var_name_sid);
+      NcVar var_lat       = get_nc_var(nc_file.get(), var_name_lat);
+      NcVar var_lon       = get_nc_var(nc_file.get(), var_name_lon);
+      NcVar var_elv       = get_nc_var(nc_file.get(), var_name_elv);
+      NcVar var_p1_00     = get_nc_var(nc_file.get(), var_name_p1_00);
+      NcVar var_p2_00     = get_nc_var(nc_file.get(), var_name_p2_00);
+      NcVar var_t1_00     = get_nc_var(nc_file.get(), var_name_t1_00);
+      NcVar var_t2_00     = get_nc_var(nc_file.get(), var_name_t2_00);
+      NcVar var_p1_12     = get_nc_var(nc_file.get(), var_name_p1_12);
+      NcVar var_p2_12     = get_nc_var(nc_file.get(), var_name_p2_12);
+      NcVar var_t1_12     = get_nc_var(nc_file.get(), var_name_t1_12);
+      NcVar var_t2_12     = get_nc_var(nc_file.get(), var_name_t2_12);
+      NcVar var_matrix_00 = get_nc_var(nc_file.get(), var_name_matrix_00);
+      NcVar var_matrix_12 = get_nc_var(nc_file.get(), var_name_matrix_12);
 
       if (IS_INVALID_NC(var_sid) || !get_nc_data(&var_sid, sid_array.data())) {
          mlog << Error << "\n" << method_name
@@ -661,7 +661,7 @@ void SeepsClimo::read_seeps_climo_grid(const ConcatString &filename) {
          seeps_score_12_map[sid] = rec_12;
       }
 
-      nc_file->close();
+      nc_file.get()->close();
 
       float duration = (float)(clock() - clock_time)/CLOCKS_PER_SEC;
       mlog << Debug(6) << method_name
@@ -805,17 +805,16 @@ void SeepsClimoGrid::read_seeps_climo_grid(const ConcatString &filename) {
    const char *method_name = "SeepsClimoGrid::read_seeps_climo_grid() -> ";
 
    try {
-      NcFile *nc_file = open_ncfile(filename.c_str());
-
+      std::unique_ptr<netCDF::NcFile> nc_file = open_ncfile(filename.c_str());
       // dimensions: month = 12;
-      if (!has_dim(nc_file, dim_name_lat) || !has_dim(nc_file, dim_name_lon)) {
+      if (!has_dim(nc_file.get(), dim_name_lat) || !has_dim(nc_file.get(), dim_name_lon)) {
          mlog << Error << "\n" << method_name
               << "\"" << filename << "\" is not valid SEEPS climo file\n\n";
          exit(1);
       }
 
-      get_dim(nc_file, dim_name_lat, ny, true);
-      get_dim(nc_file, dim_name_lon, nx, true);
+      get_dim(nc_file.get(), dim_name_lat, ny, true);
+      get_dim(nc_file.get(), dim_name_lon, nx, true);
       mlog << Debug(6) << method_name
            << "dimensions lon = " << nx << " lat = " << ny
            << " month=" << month << "\n";
@@ -841,16 +840,16 @@ void SeepsClimoGrid::read_seeps_climo_grid(const ConcatString &filename) {
 
       LongArray curs;   // = { month-1, 0, 0 };
       LongArray dims;   // = { 1, ny, nx };
-      NcVar var_p1_00  = get_nc_var(nc_file, var_name_p1_00);
-      NcVar var_p2_00  = get_nc_var(nc_file, var_name_p2_00);
-      NcVar var_t1_00  = get_nc_var(nc_file, var_name_t1_00);
-      NcVar var_t2_00  = get_nc_var(nc_file, var_name_t2_00);
-      NcVar var_odfl_00 = get_nc_var(nc_file, var_name_odfl_00);
-      NcVar var_odfh_00 = get_nc_var(nc_file, var_name_odfh_00);
-      NcVar var_olfd_00 = get_nc_var(nc_file, var_name_olfd_00);
-      NcVar var_olfh_00 = get_nc_var(nc_file, var_name_olfh_00);
-      NcVar var_ohfd_00 = get_nc_var(nc_file, var_name_ohfd_00);
-      NcVar var_ohfl_00 = get_nc_var(nc_file, var_name_ohfl_00);
+      NcVar var_p1_00  = get_nc_var(nc_file.get(), var_name_p1_00);
+      NcVar var_p2_00  = get_nc_var(nc_file.get(), var_name_p2_00);
+      NcVar var_t1_00  = get_nc_var(nc_file.get(), var_name_t1_00);
+      NcVar var_t2_00  = get_nc_var(nc_file.get(), var_name_t2_00);
+      NcVar var_odfl_00 = get_nc_var(nc_file.get(), var_name_odfl_00);
+      NcVar var_odfh_00 = get_nc_var(nc_file.get(), var_name_odfh_00);
+      NcVar var_olfd_00 = get_nc_var(nc_file.get(), var_name_olfd_00);
+      NcVar var_olfh_00 = get_nc_var(nc_file.get(), var_name_olfh_00);
+      NcVar var_ohfd_00 = get_nc_var(nc_file.get(), var_name_ohfd_00);
+      NcVar var_ohfl_00 = get_nc_var(nc_file.get(), var_name_ohfl_00);
 
       curs.add(month-1);
       curs.add(0);
@@ -909,7 +908,7 @@ void SeepsClimoGrid::read_seeps_climo_grid(const ConcatString &filename) {
               << "Did not get ohfl_00\n\n";
          exit(1);
       }
-      nc_file->close();
+      nc_file.get()->close();
 
       for(int i = 0; i < ny+3; i++) {
         mlog << Debug(9) << method_name

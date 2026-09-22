@@ -1588,7 +1588,7 @@ static DataPlane combine(const DataPlane &dp_data,
 static void write_netcdf(const DataPlane &dp) {
    ConcatString cs;
 
-   NcFile *f_out = nullptr;
+   std::unique_ptr<netCDF::NcFile> f_out;
    NcDim lat_dim;
    NcDim lon_dim;
    NcVar mask_var;
@@ -1596,23 +1596,22 @@ static void write_netcdf(const DataPlane &dp) {
    // Create a new NetCDF file and open it.
    f_out = open_ncfile(out_filename.c_str(), true);
 
-   if(IS_INVALID_NC_P(f_out)) {
+   if(IS_INVALID_NC_P(f_out.get())) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "trouble opening output file " << out_filename
            << "\n\n";
-      delete f_out;
-      f_out = nullptr;
+      f_out.reset();
       exit(1);
    }
 
    // Add global attributes
-   write_netcdf_global(f_out, out_filename.c_str(), program_name);
+   write_netcdf_global(f_out.get(), out_filename.c_str(), program_name);
 
    // Add the projection information
-   write_netcdf_proj(f_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(f_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
-   write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
+   write_netcdf_latlon(f_out.get(), &lat_dim, &lon_dim, grid);
 
    // Set the mask_name, if not already set
    if(mask_name.empty()) {
@@ -1635,7 +1634,7 @@ static void write_netcdf(const DataPlane &dp) {
    if (deflate_level < 0) deflate_level = global_config.nc_compression();
 
    // Define Variables
-   mask_var = add_var(f_out, string(mask_name), ncFloat, lat_dim, lon_dim, deflate_level);
+   mask_var = add_var(f_out.get(), string(mask_name), ncFloat, lat_dim, lon_dim, deflate_level);
    cs << cs_erase << mask_name << " masking region";
    add_att(&mask_var, "long_name", string(cs));
    add_att(&mask_var, "units", string(units_cs));
@@ -1661,8 +1660,7 @@ static void write_netcdf(const DataPlane &dp) {
       exit(1);
    }
 
-   delete f_out;
-   f_out = nullptr;
+   f_out.reset();
 
    mlog << Debug(1)
         << "Output File:\t\t" << out_filename << "\n";

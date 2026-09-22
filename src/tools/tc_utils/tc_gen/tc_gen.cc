@@ -205,13 +205,12 @@ int met_main(int argc, char *argv[]) {
    finish_txt_files();
 
    // Close the NetCDF output file
-   if(nc_out) {
+   if(nc_out.get()) {
 
       // List the NetCDF file after it is finished
       mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
 
-      delete nc_out;
-      nc_out = (NcFile *) nullptr;
+      nc_out.reset();
    }
 
    return 0;
@@ -1924,7 +1923,7 @@ void setup_nc_file() {
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_nc_file.c_str(), true);
 
-   if(IS_INVALID_NC_P(nc_out)) {
+   if(IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_nc_file << "\n\n";
@@ -1932,15 +1931,15 @@ void setup_nc_file() {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_nc_file.c_str(), program_name);
+   write_netcdf_global(nc_out.get(), out_nc_file.c_str(), program_name);
 
    // Add the projection information
    Grid grid = conf_info.NcOutGrid;
-   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(nc_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    if(conf_info.NcInfo.do_latlon) {
-      write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+      write_netcdf_latlon(nc_out.get(), &lat_dim, &lon_dim, grid);
    }
 
    return;
@@ -2502,7 +2501,7 @@ void write_nc(GenCTCInfo &gci) {
       nc_var_sa.add(var_name);
 
       // Define the variable
-      nc_var = add_var(nc_out, (string) var_name,
+      nc_var = add_var(nc_out.get(), (string) var_name,
                        ncFloat, lat_dim, lon_dim,
                        conf_info.compression_level());
 

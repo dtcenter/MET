@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <string.h>
 #include <time.h>
 
@@ -337,7 +338,7 @@ extern netCDF::NcVar  get_nc_var_lon(const netCDF::NcFile *nc);
 extern netCDF::NcVar  get_nc_var_time(const netCDF::NcFile *nc);
 extern int    get_index_at_nc_data(netCDF::NcVar *var, double value, const std::string &dim_name, bool is_time=false);
 extern int    get_index_at_nc_data(netCDF::NcVar *var, double value_min, double value_max, const std::string &dim_name, bool is_time=false);
-extern netCDF::NcFile* open_ncfile(const char * nc_name, bool write = false);
+extern std::unique_ptr<netCDF::NcFile> open_ncfile(const char * nc_name, bool write = false);
 
 // Moved from nc_cf_file.cc
 extern unixtime get_init_time(netCDF::NcVar *var);

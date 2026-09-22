@@ -295,9 +295,8 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    NcDim lat_dim, lon_dim;
 
    // Create a new NetCDF file and open it
-   NcFile *f_out = open_ncfile(OutputFilename.c_str(), true);
-
-   if(IS_INVALID_NC_P(f_out)) {
+   std::unique_ptr<netCDF::NcFile> f_out = open_ncfile(OutputFilename.c_str(), true);
+   if(IS_INVALID_NC_P(f_out.get())) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "trouble opening output NetCDF file \""
            << OutputFilename << "\"\n\n";
@@ -305,16 +304,16 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    }
 
    // Add global attributes
-   write_netcdf_global(f_out, OutputFilename.c_str(), program_name.c_str());
+   write_netcdf_global(f_out.get(), OutputFilename.c_str(), program_name.c_str());
 
    // Add the run command
-   add_att(f_out, "RunCommand", shift_cs);
+   add_att(f_out.get(), "RunCommand", shift_cs);
 
    // Add the projection information
-   write_netcdf_proj(f_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(f_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
-   write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
+   write_netcdf_latlon(f_out.get(), &lat_dim, &lon_dim, grid);
 
    // Define output variable and attributes
    cs << cs_erase << vinfo->name_attr();
@@ -326,7 +325,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = 0;
 
-   NcVar data_var = add_var(f_out, (string)cs, ncFloat, lat_dim, lon_dim, deflate_level);
+   NcVar data_var = add_var(f_out.get(), (string)cs, ncFloat, lat_dim, lon_dim, deflate_level);
    add_att(&data_var, "name", (string)cs);
    add_att(&data_var, "long_name", (string)vinfo->long_name_attr());
    add_att(&data_var, "level", (string)vinfo->level_attr());
@@ -347,9 +346,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    }
 
    // Clean up
-   if(f_out) {
-      delete f_out;   f_out = (NcFile *) nullptr;
-   }
+   f_out.reset();
 
    // List the output file
    mlog << Debug(1)

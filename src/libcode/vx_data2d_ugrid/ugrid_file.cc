@@ -194,7 +194,7 @@ bool UGridFile::open(const char * filepath)
   close();
 
   // Open the file
-  _ncFile.reset(open_ncfile(filepath));
+  _ncFile = open_ncfile(filepath);
 
   if (IS_INVALID_NC_P(_ncFile.get())) {
     close();
@@ -213,7 +213,7 @@ bool UGridFile::open_metadata(const char * filepath)
   const char *method_name = "UGridFile::open_metadata() -> ";
 
   // Open the file
-  _ncMetaFile.reset(open_ncfile(filepath));
+  _ncMetaFile = open_ncfile(filepath);
 
   mlog << Debug(7) << method_name << "open " << filepath << "\n";
 

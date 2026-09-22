@@ -1522,7 +1522,7 @@ static void process_grid_vx() {
 
       // If requested in the config file, create a NetCDF file to store
       // the verification matched pairs
-      if(out_nc_flag && nc_out == (NcFile *) nullptr) {
+      if(out_nc_flag && nc_out.get() == (NcFile *) nullptr) {
          setup_nc_file("_orank.nc");
       }
 
@@ -1721,9 +1721,7 @@ static void process_grid_vx() {
    } // end for i
 
    // Close the output NetCDF file
-   if(nc_out) {
-      delete nc_out; nc_out = (NcFile *) nullptr;
-   }
+   nc_out.reset();
 
    return;
 }
@@ -1925,7 +1923,7 @@ static void setup_nc_file(const char *suffix) {
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_nc_file.c_str(), true);
 
-   if(IS_INVALID_NC_P(nc_out)) {
+   if(IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_nc_file << "\n\n";
@@ -1933,20 +1931,20 @@ static void setup_nc_file(const char *suffix) {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_nc_file.text(), program_name,
+   write_netcdf_global(nc_out.get(), out_nc_file.text(), program_name,
                        conf_info.model.c_str(), conf_info.obtype.c_str());
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(nc_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    if(conf_info.nc_info.do_latlon) {
-      write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+      write_netcdf_latlon(nc_out.get(), &lat_dim, &lon_dim, grid);
    }
 
    // Add grid weight variable
    if(conf_info.nc_info.do_weight) {
-      write_netcdf_grid_weight(nc_out, &lat_dim, &lon_dim,
+      write_netcdf_grid_weight(nc_out.get(), &lat_dim, &lon_dim,
                                conf_info.grid_weight_flag, wgt_dp);
    }
 
@@ -2773,7 +2771,7 @@ static void write_orank_var_float(int i_vx, int i_interp, int i_mask,
    nc_orank_var_sa.add(var_name);
 
    // Define the variable
-   nc_var = add_var(nc_out, (string)var_name, ncFloat, lat_dim, lon_dim);
+   nc_var = add_var(nc_out.get(), (string)var_name, ncFloat, lat_dim, lon_dim);
 
    // Add the variable attributes
    add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.ens_info->get_var_info(),
@@ -2839,7 +2837,7 @@ static void write_orank_var_int(int i_vx, int i_interp, int i_mask,
    nc_orank_var_sa.add(var_name);
 
    // Define the variable
-   nc_var = add_var(nc_out, (string)var_name, ncInt, lat_dim, lon_dim);
+   nc_var = add_var(nc_out.get(), (string)var_name, ncInt, lat_dim, lon_dim);
 
    // Add the variable attributes
    add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.ens_info->get_var_info(),

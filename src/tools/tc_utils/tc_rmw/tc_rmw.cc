@@ -578,7 +578,7 @@ static void setup_nc_file() {
     // Create NetCDF file
     nc_out = open_ncfile(out_file.c_str(), true);
 
-    if(IS_INVALID_NC_P(nc_out)) {
+    if(IS_INVALID_NC_P(nc_out.get())) {
         mlog << Error << "\nsetup_nc_file() -> "
              << "trouble opening output NetCDF file "
              << out_file << "\n\n";
@@ -590,28 +590,28 @@ static void setup_nc_file() {
          << ", Azimuth = " << rng_azi_grid.azimuth_n() << "\n";
 
     // Add global attributes
-    write_netcdf_global(nc_out, out_file.c_str(), program_name);
+    write_netcdf_global(nc_out.get(), out_file.c_str(), program_name);
 
     // Define dimensions
-    track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
-    range_dim = add_dim(nc_out, "range", (long) rng_azi_grid.range_n());
-    azimuth_dim = add_dim(nc_out, "azimuth", (long) rng_azi_grid.azimuth_n());
+    track_point_dim = add_dim(nc_out.get(), "track_point", NC_UNLIMITED);
+    range_dim = add_dim(nc_out.get(), "range", (long) rng_azi_grid.range_n());
+    azimuth_dim = add_dim(nc_out.get(), "azimuth", (long) rng_azi_grid.azimuth_n());
 
     // Define init, lead, and valid time variables
-    def_tc_init_time(nc_out,
+    def_tc_init_time(nc_out.get(),
         init_time_str_var, init_time_ut_var);
-    def_tc_valid_time(nc_out, track_point_dim,
+    def_tc_valid_time(nc_out.get(), track_point_dim,
         valid_time_str_var, valid_time_ut_var);
-    def_tc_lead_time(nc_out, track_point_dim,
+    def_tc_lead_time(nc_out.get(), track_point_dim,
         lead_time_str_var, lead_time_sec_var);
 
     // Define range and azimuth dimensions
-    def_tc_range_azimuth(nc_out,
+    def_tc_range_azimuth(nc_out.get(),
         range_dim, azimuth_dim,
         rng_azi_grid, conf_info.rmw_scale);
 
     // Define latitude and longitude arrays
-    def_tc_lat_lon(nc_out,
+    def_tc_lat_lon(nc_out.get(),
         track_point_dim, range_dim, azimuth_dim,
         lats_var, lons_var);
 
@@ -632,12 +632,12 @@ static void setup_nc_file() {
     pressure_levels = get_pressure_levels(pressure_level_strings);
     pressure_level_indices =
         get_pressure_level_indices(pressure_level_strings, pressure_levels);
-    pressure_dim = add_dim(nc_out, "pressure", pressure_levels.size());
-    def_tc_pressure(nc_out, pressure_dim, pressure_levels);
+    pressure_dim = add_dim(nc_out.get(), "pressure", pressure_levels.size());
+    def_tc_pressure(nc_out.get(), pressure_dim, pressure_levels);
 
     wind_converter.append_nc_output_vars(variable_levels, variable_long_names, variable_units);
 
-    def_tc_variables(nc_out,
+    def_tc_variables(nc_out.get(),
         variable_levels, variable_long_names, variable_units,
         track_point_dim, pressure_dim, range_dim, azimuth_dim,
         data_3d_vars);
@@ -822,9 +822,9 @@ static void process_fields(const TrackInfoArray& tracks) {
          << " of " << track.n_points() << " points.\n";
 
     // Write the track points that were used
-    write_tc_track_lines  (nc_out, track_keep);
-    write_tc_track_lat_lon(nc_out, track_point_dim, track_keep);
-    write_tc_rmw          (nc_out, track_point_dim, track_keep);
+    write_tc_track_lines  (nc_out.get(), track_keep);
+    write_tc_track_lat_lon(nc_out.get(), track_point_dim, track_keep);
+    write_tc_rmw          (nc_out.get(), track_point_dim, track_keep);
 }
 
 ////////////////////////////////////////////////////////////////////////

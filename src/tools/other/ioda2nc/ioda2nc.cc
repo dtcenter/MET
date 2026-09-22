@@ -324,7 +324,7 @@ static void open_netcdf_output() {
 
    // Create the output netCDF file for writing
    mlog << Debug(1) << "Creating NetCDF File:\t\t" << ncfile << "\n";
-   f_out.reset(open_ncfile(ncfile.c_str(), true));
+   f_out = open_ncfile(ncfile.c_str(), true);
 
    // Check for a valid file
    if(IS_INVALID_NC_P(f_out)) {
@@ -401,7 +401,7 @@ static void process_ioda_file(int i_pb) {
    // List the IODA file being processed
    mlog << Debug(1) << "Processing IODA File:\t" << ioda_files[i_pb]<< "\n";
 
-   std::unique_ptr<NcFile> f_in(open_ncfile(ioda_files[i_pb].c_str()));
+   std::unique_ptr<NcFile> f_in = open_ncfile(ioda_files[i_pb].c_str());
 
    // Check for a valid file
    if(IS_INVALID_NC_P(f_in)) {

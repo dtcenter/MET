@@ -82,7 +82,7 @@ static StringArray VarNameSA;
 static int compress_level = -1;
 
 // Output NetCDF file
-static NcFile *nc_out  = (NcFile *) nullptr;
+static std::unique_ptr<netCDF::NcFile> nc_out;
 static NcDim  lat_dim ;
 static NcDim  lon_dim ;
 
@@ -221,7 +221,7 @@ void static process_data_file() {
    ConcatString run_cs;
    ConcatString vname;
    //Variables for GOES
-   auto nc_in = (NcFile *) nullptr;
+   std::unique_ptr<netCDF::NcFile> nc_in;
    static const char *method_name = "process_data_file() -> ";
 
    // Initialize configuration object
@@ -360,7 +360,7 @@ void static process_data_file() {
    // Close the output file
    close_nc();
 
-   delete nc_in;  nc_in  = nullptr;
+   nc_in.reset();
 
    // Clean up
    fr_mtddf.reset();
@@ -375,7 +375,7 @@ void static open_nc(const Grid &grid, const ConcatString &run_cs) {
    // Create output file
    nc_out = open_ncfile(OutputFilename.c_str(), true);
 
-   if(IS_INVALID_NC_P(nc_out)) {
+   if(IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nopen_nc() -> "
            << "trouble opening output NetCDF file \""
            << OutputFilename << "\"\n\n";
@@ -383,16 +383,16 @@ void static open_nc(const Grid &grid, const ConcatString &run_cs) {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, OutputFilename.c_str(), program_name.c_str());
+   write_netcdf_global(nc_out.get(), OutputFilename.c_str(), program_name.c_str());
 
    // Add the run command
-   add_att(nc_out, "RunCommand", run_cs);
+   add_att(nc_out.get(), "RunCommand", run_cs);
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(nc_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
-   write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+   write_netcdf_latlon(nc_out.get(), &lat_dim, &lon_dim, grid);
 
    return;
 }
@@ -405,7 +405,7 @@ void static write_nc(const DataPlane &dp, const VarInfo *vinfo,
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = 0;
 
-   NcVar data_var = add_var(nc_out, (string)vname, ncFloat,
+   NcVar data_var = add_var(nc_out.get(), (string)vname, ncFloat,
                             lat_dim, lon_dim, deflate_level);
    add_att(&data_var, "name", (string)vname);
    add_att(&data_var, "long_name", (string)vinfo->long_name_attr());
@@ -429,9 +429,7 @@ void static write_nc(const DataPlane &dp, const VarInfo *vinfo,
 void static close_nc() {
 
    // Clean up
-   if(nc_out) {
-      delete nc_out; nc_out = (NcFile *) nullptr;
-   }
+   nc_out.reset();
 
    // List the output file
    mlog << Debug(1)

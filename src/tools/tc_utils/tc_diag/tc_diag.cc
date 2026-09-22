@@ -932,7 +932,7 @@ void process_track_points(const TrackInfoArray& tracks) {
             }
 
             // Add new map entry
-            tmp_file_map[tmp_key] = tmp_info;
+            tmp_file_map[tmp_key] = std::move(tmp_info);
 
             // Setup a temp file for the current point
             tmp_file_map[tmp_key].open(&tracks[k],
@@ -1180,13 +1180,13 @@ void process_out_files(const TrackInfoArray& tracks) {
 ////////////////////////////////////////////////////////////////////////
 
 void merge_tmp_files(const vector<TmpFileInfo *> tmp_files) {
-   NcFile *nc_out = (NcFile *) nullptr;
+   std::unique_ptr<netCDF::NcFile> nc_out;
 
    // Loop over temp files
    for(int i_tmp=0; i_tmp<tmp_files.size(); i_tmp++) {
 
       // Create the output NetCDF file
-      if(!nc_out) {
+      if(!nc_out.get()) {
          ConcatString file_name;
          file_name = build_out_file_name(
                         tmp_files[i_tmp]->trk_ptr,
@@ -1198,7 +1198,7 @@ void merge_tmp_files(const vector<TmpFileInfo *> tmp_files) {
 
          nc_out = open_ncfile(file_name.c_str(), true);
 
-         if(IS_INVALID_NC_P(nc_out)) {
+         if(IS_INVALID_NC_P(nc_out.get())) {
             mlog << Error << "\nmerge_tmp_files() -> "
                  << "trouble opening output NetCDF file "
                  << file_name << "\n\n";
@@ -1206,33 +1206,33 @@ void merge_tmp_files(const vector<TmpFileInfo *> tmp_files) {
          }
 
          // Add global attributes
-         write_netcdf_global(nc_out, file_name.c_str(), program_name);
+         write_netcdf_global(nc_out.get(), file_name.c_str(), program_name);
 
          // Write track info
-         write_tc_storm(nc_out,
+         write_tc_storm(nc_out.get(),
                         tmp_files[i_tmp]->trk_ptr->storm_id().c_str(),
                         tmp_files[i_tmp]->trk_ptr->technique().c_str(),
                         nullptr);
 
          // Write the track lines
-         write_tc_track_lines(nc_out,
+         write_tc_track_lines(nc_out.get(),
                               *(tmp_files[i_tmp]->trk_ptr));
 
          // Define the time dimension
-         NcDim vld_dim = add_dim(nc_out, "time",
+         NcDim vld_dim = add_dim(nc_out.get(), "time",
                                  tmp_files[i_tmp]->trk_ptr->n_points());
 
          // Write timing info for the entire track
-         write_tc_times(nc_out, vld_dim,
+         write_tc_times(nc_out.get(), vld_dim,
                         tmp_files[i_tmp]->trk_ptr, nullptr);
 
          // Copy coordinate variables
-         copy_coord_vars(nc_out, tmp_files[i_tmp]->tmp_out);
+         copy_coord_vars(nc_out.get(), tmp_files[i_tmp]->tmp_out.get());
 
-      } // end if !nc_out
+      } // end if !nc_out.get()
 
       // Copy time variables
-      copy_time_vars(nc_out, tmp_files[i_tmp]->tmp_out, i_tmp);
+      copy_time_vars(nc_out.get(), tmp_files[i_tmp]->tmp_out.get(), i_tmp);
 
    } // end for i_tmp
 
@@ -1421,9 +1421,8 @@ NcFile *OutFileInfo::setup_nc_file(const string &out_file) {
    if(!trk_ptr) return nullptr;
 
    // Open the output NetCDF file
-   NcFile *nc_out = open_ncfile(out_file.c_str(), true);
-
-   if(IS_INVALID_NC_P(nc_out)) {
+   std::unique_ptr<netCDF::NcFile> nc_out = open_ncfile(out_file.c_str(), true);
+   if(IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nOutFileInfo::setup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_file << "\n\n";
@@ -1431,23 +1430,23 @@ NcFile *OutFileInfo::setup_nc_file(const string &out_file) {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_file.c_str(), program_name);
+   write_netcdf_global(nc_out.get(), out_file.c_str(), program_name);
 
    // Define dimension
-   vld_dim = add_dim(nc_out, "time",
+   vld_dim = add_dim(nc_out.get(), "time",
                      trk_ptr->n_points());
 
    // Write track info
-   write_tc_storm(nc_out,
+   write_tc_storm(nc_out.get(),
                   trk_ptr->storm_id().c_str(),
                   trk_ptr->technique().c_str(),
                   nullptr);
 
    // Write timing info for the entire track
-   write_tc_times(nc_out, vld_dim,
+   write_tc_times(nc_out.get(), vld_dim,
                   trk_ptr, nullptr);
 
-   return nc_out;
+   return nc_out.get();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2073,7 +2072,6 @@ void TmpFileInfo::init_from_scratch() {
    // Initialize pointers
    trk_ptr = (TrackInfo *) nullptr;
    pnt_ptr = (TrackPoint *) nullptr;
-   tmp_out = (NcFile *) nullptr;
 
    clear();
 
@@ -2107,13 +2105,12 @@ void TmpFileInfo::open(const TrackInfo *t_ptr,
 void TmpFileInfo::close() {
 
    // Write NetCDF temp file
-   if(tmp_out) {
+   if(tmp_out.get()) {
 
       mlog << Debug(3) << "Writing temp file: "
            << tmp_file << "\n";
 
-      delete tmp_out;
-      tmp_out = (NcFile *) nullptr;
+      tmp_out.reset();
    }
 
    return;
@@ -2149,12 +2146,11 @@ void TmpFileInfo::clear() {
    domain.clear();
 
    // Delete the temp file
-   if(tmp_out) {
+   if(tmp_out.get()) {
 
       remove_temp_file(tmp_file);
 
-      tmp_out = (NcFile *) nullptr;
-   }
+      }
    tmp_file.clear();
 
    return;
@@ -2168,7 +2164,7 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    // Open the output NetCDF file
    tmp_out = open_ncfile(tmp_file.c_str(), true);
 
-   if(IS_INVALID_NC_P(tmp_out)) {
+   if(IS_INVALID_NC_P(tmp_out.get())) {
       mlog << Error << "\nTmpFileInfo::setup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << tmp_file << "\n\n";
@@ -2176,7 +2172,7 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    }
 
    // Add global attributes
-   write_netcdf_global(tmp_out, tmp_file.c_str(), program_name);
+   write_netcdf_global(tmp_out.get(), tmp_file.c_str(), program_name);
 
    // Define latitude and longitude arrays
    RngAziData d = di.data;
@@ -2203,45 +2199,45 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
         << ra_grid.azimuth_delta_deg() << " degrees.\n";
 
    // Write track info
-   write_tc_storm(tmp_out,
+   write_tc_storm(tmp_out.get(),
                   trk_ptr->storm_id().c_str(),
                   trk_ptr->technique().c_str(),
                   di.domain.c_str());
 
    // Write the track lines
-   write_tc_track_lines(tmp_out, *trk_ptr);
+   write_tc_track_lines(tmp_out.get(), *trk_ptr);
 
    // Define dimensions
-   trk_dim = add_dim(tmp_out, "track_point",
+   trk_dim = add_dim(tmp_out.get(), "track_point",
                      trk_ptr->n_points());
-   vld_dim = add_dim(tmp_out, "time", 1);
-   rng_dim = add_dim(tmp_out, "range",
+   vld_dim = add_dim(tmp_out.get(), "time", 1);
+   rng_dim = add_dim(tmp_out.get(), "range",
                      (long) ra_grid.range_n());
-   azi_dim = add_dim(tmp_out, "azimuth",
+   azi_dim = add_dim(tmp_out.get(), "azimuth",
                      (long) ra_grid.azimuth_n());
 
    // Write the track locations
-   write_tc_track_lat_lon(tmp_out, trk_dim, *trk_ptr);
+   write_tc_track_lat_lon(tmp_out.get(), trk_dim, *trk_ptr);
 
    // Write timing info for this TrackPoint
-   write_tc_times(tmp_out, vld_dim, trk_ptr, pnt_ptr);
+   write_tc_times(tmp_out.get(), vld_dim, trk_ptr, pnt_ptr);
 
    // Define range and azimuth coordinate variables
-   def_tc_range_azimuth(tmp_out,
+   def_tc_range_azimuth(tmp_out.get(),
                         rng_dim, azi_dim,
                         ra_grid, bad_data_double);
 
    // Pressure dimension and values (same for all temp files)
    pressure_levels = prs_lev;
    if(pressure_levels.size() > 0) {
-      prs_dim = add_dim(tmp_out, "pressure",
+      prs_dim = add_dim(tmp_out.get(), "pressure",
                         (long) pressure_levels.size());
-      def_tc_pressure(tmp_out, prs_dim, pressure_levels);
+      def_tc_pressure(tmp_out.get(), prs_dim, pressure_levels);
    }
 
    // Define latitude and longitude
    NcVar lat_var, lon_var;
-   def_tc_lat_lon(tmp_out, vld_dim, rng_dim, azi_dim,
+   def_tc_lat_lon(tmp_out.get(), vld_dim, rng_dim, azi_dim,
                   lat_var, lon_var);
 
    // Compute lat and lon coordinate arrays
@@ -2252,7 +2248,7 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    write_tc_data(ra_grid, 0, lon_var, lon_arr.data());
 
    // Write track point values
-   write_tc_track_point(tmp_out, vld_dim, *pnt_ptr);
+   write_tc_track_point(tmp_out.get(), vld_dim, *pnt_ptr);
 
    return;
 }
@@ -2297,15 +2293,15 @@ void TmpFileInfo::write_nc_data(const VarInfo *vi, const DataPlane &dp_in,
    }
 
    // Add new variable, if needed
-   if(!has_var(tmp_out, var_name.c_str())) {
-      NcVar new_var = tmp_out->addVar(var_name, ncDouble, dims);
+   if(!has_var(tmp_out.get(), var_name.c_str())) {
+      NcVar new_var = tmp_out.get()->addVar(var_name, ncDouble, dims);
       add_att(&new_var, long_name_att_name, vi->long_name_attr());
       add_att(&new_var, units_att_name, vi->units_attr());
       add_att(&new_var, fill_value_att_name, bad_data_double);
    }
 
    // Get the current variable
-   NcVar cur_var = get_var(tmp_out, var_name.c_str());
+   NcVar cur_var = get_var(tmp_out.get(), var_name.c_str());
 
    // Write pressure level data
    if(is_prs) {

@@ -199,7 +199,7 @@ const char *method_name = "WrfFile::open() -> ";
 
 close();
 
-Nc.reset(open_ncfile(filename));
+Nc = open_ncfile(filename);
 mlog << Debug(5) << "\n" << method_name
      << "open \"" << filename << "\".\n\n";
 

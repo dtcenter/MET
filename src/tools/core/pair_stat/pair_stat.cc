@@ -27,6 +27,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -613,29 +614,26 @@ static void process_ioda_pairs(const ConcatString &file_name) {
    ioda_reader.set_data_config(default_config_filename,
                                config_file.c_str());
 
-   NcFile *f_in = open_ncfile(file_name.c_str());
-
+   std::unique_ptr<netCDF::NcFile> f_in = open_ncfile(file_name.c_str());
    // Check for a valid file
-   if(IS_INVALID_NC_P(f_in)) {
+   if(IS_INVALID_NC_P(f_in.get())) {
       mlog << Error << "\n" << method_name
            << "can't open input NetCDF file \"" << file_name
            << "\" for reading.\n\n";
-      delete f_in;
-      f_in = (NcFile *) nullptr;
+      f_in.reset();
       clean_up();
       exit(1);
    }
 
    // Read the IODA file
-   ioda_reader.read_ioda(f_in);
+   ioda_reader.read_ioda(f_in.get());
 
    // Error out for missing metadata
    if(!ioda_reader.validate_metadata()) {
       mlog << Error << "\n" << method_name
            << "Required dimensions and/or metadata variables "
            << "missing from IODA file \"" << file_name << "\".\n\n"; 
-      delete f_in;
-      f_in = (NcFile *) nullptr;
+      f_in.reset();
       clean_up();
       exit(1);
    }

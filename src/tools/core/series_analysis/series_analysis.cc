@@ -986,7 +986,7 @@ static void process_scores() {
               << (ocsd_flag ? 1 : 0) << " standard deviation field(s).\n";
 
          // Setup the output NetCDF file on the first pass
-         if(!nc_out) setup_nc_file(fcst_info, obs_info);
+         if(!nc_out.get()) setup_nc_file(fcst_info, obs_info);
 
          // Update timing info
          set_range(fcst_dp.init(),  fcst_init_beg,  fcst_init_end);
@@ -1177,18 +1177,18 @@ static void process_scores() {
    write_stat_data();
 
    // Add time range information to the global NetCDF attributes
-   add_att(nc_out, "fcst_init_beg",  (string)unix_to_yyyymmdd_hhmmss(fcst_init_beg));
-   add_att(nc_out, "fcst_init_end",  (string)unix_to_yyyymmdd_hhmmss(fcst_init_end));
-   add_att(nc_out, "fcst_valid_beg", (string)unix_to_yyyymmdd_hhmmss(fcst_valid_beg));
-   add_att(nc_out, "fcst_valid_end", (string)unix_to_yyyymmdd_hhmmss(fcst_valid_end));
-   add_att(nc_out, "fcst_lead_beg",  (string)sec_to_hhmmss(fcst_lead_beg));
-   add_att(nc_out, "fcst_lead_end",  (string)sec_to_hhmmss(fcst_lead_end));
-   add_att(nc_out, "obs_init_beg",   (string)unix_to_yyyymmdd_hhmmss(obs_init_beg));
-   add_att(nc_out, "obs_init_end",   (string)unix_to_yyyymmdd_hhmmss(obs_init_end));
-   add_att(nc_out, "obs_valid_beg",  (string)unix_to_yyyymmdd_hhmmss(obs_valid_beg));
-   add_att(nc_out, "obs_valid_end",  (string)unix_to_yyyymmdd_hhmmss(obs_valid_end));
-   add_att(nc_out, "obs_lead_beg",   (string)sec_to_hhmmss(obs_lead_beg));
-   add_att(nc_out, "obs_lead_end",   (string)sec_to_hhmmss(obs_lead_end));
+   add_att(nc_out.get(), "fcst_init_beg",  (string)unix_to_yyyymmdd_hhmmss(fcst_init_beg));
+   add_att(nc_out.get(), "fcst_init_end",  (string)unix_to_yyyymmdd_hhmmss(fcst_init_end));
+   add_att(nc_out.get(), "fcst_valid_beg", (string)unix_to_yyyymmdd_hhmmss(fcst_valid_beg));
+   add_att(nc_out.get(), "fcst_valid_end", (string)unix_to_yyyymmdd_hhmmss(fcst_valid_end));
+   add_att(nc_out.get(), "fcst_lead_beg",  (string)sec_to_hhmmss(fcst_lead_beg));
+   add_att(nc_out.get(), "fcst_lead_end",  (string)sec_to_hhmmss(fcst_lead_end));
+   add_att(nc_out.get(), "obs_init_beg",   (string)unix_to_yyyymmdd_hhmmss(obs_init_beg));
+   add_att(nc_out.get(), "obs_init_end",   (string)unix_to_yyyymmdd_hhmmss(obs_init_end));
+   add_att(nc_out.get(), "obs_valid_beg",  (string)unix_to_yyyymmdd_hhmmss(obs_valid_beg));
+   add_att(nc_out.get(), "obs_valid_end",  (string)unix_to_yyyymmdd_hhmmss(obs_valid_end));
+   add_att(nc_out.get(), "obs_lead_beg",   (string)sec_to_hhmmss(obs_lead_beg));
+   add_att(nc_out.get(), "obs_lead_end",   (string)sec_to_hhmmss(obs_lead_end));
 
    // Print summary counts
    mlog << Debug(2)
@@ -2443,7 +2443,7 @@ static void setup_nc_file(const VarInfo *fcst_info,
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_file.c_str(), true);
 
-   if(IS_INVALID_NC_P(nc_out)) {
+   if(IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_file << "\n\n";
@@ -2451,30 +2451,30 @@ static void setup_nc_file(const VarInfo *fcst_info,
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_file.c_str(), program_name,
+   write_netcdf_global(nc_out.get(), out_file.c_str(), program_name,
                        conf_info.model.c_str(), conf_info.obtype.c_str(), conf_info.desc.c_str());
-   add_att(nc_out, "mask_grid",  (conf_info.mask_grid_name.nonempty() ?
+   add_att(nc_out.get(), "mask_grid",  (conf_info.mask_grid_name.nonempty() ?
                                   (string)conf_info.mask_grid_name : na_str));
-   add_att(nc_out, "mask_poly",  (conf_info.mask_poly_name.nonempty() ?
+   add_att(nc_out.get(), "mask_poly",  (conf_info.mask_poly_name.nonempty() ?
                                   (string)conf_info.mask_poly_name : na_str));
-   add_att(nc_out, "fcst_var",   (string)fcst_info->name_attr());
-   add_att(nc_out, "fcst_lev",   (string)fcst_info->level_attr());
-   add_att(nc_out, "fcst_units", (string)fcst_info->units_attr());
-   add_att(nc_out, "obs_var",    (string)obs_info->name_attr());
-   add_att(nc_out, "obs_lev",    (string)obs_info->level_attr());
-   add_att(nc_out, "obs_units",  (string)obs_info->units_attr());
+   add_att(nc_out.get(), "fcst_var",   (string)fcst_info->name_attr());
+   add_att(nc_out.get(), "fcst_lev",   (string)fcst_info->level_attr());
+   add_att(nc_out.get(), "fcst_units", (string)fcst_info->units_attr());
+   add_att(nc_out.get(), "obs_var",    (string)obs_info->name_attr());
+   add_att(nc_out.get(), "obs_lev",    (string)obs_info->level_attr());
+   add_att(nc_out.get(), "obs_units",  (string)obs_info->units_attr());
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(nc_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
-   write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+   write_netcdf_latlon(nc_out.get(), &lat_dim, &lon_dim, grid);
 
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
    // Add the series length variable
-   NcVar var = add_var(nc_out, n_series_var_name, ncInt, deflate_level);
+   NcVar var = add_var(nc_out.get(), n_series_var_name, ncInt, deflate_level);
    add_att(&var, "long_name", "length of series");
 
    int n_series = n_series_pair + n_series_aggr;
@@ -2531,7 +2531,7 @@ static void write_stat_data() {
       const NcVarData *ptr = &stat_data[key];
 
       // Add a new variable to the NetCDF file
-      NcVar nc_var = add_var(nc_out, key, ncFloat, lat_dim, lon_dim, deflate_level);
+      NcVar nc_var = add_var(nc_out.get(), key, ncFloat, lat_dim, lon_dim, deflate_level);
 
       // Add variable attributes
       add_att(&nc_var, "_FillValue", bad_data_float);
@@ -2597,14 +2597,13 @@ static void set_pair_dims(vector<PairDataPoint> &pd_block,
 static void clean_up() {
 
    // Close the output NetCDF file
-   if(nc_out) {
+   if(nc_out.get()) {
 
       // List the NetCDF file after it is finished
       mlog << Debug(1)
            << "Output file: " << out_file << "\n";
 
-      delete nc_out;
-      nc_out = nullptr;
+      nc_out.reset();
    }
 
    // Close the aggregate NetCDF file

@@ -585,7 +585,7 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_nc_file.c_str(), true);
 
-   if(IS_INVALID_NC_P(nc_out)) {
+   if(IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_nc_file << "\n\n";
@@ -593,23 +593,23 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_nc_file.c_str(), program_name,
+   write_netcdf_global(nc_out.get(), out_nc_file.c_str(), program_name,
                        conf_info.model.c_str(), conf_info.obtype.c_str());
    if(nc_info.do_diff) {
-      add_att(nc_out, "Difference", "Forecast Value - Observation Value");
+      add_att(nc_out.get(), "Difference", "Forecast Value - Observation Value");
    }
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(nc_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    if(nc_info.do_latlon) {
-      write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+      write_netcdf_latlon(nc_out.get(), &lat_dim, &lon_dim, grid);
    }
 
    // Add grid weight variable
    if(nc_info.do_weight) {
-      write_netcdf_grid_weight(nc_out, &lat_dim, &lon_dim,
+      write_netcdf_grid_weight(nc_out.get(), &lat_dim, &lon_dim,
                                conf_info.grid_weight_flag, wgt_dp);
    }
 
@@ -2949,7 +2949,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       nc_var_sa.add(var_name);
 
       // Define the variable
-      NcVar nc_var = add_var(nc_out, var_name.string(), ncFloat,
+      NcVar nc_var = add_var(nc_out.get(), var_name.string(), ncFloat,
                              lat_dim, lon_dim, deflate_level);
 
       // Add variable attributes
@@ -3075,7 +3075,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    if(fcst_flag) {
 
       // Define the forecast variable
-      fcst_var = add_var(nc_out, fcst_var_name.string(), ncFloat,
+      fcst_var = add_var(nc_out.get(), fcst_var_name.string(), ncFloat,
                          lat_dim, lon_dim, deflate_level);
 
       // Add to the list of previously defined variables
@@ -3103,7 +3103,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    if(obs_flag) {
 
       // Define the observation variable
-      obs_var = add_var(nc_out, obs_var_name.string(), ncFloat,
+      obs_var = add_var(nc_out.get(), obs_var_name.string(), ncFloat,
                         lat_dim, lon_dim, deflate_level);
 
       // Add to the list of previously defined variables
@@ -3227,14 +3227,13 @@ void clean_up() {
    finish_txt_files();
 
    // Close the output NetCDF file
-   if(nc_out) {
+   if(nc_out.get()) {
 
       // List the NetCDF file after it is finished
       mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
 
-      //nc_out->close();
-      delete nc_out;
-      nc_out = (NcFile *) nullptr;
+      //nc_out.get()->close();
+      nc_out.reset();
    }
 
    // Deallocate memory for data files

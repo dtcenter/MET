@@ -11,6 +11,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <cstdio>
 #include <ctime>
 #include <iostream>
@@ -69,7 +70,7 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid,
 void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char * out_filename, const VarInfo & var_info) 
 {
   // Initialization
-  NcFile *f_out   = (NcFile *) nullptr;
+  std::unique_ptr<netCDF::NcFile> f_out;
   NcDim  lat_dim  ;
   NcDim  lon_dim  ;
   NcVar  f_var    ;
@@ -78,31 +79,31 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char
   // Create a new NetCDF file and open it
   f_out = open_ncfile(out_filename, true);
 
-  if(IS_INVALID_NC_P(f_out)) 
+  if(IS_INVALID_NC_P(f_out.get())) 
   {
     mlog << Error << "\nwrite_netcdf() -> "
          << "trouble opening output file " << out_filename
          << "\n\n";
-    delete f_out;  f_out = (NcFile *) nullptr;
+    f_out.reset();
     
     exit(1);
   }
 
   // Add global attributes
   const char * program_name = "data_plane_to_netcdf";
-  write_netcdf_global(f_out, out_filename, program_name);
+  write_netcdf_global(f_out.get(), out_filename, program_name);
 
   // Add the projection information
-  write_netcdf_proj(f_out, grid, lat_dim, lon_dim);
+  write_netcdf_proj(f_out.get(), grid, lat_dim, lon_dim);
 
   // Add the lat/lon variables
-  write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
+  write_netcdf_latlon(f_out.get(), &lat_dim, &lon_dim, grid);
 
   int deflate_level = get_compress();
   //if (deflate_level < 0) deflate_level = 0;
 
   // Define variable
-  f_var = add_var(f_out, (string)var_info.name(), ncFloat, lat_dim, lon_dim, deflate_level);
+  f_var = add_var(f_out.get(), (string)var_info.name(), ncFloat, lat_dim, lon_dim, deflate_level);
 
   // Add variable attributes
   add_att(&f_var, "name", (string)var_info.name());
@@ -122,8 +123,7 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char
   }
 
   // Close and clean up
-  delete f_out;
-  f_out = (NcFile *) nullptr;
+  f_out.reset();
 
   return;
 }

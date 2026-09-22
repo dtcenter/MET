@@ -24,6 +24,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -81,7 +82,7 @@ static unixtime           ens_valid_ut = (unixtime) 0;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static netCDF::NcFile *nc_out  = (netCDF::NcFile *) nullptr;
+static std::unique_ptr<netCDF::NcFile> nc_out;
 static netCDF::NcDim  lat_dim;
 static netCDF::NcDim  lon_dim;
 

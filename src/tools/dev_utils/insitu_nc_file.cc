@@ -129,7 +129,7 @@ bool InsituNcFile::open(const char * filename)
 
   // Open the file
 
-  _ncFile.reset(open_ncfile(filename));
+  _ncFile = open_ncfile(filename);
 
   if (!(IS_INVALID_NC_P(_ncFile.get())))
   {

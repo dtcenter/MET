@@ -150,7 +150,7 @@ bool MetNcFile::open(const char * filename)
 
    close();
 
-   Nc.reset(open_ncfile(filename));
+   Nc = open_ncfile(filename);
 
    if ( IS_INVALID_NC_P(Nc.get()) )  { close();  return false; }
 

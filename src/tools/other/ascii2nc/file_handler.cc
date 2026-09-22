@@ -50,7 +50,6 @@ const int DEF_DEFALTE_LEVEL = 2;
 
 FileHandler::FileHandler(const string &program_name) :
   _programName(program_name),
-  _ncFile(0),
   _nhdr(0),
   _hdrNum(0),
   _obsNum(0),
@@ -67,7 +66,7 @@ FileHandler::FileHandler(const string &program_name) :
 
 FileHandler::~FileHandler()
 {
-  if (_ncFile != 0) delete _ncFile;
+  if (_ncFile.get() != 0) delete _ncFile.get();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -173,7 +172,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
   // If we were summarizing, add global attributes showing how the
   // summarization was done.
 
-  if (_dataSummarized) write_summary_attributes(_ncFile, _summaryInfo);
+  if (_dataSummarized) write_summary_attributes(_ncFile.get(), _summaryInfo);
 
   // Write the headers and observations to the netCDF file.
 
@@ -235,8 +234,7 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
 
 void FileHandler::_closeNetcdf()
 {
-   delete _ncFile;
-   _ncFile = (NcFile *) nullptr;
+   _ncFile.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -271,7 +269,7 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
 
    _ncFile = open_ncfile(nc_filename.c_str(), true);
 
-   if(IS_INVALID_NC_P(_ncFile)) {
+   if(IS_INVALID_NC_P(_ncFile.get())) {
       mlog << Error << "\nFileHandler::_openNetcdf() -> "
            << "can't open output NetCDF file \"" << nc_filename
            << "\" for writing\n\n";
@@ -283,7 +281,7 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    //
    // Define the NetCDF dimensions and variables
    //
-   nc_point_obs.set_netcdf(_ncFile, true);
+   nc_point_obs.set_netcdf(_ncFile.get(), true);
    // Note: use_var_id was set by the handler
    nc_point_obs.init_obs_vars(use_var_id, deflate_level, true);
    nc_point_obs.set_nc_out_data(_observations, &summary_obs, _summaryInfo);

@@ -38,6 +38,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -112,17 +113,17 @@ static int process_obs(const int gc, const float conversion,
                        const time_t valid_time, const double latitude,
                        const double longitude, const double elevation);
 
-static MadisType get_madis_type(NcFile *&f_in);
+static MadisType get_madis_type(NcFile *f_in);
 static void      convert_wind_wdir_to_u_v(float wind, float wdir,
                                           float &u, float &v);
 static bool      check_masks(double lat, double lon, const char *sid);
 
-static void process_madis_metar(NcFile *&f_in);
-static void process_madis_raob(NcFile *&f_in);
-static void process_madis_profiler(NcFile *&f_in);
-static void process_madis_maritime(NcFile *&f_in);
-static void process_madis_mesonet(NcFile *&f_in);
-static void process_madis_acarsProfiles(NcFile *&f_in);
+static void process_madis_metar(NcFile *f_in);
+static void process_madis_raob(NcFile *f_in);
+static void process_madis_profiler(NcFile *f_in);
+static void process_madis_maritime(NcFile *f_in);
+static void process_madis_mesonet(NcFile *f_in);
+static void process_madis_acarsProfiles(NcFile *f_in);
 
 static void usage(int exit_code=1);
 static void set_type(const StringArray &);
@@ -296,42 +297,40 @@ void process_madis_file(const char *madis_file) {
    mlog << Debug(1) << "Reading MADIS File:\t" << madis_file << "\n";
 
    // Open the input NetCDF file
-   NcFile *f_in = open_ncfile(madis_file);
-
+   std::unique_ptr<netCDF::NcFile> f_in = open_ncfile(madis_file);
    // Check for a valid file
-   if(IS_INVALID_NC_P(f_in)) {
+   if(IS_INVALID_NC_P(f_in.get())) {
       mlog << Error << "\nprocess_madis_file() -> "
            << "can't open input NetCDF file \"" << madis_file
            << "\" for reading.\n\n";
-      delete f_in;
-      f_in = (NcFile *) nullptr;
+      f_in.reset();
 
       exit(1);
    }
    // If the MADIS type is not already set, try to guess.
-   if(my_mtype == MadisType::none) my_mtype = get_madis_type(f_in);
+   if(my_mtype == MadisType::none) my_mtype = get_madis_type(f_in.get());
 
    // Switch on the MADIS type and process accordingly.
    switch(my_mtype) {
       case MadisType::metar:
-         process_madis_metar(f_in);
+         process_madis_metar(f_in.get());
          break;
       case MadisType::raob:
-         process_madis_raob(f_in);
+         process_madis_raob(f_in.get());
          break;
       case MadisType::profiler:
-         process_madis_profiler(f_in);
+         process_madis_profiler(f_in.get());
          break;
       case MadisType::maritime:
-         process_madis_maritime(f_in);
+         process_madis_maritime(f_in.get());
          break;
 
       case MadisType::mesonet:
-         process_madis_mesonet(f_in);
+         process_madis_mesonet(f_in.get());
          break;
 
       case MadisType::acarsProfiles:
-         process_madis_acarsProfiles(f_in);
+         process_madis_acarsProfiles(f_in.get());
          break;
 
       case MadisType::coop:
@@ -353,10 +352,7 @@ void process_madis_file(const char *madis_file) {
    }
 
    // Close the input NetCDF file
-   if(f_in) {
-      delete f_in;
-      f_in = (NcFile *) nullptr;
-   }
+   f_in.reset();
 
    return;
 }
@@ -377,10 +373,7 @@ static void clean_up() {
    //
    // Close the output NetCDF file
    //
-   if(f_out) {
-      delete f_out;
-      f_out = (NcFile *) nullptr;
-   }
+   f_out.reset();
 
    return;
 }
@@ -398,18 +391,17 @@ void setup_netcdf_out(int nhdr) {
    //
    // Check for a valid file
    //
-   if(IS_INVALID_NC_P(f_out)) {
+   if(IS_INVALID_NC_P(f_out.get())) {
       mlog << Error << "\nsetup_netcdf_out() -> "
            << "trouble opening output file: " << ncfile << "\n\n";
-      delete f_out;
-      f_out = (NcFile *) nullptr;
+      f_out.reset();
       exit(1);
    }
 
    int hdr_cnt;
    int obs_cnt;
    bool use_var_id = true;
-   nc_point_obs.set_netcdf(f_out, true);
+   nc_point_obs.set_netcdf(f_out.get(), true);
    nc_point_obs.set_using_var_id(use_var_id);
 
    NetcdfObsVars *obs_vars = nc_point_obs.get_obs_vars();
@@ -426,7 +418,7 @@ void setup_netcdf_out(int nhdr) {
    //
    // Add the command line arguments that were applied.
    //
-   add_att(f_out, "RunCommand", (string)argv_str);
+   add_att(f_out.get(), "RunCommand", (string)argv_str);
 
    return;
 }
@@ -704,7 +696,7 @@ int process_obs(const int in_gc, const float conversion,
 
 ////////////////////////////////////////////////////////////////////////
 
-MadisType get_madis_type(NcFile *&f_in) {
+MadisType get_madis_type(NcFile *f_in) {
    MadisType madis_type = MadisType::none;
    ConcatString attr_value;
    //
@@ -806,7 +798,7 @@ void print_rej_counts(int obs_count) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_madis_metar(NcFile *&f_in) {
+void process_madis_metar(NcFile *f_in) {
    int nhdr;
    long i_hdr;
    int hdr_sid_len;
@@ -1224,7 +1216,7 @@ void process_madis_metar(NcFile *&f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_madis_raob(NcFile *&f_in) {
+void process_madis_raob(NcFile *f_in) {
    int nhdr;
    int nlvl;
    int hdr_sid_len;
@@ -2029,7 +2021,7 @@ void process_madis_raob(NcFile *&f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_madis_profiler(NcFile *&f_in) {
+void process_madis_profiler(NcFile *f_in) {
    int nhdr;
    int nlvl;
    int hdr_sid_len;
@@ -2275,7 +2267,7 @@ void process_madis_profiler(NcFile *&f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_madis_maritime(NcFile *&f_in) {
+void process_madis_maritime(NcFile *f_in) {
    int nhdr;
    int hdr_sid_len;
    double tmp_dbl;
@@ -2647,7 +2639,7 @@ void process_madis_maritime(NcFile *&f_in) {
 }
 ////////////////////////////////////////////////////////////////////////
 
-void process_madis_mesonet(NcFile *&f_in) {
+void process_madis_mesonet(NcFile *f_in) {
    int nhdr;
    int hdr_sid_len;
    double tmp_dbl;
@@ -3201,7 +3193,7 @@ void process_madis_mesonet(NcFile *&f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_madis_acarsProfiles(NcFile *&f_in) {
+void process_madis_acarsProfiles(NcFile *f_in) {
    int nhdr;
    int nlvl;
    int nlvl1;

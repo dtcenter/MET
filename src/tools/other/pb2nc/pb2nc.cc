@@ -870,7 +870,7 @@ void open_netcdf() {
 
    // Create the output netCDF file for writing
    mlog << Debug(1) << "Creating NetCDF File:\t\t" << ncfile << "\n";
-   f_out.reset(open_ncfile(ncfile.c_str(), true));
+   f_out = open_ncfile(ncfile.c_str(), true);
 
    // Check for a valid file
    if(IS_INVALID_NC_P(f_out)) {

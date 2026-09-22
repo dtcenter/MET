@@ -648,7 +648,7 @@ static void setup_nc_file(const WaveletStatNcOutInfo & nc_info,
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_nc_file.c_str(), true);
 
-   if(!nc_out || IS_INVALID_NC_P(nc_out)) {
+   if(!nc_out.get() || IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_nc_file << "\n\n";
@@ -656,18 +656,18 @@ static void setup_nc_file(const WaveletStatNcOutInfo & nc_info,
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_nc_file.c_str(), program_name,
+   write_netcdf_global(nc_out.get(), out_nc_file.c_str(), program_name,
                        conf_info.model.c_str(), conf_info.obtype.c_str());
-   if ( nc_info.do_diff )  add_att(nc_out, "Difference", "Forecast Value - Observation Value");
+   if ( nc_info.do_diff )  add_att(nc_out.get(), "Difference", "Forecast Value - Observation Value");
 
    // Set the NetCDF dimensions
-   x_dim = add_dim(nc_out, "x", conf_info.get_tile_dim());
+   x_dim = add_dim(nc_out.get(), "x", conf_info.get_tile_dim());
 
-   y_dim = add_dim(nc_out, "y", conf_info.get_tile_dim());
+   y_dim = add_dim(nc_out.get(), "y", conf_info.get_tile_dim());
 
-   scale_dim = add_dim(nc_out, "scale", conf_info.get_n_scale()+2);
+   scale_dim = add_dim(nc_out.get(), "scale", conf_info.get_n_scale()+2);
 
-   tile_dim  = add_dim(nc_out, "tile", conf_info.get_n_tile());
+   tile_dim  = add_dim(nc_out.get(), "tile", conf_info.get_n_tile());
 
    // Add the x_ll and y_ll variables
    NcVar x_ll_var ;
@@ -676,8 +676,8 @@ static void setup_nc_file(const WaveletStatNcOutInfo & nc_info,
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
-   x_ll_var = add_var(nc_out, "x_ll", ncInt, tile_dim, deflate_level);
-   y_ll_var = add_var(nc_out, "y_ll", ncInt, tile_dim, deflate_level);
+   x_ll_var = add_var(nc_out.get(), "x_ll", ncInt, tile_dim, deflate_level);
+   y_ll_var = add_var(nc_out.get(), "y_ll", ncInt, tile_dim, deflate_level);
 
    for(int i=0; i<conf_info.get_n_tile(); i++) {
 
@@ -1439,13 +1439,13 @@ static void write_nc_raw(const WaveletStatNcOutInfo &nc_info,
       if(deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
       if(nc_info.do_raw) {
-         fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
+         fcst_var = add_var(nc_out.get(), (string)fcst_var_name, ncFloat,
                             tile_dim, x_dim, y_dim, deflate_level);
-         obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
+         obs_var  = add_var(nc_out.get(), (string)obs_var_name,  ncFloat,
                             tile_dim, x_dim, y_dim, deflate_level);
       }
       if(nc_info.do_diff) {
-         diff_var = add_var(nc_out, (string)diff_var_name, ncFloat,
+         diff_var = add_var(nc_out.get(), (string)diff_var_name, ncFloat,
                             tile_dim, x_dim, y_dim, deflate_level);
       }
 
@@ -1513,11 +1513,11 @@ static void write_nc_raw(const WaveletStatNcOutInfo &nc_info,
    // Otherwise, retrieve the previously defined variables
    else {
       if(nc_info.do_raw) {
-         fcst_var = get_var(nc_out, fcst_var_name.c_str());
-         obs_var  = get_var(nc_out, obs_var_name.c_str());
+         fcst_var = get_var(nc_out.get(), fcst_var_name.c_str());
+         obs_var  = get_var(nc_out.get(), obs_var_name.c_str());
       }
       if(nc_info.do_diff) {
-         diff_var = get_var(nc_out, diff_var_name.c_str());
+         diff_var = get_var(nc_out.get(), diff_var_name.c_str());
       }
    }
 
@@ -1665,14 +1665,14 @@ static void write_nc_wav(const WaveletStatNcOutInfo &nc_info,
 
       // Define the forecast and difference variables
       if(nc_info.do_raw) {
-         fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
+         fcst_var = add_var(nc_out.get(), (string)fcst_var_name, ncFloat,
                             tile_dim, scale_dim, x_dim, y_dim, deflate_level);
-         obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
+         obs_var  = add_var(nc_out.get(), (string)obs_var_name,  ncFloat,
                             tile_dim, scale_dim, x_dim, y_dim, deflate_level);
       }
 
       if(nc_info.do_diff) {
-         diff_var = add_var(nc_out, (string)diff_var_name, ncFloat,
+         diff_var = add_var(nc_out.get(), (string)diff_var_name, ncFloat,
                             tile_dim, scale_dim, x_dim, y_dim, deflate_level);
       } 
 
@@ -1754,11 +1754,11 @@ static void write_nc_wav(const WaveletStatNcOutInfo &nc_info,
    else {
 
       if(nc_info.do_raw) {
-         fcst_var = get_var(nc_out, fcst_var_name.c_str());
-         obs_var  = get_var(nc_out, obs_var_name.c_str());
+         fcst_var = get_var(nc_out.get(), fcst_var_name.c_str());
+         obs_var  = get_var(nc_out.get(), obs_var_name.c_str());
       }
       if(nc_info.do_diff) {
-         diff_var = get_var(nc_out, diff_var_name.c_str());
+         diff_var = get_var(nc_out.get(), diff_var_name.c_str());
       } 
    }
 
@@ -1886,13 +1886,12 @@ static void close_out_files() {
    }
 
    // Close the output NetCDF file as long as it was opened
-   if ( nc_out && !(conf_info.nc_info.all_false()) )  {
+   if ( nc_out.get() && !(conf_info.nc_info.all_false()) )  {
 
       // List the NetCDF file after it is finished
       mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
-      //nc_out->close();
-      delete nc_out;
-      nc_out = (NcFile *) nullptr;
+      //nc_out.get()->close();
+      nc_out.reset();
    }
 
    // Close the output PSfile as long as it was opened

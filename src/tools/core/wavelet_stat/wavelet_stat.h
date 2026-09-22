@@ -94,7 +94,7 @@ static ConcatString out_dir;
 
 // Output NetCDF file
 static ConcatString out_nc_file;
-static netCDF::NcFile       *nc_out    = (netCDF::NcFile *) nullptr;
+static std::unique_ptr<netCDF::NcFile> nc_out;
 static netCDF::NcDim        x_dim     ;
 static netCDF::NcDim        y_dim     ;
 static netCDF::NcDim        scale_dim ;
