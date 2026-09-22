@@ -862,7 +862,7 @@ long MetNcCFDataFile::convert_generic_to_offset(double value, const string &dim_
    }
 
    if (offset == (long) bad_data_int && !dim_name.empty()) {
-      NcVarInfo *var_info = find_var_info_by_dim_name(_file->Var, dim_name, _file->Nvars);
+      NcVarInfo *var_info = find_var_info_by_dim_name(_file->Var.data(), dim_name, _file->Nvars);
       if (var_info) {
          long new_offset = get_index_at_nc_data(var_info->var.get(), value, dim_name);
          if (new_offset != bad_data_int) offset = new_offset;

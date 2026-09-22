@@ -91,14 +91,14 @@ void NcCfFile::init_from_scratch()
 {
   // Initialize the pointers
 
-  _ncFile = (NcFile *) nullptr;
-  _dims = (NcDim **) nullptr;
-  Var = (NcVarInfo *) nullptr;
+  _ncFile.reset();
+  _dims.clear();
+  Var.clear();
   _time_var_info = (NcVarInfo *)nullptr;
 
   _xDim = (NcDim *)nullptr;
   _yDim = (NcDim *)nullptr;
-  _tDim = (NcDim *)nullptr;
+  _tDim.reset();
   _latVar = (NcVar *)nullptr;
   _lonVar = (NcVar *)nullptr;
   _xCoordVar = (NcVar *)nullptr;
@@ -120,19 +120,12 @@ void NcCfFile::close()
 
   // Reclaim the file pointer
 
-  if (_ncFile)
-  {
-    delete _ncFile;
-    _ncFile = (NcFile *)nullptr;
-  }
+  _ncFile.reset();
 
   // Reclaim the dimension pointers
 
-  if (_dims)
-  {
-    delete [] _dims;
-    _dims = (NcDim **)nullptr;
-  }
+  _dims.clear();   //  owns its NcDims: the old "delete [] _dims" freed the
+                   //  pointer array but leaked every NcDim in it
 
   grid_ready = false;
   has_attr_grid = false;
@@ -141,15 +134,12 @@ void NcCfFile::close()
 
   _dimNames.clear();
 
-  _xDim = _yDim = _tDim = (NcDim *) nullptr;
+  _xDim = _yDim = nullptr;
+  _tDim.reset();
 
   // Reclaim the variable pointers
 
-  if (Var)
-  {
-    delete [] Var;
-    Var = (NcVarInfo *)nullptr;
-  }
+  Var.clear();
 
   Nvars = 0;
 
@@ -178,24 +168,24 @@ bool NcCfFile::open(const char * filepath)
   close();
 
   // Open the file
-  _ncFile = open_ncfile(filepath);
+  _ncFile.reset(open_ncfile(filepath));
 
-  if (IS_INVALID_NC_P(_ncFile))
+  if (IS_INVALID_NC_P(_ncFile.get()))
   {
     close();
     return false;
   }
 
   // Pull out the dimensions
-  _numDims = get_dim_count(_ncFile);
-  _dims = new NcDim*[_numDims];
+  _numDims = get_dim_count(_ncFile.get());
+  _dims.resize(_numDims);
 
   StringArray gDimNames;
-  get_dim_names(_ncFile, &gDimNames);
+  get_dim_names(_ncFile.get(), &gDimNames);
 
   for (int j=0; j<_numDims; ++j)  {
-     NcDim dim = get_nc_dim(_ncFile, gDimNames[j]);
-     _dims[j] = new NcDim(dim);
+     NcDim dim = get_nc_dim(_ncFile.get(), gDimNames[j]);
+     _dims[j] = std::make_unique<NcDim>(dim);
   }
 
   // Pull out the variables
@@ -258,7 +248,7 @@ void NcCfFile::set_var_slots(int max_dim_count)
       else if ((dim && dim == _yDim) || dim_name == var_y_dim_name || dim_name == y_dim_var_name) {
         Var[j].y_slot = k;
       }
-      else if ((dim && (dim == _tDim)) || dim_name == t_dim_name || t_dims.has(dim_name)) {
+      else if ((dim && (dim == _tDim.get())) || dim_name == t_dim_name || t_dims.has(dim_name)) {
         Var[j].t_slot = k;
       }
       else if (z_dims.has(dim_name) || is_z_dim(dim_name)) {
@@ -312,7 +302,7 @@ void NcCfFile::parse_times_from_file(const char* filepath, const char* method_na
     parse_valid_time_var(method_name, valid_time_var, units);
   }
 
-  InitTime = get_init_time(_ncFile);
+  InitTime = get_init_time(_ncFile.get());
   if (InitTime == 0) {
     // Time not in file, get from the file name
     InitTime = get_init_time_from_file_path(filepath);
@@ -336,7 +326,7 @@ void NcCfFile::parse_valid_time_var(const char* method_name, NcVar* valid_time_v
   if (time_dim_count == 1) {
      NcDim tDim = get_nc_dim(valid_time_var, 0);
      if (IS_VALID_NC(tDim)) {
-       _tDim      = new NcDim(tDim);
+       _tDim      = std::make_unique<NcDim>(tDim);
        t_dim_name = GET_NC_NAME(tDim).c_str();
      }
   }
@@ -364,7 +354,7 @@ void NcCfFile::parse_valid_time_var(const char* method_name, NcVar* valid_time_v
   nc_time_var = valid_time_var;
   auto bounds_att = get_nc_att(valid_time_var, bounds_att_name, false);
   if (get_att_value_chars(bounds_att.get(), bounds_var_name)) {
-    bounds_time_var = get_nc_var(_ncFile, bounds_var_name.c_str());
+    bounds_time_var = get_nc_var(_ncFile.get(), bounds_var_name.c_str());
     use_bounds_var = IS_VALID_NC(bounds_time_var);
     if (use_bounds_var) {
       nc_time_var = &bounds_time_var;
@@ -423,11 +413,11 @@ void NcCfFile::parse_vars_from_file(ConcatString& att_value, int& max_dim_count,
                                     NcVar*& valid_time_var)
 {
   StringArray varNames;
-  Nvars = get_var_names(_ncFile, &varNames);
-  Var = new NcVarInfo [Nvars];
+  Nvars = get_var_names(_ncFile.get(), &varNames);
+  Var.resize(Nvars);
 
   for (int j =0; j< Nvars; ++j)  {
-    NcVar v = get_var(_ncFile, varNames[j].c_str());
+    NcVar v = get_var(_ncFile.get(), varNames[j].c_str());
 
     Var[j].var = std::make_unique<NcVar>(v);
 
@@ -768,14 +758,14 @@ void NcCfFile::dump(ostream & out, int depth) const
   for (int j = 0; j < _numDims; ++j)
   {
     out << p2 << "Dim # " << j << " = " << _dimNames[j] << "   ("
-        << (GET_NC_SIZE_P(_dims[j])) << ")\n";
+        << (GET_NC_SIZE_P(_dims[j].get())) << ")\n";
   }   //  for j
 
   out << prefix << "\n";
 
   out << prefix << "Xdim = " << (_xDim ? GET_NC_NAME_P(_xDim) : "(nul)") << "\n";
   out << prefix << "Ydim = " << (_yDim ? GET_NC_NAME_P(_yDim) : "(nul)") << "\n";
-  out << prefix << "Tdim = " << (_tDim ? GET_NC_NAME_P(_tDim) : "(nul)") << "\n";
+  out << prefix << "Tdim = " << (_tDim ? GET_NC_NAME_P(_tDim.get()) : "(nul)") << "\n";
 
   out << prefix << "\n";
 
@@ -820,7 +810,7 @@ void NcCfFile::dump(ostream & out, int depth) const
         out << 'X';
       else if (Var[j].Dims[k] == _yDim)
         out << 'Y';
-      else if (Var[j].Dims[k] == _tDim)
+      else if (Var[j].Dims[k] == _tDim.get())
         out << 'T';
       else
         out << GET_NC_NAME_P(Var[j].Dims[k]);
@@ -935,7 +925,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     if (Var[j].var.get() == v)
     {
       found = true;
-      var = Var + j;
+      var = const_cast<NcVarInfo *>(&Var[j]);
       break;
     }
   }
@@ -1200,7 +1190,7 @@ void NcCfFile::find_xy_vars(const string &caller_name) {
   {
     // Get the standard name for the coordinate variable
 
-    const NcVar coord_var = get_var(_ncFile, _dims[dim_num]->getName().c_str());
+    const NcVar coord_var = get_var(_ncFile.get(), _dims[dim_num]->getName().c_str());
     if (IS_INVALID_NC(coord_var)) continue;
 
     ConcatString dim_std_name;
@@ -1212,7 +1202,7 @@ void NcCfFile::find_xy_vars(const string &caller_name) {
 
     if (dim_std_name == x_dim_key_name)
     {
-      _xDim = _dims[dim_num];
+      _xDim = _dims[dim_num].get();
 
       x_dim_var_name = GET_NC_NAME_P(_xDim);
       for (int var_num = 0; var_num < Nvars; ++var_num)
@@ -1227,7 +1217,7 @@ void NcCfFile::find_xy_vars(const string &caller_name) {
 
     if (dim_std_name == y_dim_key_name)
     {
-      _yDim = _dims[dim_num];
+      _yDim = _dims[dim_num].get();
 
       y_dim_var_name = GET_NC_NAME_P(_yDim);
       for (int var_num = 0; var_num < Nvars; ++var_num)
@@ -1248,8 +1238,8 @@ void NcCfFile::find_xy_vars(const string &caller_name) {
     if (_xCoordVar != nullptr && _xDim == nullptr) {
       NcDim dim = get_nc_dim(_xCoordVar, (get_dim_count(_xCoordVar)-1));
       for (int dim_num = 0; dim_num < _numDims; ++dim_num) {
-        if(GET_NC_NAME(dim) == GET_NC_NAME_P(_dims[dim_num])) {
-          _xDim = _dims[dim_num];
+        if(GET_NC_NAME(dim) == GET_NC_NAME_P(_dims[dim_num].get())) {
+          _xDim = _dims[dim_num].get();
           break;
         }
       }
@@ -1264,8 +1254,8 @@ void NcCfFile::find_xy_vars(const string &caller_name) {
       if (dim_offset < 0) dim_offset = 0;
       NcDim dim = get_nc_dim(_yCoordVar, dim_offset);
       for (int dim_num = 0; dim_num < _numDims; ++dim_num) {
-        if(GET_NC_NAME(dim) == GET_NC_NAME_P(_dims[dim_num])) {
-          _yDim = _dims[dim_num];
+        if(GET_NC_NAME(dim) == GET_NC_NAME_P(_dims[dim_num].get())) {
+          _yDim = _dims[dim_num].get();
           break;
         }
       }
@@ -1311,7 +1301,7 @@ NcVarInfo* NcCfFile::find_var_name(const char * var_name) const
 {
   for (int i = 0; i < Nvars; i++)
     if (Var[i].name == var_name)
-      return &Var[i];
+      return const_cast<NcVarInfo *>(&Var[i]);
 
   return nullptr;
 }
@@ -1328,7 +1318,7 @@ NcVarInfo* NcCfFile::find_var_by_dim_name(const char *dim_name) const
       if (1 == Var[i].Ndims) {
         NcDim dim = get_nc_dim(Var[i].var.get(), 0);
         if (GET_NC_NAME(dim) == dim_name) {
-          var = &Var[i];
+          var = const_cast<NcVarInfo *>(&Var[i]);
           break;
         }
       }
@@ -1462,8 +1452,8 @@ void NcCfFile::read_netcdf_grid()
     x_dim_var_name = GET_NC_NAME(get_nc_dim(_lonVar, dim_offset));
     y_dim_var_name = GET_NC_NAME(get_nc_dim(_latVar, 0));
     for (int dim_num = 0; dim_num < _numDims; ++dim_num) {
-       if(x_dim_var_name == GET_NC_NAME_P(_dims[dim_num])) _xDim = _dims[dim_num];
-       if(y_dim_var_name == GET_NC_NAME_P(_dims[dim_num])) _yDim = _dims[dim_num];
+       if(x_dim_var_name == GET_NC_NAME_P(_dims[dim_num].get())) _xDim = _dims[dim_num].get();
+       if(y_dim_var_name == GET_NC_NAME_P(_dims[dim_num].get())) _yDim = _dims[dim_num].get();
     }
     if (_xDim != nullptr && _yDim != nullptr) {
        get_grid_from_lat_lon_vars(_latVar, _lonVar,
@@ -2111,7 +2101,7 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
   {
     // The lat/lon dimensions are identified by their units
 
-    const NcVar coord_var = get_var(_ncFile, _dims[dim_num]->getName().c_str());
+    const NcVar coord_var = get_var(_ncFile.get(), _dims[dim_num]->getName().c_str());
     if (IS_INVALID_NC(coord_var)) continue;
 
     ConcatString dim_units;
@@ -2123,7 +2113,7 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
     {
       if (_yDim == nullptr)
       {
-        _yDim = _dims[dim_num];
+        _yDim = _dims[dim_num].get();
 
         y_dim_var_name = GET_NC_NAME_P(_yDim).c_str();
         for (int var_num = 0; var_num < Nvars; ++var_num)
@@ -2147,7 +2137,7 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
     {
       if (_xDim == nullptr)
       {
-        _xDim = _dims[dim_num];
+        _xDim = _dims[dim_num].get();
 
         x_dim_var_name = GET_NC_NAME_P(_xDim).c_str();
         for (int var_num = 0; var_num < Nvars; ++var_num)
@@ -2672,7 +2662,7 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
   {
     // These dimensions are identified by the standard_name attribute
 
-    const NcVar coord_var = get_var(_ncFile, _dims[dim_num]->getName().c_str());
+    const NcVar coord_var = get_var(_ncFile.get(), _dims[dim_num]->getName().c_str());
     if (IS_INVALID_NC(coord_var))
       continue;
 
@@ -2691,7 +2681,7 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
     {
       if (_yDim == nullptr)
       {
-        _yDim = _dims[dim_num];
+        _yDim = _dims[dim_num].get();
 
         y_dim_var_name = GET_NC_NAME_P(_yDim).c_str();
 
@@ -2716,7 +2706,7 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
     {
       if (_xDim == nullptr)
       {
-        _xDim = _dims[dim_num];
+        _xDim = _dims[dim_num].get();
 
         x_dim_var_name = GET_NC_NAME_P(_xDim).c_str();
         for (int var_num = 0; var_num < Nvars; ++var_num)
@@ -3052,7 +3042,7 @@ void NcCfFile::get_grid_mapping_geostationary(
 
   // Get scene_id: "Full Disk", "CONUS", or "Mesoscale"
   ConcatString scene_id;
-  if (get_global_att(_ncFile, (string)"scene_id", scene_id)) {
+  if (get_global_att(_ncFile.get(), (string)"scene_id", scene_id)) {
     auto scene_id_str = new char[scene_id.length()+1];
     m_strncpy(scene_id_str, scene_id.text(), scene_id.length(), method_name.c_str());
     scene_id_str[scene_id.length()] = 0;
@@ -3212,7 +3202,7 @@ bool NcCfFile::get_grid_from_dimensions()
     // The lat/lon dimensions are identified by their units
 
     dim_name = _dims[dim_num]->getName().c_str();
-    if (!has_var(_ncFile, dim_name.c_str())) {
+    if (!has_var(_ncFile.get(), dim_name.c_str())) {
       if ( dim_lat_nt == dim_name) {
         dim_name = var_lat_nt;
       }
@@ -3220,14 +3210,14 @@ bool NcCfFile::get_grid_from_dimensions()
         dim_name = var_lon_nt;
       }
 
-      if (!has_var(_ncFile, dim_name.c_str())) {
+      if (!has_var(_ncFile.get(), dim_name.c_str())) {
         mlog << Debug(6) << method_name << " -> " << "The coordinate variable \""
              << _dims[dim_num]->getName() << "\" does not exist.\n";
         continue;
       }
     }
 
-    coord_var = get_nc_var(_ncFile, dim_name.c_str());
+    coord_var = get_nc_var(_ncFile.get(), dim_name.c_str());
     if (IS_INVALID_NC(coord_var))
       continue;
 
@@ -3240,7 +3230,7 @@ bool NcCfFile::get_grid_from_dimensions()
     {
       if (_yDim == nullptr)
       {
-        _yDim = _dims[dim_num];
+        _yDim = _dims[dim_num].get();
 
         y_dim_var_name = GET_NC_NAME_P(_yDim).c_str();
         for (int var_num = 0; var_num < Nvars; ++var_num)
@@ -3269,7 +3259,7 @@ bool NcCfFile::get_grid_from_dimensions()
     {
       if (_xDim == nullptr)
       {
-        _xDim = _dims[dim_num];
+        _xDim = _dims[dim_num].get();
 
         x_dim_var_name = GET_NC_NAME_P(_xDim).c_str();
         for (int var_num = 0; var_num < Nvars; ++var_num)
@@ -3411,7 +3401,7 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
   data.delta_lon = dlon;
 
   ConcatString point_nccf;
-  bool skip_sanity_check = get_att_value_string(_ncFile, nc_att_met_point_nccf, point_nccf);
+  bool skip_sanity_check = get_att_value_string(_ncFile.get(), nc_att_met_point_nccf, point_nccf);
   if (!skip_sanity_check) {
     get_env(nc_att_met_point_nccf, point_nccf);
     skip_sanity_check = (point_nccf == "yes");
