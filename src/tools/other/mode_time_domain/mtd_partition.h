@@ -19,6 +19,8 @@
 
 
 #include <iostream>
+#include <memory>
+#include <vector>
 
 #include "concat_string.h"
 
@@ -44,14 +46,7 @@ class EquivalenceClass {
 
       void assign(const EquivalenceClass &);
 
-      void extend(int);
-
-
-      int * E;   //  allocated
-
-      int Nelements;
-
-      int Nalloc;
+      std::vector<int> E;
 
     public:
 
@@ -92,7 +87,7 @@ class EquivalenceClass {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int EquivalenceClass::n_elements() const { return Nelements; }
+inline int EquivalenceClass::n_elements() const { return (int) E.size(); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -102,12 +97,9 @@ inline bool EquivalenceClass::has(int k) const
 
 {
 
-int j;
-int * e = E;
+for (int j : E)  {
 
-for (j=0; j<Nelements; ++j, ++e)  {
-
-   if ( *e == k )  return true;
+   if ( j == k )  return true;
 
 }
 
@@ -140,16 +132,10 @@ class Mtd_Partition {   //  disjoint unions of equivalence classes
 
       void assign(const Mtd_Partition &);
 
-      void extend(int);
-
       ConcatString specialized_dump_string(const int Nf, const int No) const;
 
 
-      EquivalenceClass ** C;   //  allocated
-
-      int Nelements;
-
-      int Nalloc;
+      std::vector<std::unique_ptr<EquivalenceClass>> C;
 
    public:
 
@@ -199,18 +185,15 @@ class Mtd_Partition {   //  disjoint unions of equivalence classes
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int Mtd_Partition::n_elements() const { return Nelements; }
+inline int Mtd_Partition::n_elements() const { return (int) C.size(); }
 
 inline bool Mtd_Partition::has(int k) const
 
 {
 
-int j;
-EquivalenceClass ** c = C;
+for (const auto & c : C)  {
 
-for (j=0; j<Nelements; ++j, ++c)  {
-
-   if ( (*c)->has(k) )  return true;
+   if ( c->has(k) )  return true;
 
 }
 
