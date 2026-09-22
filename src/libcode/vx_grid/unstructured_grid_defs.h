@@ -18,6 +18,7 @@
 
 
 #include <iostream>
+#include <memory>
 
 #include "atlas/grid/Grid.h"    // PointLonLat
 #include "atlas/util/Geometry.h"
@@ -44,7 +45,7 @@ struct UnstructuredData {
    std::vector<atlas::PointLonLat> points_lonlat;
    std::vector<atlas::PointXYZ> points_XYZ;     // lat_deg, lon_der, alt_meters
    std::vector<atlas::PointXYZ> points_XYZ_km;  // x_km, y_km, z_km
-   atlas::util::IndexKDTree *kdtree;
+   std::unique_ptr<atlas::util::IndexKDTree> kdtree;
 
    UnstructuredData();
    ~UnstructuredData();

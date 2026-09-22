@@ -17,6 +17,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
+
 #include "grid_base.h"
 
 #include "gaussian_grid_defs.h"
@@ -42,7 +44,7 @@ class GaussianGrid : public GridRep {
 
       double Delta_Lon;
 
-      double * Latitudes;   //  allocated, increasing order (ie, south to north)
+      std::vector<double> Latitudes;   //  increasing order (ie, south to north)
 
       ConcatString Name;
 

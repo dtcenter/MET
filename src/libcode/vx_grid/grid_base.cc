@@ -400,7 +400,7 @@ void UnstructuredData::clear_data() {
    points_XYZ_km.clear();
    lat_checksum = lon_checksum = alt_checksum = 0.;
 
-   if (kdtree) { delete kdtree; kdtree = nullptr; }
+   kdtree.reset();
 
 }
 

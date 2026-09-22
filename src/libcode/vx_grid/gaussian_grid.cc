@@ -53,8 +53,6 @@ GaussianGrid::GaussianGrid()
 
 {
 
-Latitudes = 0;
-
 clear();
 
 }
@@ -89,7 +87,7 @@ Delta_Lon = 0.0;
 
 memset(&Data, 0, sizeof(Data));
 
-if ( Latitudes )  { delete [] Latitudes;  Latitudes = 0; }
+Latitudes.clear();
 
 return;
 
@@ -102,8 +100,6 @@ return;
 GaussianGrid::GaussianGrid(const GaussianData & data)
 
 {
-
-Latitudes = 0;
 
 clear();
 
@@ -145,11 +141,9 @@ double latitude;
 const int ny_half = Ny/2;
 
 
-Latitudes = new double [Ny];
+Latitudes.assign(Ny, 0.0);
 
 L.set_max_degree(Ny);
-
-for (j=0; j<Ny; ++j)  Latitudes[j] = 0.0;
 
 for (j=0; j<ny_half; ++j)  {
 

@@ -351,7 +351,6 @@ void Grid::set(const UnstructuredData &data) {
 
 
 UnstructuredData::UnstructuredData() {
-   kdtree = nullptr;
    max_distance_km = bad_data_double;  // disable distance
    clear();
 }
@@ -367,7 +366,7 @@ UnstructuredData::~UnstructuredData() {
 void UnstructuredData::build_tree() {
 
    atlas::idx_t n = 0;
-   kdtree = new IndexKDTree(atlas_geometry);
+   kdtree = std::make_unique<IndexKDTree>(atlas_geometry);
    kdtree->reserve(n_face);
    if (has_PointLatLon()) {
       for (int i=0; i<n_face; i++) {
