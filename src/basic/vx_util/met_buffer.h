@@ -20,6 +20,8 @@
 
 #include "stdlib.h"
 
+#include <vector>
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -42,10 +44,9 @@ class MetBuffer {
 
       void mb_assign(const MetBuffer &);
 
-      unsigned char * Buf;   //  allocated
+      std::vector<unsigned char> Buf;
 
       bigint Nbytes;   //  from last read
-      bigint Nalloc;   //  from last read
 
          //  these are for reading fortran binary records
 
@@ -98,10 +99,10 @@ class MetBuffer {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline unsigned char * MetBuffer::operator()() const { return Buf; }
+inline unsigned char * MetBuffer::operator()() const { return const_cast<unsigned char *>(Buf.data()); }
 
 inline bigint MetBuffer::n_bytes() const { return Nbytes; }
-inline bigint MetBuffer::n_alloc() const { return Nalloc; }
+inline bigint MetBuffer::n_alloc() const { return (bigint) Buf.size(); }
 
 
 ////////////////////////////////////////////////////////////////////////

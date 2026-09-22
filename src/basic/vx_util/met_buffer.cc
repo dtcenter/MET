@@ -100,9 +100,7 @@ void MetBuffer::mb_init_from_scratch()
 
 {
 
-Buf = 0;
-
-Nalloc = Nbytes = (bigint) 0;
+Nbytes = (bigint) 0;
 
 mb_clear();
 
@@ -118,9 +116,9 @@ void MetBuffer::mb_clear()
 
 {
 
-if ( Buf )  { delete [] Buf;  Buf = 0; }
+Buf.clear();
 
-Nalloc = Nbytes = (bigint) 0;
+Nbytes = (bigint) 0;
 
 RecPadSize = default_rec_pad_size;
 
@@ -176,7 +174,7 @@ Nbytes = b.Nbytes;
 RecPadSize = b.RecPadSize;
 SwapEndian = b.SwapEndian;
 
-memcpy(Buf, b.Buf, Nbytes);
+Buf = b.Buf;
 
 return;
 
@@ -199,25 +197,17 @@ if ( bytes < 0 )  {
 
 }
 
-if ( bytes <= Nalloc )  return;
+if ( bytes <= (bigint) Buf.size() )  return;
 
-unsigned char * u = new unsigned char [bytes];
+   //
+   //  resize, not reserve: callers write through operator() after extending.
+   //  This also drops a hand-written grow that memcpy'd the NEW size out of
+   //  the OLD buffer.
+   //
 
-memset(u, 0, bytes);
-
-if ( Buf )  {
-
-   memcpy(u, Buf, bytes);
-
-   delete [] Buf;  Buf = 0;
-
-}
-
-Buf = u;  u = 0;
+Buf.resize(bytes, 0);
 
 Nbytes = 0;
-
-Nalloc = bytes;
 
 
 
@@ -277,7 +267,7 @@ extend(bytes);
 
 int n_read;
 
-n_read = ::read(fd, Buf, bytes);
+n_read = ::read(fd, Buf.data(), bytes);
 
 Nbytes = n_read;
 
@@ -301,7 +291,7 @@ extend(s);
 
 long long n_read;
 
-n_read = ::read_fortran_binary(fd, Buf, Nalloc, RecPadSize, SwapEndian);
+n_read = ::read_fortran_binary(fd, Buf.data(), ((bigint) Buf.size()), RecPadSize, SwapEndian);
 
 Nbytes = n_read;
 
