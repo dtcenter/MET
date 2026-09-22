@@ -21,6 +21,8 @@
 
 #include "vx_cal.h"
 #include "vx_util.h"
+#include <memory>
+
 #include "vx_grid.h"
 
 
@@ -45,7 +47,7 @@ class AFDataFile {
       int two_to_one(int, int) const;
 
 
-      const Grid * grid;   //  allocated
+      std::unique_ptr<const Grid> grid;
 
       ConcatString Filename;
 
