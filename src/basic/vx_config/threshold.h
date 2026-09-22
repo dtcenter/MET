@@ -12,6 +12,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -410,7 +411,7 @@ class SingleThresh {
 
       bool operator==(const SingleThresh &) const;
 
-      ThreshNode * node;   //  allocated
+      std::unique_ptr<ThreshNode> node;
 
       void           clear();
 
