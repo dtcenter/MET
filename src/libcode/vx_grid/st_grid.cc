@@ -69,7 +69,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-StereographicGrid::StereographicGrid(const StereographicData & data)
+StereographicGrid::StereographicGrid(const StereographicData & data, Key)
 
 {
 
@@ -542,11 +542,11 @@ exit ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * StereographicGrid::copy() const
+std::unique_ptr<GridRep> StereographicGrid::copy() const
 
 {
 
-auto * p = new StereographicGrid (Data);
+auto p = std::make_unique<StereographicGrid>(Data, Key{});
 
 p->Name = Name;
 
@@ -829,7 +829,7 @@ void Grid::set(const StereographicData & data)
 
 clear();
 
-rep.reset(new StereographicGrid(data));
+rep = std::make_unique<StereographicGrid>(data, StereographicGrid::Key{});
 
 
 return;

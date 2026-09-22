@@ -80,7 +80,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-GoesImagerGrid::GoesImagerGrid(const GoesImagerData & data)
+GoesImagerGrid::GoesImagerGrid(const GoesImagerData & data, Key)
 
 {
 
@@ -336,11 +336,11 @@ exit ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * GoesImagerGrid::copy() const
+std::unique_ptr<GridRep> GoesImagerGrid::copy() const
 
 {
 
-auto * p = new GoesImagerGrid (Data);
+auto p = std::make_unique<GoesImagerGrid>(Data, Key{});
 
 p->Name = Name;
 
@@ -637,7 +637,7 @@ void Grid::set(const GoesImagerData & data)
 
 clear();
 
-rep.reset(new GoesImagerGrid(data));
+rep = std::make_unique<GoesImagerGrid>(data, GoesImagerGrid::Key{});
 
 
 }

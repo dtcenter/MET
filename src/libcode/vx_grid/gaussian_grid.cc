@@ -97,7 +97,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-GaussianGrid::GaussianGrid(const GaussianData & data)
+GaussianGrid::GaussianGrid(const GaussianData & data, Key)
 
 {
 
@@ -447,11 +447,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * GaussianGrid::copy() const
+std::unique_ptr<GridRep> GaussianGrid::copy() const
 
 {
 
-auto * p = new GaussianGrid (Data);
+auto p = std::make_unique<GaussianGrid>(Data, Key{});
 
 p->Name = Name;
 
@@ -491,7 +491,7 @@ void Grid::set(const GaussianData & data)
 
 clear();
 
-rep.reset(new GaussianGrid(data));
+rep = std::make_unique<GaussianGrid>(data, GaussianGrid::Key{});
 
 
 return;

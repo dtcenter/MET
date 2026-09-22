@@ -95,7 +95,7 @@ void UnstructuredGrid::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 
-UnstructuredGrid::UnstructuredGrid(const UnstructuredData & data) {
+UnstructuredGrid::UnstructuredGrid(const UnstructuredData & data, Key) {
 
    set_from_data(data);
 
@@ -302,9 +302,9 @@ void UnstructuredGrid::shift_right(int N)
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * UnstructuredGrid::copy() const {
+std::unique_ptr<GridRep> UnstructuredGrid::copy() const {
 
-  auto * p = new UnstructuredGrid (Data);
+  auto p = std::make_unique<UnstructuredGrid>(Data, Key{});
 
   p->Name = Name;
 
@@ -339,7 +339,7 @@ Grid::Grid(const UnstructuredData &data) {
 void Grid::set(const UnstructuredData &data) {
    clear();
 
-   rep.reset(new UnstructuredGrid(data));
+   rep = std::make_unique<UnstructuredGrid>(data, UnstructuredGrid::Key{});
    if ( !rep )  {
       mlog << Error << "\nGrid::set(const Unstructured &) -> memory allocation error\n\n";
       exit ( 1 );

@@ -118,7 +118,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-LambertGrid::LambertGrid(const LambertData & data)
+LambertGrid::LambertGrid(const LambertData & data, Key)
 
 {
 
@@ -621,11 +621,11 @@ exit ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * LambertGrid::copy() const
+std::unique_ptr<GridRep> LambertGrid::copy() const
 
 {
 
-auto * p = new LambertGrid (Data);
+auto p = std::make_unique<LambertGrid>(Data, Key{});
 
 p->Name = Name;
 
@@ -862,7 +862,7 @@ void Grid::set(const LambertData & data)
 
 clear();
 
-rep.reset(new LambertGrid(data));
+rep = std::make_unique<LambertGrid>(data, LambertGrid::Key{});
 
 
 }

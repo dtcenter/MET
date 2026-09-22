@@ -61,7 +61,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-SemiLatLonGrid::SemiLatLonGrid(const SemiLatLonData & data)
+SemiLatLonGrid::SemiLatLonGrid(const SemiLatLonData & data, Key)
 
 {
 
@@ -451,11 +451,11 @@ exit ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * SemiLatLonGrid::copy() const
+std::unique_ptr<GridRep> SemiLatLonGrid::copy() const
 
 {
 
-auto * p = new SemiLatLonGrid (Data);
+auto p = std::make_unique<SemiLatLonGrid>(Data, Key{});
 
 p->Name = Name;
 
@@ -495,7 +495,7 @@ void Grid::set(const SemiLatLonData & data)
 
 clear();
 
-rep.reset(new SemiLatLonGrid(data));
+rep = std::make_unique<SemiLatLonGrid>(data, SemiLatLonGrid::Key{});
 
 
 return;

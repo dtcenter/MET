@@ -27,11 +27,23 @@ class MercatorGrid : public GridRep {
 
       friend class Grid;
 
+         //
+         //  Key is private, so only Grid and MercatorGrid itself can create
+         //  one.  It lets the constructors below be public - which is
+         //  what std::make_unique needs - without opening grid
+         //  construction up to the rest of the code.
+         //
+
+      struct Key { explicit Key() = default; };
+
+   public:
+
+     ~MercatorGrid();
+      MercatorGrid(const MercatorData &, Key);
+
    private:
 
       MercatorGrid();
-     ~MercatorGrid();
-      MercatorGrid(const MercatorData &);
 
          //
          //
@@ -99,7 +111,7 @@ class MercatorGrid : public GridRep {
 
       void shift_right(int);
 
-      GridRep * copy() const;
+      std::unique_ptr<GridRep> copy() const;
 
 };
 

@@ -183,7 +183,7 @@ class GridRep : public GridInterface {
 
       virtual void shift_right(int) = 0;
 
-      virtual GridRep * copy() const = 0;
+      virtual std::unique_ptr<GridRep> copy() const = 0;
 
 };
 

@@ -1057,7 +1057,7 @@ clear();
 
 if ( ! (g.rep) )  return;
 
-rep.reset(g.rep->copy());
+rep = g.rep->copy();
 set_swap_to_north(g.get_swap_to_north());
 
 return;

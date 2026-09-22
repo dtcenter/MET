@@ -43,12 +43,24 @@ class LaeaGrid : public GridRep {
 
       friend class Grid;
 
+         //
+         //  Key is private, so only Grid and LaeaGrid itself can create
+         //  one.  It lets the constructors below be public - which is
+         //  what std::make_unique needs - without opening grid
+         //  construction up to the rest of the code.
+         //
+
+      struct Key { explicit Key() = default; };
+
+   public:
+
+     ~LaeaGrid();
+      LaeaGrid(const LaeaData &, Key);
+      LaeaGrid(const LaeaNetcdfData &, Key);
+
    protected:
 
       LaeaGrid();
-     ~LaeaGrid();
-      LaeaGrid(const LaeaData &);
-      LaeaGrid(const LaeaNetcdfData &);
 
       Spheroid geoid;
 
@@ -134,7 +146,7 @@ class LaeaGrid : public GridRep {
 
       void shift_right(int);
 
-      GridRep * copy() const;
+      std::unique_ptr<GridRep> copy() const;
 
 };
 

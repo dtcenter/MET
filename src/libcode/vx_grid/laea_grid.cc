@@ -69,7 +69,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-LaeaGrid::LaeaGrid(const LaeaData & data)
+LaeaGrid::LaeaGrid(const LaeaData & data, Key)
 
 {
 
@@ -119,7 +119,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-LaeaGrid::LaeaGrid(const LaeaNetcdfData & nc)
+LaeaGrid::LaeaGrid(const LaeaNetcdfData & nc, Key)
 
 {
 
@@ -589,11 +589,11 @@ return 0.0;
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * LaeaGrid::copy() const
+std::unique_ptr<GridRep> LaeaGrid::copy() const
 
 {
 
-auto * p = new LaeaGrid (Data);
+auto p = std::make_unique<LaeaGrid>(Data, Key{});
 
 return p;
 
@@ -766,7 +766,7 @@ void Grid::set(const LaeaData & data)
 
 clear();
 
-rep.reset(new LaeaGrid(data));
+rep = std::make_unique<LaeaGrid>(data, LaeaGrid::Key{});
 
 
 return;
@@ -797,7 +797,7 @@ void Grid::set(const LaeaNetcdfData & data)
 
 clear();
 
-rep.reset(new LaeaGrid(data));
+rep = std::make_unique<LaeaGrid>(data, LaeaGrid::Key{});
 
 
 return;

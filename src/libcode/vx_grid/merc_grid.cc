@@ -75,7 +75,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-MercatorGrid::MercatorGrid(const MercatorData & data)
+MercatorGrid::MercatorGrid(const MercatorData & data, Key)
 
 {
 
@@ -549,11 +549,11 @@ exit ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * MercatorGrid::copy() const
+std::unique_ptr<GridRep> MercatorGrid::copy() const
 
 {
 
-auto * p = new MercatorGrid (Data);
+auto p = std::make_unique<MercatorGrid>(Data, Key{});
 
 p->Name = Name;
 
@@ -727,7 +727,7 @@ void Grid::set(const MercatorData & data)
 
 clear();
 
-rep.reset(new MercatorGrid(data));
+rep = std::make_unique<MercatorGrid>(data, MercatorGrid::Key{});
 
 
 return;

@@ -85,7 +85,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-LatLonGrid::LatLonGrid(const LatLonData & data)
+LatLonGrid::LatLonGrid(const LatLonData & data, Key)
 
 {
 
@@ -395,11 +395,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * LatLonGrid::copy() const
+std::unique_ptr<GridRep> LatLonGrid::copy() const
 
 {
 
-auto * p = new LatLonGrid (Data);
+auto p = std::make_unique<LatLonGrid>(Data, Key{});
 
 p->Name = Name;
 
@@ -439,7 +439,7 @@ void Grid::set(const LatLonData & data)
 
 clear();
 
-rep.reset(new LatLonGrid(data));
+rep = std::make_unique<LatLonGrid>(data, LatLonGrid::Key{});
 
 
 return;

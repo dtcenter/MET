@@ -27,11 +27,23 @@ class LambertGrid : public GridRep {
 
       friend class Grid;
 
+         //
+         //  Key is private, so only Grid and LambertGrid itself can create
+         //  one.  It lets the constructors below be public - which is
+         //  what std::make_unique needs - without opening grid
+         //  construction up to the rest of the code.
+         //
+
+      struct Key { explicit Key() = default; };
+
+   public:
+
+     ~LambertGrid();
+      LambertGrid(const LambertData &, Key);
+
    private:
 
       LambertGrid();
-     ~LambertGrid();
-      LambertGrid(const LambertData &);
 
       void clear();
 
@@ -117,7 +129,7 @@ class LambertGrid : public GridRep {
 
       void shift_right(int);
 
-      GridRep * copy() const;
+      std::unique_ptr<GridRep> copy() const;
 
       double scale_km() const;
 

@@ -478,11 +478,11 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * RngAziGrid::copy() const
+std::unique_ptr<GridRep> RngAziGrid::copy() const
 
 {
 
-auto * p = new RngAziGrid (RAData);
+auto p = std::make_unique<RngAziGrid>(RAData);
 
 p->Name = Name;
 
@@ -522,7 +522,7 @@ void Grid::set(const RngAziData & data)
 
 clear();
 
-rep.reset(new RngAziGrid(data));
+rep = std::make_unique<RngAziGrid>(data);
 
 
 return;
