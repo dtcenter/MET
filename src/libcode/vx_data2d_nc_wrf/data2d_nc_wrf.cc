@@ -132,7 +132,7 @@ bool MetNcWrfDataFile::get_real_dimension(const VarInfoNcWrf *vinfo_nc,
       if (dimension[k] != vx_data2d_dim_by_value && dimension[k] != range_flag) continue;
 
       string dim_name = GET_NC_NAME(get_nc_dim(info->var, k));
-      NcVarInfo *var_info = find_var_info_by_dim_name(WrfNc->Var, dim_name,
+      NcVarInfo *var_info = find_var_info_by_dim_name(WrfNc->Var.data(), dim_name,
                                                          WrfNc->Nvars);
       if (var_info == nullptr) continue;
 
