@@ -88,12 +88,12 @@ class GridTemplate {
       // Access methods
 
       inline void addOffset(const GridOffset &offset) {
-         _offsetList.emplace_back(new GridOffset(offset.x_offset,
-                                              offset.y_offset));
+         _offsetList.emplace_back(std::make_unique<GridOffset>(offset.x_offset,
+                                                              offset.y_offset));
       }
 
       inline void addOffset(const int x_offset, const int y_offset) {
-         _offsetList.emplace_back(new GridOffset(x_offset, y_offset));
+         _offsetList.emplace_back(std::make_unique<GridOffset>(x_offset, y_offset));
       }
 
       int size(void) const {
@@ -117,7 +117,7 @@ class GridTemplate {
       bool _wrapLon;
 
       // The offsets that make up the circle
-      std::vector<GridOffset*> _offsetList;
+      std::vector<std::unique_ptr<GridOffset>> _offsetList;
 
       // The offsets that define the first and last rows and columns
       std::vector<GridOffset*> _offsetLftEdge; // not allocated
@@ -126,7 +126,7 @@ class GridTemplate {
       std::vector<GridOffset*> _offsetBotEdge; // not allocated
 
       // Iterator for finding points within a grid
-      mutable std::vector<GridOffset*>::const_iterator _pointInGridIterator;
+      mutable std::vector<std::unique_ptr<GridOffset>>::const_iterator _pointInGridIterator;
       mutable std::vector<GridOffset*>::const_iterator _pointInLftEdgeIterator;
       mutable std::vector<GridOffset*>::const_iterator _pointInRgtEdgeIterator;
       mutable std::vector<GridOffset*>::const_iterator _pointInTopEdgeIterator;
