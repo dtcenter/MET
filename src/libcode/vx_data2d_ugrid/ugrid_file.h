@@ -17,6 +17,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
+#include <memory>
 #include <ostream>
 
 #include "vx_grid.h"
@@ -85,7 +87,7 @@ class UGridFile {
 
       int Nvars;
 
-      NcVarInfo *Var;    //  allocated
+      std::vector<NcVarInfo> Var;
       std::array<NcVarInfo, UG_META_VAR_COUNT>MetaVar;
       ConcatString z_var_name;
 
@@ -116,8 +118,8 @@ class UGridFile {
 
       static const double DELTA_TOLERANCE;
       
-      netCDF::NcFile * _ncFile;      //  allocated
-      netCDF::NcFile * _ncMetaFile;  //  allocated
+      std::unique_ptr<netCDF::NcFile> _ncFile;
+      std::unique_ptr<netCDF::NcFile> _ncMetaFile;
 
       ConcatString dataset_name;
       ConcatString coordinate_file;
