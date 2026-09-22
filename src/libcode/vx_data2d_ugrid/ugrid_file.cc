@@ -88,11 +88,11 @@ void UGridFile::init_from_scratch()
   _ncMetaFile.reset();
   Var.clear();
 
-  _faceDim = (NcDim *)nullptr;
-  _edgeDim = (NcDim *)nullptr;
-  _nodeDim = (NcDim *)nullptr;
-  _virtDim = (NcDim *)nullptr;
-  _tDim = (NcDim *)nullptr;
+  _faceDim.reset();
+  _edgeDim.reset();
+  _nodeDim.reset();
+  _virtDim.reset();
+  _tDim.reset();
   _latVar = (NcVar *)nullptr;
   _lonVar = (NcVar *)nullptr;
   _zVar = (NcVar *)nullptr;
@@ -127,7 +127,9 @@ void UGridFile::close()
   metadata_map.clear();
   metadata_names.clear();
 
-  _faceDim = _edgeDim = _tDim = (NcDim *)nullptr;
+  _faceDim.reset();
+  _edgeDim.reset();
+  _tDim.reset();
 
   // Reclaim the variable pointers
 
@@ -169,12 +171,12 @@ void UGridFile::close()
 ////////////////////////////////////////////////////////////////////////
 // Helper: Assign dimension from metadata
 
-void UGridFile::assign_dim_from_metadata(const netCDF::NcFile* ncFile, netCDF::NcDim*& dim_ptr,
+void UGridFile::assign_dim_from_metadata(const netCDF::NcFile* ncFile, std::unique_ptr<netCDF::NcDim>& dim_ptr,
                                          const std::string& key, const StringArray& dim_names) {
   std::string meta_name = find_metadata_name(key, dim_names);
   if (!meta_name.empty()) {
     NcDim dim = get_nc_dim(ncFile, meta_name);
-    dim_ptr = new NcDim(dim);
+    dim_ptr = std::make_unique<NcDim>(dim);
   }
   else {
     mlog << Debug(7) << "UGridFile::assign_dim_from_metadata() "
@@ -225,10 +227,10 @@ bool UGridFile::open_metadata(const char * filepath)
 
   // Face (cell) dimension
   assign_dim_from_metadata(_ncFile.get(), _faceDim, DIM_KEYS[0], dim_names);
-  if (IS_VALID_NC_P(_faceDim)) {
+  if (IS_VALID_NC_P(_faceDim.get())) {
     string meta_name = find_metadata_name(DIM_KEYS[0], dim_names);
     if (!meta_name.empty()) {
-      face_count = get_dim_size(_faceDim);
+      face_count = get_dim_size(_faceDim.get());
       NcDim face_dim = get_nc_dim(_ncFile.get(), meta_name);
       int data_face_count = get_dim_size(&face_dim);
       if (face_count != data_face_count) {
@@ -287,7 +289,7 @@ bool UGridFile::open_metadata(const char * filepath)
     for (int k=0; k<dim_count; ++k)  {
       const NcDim *dim_p = Var[j].Dims[k];
       const ConcatString dim_name = dimNames[k];
-      if ((nullptr != dim_p && dim_p == _tDim) || dim_name == time_dim_name) {
+      if ((nullptr != dim_p && dim_p == _tDim.get()) || dim_name == time_dim_name) {
          Var[j].t_slot = k;
       }
       else if (dim_name == vert_dim_name) {
@@ -338,9 +340,9 @@ void UGridFile::dump(ostream & out, int depth) const
   out << prefix << "Nc = " << (_ncFile ? "ok" : "(nul)") << "\n";
   out << prefix << "\n";
 
-  out << prefix << "face_dim = " << (_faceDim ? GET_NC_NAME_P(_faceDim) : "(nul)") << "\n";
-  out << prefix << "edge_dim = " << (_edgeDim ? GET_NC_NAME_P(_edgeDim) : "(nul)") << "\n";
-  out << prefix << "Tdim = " << (_tDim ? GET_NC_NAME_P(_tDim) : "(nul)") << "\n";
+  out << prefix << "face_dim = " << (_faceDim ? GET_NC_NAME_P(_faceDim.get()) : "(nul)") << "\n";
+  out << prefix << "edge_dim = " << (_edgeDim ? GET_NC_NAME_P(_edgeDim.get()) : "(nul)") << "\n";
+  out << prefix << "Tdim = " << (_tDim ? GET_NC_NAME_P(_tDim.get()) : "(nul)") << "\n";
 
   out << prefix << "\n";
 
@@ -381,11 +383,11 @@ void UGridFile::dump(ostream & out, int depth) const
 
     for (int k = 0; k < Var[j].Ndims; ++k)
     {
-      if (Var[j].Dims[k] == _faceDim)
+      if (Var[j].Dims[k] == _faceDim.get())
         out << 'X';
-      else if (Var[j].Dims[k] == _edgeDim)
+      else if (Var[j].Dims[k] == _edgeDim.get())
         out << 'Y';
-      else if (Var[j].Dims[k] == _tDim)
+      else if (Var[j].Dims[k] == _tDim.get())
         out << 'T';
       else
         out << GET_NC_NAME_P(Var[j].Dims[k]);
@@ -798,10 +800,10 @@ bool UGridFile::metadata_time() {
   // Store the dimension for the time variable as the time dimension
   bool use_bounds_var = false;
   int time_dim_count = get_dim_count(_tVar);
-  if (nullptr == _tDim && (time_dim_count == 1 || time_dim_count == 2)) {
+  if (!_tDim && (time_dim_count == 1 || time_dim_count == 2)) {
      NcDim tDim = get_nc_dim(_tVar, 0);
      if (IS_VALID_NC(tDim)) {
-       _tDim = new NcDim(tDim);
+       _tDim = std::make_unique<NcDim>(tDim);
      }
   }
 
@@ -809,7 +811,7 @@ bool UGridFile::metadata_time() {
   bool is_string_time = (NC_CHAR == data_type || NC_STRING == data_type);
 
   // Determine the number of times present.
-  int n_times = IS_VALID_NC_P(_tDim) ? get_dim_size(_tDim)
+  int n_times = IS_VALID_NC_P(_tDim.get()) ? get_dim_size(_tDim.get())
                                      : get_data_size(_tVar);
   vector<double> time_values(n_times);
   if(is_string_time) {   // String type: YYYY-MM-DD HH:MM:SS

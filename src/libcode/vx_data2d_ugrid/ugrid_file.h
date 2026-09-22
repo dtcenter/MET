@@ -60,7 +60,7 @@ class UGridFile {
 
 
       int getNx() const {
-        return (_faceDim == nullptr) ? 0 : GET_NC_SIZE_P(_faceDim);
+        return (!_faceDim) ? 0 : GET_NC_SIZE_P(_faceDim.get());
       }
       
       int getNy() const {
@@ -138,11 +138,11 @@ class UGridFile {
       // variables.  Note that these are pointers into the _dims and Var
       // arrays so should not be deleted.
 
-      netCDF::NcDim *_faceDim;
-      netCDF::NcDim *_edgeDim;
-      netCDF::NcDim *_nodeDim;
-      netCDF::NcDim *_virtDim;
-      netCDF::NcDim *_tDim;
+      std::unique_ptr<netCDF::NcDim> _faceDim;
+      std::unique_ptr<netCDF::NcDim> _edgeDim;
+      std::unique_ptr<netCDF::NcDim> _nodeDim;
+      std::unique_ptr<netCDF::NcDim> _virtDim;
+      std::unique_ptr<netCDF::NcDim> _tDim;
 
       netCDF::NcVar *_latVar;
       netCDF::NcVar *_lonVar;
@@ -162,7 +162,7 @@ class UGridFile {
       // Read the grid information from the netCDF file and fill in the
       // grid member with that information.
 
-      void assign_dim_from_metadata(const netCDF::NcFile* ncFile, netCDF::NcDim*& dim_ptr,
+      void assign_dim_from_metadata(const netCDF::NcFile* ncFile, std::unique_ptr<netCDF::NcDim>& dim_ptr,
                                     const std::string& key, const StringArray& dim_names);
 
       std::string find_metadata_name(const std::string &key, const StringArray &available_names);
@@ -177,7 +177,7 @@ class UGridFile {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline netCDF::NcDim *UGridFile::get_vert_dim() const { return _virtDim; }
+inline netCDF::NcDim *UGridFile::get_vert_dim() const { return _virtDim.get(); }
 inline ConcatString UGridFile::coordinate_nc() const { return coordinate_file; }
 
 ////////////////////////////////////////////////////////////////////////
