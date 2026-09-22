@@ -846,12 +846,11 @@ void process_scores() {
 
          // Create grid template to find the number of points
          GridTemplateFactory gtf;
-         GridTemplate* gt = gtf.buildGT(interp->shape, interp->width[j], grid.wrap_lon());
+         auto gt = gtf.buildGT(interp->shape, interp->width[j], grid.wrap_lon());
 
          shc.set_interp_mthd(interp_mthd, interp->shape);
          int interp_pnts = gt->size();
          shc.set_interp_pnts(interp_pnts);
-         delete gt;
 
          // If requested in the config file, smooth the forecast field
          if(interp->field == FieldType::Fcst ||

@@ -1096,7 +1096,7 @@ void VxPairDataEnsemble::set_ens_size(int n) {
       // Handle HiRA neighborhoods
       if(it->interp_mthd == InterpMthd::HiRA) {
          GridTemplateFactory gtf;
-         const GridTemplate* gt = gtf.buildGT(it->interp_shape,
+         const auto gt = gtf.buildGT(it->interp_shape,
                                               it->interp_wdth,
                                               false);
          it->set_ens_size(n*gt->size());

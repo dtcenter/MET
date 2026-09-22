@@ -1878,7 +1878,7 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
       // Determine the number of points in the area
       GridTemplateFactory gtf;
-      GridTemplate* gt = gtf.buildGT(conf_info.vx_opt[i_vx].hira_info.shape,
+      auto gt = gtf.buildGT(conf_info.vx_opt[i_vx].hira_info.shape,
                                      conf_info.vx_opt[i_vx].hira_info.width[i],
                                      grid.wrap_lon());
       if (nullptr == gt) {
@@ -1956,7 +1956,6 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
       // Check for zero matched pairs
       if(hira_pd.o_na.n() == 0) {
-         if(gt) { delete gt; gt = nullptr; }
          continue;
       }
 
@@ -2027,7 +2026,6 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
                  << "\"" << conf_key_prob_cat_thresh << "\" thresholds are "
                  << "defined in the \"" << conf_key_hira
                  << "\" dictionary.\n";
-            if(gt) { delete gt; gt = nullptr; }
             break;
          }
 
@@ -2040,7 +2038,6 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
                        txt_at[i_rps], i_txt_row[i_rps]);
       } // end if RPS
 
-      if(gt) { delete gt; gt = nullptr; }
 
    } // end for i
 

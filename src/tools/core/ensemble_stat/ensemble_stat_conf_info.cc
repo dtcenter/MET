@@ -286,7 +286,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       for(int j=0; j<vx_opt[i].interp_info.n_interp; j++) {
          if(string_to_interpmthd(vx_opt[i].interp_info.method[j].c_str()) == InterpMthd::HiRA) {
             GridTemplateFactory gtf;
-            GridTemplate* gt = gtf.buildGT(vx_opt[i].interp_info.shape,
+            auto gt = gtf.buildGT(vx_opt[i].interp_info.shape,
                                            vx_opt[i].interp_info.width[j],
                                            false);
             max_hira_size = max(max_hira_size, gt->size());

@@ -172,8 +172,8 @@ class GridTemplateFactory {
       GridTemplates string2Enum(std::string target);
       std::string enum2String(GridTemplates gt);
 
-      GridTemplate* buildGT(std::string gt, int width, bool wrap_lon);
-      GridTemplate* buildGT(GridTemplates gt, int width, bool wrap_lon);
+      std::unique_ptr<GridTemplate> buildGT(std::string gt, int width, bool wrap_lon);
+      std::unique_ptr<GridTemplate> buildGT(GridTemplates gt, int width, bool wrap_lon);
 
 };
 

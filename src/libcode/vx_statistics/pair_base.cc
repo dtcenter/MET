@@ -2667,7 +2667,7 @@ void get_interp_points(const DataPlaneArray &dpa,
    int i, n_vld;
    NumArray pts_blw, pts_abv;
    GridTemplateFactory gtf;
-   const GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
+   const auto gt = gtf.buildGT(shape, width, wrap_lon);
 
    // Get interpolation points below the observation
    pts_blw = interp_points(dpa[i_blw], *gt, obs_x, obs_y);
@@ -2722,7 +2722,6 @@ void get_interp_points(const DataPlaneArray &dpa,
       interp_pnts.erase();
    }
 
-   if ( gt )  { delete gt;  gt = (const GridTemplate *) nullptr; }
 
    return;
 }

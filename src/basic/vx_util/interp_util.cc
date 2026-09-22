@@ -938,7 +938,7 @@ double compute_sfc_interp(const DataPlane &dp,
    }
 
    GridTemplateFactory gtf;
-   const GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
+   const auto gt = gtf.buildGT(shape, width, wrap_lon);
 
    MaskPlane sfc_mask = compute_sfc_mask(*gt, x, y, sfc_info, is_land_obs, obs_elv);
 
@@ -1010,7 +1010,6 @@ double compute_sfc_interp(const DataPlane &dp,
          exit(1);
    }
 
-   delete gt;
    return v;
 }
 
@@ -1108,7 +1107,7 @@ double compute_horz_interp(const DataPlane &dp,
    }
 
    GridTemplateFactory gtf;
-   const GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
+   const auto gt = gtf.buildGT(shape, width, wrap_lon);
 
    // Compute the interpolated value for the fields above and below
    switch(mthd) {
@@ -1183,7 +1182,6 @@ double compute_horz_interp(const DataPlane &dp,
          exit(1);
    }
 
-   delete gt;
    return v;
 }
 

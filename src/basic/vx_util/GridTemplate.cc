@@ -628,7 +628,7 @@ string GridTemplateFactory::enum2String(GridTemplates target) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-GridTemplate* GridTemplateFactory::buildGT(string gt, int width, bool wrap_lon) {
+std::unique_ptr<GridTemplate> GridTemplateFactory::buildGT(string gt, int width, bool wrap_lon) {
    return buildGT(string2Enum(gt), width, wrap_lon);
 }
 
@@ -638,14 +638,14 @@ GridTemplate* GridTemplateFactory::buildGT(string gt, int width, bool wrap_lon) 
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-GridTemplate* GridTemplateFactory::buildGT(GridTemplates gt, int width, bool wrap_lon) {
+std::unique_ptr<GridTemplate> GridTemplateFactory::buildGT(GridTemplates gt, int width, bool wrap_lon) {
 
    switch (gt) {
       case GridTemplates::Square:
-         return new RectangularTemplate(width, width, wrap_lon);
+         return std::make_unique<RectangularTemplate>(width, width, wrap_lon);
 
       case GridTemplates::Circle:
-         return new CircularTemplate(width, wrap_lon);
+         return std::make_unique<CircularTemplate>(width, wrap_lon);
 
       default:
          mlog << Error << "\nbuildGT() -> "
