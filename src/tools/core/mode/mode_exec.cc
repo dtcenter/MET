@@ -1667,8 +1667,8 @@ MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
       replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
       mvd->init(dtype, obs_magic_string, grid, 
                 ounits, olevel, data_min, data_max);
-      mvd->set_obj(engine.obs_split, simple);
-      mvd->set_raw(engine.obs_raw, simple);
+      mvd->set_obj(engine.obs_split.get(), simple);
+      mvd->set_raw(engine.obs_raw.get(), simple);
       mvd->set_shapedata(Obs_sd, simple);
       mvd->set_conv_thresh_array(engine.conf_info.Obs->conv_thresh_array, simple);
       mvd->set_merge_thresh_array(engine.conf_info.Obs->merge_thresh_array, simple);
@@ -1679,8 +1679,8 @@ MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
       replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
       mvd->init(dtype, fcst_magic_string, grid, 
                 funits, flevel, data_min, data_max);
-      mvd->set_obj(engine.fcst_split, simple);
-      mvd->set_raw(engine.fcst_raw, simple);
+      mvd->set_obj(engine.fcst_split.get(), simple);
+      mvd->set_raw(engine.fcst_raw.get(), simple);
       mvd->set_shapedata(Fcst_sd, simple);
       mvd->set_conv_thresh_array(engine.conf_info.Fcst->conv_thresh_array, simple);
       mvd->set_merge_thresh_array(engine.conf_info.Fcst->merge_thresh_array, simple);
@@ -1703,15 +1703,15 @@ void ModeExecutive::add_multivar_merge_data(MultiVarData *mvd, ModeDataType dtyp
    switch (dtype)
    {
    case ModeDataType::MvMode_Obs:
-      mvd->set_obj(engine.obs_split, simple);
-      mvd->set_raw(engine.obs_raw, simple);
+      mvd->set_obj(engine.obs_split.get(), simple);
+      mvd->set_raw(engine.obs_raw.get(), simple);
       mvd->set_shapedata(Obs_sd, simple);
       mvd->set_conv_thresh_array(engine.conf_info.Obs->conv_thresh_array, simple);
       mvd->set_merge_thresh_array(engine.conf_info.Obs->merge_thresh_array, simple);
       break;
    case ModeDataType::MvMode_Fcst:
-      mvd->set_obj(engine.fcst_split, simple);
-      mvd->set_raw(engine.fcst_raw, simple);
+      mvd->set_obj(engine.fcst_split.get(), simple);
+      mvd->set_raw(engine.fcst_raw.get(), simple);
       mvd->set_shapedata(Fcst_sd, simple);
       mvd->set_conv_thresh_array(engine.conf_info.Fcst->conv_thresh_array, simple);
       mvd->set_merge_thresh_array(engine.conf_info.Fcst->merge_thresh_array, simple);
