@@ -1301,7 +1301,7 @@ void ModeExecutive::process_output_multivar_intensity_compare(const MultiVarData
    else if(!is_bad_data(fmax) &&  is_bad_data(omax)) dmax = fmax;
    else if( is_bad_data(fmax) && !is_bad_data(omax)) dmax = omax;
          
-   set_raw_to_full(mvdf->_simple->_raw_data,mvdo->_simple->_raw_data,
+   set_raw_to_full(mvdf->_simple->_raw_data.data(),mvdo->_simple->_raw_data.data(),
                    mvdf->_nx, mvdf->_ny, dmin, dmax);
 
    write_obj_netcdf(engine.conf_info.nc_info);
@@ -2175,14 +2175,14 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    double lat;
    double lon;
 
-   Polyline **poly = nullptr;
+   std::vector<Polyline *> poly;
 
-   int   *poly_start = nullptr;
-   int   *poly_npts  = nullptr;
-   float *poly_lat   = nullptr;
-   float *poly_lon   = nullptr;
-   int   *poly_x     = nullptr;
-   int   *poly_y     = nullptr;
+   std::vector<int>   poly_start;
+   std::vector<int>   poly_npts;
+   std::vector<float> poly_lat;
+   std::vector<float> poly_lon;
+   std::vector<int>   poly_x;
+   std::vector<int>   poly_y;
 
    // Dimensions and variables for each object
    NcDim obj_dim;
@@ -2299,7 +2299,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    y_long_name     << cs_erase << field_long << " " << poly_long << " Point Y-Coordinate";
 
    // Allocate pointers for the polylines to be written
-   poly = new Polyline * [n_poly];
+   poly.assign(n_poly, nullptr);
 
    // Point at the polyline to be written
    for(int i=0; i<n_poly; i++) {
@@ -2370,12 +2370,12 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Allocate memory for the polyline points
    //
-   poly_start = new int   [n_poly];
-   poly_npts  = new int   [n_poly];
-   poly_lat   = new float [n_pts];
-   poly_lon   = new float [n_pts];
-   poly_x     = new int   [n_pts];
-   poly_y     = new int   [n_pts];
+   poly_start.resize(n_poly);
+   poly_npts.resize(n_poly);
+   poly_lat.resize(n_pts);
+   poly_lon.resize(n_pts);
+   poly_x.resize(n_pts);
+   poly_y.resize(n_pts);
 
    //
    // Store the points for each polyline
@@ -2407,8 +2407,8 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Write the polyline information
    //
-   if( !put_nc_data_with_dims(&obj_poly_start_var, &poly_start[0], n_poly) ||
-       !put_nc_data_with_dims(&obj_poly_npts_var, &poly_npts[0], n_poly) ) {
+   if( !put_nc_data_with_dims(&obj_poly_start_var, poly_start.data(), n_poly) ||
+       !put_nc_data_with_dims(&obj_poly_npts_var, poly_npts.data(), n_poly) ) {
 
       mlog << Error << "\nModeExecutive::write_poly_netcdf() -> "
            << "error with " << start_var_name << "->put or "
@@ -2419,8 +2419,8 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Write the forecast boundary lat/lon points
    //
-   if( !put_nc_data_with_dims(&poly_lat_var, &poly_lat[0], n_pts) ||
-       !put_nc_data_with_dims(&poly_lon_var, &poly_lon[0], n_pts) ) {
+   if( !put_nc_data_with_dims(&poly_lat_var, poly_lat.data(), n_pts) ||
+       !put_nc_data_with_dims(&poly_lon_var, poly_lon.data(), n_pts) ) {
 
       mlog << Error << "\nModeExecutive::write_poly_netcdf() -> "
            << "error with " << lat_var_name << "->put or "
@@ -2431,25 +2431,14 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Write the forecast boundary (x,y) points
    //
-   if( !put_nc_data_with_dims(&poly_x_var, &poly_x[0], n_pts) ||
-       !put_nc_data_with_dims(&poly_y_var, &poly_y[0], n_pts) ) {
+   if( !put_nc_data_with_dims(&poly_x_var, poly_x.data(), n_pts) ||
+       !put_nc_data_with_dims(&poly_y_var, poly_y.data(), n_pts) ) {
 
       mlog << Error << "\nModeExecutive::write_poly_netcdf() -> "
            << "error with " << x_var_name << "->put or"
            << y_var_name << "->put\n\n";
       exit(1);
    }
-
-   //
-   // Delete allocated memory
-   //
-   if(poly)       { delete [] poly;       poly       = (Polyline **) nullptr; }
-   if(poly_start) { delete [] poly_start; poly_start = (int       *) nullptr; }
-   if(poly_npts)  { delete [] poly_npts;  poly_npts  = (int       *) nullptr; }
-   if(poly_lat)   { delete [] poly_lat;   poly_lat   = (float     *) nullptr; }
-   if(poly_lon)   { delete [] poly_lon;   poly_lon   = (float     *) nullptr; }
-   if(poly_x)     { delete [] poly_x;     poly_x     = (int       *) nullptr; }
-   if(poly_y)     { delete [] poly_y;     poly_y     = (int       *) nullptr; }
 
    return;
 }

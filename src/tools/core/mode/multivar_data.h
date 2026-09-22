@@ -17,6 +17,7 @@
 
 
 #include <iostream>
+#include <memory>
 #include <vector>
 #include "shapedata.h"
 #include "vx_grid.h"
@@ -28,9 +29,10 @@ class MultiVarData1 {
 
  private:
 
-   int *_fill_int_array(ShapeData *sd);
-   float *_fill_float_array(ShapeData *sd);
-   void _print_summary(const std::string &name, int *data, const ShapeData &sd) const;
+   std::vector<int> _fill_int_array(ShapeData *sd);
+   std::vector<float> _fill_float_array(ShapeData *sd);
+   void _print_summary(const std::string &name, const std::vector<int> &data,
+                       const ShapeData &sd) const;
 
  public:
 
@@ -38,21 +40,12 @@ class MultiVarData1 {
                         ModeDataType dataType) :
       _dataType(dataType),
       _name(name),
-      _obj_sd(0),
-      _obj_data(0),
-      _raw_data(0),
-      _sd(0),
       _nx(nx), _ny(ny),
       _convThreshArray(),
       _mergeThreshArray()
       {}
 
-   inline ~MultiVarData1() {
-      if (_obj_sd) delete _obj_sd;
-      if (_obj_data) delete [] _obj_data;
-      if (_raw_data) delete [] _raw_data;
-      if (_sd) delete _sd;
-   }
+   inline ~MultiVarData1() = default;
 
    void set_obj(ShapeData *sd);
    void set_raw(ShapeData *sd);
@@ -65,10 +58,10 @@ class MultiVarData1 {
 
    ModeDataType _dataType;
    std::string _name;
-   ShapeData *_obj_sd;
-   int *_obj_data;
-   float *_raw_data;
-   ShapeData *_sd;
+   std::unique_ptr<ShapeData> _obj_sd;
+   std::vector<int> _obj_data;
+   std::vector<float> _raw_data;
+   std::unique_ptr<ShapeData> _sd;
    int _nx, _ny;
    ThreshArray _convThreshArray;
    ThreshArray _mergeThreshArray;
@@ -102,11 +95,11 @@ class MultiVarData {
    void print(void) const;
 
    ModeDataType _dataType;
-   MultiVarData1 *_simple;
-   MultiVarData1 *_merge;
+   std::unique_ptr<MultiVarData1> _simple;
+   std::unique_ptr<MultiVarData1> _merge;
    std::string _name;
    int _nx, _ny;
-   Grid *_grid;
+   std::unique_ptr<Grid> _grid;
    std::string _units;
    std::string _level;
    double _data_min, _data_max;
