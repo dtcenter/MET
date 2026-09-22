@@ -870,7 +870,7 @@ static void process_point_vx() {
    // Loop through each of the fields to be verified
    for(int i=0; i<conf_info.get_n_vx(); i++) {
 
-      EnsVarInfo *ens_info  = conf_info.vx_opt[i].vx_pd.ens_info;
+      EnsVarInfo *ens_info  = conf_info.vx_opt[i].vx_pd.ens_info.get();
       VarInfo    *fcst_info = ens_info->get_var_info();
       VarInfo    *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info.get();
       bool print_level_mismatch_warning = true;
@@ -2291,7 +2291,7 @@ static void write_txt_files(const EnsembleStatVxOpt &vx_opt,
          pd.compute_ssvar();
 
          // Make sure there are bins to process
-         if(pd.ssvar_bins) {
+         if(!pd.ssvar_bins.empty()) {
 
             // Add rows to the output AsciiTables for SSVAR
             stat_at.add_rows(pd.ssvar_bins[0].n_bin *

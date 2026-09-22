@@ -2857,7 +2857,7 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
       else if(lt == STATLineType::relp)  n  = max(it->second.ens_pd.n_ens, n);
       else if(lt == STATLineType::ssvar) {
          it->second.ens_pd.compute_ssvar();
-         if(it->second.ens_pd.ssvar_bins) n += it->second.ens_pd.ssvar_bins[0].n_bin;
+         if(!it->second.ens_pd.ssvar_bins.empty()) n += it->second.ens_pd.ssvar_bins[0].n_bin;
       }
    }
 
@@ -3029,7 +3029,7 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
       //
       else if(lt == STATLineType::ssvar) {
 
-         if(!it->second.ens_pd.ssvar_bins) continue;
+         if(it->second.ens_pd.ssvar_bins.empty()) continue;
 
          //
          // Write a line for each ssvar bin

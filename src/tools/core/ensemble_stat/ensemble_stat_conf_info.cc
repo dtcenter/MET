@@ -752,7 +752,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    clear();
 
    // Allocate new EnsVarInfo object for fcst
-   vx_pd.ens_info = new EnsVarInfo();
+   vx_pd.ens_info = std::make_unique<EnsVarInfo>();
 
    // Loop over ensemble member IDs to substitute
    for(int i=0; i<ens_member_ids.n(); i++) {

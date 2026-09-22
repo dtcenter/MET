@@ -71,9 +71,7 @@ PairDataEnsemble & PairDataEnsemble::operator=(const PairDataEnsemble &pd) {
 
 void PairDataEnsemble::init_from_scratch() {
 
-   e_na       = (NumArray *) nullptr;
    n_ens      = 0;
-   ssvar_bins = (SSVARInfo *) nullptr;
 
    clear();
 
@@ -89,8 +87,7 @@ void PairDataEnsemble::clear() {
    obs_error_entry.clear();
    obs_error_flag = false;
 
-   for(int i=0; i<n_ens; i++) e_na[i].clear();
-   if(e_na) { delete [] e_na; e_na = (NumArray *) nullptr; }
+   e_na.clear();
 
    v_na.clear();
    r_na.clear();
@@ -134,7 +131,7 @@ void PairDataEnsemble::clear() {
    mn_na.clear();
    mn_oerr_na.clear();
 
-   if(ssvar_bins) { delete [] ssvar_bins; ssvar_bins = (SSVARInfo *) nullptr; }
+   ssvar_bins.clear();
 
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
@@ -277,12 +274,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    relp_na        = pd.relp_na;
    phist_na       = pd.phist_na;
 
-   if(pd.ssvar_bins){
-      ssvar_bins = new SSVARInfo[pd.ssvar_bins[0].n_bin];
-      for(int i=0; i < pd.ssvar_bins[0].n_bin; i++){
-         ssvar_bins[i] = pd.ssvar_bins[i];
-      }
-   } else ssvar_bins = nullptr;
+   ssvar_bins = pd.ssvar_bins;
 
    ssvar_bin_size = pd.ssvar_bin_size;
    phist_bin_size = pd.phist_bin_size;
@@ -351,7 +343,7 @@ void PairDataEnsemble::set_ens_size(int n) {
 
    // Allocate a NumArray to store ensemble values for each member
    n_ens = n;
-   e_na  = new NumArray [n_ens];
+   e_na.assign(n_ens, NumArray());
 
    return;
 }
@@ -807,7 +799,7 @@ void PairDataEnsemble::compute_ssvar() {
    if(n_bin == 0) return;
 
    // Build a list of SSVARInfo objects
-   ssvar_bins = new SSVARInfo[n_bin];
+   ssvar_bins.assign(n_bin, SSVARInfo());
    i=0;
    for(auto set_it = sorted_bins.begin();
        set_it != sorted_bins.end(); set_it++, i++){
@@ -1014,8 +1006,6 @@ VxPairDataEnsemble & VxPairDataEnsemble::operator=(const VxPairDataEnsemble &vx_
 
 void VxPairDataEnsemble::init_from_scratch() {
 
-   ens_info = (EnsVarInfo *) nullptr;
-
    VxPairBase::init_from_scratch();
 
    clear();
@@ -1029,7 +1019,7 @@ void VxPairDataEnsemble::clear() {
 
    VxPairBase::clear();
 
-   if(ens_info) { delete ens_info; ens_info = (EnsVarInfo *) nullptr; }
+   ens_info.reset();
 
    obs_error_info = (ObsErrorInfo *) nullptr;
 
@@ -1049,7 +1039,7 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
 
    VxPairBase::assign(vx_pd);
 
-   set_ens_info(vx_pd.ens_info);
+   set_ens_info(vx_pd.ens_info.get());
    set_obs_info(vx_pd.obs_info.get());
 
    obs_error_info = vx_pd.obs_error_info;
@@ -1068,11 +1058,8 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
 
 void VxPairDataEnsemble::set_ens_info(const EnsVarInfo *info) {
 
-   // Deallocate, if necessary
-   if(ens_info) { delete ens_info; ens_info = (EnsVarInfo *) nullptr; }
-
    // Perform a deep copy
-   ens_info = new EnsVarInfo(*info);
+   ens_info = std::make_unique<EnsVarInfo>(*info);
 
    // Set the base pointer
    if(!fcst_info) set_fcst_info(ens_info->get_var_info());
