@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -80,6 +81,7 @@ char upper[256];
 char pound_define[256];
 ConcatString cs;
 int len, scope_len, max_len;
+std::vector<char> len_name_buf;
 char * len_name = (char *) nullptr;
 
 
@@ -101,7 +103,8 @@ for (j=0; j<(e.n_ids()); ++j)  {
 
 ++max_len;   //  allow for trailing nul
 
-len_name = new char [max_len + 40];
+len_name_buf.assign(max_len + 40, 0);
+len_name = len_name_buf.data();
 
 
 if ( e.scope() )   snprintf(len_name, (max_len + 40), "max_enum_%s_%s_len", e.scope(), e.name());
@@ -240,7 +243,6 @@ f << "\n\n"
 
 f.close();
 
-if ( len_name )  { delete [] len_name;  len_name = (char *) nullptr; }
 
 return;
 
@@ -263,6 +265,7 @@ char upper[256];
 char pound_define[256];
 ConcatString cs;
 int len, scope_len, max_len;
+std::vector<char> len_name_buf;
 char * len_name = (char *) nullptr;
 
 max_len = 0;
@@ -282,7 +285,8 @@ for (int j=0; j<(e.n_ids()); ++j)  {
 
 ++max_len;   //  allow for trailing nul
 
-len_name = new char [max_len + 40];
+len_name_buf.assign(max_len + 40, 0);
+len_name = len_name_buf.data();
 
 
 if ( e.scope() )   snprintf(len_name, (max_len + 40), "max_enum_%s_%s_len", e.scope(), e.name());
@@ -405,7 +409,6 @@ f << "\n\n"
 
 f.close();
 
-if ( len_name )  { delete [] len_name;  len_name = (char *) nullptr; }
 
 return;
 
@@ -993,13 +996,15 @@ void patch_name(char * len_name)
 
 int j, n;
 int pos;
+std::vector<char> new_name_buf;
 char * new_name = (char *) nullptr;
 char c;
 const char *method_name = "patch_name() -> ";
 
 n = m_strlen(len_name);
 
-new_name = new char [n + 1];
+new_name_buf.assign(n + 1, 0);
+new_name = new_name_buf.data();
 
 pos = 0;
 
@@ -1034,7 +1039,6 @@ m_strcpy(len_name, new_name, method_name);
    //  done
    //
 
-if ( new_name )  { delete [] new_name;  new_name = (char *) nullptr; }
 
 return;
 

@@ -25,6 +25,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -93,7 +94,7 @@ static ConcatString out_prefix;
 
 // Output NetCDF file
 static ConcatString out_file;
-static netCDF::NcFile*      nc_out = (netCDF::NcFile*) nullptr;
+static std::unique_ptr<netCDF::NcFile> nc_out;
 static netCDF::NcDim        range_dim;
 static netCDF::NcDim        azimuth_dim;
 static netCDF::NcDim        pressure_dim;

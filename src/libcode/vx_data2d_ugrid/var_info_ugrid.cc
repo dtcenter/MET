@@ -73,7 +73,7 @@ VarInfoUGrid & VarInfoUGrid::operator=(const VarInfoUGrid &f) {
 ///////////////////////////////////////////////////////////////////////////////
 
 unique_ptr<VarInfo> VarInfoUGrid::clone() const {
-   return unique_ptr<VarInfo>(new VarInfoUGrid(*this));
+   return std::make_unique<VarInfoUGrid>(*this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

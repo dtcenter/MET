@@ -18,6 +18,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
+
 #include "pxm_base.h"
 
 
@@ -28,7 +30,7 @@ class Pcm : public PxmBase {
 
    private:
 
-      Color * Colormap;
+      std::vector<Color> Colormap;
 
       int Ncolors;
 

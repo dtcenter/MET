@@ -39,7 +39,7 @@ static ConcatString program_name;
 ////////////////////////////////////////////////////////////////////////
 
 
-extern ThreshNode * result;
+extern std::unique_ptr<ThreshNode> result;
 
 extern bool test_mode;
 
@@ -104,7 +104,7 @@ if ( ! result )  {
 
 }
 
-st.set(result);
+st.set(result.get());
 
 // status = result->check(value);
 
@@ -121,7 +121,7 @@ cout << "        type  = " << result->type() << "\n\n";
    //  done
    //
 
-if ( result )  { delete result;  result = 0; }
+result.reset();
 
 return ( 0 );
 

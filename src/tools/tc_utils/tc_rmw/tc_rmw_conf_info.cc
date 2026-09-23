@@ -47,7 +47,6 @@ TCRMWConfInfo::~TCRMWConfInfo() {
 void TCRMWConfInfo::init_from_scratch() {
 
     // Initialize pointers
-    data_info = (VarInfo**) nullptr;
 
     clear();
 
@@ -85,15 +84,7 @@ void TCRMWConfInfo::clear() {
     radial_velocity_long_field_name.clear();
 
     // Clear data_info
-    if(data_info) {
-        for(int i = 0; i < n_data; i++) {
-            if(data_info[i]) {
-                data_info[i] = (VarInfo*) nullptr;
-            }
-        }
-        delete data_info;
-        data_info = (VarInfo**) nullptr;
-    }
+   data_info.clear();
 
     // Reset field count
     n_data = 0;
@@ -207,12 +198,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     }
 
     // Allocate space based on number of fields
-    data_info = new VarInfo*[n_data];
-
-    // Initialize pointers
-    for(int i=0; i<n_data; i++) {
-        data_info[i] = (VarInfo*) nullptr;
-    }
+   data_info.resize(n_data);
 
     // Parse data field information
     for(int i=0; i<n_data; i++) {

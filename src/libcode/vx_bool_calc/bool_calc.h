@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 #include <stack>
 
@@ -26,9 +27,9 @@ class BoolCalc {
       void init_from_scratch();
 
 
-      std::stack<bool> * s;     //  allocated
+      std::unique_ptr<std::stack<bool>> s;
 
-      Program * program;   //  allocated
+      std::unique_ptr<Program> program;
 
       
 

@@ -19,6 +19,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 #include "2d_att.h"
 #include "mm_engine.h"
@@ -35,16 +36,9 @@ class SingleAtt2DArray {
 
       void assign(const SingleAtt2DArray &);
 
-      void extend(int);
-
-
-      int Nelements;
-
-      int Nalloc;
-
       int AllocInc;
 
-      SingleAtt2D * e;
+      std::vector<SingleAtt2D> e;
 
 
    public:
@@ -84,8 +78,8 @@ class SingleAtt2DArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int SingleAtt2DArray::n_elements() const { return Nelements; }
-inline int SingleAtt2DArray::n         () const { return Nelements; }
+inline int SingleAtt2DArray::n_elements() const { return (int) e.size(); }
+inline int SingleAtt2DArray::n         () const { return (int) e.size(); }
 
 
 ////////////////////////////////////////////////////////////////////////

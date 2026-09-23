@@ -144,6 +144,7 @@
 
 #ifdef WITH_UGRID
 #include "vx_data2d_ugrid.h"
+#include <memory>
 #endif
 
 using namespace std;
@@ -170,13 +171,13 @@ static void get_mask_points(const GridStatVxOpt &,
                             const DataPlane *, const DataPlane *,
                             PairDataPoint &);
 
-static void do_cts       (CTSInfo *&,   int, const PairDataPoint *);
+static void do_cts       (CTSInfo *,    int, const PairDataPoint *);
 static void do_mcts      (MCTSInfo &,   int, const PairDataPoint *);
 static void do_cnt_sl1l2 (const GridStatVxOpt &, const PairDataPoint *);
-static void do_vl1l2     (VL1L2Info *&, int, const PairDataPoint *, const PairDataPoint *);
+static void do_vl1l2     (VL1L2Info *,  int, const PairDataPoint *, const PairDataPoint *);
 static void do_pct       (const GridStatVxOpt &, const PairDataPoint *);
 
-static void do_nbrcts(NBRCTSInfo *&, int, int, int, const PairDataPoint *);
+static void do_nbrcts(NBRCTSInfo *, int, int, int, const PairDataPoint *);
 static void do_nbrcnt(NBRCNTInfo &,  int, int, int, const PairDataPoint *, const PairDataPoint *);
 
 static void write_nc(const ConcatString &, const DataPlane &, int,
@@ -281,14 +282,16 @@ void process_command_line(int argc, char **argv) {
    otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
    // Read forecast file
-   if(!(fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype))) {
+   fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype);
+   if(!fcst_mtddf) {
       mlog << Error << "\nTrouble reading forecast file \""
            << fcst_file << "\". Override the FileType with \"file_type = FileType_<type>;\"\n\n";
       exit(1);
    }
 
    // Read observation file
-   if(!(obs_mtddf = Met2dDataFileFactory::new_met_2d_data_file(obs_file.c_str(), otype))) {
+   obs_mtddf = Met2dDataFileFactory::new_met_2d_data_file(obs_file.c_str(), otype);
+   if(!obs_mtddf) {
       mlog << Error << "\nTrouble reading observation file \""
            << obs_file << "\". Override the FileType with \"file_type = FileType_<type>;\"\n\n";
       exit(1);
@@ -309,7 +312,7 @@ void process_command_line(int argc, char **argv) {
          ConcatString ugrid_nc = conf_info.ugrid_nc;
          ConcatString ugrid_map_config_filename = conf_info.ugrid_map_config;
          if (FileType_UGrid == ftype) {
-            MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
+            MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf.get();
             ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
                                            ugrid_map_config_filename);
             if (0 == ugrid_nc.length() || ugrid_nc == "NA") {
@@ -322,7 +325,7 @@ void process_command_line(int argc, char **argv) {
                  << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
          }
          if (FileType_UGrid == otype) {
-            MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)obs_mtddf;
+            MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)obs_mtddf.get();
             ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
                                            ugrid_map_config_filename);
             if (0 == ugrid_nc.length() || ugrid_nc == "NA") {
@@ -345,8 +348,8 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Update the input grid, if needed
-   update_mtddf_grid(fcst_mtddf, conf_info.vx_opt[0].fcst_info);
-   update_mtddf_grid(obs_mtddf, conf_info.vx_opt[0].obs_info);
+   update_mtddf_grid(fcst_mtddf.get(), conf_info.vx_opt[0].fcst_info.get());
+   update_mtddf_grid(obs_mtddf.get(), conf_info.vx_opt[0].obs_info.get());
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.vx_opt[0].fcst_info->regrid(),
@@ -431,7 +434,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    max_col += n_header_columns + 1;
 
    // Initialize file stream
-   stat_out = (ofstream *) nullptr;
+   stat_out.reset();
 
    // Build the file name
    stat_file << base_name << stat_file_ext;
@@ -463,7 +466,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
       if(conf_info.output_flag[i] == STATOutputType::Both) {
 
          // Initialize file stream
-         txt_out[i] = (ofstream *) nullptr;
+         txt_out[i].reset();
 
          // Build the file name
          txt_file[i] << base_name << "_" << txt_file_abbr[i]
@@ -582,7 +585,7 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_nc_file.c_str(), true);
 
-   if(IS_INVALID_NC_P(nc_out)) {
+   if(IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_nc_file << "\n\n";
@@ -590,23 +593,23 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_nc_file.c_str(), program_name,
+   write_netcdf_global(nc_out.get(), out_nc_file.c_str(), program_name,
                        conf_info.model.c_str(), conf_info.obtype.c_str());
    if(nc_info.do_diff) {
-      add_att(nc_out, "Difference", "Forecast Value - Observation Value");
+      add_att(nc_out.get(), "Difference", "Forecast Value - Observation Value");
    }
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(nc_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    if(nc_info.do_latlon) {
-      write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+      write_netcdf_latlon(nc_out.get(), &lat_dim, &lon_dim, grid);
    }
 
    // Add grid weight variable
    if(nc_info.do_weight) {
-      write_netcdf_grid_weight(nc_out, &lat_dim, &lon_dim,
+      write_netcdf_grid_weight(nc_out.get(), &lat_dim, &lon_dim,
                                conf_info.grid_weight_flag, wgt_dp);
    }
 
@@ -683,11 +686,8 @@ void process_scores() {
 
    DataPlane seeps_dp, seeps_dp_fcat, seeps_dp_ocat;
 
-   CTSInfo    *cts_info    = (CTSInfo *) nullptr;
    MCTSInfo    mcts_info;
-   VL1L2Info  *vl1l2_info  = (VL1L2Info *) nullptr;
    NBRCNTInfo  nbrcnt_info;
-   NBRCTSInfo *nbrcts_info = (NBRCTSInfo *) nullptr;
    GRADInfo    grad_info;
    DMAPInfo    dmap_info;
 
@@ -697,16 +697,16 @@ void process_scores() {
    n_cov  = conf_info.get_max_n_cov_thresh();
 
    // Allocate space for output statistics types
-   cts_info    = new CTSInfo    [n_cat];
-   vl1l2_info  = new VL1L2Info  [n_wind];
-   nbrcts_info = new NBRCTSInfo [n_cov];
+   vector<CTSInfo>    cts_info   (n_cat);
+   vector<VL1L2Info>  vl1l2_info (n_wind);
+   vector<NBRCTSInfo> nbrcts_info(n_cov);
 
    // Compute scores for each verification task and write output_flag
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
       // Read the gridded data from the input forecast file
-      if(!read_data_plane(conf_info.vx_opt[i].fcst_info,
-                          fcst_dp, fcst_mtddf, fcst_file,
+      if(!read_data_plane(conf_info.vx_opt[i].fcst_info.get(),
+                          fcst_dp, fcst_mtddf.get(), fcst_file,
                           "forecast")) continue;
 
       mlog << Debug(3)
@@ -721,8 +721,8 @@ void process_scores() {
       shc.set_fcst_valid_end(fcst_dp.valid());
 
       // Read the gridded data from the input observation file
-      if(!read_data_plane(conf_info.vx_opt[i].obs_info,
-                          obs_dp, obs_mtddf, obs_file,
+      if(!read_data_plane(conf_info.vx_opt[i].obs_info.get(),
+                          obs_dp, obs_mtddf.get(), obs_file,
                           "observation")) continue;
 
       mlog << Debug(3)
@@ -846,12 +846,11 @@ void process_scores() {
 
          // Create grid template to find the number of points
          GridTemplateFactory gtf;
-         GridTemplate* gt = gtf.buildGT(interp->shape, interp->width[j], grid.wrap_lon());
+         auto gt = gtf.buildGT(interp->shape, interp->width[j], grid.wrap_lon());
 
          shc.set_interp_mthd(interp_mthd, interp->shape);
          int interp_pnts = gt->size();
          shc.set_interp_pnts(interp_pnts);
-         delete gt;
 
          // If requested in the config file, smooth the forecast field
          if(interp->field == FieldType::Fcst ||
@@ -928,7 +927,7 @@ void process_scores() {
                for(m=0; m<n_cat; m++) cts_info[m].clear();
 
                // Compute CTS
-               do_cts(cts_info, i, &pd);
+               do_cts(cts_info.data(), i, &pd);
 
                // Loop through all of the thresholds
                for(m=0; m<conf_info.vx_opt[i].fcat_ta.n(); m++) {
@@ -1029,13 +1028,13 @@ void process_scores() {
                int ui = conf_info.vx_opt[i].fcst_info->uv_index();
 
                // Read forecast data for UGRD
-               if(!read_data_plane(conf_info.vx_opt[ui].fcst_info,
-                                   fu_dp, fcst_mtddf, fcst_file,
+               if(!read_data_plane(conf_info.vx_opt[ui].fcst_info.get(),
+                                   fu_dp, fcst_mtddf.get(), fcst_file,
                                    "U-wind forecast")) continue;
 
                // Read observation data for UGRD
-               if(!read_data_plane(conf_info.vx_opt[ui].obs_info,
-                                   ou_dp, obs_mtddf, obs_file,
+               if(!read_data_plane(conf_info.vx_opt[ui].obs_info.get(),
+                                   ou_dp, obs_mtddf.get(), obs_file,
                                    "U-wind observation")) continue;
 
                // Read the forecast climatology data for UGRD
@@ -1097,7 +1096,7 @@ void process_scores() {
                                &wgt_dp, pd_u);
 
                // Compute VL1L2
-               do_vl1l2(vl1l2_info, i, &pd_u, &pd);
+               do_vl1l2(vl1l2_info.data(), i, &pd_u, &pd);
 
                // Loop through all of the wind speed thresholds
                for(m=0; m<conf_info.vx_opt[i].fwind_ta.n(); m++) {
@@ -1692,7 +1691,7 @@ void process_scores() {
                         nbrcts_info[n].clear();
                      }
 
-                     do_nbrcts(nbrcts_info, i, j, k, &pd);
+                     do_nbrcts(nbrcts_info.data(), i, j, k, &pd);
 
                      // Loop through all of the thresholds
                      for(n=0; n<conf_info.vx_opt[i].get_n_cov_thresh(); n++) {
@@ -1884,13 +1883,13 @@ void process_scores() {
                int ui = conf_info.vx_opt[i].fcst_info->uv_index();
 
                // Read forecast data for UGRD
-               if(!read_data_plane(conf_info.vx_opt[ui].fcst_info,
-                                   fu_dp, fcst_mtddf, fcst_file,
+               if(!read_data_plane(conf_info.vx_opt[ui].fcst_info.get(),
+                                   fu_dp, fcst_mtddf.get(), fcst_file,
                                    "U-wind forecast")) continue;
 
                // Read observation data for UGRD
-               if(!read_data_plane(conf_info.vx_opt[ui].obs_info,
-                                   ou_dp, obs_mtddf, obs_file,
+               if(!read_data_plane(conf_info.vx_opt[ui].obs_info.get(),
+                                   ou_dp, obs_mtddf.get(), obs_file,
                                    "U-wind observation")) continue;
 
                // Read climatology data for UGRD
@@ -1955,7 +1954,7 @@ void process_scores() {
                                &wgt_dp, pd_u);
 
                // Compute VL1L2
-               do_vl1l2(vl1l2_info, i, &pd_u, &pd);
+               do_vl1l2(vl1l2_info.data(), i, &pd_u, &pd);
 
                // Loop through all of the wind speed thresholds
                for(m=0; m<conf_info.vx_opt[i].fwind_ta.n(); m++) {
@@ -2044,9 +2043,6 @@ void process_scores() {
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
    // Deallocate memory
-   if(cts_info)    { delete [] cts_info;    cts_info    = (CTSInfo *)    nullptr; }
-   if(vl1l2_info)  { delete [] vl1l2_info;  vl1l2_info  = (VL1L2Info *)  nullptr; }
-   if(nbrcts_info) { delete [] nbrcts_info; nbrcts_info = (NBRCTSInfo *) nullptr; }
 
    return;
 }
@@ -2089,7 +2085,7 @@ void get_mask_points(const GridStatVxOpt &vx_opt,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cts(CTSInfo *&cts_info, int i_vx,
+void do_cts(CTSInfo *cts_info, int i_vx,
             const PairDataPoint *pd_ptr) {
    int i, j, n_cts;
 
@@ -2187,8 +2183,6 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
 void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    int i, j, k, n_bin;
    PairDataPoint pd_thr, pd;
-   SL1L2Info *sl1l2_info = (SL1L2Info *) nullptr;
-   CNTInfo   *cnt_info   = (CNTInfo *)   nullptr;
 
    mlog << Debug(2)
         << "Computing Scalar Partial Sums and Continuous Statistics.\n";
@@ -2211,8 +2205,8 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
                        vx_opt.obs_info->is_precipitation());
 
    // Allocate memory
-   cnt_info   = new CNTInfo   [n_bin];
-   sl1l2_info = new SL1L2Info [n_bin];
+   vector<CNTInfo>   cnt_info  (n_bin);
+   vector<SL1L2Info> sl1l2_info(n_bin);
 
    // Process each continuous filtering threshold
    for(i=0; i<vx_opt.fcnt_ta.n(); i++) {
@@ -2324,7 +2318,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
             vx_opt.output_flag[i_sal1l2] != STATOutputType::None) {
 
             SL1L2Info sl1l2_mean;
-            compute_sl1l2_mean(sl1l2_info, n_bin, sl1l2_mean);
+            compute_sl1l2_mean(sl1l2_info.data(), n_bin, sl1l2_mean);
 
             // Write out SL1L2
             if(vx_opt.output_flag[i_sl1l2]  != STATOutputType::None &&
@@ -2351,7 +2345,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          if(vx_opt.output_flag[i_cnt] != STATOutputType::None) {
 
             CNTInfo cnt_mean;
-            compute_cnt_mean(cnt_info, n_bin, cnt_mean);
+            compute_cnt_mean(cnt_info.data(), n_bin, cnt_mean);
 
             if(cnt_mean.n > 0) {
 
@@ -2366,15 +2360,13 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    } // end for i (fcnt_ta)
 
    // Dealloate memory
-   if(sl1l2_info) { delete [] sl1l2_info; sl1l2_info = (SL1L2Info *) nullptr; }
-   if(cnt_info)   { delete [] cnt_info;   cnt_info   = (CNTInfo *)   nullptr; }
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_vl1l2(VL1L2Info *&v_info, int i_vx,
+void do_vl1l2(VL1L2Info *v_info, int i_vx,
               const PairDataPoint *pd_u_ptr,
               const PairDataPoint *pd_v_ptr) {
    int i, j;
@@ -2424,7 +2416,6 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
 void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    int i, j, k, n_bin;
    PairDataPoint pd;
-   PCTInfo *pct_info = (PCTInfo *) nullptr;
 
    mlog << Debug(2)
         << "Computing Probabilistic Statistics.\n";
@@ -2440,7 +2431,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    }
 
    // Allocate memory
-   pct_info = new PCTInfo [n_bin];
+   vector<PCTInfo> pct_info(n_bin);
 
    // Process each probabilistic observation threshold
    for(i=0; i<vx_opt.ocat_ta.n(); i++) {
@@ -2521,7 +2512,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
       if(n_bin > 1) {
 
          PCTInfo pct_mean;
-         compute_pct_mean(pct_info, n_bin, pct_mean);
+         compute_pct_mean(pct_info.data(), n_bin, pct_mean);
 
          // Write out PSTD
          if(vx_opt.output_flag[i_pstd] != STATOutputType::None) {
@@ -2535,14 +2526,13 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    } // end for i (ocnt_ta)
 
    // Dealloate memory
-   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) nullptr; }
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_nbrcts(NBRCTSInfo *&nbrcts_info,
+void do_nbrcts(NBRCTSInfo *nbrcts_info,
                int i_vx, int i_wdth, int i_thresh,
                const PairDataPoint *pd_ptr) {
    int i, j, n_nbrcts;
@@ -2958,7 +2948,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       nc_var_sa.add(var_name);
 
       // Define the variable
-      NcVar nc_var = add_var(nc_out, var_name.string(), ncFloat,
+      NcVar nc_var = add_var(nc_out.get(), var_name.string(), ncFloat,
                              lat_dim, lon_dim, deflate_level);
 
       // Add variable attributes
@@ -3084,7 +3074,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    if(fcst_flag) {
 
       // Define the forecast variable
-      fcst_var = add_var(nc_out, fcst_var_name.string(), ncFloat,
+      fcst_var = add_var(nc_out.get(), fcst_var_name.string(), ncFloat,
                          lat_dim, lon_dim, deflate_level);
 
       // Add to the list of previously defined variables
@@ -3112,7 +3102,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    if(obs_flag) {
 
       // Define the observation variable
-      obs_var = add_var(nc_out, obs_var_name.string(), ncFloat,
+      obs_var = add_var(nc_out.get(), obs_var_name.string(), ncFloat,
                         lat_dim, lon_dim, deflate_level);
 
       // Add to the list of previously defined variables
@@ -3236,19 +3226,18 @@ void clean_up() {
    finish_txt_files();
 
    // Close the output NetCDF file
-   if(nc_out) {
+   if(nc_out.get()) {
 
       // List the NetCDF file after it is finished
       mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
 
-      //nc_out->close();
-      delete nc_out;
-      nc_out = (NcFile *) nullptr;
+      //nc_out.get()->close();
+      nc_out.reset();
    }
 
    // Deallocate memory for data files
-   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) nullptr; }
-   if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = (Met2dDataFile *) nullptr; }
+   fcst_mtddf.reset();
+   obs_mtddf.reset();
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);

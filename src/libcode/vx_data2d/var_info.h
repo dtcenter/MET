@@ -13,6 +13,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include "concat_string.h"
 #include "level_info.h"
 #include "threshold.h"
@@ -288,11 +289,11 @@ inline int          VarInfo::accum_attr()     const { return SetAttrAccum;    }
 //
 
 struct InputInfo {
-   VarInfo * var_info;         // Variable information to read
-   int file_index;             // Index in file_list of file to read
-   StringArray * file_list;    // Array of files (unallocated)
-   ConcatString ens_member_id; // MET_ENS_MEMBER_ID string
-   InputInfo  &operator=(const InputInfo &a) noexcept;
+   std::unique_ptr<VarInfo> var_info; // Variable information to read (owned).
+                                      // Null means use the first input's.
+   int file_index = 0;                // Index in file_list of file to read
+   StringArray * file_list = nullptr; // Array of files (not owned)
+   ConcatString ens_member_id;        // MET_ENS_MEMBER_ID string
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -303,13 +304,14 @@ struct InputInfo {
 class EnsVarInfo {
 
    private:
-      std::vector<InputInfo> inputs; // Vector of InputInfo
-      VarInfo * ctrl_info;           // Field info for control member
+      std::vector<InputInfo> inputs;     // Vector of InputInfo
+      std::unique_ptr<VarInfo> ctrl_info; // Field info for control member
 
    public:
-      EnsVarInfo();
-      ~EnsVarInfo();
+      EnsVarInfo() = default;
+      ~EnsVarInfo() = default;
       EnsVarInfo(const EnsVarInfo &);
+      EnsVarInfo & operator=(const EnsVarInfo &);
 
       void clear();
       void assign(const EnsVarInfo &);
@@ -317,7 +319,7 @@ class EnsVarInfo {
       void add_input(InputInfo);
       int inputs_n();
 
-      void set_ctrl(VarInfo *);
+      void set_ctrl(std::unique_ptr<VarInfo>);
       VarInfo * get_ctrl(int);
 
       // Get VarInfo from first InputInfo if requested VarInfo is nullptr

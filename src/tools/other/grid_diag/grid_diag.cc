@@ -266,7 +266,7 @@ static void process_command_line(int argc, char **argv) {
       int i_field = (data_files.size() > 1 ? i : 0);
 
       data_mtddf = get_mtddf(data_files[i], i);
-      update_mtddf_grid(data_mtddf.get(), conf_info.data_info[i_field]);
+      update_mtddf_grid(data_mtddf.get(), conf_info.data_info[i_field].get());
       data_grid = data_mtddf->grid();
 
    } // end for i
@@ -327,7 +327,7 @@ static void setup_diag_info(void) {
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       // Find bin ranges
-      const VarInfo *i_vinfo = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var].get();
       NumArray range(i_vinfo->range());
       int i_n_bins = i_vinfo->n_bins();
       double var_min = range[0];
@@ -356,7 +356,7 @@ static void setup_diag_info(void) {
       map<int, vector<long long> > hist2d; 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-         const VarInfo *j_vinfo = conf_info.data_info[j_var];
+         const VarInfo *j_vinfo = conf_info.data_info[j_var].get();
 
          int j_n_bins = j_vinfo->n_bins();
 
@@ -408,7 +408,7 @@ static void process_series(void) {
       // Read the input data for this series entry
       for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-         VarInfo *i_vinfo = conf_info.data_info[i_var];
+         VarInfo *i_vinfo = conf_info.data_info[i_var].get();
 
          // Check for separate data files for each field
          if(data_files.size() > 1) {
@@ -468,7 +468,7 @@ static void process_hist1d(const vector<InputDataInfo> &in_data) {
    // Update the 1D histogram counts
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_vinfo = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var].get();
 
       // Loop over the masks
       for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
@@ -525,11 +525,11 @@ static void process_hist2d(const vector<InputDataInfo> &in_data) {
    // Process the 2D joint histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_vinfo = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var].get();
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-         const VarInfo *j_vinfo = conf_info.data_info[j_var];
+         const VarInfo *j_vinfo = conf_info.data_info[j_var].get();
 
          for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
 
@@ -838,11 +838,11 @@ static void process_info_theory() {
    // Compute joint entropy and mutual information for the 2D histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_vinfo = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var].get();
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-         const VarInfo *j_vinfo = conf_info.data_info[j_var];
+         const VarInfo *j_vinfo = conf_info.data_info[j_var].get();
 
          for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
 
@@ -1034,7 +1034,7 @@ static ConcatString get_nc_att_str(const ConcatString &cs1,
 static void setup_nc_file(void) {
 
    // Create NetCDF file
-   nc_out.reset(open_ncfile(out_file.c_str(), true));
+   nc_out = open_ncfile(out_file.c_str(), true);
 
    if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
@@ -1143,7 +1143,7 @@ static void write_hist_bins(void) {
 
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_vinfo = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var].get();
       DiagInfo *i_diag = &diag_info[i_var][0];
 
       // Define NetCDF variable name
@@ -1194,7 +1194,7 @@ static void write_hist1d(void) {
    // Define and write 1D histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_vinfo = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var].get();
 
       // Define NetCDF variable name
       ConcatString var_str(get_nc_var_str(i_vinfo, i_var+1));
@@ -1238,11 +1238,11 @@ static void write_hist2d(void) {
    // Define and write 2D joint histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_vinfo = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var].get();
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-         const VarInfo *j_vinfo = conf_info.data_info[j_var];
+         const VarInfo *j_vinfo = conf_info.data_info[j_var].get();
 
          // Define NetCDF variable name
          ConcatString var_str;
@@ -1295,7 +1295,7 @@ static void write_info_theory(void) {
    // Write entropy for each 1D histogram
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_vinfo = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var].get();
 
       // Define NetCDF variable name
       ConcatString var_str(get_nc_var_str(i_vinfo, i_var+1));
@@ -1325,11 +1325,11 @@ static void write_info_theory(void) {
    // Write joint entropy and mutual information for each 2D joint histogram
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      const VarInfo *i_vinfo = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var].get();
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-         const VarInfo *j_vinfo = conf_info.data_info[j_var];
+         const VarInfo *j_vinfo = conf_info.data_info[j_var].get();
 
          ConcatString var_str;
          var_str << get_nc_var_str(i_vinfo, i_var+1) << "_"
@@ -1423,7 +1423,7 @@ static void write_power_spectrum(void) {
       // Check skip
       if(conf_info.ps_info[i_var].skip) continue;
 
-      const VarInfo *i_vinfo = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var].get();
 
       // Define NetCDF variable name
       ConcatString var_str(get_nc_var_str(i_vinfo, i_var+1));
@@ -1464,14 +1464,14 @@ static void write_error_power_spectrum(void) {
       // Check skip
       if(conf_info.ps_info[i_var].skip) continue;
 
-      const VarInfo *i_vinfo = conf_info.data_info[i_var];
+      const VarInfo *i_vinfo = conf_info.data_info[i_var].get();
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
          // Check skip
          if(conf_info.ps_info[j_var].skip) continue;
 
-         const VarInfo *j_vinfo = conf_info.data_info[j_var];
+         const VarInfo *j_vinfo = conf_info.data_info[j_var].get();
 
          // Define NetCDF variable name
          ConcatString i_var_str(get_nc_var_str(i_vinfo, i_var+1));

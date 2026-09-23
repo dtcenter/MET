@@ -112,8 +112,6 @@ void AFPixelTimeFile::init_from_scratch()
 
 {
 
-Buf = (unsigned char *) nullptr;
-
 clear();
 
 return;
@@ -128,7 +126,7 @@ void AFPixelTimeFile::clear()
 
 {
 
-if ( Buf )  { delete [] Buf;  Buf = (unsigned char *) nullptr; }
+Buf.clear();
 
 AFDataFile::clear();
 
@@ -148,11 +146,9 @@ void AFPixelTimeFile::assign(const AFPixelTimeFile & a)
 
 clear();
 
-if ( !(a.Buf) )  return;
+if ( a.Buf.empty() )  return;
 
-Buf = new unsigned char [af_nx*af_ny*pixel_time_record_size];
-
-memset(Buf, 0, af_nx*af_ny*pixel_time_record_size);
+Buf.assign(af_nx*af_ny*pixel_time_record_size, 0);
 
 AFDataFile::assign(a);
 
@@ -190,9 +186,9 @@ if ( (fd = met_open(filename, O_RDONLY)) < 0 )  {
 
 bytes = af_nx*af_ny*pixel_time_record_size;
 
-Buf = new unsigned char [bytes];
+Buf.assign(bytes, 0);
 
-if ( ::read(fd, Buf, bytes) != bytes )  {
+if ( ::read(fd, Buf.data(), bytes) != bytes )  {
 
    mlog << Error << "\nAFPixelTimeFile::read(const char *) -> "
         << "read error on file \"" << filename << "\"\n\n";
@@ -229,7 +225,7 @@ unixtime t = 0;
 
 n = two_to_one(x, y);   //  this function does range checking on x and y for us
 
-int *ibuf = (int *)Buf;
+const int *ibuf = (const int *) Buf.data();
 
 int minutes = ibuf[n];
 

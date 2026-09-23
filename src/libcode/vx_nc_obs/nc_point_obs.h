@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <ostream>
 
 #include "observation.h"
@@ -34,8 +35,14 @@ class MetNcPointObs : public MetPointData {
 
    protected:
 
-      bool keep_nc;
-      netCDF::NcFile *obs_nc;      //  allocated
+      //
+      //  obs_nc is the active handle, whether this object opened the file or
+      //  was handed one.  obs_nc_owner is non-null only in the first case, so
+      //  ownership is carried by the type rather than by the old keep_nc flag.
+      //
+
+      std::unique_ptr<netCDF::NcFile> obs_nc_owner;
+      netCDF::NcFile *obs_nc;      //  borrowed when obs_nc_owner is null
       NetcdfObsVars obs_vars;
 
       void init_from_scratch();
@@ -47,7 +54,8 @@ class MetNcPointObs : public MetPointData {
 
       bool open(const char * filename);
       void close();
-      bool set_netcdf(netCDF::NcFile *nc_file, bool _keep_nc=false);
+      //  set_netcdf() always borrows; open() is the owning entry point
+      bool set_netcdf(netCDF::NcFile *nc_file);
 
       bool is_using_obs_arr();
 

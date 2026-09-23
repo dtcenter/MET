@@ -22,6 +22,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -78,12 +79,8 @@ int main(int argc, char *argv[])
 
    }
 
-   NcFile * _ncFile = open_ncfile(argv[1]);
-   if (IS_INVALID_NC_P(_ncFile)) {
-     if (_ncFile) {
-       delete _ncFile;
-       _ncFile = (NcFile *)nullptr;
-     }
+   std::unique_ptr<netCDF::NcFile> _ncFile = open_ncfile(argv[1]);
+   if (IS_INVALID_NC_P(_ncFile.get())) {
       exit(1);
    }
 
@@ -99,9 +96,9 @@ int main(int argc, char *argv[])
         << ",  lat_name=" << lat_name << ", lon_name=" << lon_name
         << ", alt_name=" << alt_name << "\n\n";
 
-   NcVar lat_var = get_nc_var(_ncFile, lat_name);
-   NcVar lon_var = get_nc_var(_ncFile, lon_name);
-   NcVar alt_var = get_nc_var(_ncFile, alt_name);
+   NcVar lat_var = get_nc_var(_ncFile.get(), lat_name);
+   NcVar lon_var = get_nc_var(_ncFile.get(), lon_name);
+   NcVar alt_var = get_nc_var(_ncFile.get(), alt_name);
 
    const int nlat = get_data_size(&lat_var);
    const int nlon = get_data_size(&lon_var);
@@ -145,11 +142,6 @@ int main(int argc, char *argv[])
            << x << ", " << y << ", " << z << ")\n";
    }
    cout << "\n";
-
-   if (_ncFile) {
-      delete _ncFile;
-      _ncFile = (NcFile *)nullptr;
-   }
 
    //
    //  done

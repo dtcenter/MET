@@ -34,7 +34,7 @@ class ModeSuperObject {
 
    ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
                    int r_index, int t_index,
-                   const std::vector<MultiVarData *> &mvd,
+                   const std::vector<std::unique_ptr<MultiVarData>> &mvd,
                    BoolCalc &calc);
    inline ~ModeSuperObject() {}
 

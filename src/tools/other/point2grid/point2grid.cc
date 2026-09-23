@@ -53,6 +53,7 @@
 #ifdef WITH_PYTHON
 #include "data2d_nc_met.h"
 #include "pointdata_python.h"
+#include <memory>
 #endif
 
 using namespace std;
@@ -124,7 +125,7 @@ static bool do_gaussian_filter = false;
 static SingleThresh prob_cat_thresh;
 
 // Output NetCDF file
-static NcFile *nc_out  = (NcFile *) nullptr;
+static std::unique_ptr<netCDF::NcFile> nc_out;
 static NcDim  lat_dim ;
 static NcDim  lon_dim ;
 
@@ -380,7 +381,6 @@ static void process_command_line(int argc, char **argv) {
          else var_names.add(vname);
       }
       // Clean up
-      if(vinfo) { delete vinfo; vinfo = (VarInfo *) nullptr; }
    }
    // Check that the number of output names and fields match
    else if(VarNameSA.n() != FieldSA.n()) {
@@ -409,7 +409,7 @@ static void process_data_file() {
    Grid fr_grid;
    GrdFileType ftype;
    ConcatString run_cs;
-   auto nc_in = (NcFile *) nullptr;
+   std::unique_ptr<netCDF::NcFile> nc_in;
    static const char *method_name = "process_data_file() -> ";
 
    // Initialize configuration object
@@ -425,11 +425,11 @@ static void process_data_file() {
 
    // Open the input file
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
+   std::unique_ptr<Met2dDataFile> fr_mtddf;
    bool goes_data = false;
    bool use_python = false;
    int obs_type;
-   auto fr_mtddf = (Met2dDataFile *) nullptr;
-#ifdef WITH_PYTHON
+   #ifdef WITH_PYTHON
    string python_command = InputFilename;
    bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
    use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
@@ -443,7 +443,7 @@ static void process_data_file() {
 
       python_command = python_command.substr(offset+1);
       obs_type = TYPE_PYTHON;
-      fr_mtddf = new MetNcMetDataFile();
+      fr_mtddf = std::make_unique<MetNcMetDataFile>();
    }
    else
 #endif
@@ -451,7 +451,7 @@ static void process_data_file() {
       nc_in = open_ncfile(InputFilename.c_str());
 
       // Get the obs type before opening NetCDF
-      obs_type = get_obs_type(nc_in);
+      obs_type = get_obs_type(nc_in.get());
       goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
       if (obs_type == TYPE_UNKNOWN && ftype == FileType_NcCF) obs_type = TYPE_NCCF;
       if (obs_type == TYPE_NCCF) setenv(nc_att_met_point_nccf, "yes", 1);
@@ -509,18 +509,18 @@ static void process_data_file() {
    open_nc(to_grid, run_cs);
 
    if (goes_data) {
-      process_goes_file(nc_in, config, vinfo, fr_grid, to_grid);
+      process_goes_file(nc_in.get(), config, vinfo.get(), fr_grid, to_grid);
    }
    else if (TYPE_OBS == obs_type) {
-      process_point_file(nc_in, config, vinfo, to_grid);
+      process_point_file(nc_in.get(), config, vinfo.get(), to_grid);
    }
    else if (TYPE_NCCF == obs_type) {
-      process_point_nccf_file(nc_in, config, vinfo, fr_mtddf, to_grid);
+      process_point_nccf_file(nc_in.get(), config, vinfo.get(), fr_mtddf.get(), to_grid);
       unsetenv(nc_att_met_point_nccf);
    }
 #ifdef WITH_PYTHON
    else if (TYPE_PYTHON == obs_type) {
-      process_point_python(python_command, config, vinfo, to_grid, use_xarray);
+      process_point_python(python_command, config, vinfo.get(), to_grid, use_xarray);
    }
 #endif
    else {
@@ -534,90 +534,10 @@ static void process_data_file() {
    close_nc();
 
    // Clean up
-   if(nc_in)    { delete nc_in;    nc_in  = nullptr; }
-   if(fr_mtddf) { delete fr_mtddf; fr_mtddf = (Met2dDataFile *) nullptr; }
-   if(vinfo)    { delete vinfo;    vinfo    = (VarInfo *)       nullptr; }
+   nc_in.reset();
+   fr_mtddf.reset();
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-// returns true if no error
-
-bool get_nc_data_int_array(NcFile *nc, char *var_name, int *data_array, bool stop=true) {
-   bool status = false;
-   NcVar nc_var = get_nc_var(nc, var_name, stop);
-   if (IS_INVALID_NC(nc_var)) {
-      if (stop) exit(1);
-   }
-   else {
-      status = get_nc_data(&nc_var, data_array);
-   }
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
-// returns true if no error
-
-bool get_nc_data_int_array(NcFile *nc, const char *var_name, int *data_array, bool stop=true) {
-   bool status = false;
-   char *_var_name = strdup(var_name);
-   if (_var_name) {
-      status = get_nc_data_int_array(nc, _var_name, data_array, stop);
-      free(_var_name);
-   }
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
-// returns true if no error
-
-bool get_nc_data_float_array(NcFile *nc, char *var_name, float *data_array) {
-   NcVar nc_var = get_nc_var(nc, var_name);
-   if (IS_INVALID_NC(nc_var)) exit(1);
-
-   bool status = get_nc_data(&nc_var, data_array);
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
-// returns true if no error
-
-bool get_nc_data_float_array(NcFile *nc, const char *var_name, float *data_array) {
-   bool status = false;
-   char *_var_name = strdup(var_name);
-   if (_var_name) {
-      status = get_nc_data_float_array(nc, _var_name, data_array);
-      free(_var_name);
-   }
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
-// returns true if no error
-
-bool get_nc_data_string_array(NcFile *nc, char *var_name,
-                              StringArray *stringArray) {
-   NcVar nc_var = get_nc_var(nc, var_name, true);
-   if (IS_INVALID_NC(nc_var)) exit(1);
-
-   bool status = get_nc_data_to_array(&nc_var, stringArray);
-   return status;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-// returns true if no error
-
-bool get_nc_data_string_array(NcFile *nc, const char *var_name,
-                              StringArray *stringArray) {
-   bool status = false;
-   char *_var_name = strdup(var_name);
-   if (_var_name) {
-      status = get_nc_data_string_array(nc, _var_name, stringArray);
-      free(_var_name);
-   }
-   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -647,7 +567,6 @@ static int get_obs_type(NcFile *nc) {
          break;
       }
    }
-   if (vinfo) { delete vinfo; vinfo = (VarInfo *) nullptr; }
 
    if (has_attr_grid) {
       obs_type = TYPE_NCCF;
@@ -1226,7 +1145,7 @@ static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    }
 
    MetNcPointObsIn nc_point_obs;
-   nc_point_obs.set_netcdf(nc_in, true);
+   nc_point_obs.set_netcdf(nc_in);
    // Read the dimensions and variables
    nc_point_obs.read_dim_headers();
    nc_point_obs.check_nc(GET_NC_NAME_P(nc_in).c_str(), method_name_s);   // exit if missing dims/vars
@@ -1690,7 +1609,7 @@ static void open_nc(const Grid &grid, ConcatString run_cs) {
    // Create output file
    nc_out = open_ncfile(OutputFilename.c_str(), true);
 
-   if(IS_INVALID_NC_P(nc_out)) {
+   if(IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nopen_nc() -> "
            << "trouble opening output NetCDF file \""
            << OutputFilename << "\"\n\n";
@@ -1698,16 +1617,16 @@ static void open_nc(const Grid &grid, ConcatString run_cs) {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, OutputFilename.c_str(), program_name.c_str());
+   write_netcdf_global(nc_out.get(), OutputFilename.c_str(), program_name.c_str());
 
    // Add the run command
-   add_att(nc_out, "RunCommand", run_cs);
+   add_att(nc_out.get(), "RunCommand", run_cs);
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(nc_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
-   write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+   write_netcdf_latlon(nc_out.get(), &lat_dim, &lon_dim, grid);
 
    return;
 }
@@ -1724,7 +1643,7 @@ static void write_nc(const DataPlane &dp, const Grid &grid,
    if(deflate_level < 0) deflate_level = 0;
 
    // Create the output variable
-   NcVar data_var = add_var(nc_out, (string)vname, ncFloat,
+   NcVar data_var = add_var(nc_out.get(), (string)vname, ncFloat,
                             lat_dim, lon_dim, deflate_level);
 
    // Add standard attributes
@@ -1773,7 +1692,7 @@ static void write_nc_int(const DataPlane &dp, const Grid &grid,
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = 0;
 
-   NcVar data_var = add_var(nc_out, (string)vname, ncInt,
+   NcVar data_var = add_var(nc_out.get(), (string)vname, ncInt,
                             lat_dim, lon_dim, deflate_level);
    add_att(&data_var, "name", (string)vname);
    add_att(&data_var, "long_name", (string)vinfo->long_name());
@@ -1803,7 +1722,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    DataPlane fr_dp, to_dp;
    ConcatString vname;
    clock_t start_clock =  clock();
-   auto nc_adp = (NcFile *) nullptr;
+   std::unique_ptr<netCDF::NcFile> nc_adp;
    static const char *method_name = "process_goes_file() -> ";
 
    ConcatString tmp_dir = config.get_tmp_dir();
@@ -1814,12 +1733,12 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    // Open ADP file if exists
    if (!adp_filename.empty() && file_exists(adp_filename.c_str())) {
       nc_adp = open_ncfile(adp_filename.c_str());
-      if (IS_INVALID_NC_P(nc_adp)) {
+      if (IS_INVALID_NC_P(nc_adp.get())) {
          mlog << Error << "\n" << method_name
               << "Can't open the ADP input \"" << adp_filename << "\"\n\n";
          exit(1);
       }
-      else if (is_time_mismatch(nc_in, nc_adp)) {
+      else if (is_time_mismatch(nc_in, nc_adp.get())) {
          exit(1);
       }
    }
@@ -1846,7 +1765,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       to_dp.set_valid(valid_time);
       to_dp.set_constant(DefaultValueNA[i]);
       regrid_goes_variable(nc_in, vinfo, fr_dp, to_dp,
-                           fr_grid, to_grid, cellMapping.data(), nc_adp);
+                           fr_grid, to_grid, cellMapping.data(), nc_adp.get());
 
       // List range of data values
       if(mlog.verbosity_level() >= 2) {
@@ -1919,11 +1838,11 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    for (const auto &kv : mapVar) {
       if (kv.first == "t" || string::npos != kv.first.find("time")) {
          NcVar from_var = kv.second;
-         copy_nc_var(nc_out, &from_var);
+         copy_nc_var(nc_out.get(), &from_var);
       }
    }
 
-   delete nc_adp; nc_adp = nullptr;
+   nc_adp.reset();
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << get_exe_duration(start_clock) << " seconds\n";
 
@@ -2327,13 +2246,13 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
    }
 
    // Override the from nx & ny from NetCDF if exists
-   auto coord_nc_in = (NcFile *) nullptr;
+   std::unique_ptr<netCDF::NcFile> coord_nc_in;
    if (has_coord_input) {
       mlog << Debug(2)  << method_name << "Reading coord file: " << cur_coord_name << "\n";
       coord_nc_in = open_ncfile(cur_coord_name.c_str());
-      if (IS_VALID_NC_P(coord_nc_in)) {
-         from_lat_count = get_lat_count(coord_nc_in);
-         from_lon_count = get_lon_count(coord_nc_in);
+      if (IS_VALID_NC_P(coord_nc_in.get())) {
+         from_lat_count = get_lat_count(coord_nc_in.get());
+         from_lon_count = get_lon_count(coord_nc_in.get());
       }
    }
    int data_size  = from_lat_count * from_lon_count;
@@ -2357,9 +2276,9 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
 
       if (has_coord_input) {
 
-         if (IS_VALID_NC_P(coord_nc_in)) {
-            NcVar var_lat = get_nc_var(coord_nc_in, var_name_lat);
-            NcVar var_lon = get_nc_var(coord_nc_in, var_name_lon);
+         if (IS_VALID_NC_P(coord_nc_in.get())) {
+            NcVar var_lat = get_nc_var(coord_nc_in.get(), var_name_lat);
+            NcVar var_lon = get_nc_var(coord_nc_in.get(), var_name_lon);
             if (IS_VALID_NC(var_lat) && IS_VALID_NC(var_lon)) {
                lat_count = get_data_size(&var_lat);
                lon_count = get_data_size(&var_lon);
@@ -2378,8 +2297,8 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
             fclose (pFile);
 
             bool compare_binary_and_computation = false;
-            if (compare_binary_and_computation && fr_grid.info().gi) {
-               grid_data.copy(fr_grid.info().gi);
+            if (compare_binary_and_computation && fr_grid.info().gi.get()) {
+               grid_data.copy(fr_grid.info().gi.get());
                grid_data.compute_lat_lon();
                grid_data.test();
 
@@ -2387,8 +2306,8 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
                int lat_mis_matching_count = 0;
                int lon_matching_count = 0;
                int lon_mis_matching_count = 0;
-               const float *tmp_lats = grid_data.lat_values;
-               const float *tmp_lons = grid_data.lon_values;
+               const float *tmp_lats = grid_data.lat_values.data();
+               const float *tmp_lons = grid_data.lon_values.data();
 
                for (int idx=0; idx<data_size; idx++) {
                    if ((latitudes[idx] > MISSING_LATLON) && (tmp_lats[idx] > MISSING_LATLON)) {
@@ -2423,11 +2342,11 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
             }
          }
       }
-      else if (fr_grid.info().gi) {
-         grid_data.copy(fr_grid.info().gi);
+      else if (fr_grid.info().gi.get()) {
+         grid_data.copy(fr_grid.info().gi.get());
          grid_data.compute_lat_lon();
-         latitudes = grid_data.lat_values;
-         longitudes = grid_data.lon_values;
+         latitudes = grid_data.lat_values.data();
+         longitudes = grid_data.lon_values.data();
          if (!file_exists(geostationary_file.c_str())) {
             save_geostationary_data(geostationary_file,
                   latitudes, longitudes, grid_data);
@@ -2454,7 +2373,7 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
 
    }   //  if data_size > 0
 
-   if(coord_nc_in) delete coord_nc_in;
+   coord_nc_in.reset();
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << get_exe_duration(start_clock) << " seconds\n";
@@ -2859,12 +2778,12 @@ static void save_geostationary_data(const ConcatString geostationary_file,
    clock_t start_clock =  clock();
    static const char *method_name = "save_geostationary_data() -> ";
 
-   NcFile *nc_file = open_ncfile(geostationary_file.text(), true);
-   NcDim xdim = add_dim(nc_file, dim_name_lon, grid_data.nx);
-   NcDim ydim = add_dim(nc_file, dim_name_lat, grid_data.ny);
+   std::unique_ptr<netCDF::NcFile> nc_file = open_ncfile(geostationary_file.text(), true);
+   NcDim xdim = add_dim(nc_file.get(), dim_name_lon, grid_data.nx);
+   NcDim ydim = add_dim(nc_file.get(), dim_name_lat, grid_data.ny);
 
-   NcVar lat_var = add_var(nc_file, var_name_lat, ncFloat, ydim, xdim, deflate_level);
-   NcVar lon_var = add_var(nc_file, var_name_lon, ncFloat, ydim, xdim, deflate_level);
+   NcVar lat_var = add_var(nc_file.get(), var_name_lat, ncFloat, ydim, xdim, deflate_level);
+   NcVar lon_var = add_var(nc_file.get(), var_name_lon, ncFloat, ydim, xdim, deflate_level);
 
    if (IS_VALID_NC(lat_var)) {
       if (grid_data.dy_rad >= 0) {
@@ -2899,7 +2818,7 @@ static void save_geostationary_data(const ConcatString geostationary_file,
       }
    }
 
-   add_att(nc_file, "Conventions", "CF-1.6");
+   add_att(nc_file.get(), "Conventions", "CF-1.6");
 
    if (has_error) {
       remove(geostationary_file.c_str());
@@ -2912,7 +2831,7 @@ static void save_geostationary_data(const ConcatString geostationary_file,
           << geostationary_file << ") was saved\n";
    }
 
-   delete nc_file;  nc_file = nullptr;
+   nc_file.reset();
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << get_exe_duration(start_clock) << " seconds\n";
@@ -2923,9 +2842,7 @@ static void save_geostationary_data(const ConcatString geostationary_file,
 static void close_nc() {
 
    // Clean up
-   if(nc_out) {
-      delete nc_out; nc_out = (NcFile *) nullptr;
-   }
+   nc_out.reset();
 
    // List the output file
    mlog << Debug(1)

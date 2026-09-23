@@ -33,20 +33,20 @@ static const int lr_rpt_wdth[] = {
    13,  7, 13,  7, 13,  7, 13,  7, 13,  7,
    13,  7, 13,  7, 13,  7
 };
-static int n_lr_rpt_wdth = sizeof(lr_rpt_wdth)/sizeof(*lr_rpt_wdth);
+static int n_lr_rpt_wdth = std::size(lr_rpt_wdth);
 
 // Little-R fixed widths for the data lines
 static const int lr_meas_wdth[] = {
    13,  7, 13,  7, 13,  7, 13,  7, 13,  7,
    13,  7, 13,  7, 13,  7, 13,  7, 13,  7
 };   
-static int n_lr_meas_wdth = sizeof(lr_meas_wdth)/sizeof(*lr_meas_wdth);
+static int n_lr_meas_wdth = std::size(lr_meas_wdth);
 
 // Little-R fixed widths for the end of report lines
 static const int lr_end_wdth[] = {
     7,  7,  7
 };
-static int n_lr_end_wdth = sizeof(lr_end_wdth)/sizeof(*lr_end_wdth);
+static int n_lr_end_wdth = std::size(lr_end_wdth);
 
 // GRIB codes for entries in the Little-R data lines
 static const int lr_grib_codes[] = {

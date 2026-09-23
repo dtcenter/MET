@@ -28,6 +28,7 @@
 #include "mtd_file_float.h"
 #include "3d_moments.h"
 #include "2d_moments.h"
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -48,9 +49,9 @@ class MtdIntFile : public MtdFileBase {
 
 
 
-      int * Data;   //  allocated
+      std::vector<int> Data;
 
-      int * ObjVolume;    //  volume, allocated, used after splitting
+      std::vector<int> ObjVolume;   //  volume, used after splitting
 
       int Nobjects;   //  object numbers run from 1 to Nobjects inclusive
 
@@ -176,7 +177,7 @@ inline int MtdIntFile::data_max() const { return DataMax; }
 
 inline int MtdIntFile::n_objects() const { return Nobjects; }
 
-inline const int * MtdIntFile::data() const { return Data; }
+inline const int * MtdIntFile::data() const { return Data.data(); }
 
 inline int MtdIntFile::operator()(int _x, int _y, int _t) const
 

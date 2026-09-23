@@ -23,6 +23,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
+#include <string>
 #include <iostream>
 #include <vector>
 
@@ -138,8 +140,8 @@ class IcodeCell {
 
       double d;
 
-      char * name;   //  allocated if needed
-      char * text;   //  allocated if needed
+      std::string name;
+      std::string text;
 
       const DictionaryEntry * e;   //  not allocated
 
@@ -280,7 +282,7 @@ class ICVStack {
 
    private:
 
-      IcodeVector * v [icv_stack_size];
+      std::unique_ptr<IcodeVector> v [icv_stack_size];
 
       int Depth;
 
@@ -326,7 +328,7 @@ class ICVQueue {
 
    private:
 
-      IcodeVector * v [icv_stack_size];
+      std::unique_ptr<IcodeVector> v [icv_stack_size];
 
       int Nelements;
 

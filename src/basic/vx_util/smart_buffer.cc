@@ -96,9 +96,7 @@ void SmartBuffer::clear()
 
 {
 
-if ( Buf )  { delete [] Buf;  Buf = 0; }
-
-Size = 0;
+Buf.clear();
 
 return;
 
@@ -111,8 +109,6 @@ return;
 void SmartBuffer::init_from_scratch()
 
 {
-
-Buf = 0;
 
 clear();
 
@@ -128,15 +124,7 @@ void SmartBuffer::assign(const SmartBuffer & b)
 
 {
 
-clear();
-
-if ( b.Size == 0 )  return;
-
-Buf = new unsigned char [b.Size];
-
-memcpy(Buf, b.Buf, b.Size);
-
-Size = b.Size;
+Buf = b.Buf;
 
 return;
 
@@ -150,31 +138,14 @@ void SmartBuffer::extend(const int bytes)
 
 {
 
-if ( Size >= bytes )  return;
-
-unsigned char * u = 0;
-
-u = new unsigned char [bytes];
+if ( (int) Buf.size() >= bytes )  return;
 
    //
-   //  If there is any old data, copy it to the new buffer
+   //  resize, not reserve: callers write into the buffer through the
+   //  unsigned char * conversion immediately after extending it
    //
 
-if ( Buf )  {
-
-   if ( Size > 0 )  memcpy(u, Buf, Size);
-
-   delete [] Buf;  Buf = 0;
-
-}
-
-   //
-   //  At this point, Buf is zero, whether there was any old data or not
-   //
-
-Buf = u;  u = 0;   //  handoff
-
-Size = bytes;
+Buf.resize(bytes, 0);
 
    //
    //  done
@@ -194,9 +165,9 @@ int SmartBuffer::read (const int fd, const int bytes)
 
 int n_read;
 
-if ( bytes > Size )  extend(bytes);
+if ( bytes > size() )  extend(bytes);
 
-n_read = ::read(fd, Buf, bytes);
+n_read = ::read(fd, Buf.data(), bytes);
 
    //
    //  done
@@ -216,17 +187,17 @@ int SmartBuffer::write (const int fd, const int bytes) const
 
 int n_written;
 
-if ( bytes > Size )  {
+if ( bytes > size() )  {
 
    mlog << Error
         << "\n\n  SmartBuffer:: write () -> can't write more than "
-        << Size << " bytes!\n\n";
+        << size() << " bytes!\n\n";
 
    exit ( 1 );
 
 }
 
-n_written = ::write(fd, Buf, bytes);
+n_written = ::write(fd, Buf.data(), bytes);
 
    //
    //  done
@@ -244,9 +215,9 @@ void SmartBuffer::read_from_buf (void * other_buf, const int bytes, const int po
 
 {
 
-if ( pos + bytes > Size )  extend(pos + bytes);
+if ( pos + bytes > size() )  extend(pos + bytes);
 
-memcpy(Buf + pos, other_buf, bytes);
+memcpy(Buf.data() + pos, other_buf, bytes);
 
 
 return;
@@ -261,7 +232,7 @@ void SmartBuffer::write_to_buf   (void * other_buf, const int bytes, const int p
 
 {
 
-if ( pos + bytes > Size )  {
+if ( pos + bytes > size() )  {
 
    mlog << Error
         << "\n\n  SmartBuffer::write_to_buf() -> can't write values past end of buffer\n\n";
@@ -270,7 +241,7 @@ if ( pos + bytes > Size )  {
 
 }
 
-memcpy(other_buf, Buf + pos, bytes);
+memcpy(other_buf, Buf.data() + pos, bytes);
 
 return;
 

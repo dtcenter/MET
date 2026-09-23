@@ -64,12 +64,6 @@ CIInfo & CIInfo::operator=(const CIInfo &c) {
 
 void CIInfo::init_from_scratch() {
 
-   v_ncl = (double *) nullptr;
-   v_ncu = (double *) nullptr;
-
-   v_bcl = (double *) nullptr;
-   v_bcu = (double *) nullptr;
-
    clear();
 
    return;
@@ -83,11 +77,11 @@ void CIInfo::clear() {
    v   = bad_data_double;
    vif = 1.0;
 
-   if(v_ncl) { delete [] v_ncl; v_ncl = (double *) nullptr; }
-   if(v_ncu) { delete [] v_ncu; v_ncu = (double *) nullptr; }
+   v_ncl.clear();
+   v_ncu.clear();
 
-   if(v_bcl) { delete [] v_bcl; v_bcl = (double *) nullptr; }
-   if(v_bcu) { delete [] v_bcu; v_bcu = (double *) nullptr; }
+   v_bcl.clear();
+   v_bcu.clear();
 
    return;
 }
@@ -133,30 +127,14 @@ void CIInfo::assign(const CIInfo &c) {
 ////////////////////////////////////////////////////////////////////////
 
 void CIInfo::allocate_n_alpha(int i) {
-   int j;
 
    n = i;
 
-   if(n > 0) {
-      v_ncl = new double [n];
-      v_ncu = new double [n];
-      v_bcl = new double [n];
-      v_bcu = new double [n];
-
-      if(!v_ncl || !v_ncu || !v_bcl || !v_bcu) {
-         mlog << Error << "\nCIInfo::allocate_n_alpha() -> "
-              << "Memory allocation error!\n\n";
-        exit(1);
-      }
-   }
-
    // Initialize the values
-   for(j=0; j<n; j++) {
-      v_ncl[j] = bad_data_double;
-      v_ncu[j] = bad_data_double;
-      v_bcl[j] = bad_data_double;
-      v_bcu[j] = bad_data_double;
-   }
+   v_ncl.assign(n, bad_data_double);
+   v_ncu.assign(n, bad_data_double);
+   v_bcl.assign(n, bad_data_double);
+   v_bcu.assign(n, bad_data_double);
 
    return;
 }
@@ -201,7 +179,6 @@ CTSInfo & CTSInfo::operator=(const CTSInfo &c) {
 
 void CTSInfo::init_from_scratch() {
 
-   alpha = (double *) nullptr;
 
    clear();
 
@@ -213,7 +190,7 @@ void CTSInfo::init_from_scratch() {
 void CTSInfo::clear() {
 
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
+   alpha.clear();
 
    cts.zero_out();
    fthresh.clear();
@@ -291,13 +268,7 @@ void CTSInfo::allocate_n_alpha(int i) {
 
    if(n_alpha > 0) {
 
-      alpha = new double [n_alpha];
-
-      if(!alpha) {
-         mlog << Error << "\nCTSInfo::allocate_n() -> "
-              << "Memory allocation error!\n\n";
-        exit(1);
-      }
+      alpha.resize(n_alpha);
 
       baser.allocate_n_alpha(n_alpha);
       fmean.allocate_n_alpha(n_alpha);
@@ -674,7 +645,6 @@ MCTSInfo & MCTSInfo::operator=(const MCTSInfo &c) {
 
 void MCTSInfo::init_from_scratch() {
 
-   alpha = (double *) nullptr;
 
    clear();
 
@@ -686,7 +656,7 @@ void MCTSInfo::init_from_scratch() {
 void MCTSInfo::clear() {
 
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
+   alpha.clear();
 
    cts.zero_out();
    fthresh.clear();
@@ -732,13 +702,7 @@ void MCTSInfo::allocate_n_alpha(int i) {
 
    if(n_alpha > 0) {
 
-      alpha = new double [n_alpha];
-
-      if(!alpha) {
-         mlog << Error << "\nMCTSInfo::allocate_n() -> "
-              << "Memory allocation error!\n\n";
-        exit(1);
-      }
+      alpha.resize(n_alpha);
 
       acc.allocate_n_alpha(n_alpha);
       hk.allocate_n_alpha(n_alpha);
@@ -977,7 +941,6 @@ CNTInfo & CNTInfo::operator=(const CNTInfo &c) {
 
 void CNTInfo::init_from_scratch() {
 
-   alpha = (double *) nullptr;
 
    clear();
 
@@ -1028,7 +991,7 @@ void CNTInfo::clear() {
 
    n = 0;
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
+   alpha.clear();
 
    fthresh.clear();
    othresh.clear();
@@ -1126,13 +1089,7 @@ void CNTInfo::allocate_n_alpha(int i) {
 
    if(n_alpha > 0) {
 
-      alpha = new double [n_alpha];
-
-      if(!alpha) {
-         mlog << Error << "\nCNTInfo::allocate_n_alpha() -> "
-              << "Memory allocation error!\n\n";
-        exit(1);
-      }
+      alpha.resize(n_alpha);
 
       fbar.allocate_n_alpha(n_alpha);
       fstdev.allocate_n_alpha(n_alpha);
@@ -1912,7 +1869,6 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
 
 void VL1L2Info::init_from_scratch() {
 
-   alpha = (double *) nullptr;
    
    clear();
 
@@ -1972,7 +1928,7 @@ void VL1L2Info::clear() {
 
    n = 0;
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
+   alpha.clear();
    
    fthresh.clear();
    othresh.clear();
@@ -2319,13 +2275,7 @@ void VL1L2Info::allocate_n_alpha(int i) {
    
    if(n_alpha > 0) {
       
-      alpha = new double [n_alpha];
-      
-      if(!alpha) {
-         mlog << Error << "\nVL1L2Info::allocate_n_alpha() -> "
-              << "Memory allocation error!\n\n";
-         exit(1);
-      }
+      alpha.resize(n_alpha);
       
       FBAR.allocate_n_alpha(n_alpha);
       OBAR.allocate_n_alpha(n_alpha);
@@ -2781,7 +2731,6 @@ NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
 
 void NBRCNTInfo::init_from_scratch() {
 
-   alpha = (double *) nullptr;
 
    clear();
 
@@ -2793,7 +2742,7 @@ void NBRCNTInfo::init_from_scratch() {
 void NBRCNTInfo::clear() {
 
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
+   alpha.clear();
 
    fthresh.clear();
    othresh.clear();
@@ -2838,13 +2787,7 @@ void NBRCNTInfo::allocate_n_alpha(int i) {
 
    if(n_alpha > 0) {
 
-      alpha = new double [n_alpha];
-
-      if(!alpha) {
-         mlog << Error << "\nNBRCNTInfo::allocate_n_alpha() -> "
-              << "Memory allocation error!\n\n";
-        exit(1);
-      }
+      alpha.resize(n_alpha);
 
       fbs.allocate_n_alpha(i);
       fss.allocate_n_alpha(i);
@@ -2925,11 +2868,6 @@ ISCInfo & ISCInfo::operator=(const ISCInfo &c) {
 
 void ISCInfo::init_from_scratch() {
 
-   mse_scale = (double *) nullptr;
-   isc_scale = (double *) nullptr;
-   fen_scale = (double *) nullptr;
-   oen_scale = (double *) nullptr;
-
    clear();
 
    return;
@@ -2954,10 +2892,10 @@ void ISCInfo::clear() {
    n_scale  = 0;
    total    = 0;
 
-   if(mse_scale) { delete [] mse_scale; mse_scale = (double *) nullptr; }
-   if(isc_scale) { delete [] isc_scale; isc_scale = (double *) nullptr; }
-   if(fen_scale) { delete [] fen_scale; fen_scale = (double *) nullptr; }
-   if(oen_scale) { delete [] oen_scale; oen_scale = (double *) nullptr; }
+   mse_scale.clear();
+   isc_scale.clear();
+   fen_scale.clear();
+   oen_scale.clear();
 
    return;
 }
@@ -3030,28 +2968,14 @@ void ISCInfo::assign(const ISCInfo &c) {
 ////////////////////////////////////////////////////////////////////////
 
 void ISCInfo::allocate_n_scale(int i) {
-   int j;
 
    if((n_scale = i) == 0) return;
 
-   mse_scale = new double [n_scale+1];
-   isc_scale = new double [n_scale+1];
-   fen_scale = new double [n_scale+1];
-   oen_scale = new double [n_scale+1];
-
-   if(!mse_scale || !isc_scale || !fen_scale || !oen_scale) {
-      mlog << Error << "\nISCInfo::allocate_n_scale() -> "
-           << "Memory allocation error!\n\n";
-      exit(1);
-   }
-
    // Initialize the values
-   for(j=0; j<=n_scale; j++) {
-      mse_scale[j] = bad_data_double;
-      isc_scale[j] = bad_data_double;
-      fen_scale[j] = bad_data_double;
-      oen_scale[j] = bad_data_double;
-   }
+   mse_scale.assign(n_scale+1, bad_data_double);
+   isc_scale.assign(n_scale+1, bad_data_double);
+   fen_scale.assign(n_scale+1, bad_data_double);
+   oen_scale.assign(n_scale+1, bad_data_double);
 
    return;
 }
@@ -3167,7 +3091,6 @@ PCTInfo & PCTInfo::operator=(const PCTInfo &c) {
 
 void PCTInfo::init_from_scratch() {
 
-   alpha = (double *) nullptr;
 
    clear();
 
@@ -3179,7 +3102,7 @@ void PCTInfo::init_from_scratch() {
 void PCTInfo::clear() {
 
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
+   alpha.clear();
 
    pct.clear();
    climo_pct.clear();
@@ -3237,13 +3160,7 @@ void PCTInfo::allocate_n_alpha(int i) {
 
    if(n_alpha > 0) {
 
-      alpha = new double [n_alpha];
-
-      if(!alpha) {
-         mlog << Error << "\nPCTInfo::allocate_n() -> "
-              << "Memory allocation error!\n\n";
-        exit(1);
-      }
+      alpha.resize(n_alpha);
 
       baser.allocate_n_alpha(n_alpha);
       brier.allocate_n_alpha(n_alpha);
@@ -4302,93 +4219,6 @@ SSIDXData &SSIDXData::operator=(const SSIDXData &a) noexcept {
 //
 // Begin code for misc functions
 //
-////////////////////////////////////////////////////////////////////////
-
-int parse_message_type(const char *msg_typ_str, char **&msg_typ_arr) {
-   char tmp_str[max_str_len + 1];
-   char *c = (char *) nullptr;
-   char *temp_ptr = (char *) nullptr;
-   int n;
-   const char *method_name = "parse_message_type() ";
-
-   // Compute the number of tokens in the string based on " "
-   n = num_tokens(msg_typ_str, " ");
-
-   // Check for no tokens in string
-   if(n == 0) return 0;
-
-   // Allocate space for the list of tokens
-   msg_typ_arr = new char * [n];
-
-   // Initialize the temp string for use in tokenizing
-   m_strncpy(tmp_str, msg_typ_str, max_str_len, method_name);
-
-   char a_var_name[512+1];
-   // Parse remaining tokens
-   for(int i=0; i<n; i++) {
-      // Tokenize the string and store the double values
-      c = strtok_r(tmp_str, " ", &temp_ptr);
-      snprintf(a_var_name, 512, "msg_typ_arr[%d]", i);
-      msg_typ_arr[i] = m_strcpy2(c, method_name, a_var_name);
-   }
-
-   return n;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int parse_dbl_list(const char *dbl_str, double *&dbl_arr) {
-   char tmp_str[max_str_len+1];
-   char *c = (char *) nullptr;
-   char *temp_ptr = (char *) nullptr;
-   int n;
-   const char *method_name = "parse_dbl_list()";
-
-   // Compute the number of tokens in the string based on " "
-   n = num_tokens(dbl_str, " ");
-
-   // Check for no tokens in string
-   if(n == 0) return 0;
-
-   // Allocate space for the list of tokens
-   dbl_arr = new double [n];
-
-   // Initialize the temp string for use in tokenizing
-   m_strcpy(tmp_str, dbl_str, method_name);
-
-   // Tokenize the string and store the double values
-   for(int i=0; i<n; i++) dbl_arr[i] = atof(strtok_r(tmp_str, " ", &temp_ptr));
-
-   return n;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int parse_int_list(const char *int_str, int *&int_arr) {
-   char tmp_str[max_str_len+1];
-   char *c = (char *) nullptr;
-   char *temp_ptr = (char *) nullptr;
-   int n;
-   const char *method_name = "parse_int_list()";
-
-   // Compute the number of tokens in the string based on " "
-   n = num_tokens(int_str, " ");
-
-   // Check for no tokens in string
-   if(n == 0) return 0;
-
-   // Allocate space for the list of tokens
-   int_arr = new int [n];
-
-   // Initialize the temp string for use in tokenizing
-   m_strcpy(tmp_str, int_str, method_name);
-
-   // Tokenize the string and store the integer values
-   for(int i=0; i<n; i++) int_arr[i] = nint(atof(strtok_r(tmp_str, " ", &temp_ptr)));
-
-   return n;
-}
-
 ////////////////////////////////////////////////////////////////////////
 
 int max_int(const int *v_int, int n) {

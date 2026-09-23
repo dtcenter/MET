@@ -17,6 +17,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <cmath>
+#include <vector>
 
 #include "concat_string.h"
 #include "logger.h"
@@ -497,21 +498,29 @@ void ConcatString::strip_chars_from(const char *chars_to_remove)
 int ConcatString::format(const char *fmt, ...)
 {
    va_list vl;
+   va_list vl_copy;
    int status = -1;
-   char *tmp = nullptr;
 
    va_start(vl, fmt);
-   status = vasprintf(&tmp, fmt, vl);
 
-   if (status == -1) {
+   // First pass computes the required length
+   va_copy(vl_copy, vl);
+   status = vsnprintf(nullptr, 0, fmt, vl_copy);
+   va_end(vl_copy);
+
+   if (status < 0) {
+      va_end(vl);
       mlog << Error << "\nConcatString::format() -> "
-           << "could not allocate a temporary buffer.\n\n";
+           << "could not format the output string.\n\n";
       exit(1);
    }
 
-   s.assign(tmp);
-   free(tmp);
+   // Second pass writes into a buffer with room for the terminator
+   std::vector<char> tmp(status + 1);
+   vsnprintf(tmp.data(), tmp.size(), fmt, vl);
    va_end(vl);
+
+   s.assign(tmp.data(), status);
 
    return status;
 }

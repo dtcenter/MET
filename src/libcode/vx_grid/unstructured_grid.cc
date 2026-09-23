@@ -95,7 +95,7 @@ void UnstructuredGrid::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 
-UnstructuredGrid::UnstructuredGrid(const UnstructuredData & data) {
+UnstructuredGrid::UnstructuredGrid(const UnstructuredData & data, Key) {
 
    set_from_data(data);
 
@@ -302,9 +302,9 @@ void UnstructuredGrid::shift_right(int N)
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * UnstructuredGrid::copy() const {
+std::unique_ptr<GridRep> UnstructuredGrid::copy() const {
 
-  auto * p = new UnstructuredGrid (Data);
+  auto p = std::make_unique<UnstructuredGrid>(Data, Key{});
 
   p->Name = Name;
 
@@ -339,7 +339,7 @@ Grid::Grid(const UnstructuredData &data) {
 void Grid::set(const UnstructuredData &data) {
    clear();
 
-   rep = new UnstructuredGrid ( data );
+   rep = std::make_unique<UnstructuredGrid>(data, UnstructuredGrid::Key{});
    if ( !rep )  {
       mlog << Error << "\nGrid::set(const Unstructured &) -> memory allocation error\n\n";
       exit ( 1 );
@@ -351,7 +351,6 @@ void Grid::set(const UnstructuredData &data) {
 
 
 UnstructuredData::UnstructuredData() {
-   kdtree = nullptr;
    max_distance_km = bad_data_double;  // disable distance
    clear();
 }
@@ -367,7 +366,7 @@ UnstructuredData::~UnstructuredData() {
 void UnstructuredData::build_tree() {
 
    atlas::idx_t n = 0;
-   kdtree = new IndexKDTree(atlas_geometry);
+   kdtree = std::make_unique<IndexKDTree>(atlas_geometry);
    kdtree->reserve(n_face);
    if (has_PointLatLon()) {
       for (int i=0; i<n_face; i++) {

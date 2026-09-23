@@ -189,7 +189,8 @@ Or_Node::Or_Node()
 
 {
 
-left_child = right_child = nullptr;
+left_child.reset();
+right_child.reset();
 
 }
 
@@ -201,8 +202,8 @@ Or_Node::~Or_Node()
 
 {
 
-if (  left_child )  { delete  left_child;   left_child = nullptr; }
-if ( right_child )  { delete right_child;  right_child = nullptr; }
+left_child.reset();
+right_child.reset();
 
 }
 
@@ -228,11 +229,11 @@ return tf_right;
 ////////////////////////////////////////////////////////////////////////
 
 
-ThreshNode * Or_Node::copy() const
+std::unique_ptr<ThreshNode> Or_Node::copy() const
 
 {
 
-Or_Node * n = new Or_Node;
+auto n = std::make_unique<Or_Node>();
 
 if (  left_child )  n->left_child  = left_child->copy();
 if ( right_child )  n->right_child = right_child->copy();
@@ -385,7 +386,8 @@ And_Node::And_Node()
 
 {
 
-left_child = right_child = nullptr;
+left_child.reset();
+right_child.reset();
 
 }
 
@@ -397,8 +399,8 @@ And_Node::~And_Node()
 
 {
 
-if (  left_child )  { delete  left_child;   left_child = nullptr; }
-if ( right_child )  { delete right_child;  right_child = nullptr; }
+left_child.reset();
+right_child.reset();
 
 }
 
@@ -424,11 +426,11 @@ return ( tf_left && tf_right );
 ////////////////////////////////////////////////////////////////////////
 
 
-ThreshNode * And_Node::copy() const
+std::unique_ptr<ThreshNode> And_Node::copy() const
 
 {
 
-And_Node * n = new And_Node;
+auto n = std::make_unique<And_Node>();
 
 if (  left_child )  n->left_child  = left_child->copy();
 if ( right_child )  n->right_child = right_child->copy();
@@ -611,7 +613,7 @@ Not_Node::~Not_Node()
 
 {
 
-if ( child )  { delete child;  child = nullptr; }
+child.reset();
 
 }
 
@@ -633,11 +635,11 @@ return !tf;
 ////////////////////////////////////////////////////////////////////////
 
 
-ThreshNode * Not_Node::copy() const
+std::unique_ptr<ThreshNode> Not_Node::copy() const
 
 {
 
-Not_Node * n = new Not_Node;
+auto n = std::make_unique<Not_Node>();
 
 if ( child )  n->child  = child->copy();
 
@@ -896,11 +898,11 @@ return tf;
 ////////////////////////////////////////////////////////////////////////
 
 
-ThreshNode * Simple_Node::copy() const
+std::unique_ptr<ThreshNode> Simple_Node::copy() const
 
 {
 
-Simple_Node * n = new Simple_Node;
+auto n = std::make_unique<Simple_Node>();
 
 n->T = T;
 
@@ -1373,9 +1375,7 @@ SingleThresh::SingleThresh(SingleThresh && c) noexcept
 
 {
 
-node = c.node;
-
-c.node = nullptr;
+node = std::move(c.node);
 
 }
 
@@ -1421,9 +1421,7 @@ if ( this == &c ) return *this;
 
 clear();
 
-node = c.node;
-
-c.node = nullptr;
+node = std::move(c.node);
 
 return *this;
 
@@ -1456,7 +1454,7 @@ if (    node->type() == thresh_complex ||
 
 else  {
 
-   if ( ((Simple_Node *) node)->need_perc() ) {
+   if ( ((Simple_Node *) node.get())->need_perc() ) {
       return ( node->type() == st.node->type() &&
                node->ptype() == st.node->ptype() &&
                is_eq(node->pvalue(), st.node->pvalue()) );
@@ -1477,7 +1475,7 @@ void SingleThresh::init_from_scratch()
 
 {
 
-node = nullptr;
+node.reset();
 
 clear();
 
@@ -1493,7 +1491,7 @@ void SingleThresh::clear()
 
 {
 
-if ( node )  { delete node;  node = nullptr; }
+node.reset();
 
 return;
 
@@ -1527,16 +1525,14 @@ void SingleThresh::set(double t, ThreshType ind)
 
 clear();
 
-Simple_Node * a = new Simple_Node;
+auto a = std::make_unique<Simple_Node>();
 
 a->T      = t;
 a->op     = ind;
 a->s      << thresh_type_str[ind] << t;
 a->abbr_s << thresh_abbr_str[ind] << t;
 
-node = a;
-
-a = nullptr;
+node = std::move(a);
 
 return;
 
@@ -1561,7 +1557,7 @@ if ( ptype == no_perc_thresh_type )  {
 
 }
 
-Simple_Node * a = new Simple_Node;
+auto a = std::make_unique<Simple_Node>();
 
 ConcatString cs;
 cs << perc_thresh_info_map.at(ptype).short_name << pt;
@@ -1574,9 +1570,7 @@ a->PT     = pt;
 a->s      << thresh_type_str[ind] << cs;
 a->abbr_s << thresh_abbr_str[ind] << cs;
 
-node = a;
-
-a = nullptr;
+node = std::move(a);
 
 return;
 
@@ -1608,13 +1602,11 @@ void SingleThresh::set_na()
 
 clear();
 
-Simple_Node * a = new Simple_Node;
+auto a = std::make_unique<Simple_Node>();
 
 a->set_na();
 
-node = a;
-
-a = nullptr;
+node = std::move(a);
 
 return;
 

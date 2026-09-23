@@ -463,9 +463,7 @@ def run_usecases(settings:dict, ts:str, files_from_ctrack:tuple)->None:
         summary_info = extract_summary_info(summary_filename, usecase_subdir)
         detail_info = extract_detail_info(details_filename, usecase_subdir)
 
-        # hard-code the run_number, no multiple runs are currently supported
-        run_number = 1
-        consolidated_df = consolidate_info(summary_info, detail_info, run_number)
+        consolidated_df = consolidate_info(summary_info, detail_info)
         save_results(consolidated_df, output_base, ts, filename, usecase_subdir)
 
         # provide information about this run: Python version, etc.

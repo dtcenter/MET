@@ -1,3 +1,4 @@
+#include <memory>
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -36,7 +37,7 @@ class MetGrib1DataFile : public Met2dDataFile {
       MetGrib1DataFile(const MetGrib1DataFile &);
       MetGrib1DataFile & operator=(const MetGrib1DataFile &);
 
-      GribFile * GF;   //  allocated
+      std::unique_ptr<GribFile> GF;
 
       GribRecord CurrentRecord;
 

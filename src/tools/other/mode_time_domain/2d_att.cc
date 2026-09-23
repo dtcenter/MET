@@ -16,6 +16,7 @@
 #include <string.h>
 #include <cstdio>
 #include <cmath>
+#include <vector>
 
 #include "vx_util.h"
 #include "vx_math.h"
@@ -388,7 +389,6 @@ SingleAtt2D calc_2d_single_atts(const MtdIntFile & mask_2d, const DataPlane & ra
 
 SingleAtt2D a;
 Mtd_2D_Moments moments;
-float * values = (float *) nullptr;
 const int    * i = 0;
 const double * r = 0;
 const int nxy = (mask_2d.nx())*(mask_2d.ny());
@@ -417,16 +417,7 @@ a.AxisAngle = moments.calc_2D_axis_plane_angle();
    //
 
 
-values = new float [a.Area];
-
-if ( !values )  {
-
-   mlog << Error << "\ncalc_2d_single_atts() -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
+vector<float> values(a.Area);
 
 i = mask_2d.data();
 r = raw_2d.data();
@@ -445,24 +436,23 @@ for (j=0; j<nxy; ++j)  {
 }
 
 
-sort_f(values, n);
+sort_f(values.data(), n);
 
-a.Ptile_10 = percentile_f(values, n, 0.10);
-a.Ptile_25 = percentile_f(values, n, 0.25);
-a.Ptile_50 = percentile_f(values, n, 0.50);
-a.Ptile_75 = percentile_f(values, n, 0.75);
-a.Ptile_90 = percentile_f(values, n, 0.90);
+a.Ptile_10 = percentile_f(values.data(), n, 0.10);
+a.Ptile_25 = percentile_f(values.data(), n, 0.25);
+a.Ptile_50 = percentile_f(values.data(), n, 0.50);
+a.Ptile_75 = percentile_f(values.data(), n, 0.75);
+a.Ptile_90 = percentile_f(values.data(), n, 0.90);
 
 a.Ptile_Value = ptile_value;
 
-a.Ptile_User = percentile_f(values, n, (double) (a.Ptile_Value/100.0));
+a.Ptile_User = percentile_f(values.data(), n, (double) (a.Ptile_Value/100.0));
 
 
    //
    //   done
    //
 
-if ( values )  { delete [] values;  values = 0; }
 
 return a;
 
@@ -478,7 +468,6 @@ void SingleAtt2D::write_txt(AsciiTable & table, const int row) const
 
 int c = n_header_3d_cols;
 int k;
-const char * format = 0;
 ConcatString cs;
 ConcatString s;
 
@@ -537,13 +526,11 @@ table.set_entry(row, c, Area); c++;
    //  centroid (x, y)
    //
 
-format = format_2_decimals;
-
-cs.format(format, Xbar);
+cs.format(format_2_decimals, Xbar);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ybar);
+cs.format(format_2_decimals, Ybar);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -551,13 +538,11 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  centroid lat/lon
    //
 
-format = format_2_decimals;
-
-cs.format(format, CentroidLat);
+cs.format(format_2_decimals, CentroidLat);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, -CentroidLon);   //  toggle sign
+cs.format(format_2_decimals, -CentroidLon);   // toggle sign
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -565,9 +550,7 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  axis angle
    //
 
-format = format_2_decimals;
-
-cs.format(format, AxisAngle);
+cs.format(format_2_decimals, AxisAngle);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -576,25 +559,23 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  intensities 10, 25, 50, 75, 90
    //
 
-   format = format_2_decimals;
-
-cs.format(format, Ptile_10);
+cs.format(format_2_decimals, Ptile_10);
 
    table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_25);
+cs.format(format_2_decimals, Ptile_25);
 
    table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_50);
+cs.format(format_2_decimals, Ptile_50);
 
    table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_75);
+cs.format(format_2_decimals, Ptile_75);
 
    table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_90);
+cs.format(format_2_decimals, Ptile_90);
 
    table.set_entry(row, c, cs.c_str()); c++;
 
@@ -602,7 +583,7 @@ cs.format(format, Ptile_90);
    //  custom intensity value
    //
 
-cs.format(format, Ptile_User);
+cs.format(format_2_decimals, Ptile_User);
 
    table.set_entry(row, c, cs.c_str()); c++;
 

@@ -158,8 +158,6 @@ PSfile::~PSfile()
 
 close();
 
-delete afm;  afm = (Afm *) nullptr;
-
 }
 
 
@@ -170,13 +168,11 @@ void PSfile::init_from_scratch()
 
 {
 
-File = (ofstream *) nullptr;
-
 psout.ignore_columns = true;
 
 Head = &psout;
 
-afm = new Afm;
+afm = std::make_unique<Afm>();
 
 showpage_count = 0;
 
@@ -197,7 +193,7 @@ void PSfile::open(const char * filename, DocumentMedia DM, DocumentOrientation D
 
 close();
 
-File = new ofstream;
+File = std::make_unique<ofstream>();
 
 met_open(*File, filename);
 
@@ -212,7 +208,7 @@ if ( !(*File) )  {
 
 OutputFilename = filename;
 
-psout.attach(File);
+psout.attach(File.get());
 
 psout.set_decimal_places(ml_prec);
 
@@ -398,7 +394,7 @@ if ( File )  {
 
    File->close();
 
-   delete File;   File = (ofstream *) nullptr;
+   File.reset();
 
 }
 
@@ -633,7 +629,7 @@ if ( render_flag )  {
 
       x_cur += scale*(n->width());
 
-      n = n->next;
+      n = n->next.get();
 
    }
 
@@ -1183,8 +1179,7 @@ void PSfile::begin_flate()
 
 {
 
-PSFilter **v = &fa_bank;
-PSOutputFilter * pso = 0;
+std::unique_ptr<PSFilter> *v = &fa_bank;
 
 comment("begin flate compression");
 
@@ -1192,25 +1187,25 @@ comment("begin flate compression");
    //  add a flate encode filter
    //
 
-*v = new FlateEncodeFilter();
+*v = std::make_unique<FlateEncodeFilter>();
  v = &((*v)->next);
 
    //
    //  add a ascii85 encode filter
    //
 
-*v = new ASCII85EncodeFilter();
+*v = std::make_unique<ASCII85EncodeFilter>();
  v = &((*v)->next);
 
    //
    //  add a ps output filter
    //
 
-pso = new PSOutputFilter();
+auto pso = std::make_unique<PSOutputFilter>();
 pso->ignore_columns = false;
-pso->file = File;
+pso->file = File.get();
 
-*v = pso;
+*v = std::move(pso);
  v = &((*v)->next);
 
    //
@@ -1221,7 +1216,7 @@ pso->file = File;
            "/ASCII85Decode filter /FlateDecode filter\n"
            "cvx exec\n";
 
-Head = fa_bank;
+Head = fa_bank.get();
 
 Head->set_decimal_places(ml_prec);
 
@@ -1240,11 +1235,11 @@ void PSfile::end_flate()
 
 fa_bank->eod();
 
-delete fa_bank;  fa_bank = 0;
+fa_bank.reset();
 
 Head = &psout;
 
-psout.file = File;
+psout.file = File.get();
 
 file() << '\n';
 
@@ -1780,7 +1775,7 @@ if ( j < 0 )  {
 
 }
 
-AfmCharMetrics & cm = afm.cm[j];
+const AfmCharMetrics & cm = afm.cm[j];
 
 if (m_strlen(c) > 1) {
 
@@ -1909,7 +1904,7 @@ if ( !(cur->is_empty()) )  {
 
    cur->add_link();
 
-   cur = cur->next;
+   cur = cur->next.get();
 
 }
 

@@ -23,6 +23,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -72,7 +73,7 @@ static const int na_len = m_strlen(na_str);
 
 static IntArray    valid_times;
 
-static NcFile *ncf;
+static std::unique_ptr<netCDF::NcFile> ncf;
 static MetNcPointObsOut nc_point_obs;
 
 ////////////////////////////////////////////////////////////////////////
@@ -132,7 +133,11 @@ if ( output_filename.empty() )  usage();
    //
 
 ncf = open_ncfile(output_filename.text(), true);
-nc_point_obs.set_netcdf(ncf);
+//
+   //  ncf owns the file now, so MetNcPointObs must NOT also delete it
+   //
+
+nc_point_obs.set_netcdf(ncf.get());
 
    //
    //  process the lidar file
@@ -140,7 +145,7 @@ nc_point_obs.set_netcdf(ncf);
 
 mlog << Debug(1) << "Processing Lidar File: " << cline[0] << "\n";
 
-process_calipso_file(ncf, cline[0].c_str());
+process_calipso_file(ncf.get(), cline[0].c_str());
 
 nc_point_obs.close();
 
