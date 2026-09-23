@@ -189,7 +189,8 @@ Or_Node::Or_Node()
 
 {
 
-left_child = right_child = nullptr;
+left_child.reset();
+right_child.reset();
 
 }
 
@@ -201,8 +202,8 @@ Or_Node::~Or_Node()
 
 {
 
-if (  left_child )  { delete  left_child;   left_child = nullptr; }
-if ( right_child )  { delete right_child;  right_child = nullptr; }
+left_child.reset();
+right_child.reset();
 
 }
 
@@ -228,11 +229,11 @@ return tf_right;
 ////////////////////////////////////////////////////////////////////////
 
 
-ThreshNode * Or_Node::copy() const
+std::unique_ptr<ThreshNode> Or_Node::copy() const
 
 {
 
-Or_Node * n = new Or_Node;
+auto n = std::make_unique<Or_Node>();
 
 if (  left_child )  n->left_child  = left_child->copy();
 if ( right_child )  n->right_child = right_child->copy();
@@ -385,7 +386,8 @@ And_Node::And_Node()
 
 {
 
-left_child = right_child = nullptr;
+left_child.reset();
+right_child.reset();
 
 }
 
@@ -397,8 +399,8 @@ And_Node::~And_Node()
 
 {
 
-if (  left_child )  { delete  left_child;   left_child = nullptr; }
-if ( right_child )  { delete right_child;  right_child = nullptr; }
+left_child.reset();
+right_child.reset();
 
 }
 
@@ -424,11 +426,11 @@ return ( tf_left && tf_right );
 ////////////////////////////////////////////////////////////////////////
 
 
-ThreshNode * And_Node::copy() const
+std::unique_ptr<ThreshNode> And_Node::copy() const
 
 {
 
-And_Node * n = new And_Node;
+auto n = std::make_unique<And_Node>();
 
 if (  left_child )  n->left_child  = left_child->copy();
 if ( right_child )  n->right_child = right_child->copy();
@@ -611,7 +613,7 @@ Not_Node::~Not_Node()
 
 {
 
-if ( child )  { delete child;  child = nullptr; }
+child.reset();
 
 }
 
@@ -633,11 +635,11 @@ return !tf;
 ////////////////////////////////////////////////////////////////////////
 
 
-ThreshNode * Not_Node::copy() const
+std::unique_ptr<ThreshNode> Not_Node::copy() const
 
 {
 
-Not_Node * n = new Not_Node;
+auto n = std::make_unique<Not_Node>();
 
 if ( child )  n->child  = child->copy();
 
@@ -896,11 +898,11 @@ return tf;
 ////////////////////////////////////////////////////////////////////////
 
 
-ThreshNode * Simple_Node::copy() const
+std::unique_ptr<ThreshNode> Simple_Node::copy() const
 
 {
 
-Simple_Node * n = new Simple_Node;
+auto n = std::make_unique<Simple_Node>();
 
 n->T = T;
 
@@ -1507,7 +1509,7 @@ clear();
 
 if ( !(c.node) )  return;
 
-node.reset(c.node->copy());
+node = c.node->copy();
 
 return;
 
@@ -1584,7 +1586,7 @@ void SingleThresh::set(const ThreshNode * n)
 
 clear();
 
-node.reset(n->copy());
+node = n->copy();
 
 return;
 

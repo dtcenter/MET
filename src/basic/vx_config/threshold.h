@@ -135,7 +135,7 @@ class ThreshNode {
 
       virtual bool check(double, const ClimoPntInfo *cpi = nullptr) const = 0;
 
-      virtual ThreshNode * copy() const = 0;
+      virtual std::unique_ptr<ThreshNode> copy() const = 0;
 
       virtual ThreshType type() const = 0;
 
@@ -176,7 +176,7 @@ class Or_Node : public ThreshNode {
 
       bool check(double, const ClimoPntInfo *cpi = nullptr) const override;
 
-      ThreshNode * copy() const override;
+      std::unique_ptr<ThreshNode> copy() const override;
 
       ThreshType type() const override;
 
@@ -199,8 +199,8 @@ class Or_Node : public ThreshNode {
 
       void get_simple_nodes(std::vector<Simple_Node> &) const override;
 
-      ThreshNode * left_child;
-      ThreshNode * right_child;
+      std::unique_ptr<ThreshNode> left_child;
+      std::unique_ptr<ThreshNode> right_child;
 
 };
 
@@ -247,10 +247,10 @@ class And_Node : public ThreshNode {
 
       void get_simple_nodes(std::vector<Simple_Node> &) const override;
 
-      ThreshNode * copy() const override;
+      std::unique_ptr<ThreshNode> copy() const override;
 
-      ThreshNode * left_child;
-      ThreshNode * right_child;
+      std::unique_ptr<ThreshNode> left_child;
+      std::unique_ptr<ThreshNode> right_child;
 
 };
 
@@ -297,9 +297,9 @@ class Not_Node : public ThreshNode {
 
       void get_simple_nodes(std::vector<Simple_Node> &) const override;
 
-      ThreshNode * copy() const override;
+      std::unique_ptr<ThreshNode> copy() const override;
 
-      ThreshNode * child;
+      std::unique_ptr<ThreshNode> child;
 
 };
 
@@ -366,7 +366,7 @@ class Simple_Node : public ThreshNode {
          //  do stuff
          //
 
-      ThreshNode * copy() const override;
+      std::unique_ptr<ThreshNode> copy() const override;
 
       bool check(double, const ClimoPntInfo *cpi = nullptr) const override;
 
