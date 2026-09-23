@@ -702,7 +702,7 @@ long long s = peek_record_size(f.Fd, f.get_rec_pad_size(), f.get_swap_endian());
 
 r.extend(s);
 
-n_read = read_fortran_binary(f.Fd, r.Buf, r.Nalloc, f.get_rec_pad_size(), f.get_swap_endian());
+n_read = read_fortran_binary(f.Fd, r.Buf.data(), r.Nalloc, f.get_rec_pad_size(), f.get_swap_endian());
 
 if ( n_read == 0 )  return false;
 
@@ -719,11 +719,11 @@ r.Ndiag     = n_diag;
 r.Ndiagchan = n12;
 r.Nextra    = iextra*jextra;
 
-r.diag     = (float *) (r.Buf);
-r.diagchan = (float *) (r.Buf + 4*n_diag);
+r.diag     = (float *) (r.Buf.data());
+r.diagchan = (float *) (r.Buf.data() + 4*n_diag);
 r.extra    = 0;
 
-if ( r.Nextra > 0 )  r.extra = (float *) (r.Buf + 4*n_diag + 4*n12);
+if ( r.Nextra > 0 )  r.extra = (float *) (r.Buf.data() + 4*n_diag + 4*n12);
 
 r.N1 = f.N1;
 r.N2 = f.N2;
@@ -738,7 +738,7 @@ if ( f.get_swap_endian() )  {
    int j;
    const int n = r.Ndiag + r.Ndiagchan + r.Nextra;
 
-   for (j=0; j<n; ++j)  shuffle_4(r.Buf + 4*j);
+   for (j=0; j<n; ++j)  shuffle_4(r.Buf.data() + 4*j);
 
 }
 

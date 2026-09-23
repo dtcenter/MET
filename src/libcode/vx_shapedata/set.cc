@@ -185,8 +185,6 @@ SetCollection & SetCollection::operator=(const SetCollection & a) {
 
 void SetCollection::init_from_scratch() {
 
-   set = nullptr;
-
    all_clear();
 
    extend(10);
@@ -200,7 +198,7 @@ void SetCollection::clear() {
 
    n_sets  = 0;
 
-   for(int j=0; j<n_alloc; j++) set[j].clear();
+   for(auto &s : set) s.clear();
 
    return;
 }
@@ -209,11 +207,9 @@ void SetCollection::clear() {
 
 void SetCollection::all_clear() {
 
-   if(set) { delete [] set; set = nullptr; }
+   set.clear();
 
    n_sets  = 0;
-
-   n_alloc = 0;
 
    return;
 }
@@ -225,9 +221,9 @@ void SetCollection::assign(const SetCollection & s) {
 
    all_clear();
 
-   if(!(s.set)) return;
+   if(s.set.empty()) return;
 
-   extend(s.n_alloc);
+   extend((int) s.set.size());
 
    n_sets = s.n_sets;
 
@@ -240,7 +236,7 @@ void SetCollection::assign(const SetCollection & s) {
 
 void SetCollection::extend(int N) {
 
-   if(N <= n_alloc)  return;
+   if(N <= (int) set.size())  return;
 
    int k = N/set_alloc_inc;
 
@@ -248,16 +244,8 @@ void SetCollection::extend(int N) {
 
    k *= set_alloc_inc;
 
-   auto *u = new FcstObsSet [k];
-
-   if(set) {
-      for(int j=0; j<n_alloc; j++) u[j] = set[j];
-      delete [] set; set = nullptr;
-   }
-
-   set = u; u = nullptr;
-
-   n_alloc = k;
+   //  resize, not reserve: the elements are reached by set[j] below
+   set.resize(k);
 
    return;
 }
@@ -332,7 +320,7 @@ void SetCollection::merge_two(int index1, int index2) {
 
    n_sets++;
 
-   for(int j=n_sets; j<n_alloc; j++) {
+   for(int j=n_sets; j<(int) set.size(); j++) {
       set[j].clear();
    }
 

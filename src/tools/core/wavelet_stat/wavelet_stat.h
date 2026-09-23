@@ -105,7 +105,7 @@ static netCDF::NcVar        diff_var  ;
 
 // Output PostScript file
 static ConcatString out_ps_file;
-static PSfile       *ps_out = (PSfile *) nullptr;
+static std::unique_ptr<PSfile> ps_out;
 
 // Output STAT file
 static ConcatString     stat_file;

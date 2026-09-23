@@ -98,9 +98,10 @@ static void get_tile(const DataPlane &, const DataPlane &, int, int,
 static int  get_tile_tot_count();
 
 static void do_intensity_scale(const NumArray &, const NumArray &,
-                               ISCInfo *&, int, int);
+                               std::vector<ISCInfo> &, int, int);
 
-static void aggregate_isc_info(ISCInfo **, int, int, ISCInfo &);
+static void aggregate_isc_info(const std::vector<std::vector<ISCInfo>> &,
+                               int, int, ISCInfo &);
 
 static void compute_cts(const double *, const double *, int, ISCInfo &);
 static void compute_mse(const double *, const double *, int, double &);
@@ -265,7 +266,8 @@ static void process_scores() {
    DataPlane fcst_dp_fill, obs_dp_fill;
 
    NumArray f_na, o_na;
-   ISCInfo **isc_info = (ISCInfo **) 0, isc_aggr;
+   std::vector<std::vector<ISCInfo>> isc_info;
+   ISCInfo isc_aggr;
    Grid fcst_grid, obs_grid;
 
    // Loop through each of the fields to be verified
@@ -425,11 +427,9 @@ static void process_scores() {
          plot_ps_raw(fcst_dp, obs_dp, fcst_dp_fill, obs_dp_fill, i);
       }
 
-      // Allocate memory for ISCInfo objects sized as [n_tile][n_thresh]
-      isc_info = new ISCInfo * [conf_info.get_n_tile()];
-      for(int j=0; j<conf_info.get_n_tile(); j++) {
-         isc_info[j] = new ISCInfo [conf_info.fcat_ta[i].n()];
-      }
+      // ISCInfo objects sized as [n_tile][n_thresh]
+      isc_info.assign(conf_info.get_n_tile(),
+                      std::vector<ISCInfo>(conf_info.fcat_ta[i].n()));
 
       // Process percentile thresholds
       conf_info.set_perc_thresh(fcst_dp, obs_dp);
@@ -491,17 +491,8 @@ static void process_scores() {
          }
       }
 
-      // Deallocate memory for ISCInfo objects
-      for(int j=0; j<conf_info.get_n_tile(); j++) {
-         if(isc_info[j]) {
-            delete [] isc_info[j];
-            isc_info[j] = (ISCInfo *) nullptr;
-         }
-      }
-      if(isc_info) {
-         delete [] isc_info;
-         isc_info = (ISCInfo **) nullptr;
-      }
+      // Release the ISCInfo objects
+      isc_info.clear();
 
    } // end for i
 
@@ -714,7 +705,7 @@ static void setup_ps_file(unixtime valid_ut, int lead_sec) {
    build_outfile_name(valid_ut, lead_sec, ".ps", out_ps_file);
 
    // Create a new PostScript file and open it
-   ps_out = new PSfile;
+   ps_out = std::make_unique<PSfile>();
    ps_out->open(out_ps_file.c_str());
    n_page = 1;
 
@@ -913,7 +904,7 @@ static int get_tile_tot_count() {
 
 static void do_intensity_scale(const NumArray &f_na,
                                const NumArray &o_na,
-                               ISCInfo *&isc_info, int i_vx,
+                               std::vector<ISCInfo> &isc_info, int i_vx,
                                int i_tile) {
 
    // Check the NumArray lengths
@@ -1181,7 +1172,7 @@ static void do_intensity_scale(const NumArray &f_na,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void aggregate_isc_info(ISCInfo **isc_info, int i_vx,
+static void aggregate_isc_info(const std::vector<std::vector<ISCInfo>> &isc_info, int i_vx,
                                int i_thresh, ISCInfo &isc_aggr) {
 
    // Set up the aggregated ISCInfo object
@@ -1900,8 +1891,7 @@ static void close_out_files() {
       // List the PostScript file after it is finished
       mlog << Debug(1) << "Output file: " << out_ps_file << "\n";
       ps_out->close();
-      delete ps_out;
-      ps_out = (PSfile *) nullptr;
+      ps_out.reset();
    }
 
    return;
@@ -2092,9 +2082,9 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
 
    Box dim;
    set_dim(dim, v_tab_1, v_tab_1 + sm_plot_height, h_tab_1);
-   render_image(ps_out, fcst_dp, dim, 1);
-   draw_map(ps_out, dim);
-   draw_border(ps_out, dim);
+   render_image(ps_out.get(), fcst_dp, dim, 1);
+   draw_map(ps_out.get(), dim);
+   draw_border(ps_out.get(), dim);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -2102,7 +2092,7 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
    //
    ////////////////////////////////////////////////////////////////////////////
 
-   draw_colorbar(ps_out, dim, 1, 1);
+   draw_colorbar(ps_out.get(), dim, 1, 1);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -2111,9 +2101,9 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
    ////////////////////////////////////////////////////////////////////////////
 
    set_dim(dim, v_tab_1, v_tab_1 + sm_plot_height, h_tab_3);
-   render_image(ps_out, obs_dp, dim, 0);
-   draw_map(ps_out, dim);
-   draw_border(ps_out, dim);
+   render_image(ps_out.get(), obs_dp, dim, 0);
+   draw_map(ps_out.get(), dim);
+   draw_border(ps_out.get(), dim);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -2122,10 +2112,10 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
    ////////////////////////////////////////////////////////////////////////////
 
    set_dim(dim, v_tab_2, v_tab_2 + sm_plot_height, h_tab_1);
-   render_image(ps_out, fcst_dp_fill, dim, 1);
-   draw_map(ps_out, dim);
-   draw_border(ps_out, dim);
-   draw_tiles(ps_out, dim, 0, conf_info.get_n_tile()-1, 1);
+   render_image(ps_out.get(), fcst_dp_fill, dim, 1);
+   draw_map(ps_out.get(), dim);
+   draw_border(ps_out.get(), dim);
+   draw_tiles(ps_out.get(), dim, 0, conf_info.get_n_tile()-1, 1);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -2133,7 +2123,7 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
    //
    ////////////////////////////////////////////////////////////////////////////
 
-   draw_colorbar(ps_out, dim, 0, 1);
+   draw_colorbar(ps_out.get(), dim, 0, 1);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -2142,10 +2132,10 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
    ////////////////////////////////////////////////////////////////////////////
 
    set_dim(dim, v_tab_2, v_tab_2 + sm_plot_height, h_tab_3);
-   render_image(ps_out, obs_dp_fill, dim, 0);
-   draw_map(ps_out, dim);
-   draw_border(ps_out, dim);
-   draw_tiles(ps_out, dim, 0, conf_info.get_n_tile()-1, 1);
+   render_image(ps_out.get(), obs_dp_fill, dim, 0);
+   draw_map(ps_out.get(), dim);
+   draw_border(ps_out.get(), dim);
+   draw_tiles(ps_out.get(), dim, 0, conf_info.get_n_tile()-1, 1);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -2389,11 +2379,11 @@ static void plot_ps_wvlt(const double *diff, double mad,
    ////////////////////////////////////////////////////////////////////////////
 
    set_dim(dim, v_tab-lg_plot_height, v_tab, h_tab_cen);
-   render_tile(ps_out, diff, n, i_tile, dim);
-   draw_map(ps_out, dim);
-   draw_border(ps_out, dim);
-   draw_tiles(ps_out, dim, i_tile, i_tile, 0);
-   draw_colorbar(ps_out, dim, 0, 0);
+   render_tile(ps_out.get(), diff, n, i_tile, dim);
+   draw_map(ps_out.get(), dim);
+   draw_border(ps_out.get(), dim);
+   draw_tiles(ps_out.get(), dim, i_tile, i_tile, 0);
+   draw_colorbar(ps_out.get(), dim, 0, 0);
 
    ////////////////////////////////////////////////////////////////////////////
    //

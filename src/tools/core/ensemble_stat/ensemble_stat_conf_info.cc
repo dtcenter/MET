@@ -49,7 +49,7 @@ EnsembleStatConfInfo::~EnsembleStatConfInfo() {
 void EnsembleStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   vx_opt   = (EnsembleStatVxOpt *) nullptr;
+   vx_opt.clear();
    rng_ptr  = (gsl_rng *)           nullptr;
 
    clear();
@@ -88,7 +88,7 @@ void EnsembleStatConfInfo::clear() {
    nc_info.clear();
 
    // Deallocate memory
-   if(vx_opt) { delete [] vx_opt; vx_opt = (EnsembleStatVxOpt *) nullptr; }
+   vx_opt.clear();
 
    // Reset counts
    n_vx          = 0;
@@ -257,7 +257,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Allocate memory for the verification task options
    n_vx   = n_fvx;
-   vx_opt = new EnsembleStatVxOpt [n_vx];
+   vx_opt.resize(n_vx);
 
    // Check for consistent number of climatology fields
    check_climo_n_vx(fdict, n_vx);
