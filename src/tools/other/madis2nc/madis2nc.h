@@ -142,7 +142,7 @@ static Madis2NcConfInfo conf_info;
 
 static bool do_summary;
 static bool save_summary_only = false;
-static SummaryObs *summary_obs = nullptr;
+static std::unique_ptr<SummaryObs> summary_obs;
 
 #endif   //  __MADIS2NC_H__
 

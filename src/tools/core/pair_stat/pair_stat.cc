@@ -556,7 +556,7 @@ static void process_python_pairs(const ConcatString &python_command) {
       user_script_args.shift_down(0, 1);
    }
 
-   auto *pldf = new PyLineDataFile;
+   auto pldf = std::make_unique<PyLineDataFile>();
 
    if(!pldf->open(user_script_path.c_str(), user_script_args)) {
       mlog << Error << "\n" << method_name
@@ -575,7 +575,7 @@ static void process_python_pairs(const ConcatString &python_command) {
    // Process the STAT lines
    //
    STATLine line;
-   LineDataFile *f = pldf;
+   LineDataFile *f = pldf.get();
    while((*f) >> line) {
 
       // Skip header and non-MPR lines
@@ -597,7 +597,6 @@ static void process_python_pairs(const ConcatString &python_command) {
 	<< "\".\n";
 
    f->close();
-   if(pldf) { delete pldf; pldf = (PyLineDataFile *) nullptr; } 
 
 #endif
 

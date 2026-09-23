@@ -557,7 +557,7 @@ static void process_stat_file(const char *filename, const STATAnalysisJob &job,
 
 static StringArray process_python(const STATAnalysisJob & job) {
 
-   auto *pldf = new PyLineDataFile;
+   auto pldf = std::make_unique<PyLineDataFile>();
 
    if(!pldf->open(user_script_path.c_str(), user_script_args)) {
       mlog << Error << "\nprocess_python() -> "
@@ -566,7 +566,7 @@ static StringArray process_python(const STATAnalysisJob & job) {
       throw 1;
    }
 
-   LineDataFile *f = pldf;
+   LineDataFile *f = pldf.get();
 
    open_temp_file();
 
@@ -587,7 +587,6 @@ static StringArray process_python(const STATAnalysisJob & job) {
 
    f->close();
 
-   if(pldf) { delete pldf; pldf = (PyLineDataFile *) nullptr; }
 
    StringArray sa;
    sa.add(tmp_path);

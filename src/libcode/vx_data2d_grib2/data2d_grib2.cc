@@ -402,13 +402,13 @@ void MetGrib2DataFile::find_record_matches(const VarInfoGrib2* vinfo,
          } else if ( sign == '-' ) {
             vinfo_ens_type = 2;
          }
-         auto ens_number_str  = new char[vinfo_ens.length()  ];
-         m_strncpy(ens_number_str, vinfo_ens.text()+1, (size_t) vinfo_ens.length(), method_name);
-         ens_number_str[vinfo_ens.length()-1] = (char) 0;
+         //  everything after the leading sign
+         const std::string ens_number_str(vinfo_ens.text() + 1);
 
          //  if the  string is numeric
-         if( check_reg_exp("^[0-9]*$", ens_number_str) ) vinfo_ens_number = atoi(ens_number_str);
-         delete[] ens_number_str;
+         if( check_reg_exp("^[0-9]*$", ens_number_str.c_str()) ) {
+            vinfo_ens_number = atoi(ens_number_str.c_str());
+         }
       }
 
       // if one of the parameters was not set - error
@@ -579,8 +579,8 @@ void MetGrib2DataFile::find_record_matches(const VarInfoGrib2* vinfo,
       }  //  END: else if( parameter match )
 
       //  add the record to the result lists, depending on the match type
-      if( rec_match_ex )                 listMatchExact.emplace_back(*it);
-      if( rec_match_ex || rec_match_rn ) listMatchRange.emplace_back(*it);
+      if( rec_match_ex )                 listMatchExact.emplace_back(it->get());
+      if( rec_match_ex || rec_match_rn ) listMatchRange.emplace_back(it->get());
 
    }  //  END:  for( vector<Grib2Record*>::iterator it = RecList.begin(); ...)
 
@@ -632,7 +632,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
          }
 
          //  store the record information
-         auto rec = new Grib2Record;
+         auto rec = std::make_unique<Grib2Record>();
          rec->ByteOffset   = offset;
          rec->Index        = idx++;
          rec->NumFields    = (int)numfields;
@@ -862,7 +862,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
          }
 
          //  add the record to the list
-         RecList.emplace_back(rec);
+         RecList.emplace_back(std::move(rec));
 
          g2_free(gfld);
 

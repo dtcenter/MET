@@ -305,7 +305,7 @@ extern netCDF::NcVar get_nc_var(netCDF::NcFile *, const char *var_name,
 extern netCDF::NcVar get_nc_var(netCDF::NcFile *, const ConcatString &var_name,
                                 const char *group_name, bool log_as_error=false);   // continue even though not exists
 
-extern netCDF::NcVar *copy_nc_var(netCDF::NcFile *,  netCDF::NcVar *,
+extern netCDF::NcVar copy_nc_var(netCDF::NcFile *,  netCDF::NcVar *,
                                   const int deflate_level=DEF_DEFLATE_LEVEL, const bool all_attrs=true);
 extern void   copy_nc_att(netCDF::NcFile *, netCDF::NcVar *, const ConcatString attr_name);
 extern void   copy_nc_att( netCDF::NcVar *,  netCDF::NcVar *, const ConcatString attr_name);

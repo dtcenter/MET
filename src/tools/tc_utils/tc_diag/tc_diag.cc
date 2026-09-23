@@ -1256,7 +1256,7 @@ void copy_coord_vars(NcFile *to_nc, NcFile *from_nc) {
 
       // Get the current coordinate variable
       NcVar from_var = get_var(from_nc, var_names[i].c_str());
-      NcVar *to_var = copy_nc_var(to_nc, &from_var);
+      copy_nc_var(to_nc, &from_var);
    }
 
    return;

@@ -213,7 +213,7 @@ static void initialize() {
    rej_poly = 0;
    rej_sid  = 0;
 
-   summary_obs = new SummaryObs();
+   summary_obs = std::make_unique<SummaryObs>();
    return;
 }
 
@@ -361,7 +361,7 @@ void process_madis_file(const char *madis_file) {
 
 static void clean_up() {
 
-   if (summary_obs) delete summary_obs;
+   summary_obs.reset();
    
    nc_point_obs.close();
 
@@ -411,7 +411,7 @@ void setup_netcdf_out(int nhdr) {
    mlog << Debug(5) << "setup_netcdf_out() nhdr:\t" << nhdr
         << "\tobs_cnt:\t" << obs_vars->obs_cnt << "\n";
 
-   nc_point_obs.set_nc_out_data(obs_vector, summary_obs, conf_info.getSummaryInfo());
+   nc_point_obs.set_nc_out_data(obs_vector, summary_obs.get(), conf_info.getSummaryInfo());
    nc_point_obs.get_dim_counts(&obs_cnt, &hdr_cnt);
    nc_point_obs.init_netcdf(obs_cnt, hdr_cnt, program_name);
    

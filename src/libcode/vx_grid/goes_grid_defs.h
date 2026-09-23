@@ -27,7 +27,7 @@
 struct GoesImagerData {
 
    const char *name;
-   const char *scene_id;
+   std::string scene_id;
 
    double perspective_point_height;
    double semi_major_axis;

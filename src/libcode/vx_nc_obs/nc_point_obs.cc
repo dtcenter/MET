@@ -40,7 +40,7 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 MetNcPointObs::MetNcPointObs() {
-   obs_data = new NcPointObsData();
+   obs_data = std::make_unique<NcPointObsData>();
    init_from_scratch();
 }
 

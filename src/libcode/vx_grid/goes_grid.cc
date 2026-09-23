@@ -550,7 +550,7 @@ void GoesImagerData::reset() {
    y_values.clear(); //radian
    x_image_bounds.clear();
    y_image_bounds.clear();
-   scene_id = nullptr;
+   scene_id.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -562,7 +562,7 @@ void GoesImagerData::release() {
    y_values.clear();
    x_image_bounds.clear();
    y_image_bounds.clear();
-   if (scene_id) { delete[] scene_id; scene_id=0; }
+   scene_id.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////

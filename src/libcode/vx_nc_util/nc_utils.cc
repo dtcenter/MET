@@ -193,10 +193,18 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
             // NC_STRING attributes do not parse well with Intel compilers
             int num_elements_sub = 8096;
             int num_elements = att->getAttLength();
-            vector <char *> att_value(num_elements);
-            for(int i=0; i<num_elements; i++) {
-               att_value[i] = (char*) calloc(num_elements_sub, sizeof(char));
-            }
+            //
+            //  these buffers were calloc'd and then freed with delete, which
+            //  is undefined behaviour twice over - wrong allocator, and the
+            //  scalar form for an array.  netCDF still needs a char *[], so
+            //  the storage is a vector of vectors and att_value just points
+            //  into it.
+            //
+
+            vector<vector<char>> att_buf(num_elements,
+                                         vector<char>(num_elements_sub, '\0'));
+            vector<char *> att_value(num_elements);
+            for(int i=0; i<num_elements; i++) att_value[i] = att_buf[i].data();
             try {
                att->getValues(att_value.data());
                value = att_value[0];
@@ -208,8 +216,6 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
                     << GET_NC_TYPE_NAME_P(att) << " type).\n"
                     << "Please check the encoding of the "<< GET_NC_NAME_P(att) << " attribute.\n\n";
             }
-            // Cleanup
-            for(int i=0; i<num_elements; i++) delete att_value[i];
          }
       }
       else { // MET-788: to handle a custom modified NetCDF
@@ -2717,7 +2723,7 @@ void copy_nc_att_short(NcVar *var_to, NcVarAtt *from_att) {
 
 ////////////////////////////////////////////////////////////////////////
 
-NcVar *copy_nc_var(NcFile *to_nc, NcVar *from_var,
+NcVar copy_nc_var(NcFile *to_nc, NcVar *from_var,
       const int deflate_level, const bool all_attrs) {
    vector<NcDim> dims = from_var->getDims();
    for(unsigned int idx=0; idx<dims.size(); idx++) {
@@ -2726,11 +2732,10 @@ NcVar *copy_nc_var(NcFile *to_nc, NcVar *from_var,
          add_dim(to_nc, GET_NC_NAME(dim), dim.getSize());
       }
    }
-   NcVar tmp_var = add_var(to_nc, GET_NC_NAME_P(from_var),
+   NcVar to_var = add_var(to_nc, GET_NC_NAME_P(from_var),
          from_var->getType(), dims, deflate_level);
-   NcVar *to_var = new NcVar(tmp_var);
-   copy_nc_atts(from_var, to_var, all_attrs);
-   copy_nc_var_data(from_var, to_var);
+   copy_nc_atts(from_var, &to_var, all_attrs);
+   copy_nc_var_data(from_var, &to_var);
    return to_var;
 }
 
