@@ -886,7 +886,7 @@ void open_netcdf() {
    bool use_var_id = true;
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
-   nc_point_obs.set_netcdf(f_out.get(), true);
+   nc_point_obs.set_netcdf(f_out.get());
    nc_point_obs.init_obs_vars(use_var_id, deflate_level);
 
    return;

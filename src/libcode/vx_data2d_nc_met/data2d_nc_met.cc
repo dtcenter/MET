@@ -68,7 +68,7 @@ MetNcMetDataFile & MetNcMetDataFile::operator=(const MetNcMetDataFile &) {
 
 void MetNcMetDataFile::nc_met_init_from_scratch() {
 
-   MetNc  = (MetNcFile *) nullptr;
+   MetNc.reset();
 
    close();
 
@@ -79,7 +79,7 @@ void MetNcMetDataFile::nc_met_init_from_scratch() {
 
 void MetNcMetDataFile::close() {
 
-   if(MetNc) { delete MetNc; MetNc = (MetNcFile *) nullptr; }
+   MetNc.reset();
 
    return;
 }
@@ -90,7 +90,7 @@ bool MetNcMetDataFile::open(const char * _filename) {
 
    close();
 
-   MetNc = new MetNcFile;
+   MetNc = std::make_unique<MetNcFile>();
 
    if(!MetNc->open(_filename)) {
       mlog << Error << "\nMetNcMetDataFile::open(const char *) -> "

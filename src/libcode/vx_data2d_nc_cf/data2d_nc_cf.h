@@ -1,3 +1,4 @@
+#include <memory>
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -65,7 +66,7 @@ class MetNcCFDataFile : public Met2dDataFile {
       //  NetCDF file
       //
 
-      NcCfFile *_file;          // allocated
+      std::unique_ptr<NcCfFile> _file;
       long cur_time_index;      // current time index to get the data plane (for array of data_plane)
       long cur_z_index;         // current vlevel index to get the data plane (for array of data_plane)
 

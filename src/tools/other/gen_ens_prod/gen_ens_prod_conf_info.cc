@@ -57,15 +57,10 @@ void GenEnsProdConfInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void GenEnsProdConfInfo::clear() {
-   vector<GenEnsProdVarInfo*>::const_iterator var_it = ens_input.begin();
 
    // Clear, erase, and initialize members
    model.clear();
    desc.clear();
-
-   for(; var_it != ens_input.end(); var_it++) {
-     if(*var_it) { delete *var_it; }
-   }
 
    ens_input.clear();
    cdf_info.clear();
@@ -183,7 +178,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
    max_n_cat = 0;
    for(int i=0; i<n_var; i++) {
       
-      auto ens_info = new GenEnsProdVarInfo();
+      auto ens_info = std::make_unique<GenEnsProdVarInfo>();
 
       // Get the current dictionary
       i_edict = parse_conf_i_vx_dict(edict, i);
@@ -267,7 +262,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
       // Conf: ensemble_flag
       ens_info->nc_info = parse_nc_info(&i_edict);
 
-      ens_input.emplace_back(ens_info);
+      ens_input.emplace_back(std::move(ens_info));
    } // end for i
 
    // Conf: ens.ens_thresh

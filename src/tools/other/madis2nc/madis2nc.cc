@@ -401,7 +401,7 @@ void setup_netcdf_out(int nhdr) {
    int hdr_cnt;
    int obs_cnt;
    bool use_var_id = true;
-   nc_point_obs.set_netcdf(f_out.get(), true);
+   nc_point_obs.set_netcdf(f_out.get());
    nc_point_obs.set_using_var_id(use_var_id);
 
    NetcdfObsVars *obs_vars = nc_point_obs.get_obs_vars();

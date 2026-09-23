@@ -137,7 +137,7 @@ ncf = open_ncfile(output_filename.text(), true);
    //  ncf owns the file now, so MetNcPointObs must NOT also delete it
    //
 
-nc_point_obs.set_netcdf(ncf.get(), true);
+nc_point_obs.set_netcdf(ncf.get());
 
    //
    //  process the lidar file

@@ -79,7 +79,7 @@ MetNcCFDataFile & MetNcCFDataFile::operator=(const MetNcCFDataFile &) {
 
 void MetNcCFDataFile::nccf_init_from_scratch() {
 
-   _file = (NcCfFile *) nullptr;
+   _file.reset();
    cur_time_index = -1;
    cur_z_index = -1;
 
@@ -113,7 +113,7 @@ NcVarInfo *MetNcCFDataFile::find_first_data_var() {
 
 void MetNcCFDataFile::close() {
 
-   if(_file) { delete _file; _file = (NcCfFile *) nullptr; }
+   _file.reset();
 
    return;
 }
@@ -124,7 +124,7 @@ bool MetNcCFDataFile::open(const char * _filename) {
 
    close();
 
-   _file = new NcCfFile;
+   _file = std::make_unique<NcCfFile>();
 
    if(!_file->open(_filename)) {
       mlog << Error << "\nMetNcCFDataFile::open(const char *) -> "

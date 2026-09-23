@@ -285,7 +285,7 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    //
    // Define the NetCDF dimensions and variables
    //
-   nc_point_obs.set_netcdf(_ncFile.get(), true);
+   nc_point_obs.set_netcdf(_ncFile.get());
    // Note: use_var_id was set by the handler
    nc_point_obs.init_obs_vars(use_var_id, deflate_level, true);
    nc_point_obs.set_nc_out_data(_observations, &summary_obs, _summaryInfo);

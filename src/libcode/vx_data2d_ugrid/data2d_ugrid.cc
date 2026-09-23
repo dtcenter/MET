@@ -90,7 +90,7 @@ bool MetUGridDataFile::fail_with_error(const char *method_name, const std::strin
 
 void MetUGridDataFile::ugrid_init_from_scratch() {
 
-   _file = (UGridFile *) nullptr;
+   _file.reset();
    _cur_time_index = -1;
    _cur_vert_index = -1;
 
@@ -103,7 +103,7 @@ void MetUGridDataFile::ugrid_init_from_scratch() {
 
 void MetUGridDataFile::close() {
 
-   if(_file) { delete _file; _file = (UGridFile *) nullptr; }
+   _file.reset();
 
    return;
 }
@@ -115,7 +115,7 @@ bool MetUGridDataFile::open(const char * _filename) {
 
    close();
 
-   _file = new UGridFile;
+   _file = std::make_unique<UGridFile>();
 
    if(!_file->open(_filename)) {
       return fail_with_error(method_name, std::string("unable to open NetCDF file \"") + _filename + "\"");

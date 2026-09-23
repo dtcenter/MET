@@ -55,7 +55,7 @@ MetNcPointObs::~MetNcPointObs() {
 void MetNcPointObs::init_from_scratch() {
    MetPointData::init_from_scratch();
 
-   keep_nc = false;
+   obs_nc_owner.reset();
    obs_nc = (NcFile *) nullptr;
 }
 
@@ -64,23 +64,23 @@ void MetNcPointObs::init_from_scratch() {
 void MetNcPointObs::close() {
    MetPointData::clear();
 
-   if ( !keep_nc && obs_nc ) {
-      delete obs_nc;
-      obs_nc = (NcFile *) nullptr;
-   }
+   obs_nc_owner.reset();
+   obs_nc = (NcFile *) nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool MetNcPointObs::open(const char * filename) {
-   return set_netcdf(open_ncfile(filename).release());
+   close();
+   obs_nc_owner = open_ncfile(filename);
+   obs_nc = obs_nc_owner.get();
+   return IS_VALID_NC_P(obs_nc);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcPointObs::set_netcdf(NcFile *nc_file, bool _keep_nc) {
+bool MetNcPointObs::set_netcdf(NcFile *nc_file) {
    close();
-   keep_nc = _keep_nc;
    obs_nc = nc_file;
    return IS_VALID_NC_P(obs_nc);
 }

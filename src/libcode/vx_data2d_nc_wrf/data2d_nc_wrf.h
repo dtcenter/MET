@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <netcdf>
 
 #include "data_plane.h"
@@ -44,7 +45,7 @@ class MetNcWrfDataFile : public Met2dDataFile {
          //  NetCDF file
          //
       
-      WrfFile * WrfNc;  //  allocated
+      std::unique_ptr<WrfFile> WrfNc;
 
    public:
 

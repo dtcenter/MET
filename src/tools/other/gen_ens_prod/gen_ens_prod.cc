@@ -289,7 +289,7 @@ static void process_ensemble() {
    unixtime max_init_ut = bad_data_ll;
 
    // Loop through each of the ensemble fields to be processed
-   vector<GenEnsProdVarInfo*>::const_iterator var_it = conf_info.ens_input.begin();
+   auto var_it = conf_info.ens_input.begin();
    for(int i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
 
       // Need to reinitialize counts and sums for each ensemble field
@@ -350,14 +350,14 @@ static void process_ensemble() {
             clear_counts();
 
             // Read climatology data for this field
-            get_climo_mean_stdev((*var_it), i_var,
+            get_climo_mean_stdev(var_it->get(), i_var,
                                  set_climo_ens_mem_id,
                                  i_ens, cmn_dp, csd_dp);
 
             // Compute the ensemble summary data, if needed
             if((*var_it)->normalize == NormalizeType::FcstAnom ||
                (*var_it)->normalize == NormalizeType::FcstStdAnom) {
-               get_ens_mean_stdev((*var_it), emn_dp, esd_dp);
+               get_ens_mean_stdev(var_it->get(), emn_dp, esd_dp);
             }
             else {
                emn_dp.erase();
@@ -384,7 +384,7 @@ static void process_ensemble() {
 
                // Read climo data with MET_ENS_MEMBER_ID set
                if(set_climo_ens_mem_id) {
-                  get_climo_mean_stdev((*var_it), i_var,
+                  get_climo_mean_stdev(var_it->get(), i_var,
                                        set_climo_ens_mem_id, i_ens,
                                        cmn_dp, csd_dp);
                }
@@ -396,7 +396,7 @@ static void process_ensemble() {
                }
 
                // Apply current data to the running sums and counts
-               track_counts(*var_it, ctrl_dp, true, cmn_dp, csd_dp);
+               track_counts(var_it->get(), ctrl_dp, true, cmn_dp, csd_dp);
 
             } // end if ctrl_file
 
@@ -411,7 +411,7 @@ static void process_ensemble() {
 
          // Read climo data with MET_ENS_MEMBER_ID set
          if(set_climo_ens_mem_id) {
-             get_climo_mean_stdev((*var_it), i_var,
+             get_climo_mean_stdev(var_it->get(), i_var,
                                   set_climo_ens_mem_id, i_ens,
                                   cmn_dp, csd_dp);
          }
@@ -423,7 +423,7 @@ static void process_ensemble() {
          }
 
          // Apply current data to the running sums and counts
-         track_counts(*var_it, ens_dp, false, cmn_dp, csd_dp);
+         track_counts(var_it->get(), ens_dp, false, cmn_dp, csd_dp);
 
          // Keep track of the maximum initialization time
          if(is_bad_data(max_init_ut) || ens_dp.init() > max_init_ut) {
@@ -446,7 +446,7 @@ static void process_ensemble() {
 
       // Write out the ensemble information to a NetCDF file
       ens_dp.set_init(max_init_ut);
-      write_ens_nc(*var_it, n_ens_vld, ens_dp, cmn_dp, csd_dp);
+      write_ens_nc(var_it->get(), n_ens_vld, ens_dp, cmn_dp, csd_dp);
 
    } // end for var_it
 

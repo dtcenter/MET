@@ -62,7 +62,7 @@ MetNcWrfDataFile & MetNcWrfDataFile::operator=(const MetNcWrfDataFile &) {
 
 void MetNcWrfDataFile::nc_wrf_init_from_scratch() {
 
-   WrfNc  = (WrfFile *) nullptr;
+   WrfNc.reset();
 
    close();
 
@@ -73,7 +73,7 @@ void MetNcWrfDataFile::nc_wrf_init_from_scratch() {
 
 void MetNcWrfDataFile::close() {
 
-   if(WrfNc) { delete WrfNc; WrfNc = (WrfFile *) nullptr; }
+   WrfNc.reset();
 
    return;
 }
@@ -84,7 +84,7 @@ bool MetNcWrfDataFile::open(const char * _filename) {
 
    close();
 
-   WrfNc = new WrfFile;
+   WrfNc = std::make_unique<WrfFile>();
 
    if(!WrfNc->open(_filename)) {
       mlog << Error << "\nMetNcWrfDataFile::open(const char *) -> "

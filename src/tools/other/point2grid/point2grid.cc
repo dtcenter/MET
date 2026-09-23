@@ -1224,7 +1224,7 @@ static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    }
 
    MetNcPointObsIn nc_point_obs;
-   nc_point_obs.set_netcdf(nc_in, true);
+   nc_point_obs.set_netcdf(nc_in);
    // Read the dimensions and variables
    nc_point_obs.read_dim_headers();
    nc_point_obs.check_nc(GET_NC_NAME_P(nc_in).c_str(), method_name_s);   // exit if missing dims/vars
