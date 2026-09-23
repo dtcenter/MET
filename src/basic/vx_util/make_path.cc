@@ -42,6 +42,13 @@ int make_path(const char * path, int mode)
 {
 
 
+   //
+   //  stat() and mkdir() both take a nonnull path, so reject a null one
+   //  here rather than at the first dereference below
+   //
+
+if ( !path )  return 0;
+
 if ( path_exists(path) )  return 1;
 
 int status;
@@ -52,19 +59,16 @@ const char *method_name = "make_path() ";
    //  make subpath: everything up to, but not including, the last '/'
    //
 
-if ( path )  {
-   std::string subpath(path);
-   auto slash = subpath.find_last_of('/');
-   subpath = (slash == std::string::npos) ? std::string() : subpath.substr(0, slash);
+std::string subpath(path);
+auto slash = subpath.find_last_of('/');
+subpath = (slash == std::string::npos) ? std::string() : subpath.substr(0, slash);
 
-   mlog << Debug(1) << "\n\n  " << method_name << "subpath = \"" << subpath << "\"\n\n";
+mlog << Debug(1) << "\n\n  " << method_name << "subpath = \"" << subpath << "\"\n\n";
 
-   if ( subpath.empty() )  return 0;
+if ( subpath.empty() )  return 0;
 
-   if ( !(path_exists(subpath.c_str())) )  {
-      make_path(subpath.c_str(), mode);
-   }
-
+if ( !(path_exists(subpath.c_str())) )  {
+   make_path(subpath.c_str(), mode);
 }
 
 status = mkdir(path, mode);
