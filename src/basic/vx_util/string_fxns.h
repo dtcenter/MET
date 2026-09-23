@@ -40,9 +40,7 @@ extern void strip_char(char *, const char);
 extern bool has_prefix(const char **prefix_list, int n_prefix,
                        const char *str);
 
-extern int regex_apply(const char* pat, int num_mat, const char* str, char** &mat);
-
-extern void regex_clean(char** &mat);
+extern int regex_apply(const char* pat, int num_mat, const char* str, StringArray &mat);
 
 extern ConcatString str_replace(const char* data, const char* old, const char* repl);
 

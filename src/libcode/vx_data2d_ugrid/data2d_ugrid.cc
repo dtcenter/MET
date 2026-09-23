@@ -680,21 +680,15 @@ long MetUGridDataFile::convert_value_to_offset(double z_value, string z_dim_name
 
 int MetUGridDataFile::extract_vlevels(const ConcatString &var_name_base, const char *var_name) {
    int num_mat = 0;
-   char** mat = nullptr;
+   StringArray mat;
    int vlevel = bad_data_int;
    ConcatString name_pattern;
 
    name_pattern.erase();
    name_pattern << "(" << var_name_base << "[ _])([0-9]+)(.*)";
    num_mat = regex_apply(name_pattern.c_str(), 4, var_name, mat);
-   if (2 < num_mat) vlevel = atoi(mat[2]);
+   if (2 < num_mat) vlevel = atoi(mat[2].c_str());
 
-   if (mat) {
-      for (int i = 0; i < num_mat; ++i) {
-         delete[] mat[i];   // free each row
-      }
-      delete[] mat;         // free the array of pointers
-   }
    return vlevel;
 }
 

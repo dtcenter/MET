@@ -177,11 +177,12 @@ class SeepsClimo : public SeepsClimoBase {
    private:
 
       int nstn;
-      std::map<int,SeepsClimoRecord *> seeps_score_00_map;
-      std::map<int,SeepsClimoRecord *> seeps_score_12_map;
+      std::map<int,std::unique_ptr<SeepsClimoRecord>> seeps_score_00_map;
+      std::map<int,std::unique_ptr<SeepsClimoRecord>> seeps_score_12_map;
 
-      SeepsClimoRecord *create_climo_record(int sid, double lat, double lon, double elv,
-                                            double *p1, double *p2, double *t1, double *t2, 
+      std::unique_ptr<SeepsClimoRecord> create_climo_record(
+                                            int sid, double lat, double lon, double elv,
+                                            double *p1, double *p2, double *t1, double *t2,
                                             double *scores);
       void print_record(SeepsClimoRecord *record, bool with_header=false);
       void read_records(const ConcatString &filename);

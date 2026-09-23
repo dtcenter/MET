@@ -667,7 +667,7 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
 
       //  parse the level string components
       int num_mat = 0;
-      char** mat = nullptr;
+      StringArray mat;
       const char* pat_mag = "([ALPRZ])([0-9\\.]+)(\\-[0-9\\.]+)?";
       if( 3 > (num_mat = regex_apply(pat_mag, 4, field_level.text(), mat)) ){
          mlog << Error << "\nVarInfo::set_level_info_grib() - failed to parse level string '"
@@ -681,7 +681,6 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
          lvl_val2 = mat[3];
          lvl2 = atof( lvl_val2.substr(1, lvl_val2.length() - 1).data() );
       }
-      regex_clean(mat);
 
       //  set the level type based on the letter abbreviation
       if      (lvl_type == "A") lt = LevelType_Accum;

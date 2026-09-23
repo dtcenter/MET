@@ -712,7 +712,7 @@ void PairBase::calc_obs_summary(){
       station_values_t * svt = &map_val[map_key[i]];
 
       //  parse the single key string
-      char** mat = nullptr;
+      StringArray mat;
       if( 5 != regex_apply("^([^:]+):([^:]+):([^:]+):([^:]+)$", 5,
                            map_key[i].c_str(), mat) ){
          mlog << Error << "\nPairBase::calc_obs_summary() -> "
@@ -722,12 +722,10 @@ void PairBase::calc_obs_summary(){
       }
 
       string msg_key = str_format("%s:%s:%s:%s",
-                                  mat[1], mat[2],
-                                  mat[3], mat[4]).text();
+                                  mat[1].c_str(), mat[2].c_str(),
+                                  mat[3].c_str(), mat[4].c_str()).text();
 
       ob_val_t ob;
-
-      regex_clean(mat);
 
       switch(obs_summary) {
          case ObsSummary::Nearest:

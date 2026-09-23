@@ -36,8 +36,8 @@ using namespace netCDF;
 
 bool standalone_debug_seeps = false;
 
-static SeepsClimo *seeps_climo = nullptr;
-static std::map<int,SeepsClimoGrid *> seeps_climo_grid_map_00;
+static std::unique_ptr<SeepsClimo> seeps_climo;
+static std::map<int,std::unique_ptr<SeepsClimoGrid>> seeps_climo_grid_map_00;
 
 static const char *var_name_sid       = "sid";
 static const char *var_name_lat       = "lat";
@@ -52,14 +52,14 @@ double weighted_average(double, double, double, double);
 ////////////////////////////////////////////////////////////////////////
 
 SeepsClimo *get_seeps_climo(const ConcatString &seeps_point_climo_name) {
-   if (! seeps_climo) seeps_climo = new SeepsClimo(seeps_point_climo_name);
-   return seeps_climo;
+   if (! seeps_climo) seeps_climo = std::make_unique<SeepsClimo>(seeps_point_climo_name);
+   return seeps_climo.get();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void release_seeps_climo() {
-   if (seeps_climo) { delete seeps_climo; seeps_climo = nullptr; }
+   seeps_climo.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -67,22 +67,18 @@ void release_seeps_climo() {
 SeepsClimoGrid *get_seeps_climo_grid(int month, const ConcatString &seeps_grid_climo_name, int hour) {
 
    if (seeps_climo_grid_map_00.count(month) == 0) {
-      seeps_climo_grid_map_00[month] = nullptr;
-      seeps_climo_grid_map_00[month] = new SeepsClimoGrid(month, hour, seeps_grid_climo_name);
+      seeps_climo_grid_map_00[month] =
+         std::make_unique<SeepsClimoGrid>(month, hour, seeps_grid_climo_name);
    }
 
-   return seeps_climo_grid_map_00[month];
+   return seeps_climo_grid_map_00[month].get();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void release_seeps_climo_grid(int month, int hour) {
 
-   if (seeps_climo_grid_map_00.count(month) > 0) {
-      delete seeps_climo_grid_map_00[month];
-      seeps_climo_grid_map_00[month] = nullptr;
-      seeps_climo_grid_map_00.erase(month);
-   }
+   seeps_climo_grid_map_00.erase(month);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -261,15 +257,6 @@ SeepsClimo::~SeepsClimo() {
 
 void SeepsClimo::clear() {
    SeepsClimoBase::clear();
-   for (map<int,SeepsClimoRecord *>::iterator it=seeps_score_00_map.begin();
-        it!=seeps_score_00_map.end(); ++it) {
-      delete it->second;
-   }
-
-   for (map<int,SeepsClimoRecord *>::iterator it=seeps_score_12_map.begin();
-        it!=seeps_score_12_map.end(); ++it) {
-      delete it->second;
-   }
 
    seeps_score_00_map.clear();
    seeps_score_12_map.clear();
@@ -277,11 +264,11 @@ void SeepsClimo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsClimoRecord *SeepsClimo::create_climo_record(
+std::unique_ptr<SeepsClimoRecord> SeepsClimo::create_climo_record(
       int sid, double lat, double lon, double elv,
       double *p1, double *p2, double *t1, double *t2, double *scores) {
    int offset;
-   SeepsClimoRecord *record = new SeepsClimoRecord();
+   auto record = std::make_unique<SeepsClimoRecord>();
    const char *method_name = "SeepsClimo::create_climo_record() -> ";
    
    record->sid = sid;
@@ -328,14 +315,14 @@ std::unique_ptr<SeepsRecord> SeepsClimo::get_record(int sid, int month, int hour
 
    if (is_seeps_ready()) {
       SeepsClimoRecord *climo_record = nullptr;
-      map<int,SeepsClimoRecord *>::iterator it;
+      std::map<int,std::unique_ptr<SeepsClimoRecord>>::iterator it;
       if (hour < 6 || hour >= 18) {
          it = seeps_score_00_map.find(sid);
-         if (it != seeps_score_00_map.end()) climo_record = it->second;
+         if (it != seeps_score_00_map.end()) climo_record = it->second.get();
       }
       else {
          it = seeps_score_12_map.find(sid);
-         if (it != seeps_score_12_map.end()) climo_record = it->second;
+         if (it != seeps_score_12_map.end()) climo_record = it->second.get();
       }
       if (nullptr != climo_record) {
          double p1 = climo_record->p1[month-1];
@@ -453,18 +440,18 @@ void SeepsClimo::print_all() {
    cout << "===============  00Z  ===============\n";
    cout << "  sid\tlat\tlon\telv\n";
    cout << "\tmonth\tp1\tp2\tt1\tt2\tscores (3 by 3 matrix)\n";
-   for (map<int,SeepsClimoRecord *>::iterator it=seeps_score_00_map.begin();
+   for (auto it=seeps_score_00_map.begin();
         it!=seeps_score_00_map.end(); ++it) {
-      print_record(it->second);
+      print_record(it->second.get());
    }
 
    cout << "\n";
    cout << "===============  12Z  ===============\n";
    cout << "  sid\tlat\tlon\telv\n";
    cout << "\tmonth\tp1\tp2\tt1\tt2\tscores (3 by 3 matrix)\n";
-   for (map<int,SeepsClimoRecord *>::iterator it=seeps_score_12_map.begin();
+   for (auto it=seeps_score_12_map.begin();
         it!=seeps_score_12_map.end(); ++it) {
-      print_record(it->second);
+      print_record(it->second.get());
    }
 
 }
@@ -632,8 +619,8 @@ void SeepsClimo::read_seeps_climo_grid(const ConcatString &filename) {
          exit(1);
       }
 
-      SeepsClimoRecord *rec_00;
-      SeepsClimoRecord *rec_12;
+      std::unique_ptr<SeepsClimoRecord> rec_00;
+      std::unique_ptr<SeepsClimoRecord> rec_12;
       for (int idx=0; idx<nstn; idx++) {
          int sid = sid_array[idx];
          int start_offset = idx * SEEPS_MONTH;
@@ -657,8 +644,8 @@ void SeepsClimo::read_seeps_climo_grid(const ConcatString &filename) {
                                       p1_00_buf, p2_00_buf, t1_00_buf, t2_00_buf, matrix_00_buf);
          rec_12 = create_climo_record(sid, lat_array[idx], lon_array[idx], elv_array[idx],
                                       p1_12_buf, p2_12_buf, t1_12_buf, t2_12_buf, matrix_12_buf);
-         seeps_score_00_map[sid] = rec_00;
-         seeps_score_12_map[sid] = rec_12;
+         seeps_score_00_map[sid] = std::move(rec_00);
+         seeps_score_12_map[sid] = std::move(rec_12);
       }
 
       nc_file.reset();
