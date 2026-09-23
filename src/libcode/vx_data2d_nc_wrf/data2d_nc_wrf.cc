@@ -62,7 +62,7 @@ MetNcWrfDataFile & MetNcWrfDataFile::operator=(const MetNcWrfDataFile &) {
 
 void MetNcWrfDataFile::nc_wrf_init_from_scratch() {
 
-   WrfNc  = (WrfFile *) nullptr;
+   WrfNc.reset();
 
    close();
 
@@ -73,7 +73,7 @@ void MetNcWrfDataFile::nc_wrf_init_from_scratch() {
 
 void MetNcWrfDataFile::close() {
 
-   if(WrfNc) { delete WrfNc; WrfNc = (WrfFile *) nullptr; }
+   WrfNc.reset();
 
    return;
 }
@@ -84,7 +84,7 @@ bool MetNcWrfDataFile::open(const char * _filename) {
 
    close();
 
-   WrfNc = new WrfFile;
+   WrfNc = std::make_unique<WrfFile>();
 
    if(!WrfNc->open(_filename)) {
       mlog << Error << "\nMetNcWrfDataFile::open(const char *) -> "
@@ -96,11 +96,11 @@ bool MetNcWrfDataFile::open(const char * _filename) {
 
    Filename = _filename;
 
-   Raw_Grid = new Grid;
+   Raw_Grid = std::make_unique<Grid>();
 
    (*Raw_Grid) = WrfNc->grid;
 
-   Dest_Grid = new Grid;
+   Dest_Grid = std::make_unique<Grid>();
 
    (*Dest_Grid) = (*Raw_Grid);
 
@@ -131,13 +131,13 @@ bool MetNcWrfDataFile::get_real_dimension(const VarInfoNcWrf *vinfo_nc,
 
       if (dimension[k] != vx_data2d_dim_by_value && dimension[k] != range_flag) continue;
 
-      string dim_name = GET_NC_NAME(get_nc_dim(info->var, k));
-      NcVarInfo *var_info = find_var_info_by_dim_name(WrfNc->Var, dim_name,
+      string dim_name = GET_NC_NAME(get_nc_dim(info->var.get(), k));
+      NcVarInfo *var_info = find_var_info_by_dim_name(WrfNc->Var.data(), dim_name,
                                                          WrfNc->Nvars);
       if (var_info == nullptr) continue;
 
       if (dimension[k] == vx_data2d_dim_by_value) {
-         long new_offset = get_index_at_nc_data(var_info->var,
+         long new_offset = get_index_at_nc_data(var_info->var.get(),
                                                 vinfo_nc->dim_value(k),
                                                 dim_name, (k == info->t_slot));
          if (new_offset != bad_data_int) dimension[k] = new_offset;
@@ -153,7 +153,7 @@ bool MetNcWrfDataFile::get_real_dimension(const VarInfoNcWrf *vinfo_nc,
       else if (dimension[k] == range_flag) {
          double lower = vinfo_nc->level().lower();
          double upper = vinfo_nc->level().upper();
-         long new_offset = get_index_at_nc_data(var_info->var, lower, upper,
+         long new_offset = get_index_at_nc_data(var_info->var.get(), lower, upper,
                                                 dim_name, (k == info->t_slot));
          if (new_offset != bad_data_int) dimension[k] = new_offset;
          else {

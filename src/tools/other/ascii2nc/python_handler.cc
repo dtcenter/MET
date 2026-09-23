@@ -246,7 +246,14 @@ user_base.chomp(".py");
    //  start up the python interpreter
    //
 
-Python3_Script *script = get_python3_script();
+   //
+   //  deliberately leaked: ~Python3_Script calls Py_Finalize(), and the
+   //  PyObject values taken from this script are used after this call
+   //  returns.  This matches the previous behaviour, where the raw
+   //  pointer was simply never deleted.
+   //
+
+Python3_Script *script = get_python3_script().release();
 
    //
    //  set up a "new" sys.argv list
@@ -372,7 +379,14 @@ if ( status )  {
 
 }
 
-Python3_Script *script = get_python3_script();
+   //
+   //  deliberately leaked: ~Python3_Script calls Py_Finalize(), and the
+   //  PyObject values taken from this script are used after this call
+   //  returns.  This matches the previous behaviour, where the raw
+   //  pointer was simply never deleted.
+   //
+
+Python3_Script *script = get_python3_script().release();
 
 mlog << Debug(4) << "Reading temporary Python ascii observation file: "
      << tmp_ascii_path << "\n";

@@ -23,6 +23,7 @@
 
 
 #include "string_array.h"
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -40,9 +41,9 @@ class Wchar_Argv {
       Wchar_Argv & operator=(const Wchar_Argv &);
 
 
-      wchar_t * W_Buf;        //  allocated
+      std::vector<wchar_t> W_Buf;
 
-      wchar_t ** W_Argv;      //  allocated
+      std::vector<wchar_t *> W_Argv;
 
       int Argc;
 
@@ -81,7 +82,7 @@ class Wchar_Argv {
 
 inline int Wchar_Argv::wargc() const { return Argc; }
 
-inline wchar_t ** Wchar_Argv::wargv() const { return W_Argv; }
+inline wchar_t ** Wchar_Argv::wargv() const { return const_cast<wchar_t **>(W_Argv.data()); }
 
 
 ////////////////////////////////////////////////////////////////////////

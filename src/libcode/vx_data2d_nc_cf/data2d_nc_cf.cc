@@ -79,7 +79,7 @@ MetNcCFDataFile & MetNcCFDataFile::operator=(const MetNcCFDataFile &) {
 
 void MetNcCFDataFile::nccf_init_from_scratch() {
 
-   _file = (NcCfFile *) nullptr;
+   _file.reset();
    cur_time_index = -1;
    cur_z_index = -1;
 
@@ -113,7 +113,7 @@ NcVarInfo *MetNcCFDataFile::find_first_data_var() {
 
 void MetNcCFDataFile::close() {
 
-   if(_file) { delete _file; _file = (NcCfFile *) nullptr; }
+   _file.reset();
 
    return;
 }
@@ -124,7 +124,7 @@ bool MetNcCFDataFile::open(const char * _filename) {
 
    close();
 
-   _file = new NcCfFile;
+   _file = std::make_unique<NcCfFile>();
 
    if(!_file->open(_filename)) {
       mlog << Error << "\nMetNcCFDataFile::open(const char *) -> "
@@ -136,11 +136,11 @@ bool MetNcCFDataFile::open(const char * _filename) {
 
    Filename = _filename;
 
-   Raw_Grid = new Grid;
+   Raw_Grid = std::make_unique<Grid>();
 
    (*Raw_Grid) = _file->grid;
 
-   Dest_Grid = new Grid;
+   Dest_Grid = std::make_unique<Grid>();
 
    (*Dest_Grid) = (*Raw_Grid);
 
@@ -862,9 +862,9 @@ long MetNcCFDataFile::convert_generic_to_offset(double value, const string &dim_
    }
 
    if (offset == (long) bad_data_int && !dim_name.empty()) {
-      NcVarInfo *var_info = find_var_info_by_dim_name(_file->Var, dim_name, _file->Nvars);
+      NcVarInfo *var_info = find_var_info_by_dim_name(_file->Var.data(), dim_name, _file->Nvars);
       if (var_info) {
-         long new_offset = get_index_at_nc_data(var_info->var, value, dim_name);
+         long new_offset = get_index_at_nc_data(var_info->var.get(), value, dim_name);
          if (new_offset != bad_data_int) offset = new_offset;
       }
    }
@@ -1097,10 +1097,10 @@ long MetNcCFDataFile::find_generic_offset(VarInfo &vinfo, const NcVarInfo *data_
    string dim_name = get_dim_name(data_var, index);
    NcVarInfo* dim_var_info = _file->find_var_by_dim_name(dim_name.c_str());
 
-   int dim_size = get_data_size(dim_var_info->var);
+   int dim_size = get_data_size(dim_var_info->var.get());
    vector<double> values(dim_size);
 
-   if( !get_nc_data(dim_var_info->var, values.data()) ) {
+   if( !get_nc_data(dim_var_info->var.get(), values.data()) ) {
       mlog << Error << "\n" << method_name << "failed to get data from " << dim_name << "\n\n";
       exit(1);
    }
@@ -1153,7 +1153,7 @@ NcVarInfo *MetNcCFDataFile::get_data_var(VarInfo &vinfo) {
 string MetNcCFDataFile::get_dim_name(const NcVarInfo *data_var, int index) const {
    string dim_name;
    if (index >= 0) {
-      NcDim dim = get_nc_dim(data_var->var, index);
+      NcDim dim = get_nc_dim(data_var->var.get(), index);
       if (IS_VALID_NC(dim)) dim_name = GET_NC_NAME(dim);
    }
    return dim_name;

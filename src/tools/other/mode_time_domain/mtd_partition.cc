@@ -109,8 +109,6 @@ void EquivalenceClass::init_from_scratch()
 
 {
 
-E = (int *) nullptr;
-
 clear();
 
 return;
@@ -125,9 +123,7 @@ void EquivalenceClass::clear()
 
 {
 
-if ( E )  { delete [] E;  E = (int *) nullptr; }
-
-Nelements = Nalloc = 0;
+E.clear();
 
 return;
 
@@ -141,53 +137,7 @@ void EquivalenceClass::assign(const EquivalenceClass & c)
 
 {
 
-clear();
-
-if ( !(c.E) )  return;
-
-extend(c.Nelements);
-
-int j;
-
-for (j=0; j<(c.Nelements); ++j)  E[j] = c.E[j];
-
-Nelements = c.Nelements;
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void EquivalenceClass::extend(int n)
-
-{
-
-if ( Nalloc >= n )  return;
-
-n = eq_alloc_inc*((n + eq_alloc_inc - 1)/eq_alloc_inc);
-
-int * u = new int [n];
-
-memset(u, 0, n*sizeof(int));
-
-if ( E )  {
-
-   memcpy(u, E, Nelements*sizeof(int));
-
-   delete [] E;  E = (int *) nullptr;
-
-}
-
-E = u;  u = (int *) nullptr;
-
-Nalloc = n;
+E = c.E;
 
    //
    //  done
@@ -207,11 +157,7 @@ void EquivalenceClass::add_no_repeat(int k)
 
 if ( has(k) )  return;
 
-if (Nelements < 0) Nelements = 0;
-
-extend(Nelements + 1);
-
-E[Nelements++] = k;
+E.push_back(k);
 
    //
    //  done
@@ -229,7 +175,7 @@ int EquivalenceClass::element(int k) const
 
 {
 
-if ( (k < 0) || (k >= Nelements) )  {
+if ( (k < 0) || (k >= n_elements()) )  {
 
    mlog << Error << "\nEquivalenceClass::element(int) const -> "
         << "range check error\n\n";
@@ -253,15 +199,15 @@ void EquivalenceClass::dump(ostream & out, int depth) const
 
 Indent prefix(depth);
 
-out << prefix << '(' << Nelements << ") {";
+out << prefix << '(' << n_elements() << ") {";
 
 int j;
 
-for (j=0; j<Nelements; ++j)  {
+for (j=0; j<n_elements(); ++j)  {
 
    out << E[j];
 
-   if ( j != (Nelements - 1) )  out << ',';
+   if ( j != (n_elements() - 1) )  out << ',';
 
 }
 
@@ -285,17 +231,23 @@ int EquivalenceClass::n_max() const
 
 {
 
-if ( Nelements == 0 )  return 0;
+if ( E.empty() )  return 0;
 
 int j, n;
 
 n = E[0];
 
-for (j=1; j<Nelements; ++j)  {
+for (j=1; j<n_elements(); ++j)  {
 
    n = max(n, E[j]);
 
 }
+
+   //
+   //  NOTE: returns 0, not n.  That is what this has always done; it is a
+   //  bug, but fixing it would change mtd output and is not this commit's
+   //  to make.
+   //
 
 return 0;
 
@@ -371,8 +323,6 @@ void Mtd_Partition::init_from_scratch()
 
 {
 
-C = (EquivalenceClass **) nullptr;
-
 clear();
 
 return;
@@ -387,21 +337,7 @@ void Mtd_Partition::clear()
 
 {
 
-int j;
-
-if ( C )  {
-
-   for (j=0; j<Nalloc; ++j)  {
-
-      if ( C[j] )  { delete C[j];  C[j] = (EquivalenceClass *) nullptr; }
-
-   }
-
-   delete [] C;   C = (EquivalenceClass **) nullptr;
-
-}
-
-Nelements = Nalloc = 0;
+C.clear();
 
 return;
 
@@ -417,59 +353,13 @@ void Mtd_Partition::assign(const Mtd_Partition & p)
 
 clear();
 
-if ( !(p.C) )  return;
+C.reserve(p.C.size());
 
-extend(p.Nelements);
+for (const auto & c : p.C)  {
 
-int j;
-
-for (j=0; j<(p.Nelements); ++j)  {
-
-   C[j] = new EquivalenceClass;
-
-   *(C[j]) = *(p.C[j]);
+   C.push_back(std::make_unique<EquivalenceClass>(*c));
 
 }
-
-Nelements = p.Nelements;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void Mtd_Partition::extend(int n)
-
-{
-
-if ( n <= Nalloc )  return;
-
-EquivalenceClass ** u = (EquivalenceClass **) nullptr;
-
-n = mtd_partition_alloc_inc*((n + mtd_partition_alloc_inc - 1)/mtd_partition_alloc_inc);
-
-u = new EquivalenceClass * [n];
-
-memset(u, 0, n*(sizeof(EquivalenceClass *)));
-
-if ( C )  {
-
-   memcpy(u, C, Nelements*(sizeof(EquivalenceClass *)));
-
-   delete [] C;  C = (EquivalenceClass **) nullptr;
-
-}
-
-C = u;  u = (EquivalenceClass **) nullptr;
-
-Nalloc = n;
-
-   //
-   //  done
-   //
 
 return;
 
@@ -486,9 +376,9 @@ void Mtd_Partition::dump(ostream & out, int depth) const
 int j;
 Indent prefix(depth);
 
-out << prefix << '[' << Nelements << " equivalence classes]\n";
+out << prefix << '[' << n_elements() << " equivalence classes]\n";
 
-for (j=0; j<Nelements; ++j)  {
+for (j=0; j<n_elements(); ++j)  {
 
    C[j]->dump(out, depth + 1);
 
@@ -514,7 +404,7 @@ bool Mtd_Partition::has(int index, int k) const
 
 {
 
-if ( (index < 0) || (index >= Nelements) )  {
+if ( (index < 0) || (index >= n_elements()) )  {
 
    mlog << Error << "\nMtd_Partition::has(int index, int k) const -> "
         << "range check error on index\n\n";
@@ -538,7 +428,7 @@ int Mtd_Partition::which_class(int k) const
 
 int j;
 
-for (j=0; j<Nelements; ++j)  {
+for (j=0; j<n_elements(); ++j)  {
 
    if ( C[j]->has(k) )  return j;
 
@@ -557,7 +447,7 @@ void Mtd_Partition::merge_classes(int nclass_1, int nclass_2)
 
 {
 
-if ( (nclass_1 < 0) || (nclass_1 >= Nelements) || (nclass_2 < 0) || (nclass_2 >= Nelements) )  {
+if ( (nclass_1 < 0) || (nclass_1 >= n_elements()) || (nclass_2 < 0) || (nclass_2 >= n_elements()) )  {
 
    mlog << Error << "\nMtd_Partition::merge_classes() -> "
         << "range check error\n\n";
@@ -577,10 +467,10 @@ EquivalenceClass * c_max = (EquivalenceClass *) nullptr;
 n_class_min = min(nclass_1, nclass_2);
 n_class_max = max(nclass_1, nclass_2);
 
-c_min = C[n_class_min];
-c_max = C[n_class_max];
+c_min = C[n_class_min].get();
+c_max = C[n_class_max].get();
 
-n = c_max->Nelements;
+n = c_max->n_elements();
 
 for (k=0; k<n; ++k)  {
 
@@ -589,15 +479,13 @@ for (k=0; k<n; ++k)  {
 }
 
 
-for (k=n_class_max; k<(Nelements - 1); ++k)  {
+   //
+   //  erase shifts the tail down AND frees the merged-away class, which the
+   //  hand-written shift below did not: it overwrote C[n_class_max] and
+   //  nulled the last slot, leaking c_max.
+   //
 
-   C[k] = C[k + 1];
-
-}
-
-C[Nelements - 1] = (EquivalenceClass *) nullptr;
-
---Nelements;
+C.erase(C.begin() + n_class_max);
 
 return;
 
@@ -646,15 +534,9 @@ void Mtd_Partition::add_no_repeat(int k)
 
 if ( has(k) )  return;
 
-if (Nelements < 0) Nelements = 0;
+C.push_back(std::make_unique<EquivalenceClass>());
 
-extend(Nelements + 1);
-
-C[Nelements] = new EquivalenceClass;
-
-C[Nelements]->add_no_repeat(k);
-
-++Nelements;
+C.back()->add_no_repeat(k);
 
 return;
 
@@ -668,7 +550,7 @@ const EquivalenceClass * Mtd_Partition::operator()(int k) const
 
 {
 
-if ( (k < 0) || (k >= Nelements) )  {
+if ( (k < 0) || (k >= n_elements()) )  {
 
    mlog << Error << "\nMtd_Partition::operator()(int) const -> "
         << "range check error\n\n";
@@ -678,7 +560,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 }
 
 
-return C[k];
+return C[k].get();
 
 }
 
@@ -698,11 +580,11 @@ ConcatString s;
 ConcatString out;
 StringArray a;
 
-out << '[' << Nelements << " equivalence classes]\n";
+out << '[' << n_elements() << " equivalence classes]\n";
 
-for (j=0; j<Nelements; ++j)  {
+for (j=0; j<n_elements(); ++j)  {
 
-   c = C[j];
+   c = C[j].get();
 
    a.clear();
 

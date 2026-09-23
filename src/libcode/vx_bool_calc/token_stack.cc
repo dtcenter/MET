@@ -97,8 +97,6 @@ void TokenStack::init_from_scratch()
 
 {
 
-e = (Token *) nullptr;
-
 AllocInc = 50;   //  default value
 
 clear();
@@ -115,13 +113,7 @@ void TokenStack::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (Token *) nullptr; }
-
-
-
-Nelements = 0;
-
-Nalloc = 0;
+e.clear();
 
 // AllocInc = 50;   //  don't reset AllocInc
 
@@ -142,58 +134,7 @@ clear();
 
 if ( _a.depth() == 0 )  return;
 
-extend(_a.depth());
-
-int j;
-
-for (j=0; j<(_a.depth()); ++j)  {
-
-   e[j] = _a.e[j];
-
-}
-
-Nelements = _a.Nelements;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void TokenStack::extend(int n)
-
-{
-
-if ( n <= Nalloc )  return;
-
-n = AllocInc*( (n + AllocInc - 1)/AllocInc );
-
-int j;
-Token * u = new Token [n];
-
-if ( !u )  {
-
-   cout << "TokenStack::extend(int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for(j=0; j<Nelements; ++j)  {
-
-   u[j] = e[j];
-
-}
-
-if ( e )  { delete [] e;  e = (Token *) nullptr; }
-
-e = u;
-
-u = (Token *) nullptr;
-
-Nalloc = n;
+e = _a.e;
 
 return;
 
@@ -209,13 +150,13 @@ void TokenStack::dump(ostream & out, int _depth_) const
 
 Indent prefix(_depth_);
 
-out << prefix << "Nelements = " << Nelements << "\n";
+out << prefix << "Nelements = " << e.size() << "\n";
 // out << prefix << "Nalloc    = " << Nalloc    << "\n";
 // out << prefix << "AllocInc  = " << AllocInc  << "\n";
 
 int j;
 
-for(j=0; j<Nelements; ++j)  {
+for(j=0; j<(int) e.size(); ++j)  {
 
    // out << prefix << "Element # " << j << " ... \n";
    // e[j].dump(out, _depth_ + 1);
@@ -262,9 +203,7 @@ void TokenStack::push(const Token & a)
 
 {
 
-extend(Nelements + 1);
-
-e[Nelements++] = a;
+e.push_back(a);
 
 return;
 
@@ -278,7 +217,7 @@ Token TokenStack::pop()
 
 {
 
-if ( Nelements <= 0 )  {
+if ( e.empty() )  {
 
    cout << "TokenStack::pop() -> stack empty!\n\n";
 
@@ -286,9 +225,9 @@ if ( Nelements <= 0 )  {
 
 }
 
-Token _t = e[Nelements - 1];
+Token _t = e.back();
 
---Nelements;
+e.pop_back();
 
 return _t;
 
@@ -302,7 +241,7 @@ Token TokenStack::peek() const
 
 {
 
-if ( Nelements <= 0 )  {
+if ( e.empty() )  {
 
    cout << "TokenStack::pop() -> stack empty!\n\n";
 
@@ -310,7 +249,7 @@ if ( Nelements <= 0 )  {
 
 }
 
-Token _t = e[Nelements - 1];
+Token _t = e.back();
 
 return _t;
 
@@ -324,7 +263,7 @@ int TokenStack::top_prec() const   //  the "in" prec
 
 {
 
-if ( Nelements <= 0 )  {
+if ( e.empty() )  {
 
    cout << "TokenStack::top_prec() -> stack empty!\n\n";
 
@@ -332,7 +271,7 @@ if ( Nelements <= 0 )  {
 
 }
 
-int k = e[Nelements - 1].in_prec;
+int k = e.back().in_prec;
 
 return k;
 
@@ -346,7 +285,7 @@ char TokenStack::top_value() const
 
 {
 
-if ( Nelements <= 0 )  {
+if ( e.empty() )  {
 
    cout << "TokenStack::top_value() -> stack empty!\n\n";
 
@@ -354,7 +293,7 @@ if ( Nelements <= 0 )  {
 
 }
 
-char c = e[Nelements - 1].value;
+char c = e.back().value;
 
 return c;
 
@@ -369,7 +308,7 @@ bool TokenStack::top_is_mark() const
 
 {
 
-if ( Nelements <= 0 )  {
+if ( e.empty() )  {
 
    cout << "TokenStack::top_is_mark() -> stack empty!\n\n";
 
@@ -377,7 +316,7 @@ if ( Nelements <= 0 )  {
 
 }
 
-bool tf = e[Nelements - 1].is_mark();
+bool tf = e.back().is_mark();
 
 return tf;
 

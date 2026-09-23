@@ -51,11 +51,8 @@ GridTemplate::GridTemplate(void) :
 GridTemplate::GridTemplate(const GridTemplate& rhs) {
    _wrapLon = rhs._wrapLon;
 
-   vector<GridOffset*>::const_iterator offset_iter;
-
-   for (offset_iter = rhs._offsetList.begin();
-        offset_iter != rhs._offsetList.end(); ++offset_iter)
-      _offsetList.emplace_back(new GridOffset(*offset_iter));
+   for (const auto & offset : rhs._offsetList)
+      _offsetList.emplace_back(std::make_unique<GridOffset>(*offset));
 
    _pointInGridBase   = rhs._pointInGridBase;
    _pointInGridNumX   = rhs._pointInGridNumX;
@@ -67,13 +64,7 @@ GridTemplate::GridTemplate(const GridTemplate& rhs) {
 
 GridTemplate::~GridTemplate(void) {
 
-   // Reclaim the space for the offset list
-   vector<GridOffset*>::iterator list_iter;
-   for(list_iter = _offsetList.begin(); list_iter != _offsetList.end();
-       ++list_iter)
-      delete *list_iter;
-
-   _offsetList.erase(_offsetList.begin(), _offsetList.end());
+   _offsetList.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,7 +101,7 @@ GridPoint *GridTemplate::getFirstInGrid(
 GridPoint *GridTemplate::getNextInGrid(void) const {
 
    while (_pointInGridIterator != _offsetList.end()) {
-      GridOffset *offset = *_pointInGridIterator;
+      const GridOffset *offset = _pointInGridIterator->get();
 
       _pointInGridIterator++;
 
@@ -167,7 +158,7 @@ GridPoint *GridTemplate::getNext(void) const {
 
    GridPoint *next_point = (GridPoint *)nullptr;
    if(_pointInGridIterator != _offsetList.end()) {
-      GridOffset *offset = *_pointInGridIterator;
+      const GridOffset *offset = _pointInGridIterator->get();
 
       _pointInGridIterator++;
 
@@ -480,12 +471,7 @@ void GridTemplate::incBaseY(const int &y_inc) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void GridTemplate::printOffsetList(FILE *stream) {
-   vector< GridOffset* >::iterator ol_iterator;
-
-   for(ol_iterator  = _offsetList.begin();
-       ol_iterator != _offsetList.end();
-       ol_iterator++) {
-      GridOffset *offset = *ol_iterator;
+   for(const auto & offset : _offsetList) {
 
       double x = (double)offset->x_offset;
       double y = (double)offset->y_offset;
@@ -504,9 +490,7 @@ void GridTemplate::printOffsetList(FILE *stream) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void GridTemplate::_addOffset(int x_offset, int y_offset) {
-   GridOffset *offset = new GridOffset(x_offset, y_offset);
-
-   _offsetList.emplace_back(offset);
+   _offsetList.emplace_back(std::make_unique<GridOffset>(x_offset, y_offset));
 
    return;
 }
@@ -518,7 +502,6 @@ void GridTemplate::_addOffset(int x_offset, int y_offset) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void GridTemplate::_setEdgeOffsets() {
-   vector<GridOffset*>::iterator v_iterator;
    map<int, GridOffset*>::iterator m_iterator;
    map<int, GridOffset*> min_x_by_y;
    map<int, GridOffset*> max_x_by_y;
@@ -530,10 +513,8 @@ void GridTemplate::_setEdgeOffsets() {
    // For each row, find the min/max col.
    // For each col, find the min/max row.
 
-   for(v_iterator  = _offsetList.begin();
-       v_iterator != _offsetList.end();
-       v_iterator++) {
-      GridOffset *offset = *v_iterator;
+   for(const auto & offset_ptr : _offsetList) {
+      GridOffset *offset = offset_ptr.get();
       x = offset->x_offset;
       y = offset->y_offset;
 
@@ -647,7 +628,7 @@ string GridTemplateFactory::enum2String(GridTemplates target) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-GridTemplate* GridTemplateFactory::buildGT(string gt, int width, bool wrap_lon) {
+std::unique_ptr<GridTemplate> GridTemplateFactory::buildGT(string gt, int width, bool wrap_lon) {
    return buildGT(string2Enum(gt), width, wrap_lon);
 }
 
@@ -657,14 +638,14 @@ GridTemplate* GridTemplateFactory::buildGT(string gt, int width, bool wrap_lon) 
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-GridTemplate* GridTemplateFactory::buildGT(GridTemplates gt, int width, bool wrap_lon) {
+std::unique_ptr<GridTemplate> GridTemplateFactory::buildGT(GridTemplates gt, int width, bool wrap_lon) {
 
    switch (gt) {
       case GridTemplates::Square:
-         return new RectangularTemplate(width, width, wrap_lon);
+         return std::make_unique<RectangularTemplate>(width, width, wrap_lon);
 
       case GridTemplates::Circle:
-         return new CircularTemplate(width, wrap_lon);
+         return std::make_unique<CircularTemplate>(width, wrap_lon);
 
       default:
          mlog << Error << "\nbuildGT() -> "

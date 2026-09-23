@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <iostream>
 
 #include "vx_config.h"
@@ -86,8 +87,8 @@ class MtdConfigInfo {
       ConcatString     desc;                   // Description
       ConcatString     obtype;                 // Observation type
 
-      VarInfo *        fcst_info;              // allocated
-      VarInfo *        obs_info;               // allocated
+      std::unique_ptr<VarInfo> fcst_info;
+      std::unique_ptr<VarInfo> obs_info;
 
       int              fcst_conv_radius;       // Convolution radius in grid squares
       int              obs_conv_radius;

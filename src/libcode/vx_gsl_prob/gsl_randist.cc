@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
+#include <vector>
 
 #include "vx_log.h"
 #include "gsl_randist.h"
@@ -137,18 +138,15 @@ void ran_shuffle(const gsl_rng *r, double *base, int n) {
 
 void ran_shuffle(const gsl_rng *r, NumArray &na) {
    int n, i;
-   double *arr = (double *) nullptr;
 
-   n   = na.n_elements();
-   arr = new double [n];
+   n = na.n_elements();
+   vector<double> arr(n);
 
    for(i=0; i<n; i++) arr[i] = na[i];
 
-   ran_shuffle(r, arr, n);
+   ran_shuffle(r, arr.data(), n);
 
    for(i=0; i<n; i++) na.set(i, arr[i]);
-
-   if(arr) { delete[] arr; arr = (double *) nullptr; }
 
    return;
 }
@@ -181,21 +179,17 @@ void ran_choose(const gsl_rng *r, double *src,  int n,
 void ran_choose(const gsl_rng *r, NumArray &src_na,
                                   NumArray &dest_na, int k) {
    int n, i;
-   double *src = (double *) 0, *dest = (double *) nullptr;
 
-   n    = src_na.n_elements();
-   src  = new double [n];
-   dest = new double [k];
+   n = src_na.n_elements();
+   vector<double> src(n);
+   vector<double> dest(k);
 
    for(i=0; i<n; i++) src[i] = src_na[i];
 
-   ran_choose(r, src, n, dest, k);
+   ran_choose(r, src.data(), n, dest.data(), k);
 
    dest_na.clear();
    for(i=0; i<k; i++) dest_na.add(dest[i]);
-
-   if(src)  { delete[] src;  src  = (double *) nullptr; }
-   if(dest) { delete[] dest; dest = (double *) nullptr; }
 
    return;
 }
@@ -220,22 +214,18 @@ void ran_sample(const gsl_rng *r, double *src,  int n,
 void ran_sample(const gsl_rng *r, NumArray &src_na,
                                   NumArray &dest_na, int k) {
    int n, i;
-   double *src = (double *) 0, *dest = (double *) nullptr;
 
-   n    = src_na.n_elements();
-   src  = new double [n];
-   dest = new double [k];
+   n = src_na.n_elements();
+   vector<double> src(n);
+   vector<double> dest(k);
 
    for(i=0; i<n; i++) src[i] = src_na[i];
 
-   ran_sample(r, src, n, dest, k);
+   ran_sample(r, src.data(), n, dest.data(), k);
 
    dest_na.clear();
    dest_na.extend(k);
    for(i=0; i<k; i++) dest_na.add(dest[i]);
-
-   if(src)  { delete[] src;  src  = (double *) nullptr; }
-   if(dest) { delete[] dest; dest = (double *) nullptr; }
 
    return;
 }

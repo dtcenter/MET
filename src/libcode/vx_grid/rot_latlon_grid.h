@@ -30,11 +30,23 @@ class RotatedLatLonGrid : public LatLonGrid {
 
       friend class Grid;
 
+         //
+         //  Key is private, so only Grid and RotatedLatLonGrid itself can create
+         //  one.  It lets the constructors below be public - which is
+         //  what std::make_unique needs - without opening grid
+         //  construction up to the rest of the code.
+         //
+
+      struct Key { explicit Key() = default; };
+
+   public:
+
+     ~RotatedLatLonGrid();
+      RotatedLatLonGrid(const RotatedLatLonData &, Key);
+
    protected:
 
       RotatedLatLonGrid();
-     ~RotatedLatLonGrid();
-      RotatedLatLonGrid(const RotatedLatLonData &);
 
       void clear();
 
@@ -73,7 +85,7 @@ class RotatedLatLonGrid : public LatLonGrid {
 
       void shift_right(int);
 
-      GridRep * copy() const;
+      std::unique_ptr<GridRep> copy() const;
 
 };
 

@@ -14,6 +14,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <vector>
+#include <memory>
 
 #include "vx_config.h"
 #include "vx_data2d_factory.h"
@@ -66,7 +68,7 @@ class TCRMWConfInfo {
         ConcatString radial_velocity_long_field_name;
 
         // Variable information
-        VarInfo** data_info;
+        std::vector<std::unique_ptr<VarInfo>> data_info;
 
         TCRMWConfInfo();
         ~TCRMWConfInfo();

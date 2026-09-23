@@ -12,6 +12,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -94,10 +95,9 @@ bool is_nccf_file(const char * filename)
    bool status = false;
    try {
       ConcatString att_val;
-      NcFile *nc_file = open_ncfile(filename);
-
-      if (!IS_INVALID_NC_P(nc_file)) {
-         bool found = get_cf_conventions(nc_file, att_val); // "Conventions" attrribute
+      std::unique_ptr<netCDF::NcFile> nc_file = open_ncfile(filename);
+      if (!IS_INVALID_NC_P(nc_file.get())) {
+         bool found = get_cf_conventions(nc_file.get(), att_val); // "Conventions" attrribute
          if (found) {
             status = (att_val.compare(0, nccf_att_value.length(),
                       nccf_att_value) == 0  ||
@@ -107,8 +107,6 @@ bool is_nccf_file(const char * filename)
                       nccf_att_value3) == 0);
          }
       }
-
-      delete nc_file;
 
    }
    catch(...) {
@@ -128,15 +126,12 @@ bool is_ncmet_file(const char * filename)
    try {
       ConcatString att_val;
 
-      NcFile *nc_file = open_ncfile(filename);
-
-      if (!IS_INVALID_NC_P(nc_file)) {
-         status = (get_global_att(nc_file, ncmet_att_version,    att_val) ||
-                   get_global_att(nc_file, ncmet_att_projection, att_val) ||
-                   is_ncmet_range_azimuth_file(nc_file));
+      std::unique_ptr<netCDF::NcFile> nc_file = open_ncfile(filename);
+      if (!IS_INVALID_NC_P(nc_file.get())) {
+         status = (get_global_att(nc_file.get(), ncmet_att_version,    att_val) ||
+                   get_global_att(nc_file.get(), ncmet_att_projection, att_val) ||
+                   is_ncmet_range_azimuth_file(nc_file.get()));
       }
-
-      delete nc_file;
 
    }catch(...) {
    }
@@ -154,18 +149,15 @@ bool is_ncpinterp_file(const char * filename)
    bool status = false;
    try {
       ConcatString att_val;
-      NcFile *nc_file = open_ncfile(filename);
-
-      if (!IS_INVALID_NC_P(nc_file)) {
+      std::unique_ptr<netCDF::NcFile> nc_file = open_ncfile(filename);
+      if (!IS_INVALID_NC_P(nc_file.get())) {
          // Get the global attribute
-         if (get_global_att(nc_file, nctitle_att_name, att_val)) {
+         if (get_global_att(nc_file.get(), nctitle_att_name, att_val)) {
             // Check the attribute value for the target string
             status = (strstr(att_val.c_str(), ncwrf_att_value) &&
                       strstr(att_val.c_str(), ncpinterp_att_value));
          }
       }
-
-      delete nc_file;
 
    }catch(...) {
    }
@@ -183,19 +175,16 @@ bool is_ncwrf_file(const char * filename)
    bool status = false;
    try {
       ConcatString att_val;
-      NcFile *nc_file = open_ncfile(filename);
-
-      if (!IS_INVALID_NC_P(nc_file)) {
+      std::unique_ptr<netCDF::NcFile> nc_file = open_ncfile(filename);
+      if (!IS_INVALID_NC_P(nc_file.get())) {
          // Get the global attribute
-         if (get_global_att(nc_file, nctitle_att_name, att_val)) {
+         if (get_global_att(nc_file.get(), nctitle_att_name, att_val)) {
             // Check the attribute value for the target string
             // Distinguish between WRF and PInterp output
             status = ( strstr(att_val.c_str(), ncwrf_att_value) &&
                       !strstr(att_val.c_str(), ncpinterp_att_value));
          }
       }
-
-      delete nc_file;
 
    }catch(...) {
    }
@@ -213,22 +202,20 @@ bool is_ugrid_file(const char * filename)
    bool status = false;
    try {
       ConcatString att_val;
-      NcFile *nc_file = open_ncfile(filename);
-
-      if (!IS_INVALID_NC_P(nc_file)) {
+      std::unique_ptr<netCDF::NcFile> nc_file = open_ncfile(filename);
+      if (!IS_INVALID_NC_P(nc_file.get())) {
          // Get the global attribute
          // Check Conventions attrribute (Conventions= "UGRID" or "MPAS")
-         if (get_cf_conventions(nc_file, att_val)) {
+         if (get_cf_conventions(nc_file.get(), att_val)) {
             status = (0 == att_val.compare(0, ugrid_att_value.length(),
                                            ugrid_att_value)
                    || 0 == att_val.compare(0, mpas_att_value.length(),
                                            mpas_att_value));
          }
          if (!status) {
-            status = get_global_att(nc_file, mesh_spec_att_name, att_val); // for MPAS
+            status = get_global_att(nc_file.get(), mesh_spec_att_name, att_val); // for MPAS
          }
       }
-      if (nullptr != nc_file) delete nc_file;
 
    }catch(...) {
    }

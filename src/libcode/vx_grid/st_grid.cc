@@ -69,7 +69,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-StereographicGrid::StereographicGrid(const StereographicData & data)
+StereographicGrid::StereographicGrid(const StereographicData & data, Key)
 
 {
 
@@ -341,48 +341,6 @@ return sum;
 ////////////////////////////////////////////////////////////////////////
 
 
-double StereographicGrid::xy_closedpolyline_area(const double *x, const double *y, int n) const
-
-{
-
-int j;
-double sum;
-double *u = (double *) nullptr;
-double *v = (double *) nullptr;
-
-u = new double [n];
-v = new double [n];
-
-if ( !u || !v )  {
-
-   mlog << Error << "\nStereographicGrid::xy_closedpolyline_area() -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for (j=0; j<n; ++j)  {
-
-   xy_to_uv(x[j], y[j], u[j], v[j]);
-
-}
-
-sum = uv_closedpolyline_area(u, v, n);
-
-sum *= earth_radius_km*earth_radius_km;
-
-delete [] u;  u = (double *) nullptr;
-delete [] v;  v = (double *) nullptr;
-
-return sum;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 ConcatString StereographicGrid::name() const
 
 {
@@ -584,11 +542,11 @@ exit ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * StereographicGrid::copy() const
+std::unique_ptr<GridRep> StereographicGrid::copy() const
 
 {
 
-auto * p = new StereographicGrid (Data);
+auto p = std::make_unique<StereographicGrid>(Data, Key{});
 
 p->Name = Name;
 
@@ -871,16 +829,8 @@ void Grid::set(const StereographicData & data)
 
 clear();
 
-rep = new StereographicGrid (data);
+rep = std::make_unique<StereographicGrid>(data, StereographicGrid::Key{});
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const StereographicData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 

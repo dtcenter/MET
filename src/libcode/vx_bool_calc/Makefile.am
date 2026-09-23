@@ -21,6 +21,16 @@ libvx_bool_calc_a_SOURCES = \
 libvx_bool_calc_a_CPPFLAGS = ${MET_CPPFLAGS}
 
 if ENABLE_DEVELOPMENT
+
+# BUILT_SOURCES so these are generated before anything that
+# includes them is compiled.  Without it, a development build
+# whose .deps are empty - as after the make clean that removes
+# these very files - compiles sources in _SOURCES order and can
+# reach a consumer before its header has been generated.
+
+BUILT_SOURCES = tokentype_to_string.cc \
+                tokentype_to_string.h
+
 tokentype_to_string.cc tokentype_to_string.h: token.h
 	${ENUM_TO_STRING} -concat_string -reverse token.h
  

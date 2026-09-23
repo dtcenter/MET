@@ -71,8 +71,6 @@ void MtdFileBase::base_init_from_scratch()
 
 {
 
-G = (Grid *) nullptr;
-
 clear();
 
 return;
@@ -87,7 +85,7 @@ void MtdFileBase::clear()
 
 {
 
-if ( G )  { delete G;  G = (Grid *) nullptr; }
+G.reset();
 
 Nx = Ny = Nt = 0;
  
@@ -216,9 +214,7 @@ void MtdFileBase::set_grid(const Grid & g)
 
 {
 
-if ( G )  { delete G;  G = (Grid *) nullptr; }
-
-G = new Grid ( g );
+G = std::make_unique<Grid>(g);
 
 return;
 
@@ -254,7 +250,7 @@ const Grid * MtdFileBase::grid_p() const
 
 {
 
-return G;
+return G.get();
 
 }
 
@@ -430,7 +426,7 @@ Nt  = GET_NC_SIZE(dim);
 
    //  Grid
 
-G = new Grid;
+G = std::make_unique<Grid>();
 
 read_netcdf_grid(&f, *G);
 

@@ -41,6 +41,7 @@
 #include "mode_ps_file.h"
 #include "mode_data_type.h"
 #include "multivar_data.h"
+#include <memory>
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -113,8 +114,8 @@ class ModeExecutive {
    ConcatString obs_file;
 
    // set and used only for trad mode
-   Met2dDataFile * fcst_mtddf;
-   Met2dDataFile * obs_mtddf;
+   std::unique_ptr<Met2dDataFile> fcst_mtddf;
+   std::unique_ptr<Met2dDataFile> obs_mtddf;
 
    // used for both trad and multivar mode
    TTContingencyTable cts[n_cts];
@@ -200,7 +201,7 @@ class ModeExecutive {
       
   
    // owned by caller
-   MultiVarData *get_multivar_data(ModeDataType dtype);
+   std::unique_ptr<MultiVarData> get_multivar_data(ModeDataType dtype);
    void add_multivar_merge_data(MultiVarData *mvdi, ModeDataType dtype);
 
    void plot_engine();

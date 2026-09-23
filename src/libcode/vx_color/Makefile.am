@@ -17,6 +17,13 @@ AM_YFLAGS	= --defines=color_parser_yacc.h -p color
 noinst_LIBRARIES = libvx_color.a
 
 if ENABLE_DEVELOPMENT
+
+# BUILT_SOURCES so bison runs before my_color_scanner.cc, which
+# includes color_parser_yacc.h, is compiled.  The .cc is named
+# rather than the .h because only the .cc has a rule - automake
+# emits the header as a side effect of it.
+
+    BUILT_SOURCES = color_parser_yacc.cc
     libvx_color_a_SOURCES = color_parser_yacc.yy my_color_scanner.cc
 else
     libvx_color_a_SOURCES = color_parser_yacc.cc color_parser_yacc.h my_color_scanner.cc

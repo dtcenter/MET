@@ -18,6 +18,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
+
 #include "concat_string.h"
 
 
@@ -57,7 +59,17 @@ class PSFilter {
       PSFilter();
       virtual ~PSFilter();
 
-      PSFilter *next;
+         //
+         //  "next" is an owning link, so a copy must not alias the original's
+         //  tail.  Copying a filter yields an unchained one, which is what the
+         //  raw-pointer version did in the only case it was used: copying a
+         //  filter that had not been chained yet.
+         //
+
+      PSFilter(const PSFilter &);
+      PSFilter & operator=(const PSFilter &);
+
+      std::unique_ptr<PSFilter> next;
 
       int DecimalPlaces;
 

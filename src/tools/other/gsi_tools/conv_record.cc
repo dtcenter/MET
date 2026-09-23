@@ -391,7 +391,7 @@ r.date = f.Date;
 
 r.extend(512);
 
-long long s = read_fortran_binary(f.Fd, r.Buf, 23, f.RecPadSize, f.SwapEndian);
+long long s = read_fortran_binary(f.Fd, r.Buf.data(), 23, f.RecPadSize, f.SwapEndian);
 
 if ( s == 0 )  return false;
 
@@ -404,14 +404,14 @@ if ( s != 19 && s != 23 )  {
 
 }
 
- r.variable = (string)(char*)r.Buf;
+ r.variable = (string)(char*)r.Buf.data();
 
 //r.variable[3] = (char) 0;
 
-memcpy(&(r.nchar), r.Buf +  3, 4);
-memcpy(&(r.nreal), r.Buf +  7, 4);
-memcpy(&(r.ii),    r.Buf + 11, 4);
-memcpy(&(r.mtype), r.Buf + 15, 4);
+memcpy(&(r.nchar), r.Buf.data() +  3, 4);
+memcpy(&(r.nreal), r.Buf.data() +  7, 4);
+memcpy(&(r.ii),    r.Buf.data() + 11, 4);
+memcpy(&(r.mtype), r.Buf.data() + 15, 4);
 
 if ( f.SwapEndian )  {
 
@@ -436,10 +436,10 @@ s = peek_record_size(f.Fd, f.RecPadSize, f.SwapEndian);
 
 r.extend(s);
 
-s = read_fortran_binary(f.Fd, r.Buf, r.Nalloc, f.RecPadSize, f.SwapEndian);
+s = read_fortran_binary(f.Fd, r.Buf.data(), r.Nalloc, f.RecPadSize, f.SwapEndian);
 
-r.cdiag = (char *)  (r.Buf);
-r.rdiag = (float *) (r.Buf + r.cdiag_bytes);
+r.cdiag = (char *)  (r.Buf.data());
+r.rdiag = (float *) (r.Buf.data() + r.cdiag_bytes);
 
 if ( f.SwapEndian )  {
 

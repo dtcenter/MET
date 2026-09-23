@@ -64,9 +64,8 @@ void PxmBase::init_from_scratch()
 
 {
 
-data = (unsigned char *) nullptr;
 
-Name = (char *) nullptr;
+Name.clear();
 
 
 clear_common();
@@ -84,17 +83,21 @@ void PxmBase::clear_common()
 
 {
 
-if ( data )  { delete [] data;  data = (unsigned char *) nullptr; }
+data.clear();
 
 Nalloc = 0;
 
-if ( Name )  { delete [] Name;  Name = (char *) nullptr; }
+Name.clear();
 
 Nrows = Ncols = 0;
 
 Ncomments = 0;
 
-memset(Comment, 0, sizeof(Comment));
+   //
+   //  a loop, not memset: Comment holds std::string now
+   //
+
+for (int j=0; j<max_comments; ++j)  Comment[j].clear();
 
 
 
@@ -115,24 +118,14 @@ if ( this == &p )  return;
 
 clear_common();
 
-if ( p.data )  {
+Nalloc = p.Nalloc;
 
-   Nalloc = p.Nalloc;
-
-   data = new unsigned char [Nalloc];
-
-   memcpy(data, p.data, Nalloc);
-
-}
+data   = p.data;
 
 Nrows = p.Nrows;
 Ncols = p.Ncols;
 
-if ( p.Name )  {
-
-   Name = m_strcpy2(p.Name, method_name, "Name");
-
-}
+Name = p.Name;
 
 if ( p.Ncomments > 0 )  {
 
@@ -143,8 +136,7 @@ if ( p.Ncomments > 0 )  {
 
    for (j=0; j<Ncomments; ++j)  {
 
-      snprintf(a_var_name, 512, "Comment[%d]", j);
-      Comment[j] = m_strcpy2(p.Comment[j], method_name, a_var_name);
+      Comment[j] = p.Comment[j];
 
    }
 
@@ -213,18 +205,11 @@ const char * PxmBase::short_name() const
 
 {
 
-if ( !Name )  return (const char *) 0;
+if ( Name.empty() )  return (const char *) nullptr;
 
-int j;
+const size_t slash = Name.find_last_of('/');
 
-j = m_strlen(Name) - 1;
-
-while ( (j >= 0) && (Name[j] != '/') )  --j;
-
-++j;
-
-
-return ( Name + j );
+return ( slash == std::string::npos ? Name.c_str() : Name.c_str() + slash + 1 );
 
 }
 
@@ -245,7 +230,7 @@ if ( (n < 0) || (n >= Ncomments) )  {
 }
 
 
-return Comment[n];
+return Comment[n].c_str();
 
 }
 
@@ -267,7 +252,7 @@ if ( Ncomments >= max_comments )  {
 
 }
 
-Comment[Ncomments] = m_strcpy2(text, method_name, "Comment");
+Comment[Ncomments] = text;
 
 ++Ncomments;
 
@@ -288,11 +273,7 @@ int j;
 
 for (j=0; j<max_comments; ++j)  {
 
-   if ( Comment[j] )  {
-
-      delete [] Comment[j];  Comment[j] = (char *) nullptr;
-
-   }
+   Comment[j].clear();
 
 }
 
@@ -318,14 +299,14 @@ Indent prefix2(depth + 1);
 
 out << prefix << "Name      = ";
 
-if ( Name )  out << "\"" << Name << "\"\n";
+if ( !Name.empty() )  out << "\"" << Name << "\"\n";
 else         out << "(nul)\n";
 
 out << prefix << "data      = ";
 
-if ( data )  {
+if ( !(data.empty()) )  {
 
-   u = (unsigned long) data;
+   u = (unsigned long) data.data();
 
    out << u << "\n";
 
@@ -371,7 +352,7 @@ void PxmBase::copy_data(unsigned char * out) const
 
 const int n = n_data_bytes();
 
-memcpy(out, data, n);
+memcpy(out, data.data(), n);
 
 
 return;
@@ -390,7 +371,7 @@ int j;
 const int nxy = Nrows*Ncols;
 unsigned char * u = out;
 unsigned int  * i = (unsigned int *) out;
-unsigned char * d = data;
+const unsigned char * d = data.data();
 
 j = 0;
 

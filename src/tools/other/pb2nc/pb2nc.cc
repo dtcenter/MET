@@ -329,7 +329,7 @@ static vector<derive_var_cfg> bufr_derive_cfgs;
 static map<ConcatString, StringArray> variableTypeMap;
 
 static bool do_summary;
-static SummaryObs *summary_obs;
+static std::unique_ptr<SummaryObs> summary_obs;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -339,7 +339,7 @@ static vector< Observation > observations;
 //
 // Output NetCDF file, dimensions, and variables
 //
-static NcFile *f_out      = (NcFile *) nullptr;
+static std::unique_ptr<NcFile> f_out;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -420,7 +420,7 @@ static bool   is_valid_pb_data(double pb_value);
 static void   check_fortran_file_id(const int unit, const char *method_name);
 static void   log_merged_tqz_uv(const map<double, double*> &pqtzuv_map_tq,
                                 const map<double, double*> &pqtzuv_map_uv,
-                                const map<double, double*> &pqtzuv_map_merged,
+                                const map<double, std::unique_ptr<double[]>> &pqtzuv_map_merged,
                                 const char *method_name);
 static void   log_pbl_input(int pbl_level, const char *method_name);
 static void   log_tqz_and_uv(const map<double, double*> &pqtzuv_map_tq,
@@ -429,7 +429,7 @@ static void   log_tqz_and_uv(const map<double, double*> &pqtzuv_map_tq,
 static void   merge_records(double *first_pqtzuv,
                             const map<double, double*> pqtzuv_map_pivot,
                             const map<double, double*> pqtzuv_map_aux,
-                            map<double, double*> &pqtzuv_map_merged);
+                            map<double, std::unique_ptr<double[]>> &pqtzuv_map_merged);
 
 static void   usage(int exit_code=1);
 static void   set_pbfile(const StringArray &);
@@ -602,7 +602,7 @@ static void initialize() {
       hdr[idx] = r8bfms * 10;
    }
 
-   summary_obs = new SummaryObs();
+   summary_obs = std::make_unique<SummaryObs>();
    return;
 }
 
@@ -877,8 +877,7 @@ void open_netcdf() {
       mlog << Error << "\nopen_netcdf() -> "
            << "trouble opening output file: " << ncfile << "\n\n";
 
-      delete f_out;
-      f_out = (NcFile *) nullptr;
+      f_out.reset();
 
       exit(1);
    }
@@ -887,7 +886,7 @@ void open_netcdf() {
    bool use_var_id = true;
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
-   nc_point_obs.set_netcdf(f_out, true);
+   nc_point_obs.set_netcdf(f_out.get());
    nc_point_obs.init_obs_vars(use_var_id, deflate_level);
 
    return;
@@ -1081,7 +1080,7 @@ static void process_pbfile_messages(int unit, int npbmsg, int npbmsg_total,
    double   prev_hdr_lat, prev_hdr_lon, prev_hdr_elv;
    map<double, double*> pqtzuv_map_tq;
    map<double, double*> pqtzuv_map_uv;
-   vector<double*> pqtzuv_list;
+   vector<std::unique_ptr<double[]>> pqtzuv_list;
 
    // Initialize
    prev_hdr_lat = prev_hdr_lon = prev_hdr_elv = bad_data_double;
@@ -1662,13 +1661,14 @@ static void process_pbfile_messages(int unit, int npbmsg, int npbmsg_total,
                             (IGNORE_Z_PBL || is_valid_pb_data(pqtzuv[3]));
                if (has_tq || has_uv) {
                   // Allocated memory is deleted after all observations are processed
-                  auto tmp_pqtzuv = new double [mxr8vt];
+                  auto owned_pqtzuv = std::make_unique<double[]>(mxr8vt);
+                  double *tmp_pqtzuv = owned_pqtzuv.get();
 
                   for(kk=0; kk<mxr8vt; kk++) tmp_pqtzuv[kk] = pqtzuv[kk];
 
                   if (has_uv) pqtzuv_map_uv[pqtzuv[0]] = tmp_pqtzuv;
                   if (has_tq) pqtzuv_map_tq[pqtzuv[0]] = tmp_pqtzuv;
-                  pqtzuv_list.emplace_back(tmp_pqtzuv);
+                  pqtzuv_list.push_back(std::move(owned_pqtzuv));
                   excluded = false;
                }
             }
@@ -1965,10 +1965,6 @@ static void process_pbfile_messages(int unit, int npbmsg, int npbmsg_total,
             if (insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
                            hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid)) n_derived_obs++;
 
-            for(auto it = pqtzuv_list.begin();
-                it != pqtzuv_list.end(); ++it) {
-               delete *it;
-            }
             pqtzuv_list.clear();
             pqtzuv_map_tq.clear();
             pqtzuv_map_uv.clear();
@@ -2005,10 +2001,6 @@ static void process_pbfile_messages(int unit, int npbmsg, int npbmsg_total,
       if (insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
                      hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid)) n_derived_obs++;
 
-      for(auto it = pqtzuv_list.begin();
-          it != pqtzuv_list.end(); ++it) {
-         delete *it;
-      }
       pqtzuv_list.clear();
       pqtzuv_map_tq.clear();
       pqtzuv_map_uv.clear();
@@ -2602,7 +2594,7 @@ static void write_netcdf_hdr_data() {
    static const string method_name = "write_netcdf_hdr_data() ";
 
    auto pb_hdr_count = (long) nc_point_obs.get_hdr_index();
-   nc_point_obs.set_nc_out_data(observations, summary_obs,
+   nc_point_obs.set_nc_out_data(observations, summary_obs.get(),
                                 summary_info, pb_hdr_count);
 
    int hdr_cnt;
@@ -2719,8 +2711,7 @@ static void clean_up() {
    nc_point_obs.close();
 
    if(f_out) {
-      delete f_out;
-      f_out = (NcFile *) nullptr;
+      f_out.reset();
    }
 
    return;
@@ -3056,11 +3047,11 @@ static void copy_pqtzuv(double *to_pqtzuv, const double *from_pqtzuv, bool copy_
 
 static int combine_tqz_and_uv(map<double, double*> &pqtzuv_map_tq,
                               map<double, double*> &pqtzuv_map_uv,
-                              vector<double *> &pqtzuv_merged_array) {
+                              vector<std::unique_ptr<double[]>> &pqtzuv_merged_array) {
    static const char *method_name = "combine_tqz_and_uv() ";
    auto tq_count = pqtzuv_map_tq.size();
    auto uv_count = pqtzuv_map_uv.size();
-   map<double, double*> pqtzuv_map_merged;
+   map<double, std::unique_ptr<double[]>> pqtzuv_map_merged;
    pqtzuv_merged_array.clear();
    if (tq_count > 0 && uv_count > 0) {
       IntArray common_levels;
@@ -3121,7 +3112,8 @@ static int combine_tqz_and_uv(map<double, double*> &pqtzuv_map_tq,
       auto it_uv = pqtzuv_map_uv.begin();
       pqtzuv_tq = it_tq->second;
       pqtzuv_uv = it_uv->second;
-      pqtzuv_merged = new double[mxr8vt];
+      auto owned_merged = std::make_unique<double[]>(mxr8vt);
+      pqtzuv_merged = owned_merged.get();
       tq_pres = nint(it_tq->first);
       uv_pres = nint(it_uv->first);
       if (common_levels.has(tq_pres) || common_levels.has(uv_pres)) {
@@ -3162,7 +3154,7 @@ static int combine_tqz_and_uv(map<double, double*> &pqtzuv_map_tq,
       }
       double first_pres = (pqtzuv_merged[0] < 0 || is_eq(pqtzuv_merged[0], 0.)
                          ? bad_data_double : pqtzuv_merged[0]);
-      pqtzuv_map_merged[first_pres] = pqtzuv_merged;
+      pqtzuv_map_merged[first_pres] = std::move(owned_merged);
       mlog << Debug(9) << method_name << "Added " << first_pres << " to merged records (first record)\n";
 
       if (pqtzuv_merged != nullptr) {
@@ -3171,17 +3163,16 @@ static int combine_tqz_and_uv(map<double, double*> &pqtzuv_map_tq,
          //Merge TQZ into UV records
          merge_records(pqtzuv_merged, pqtzuv_map_uv, pqtzuv_map_tq, pqtzuv_map_merged);
       }
-      for (it=pqtzuv_map_merged.begin();
-          it!=pqtzuv_map_merged.end(); ++it) {
-        auto new_pqtzuv = new double[mxr8vt];
-        for (int i=0; i<mxr8vt; i++) new_pqtzuv[i] = it->second[i];
-        pqtzuv_merged_array.emplace_back(new_pqtzuv);
+      for (auto mit=pqtzuv_map_merged.begin();
+          mit!=pqtzuv_map_merged.end(); ++mit) {
+        auto new_pqtzuv = std::make_unique<double[]>(mxr8vt);
+        for (int i=0; i<mxr8vt; i++) new_pqtzuv[i] = mit->second[i];
+        pqtzuv_merged_array.push_back(std::move(new_pqtzuv));
       }
 
       if(mlog.verbosity_level() >= PBL_DEBUG_LEVEL) {
          log_merged_tqz_uv(pqtzuv_map_tq, pqtzuv_map_uv, pqtzuv_map_merged, method_name);
       }
-      delete [] pqtzuv_merged;
    }
 
    return pqtzuv_merged_array.size();
@@ -3210,7 +3201,7 @@ static double compute_pbl(map<double, double*> pqtzuv_map_tq,
       int spfh_cnt;
       IntArray selected_levels;
 
-      vector<double*> pqtzuv_merged_array;
+      vector<std::unique_ptr<double[]>> pqtzuv_merged_array;
       pbl_level = combine_tqz_and_uv(pqtzuv_map_tq, pqtzuv_map_uv,
                                      pqtzuv_merged_array);
       mlog << Debug(7) << method_name << "pbl_level= " << pbl_level
@@ -3231,7 +3222,7 @@ static double compute_pbl(map<double, double*> pqtzuv_map_tq,
          hgt_cnt = spfh_cnt = 0;
          int start_offset = (MAX_PBL_LEVEL >= pbl_level) ? 0 : (pbl_level-MAX_PBL_LEVEL);
          for (int i=(pbl_level-1); i>=start_offset; i--,index++) {
-            pqtzuv = pqtzuv_merged_array[i];
+            pqtzuv = pqtzuv_merged_array[i].get();
             pbl_data_pres[index] = pqtzuv[0];
             pbl_data_pres[index] = pqtzuv[0];
             pbl_data_spfh[index] = pqtzuv[1];
@@ -3268,7 +3259,7 @@ static double compute_pbl(map<double, double*> pqtzuv_map_tq,
                   found = false;
                   for (; vector_idx>=0; vector_idx--) {
                      if (is_eq(pqtzuv_merged_array[vector_idx][0], it->first)) {
-                        pqtzuv = pqtzuv_merged_array[vector_idx];
+                        pqtzuv = pqtzuv_merged_array[vector_idx].get();
                         pbl_data_pres[index] = pqtzuv[0];
                         pbl_data_spfh[index] = pqtzuv[1];
                         pbl_data_temp[index] = pqtzuv[2];
@@ -3329,7 +3320,6 @@ static double compute_pbl(map<double, double*> pqtzuv_map_tq,
                     << pqtzuv_merged_array.size() << "\n";
          }
       }
-      for (int i=0; i<pqtzuv_merged_array.size(); i++) delete pqtzuv_merged_array[i];
       pqtzuv_merged_array.clear();
    }
    return hpbl;
@@ -3492,7 +3482,7 @@ static void check_fortran_file_id(const int unit, const char *method_name) {
 static void merge_records(double *first_pqtzuv,
                           const map<double, double*> pqtzuv_map_pivot,
                           const map<double, double*> pqtzuv_map_aux,
-                          map<double, double*> &pqtzuv_map_merged) {
+                          map<double, std::unique_ptr<double[]>> &pqtzuv_map_merged) {
 
    double cur_pres;
    const double *cur_pqtzuv;
@@ -3529,7 +3519,8 @@ static void merge_records(double *first_pqtzuv,
       }
 
       cur_pqtzuv = it_pivot->second;
-      pqtzuv_merged = new double[mxr8vt];
+      auto owned_merged = std::make_unique<double[]>(mxr8vt);
+      pqtzuv_merged = owned_merged.get();
       copy_pqtzuv(pqtzuv_merged, cur_pqtzuv);
       // Advance aux record if necessary
       if (prev_pqtzuv[0] < cur_pres) {
@@ -3543,7 +3534,7 @@ static void merge_records(double *first_pqtzuv,
                copy_pqtzuv(pqtzuv_merged, prev_pqtzuv, false);
             }
             mlog << Debug(9) << method_name << "Added " << cur_pres << "\n";
-            pqtzuv_map_merged[cur_pres] = pqtzuv_merged;
+            pqtzuv_map_merged[cur_pres] = std::move(owned_merged);
             break;
          }
       }
@@ -3560,7 +3551,7 @@ static void merge_records(double *first_pqtzuv,
          interpolate_pqtzuv(prev_pqtzuv, pqtzuv_merged, next_pqtzuv);
       }
       mlog << Debug(9) << method_name << "Added " << cur_pres << "\n";
-      pqtzuv_map_merged[cur_pres] = pqtzuv_merged;
+      pqtzuv_map_merged[cur_pres] = std::move(owned_merged);
    }
 }
 
@@ -3609,13 +3600,13 @@ static void log_tqz_and_uv(const map<double, double*> &pqtzuv_map_tq,
 
 static void log_merged_tqz_uv(const map<double, double*> &pqtzuv_map_tq,
                               const map<double, double*> &pqtzuv_map_uv,
-                              const map<double, double*> &pqtzuv_map_merged,
+                              const map<double, std::unique_ptr<double[]>> &pqtzuv_map_merged,
                               const char *method_name) {
    ConcatString buf;
    StringArray log_array;
    for (auto it=pqtzuv_map_merged.begin();
          it!=pqtzuv_map_merged.end(); ++it) {
-      double *pqtzuv = it->second;
+      const double *pqtzuv = it->second.get();
       buf.clear();
       for (int idx=0; idx<mxr8vt; idx++) {
         buf << " " << pqtzuv[idx];

@@ -45,7 +45,7 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
 
       // Build GridTemplate for each EAS width
       GridTemplateFactory gtf;
-      vector<GridTemplate *> eas_gt;
+      vector<std::unique_ptr<GridTemplate>> eas_gt;
       for(int i_eas=0; i_eas<n_eas; i_eas++) {
          eas_gt.emplace_back(gtf.buildGT(eas_info.shape,
                                          eas_info.width[i_eas],
@@ -65,7 +65,7 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
 
             double frac_cov_mean;
             double dist_mean = compute_eas_dist(thresh_dp,
-                                  eas_gt[i_eas],
+                                  eas_gt[i_eas].get(),
                                   eas_info.vld_thresh,
                                   x, y, frac_cov_mean);
 
@@ -92,7 +92,6 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
       } // end for i
 
       // Clean up
-      for(auto &gt : eas_gt) delete gt;
 
    } // end of omp parallel
 

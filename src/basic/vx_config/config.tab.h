@@ -101,7 +101,7 @@ extern int configdebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 185 "config.tab.yy"
+#line 186 "config.tab.yy"
 
 
    char text[max_id_length + 1];

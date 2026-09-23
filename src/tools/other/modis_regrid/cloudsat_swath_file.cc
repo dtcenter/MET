@@ -282,9 +282,7 @@ void SatAttribute::init_from_scratch()
 
 {
 
-Ival = (int *) nullptr;
 
-Dval = (double *) nullptr;
 
 clear();
 
@@ -310,8 +308,8 @@ Nvalues = 0;
 
 Sval.clear();
 
-if ( Ival )  { delete [] Ival;  Ival = (int *) nullptr; }
-if ( Dval )  { delete [] Dval;  Dval = (double *) nullptr; }
+Ival.clear();
+Dval.clear();
 
    //
    //  done
@@ -482,8 +480,8 @@ char c[2];
 
 
 Sval.clear();
-if ( Dval )  { delete [] Dval;  Dval = (double *) nullptr; }
-if ( Ival )  { delete [] Ival;  Ival = (int *) nullptr; }
+Dval.clear();
+Ival.clear();
 
 Numbertype = nt;
 
@@ -503,7 +501,7 @@ switch ( Numbertype )  {
    case nt_int_8:
       bytes_per_sample = 1;
       Nvalues = Bytes/bytes_per_sample;
-      Ival = new int [Nvalues];
+      Ival.resize(Nvalues);
       for (j=0; j<Nvalues; ++j)  {
          memcpy(c, b + j*bytes_per_sample, bytes_per_sample);
          // if ( do_shuffle )  shuffle_1(c);
@@ -521,7 +519,7 @@ switch ( Numbertype )  {
          exit ( 1 ); 
       }
       Nvalues = Bytes/bytes_per_sample;
-      Ival = new int [Nvalues];
+      Ival.resize(Nvalues);
       for (j=0; j<Nvalues; ++j)  {
          memcpy(s, b + j*bytes_per_sample, bytes_per_sample);
          if ( do_shuffle )  shuffle_2(s);
@@ -539,7 +537,7 @@ switch ( Numbertype )  {
          exit ( 1 ); 
       }
       Nvalues = Bytes/bytes_per_sample;
-      Dval = new double [Nvalues];
+      Dval.resize(Nvalues);
       for (j=0; j<Nvalues; ++j)  {
          memcpy(f, b + j*bytes_per_sample, bytes_per_sample);
          if ( do_shuffle )  shuffle_4(f);
@@ -557,7 +555,7 @@ switch ( Numbertype )  {
          exit ( 1 ); 
       }
       Nvalues = Bytes/bytes_per_sample;
-      Dval = new double [Nvalues];
+      Dval.resize(Nvalues);
       for (j=0; j<Nvalues; ++j)  {
          memcpy(d, b + bytes_per_sample*j, bytes_per_sample);
          if ( do_shuffle )  shuffle_8(d);
@@ -657,7 +655,6 @@ void SwathDataField::init_from_scratch()
 
 {
 
-Dimensions = (SatDimension **) nullptr;
 
 clear();
 
@@ -681,7 +678,7 @@ Numbertype = -1;
 
 Ndimensions = 0;
 
-if ( Dimensions )  { delete [] Dimensions;  Dimensions = (SatDimension **) nullptr; }
+Dimensions.clear();
 
    //
    //  done
@@ -709,15 +706,7 @@ Numbertype = df.Numbertype;
 
 Ndimensions = df.Ndimensions;
 
-if ( df.Dimensions )  {
-
-   int j;
-
-   Dimensions = new SatDimension * [Ndimensions];
-
-   for (j=0; j<Ndimensions; ++j)  Dimensions[j] = df.Dimensions[j];
-
-}
+Dimensions = df.Dimensions;
 
 
    //
@@ -831,13 +820,9 @@ if ( k <= 0 )  {
 
 }
 
-if ( Dimensions )  { delete [] Dimensions;  Dimensions = (SatDimension **) nullptr; }
+Dimensions.clear();
 
-Dimensions = new SatDimension * [k];
-
-int j;
-
-for (j=0; j<k; ++j)  Dimensions[j] = (SatDimension *) nullptr;
+Dimensions.assign(k, (SatDimension *) nullptr);
 
 Ndimensions = k;
 
@@ -965,14 +950,6 @@ void CloudsatSwath::init_from_scratch()
 
 {
 
-DataField = (SwathDataField *) nullptr;
-
-Attribute = (SatAttribute *) nullptr;
-
-GeoField  = (SwathDataField *) nullptr;
-
-Dimension = (SatDimension *) nullptr;
-
 clear();
 
 return;
@@ -991,13 +968,13 @@ Name.clear();
 
 SwathId = -1;
 
-if ( DataField )  { delete [] DataField;  DataField = (SwathDataField *) nullptr; }
+DataField.clear();
 
-if ( Attribute )  { delete [] Attribute;  Attribute = (SatAttribute *) nullptr; }
+Attribute.clear();
 
-if (  GeoField )  { delete []  GeoField;   GeoField = (SwathDataField *) nullptr; }
+GeoField.clear();
 
-if ( Dimension )  { delete [] Dimension;  Dimension = (SatDimension *) nullptr; }
+Dimension.clear();
 
 Ndatafields = 0;
 
@@ -1167,8 +1144,6 @@ const char * c = (const char *) nullptr;
 ConcatString s;
 SatDimension * d = (SatDimension *) nullptr;
 int n_dims;
-int32 * rank       = (int32 *) nullptr;
-int32 * numbertype = (int32 *) nullptr;
 int32 dims[max_dims];
 int32 r, nt;
 
@@ -1188,7 +1163,7 @@ parse_csl(buf, a);
 
 Ndatafields = a.n_elements();
 
-DataField = new SwathDataField [Ndatafields];
+DataField.resize(Ndatafields);
 
 for (j=0; j<Ndatafields; ++j)  {
 
@@ -1196,12 +1171,12 @@ for (j=0; j<Ndatafields; ++j)  {
 
 }
 
-rank = new int32 [Ndatafields];
-numbertype = new int32 [Ndatafields];
+std::vector<int32> rank(Ndatafields);
+std::vector<int32> numbertype(Ndatafields);
 
 clear_buf();
 
-if ( SWinqdatafields(SwathId, (char *) buf, rank, numbertype) < 0 )  {
+if ( SWinqdatafields(SwathId, (char *) buf, rank.data(), numbertype.data()) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_data_fields() -> error (2)\n\n";
@@ -1267,8 +1242,7 @@ for (j=0; j<Ndatafields; ++j)  {
    //  done
    //
 
-if ( rank )        { delete [] rank;  rank = (int32 *) nullptr; }
-if ( numbertype )  { delete [] numbertype;  numbertype = (int32 *) nullptr; }
+
 
 return;
 
@@ -1300,27 +1274,25 @@ if ( (retval = SWinqattrs(SwathId, nullptr, &att_buf_size)) < 0 )  {
 
 if ( retval == 0 )  return;
 
-char * att_buf = new char [att_buf_size];
+std::vector<char> att_buf(att_buf_size);
 
-if ( (retval = SWinqattrs(SwathId, att_buf, &att_buf_size)) < 0 )  {
+if ( (retval = SWinqattrs(SwathId, att_buf.data(), &att_buf_size)) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_attributes() -> can't get attribute names\n\n";
-   if ( att_buf )  { delete [] att_buf;   att_buf = (char *) nullptr; }
-
+   
    exit ( 1 );
 
 }
 
  if ( retval == 0 ) {
-   if ( att_buf )  { delete [] att_buf;   att_buf = (char *) nullptr; }
    return;
  }
-parse_csl(att_buf, a);
+parse_csl(att_buf.data(), a);
 
 Nattributes = a.n_elements();
 
-Attribute = new SatAttribute [Nattributes];
+Attribute.resize(Nattributes);
 
 for (j=0; j<Nattributes; ++j)  {
 
@@ -1331,7 +1303,6 @@ for (j=0; j<Nattributes; ++j)  {
       mlog << Error
            << "\n\n  CloudsatSwath::get_attributes() -> can't get info on attribute \"" << (a[j]) << "\"\n\n";
 
-      if ( att_buf )  { delete [] att_buf;   att_buf = (char *) nullptr; }
       exit ( 1 );
 
    }
@@ -1339,18 +1310,17 @@ for (j=0; j<Nattributes; ++j)  {
    // Attribute[j].set_number_type ((int) nt);
    // Attribute[j].set_bytes       ((int) att_size);
 
-   clear_buf(att_buf, att_buf_size);
+   clear_buf(att_buf.data(), att_buf_size);
 
-   if ( SWreadattr(SwathId, (char*)a[j].c_str(), att_buf) < 0 )  {
+   if ( SWreadattr(SwathId, (char*)a[j].c_str(), att_buf.data()) < 0 )  {
 
       mlog << Error
            << "\n\n  CloudsatSwath::get_attributes() -> can't get value for attribute \"" << (a[j]) << "\"\n\n";
-      if ( att_buf )  { delete [] att_buf;   att_buf = (char *) nullptr; }
       exit ( 1 );
 
    }
 
-   Attribute[j].set_value((int) nt, (unsigned char *) att_buf, (int) att_size);
+   Attribute[j].set_value((int) nt, (unsigned char *) att_buf.data(), (int) att_size);
 
 }   //  for j
 
@@ -1360,7 +1330,6 @@ for (j=0; j<Nattributes; ++j)  {
    //  done
    //
 
-if ( att_buf )  { delete [] att_buf;   att_buf = (char *) nullptr; }
 
 return;
 
@@ -1380,8 +1349,6 @@ const char * c = (const char *) nullptr;
 ConcatString s;
 SatDimension * d = (SatDimension *) nullptr;
 StringArray a;
-int32 * rank       = (int32 *) nullptr;
-int32 * numbertype = (int32 *) nullptr;
 int32 dims[max_dims];
 int32 r, nt;
 
@@ -1401,7 +1368,7 @@ parse_csl(buf, a);
 
 Ngeofields = a.n_elements();
 
-GeoField = new SwathDataField [Ngeofields];
+GeoField.resize(Ngeofields);
 
 for (j=0; j<Ngeofields; ++j)  {
 
@@ -1409,12 +1376,12 @@ for (j=0; j<Ngeofields; ++j)  {
 
 }
 
-rank = new int32 [Ngeofields];
-numbertype = new int32 [Ngeofields];
+std::vector<int32> rank(Ngeofields);
+std::vector<int32> numbertype(Ngeofields);
 
 clear_buf();
 
-if ( SWinqgeofields(SwathId, (char *) buf, rank, numbertype) < 0 )  {
+if ( SWinqgeofields(SwathId, (char *) buf, rank.data(), numbertype.data()) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_geo_fields() -> error (2)\n\n";
@@ -1480,9 +1447,6 @@ for (j=0; j<Ngeofields; ++j)  {
    //  done
    //
 
-if ( rank )  { delete [] rank;  rank = (int32 *) nullptr; }
-if ( numbertype )  { delete [] numbertype;  numbertype = (int32 *) nullptr; }
-
 return;
 
 }
@@ -1514,7 +1478,7 @@ parse_csl(buf, a);
 
 Ndimensions = a.n_elements();
 
-Dimension = new SatDimension [Ndimensions];
+Dimension.resize(Ndimensions);
 
 for (j=0; j<Ndimensions; ++j)  {
 
@@ -1553,7 +1517,7 @@ int j;
 
 for (j=0; j<Ndatafields; ++j)  {
 
-   if ( DataField[j].name() == _name )  return ( DataField + j );
+   if ( DataField[j].name() == _name )  return const_cast<SwathDataField *>( DataField.data() + j );
 
 }
 
@@ -1580,7 +1544,7 @@ if ( (k < 0) || (k >= Ndatafields) )  {
 }
 
 
-return ( DataField + k );
+return const_cast<SwathDataField *>( DataField.data() + k );
 
 }
 
@@ -1596,7 +1560,7 @@ int j;
 
 for (j=0; j<Ngeofields; ++j)  {
 
-   if ( GeoField[j].name() == _name )  return ( GeoField + j );
+   if ( GeoField[j].name() == _name )  return const_cast<SwathDataField *>( GeoField.data() + j );
 
 }
 
@@ -1623,7 +1587,7 @@ if ( (k < 0) || (k >= Ngeofields) )  {
 }
 
 
-return ( GeoField + k );
+return const_cast<SwathDataField *>( GeoField.data() + k );
 
 }
 
@@ -1639,7 +1603,7 @@ int j;
 
 for (j=0; j<Ndatafields; ++j)  {
 
-   if ( DataField[j].name() == _name )  return ( DataField + j );
+   if ( DataField[j].name() == _name )  return const_cast<SwathDataField *>( DataField.data() + j );
 
 }
 
@@ -1666,7 +1630,7 @@ if ( (k < 0) || (k >= Ndatafields) )  {
 }
 
 
-return ( DataField + k );
+return const_cast<SwathDataField *>( DataField.data() + k );
 
 }
 
@@ -1688,7 +1652,7 @@ if ( (k < 0) || (k >= Ndimensions) )  {
 }
 
 
-return ( Dimension + k );
+return const_cast<SatDimension *>( Dimension.data() + k );
 
 }
 
@@ -1705,7 +1669,7 @@ SatDimension * d = (SatDimension *) nullptr;
 
 for (j=0; j<Ndimensions; ++j)  {
 
-   if ( Dimension[j].name() == _name )  return ( Dimension + j );
+   if ( Dimension[j].name() == _name )  return const_cast<SatDimension *>( Dimension.data() + j );
 
 }
 
@@ -2004,8 +1968,6 @@ void CloudsatSwathFile::init_from_scratch()
 
 FileId = -1;
 
-Swath  = (CloudsatSwath *) nullptr;
-
 close();
 
 return;
@@ -2108,7 +2070,7 @@ parse_csl(buf, a);
 
 Nswaths = a.n_elements();
 
-if ( Nswaths > 0 )  Swath = new CloudsatSwath [Nswaths];
+if ( Nswaths > 0 )  Swath.resize(Nswaths);
 
 for (j=0; j<Nswaths; ++j)  {
 
@@ -2169,7 +2131,7 @@ FileId = -1;
 
 Filename.clear();
 
-if ( Swath )  { delete [] Swath;  Swath = (CloudsatSwath *) nullptr; }
+Swath.clear();
 
 Nswaths = 0;
 
@@ -2214,7 +2176,7 @@ if ( (k < 0) || (k >= Nswaths) )  {
 
 }
 
-return ( Swath + k );
+return const_cast<CloudsatSwath *>( Swath.data() + k );
 
 }
 
