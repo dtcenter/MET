@@ -66,7 +66,11 @@ FileHandler::FileHandler(const string &program_name) :
 
 FileHandler::~FileHandler()
 {
-  if (_ncFile.get() != 0) delete _ncFile.get();
+  //
+  //  _ncFile is a unique_ptr and closes itself.  This used to delete the
+  //  pointer it owns, which double freed whenever writeNetcdfFile() returned
+  //  early from _writeObservations() with the file still open.
+  //
 }
 
 ////////////////////////////////////////////////////////////////////////
