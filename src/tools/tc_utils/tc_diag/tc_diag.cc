@@ -1446,7 +1446,13 @@ NcFile *OutFileInfo::setup_nc_file(const string &out_file) {
    write_tc_times(nc_out.get(), vld_dim,
                   trk_ptr, nullptr);
 
-   return nc_out.get();
+   //
+   //  setup_nc_file() hands the open file to its caller, which stores it in
+   //  the raw nc_diag_out member and deletes it later, so ownership has to be
+   //  released here rather than handed out as a borrowed pointer.
+   //
+
+   return nc_out.release();
 }
 
 ////////////////////////////////////////////////////////////////////////
