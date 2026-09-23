@@ -8,6 +8,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <dirent.h>
 #include <iostream>
 #include <unistd.h>
@@ -880,9 +881,14 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    // Initialize
    clear();
 
-   // Allocate new VarInfo objects
+   //
+   //  set_fcst_info()/set_obs_info() copy what they are given, so these only
+   //  need to outlive the call.  The raw "new VarInfoGrib" that used to be
+   //  here was never freed.
+   //
+
    vx_pd.set_fcst_info(VarInfoFactory::new_var_info(ftype).get());
-   vx_pd.set_obs_info(new VarInfoGrib);
+   vx_pd.set_obs_info(std::make_unique<VarInfoGrib>().get());
 
    // Set the VarInfo objects
    vx_pd.fcst_info->set_dict(fdict);
