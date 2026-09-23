@@ -561,7 +561,7 @@ static void setup_txt_files(unixtime valid_ut, int lead_sec) {
    /////////////////////////////////////////////////////////////////////
 
    // Initialize file stream
-   stat_out = (ofstream *) nullptr;
+   stat_out.reset();
 
    // Build the file name
    stat_file << tmp_str << stat_file_ext;
@@ -590,7 +590,7 @@ static void setup_txt_files(unixtime valid_ut, int lead_sec) {
 
 
       // Initialize file stream
-      isc_out   = (ofstream *) nullptr;
+      isc_out.reset();
 
       // Build the file name
       isc_file << tmp_str << "_" << isc_file_abbr << txt_file_ext;

@@ -434,7 +434,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    max_col += n_header_columns + 1;
 
    // Initialize file stream
-   stat_out = (ofstream *) nullptr;
+   stat_out.reset();
 
    // Build the file name
    stat_file << base_name << stat_file_ext;
@@ -466,7 +466,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
       if(conf_info.output_flag[i] == STATOutputType::Both) {
 
          // Initialize file stream
-         txt_out[i] = (ofstream *) nullptr;
+         txt_out[i].reset();
 
          // Build the file name
          txt_file[i] << base_name << "_" << txt_file_abbr[i]

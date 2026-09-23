@@ -116,13 +116,13 @@ static StringArray nc_var_sa;
 
 // Output STAT file
 static ConcatString   stat_file;
-static std::ofstream *stat_out = (std::ofstream *) nullptr;
+static std::unique_ptr<std::ofstream> stat_out;
 static AsciiTable     stat_at;
 static int            i_stat_row;
 
 // Optional ASCII output files
 static ConcatString   txt_file[n_txt];
-static std::ofstream *txt_out[n_txt];
+static std::unique_ptr<std::ofstream> txt_out[n_txt];
 static AsciiTable     txt_at[n_txt];
 static int            i_txt_row[n_txt];
 

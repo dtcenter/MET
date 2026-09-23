@@ -109,13 +109,13 @@ static PSfile       *ps_out = (PSfile *) nullptr;
 
 // Output STAT file
 static ConcatString     stat_file;
-static std::ofstream    *stat_out = (std::ofstream *) nullptr;
+static std::unique_ptr<std::ofstream> stat_out;
 static AsciiTable       stat_at;
 static int              i_stat_row;
 
 // Optional ISC output file
 static ConcatString     isc_file;
-static std::ofstream    *isc_out = (std::ofstream *) nullptr;
+static std::unique_ptr<std::ofstream> isc_out;
 static AsciiTable       isc_at;
 static int              i_isc_row;
 

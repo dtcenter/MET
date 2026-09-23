@@ -248,7 +248,7 @@ class OutFileInfo {
 
       // NetCDF Diagnostics output
       ConcatString    nc_diag_file;
-      netCDF::NcFile *nc_diag_out;
+      std::unique_ptr<netCDF::NcFile> nc_diag_out;
 
       // NetCDF Dimensions
       netCDF::NcDim vld_dim;
@@ -256,11 +256,11 @@ class OutFileInfo {
 
       // CIRA Diagnostics output
       ConcatString   cira_diag_file;
-      std::ofstream *cira_diag_out;
+      std::unique_ptr<std::ofstream> cira_diag_out;
 
       void clear();
 
-      netCDF::NcFile *setup_nc_file(const std::string &);
+      std::unique_ptr<netCDF::NcFile> setup_nc_file(const std::string &);
       void add_tmp_file_info(const TmpFileInfo &, const StringArray &, int);
       void write_nc_diag();
       void write_nc_domain_info(const DomainInfo &);

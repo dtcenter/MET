@@ -621,7 +621,6 @@ void set_outdir(const StringArray& a) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_out_files(const TrackInfoArray &tracks) {
-   OutFileInfo out_info;
    int i, j;
 
    // Setup output files for each track
@@ -638,8 +637,10 @@ void setup_out_files(const TrackInfoArray &tracks) {
          exit(1);
       }
 
-      // Add new map entry
-      out_file_map[out_key] = out_info;
+      //  operator[] default constructs the entry in place below; the
+      //  copy of a default constructed OutFileInfo that used to be here
+      //  was redundant, and no longer compiles now that the class owns
+      //  its NcFile.
 
       mlog << Debug(3) << "Preparing output files for "
            << out_key << " track.\n";
@@ -1355,8 +1356,8 @@ void OutFileInfo::init_from_scratch() {
    trk_ptr = (TrackInfo *) nullptr;
 
    // Initialize output file stream pointers
-   nc_diag_out   = (NcFile *) nullptr;
-   cira_diag_out = (ofstream *) nullptr;
+   nc_diag_out.reset();
+   cira_diag_out.reset();
 
    clear();
 
@@ -1392,9 +1393,7 @@ void OutFileInfo::clear() {
            << nc_diag_file << "\n";
 
       // Close the output file
-      nc_diag_out->close();
-      delete nc_diag_out;
-      nc_diag_out = (NcFile *) nullptr;
+      nc_diag_out.reset();
    }
    nc_diag_file.clear();
 
@@ -1406,8 +1405,7 @@ void OutFileInfo::clear() {
 
       // Close the output file
       cira_diag_out->close();
-      delete cira_diag_out;
-      cira_diag_out = (ofstream *) nullptr;
+      cira_diag_out.reset();
    }
    cira_diag_file.clear();
 
@@ -1416,7 +1414,7 @@ void OutFileInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-NcFile *OutFileInfo::setup_nc_file(const string &out_file) {
+std::unique_ptr<netCDF::NcFile> OutFileInfo::setup_nc_file(const string &out_file) {
 
    if(!trk_ptr) return nullptr;
 
@@ -1446,13 +1444,7 @@ NcFile *OutFileInfo::setup_nc_file(const string &out_file) {
    write_tc_times(nc_out.get(), vld_dim,
                   trk_ptr, nullptr);
 
-   //
-   //  setup_nc_file() hands the open file to its caller, which stores it in
-   //  the raw nc_diag_out member and deletes it later, so ownership has to be
-   //  released here rather than handed out as a borrowed pointer.
-   //
-
-   return nc_out.release();
+   return nc_out;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1650,9 +1642,9 @@ void OutFileInfo::write_nc_diag() {
    // Define the pressure dimension and coordinate variable
    set<double> prs_set;
    for(i=0; i<prs_lev.n(); i++) prs_set.insert(prs_lev[i]);
-   prs_dim = add_dim(nc_diag_out, "pressure",
+   prs_dim = add_dim(nc_diag_out.get(), "pressure",
                      (long) prs_set.size());
-   def_tc_pressure(nc_diag_out, prs_dim, prs_set);
+   def_tc_pressure(nc_diag_out.get(), prs_dim, prs_set);
 
    // Allocate space
    int n_prs_data = vld_dim.getSize() * prs_dim.getSize();
@@ -1818,7 +1810,7 @@ void OutFileInfo::write_cira_diag() {
    int i;
 
    // Create output file stream
-   cira_diag_out = new ofstream;
+   cira_diag_out = std::make_unique<std::ofstream>();
    cira_diag_out->open(cira_diag_file);
 
    if(!cira_diag_out) {

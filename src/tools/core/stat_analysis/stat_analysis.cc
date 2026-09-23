@@ -435,7 +435,7 @@ static void set_out_file(const char *path) {
    //
    // Create an output file and set the sa_out ofstream to it.
    //
-   sa_out = new ofstream;
+   sa_out = std::make_unique<std::ofstream>();
    sa_out->open(out_file.c_str());
 
    if(!(*sa_out)) {
@@ -674,7 +674,7 @@ static void process_job(const char * jobstring, int n_job,
    //
    // Do the job
    //
-   do_job(full_jobstring, job_input_files, job, n_job, tmp_dir, sa_out);
+   do_job(full_jobstring, job_input_files, job, n_job, tmp_dir, sa_out.get());
 
    return;
 }

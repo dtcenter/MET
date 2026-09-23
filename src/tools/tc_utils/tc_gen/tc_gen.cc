@@ -1733,7 +1733,7 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
    int i, n_rows, n_cols, stat_rows, stat_cols, n_prob;
 
    // Check to see if the stat file stream has already been setup
-   bool init_from_scratch = (stat_out == (ofstream *) nullptr);
+   bool init_from_scratch = (!stat_out);
 
    // Get the maximum number of probability thresholds
    n_prob = conf_info.get_max_n_prob_thresh();
@@ -1806,7 +1806,7 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
          if(init_from_scratch) {
 
             // Initialize file stream
-            txt_out[i] = (ofstream *) nullptr;
+            txt_out[i].reset();
 
             // Build the file name
             txt_file[i] << out_base << "_" << txt_file_abbr[i]
