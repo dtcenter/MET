@@ -52,7 +52,7 @@ using IndexKDTree = atlas::util::IndexKDTree;
 
 static Geometry atlas_geometry;
 
-IndexKDTree *build_tree(vector<double> &lat, vector<double> &lon, vector<double> &alt_m);
+std::unique_ptr<IndexKDTree> build_tree(vector<double> &lat, vector<double> &lon, vector<double> &alt_m);
 void check_llh_to_ecef();
 void llh_to_ecef(double lat, double lon, double alt_m, double *x_km, double *y_km, double *z_km);
 void test_llh_to_ecef(double lat, double lon, double alt_m, double true_x_km, double true_y_km, double true_z_km, string location);
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
    //bool in_distance;
    int closest_n = 5;
    double distance_km;
-   IndexKDTree *kdtree = build_tree(lat_values, lon_values, alt_values);
+   auto kdtree = build_tree(lat_values, lon_values, alt_values);
 
    idx = 0;
    cout << "The first point from the input file: "
@@ -222,14 +222,14 @@ int main(int argc, char *argv[])
 
 ////////////////////////////////////////////////////////////////////////
 
-IndexKDTree *build_tree(vector<double> &lat, vector<double> &lon, vector<double> &alt_m) {
+std::unique_ptr<IndexKDTree> build_tree(vector<double> &lat, vector<double> &lon, vector<double> &alt_m) {
 
    double x;
    double y;
    double z;
    int count = lat.size();
    atlas::idx_t n = 0;
-   IndexKDTree *kdtree = new IndexKDTree(atlas_geometry);
+   auto kdtree = std::make_unique<IndexKDTree>(atlas_geometry);
    kdtree->reserve(count);
    for (int i=0; i<count; i++) {
       llh_to_ecef(lat[i], lon[i], alt_m[i], &x, &y, &z);

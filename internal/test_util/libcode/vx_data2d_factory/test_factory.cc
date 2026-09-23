@@ -17,6 +17,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <stdlib.h>
 #include <string.h>
 
@@ -33,7 +34,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
    // Pointers for the current objects
-   VarInfo       * vinfo_cur = nullptr; 
+   std::unique_ptr<VarInfo> vinfo_cur;
 
    // DataPlane objects for storing the data
    DataPlane plane;
@@ -72,7 +73,7 @@ int main(int argc, char *argv[]) {
    mtddf_cur->dump(cout);
 
    // Create a VarInfo object based on the gridded data file type
-   vinfo_cur = VarInfoFactory::new_var_info(mtddf_cur->file_type()).release();
+   vinfo_cur = VarInfoFactory::new_var_info(mtddf_cur->file_type());
 
    mlog << Debug(1) << "\nCALLING: vinfo_cur->VarInfo::dump(cout);\n";
    vinfo_cur->VarInfo::dump(cout);
@@ -143,9 +144,6 @@ int main(int argc, char *argv[]) {
       cin  >> name_str >> level_str;
 
    } // end while loop
-
-   // Clean up
-   if(vinfo_cur) { delete vinfo_cur; vinfo_cur = (VarInfo       *) 0; }
 
    return(0);
 }
