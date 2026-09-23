@@ -241,6 +241,7 @@ bool parse_line(const char * line)
 int n, k;
 char line2[1024];
 char * s = line2;
+char * saveptr = (char *) nullptr;
 char * c = (char *) nullptr;
 const char *method_name = "parse_line() -> ";
 
@@ -256,7 +257,7 @@ if ( ! strchr(line, '\"') )  return false;
    //  index and table number
    //
 
-c = strtok(s, " /*");
+c = strtok_r(s, " /*", &saveptr);
 
 s = (char *) nullptr;
 
@@ -270,7 +271,7 @@ cout << n << ' ' << table_number << ' ';
    //  first string
    //
 
-c = strtok(s, " /*{\"");
+c = strtok_r(s, " /*{\"", &saveptr);
 
 if ( !c )  return false;
 
@@ -280,14 +281,14 @@ cout << '\"' << c << "\" ";
    //  second string (is this football?)
    //
 
-c = strtok(s, ",\"");
-c = strtok(s, ",\"[");
+c = strtok_r(s, ",\"", &saveptr);
+c = strtok_r(s, ",\"[", &saveptr);
+
+if ( !c )  return false;
 
 k = m_strlen(c) - 1;
 
 if ( c[k] == ' ' )  c[k] = (char) 0;
-
-if ( !c )  return false;
 
 cout << '\"' << c << "\" ";
 
@@ -301,7 +302,7 @@ if ( strcmp(c, "undefined") == 0 )  {
 
 } else {
 
-   c = strtok(s, "]\"");
+   c = strtok_r(s, "]\"", &saveptr);
 
    if ( !c )  return false;
 
