@@ -755,7 +755,12 @@ clear();
 
 auto D = std::make_unique<GoesImagerData>();
 
-memcpy(D.get(), &data, sizeof(data));
+   //
+   //  deep copy instead of memcpy because the struct
+   //  contains std::vector members
+   //
+
+*D = data;
 
 gi = std::move(D);
 

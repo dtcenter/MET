@@ -70,7 +70,12 @@ Ny = 0;
 
 Name.clear();
 
-memset(&Data, 0, sizeof(Data));
+   //
+   //  value-initialize instead of memset because the struct
+   //  contains std::vector members
+   //
+
+Data = GoesImagerData();
 
 return;
 
