@@ -329,7 +329,7 @@ if ( !in )  {
    //
    //  copy filename
    //
-Name = m_strcpy2(filename, method_name, "Name");
+Name = filename;
 
    //
    //  read magic cookie

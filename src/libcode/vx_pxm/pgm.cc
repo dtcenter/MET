@@ -279,19 +279,7 @@ if ( !in )  {
    //  copy filename
    //
 
-Name = new char [1 + m_strlen(filename)];
-
-if ( !Name )  {
-
-   mlog << Warning << "\nPgm::read() -> can't allocate memory for file name\n\n";
-
-   clear();
-
-   return 0;
-
-}
-
-memcpy(Name, filename, 1 + m_strlen(filename));
+Name = filename;
 
    //
    //  read magic cookie

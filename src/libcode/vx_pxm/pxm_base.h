@@ -43,12 +43,12 @@ class PxmBase {
 
       int Nalloc;
 
-      char * Name;
+      std::string Name;
 
       int Nrows;
       int Ncols;
 
-      char * Comment [max_comments];
+      std::string Comment [max_comments];
 
       int Ncomments;
 
@@ -138,7 +138,7 @@ class PxmBase {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline const char * PxmBase::name() const { return Name; }
+inline const char * PxmBase::name() const { return ( Name.empty() ? nullptr : Name.c_str() ); }
 
 inline int PxmBase::nrows() const { return Nrows; }
 inline int PxmBase::ncols() const { return Ncols; }
