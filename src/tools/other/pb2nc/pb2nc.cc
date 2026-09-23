@@ -2825,9 +2825,10 @@ static void cleanup_hdr_typ(char *hdr_typ, bool is_prepbufr) {
 ////////////////////////////////////////////////////////////////////////
 
 static void dbl2str(double *d, ConcatString & str) {
-   const char *fmt_str = "%s";
-
-   str.format(fmt_str, d);
+   // BUFR character data is packed into the bytes of a double and is only
+   // null-terminated when shorter than sizeof(double)
+   const char *c = reinterpret_cast<const char *>(d);
+   str = string(c, strnlen(c, sizeof(double)));
    if (str.empty()) {
       str = "NA";
    }

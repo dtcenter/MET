@@ -523,7 +523,6 @@ void SingleAtt3D::write_txt(AsciiTable & table, const int row) const
 ConcatString cs;
 int c = n_header_3d_cols;
 int k;
-const char * format = 0;
 ConcatString s;
 
 
@@ -565,17 +564,15 @@ table.set_entry(row, c, s.text()); c++;
    //  centroid x, y, t
    //
 
-format = format_2_decimals;
-
-cs.format(format, Xbar);
+cs.format(format_2_decimals, Xbar);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ybar);
+cs.format(format_2_decimals, Ybar);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Tbar);
+cs.format(format_2_decimals, Tbar);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -583,13 +580,11 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  space centroid lat, lon
    //
 
-format = format_2_decimals;
-
-cs.format(format, Centroid_Lat);
+cs.format(format_2_decimals, Centroid_Lat);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, -Centroid_Lon);
+cs.format(format_2_decimals, -Centroid_Lon);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -597,13 +592,11 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  velocity xdot, ydot
    //
 
-format = format_2_decimals;
-
-cs.format(format, Xvelocity);
+cs.format(format_2_decimals, Xvelocity);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Yvelocity);
+cs.format(format_2_decimals, Yvelocity);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -611,9 +604,7 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  spatial axis angle
    //
 
-format = format_2_decimals;
-
-cs.format(format, SpatialAxisAngle);
+cs.format(format_2_decimals, SpatialAxisAngle);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -629,13 +620,11 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  start time, end time
    //
 
-format = format_int;
-
-cs.format(format, Tmin);
+cs.format(format_int, Tmin);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Tmax);
+cs.format(format_int, Tmax);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -643,9 +632,7 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  centroid distance travelled
    //
 
-format = format_3_decimals;
-
-cs.format(format, CdistTravelled);
+cs.format(format_3_decimals, CdistTravelled);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -653,25 +640,23 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  intensities 10, 25, 50, 75, 90
    //
 
-format = format_2_decimals;
-
-cs.format(format, Ptile_10);
+cs.format(format_2_decimals, Ptile_10);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_25);
+cs.format(format_2_decimals, Ptile_25);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_50);
+cs.format(format_2_decimals, Ptile_50);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_75);
+cs.format(format_2_decimals, Ptile_75);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_90);
+cs.format(format_2_decimals, Ptile_90);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -679,7 +664,7 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  custom intensity value
    //
 
-cs.format(format, Ptile_User);
+cs.format(format_2_decimals, Ptile_User);
 
 table.set_entry(row, c, cs.c_str()); c++;
 

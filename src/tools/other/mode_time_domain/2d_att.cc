@@ -468,7 +468,6 @@ void SingleAtt2D::write_txt(AsciiTable & table, const int row) const
 
 int c = n_header_3d_cols;
 int k;
-const char * format = 0;
 ConcatString cs;
 ConcatString s;
 
@@ -527,13 +526,11 @@ table.set_entry(row, c, Area); c++;
    //  centroid (x, y)
    //
 
-format = format_2_decimals;
-
-cs.format(format, Xbar);
+cs.format(format_2_decimals, Xbar);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ybar);
+cs.format(format_2_decimals, Ybar);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -541,13 +538,11 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  centroid lat/lon
    //
 
-format = format_2_decimals;
-
-cs.format(format, CentroidLat);
+cs.format(format_2_decimals, CentroidLat);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, -CentroidLon);   //  toggle sign
+cs.format(format_2_decimals, -CentroidLon);   // toggle sign
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -555,9 +550,7 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  axis angle
    //
 
-format = format_2_decimals;
-
-cs.format(format, AxisAngle);
+cs.format(format_2_decimals, AxisAngle);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -566,25 +559,23 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  intensities 10, 25, 50, 75, 90
    //
 
-   format = format_2_decimals;
-
-cs.format(format, Ptile_10);
+cs.format(format_2_decimals, Ptile_10);
 
    table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_25);
+cs.format(format_2_decimals, Ptile_25);
 
    table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_50);
+cs.format(format_2_decimals, Ptile_50);
 
    table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_75);
+cs.format(format_2_decimals, Ptile_75);
 
    table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_90);
+cs.format(format_2_decimals, Ptile_90);
 
    table.set_entry(row, c, cs.c_str()); c++;
 
@@ -592,7 +583,7 @@ cs.format(format, Ptile_90);
    //  custom intensity value
    //
 
-cs.format(format, Ptile_User);
+cs.format(format_2_decimals, Ptile_User);
 
    table.set_entry(row, c, cs.c_str()); c++;
 

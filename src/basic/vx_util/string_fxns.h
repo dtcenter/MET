@@ -46,7 +46,7 @@ extern ConcatString str_replace(const char* data, const char* old, const char* r
 
 extern ConcatString str_replace_all(const char* data, const char* old, const char* repl);
 
-extern ConcatString str_format(const char *fmt, ...);
+extern ConcatString str_format(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 
 extern ConcatString str_trim(const ConcatString str);
 
