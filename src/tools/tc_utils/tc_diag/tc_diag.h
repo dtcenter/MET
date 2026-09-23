@@ -113,13 +113,23 @@ class TmpFileInfo {
       ~TmpFileInfo();
 
          //
-         //  tmp_out owns its NcFile, so these objects move rather than copy.
-         //  The moves are declared explicitly because the user-declared
-         //  destructor above suppresses the implicit ones.
+         //  process_track_points() does tmp_file_map[key] = std::move(info),
+         //  so the move assignment is needed; map::operator[] default
+         //  constructs in place, so a move constructor is not.  A defaulted one
+         //  would in any case be deleted, because the ra_grid member is a
+         //  RngAziGrid whose copy constructor is deleted by GridRep's being
+         //  inaccessible.
+         //
+         //  noexcept is declared rather than deduced.  The deduced
+         //  specification is potentially throwing, because assigning ra_grid
+         //  falls back to RngAziGrid's copy assignment and grid_out is a Grid,
+         //  which deep copies its GridRep; both allocate.  The only exception
+         //  that can produce is std::bad_alloc, which no MET tool can ever
+         //  observe: met_main() calls set_handlers(), whose
+         //  set_new_handler(oom) exits the process before operator new throws.
          //
 
-      TmpFileInfo(TmpFileInfo &&) = default;
-      TmpFileInfo & operator=(TmpFileInfo &&) = default;
+      TmpFileInfo & operator=(TmpFileInfo &&) noexcept = default;
 
       //////////////////////////////////////////////////////////////////
 

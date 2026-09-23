@@ -35,9 +35,17 @@ class SimpleObjects {
       //  The destructor is defaulted for the same reason: a user-declared one
       //  suppresses the implicit move constructor.
       //
+      //  noexcept is declared rather than deduced.  The deduced specification
+      //  is potentially throwing, because _super has no move of its own -
+      //  ShapeData and BoolPlane declare destructors and so suppress theirs -
+      //  and copying it allocates.  The only exception that can produce is
+      //  std::bad_alloc, which no MET tool can ever observe: met_main() calls
+      //  set_handlers(), whose set_new_handler(oom) exits the process before
+      //  operator new can throw.
+      //
 
-   SimpleObjects(SimpleObjects &&) = default;
-   SimpleObjects & operator=(SimpleObjects &&) = default;
+   SimpleObjects(SimpleObjects &&) noexcept = default;
+   SimpleObjects & operator=(SimpleObjects &&) noexcept = default;
 
    void init(ModeDataType dataType, int rIndex, int tIndex);
    void setSuper(bool isFcst, int n_fcst_files, bool do_clusters, BoolCalc &f_calc);
