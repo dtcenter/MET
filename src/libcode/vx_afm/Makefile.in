@@ -356,7 +356,23 @@ libvx_afm_a_SOURCES = afm.cc afm.h \
               afm_token_types.h
 
 libvx_afm_a_CPPFLAGS = ${MET_CPPFLAGS}
-all: all-am
+
+# If we are in development mode, generate the "to_string" files and
+# clean them up in a "make clean".  We don't want to do either of these
+# in a distribution because the enum_to_string utility isn't available.
+
+# BUILT_SOURCES so these are generated before anything that
+# includes them is compiled.  Without it, a development build
+# whose .deps are empty - as after the make clean that removes
+# these very files - compiles sources in _SOURCES order and can
+# reach a consumer before its header has been generated.
+@ENABLE_DEVELOPMENT_TRUE@BUILT_SOURCES = afmkeyword_to_string.cc \
+@ENABLE_DEVELOPMENT_TRUE@                afmkeyword_to_string.h \
+@ENABLE_DEVELOPMENT_TRUE@                afmtokentype_to_string.cc \
+@ENABLE_DEVELOPMENT_TRUE@                afmtokentype_to_string.h
+
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .cc .o .obj
@@ -600,11 +616,14 @@ distdir-am: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(LIBRARIES)
 installdirs:
-install: install-am
-install-exec: install-exec-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
+install-exec: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
 
@@ -633,6 +652,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 @ENABLE_DEVELOPMENT_FALSE@clean-local:
 clean: clean-am
@@ -715,7 +735,7 @@ ps-am:
 
 uninstall-am:
 
-.MAKE: install-am install-strip
+.MAKE: all check install install-am install-exec install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-am clean \
 	clean-generic clean-local clean-noinstLIBRARIES cscopelist-am \
@@ -736,10 +756,6 @@ uninstall-am:
 # Include the project definitions
 
 include ${top_srcdir}/Make-include
-
-# If we are in development mode, generate the "to_string" files and
-# clean them up in a "make clean".  We don't want to do either of these
-# in a distribution because the enum_to_string utility isn't available.
 
 @ENABLE_DEVELOPMENT_TRUE@afmkeyword_to_string.h afmkeyword_to_string.cc: afm_keywords.h
 @ENABLE_DEVELOPMENT_TRUE@	${ENUM_TO_STRING} -concat_string afm_keywords.h
