@@ -67,12 +67,6 @@ static const char range_azimuth_proj_type  [] = "Range Azimuth";
 static const char laea_proj_type           [] = "Lambert Azimuthal Equal Area";
 static const char semilatlon_proj_type     [] = "SemiLatLon";
 
-// String containing all valid PrepBufr message types
-static const char vld_msg_typ_str[] =
-   "ADPUPA AIRCAR AIRCFT ADPSFC ERS1DA GOESND GPSIPW MSONET \
-    PROFLR QKSWND RASSDA SATEMP SATWND SFCBOG SFCSHP SPSSMI \
-    SYNDAT VADWND ANYAIR ANYSFC ONLYSF ASCATW WDSATR";
-
 // Array of valid PrepBufr message types
 static const char *vld_msg_typ_list[] = {
    "ADPUPA", "AIRCAR", "AIRCFT", "ADPSFC", "ERS1DA", "GOESND",
