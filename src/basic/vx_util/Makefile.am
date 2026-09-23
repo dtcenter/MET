@@ -82,6 +82,16 @@ libvx_util_a_CPPFLAGS = ${MET_CPPFLAGS}
 # in a distribution because the enum_to_string utility isn't available.
 
 if ENABLE_DEVELOPMENT
+
+# BUILT_SOURCES so these are generated before anything that
+# includes them is compiled.  Without it, a development build
+# whose .deps are empty - as after the make clean that removes
+# these very files - compiles sources in _SOURCES order and can
+# reach a consumer before its header has been generated.
+
+BUILT_SOURCES = asciitablejust_to_string.cc \
+                asciitablejust_to_string.h
+
 asciitablejust_to_string.cc asciitablejust_to_string.h: ascii_table.h
 	${ENUM_TO_STRING} -concat_string ascii_table.h
 
