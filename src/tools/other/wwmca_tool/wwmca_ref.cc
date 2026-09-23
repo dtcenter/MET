@@ -21,10 +21,6 @@
 
 #include "wwmca_ref.h"
 #include "interp_base.h"
-#include "ave_interp.h"
-#include "max_interp.h"
-#include "min_interp.h"
-#include "nearest_interp.h"
 #include "gridhemisphere_to_string.h"
 
 #include "grid_output.h"
