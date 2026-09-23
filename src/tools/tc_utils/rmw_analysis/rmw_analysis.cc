@@ -332,6 +332,11 @@ static void process_data_files() {
    count_3d.emplace_back(n_range);
    count_3d.emplace_back(n_azimuth);
 
+   // Close the handle used to read the dimensions above.  The loop below
+   // re-opens the same file as its first iteration, and holding two open
+   // handles to one file and then closing the first one crashes in HDF5.
+   nc_in.reset();
+
    // Loop over the input files
    for(int i_file = 0; i_file < data_files.n(); i_file++) {
 
@@ -433,6 +438,10 @@ static void process_data_files() {
          } // end for i_point
       } // end for i_var
    } // end for i_file
+
+   // Release the last input file while the netCDF library is still alive,
+   // rather than leaving it to static destruction after main() returns.
+   nc_in.reset();
 
    return;
 }
@@ -647,7 +656,7 @@ static void write_stats() {
    double lon_mean = track_lon.mean();
    lon_var.putVar(&lon_mean);
 
-   nc_out.get()->close();
+   nc_out.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////

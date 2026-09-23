@@ -661,7 +661,7 @@ void SeepsClimo::read_seeps_climo_grid(const ConcatString &filename) {
          seeps_score_12_map[sid] = rec_12;
       }
 
-      nc_file.get()->close();
+      nc_file.reset();
 
       float duration = (float)(clock() - clock_time)/CLOCKS_PER_SEC;
       mlog << Debug(6) << method_name
@@ -908,7 +908,7 @@ void SeepsClimoGrid::read_seeps_climo_grid(const ConcatString &filename) {
               << "Did not get ohfl_00\n\n";
          exit(1);
       }
-      nc_file.get()->close();
+      nc_file.reset();
 
       for(int i = 0; i < ny+3; i++) {
         mlog << Debug(9) << method_name
