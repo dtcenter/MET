@@ -11,6 +11,8 @@
 #ifndef  __UTIL_CONSTANTS_H__
 #define  __UTIL_CONSTANTS_H__
 
+
+#include <iterator>
 #if HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -80,7 +82,7 @@ static const char *vld_msg_typ_list[] = {
 
 // Number of valid PrepBufr message types
 static const int n_vld_msg_typ =
-   sizeof(vld_msg_typ_list)/sizeof(*vld_msg_typ_list);
+   std::size(vld_msg_typ_list);
 
 // Message type group names
 static const char surface_msg_typ_group_str [] = "SURFACE"; // Surface message type group

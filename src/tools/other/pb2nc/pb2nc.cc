@@ -599,7 +599,7 @@ static void initialize() {
    prepbufr_derive_vars.add("D_MLCAPE");
    prepbufr_derive_vars.add("D_PBL");
 
-   for (int idx=0; idx<(sizeof(hdr) / sizeof(hdr[0])); idx++) {
+   for (int idx=0; idx<(std::size(hdr)); idx++) {
       hdr[idx] = r8bfms * 10;
    }
 

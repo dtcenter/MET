@@ -18,6 +18,7 @@
 #include <cmath>
 
 #include <netcdf>
+#include <iterator>
 
 #include "vx_math.h"
 #include "vx_cal.h"
@@ -78,7 +79,7 @@ static const char *accum_var_names     [] = { "ACGRDFLX", "CUPPT",
                                               "RAINC",    "RAINNC",
                                               "SNOWNC",   "GRAUPELNC",
                                               "ACHFX",    "ACLHF" };
-static const int n_accum_var_names        = sizeof(accum_var_names)/sizeof(*accum_var_names);
+static const int n_accum_var_names        = std::size(accum_var_names);
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -16,6 +16,7 @@
 #include <iostream>
 #include <memory>
 #include <fstream>
+#include <iterator>
 
 #include "vx_util.h"
 
@@ -33,7 +34,7 @@ static const char * tc_header_cols [] = {
    "VALID_MASK", "LINE_TYPE"
 };
 
-static const int n_tc_header_cols = sizeof(tc_header_cols)/sizeof(*tc_header_cols);
+static const int n_tc_header_cols = std::size(tc_header_cols);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -75,14 +76,14 @@ static const char * tc_mpr_cols [] = {
    "MSLP_STDEV",  "MAX_WIND_STDEV"
 };
 
-static const int n_tc_mpr_cols = sizeof(tc_mpr_cols)/sizeof(*tc_mpr_cols);
+static const int n_tc_mpr_cols = std::size(tc_mpr_cols);
 
 ////////////////////////////////////////////////////////////////////////
 
 static const char * tc_cols_track [] = {
   "TK_ERR", "ALTK_ERR", "CRTK_ERR"
 };
-static const int n_tc_cols_track = sizeof(tc_cols_track)/sizeof(*tc_cols_track);
+static const int n_tc_cols_track = std::size(tc_cols_track);
 
 static const char * tc_cols_wind [] = {
    "ABS(AAL_WIND_34-BAL_WIND_34)",
@@ -101,22 +102,22 @@ static const char * tc_cols_wind [] = {
    "ABS(ASW_WIND_64-BSW_WIND_64)",
    "ABS(ANW_WIND_64-BNW_WIND_64)"
 };
-static const int n_tc_cols_wind = sizeof(tc_cols_wind)/sizeof(*tc_cols_wind);
+static const int n_tc_cols_wind = std::size(tc_cols_wind);
 
 static const char * tc_cols_ti [] = {
   "ABS(TK_ERR)", "ABS(AMAX_WIND-BMAX_WIND)"
 };
-static const int n_tc_cols_ti = sizeof(tc_cols_ti)/sizeof(*tc_cols_ti);
+static const int n_tc_cols_ti = std::size(tc_cols_ti);
 
 static const char * tc_cols_ac [] = {
   "ABS(ALTK_ERR)", "ABS(CRTK_ERR)"
 };
-static const int n_tc_cols_ac = sizeof(tc_cols_ac)/sizeof(*tc_cols_ac);
+static const int n_tc_cols_ac = std::size(tc_cols_ac);
 
 static const char * tc_cols_xy [] = {
   "ABS(X_ERR)", "ABS(Y_ERR)"
 };
-static const int n_tc_cols_xy = sizeof(tc_cols_xy)/sizeof(*tc_cols_xy);
+static const int n_tc_cols_xy = std::size(tc_cols_xy);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -126,7 +127,7 @@ static const char * tc_diag_cols [] = {
       "N_DIAG",      "DIAG_",        "VALUE_"
 };
 
-static const int n_tc_diag_cols = sizeof(tc_diag_cols)/sizeof(*tc_diag_cols);
+static const int n_tc_diag_cols = std::size(tc_diag_cols);
 
 inline int get_n_tc_diag_cols (int n) { return(n_tc_diag_cols + (2*n)); } // n = NDiag
 
@@ -146,7 +147,7 @@ static const char * prob_rirw_cols [] = {
    "N_THRESH",    "THRESH_",    "PROB_"
 };
 
-static int n_prob_rirw_cols = sizeof(prob_rirw_cols)/sizeof(*prob_rirw_cols);
+static int n_prob_rirw_cols = std::size(prob_rirw_cols);
 
 inline int get_n_prob_rirw_cols (int n) { return(n_prob_rirw_cols + (2*n)); } // n = NThresh
 

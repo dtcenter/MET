@@ -13,6 +13,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <iterator>
+
 #include "vx_util.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -56,8 +58,7 @@ static const char *grib_precipitation_abbr[] = {
 // Number of GRIB1 precipitation variable names
 //
 static const int n_grib_precipitation_abbr =
-                     sizeof(grib_precipitation_abbr)/
-                    sizeof(*grib_precipitation_abbr);
+                     std::size(grib_precipitation_abbr);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -76,8 +77,7 @@ static const char *grib_specific_humidity_abbr[] = {
 // Number of GRIB1 specific humidity abbreviations
 //
 static const int n_grib_specific_humidity_abbr =
-                     sizeof(grib_specific_humidity_abbr)/
-                    sizeof(*grib_specific_humidity_abbr);
+                     std::size(grib_specific_humidity_abbr);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -213,7 +213,7 @@ static const GribLevelData grib_level_list[] = {
    { 254, 0, 0, "Highest top level of supercooled liquid water layer", "HTLSW" },
    { 255, 0, 0, "Missing", "NA" }
 };
-static const int n_grib_level_list = sizeof(grib_level_list)/sizeof(GribLevelData);
+static const int n_grib_level_list = std::size(grib_level_list);
 
 ////////////////////////////////////////////////////////////////////////
 

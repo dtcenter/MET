@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
+#include <iterator>
 
 #include "data2d_factory_utils.h"
 #include "is_grib_file.h"
@@ -34,16 +35,13 @@ using namespace std;
 // List of file name extensions corresponding to these file types
 //
 static const char *gb_file_ext [] = { ".grib", ".grb", ".gb" };
-static const int   n_gb_file_ext  = sizeof(gb_file_ext)/sizeof(*gb_file_ext);
+static const int   n_gb_file_ext  = std::size(gb_file_ext);
 
 static const char *gb2_file_ext [] = { ".grib2", ".grb2", ".gb2" };
-static const int   n_gb2_file_ext  = sizeof(gb2_file_ext)/sizeof(*gb2_file_ext);
-
-// static const char *nc_file_ext [] = { ".netcdf", ".ncf", ".nc" };
-// static const int   n_nc_file_ext  = sizeof(nc_file_ext)/sizeof(*nc_file_ext);
+static const int   n_gb2_file_ext  = std::size(gb2_file_ext);
 
 static const char *bf_file_ext [] = { ".bufr", ".bfr", ".prepbufr", ".pb" };
-static const int   n_bf_file_ext  = sizeof(bf_file_ext)/sizeof(*bf_file_ext);
+static const int   n_bf_file_ext  = std::size(bf_file_ext);
 
 
 ////////////////////////////////////////////////////////////////////////
