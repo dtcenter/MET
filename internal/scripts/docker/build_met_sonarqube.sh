@@ -95,14 +95,8 @@ if [ "$MET_GIT_NAME" != "$SONAR_REFERENCE_BRANCH" ]; then
   echo "sonar.newCode.referenceBranch=${SONAR_REFERENCE_BRANCH}" >> $SONAR_PROPERTIES
 fi
 
-# Enable development mode.  src/basic/enum_to_string, src/tools/dev_utils and
-# internal/test_util are only added to SUBDIRS under ENABLE_DEVELOPMENT, so
-# without this they are never compiled, never appear in the build-wrapper's
-# compile_commands.json, and are therefore never analysed no matter what
-# sonar.sources says.  The auto-generated parsers are recreated as a result;
-# config.tab.* and color_parser_yacc.* stay in sonar.exclusions so the
-# regenerated code is still not reported.
-export MET_DEVELOPMENT=true
+# Disable development mode so that auto-generated code will not be recreated 
+unset MET_DEVELOPMENT
 
 # Run the MET configure script
 time_command ./configure \
