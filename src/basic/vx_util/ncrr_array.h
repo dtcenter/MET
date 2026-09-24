@@ -65,11 +65,39 @@ class NCRR_Array {
 
       NCRR_Array(const NCRR_Array & _a)  { init_from_scratch();  assign(_a); }
 
+      NCRR_Array(NCRR_Array && _a) noexcept
+         : Nelements(_a.Nelements), Nalloc(_a.Nalloc), AllocInc(_a.AllocInc), e(_a.e) {
+
+         _a.e = (T **) nullptr;
+         _a.Nelements = 0;
+         _a.Nalloc = 0;
+
+      }
+
       NCRR_Array & operator=(const NCRR_Array & _a)  {
 
-         if ( this == _a )  return *this;
+         if ( this == &_a )  return *this;
 
          assign(_a);
+
+         return *this;
+
+      }
+
+      NCRR_Array & operator=(NCRR_Array && _a) noexcept  {
+
+         if ( this == &_a )  return *this;
+
+         clear();
+
+         Nelements = _a.Nelements;
+         Nalloc    = _a.Nalloc;
+         AllocInc  = _a.AllocInc;
+         e         = _a.e;
+
+         _a.e = (T **) nullptr;
+         _a.Nelements = 0;
+         _a.Nalloc = 0;
 
          return *this;
 

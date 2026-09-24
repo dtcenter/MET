@@ -71,41 +71,6 @@ return earth_radius_km*ahaversine(x);
 
 
    //
-   //  gc_angle
-   //
-   //  Calculates the angle in degrees
-   //     between the points (lat1, lon1),
-   //     (lat2, lon2) (in degrees) with the
-   //     center of the earth as the vertex
-   //
-
-
-//////////////////////////////////////////////////////////////////
-
-
-double gc_angle(double lat1, double lon1, double lat2, double lon2)
-
-{
-
-double lat1_radians = lat1 * rad_per_deg;
-double lat2_radians = lat2 * rad_per_deg;
-double lon1_radians = lon1 * rad_per_deg;
-double lon2_radians = lon2 * rad_per_deg;
-
-double dp = (lat1_radians - lat2_radians);
-double dl = (lon1_radians - lon2_radians);
-
-double x = haversine(dp) + cos(lat1_radians)*cos(lat2_radians)*haversine(dl);
-
-return deg_per_rad*ahaversine(x);
-
-}
-
-
-//////////////////////////////////////////////////////////////////
-
-
-   //
    //  haversine
    //
    //  Calculates the haversine of an
@@ -213,7 +178,9 @@ double rl_bearing(double lat1, double lon1, double lat2, double lon2)
 double mp1 = meridional_parts(lat1);
 double mp2 = meridional_parts(lat2);
 
-return atan2d( rad_per_deg * (lon1 - lon2), mp2 - mp1);
+double beta = atan2d( rad_per_deg * (lon1 - lon2), mp2 - mp1);
+
+return beta;
 
 }
 
@@ -270,9 +237,7 @@ double x = cosd(lat1)*sind(lat2) - sind(lat1)*cosd(lat2)*cosd(dl);
 
 double y = cosd(lat2)*sind(dl);
 
-double beta = atan2d(y, x);
-
-return beta;
+return atan2d(y, x);
 
 }
 
@@ -307,27 +272,21 @@ double theta = gc_dist(lat1, lon1, lat2, lon2)/earth_radius_km;
 double t = dist/earth_radius_km;
 
 double sth = sin(theta);
-
 double st = sin(t);
-
 double stmt = sin(theta - t);
 
 double sp1 = sind(lat1);
 double sp2 = sind(lat2);
-
 double sl1 = sind(lon1);
 double sl2 = sind(lon2);
 
 double cp1 = cosd(lat1);
 double cp2 = cosd(lat2);
-
 double cl1 = cosd(lon1);
 double cl2 = cosd(lon2);
 
 double x = cp1*cl1*stmt + cp2*cl2*st;
-
 double y = cp1*sl1*stmt + cp2*sl2*st;
-
 double z = (sp1*stmt + sp2*st)/sth;
 
 lat = asind(z);
@@ -371,22 +330,18 @@ void gc_point_v2(double lat1, double lon1, double bear, double dist,
 
 double t = dist/earth_radius_km;
 
-double sp = sind(lat1); 
+double sp = sind(lat1);
 double cp = cosd(lat1);
-
 double sl = sind(lon1);
 double cl = cosd(lon1);
 
 double sb = sind(bear);
 double cb = cosd(bear);
-
 double st = sin(t);
 double ct = cos(t);
 
 double x = cp*sl*ct - sp*sl*cb*st - cl*sb*st;
-
 double y = cp*cl*ct - sp*cl*cb*st + sl*sb*st;
-
 double z = sp*ct + cp*cb*st;
 
 lat = asind(z);
@@ -473,9 +428,7 @@ if ( fabs(cb) < 1.0e-5 )
 else {
 
    double tb = tand(bear);
-
    double mp = meridional_parts(lat);
-
    double mp1 = meridional_parts(lat1);
 
    lon = lon1 * rad_per_deg - tb*( mp - mp1 );

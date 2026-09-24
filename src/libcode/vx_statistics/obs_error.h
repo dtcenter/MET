@@ -13,6 +13,11 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <functional>
+#include <map>
+#include <string>
+#include <vector>
+
 #include "vx_config.h"
 #include "vx_util.h"
 
@@ -71,6 +76,11 @@ class ObsErrorEntry {
 
       double variance() const;
 
+      // Check whether this entry actually requires bias correction
+      // and/or perturbation
+      bool need_bias_correction() const;
+      bool need_perturbation() const;
+
          //
          //  do stuff
          //
@@ -80,7 +90,8 @@ class ObsErrorEntry {
       bool is_header(const DataLine &);
 
       bool is_match(const char *, const char *, const char *,
-                    int, int, int, double, double, double);
+                    int, int, int, double, double, double,
+                    bool skip_var_name = false);
 
       void validate();
 };
@@ -91,26 +102,33 @@ class ObsErrorTable {
 
    private:
 
-      void init_from_scratch();
-
       void assign(const ObsErrorTable &);
 
       void extend(int);
 
-      ObsErrorEntry * e;   //  elements ... allocated
+      std::vector<ObsErrorEntry> e;   //  elements
 
-      int N_elements;
+      bool IsSet = false;
 
-      int N_alloc;
+      // Cache of table row indices, subsetted by variable name, to
+      // avoid rescanning (and re-running regex matches over) the full
+      // table on every lookup() call for a given variable name
+      std::map<std::string, std::vector<int>, std::less<>> VarSubsetCache;
 
-      bool IsSet;
+      // Index of the most recently matched table row which is checked
+      // first since consecutive lookups often produce the same match
+      int LastMatchIndex = -1;
+
+      const std::vector<int> & var_subset(const char *cur_var_name);
 
    public:
 
-      ObsErrorTable();
+      ObsErrorTable() = default;
      ~ObsErrorTable();
       ObsErrorTable(const ObsErrorTable &);
+      ObsErrorTable(ObsErrorTable &&) noexcept;
       ObsErrorTable & operator=(const ObsErrorTable &);
+      ObsErrorTable & operator=(ObsErrorTable &&) noexcept;
 
       void clear();
 
@@ -137,19 +155,19 @@ class ObsErrorTable {
       bool read(const char * filename);
 
       // for point observations
-      ObsErrorEntry * lookup(const char *, const char *, const char *,
-                             int, int, int, double, double, double);
+      const ObsErrorEntry * lookup(const char *, const char *, const char *,
+                                   int, int, int, double, double, double);
 
       // for gridded analyses
-      ObsErrorEntry * lookup(const char *, const char *,
-                             double cur_val = bad_data_double);
+      const ObsErrorEntry * lookup(const char *, const char *,
+                                   double cur_val = bad_data_double);
 
       bool has(const char *, const char *);
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int  ObsErrorTable::n()      const { return N_elements; }
+inline int  ObsErrorTable::n()      const { return (int) e.size(); }
 inline bool ObsErrorTable::is_set() const { return IsSet;      }
 
 ////////////////////////////////////////////////////////////////////////
@@ -188,20 +206,39 @@ extern ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *);
 
 extern double       add_obs_error_inc(const gsl_rng *, FieldType,
                                       const ObsErrorEntry *, const double,
-                                      double);
+                                      double, bool log_detail = true);
 extern DataPlane    add_obs_error_inc(const gsl_rng *, FieldType,
                                       const ObsErrorEntry *,
                                       const DataPlane &in_dp,
                                       const DataPlane &obs_dp,
                                       const char *, const char *);
 
-extern double       add_obs_error_bc(const gsl_rng *, FieldType,
-                                     const ObsErrorEntry *, double);
-extern DataPlane    add_obs_error_bc(const gsl_rng *, FieldType,
+extern double       add_obs_error_bc(FieldType,
+                                     const ObsErrorEntry *, double,
+                                     bool log_detail = true);
+extern DataPlane    add_obs_error_bc(FieldType,
                                      const ObsErrorEntry *,
                                      const DataPlane &in_dp,
                                      const DataPlane &obs_dp,
                                      const char *, const char *);
+
+// Build a per-gridpoint cache of resolved ObsErrorEntry pointers by
+// doing one table lookup per point to avoid repeating the table
+// lookup for each ensemble member.
+extern std::vector<const ObsErrorEntry *> build_obs_error_entry_grid(
+                                      const DataPlane &val_dp,
+                                      const char *var_name,
+                                      const char *obtype);
+
+// Variants that consume a precomputed per-gridpoint entry cache
+// instead of a single entry or a var_name/obtype table lookup
+extern DataPlane    add_obs_error_inc(const gsl_rng *, FieldType,
+                                      const std::vector<const ObsErrorEntry *> &entry_grid,
+                                      const DataPlane &in_dp,
+                                      const DataPlane &obs_dp);
+extern DataPlane    add_obs_error_bc(FieldType,
+                                     const std::vector<const ObsErrorEntry *> &entry_grid,
+                                     const DataPlane &in_dp);
 
 ////////////////////////////////////////////////////////////////////////
 

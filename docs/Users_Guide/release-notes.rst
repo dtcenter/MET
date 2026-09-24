@@ -183,6 +183,9 @@ MET Version 13.0.0 Upgrade Instructions
      * The "mask.grid" and "mask.poly" entries have changed from strings to arrays of strings
        to support the processing of multiple masking regions.
 
+     * The "power_spectrum" dictionary is added to configure how missing data values should
+       handled when computing power spectra.
+
      * The new "output_flag" entry is a dictionary specifying the desired output types.
 
    * Gen-Ens-Prod configuration file
@@ -211,7 +214,12 @@ MET Version 13.0.0 Upgrade Instructions
 
      * Existing histogram variables are modified to include the "mask" dimension.
 
-     * New information theory variables are added for "entropy", "joint_entropy", and "mutual_information".
+     * New information theory variables are added for "entropy", "joint_entropy", and
+       "mutual_information".
+
+     * A new power spectrum "wavenumber" dimension is added, along with "wavenumber" and
+       "wavelength" variables. "power_spectrum" variables are written for each input,
+       and "error_power_spectrum" variables contain the differences for multiple inputs.
 
    * Gen-Ens-Prod output format
 
