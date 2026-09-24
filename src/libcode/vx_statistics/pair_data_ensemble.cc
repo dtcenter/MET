@@ -1284,7 +1284,7 @@ bool VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
                obs_lvl, obs_hgt, obs_v);
 
             // MET #3429: Skip observation if the table lookup fails
-            if(!oerr_ptr) { n_fail_obs_error++; return; }
+            if(!oerr_ptr) { n_fail_obs_error++; return obs_used; }
          }
       }
    }
