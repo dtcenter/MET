@@ -566,7 +566,12 @@ bool PairStatConfInfo::add_mpr_line(STATLine l) {
       if(vx.add_mpr_line(l)) keep = true;
    }
 
-   // JHG HERE?
+   // Update point weight station id locations
+   if(keep && point_weight_info.need_sid()) {
+      point_weight_info.add_sid(l.get_item("OBS_SID"),
+                                atof(l.get_item("OBS_LAT")),
+                                atof(l.get_item("OBS_LON")));
+   }
 
    return keep;
 }

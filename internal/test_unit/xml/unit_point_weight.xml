@@ -220,4 +220,24 @@
     </output>
   </test>
 
+  <!-- Read MPR output from the point_weight_POINT_STAT_KDE test above -->
+  <test name="point_weight_PAIR_STAT_KDE">
+    <exec>&MET_BIN;/pair_stat</exec>
+    <env>
+      <pair><name>DESC</name>          <value>KDE_WEIGHT</value></pair>
+      <pair><name>POINT_WEIGHT</name>  <value>KDE</value></pair>
+    </env>
+    <param> \
+      -pairs  &OUTPUT_DIR;/point_weight/point_stat_KDE_WEIGHT_150000L_20120409_120000V.stat \
+      -format mpr \
+      -config &CONFIG_DIR;/PairStatConfig_point_weight \
+      -out    &OUTPUT_DIR;/point_weight/pair_stat_KDE_WEIGHT \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_weight/pair_stat_KDE_WEIGHT.stat</stat>
+      <exist>&OUTPUT_DIR;/point_weight/pair_stat_KDE_WEIGHT_KDE_point_weights.txt</exist>
+    </output>
+  </test>
+
 </met_test>

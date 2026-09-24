@@ -51,7 +51,8 @@ fcst = {
    field = [
       { name = "TMP";  level = "P850"; message_type = "ADPUPA"; cat_thresh = [ >273, >283 ]; },
       { name = "UGRD"; level = "P850"; message_type = "ADPUPA"; cat_thresh = [ >5 ];         },
-      { name = "VGRD"; level = "P850"; message_type = "ADPUPA"; cat_thresh = [ >5 ];         }
+      { name = "VGRD"; level = "P850"; message_type = "ADPUPA"; cat_thresh = [ >5 ];         },
+      { name = "TMP";  level = "Z2";   message_type = "ADPSFC"; cat_thresh = [ >273, >283 ]; }
    ];
 
 }

@@ -684,12 +684,17 @@ static void process_ioda_pairs(const ConcatString &file_name) {
 
          // Add each IODA pair 
          for(const auto &x : *pairs) {
-            if(vx.add_ioda_pair(x)) n_keep++;
+            if(vx.add_ioda_pair(x)) {
+               n_keep++;
+
+               // Update point weight station id locations
+               if(conf_info.point_weight_info.need_sid()) {
+                  conf_info.point_weight_info.add_sid(x.sid, x.lat, x.lon);
+               }
+            }
          }
       }
    }
-
-   // JHG HERE
 
    mlog << Debug(3) << "Keeping " << n_keep << " of " << n_read
         << " IODA pairs from \"" << file_name << "\".\n";
