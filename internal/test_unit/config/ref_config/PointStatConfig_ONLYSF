@@ -36,6 +36,9 @@ cnt_thresh  = [ NA ];
 cnt_logic   = UNION;
 wind_logic  = INTERSECTION;
 
+duplicate_flag = NONE;
+rank_corr_flag = FALSE;
+
 //
 // Forecast and observation fields to be verified
 //
@@ -163,6 +166,13 @@ hira = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Threshold for SEEPS p1 (Probability of being dry)
+//
+seeps_p1_thresh = >=0.1&&<=0.85;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Statistical output types
 //
 output_flag = {
@@ -190,10 +200,11 @@ output_flag = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-duplicate_flag = NONE;
-rank_corr_flag = FALSE;
-
 point_weight_flag = NONE;
+kde_ref_angle     = 0.75;
+write_weights     = FALSE;
+
+////////////////////////////////////////////////////////////////////////////////
 
 tmp_dir       = "/tmp";
 output_prefix = "${MODEL}_F${FCST_TIME}_ONLYSF";

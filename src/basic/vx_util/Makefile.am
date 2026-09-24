@@ -62,6 +62,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                polyline.h polyline.cc \
                mask_poly.h mask_poly.cc \
                mask_sid.h mask_sid.cc \
+               point_weight.h point_weight.cc \
                read_fortran_binary.h read_fortran_binary.cc \
                met_buffer.h met_buffer.cc \
                smart_buffer.h smart_buffer.cc  \

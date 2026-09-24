@@ -107,6 +107,7 @@ class PointStatVxOpt {
       //////////////////////////////////////////////////////////////////
 
       VxPairDataPoint vx_pd;              // Matched pair data [n_msg_typ][n_mask][n_interp]
+      PointWeightInfo point_weight_info;  // Point weighting information for this task
 
       int             beg_ds;             // Begin observation time window offset
       int             end_ds;             // End observation time window offset
@@ -239,7 +240,7 @@ class PointStatConfInfo {
       // Mapping of mask names to Station ID lists
       std::map<ConcatString,MaskSID>     mask_sid_map;
 
-      PointWeightType point_weight_flag;    // Point weighting flag
+      PointWeightInfo point_weight_info;    // Point weighting settings, copied to each task
 
       ConcatString tmp_dir;                 // Directory for temporary files
       ConcatString output_prefix;           // String to customize output file name

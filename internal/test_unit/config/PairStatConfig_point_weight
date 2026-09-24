@@ -17,7 +17,7 @@ model = "";
 // Non-empty string overrides input data values
 // May be set separately in each "obs.pairs" entry
 //
-desc = "";
+desc = "${DESC}";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -26,40 +26,14 @@ desc = "";
 //
 fcst = {
   pairs = [
-    {
-      name          = "/hofx/air_temperature";
-      set_attr_name = "HOFX_TMP";
-    },
-    {
-      name          = "/hofx/eastward_wind";
-      set_attr_name = "HOFX_UWIND";
-      is_u_wind = TRUE;
-    },
-    {
-      name          = "/hofx/northward_wind";
-      set_attr_name = "HOFX_VWIND";
-      is_v_wind = TRUE;
-    }
+    { name = "TMP";  level = "P850"; cat_thresh = [ >273, >283 ]; },
+    { name = "UGRD"; level = "P850"; cat_thresh = [ >5 ];         },
+    { name = "VGRD"; level = "P850"; cat_thresh = [ >5 ];         },
+    { name = "TMP";  level = "Z2";   cat_thresh = [ >273, >283 ]; }
   ];
 }
-obs = {
-  pairs = [
-    {
-      name          = "/ObsValue/air_temperature";
-      set_attr_name = "OBSV_TMP";
-    },
-    {
-      name          = "/ObsValue/eastward_wind";
-      set_attr_name = "OBSV_UWIND";
-      is_u_wind = TRUE;
-    },
-    {
-      name          = "/ObsValue/northward_wind";
-      set_attr_name = "OBSV_VWIND";
-      is_v_wind = TRUE;
-    }
-  ];
-}
+
+obs = fcst;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -84,7 +58,8 @@ wind_logic    = UNION;
 //
 mpr_column      = [];
 mpr_thresh      = [];
-mpr_str_inc     = [];
+mpr_str_inc     = [ { key = "VX_MASK"; val = "FULL";          },
+                    { key = "OBTYPE";  val = "ADPSFC,ADPUPA"; } ];
 mpr_str_exc     = [];
 
 fcst_lead       = [];
@@ -130,10 +105,8 @@ rank_corr_flag = FALSE;
 //
 climo_mean = {
 
-   file_name = [ ${CLIMO_MEAN_FILE_LIST} ];
-   field     = [ { name = "TMP";  level = "Z2"; },
-                 { name = "UGRD"; level = "Z10"; },
-                 { name = "VGRD"; level = "Z10"; } ];
+   file_name = [];
+   field     = [];
 
    regrid = {
       method     = NEAREST;
@@ -142,9 +115,9 @@ climo_mean = {
       shape      = SQUARE;
    }
 
-   time_interp_method = NEAREST;
-   day_interval       = ${DAY_INTERVAL};
-   hour_interval      = ${HOUR_INTERVAL};
+   time_interp_method = DW_MEAN;
+   day_interval       = 31;
+   hour_interval      = 6;
 }
 
 //
@@ -153,7 +126,7 @@ climo_mean = {
 //
 climo_stdev = climo_mean;
 climo_stdev = {
-   file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
+   file_name = [];
 }
 
 //
@@ -174,7 +147,7 @@ climo_cdf = {
 // May be set separately in each "obs.pairs" entry
 //
 mask = {
-   grid  = [];
+   grid  = [ "FULL" ];
    poly  = [];
    sid   = [];
    llpnt = [];
@@ -211,31 +184,31 @@ seeps_p1_thresh = >=0.1&&<=0.85;
 //
 output_flag = {
    fho    = NONE;
-   ctc    = NONE;
-   cts    = NONE;
+   ctc    = STAT;
+   cts    = STAT;
    mctc   = NONE;
    mcts   = NONE;
-   cnt    = NONE;
+   cnt    = STAT;
    sl1l2  = STAT;
-   sal1l2 = STAT;
-   vl1l2  = STAT;
-   val1l2 = STAT;
-   vcnt   = STAT;
+   sal1l2 = NONE;
+   vl1l2  = NONE;
+   val1l2 = NONE;
+   vcnt   = NONE;
    pct    = NONE;
    pstd   = NONE;
    pjc    = NONE;
    prc    = NONE;
    eclv   = NONE;
-   mpr    = STAT;
+   mpr    = NONE;
    seeps  = NONE;
    seeps_mpr = NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-point_weight_flag = NONE;
+point_weight_flag = ${POINT_WEIGHT};
 kde_ref_angle     = 0.75;
-write_weights     = FALSE;
+write_weights     = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
 

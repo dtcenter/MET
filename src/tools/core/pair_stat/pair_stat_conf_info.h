@@ -128,6 +128,7 @@ class PairStatVxOpt {
       //////////////////////////////////////////////////////////////////
 
       VxPairDataPoint vx_pd;              // Matched pair data [n_mask]
+      PointWeightInfo point_weight_info;  // Point weighting information for this task
       std::vector<StatHdrInfo> vx_hdr;    // Track header inputs [n_mask]
       bool convert_censor_flag;           // Conversion and/or censoring requested
 
@@ -287,7 +288,7 @@ class PairStatConfInfo {
       // Mapping of mask names to Station ID lists
       std::map<ConcatString,MaskSID> mask_sid_map;
 
-      PointWeightType point_weight_flag;    // Point weighting flag
+      PointWeightInfo point_weight_info;    // Point weighting settings, copied to each task
 
       ConcatString tmp_dir;                 // Directory for temporary files
       ConcatString version;                 // Config file version

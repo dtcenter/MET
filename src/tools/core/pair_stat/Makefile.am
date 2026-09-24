@@ -41,6 +41,7 @@ pair_stat_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_util_math \
 	-lvx_util \
+        -lvx_nav \
 	$(PYTHON_MET_LIBS) \
 	-lvx_math \
 	-lvx_cal \

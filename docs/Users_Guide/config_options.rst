@@ -2797,22 +2797,75 @@ point_weight_flag
 -----------------
 
 The "point_weight_flag" is similar to the "grid_weight_flag", described above,
-but applies to grid-to-point verification in Point-Stat and Ensemble-Stat.
+but applies to point verification in Point-Stat, Ensemble-Stat, and Pair-Stat.
 It is not applied for grid-to-grid verification which is controlled by the
 "grid_weight_flag" option. It can only be defined once at the highest level
 of config file context and applies to all verification tasks for that run.
 
-While only one point weighting option is currently supported, additional
-methods are planned for future versions:
+Three point weighting options are currently supported:
 
 * NONE to disable point weighting using a constant weight of 1.0 (default).
 
 * SID to use the weights defined by the station ID masking configuration option,
   "mask.sid".
 
+* KDE to apply a kernel density estimator to compute weights based on observation
+  density to avoid the impact of oversampling from data rich regions, as described
+  in :ref:`Rodwell et al., 2010 <Rodwell-2010>` and
+  :ref:`Haiden et al., 2012 <Haiden-2012>`. The weight for each station is the
+  inverse of its station density, computed as the sum of
+  exp(-(angle / kde_ref_angle)^2) over all stations, including itself, where
+  angle is the great circle angle between the two stations. KDE weights are in
+  the range (0, 1], where a weight of 1 indicates an isolated station.
+
+  KDE weights are computed separately for each verification task, using only the
+  stations whose observations are used by that task. As a result, adding or
+  removing a verification task does not change the weights for any other task.
+  Each unique station ID is treated as a single point in the density calculation,
+  located at the first location encountered for that station within each
+  verification task.
+
 .. code-block:: none
 
   point_weight_flag = NONE;
+
+kde_ref_angle
+-------------
+
+The "kde_ref_angle" entry defines the reference angle used when computing the
+weights for "point_weight_flag = KDE". This reference angle is defined in degrees
+with a default value of 0.75. As described in :ref:`Haiden et al., 2012 <Haiden-2012>`,
+an increase of this parameter increases the weights of data-sparse regions in global
+or continental-scale averages. The value must be greater than 0 when
+"point_weight_flag = KDE".
+
+.. code-block:: none
+
+  kde_ref_angle = 0.75;
+
+write_weights
+-------------
+
+Point weights are either pre-defined ("point_weight_flag = SID") or computed based
+on the station location density ("point_weight_flag = KDE"). The "write_weights"
+entry is a boolean that can be set to TRUE or FALSE (default). If TRUE, the weights
+for each verification task are written to a separate output ASCII file. The file
+names end in "_NAME_LEVEL_TYPE_point_weights.txt", where NAME and LEVEL are the
+forecast variable name and level for that task, and TYPE is SID or KDE. Characters
+other than letters, digits, "-", and "." in the NAME and LEVEL strings are replaced
+with "_". If multiple verification tasks have the same NAME and LEVEL, the 1-based
+task index is appended (e.g. "_TMP_Z2_vx4") to make the file names unique. These
+files can be used to define the "mask.sid" station ID masking file in future runs.
+
+Note that "mask.sid" can be specified separately for each verification task, and,
+technically, the same station could be assigned different weights for different
+masking regions within a single verification task. If the same station name
+appears in multiple "mask.sid" lists for a task, only the first weight encountered
+for each station is written to the output.
+
+.. code-block:: none
+
+  write_weights = FALSE;
 
 hss_ec_value
 ------------

@@ -63,7 +63,7 @@ fcst = {
    field = [
       { name = "TMP";   level = [ "P500" ];  cat_thresh = [ ==FBIAS0.9, ==FBIAS1.0, ==FBIAS1.1, ==FBIAS0.9, ==FBIAS1.0, ==FBIAS1.1, <243, <243, <243, >253, >253, >253 ]; } 
    ];
-   
+
 }
 obs = {
 
