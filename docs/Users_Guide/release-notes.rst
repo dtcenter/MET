@@ -175,8 +175,9 @@ MET Version 13.0.0 Upgrade Instructions
 
      * The "kde_ref_angle" numeric entry defines a reference angle when computing KDE weights.
 
-     * The "write_weights" boolean entry instructs the tools to write an output text file
-       containing the point weight values applied based on the "point_weight_flag" setting.
+     * The "write_weights" boolean entry instructs the tools to write output text files,
+       one per verification task, containing the point weight values applied based on the
+       "point_weight_flag" setting.
 
    * Grid-Diag configuration file
 

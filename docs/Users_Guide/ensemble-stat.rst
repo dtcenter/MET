@@ -489,6 +489,10 @@ The output ASCII files are named similarly:
 
 ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of elements of the **output_flag** configuration option to indicate the line type it contains.
 
+When **write_weights = TRUE** and **point_weight_flag** is set to SID or KDE, the point weights for each verification task are written to a separate ASCII file:
+
+ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_NAME_LEVEL_TYPE_point_weights.txt where NAME and LEVEL are the forecast variable name and level for that task and TYPE is SID or KDE, as described in :numref:`config_options`.
+
 
 When verification against gridded analyses is performed, Ensemble-Stat can produce output NetCDF files using the following naming convention:
 
