@@ -7,7 +7,7 @@ on:
 
 jobs:
   add-checksum:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: dtcenter/metplus-action-release-checksum@v2
         with:

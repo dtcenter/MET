@@ -29,7 +29,7 @@ jobs:
 
   define-matrix:
     name: Define Matrix
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       matrix: ${{ steps.get-versions.outputs.matrix }}
       update_latest: ${{ steps.get-versions.outputs.update_latest }}
@@ -70,7 +70,7 @@ jobs:
 
   build_scan_and_push:
     name: Build, Scan, and Push Images
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: define-matrix
     strategy:
       fail-fast: false

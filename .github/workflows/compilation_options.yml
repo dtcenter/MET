@@ -24,7 +24,7 @@ jobs:
 
   job_control:
     name: Determine which jobs to run
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     steps:
       - uses: actions/checkout@v6
@@ -42,7 +42,7 @@ jobs:
 
   compile:
     name: Config Opts
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: job_control
     strategy:
       matrix:

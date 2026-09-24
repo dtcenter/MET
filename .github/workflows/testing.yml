@@ -51,7 +51,7 @@ jobs:
 
   job_control:
     name: Determine which jobs to run
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     steps:
       - uses: actions/checkout@v6
@@ -77,7 +77,7 @@ jobs:
 
   compile:
     name: Compile MET
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: job_control
     if: ${{ needs.job_control.outputs.run_compile == 'true' }}
     steps:
@@ -122,7 +122,7 @@ jobs:
 
   update_input_data:
     name: Update input data volumes
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [job_control]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     steps:
@@ -144,7 +144,7 @@ jobs:
 
   unit_1a:
     name: Unit 1a
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [job_control, update_input_data, compile]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
@@ -184,7 +184,7 @@ jobs:
 
   unit_1b:
     name: Unit 1b
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [job_control, update_input_data, compile]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
@@ -224,7 +224,7 @@ jobs:
 
   unit_1c:
     name: Unit 1c
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [job_control, update_input_data, compile]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
@@ -266,7 +266,7 @@ jobs:
 
   unit_2c:
     name: Unit 2c 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [job_control, unit_1c]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
@@ -311,7 +311,7 @@ jobs:
 
   unit_2a:
     name: Unit 2a
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [job_control, unit_1a]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
@@ -366,7 +366,7 @@ jobs:
 
   unit_2b:
     name: Unit 2b
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [job_control, unit_1a]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
@@ -419,7 +419,7 @@ jobs:
 
   run_diffs:
     name: Check for Differences
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [job_control, unit_1b, unit_2a, unit_2b, unit_2c]
     if: ${{ needs.job_control.outputs.run_diff == 'true' }}
     steps:
@@ -458,7 +458,7 @@ jobs:
 
   merge_logs:
     name: Merge Log Artifacts
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [run_diffs]
     if: ${{ always() }}
     steps:
@@ -471,7 +471,7 @@ jobs:
 
   update_truth:
     name: Update Truth Data
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [job_control, unit_1b, unit_2a, unit_2b, unit_2c]
     if: ${{ needs.job_control.outputs.run_update_truth == 'true' }}
     steps:
