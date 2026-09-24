@@ -146,7 +146,17 @@ bool PointWeightInfo::has_sid(const string &sid, double &wgt) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// Reference:
+// The weight for station k is the inverse of the station density:
+//    w_k = 1 / rho_k, where rho_k = sum_l exp(-(a_kl / a_0)^2)
+// The sum is over all stations l, including l = k. Since a_kk = 0,
+// rho_k >= 1 and the weights are finite.
+//
+// References:
+//    Rodwell, M.J., D.S. Richardson, T.D. Hewson, T. Haiden, 2010:
+//    A new equitable score suitable for verifying precipitation in
+//    numerical weather prediction. Quarterly Journal of the Royal
+//    Meteorological Society, 136, 1344-1363. doi.org/10.1002/qj.656
+//
 //    Haiden, T., M.J. Rodwell, D.S. Richardson, A. Okagaki, T. Robinson, T. Hewson, 2012:
 //    Intercomparison of Global Model Precipitation Forecast Skill in 2010/11
 //    Using the SEEPS Score. Monthly Weather Review, 140, 2720-2733.
@@ -155,7 +165,6 @@ bool PointWeightInfo::has_sid(const string &sid, double &wgt) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void PointWeightInfo::compute_kde_weights() {
-   const char *method_name = "PointWeightInfo()::compute_kde_weights() -> ";
 
    // Check for no work to do
    if(Type != PointWeightType::KDE || WeightsComputed) return;
@@ -164,9 +173,8 @@ void PointWeightInfo::compute_kde_weights() {
         << " observation locations using a reference angle of " << KDERefAngle
         << " degrees.\n";
 
-   // Store sums for the weights
-   vector<double> p_sum(n_stn(), 0.0);
-   vector<double> a_sum(n_stn(), 0.0);
+   // Store sums for the weights, initialized to 1.0 for the l = k term
+   vector<double> p_sum(n_stn(), 1.0);
 
    // Define e constant
    const double e = exp(1.0);
@@ -178,7 +186,7 @@ void PointWeightInfo::compute_kde_weights() {
                     initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
 
 #pragma omp parallel default (none) \
-   shared(SIDWeights, KDERefAngle, p_sum, a_sum, e)
+   shared(SIDWeights, KDERefAngle, p_sum, e)
    {
 
       // Compute the sums of the pairwise distances
@@ -194,34 +202,12 @@ void PointWeightInfo::compute_kde_weights() {
             // Sum of the terms
             p_sum[i]   += p;
             p_sum[j]   += p;
-
-            // Sum of the angles for error message
-            a_sum[i]   += ang;
-            a_sum[j]   += ang;
          }
       }
    } // End omp parallel
 
-   // Compute weights as the inverse of the p sums
-   for(int i=0; i<n_stn(); i++) {
-
-      // Sanity check
-      if(is_eq(p_sum[i], 0.0)) {
-         mlog << Error << "\n" << method_name
-              << "computed an infinite weight for location ("
-              << SIDWeights[i].Lat << ", " << SIDWeights[i].Lon
-              << ") with an average angular difference of "
-              << a_sum[i] / (n_stn() - 1) << " degrees from "
-              << n_stn() - 1 << " other points.\n"
-              << "Adjust the \"" << conf_key_kde_ref_angle << " = "
-              << KDERefAngle << "\" configuration setting to avoid it!\n\n";
-         exit(1);
-      }
-      SIDWeights[i].Wgt = 1.0/p_sum[i];
-   }
-
-   // Rescale weights
-   rescale_weights(rescale_kde_min, rescale_kde_max);
+   // Compute weights as the inverse of the p sums, in the range (0, 1]
+   for(int i=0; i<n_stn(); i++) SIDWeights[i].Wgt = 1.0/p_sum[i];
 
    // Dump weights for high verbosity
    if(mlog.verbosity_level() >= 7) {
@@ -236,39 +222,6 @@ void PointWeightInfo::compute_kde_weights() {
 
    // Note that the weights have been computed
    WeightsComputed = true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void PointWeightInfo::rescale_weights(double new_min, double new_max) {
-
-   if(SIDWeights.empty()) return;
-
-   double old_min = SIDWeights[0].Wgt; 
-   double old_max = SIDWeights[0].Wgt; 
-
-#pragma omp parallel default (none) \
-   shared(SIDWeights, old_min, old_max, new_min, new_max)
-   {
-
-      // Get the old range of weights
-#pragma omp for reduction(min: old_min) \
-                reduction(max: old_max)
-      for(const auto &x : SIDWeights) {
-         if(x.Wgt < old_min) old_min = x.Wgt;
-         if(x.Wgt > old_max) old_max = x.Wgt;
-      }
-
-      // Rescale to the new range of weights
-#pragma omp for schedule(static)
-      for(auto &x : SIDWeights) {
-         x.Wgt = new_min + ((x.Wgt - old_min) * (new_max - new_min) / (old_max - old_min));
-      }
-   } // End omp parallel
-
-   mlog << Debug(4) << "Rescaling " << n_stn()
-        << " point weights from range (" << old_min << ", " << old_max
-        << ") to (" << new_min << ", " << new_max << ").\n";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -351,6 +304,16 @@ PointWeightInfo parse_conf_point_weight(Dictionary *dict) {
 
    // Conf: kde_ref_angle
    info.set_kde_ref_angle(dict->lookup_double(conf_key_kde_ref_angle));
+
+   // Check for a positive reference angle
+   if(info.get_type() == PointWeightType::KDE &&
+      info.get_kde_ref_angle() <= 0.0) {
+      mlog << Error << "\n" << method_name
+           << "The \"" << conf_key_kde_ref_angle << "\" value ("
+           << info.get_kde_ref_angle() << ") must be greater than 0 when \""
+           << conf_key_point_weight_flag << "\" = " << conf_val_kde << ".\n\n";
+      exit(1);
+   }
 
    // Conf: write_weights
    info.set_write_weights(dict->lookup_bool(conf_key_write_weights));

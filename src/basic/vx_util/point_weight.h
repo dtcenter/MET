@@ -36,12 +36,6 @@ struct SIDWeight {
    double Wgt;
 };
 
-//
-// KDE weight scale
-//
-const double rescale_kde_min = 1.0;
-const double rescale_kde_max = 100.0;
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Class to store point weighting information
@@ -94,7 +88,6 @@ class PointWeightInfo {
       bool has_sid(const std::string &) const;
       bool has_sid(const std::string &, double &) const;
       void compute_kde_weights();
-      void rescale_weights(double, double);
       void write_weights() const;
 };
 
