@@ -44,8 +44,6 @@ struct SIDWeight {
 
 class PointWeightInfo {
 
-   void assign(const PointWeightInfo &);
-
    // Point weighting type
    PointWeightType Type;
 
@@ -64,10 +62,9 @@ class PointWeightInfo {
 
    public:
 
+      // Use the implicit copy and move operations, which are noexcept
+      // for moves so that containers of tasks can move them
       PointWeightInfo();
-     ~PointWeightInfo();
-      PointWeightInfo(const PointWeightInfo &);
-      PointWeightInfo & operator=(const PointWeightInfo &a) noexcept;
 
       void clear();
 
@@ -106,6 +103,9 @@ inline bool PointWeightInfo::need_sid() const { return Type == PointWeightType::
 ////////////////////////////////////////////////////////////////////////
 
 extern PointWeightInfo parse_conf_point_weight(Dictionary *dict);
+
+extern std::vector<std::string> build_point_weight_file_tags(
+                                   const std::vector<std::string> &);
 
 ////////////////////////////////////////////////////////////////////////
 

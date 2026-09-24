@@ -8,7 +8,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <cctype>
 #include <iostream>
+#include <map>
 
 #include "vx_util.h"
 #include "nav.h"
@@ -32,29 +34,6 @@ PointWeightInfo::PointWeightInfo() {
 
 ////////////////////////////////////////////////////////////////////////
 
-PointWeightInfo::~PointWeightInfo() {
-   clear();
-}
-
-////////////////////////////////////////////////////////////////////////
-
-PointWeightInfo::PointWeightInfo(const PointWeightInfo &m) {
-   assign(m);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-PointWeightInfo & PointWeightInfo::operator=(const PointWeightInfo &m) noexcept {
-
-   if(this == &m) return *this;
-
-   assign(m);
-
-   return *this;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void PointWeightInfo::clear() {
    Type = PointWeightType::None;
    KDERefAngle = bad_data_double;
@@ -62,19 +41,6 @@ void PointWeightInfo::clear() {
    WeightsComputed = false;
    WriteWeights = false;
    WeightFilePrefix.clear();
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PointWeightInfo::assign(const PointWeightInfo & m) {
-   Type = m.Type;
-   KDERefAngle = m.KDERefAngle;
-   SIDWeights = m.SIDWeights;
-   WeightsComputed = m.WeightsComputed;
-   WriteWeights = m.WriteWeights;
-   WeightFilePrefix = m.WeightFilePrefix;
-
-   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -319,6 +285,45 @@ PointWeightInfo parse_conf_point_weight(Dictionary *dict) {
    info.set_write_weights(dict->lookup_bool(conf_key_write_weights));
 
    return info;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Build a file name tag for each verification task from its name and
+// level string. Replace characters other than letters, digits, '-',
+// and '.' with '_'. If multiple tasks have the same tag, append the
+// 1-based task index to make them unique.
+//
+///////////////////////////////////////////////////////////////////////////////
+
+vector<string> build_point_weight_file_tags(const vector<string> &names) {
+   vector<string> tags;
+   map<string,int> tag_count;
+
+   // Sanitize each name
+   for(const auto &name : names) {
+      string tag;
+      for(char c : name) {
+         if(isalnum(static_cast<unsigned char>(c)) || c == '-' || c == '.') {
+            tag += c;
+         }
+         else if(!tag.empty() && tag.back() != '_') {
+            tag += '_';
+         }
+      }
+      if(!tag.empty() && tag.back() == '_') tag.pop_back();
+      tags.push_back(tag);
+      tag_count[tag]++;
+   }
+
+   // Append the task index to empty or duplicate tags
+   for(int i=0; i<(int) tags.size(); i++) {
+      string vx_str("vx" + to_string(i+1));
+      if(tags[i].empty())              tags[i] = vx_str;
+      else if(tag_count[tags[i]] > 1) tags[i] += "_" + vx_str;
+   }
+
+   return tags;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

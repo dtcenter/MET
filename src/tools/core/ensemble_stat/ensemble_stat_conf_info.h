@@ -92,6 +92,7 @@ class EnsembleStatVxOpt {
       //////////////////////////////////////////////////////////////////
 
       VxPairDataEnsemble vx_pd;          // Ensemble pair data
+      PointWeightInfo point_weight_info; // Point weighting information for this task
 
       ConcatString   var_str;            // nc_pairs_var_str string
       ConcatString   control_id;         // Control ID
@@ -237,7 +238,7 @@ class EnsembleStatConfInfo {
       gsl_rng *rng_ptr;                     // GSL random number generator (allocated)
 
       GridWeightType  grid_weight_flag;     // Grid weighting flag
-      PointWeightInfo point_weight_info;    // Point weighting information
+      PointWeightInfo point_weight_info;    // Point weighting settings, copied to each task
 
       ConcatString   output_prefix;         // String to customize output file name
       ConcatString   version;               // Config file version

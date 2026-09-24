@@ -55,7 +55,10 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_weight/point_stat_SID_WEIGHT_150000L_20120409_120000V.stat</stat>
-      <exist>&OUTPUT_DIR;/point_weight/point_stat_SID_WEIGHT_150000L_20120409_120000V_SID_point_weights.txt</exist>
+      <exist>&OUTPUT_DIR;/point_weight/point_stat_SID_WEIGHT_150000L_20120409_120000V_TMP_P850_SID_point_weights.txt</exist>
+      <exist>&OUTPUT_DIR;/point_weight/point_stat_SID_WEIGHT_150000L_20120409_120000V_UGRD_P850_SID_point_weights.txt</exist>
+      <exist>&OUTPUT_DIR;/point_weight/point_stat_SID_WEIGHT_150000L_20120409_120000V_VGRD_P850_SID_point_weights.txt</exist>
+      <exist>&OUTPUT_DIR;/point_weight/point_stat_SID_WEIGHT_150000L_20120409_120000V_TMP_Z2_SID_point_weights.txt</exist>
     </output>
   </test>
 
@@ -76,7 +79,10 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_weight/point_stat_KDE_WEIGHT_150000L_20120409_120000V.stat</stat>
-      <exist>&OUTPUT_DIR;/point_weight/point_stat_KDE_WEIGHT_150000L_20120409_120000V_KDE_point_weights.txt</exist>
+      <exist>&OUTPUT_DIR;/point_weight/point_stat_KDE_WEIGHT_150000L_20120409_120000V_TMP_P850_KDE_point_weights.txt</exist>
+      <exist>&OUTPUT_DIR;/point_weight/point_stat_KDE_WEIGHT_150000L_20120409_120000V_UGRD_P850_KDE_point_weights.txt</exist>
+      <exist>&OUTPUT_DIR;/point_weight/point_stat_KDE_WEIGHT_150000L_20120409_120000V_VGRD_P850_KDE_point_weights.txt</exist>
+      <exist>&OUTPUT_DIR;/point_weight/point_stat_KDE_WEIGHT_150000L_20120409_120000V_TMP_Z2_KDE_point_weights.txt</exist>
     </output>
   </test>
 
@@ -189,7 +195,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_weight/ensemble_stat_SID_WEIGHT_20120410_120000V.stat</stat>
-      <exist>&OUTPUT_DIR;/point_weight/ensemble_stat_SID_WEIGHT_20120410_120000V_SID_point_weights.txt</exist>
+      <exist>&OUTPUT_DIR;/point_weight/ensemble_stat_SID_WEIGHT_20120410_120000V_APCP_24_A24_SID_point_weights.txt</exist>
     </output>
   </test>
 
@@ -216,7 +222,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_weight/ensemble_stat_KDE_WEIGHT_20120410_120000V.stat</stat>
-      <exist>&OUTPUT_DIR;/point_weight/ensemble_stat_KDE_WEIGHT_20120410_120000V_KDE_point_weights.txt</exist>
+      <exist>&OUTPUT_DIR;/point_weight/ensemble_stat_KDE_WEIGHT_20120410_120000V_APCP_24_A24_KDE_point_weights.txt</exist>
     </output>
   </test>
 
@@ -236,7 +242,10 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_weight/pair_stat_KDE_WEIGHT.stat</stat>
-      <exist>&OUTPUT_DIR;/point_weight/pair_stat_KDE_WEIGHT_KDE_point_weights.txt</exist>
+      <exist>&OUTPUT_DIR;/point_weight/pair_stat_KDE_WEIGHT_TMP_P850_KDE_point_weights.txt</exist>
+      <exist>&OUTPUT_DIR;/point_weight/pair_stat_KDE_WEIGHT_UGRD_P850_KDE_point_weights.txt</exist>
+      <exist>&OUTPUT_DIR;/point_weight/pair_stat_KDE_WEIGHT_VGRD_P850_KDE_point_weights.txt</exist>
+      <exist>&OUTPUT_DIR;/point_weight/pair_stat_KDE_WEIGHT_TMP_Z2_KDE_point_weights.txt</exist>
     </output>
   </test>
 

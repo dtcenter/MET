@@ -276,6 +276,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
                                rng_ptr, point_vx, ens_member_ids,
                                ens_files, use_ctrl, control_id);
 
+      // Store the point weighting settings for this verification task
+      vx_opt[i].point_weight_info = point_weight_info;
+
       // For no point verification, store obtype as the message type
       if(!point_vx) {
          vx_opt[i].msg_typ.clear();
@@ -696,6 +699,7 @@ void EnsembleStatVxOpt::clear() {
 
    // Initialize values
    vx_pd.clear();
+   point_weight_info.clear();
    var_str.clear();
    beg_ds = end_ds = bad_data_int;
 

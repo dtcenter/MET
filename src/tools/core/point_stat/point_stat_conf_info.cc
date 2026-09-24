@@ -225,6 +225,9 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
       // Process the options for this verification task
       vx_opt[i].process_config(ftype, i_fdict, i_odict);
+
+      // Store the point weighting settings for this verification task
+      vx_opt[i].point_weight_info = point_weight_info;
    }
 
    // Summarize output flags across all verification tasks
@@ -775,6 +778,7 @@ void PointStatVxOpt::clear() {
 
    // Initialize values
    vx_pd.clear();
+   point_weight_info.clear();
 
    beg_ds = end_ds = bad_data_int;
 

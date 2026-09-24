@@ -200,6 +200,9 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
 
       // Process the options for this verification task
       vx_opt[i].process_config(ftype, i_fdict, i_odict);
+
+      // Store the point weighting settings for this verification task
+      vx_opt[i].point_weight_info = point_weight_info;
    }
 
    // Summarize output flags across all verification tasks
@@ -566,13 +569,6 @@ bool PairStatConfInfo::add_mpr_line(STATLine l) {
       if(vx.add_mpr_line(l)) keep = true;
    }
 
-   // Update point weight station id locations
-   if(keep && point_weight_info.need_sid()) {
-      point_weight_info.add_sid(l.get_item("OBS_SID"),
-                                atof(l.get_item("OBS_LAT")),
-                                atof(l.get_item("OBS_LON")));
-   }
-
    return keep;
 }
 
@@ -602,6 +598,7 @@ void PairStatVxOpt::clear() {
 
    // Initialize values
    vx_pd.clear();
+   point_weight_info.clear();
    vx_hdr.clear();
    convert_censor_flag = false;
 
@@ -1497,6 +1494,13 @@ bool PairStatVxOpt::add_mpr_line(STATLine l) {
             vx_hdr[i_mask].add(l);
          }
       } // end for i_mask
+
+      // Update point weight station id locations
+      if(keep && point_weight_info.need_sid()) {
+         point_weight_info.add_sid(l.get_item("OBS_SID"),
+                                   atof(l.get_item("OBS_LAT")),
+                                   atof(l.get_item("OBS_LON")));
+      }
    }
 
    return keep;
@@ -1568,6 +1572,11 @@ bool PairStatVxOpt::add_ioda_pair(point_pair_t p) {
                p.typ);
          }
       } // end for i_mask
+
+      // Update point weight station id locations
+      if(keep && point_weight_info.need_sid()) {
+         point_weight_info.add_sid(p.sid, p.lat, p.lon);
+      }
    }
 
    return keep;

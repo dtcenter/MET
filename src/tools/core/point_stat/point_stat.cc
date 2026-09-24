@@ -1,6 +1,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2026
-// ** University Corporation for Atmospheric Research led(UCAR)
+// ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
@@ -208,7 +208,7 @@ int met_main(int argc, char *argv[]) {
    for(i=0; i<conf_info.get_n_vx(); i++) {
       conf_info.vx_opt[i].vx_pd.calc_obs_summary();
       conf_info.vx_opt[i].vx_pd.print_obs_summary();
-      conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_info);
+      conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.vx_opt[i].point_weight_info);
    }
 
    // Compute the scores and write them out
@@ -404,8 +404,19 @@ static void setup_txt_files() {
    // Create output file names for the stat file and optional text files
    build_outfile_name(fcst_valid_ut, fcst_lead_sec, "", base_name);
 
-   // Store the output point weight file information
-   conf_info.point_weight_info.set_weight_file_prefix(base_name);
+   // Store the output point weight file information for each task,
+   // using the forecast name and level to make the file names unique
+   vector<string> vx_names;
+   for(int i=0; i<conf_info.get_n_vx(); i++) {
+      const VarInfo *info = conf_info.vx_opt[i].vx_pd.fcst_info;
+      vx_names.push_back(info ? info->name_attr().string() + "_" +
+                                info->level_attr().string() : "");
+   }
+   vector<string> vx_tags = build_point_weight_file_tags(vx_names);
+   for(int i=0; i<conf_info.get_n_vx(); i++) {
+      conf_info.vx_opt[i].point_weight_info.set_weight_file_prefix(
+         base_name.string() + "_" + vx_tags[i]);
+   }
 
    /////////////////////////////////////////////////////////////////////
    //
@@ -969,9 +980,9 @@ static void process_obs_file(int i_nc) {
                   hdr_ut, obs_qty_str.c_str(), obs_arr,
                   grid, var_name.c_str())) {
 
-               // Update point weight station id locations
-               if(conf_info.point_weight_info.need_sid()) {
-                  conf_info.point_weight_info.add_sid(
+               // Update point weight station id locations for this task
+               if(conf_info.vx_opt[j].point_weight_info.need_sid()) {
+                  conf_info.vx_opt[j].point_weight_info.add_sid(
                      hdr_sid_str, hdr_arr[0], hdr_arr[1]);
                }
             }
@@ -2246,8 +2257,10 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
 static void finish_txt_files() {
 
-   // Write the point weight file
-   conf_info.point_weight_info.write_weights();
+   // Write the point weight file for each task
+   for(int i=0; i<conf_info.get_n_vx(); i++) {
+      conf_info.vx_opt[i].point_weight_info.write_weights();
+   }
 
    // Write out the contents of the STAT AsciiTable and
    // close the STAT output files
