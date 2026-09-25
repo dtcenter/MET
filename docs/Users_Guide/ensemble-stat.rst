@@ -440,7 +440,7 @@ The **nc_orank_flag** specifies which gridded verification output types should b
 
 6. Ensemble valid data count
 
-7. Grid area weight values
+7. Grid area weight values and, for **grid_weight_flag = AREA**, the true grid box areas
 
 __________________
 
