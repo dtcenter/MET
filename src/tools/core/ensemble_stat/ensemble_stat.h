@@ -156,6 +156,9 @@ static int nxy = 0;
 // Weight for each grid point
 static DataPlane wgt_dp;
 
+// True grid box area for grid_weight_flag = AREA
+static DataPlane area_dp;
+
 // Strings to be output in the STAT and optional text files
 static StatHdrColumns shc;
 

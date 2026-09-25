@@ -118,6 +118,7 @@
 //   060    05/05/24  Halley Gotway  MET #3145 Add OpenMP.
 //   061    12/08/25  Halley Gotway  MET #3293 Fix set_attr_grid.
 //   062    01/27/26  Halley Gotway  MET #3298 Add the FULL grid, if needed.
+//   063    09/25/26  Halley Gotway  MET #3448 Normalize AREA grid weights.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -353,7 +354,7 @@ void process_command_line(int argc, char **argv) {
                         &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
 
    // Compute weight for each grid point
-   parse_grid_weight(grid, conf_info.grid_weight_flag, wgt_dp);
+   parse_grid_weight(grid, conf_info.grid_weight_flag, wgt_dp, &area_dp);
 
    // Set the model name
    shc.set_model(conf_info.model.c_str());
@@ -607,7 +608,7 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
    // Add grid weight variable
    if(nc_info.do_weight) {
       write_netcdf_grid_weight(nc_out, &lat_dim, &lon_dim,
-                               conf_info.grid_weight_flag, wgt_dp);
+                               conf_info.grid_weight_flag, wgt_dp, &area_dp);
    }
 
    return;

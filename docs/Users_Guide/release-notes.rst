@@ -216,6 +216,13 @@ MET Version 13.0.0 Upgrade Instructions
      * Adds new output variables with names include "EAS" and "EAS_WIDTH" for the Ensemble
        Agreement Scale algorithm.
 
+   * Grid-Stat and Ensemble-Stat NetCDF output format
+
+     * For "grid_weight_flag = AREA", the "grid_weight" variable now contains the normalized
+       weights in the range (0, 1] with units of "NA", rather than the grid box areas in km^2.
+       The true grid box areas are written to the new "grid_area" variable, as described in MET
+       `#3448 <https://github.com/dtcenter/MET/issues/3448>`_.
+
 .. dropdown:: Output data changes
 
    MET version 13.0.0 modifies existing output data values in the following ways:
@@ -224,6 +231,15 @@ MET Version 13.0.0 Upgrade Instructions
      HiRA algorithm of Point-Stat are modified slightly. As described in MET
      `#3396 <https://github.com/dtcenter/MET/issues/3396>`_, improvements to the RPS computation
      algorithm result in minor changes to the statistics.
+
+   * For "grid_weight_flag = AREA", Grid-Stat and Ensemble-Stat now normalize the grid box
+     areas to the range (0, 1] by dividing by the maximum grid box area in the verification grid,
+     as described in MET `#3448 <https://github.com/dtcenter/MET/issues/3448>`_. As a result, the
+     cell values in the CTC, MCTC, PCT, and NBRCTC line types change. The normal approximation
+     confidence intervals computed from those weighted cell values also change, including those
+     for HK, ODDS, LODDS, ORSS, EDS, SEDS, EDI, and SEDI in the CTS line type and for BRIER and
+     BRIERCL in the PSTD line type. Previously, the large grid box area weights resulted in
+     confidence intervals that were much too narrow. The statistics themselves are unchanged.
 
 .. dropdown:: Additional upgrade instructions - NONE
 
