@@ -407,6 +407,9 @@ static int    combine_tqz_and_uv(map<float, float*>, map<float, float*>,
 static float  compute_pbl(map<float, float*> pqtzuv_map_tq,
                           map<float, float*> pqtzuv_map_uv);
 static void   copy_pqtzuv(float *to_pqtzuv, float *from_pqtzuv, bool copy_all=true);
+static void   clear_pbl_input(map<float, float*> &pqtzuv_map_tq,
+                              map<float, float*> &pqtzuv_map_uv,
+                              vector<float*> &pqtzuv_list);
 static bool   insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
                          const float pbl_p, const float pbl_h, const float pbl_qm,
                          const float hdr_lat, const float hdr_lon,
@@ -1414,6 +1417,33 @@ void process_pbfile(int i_pb) {
 
       do_pbl = cal_pbl && 0 == strcmp("ADPUPA", hdr_typ);
 
+      if (do_pbl) {
+
+         // Determine whether this message belongs to the same header as the
+         // previous one.  PBL input records are accumulated across messages
+         // which share a header and are consumed when the PBL is derived.
+         is_same_header = (prev_hdr_vld_ut == hdr_vld_ut)
+               && is_eq(prev_hdr_lat, hdr_lat)
+               && is_eq(prev_hdr_lon, hdr_lon)
+               && is_eq(prev_hdr_elv, hdr_elv)
+               && 0 == strcmp(prev_hdr_typ, hdr_typ)
+               && 0 == strcmp(prev_hdr_sid, hdr_sid.c_str());
+
+         // Starting a new header, so discard any PBL input records left over
+         // from the previous one.  The PBL could not be derived from them,
+         // and retaining them corrupts the PBL derived for this header.
+         if (!is_same_header &&
+             (pqtzuv_map_tq.size() > 0 || pqtzuv_map_uv.size() > 0)) {
+            mlog << Debug(6) << method_name
+                 << "Discarding " << pqtzuv_map_tq.size() << " TQZ and "
+                 << pqtzuv_map_uv.size() << " UV unused PBL input records "
+                 << "from the previous header before processing "
+                 << hdr_sid << "\n";
+            clear_pbl_input(pqtzuv_map_tq, pqtzuv_map_uv, pqtzuv_list);
+            pbl_qm = bad_data_float;
+         }
+      }
+
       // Search through the vertical levels
       for(lv=0, n_hdr_obs = 0; lv<buf_nlev; lv++) {
 
@@ -1949,12 +1979,6 @@ void process_pbfile(int i_pb) {
       }
 
       if (do_pbl) {
-         is_same_header = (prev_hdr_vld_ut == hdr_vld_ut)
-               && is_eq(prev_hdr_lat, hdr_lat)
-               && is_eq(prev_hdr_lon, hdr_lon)
-               && is_eq(prev_hdr_elv, hdr_elv)
-               && 0 == strcmp(prev_hdr_typ, hdr_typ)
-               && 0 == strcmp(prev_hdr_sid, hdr_sid.c_str());
          has_pbl_data = (pqtzuv_map_tq.size() > 0 && pqtzuv_map_uv.size() > 0);
          if (is_same_header && has_pbl_data) {
             float pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
@@ -1962,13 +1986,7 @@ void process_pbfile(int i_pb) {
             if (insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
                            hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid)) n_derived_obs++;
 
-            for(vector<float *>::iterator it = pqtzuv_list.begin();
-                it != pqtzuv_list.end(); ++it) {
-               delete *it;
-            }
-            pqtzuv_list.clear();
-            pqtzuv_map_tq.clear();
-            pqtzuv_map_uv.clear();
+            clear_pbl_input(pqtzuv_map_tq, pqtzuv_map_uv, pqtzuv_list);
             pbl_qm = bad_data_float;
          }
          prev_hdr_vld_ut = hdr_vld_ut;
@@ -2002,13 +2020,7 @@ void process_pbfile(int i_pb) {
       if (insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
                      hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid)) n_derived_obs++;
 
-      for(vector<float *>::iterator it = pqtzuv_list.begin();
-          it != pqtzuv_list.end(); ++it) {
-         delete *it;
-      }
-      pqtzuv_list.clear();
-      pqtzuv_map_tq.clear();
-      pqtzuv_map_uv.clear();
+      clear_pbl_input(pqtzuv_map_tq, pqtzuv_map_uv, pqtzuv_list);
    }
 
    if(showed_progress) {
@@ -2975,6 +2987,20 @@ void copy_pqtzuv(float *to_pqtzuv, float *from_pqtzuv, bool copy_all) {
       if (copy_all || !is_bad_data(from_pqtzuv[index]))
          to_pqtzuv[index] = from_pqtzuv[index];
    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void clear_pbl_input(map<float, float*> &pqtzuv_map_tq,
+                     map<float, float*> &pqtzuv_map_uv,
+                     vector<float*> &pqtzuv_list) {
+   for(vector<float *>::iterator it = pqtzuv_list.begin();
+       it != pqtzuv_list.end(); ++it) {
+      delete [] *it;
+   }
+   pqtzuv_list.clear();
+   pqtzuv_map_tq.clear();
+   pqtzuv_map_uv.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
