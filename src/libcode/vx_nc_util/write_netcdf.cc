@@ -34,6 +34,10 @@ using namespace netCDF;
 
 static void write_netcdf_latlon_1d(NcFile *, NcDim *, NcDim *, const Grid &);
 static void write_netcdf_latlon_2d(NcFile *, NcDim *, NcDim *, const Grid &);
+static void write_netcdf_grid_data(NcFile *, NcDim *, NcDim *,
+                                   const char *, const char *,
+                                   const char *, const char *,
+                                   const DataPlane &);
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -232,61 +236,80 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
 ///////////////////////////////////////////////////////////////////////////////
 
 void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
-                              const GridWeightType t, const DataPlane &wgt_dp) {
-   NcVar wgt_var;
-   vector<NcDim> dims;
-   vector<size_t> count;
+                              const GridWeightType t, const DataPlane &wgt_dp,
+                              const DataPlane *area_dp) {
 
-   // Allocate space for weight values
-   vector<float> wgt_data(wgt_dp.nx()*wgt_dp.ny());
+   // Write the grid weights
+   switch(t) {
+
+      case GridWeightType::Cos_Lat:
+         write_netcdf_grid_data(f_out, lat_dim, lon_dim, "grid_weight",
+                                "weight", "cosine latitude grid weight",
+                                "NA", wgt_dp);
+         break;
+
+      case GridWeightType::Area:
+         write_netcdf_grid_data(f_out, lat_dim, lon_dim, "grid_weight",
+                                "weight", "normalized true area grid weight",
+                                "NA", wgt_dp);
+         break;
+
+      default:
+         write_netcdf_grid_data(f_out, lat_dim, lon_dim, "grid_weight",
+                                "weight", "default grid weight",
+                                "NA", wgt_dp);
+         break;
+   }
+
+   // Write the true grid box areas, if provided
+   if(t == GridWeightType::Area && area_dp && area_dp->nxy() > 0) {
+      write_netcdf_grid_data(f_out, lat_dim, lon_dim, "grid_area",
+                             "cell_area", "true grid box area",
+                             "km^2", *area_dp);
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void write_netcdf_grid_data(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
+                            const char *var_name, const char *standard_name,
+                            const char *long_name, const char *units,
+                            const DataPlane &dp) {
+   NcVar nc_var;
+   vector<NcDim> dims;
+
+   // Allocate space for the data values
+   vector<float> nc_data(dp.nx()*dp.ny());
 
    // Define Variables
    dims.emplace_back(*lat_dim);
    dims.emplace_back(*lon_dim);
-   wgt_var = add_var(f_out, "grid_weight", ncFloat, dims);
+   nc_var = add_var(f_out, var_name, ncFloat, dims);
 
    // Add variable attributes
-   add_att(&wgt_var, "standard_name", "weight");
-
-   switch(t) {
-
-      case GridWeightType::Cos_Lat:
-         add_att(&wgt_var, long_name_att_name, "cosine latitude grid weight");
-         add_att(&wgt_var, units_att_name, "NA");
-         break;
-
-      case GridWeightType::Area:
-         add_att(&wgt_var, long_name_att_name, "true area grid weight");
-         add_att(&wgt_var, units_att_name, "km^2");
-         break;
-
-      default:
-         add_att(&wgt_var, long_name_att_name, "default grid weight");
-         add_att(&wgt_var, units_att_name, "NA");
-         break;
-   }
+   add_att(&nc_var, "standard_name", standard_name);
+   add_att(&nc_var, long_name_att_name, long_name);
+   add_att(&nc_var, units_att_name, units);
 
 #pragma omp parallel default(none) \
-   shared(wgt_dp, wgt_data, DefaultTO)
+   shared(dp, nc_data, DefaultTO)
    {
 
-      // Store weight values
+      // Store data values
 #pragma omp for schedule(static) \
                 collapse(2)
-      for(int x=0; x<wgt_dp.nx(); x++) {
-         for(int y=0; y<wgt_dp.ny(); y++) {
-            int i = DefaultTO.two_to_one(wgt_dp.nx(), wgt_dp.ny(), x, y);
-            wgt_data[i] = (float) wgt_dp(x, y);
+      for(int x=0; x<dp.nx(); x++) {
+         for(int y=0; y<dp.ny(); y++) {
+            int i = DefaultTO.two_to_one(dp.nx(), dp.ny(), x, y);
+            nc_data[i] = (float) dp(x, y);
          }
       }
    } // End omp parallel
 
-   // Write the weights
-   count.emplace_back(wgt_dp.ny());
-   count.emplace_back(wgt_dp.nx());
-   put_nc_data_with_dims(&wgt_var, wgt_data.data(), wgt_dp.ny(), wgt_dp.nx());
-
-   // Clean up
+   // Write the data
+   put_nc_data_with_dims(&nc_var, nc_data.data(), dp.ny(), dp.nx());
 
    return;
 }

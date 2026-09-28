@@ -32,7 +32,8 @@ extern void write_netcdf_global     (netCDF::NcFile *, const char *, const char 
                                      const char *desc       = (const char *) 0);
 extern void write_netcdf_proj       (netCDF::NcFile *, const Grid &, netCDF::NcDim &, netCDF::NcDim &);
 extern void write_netcdf_latlon     (netCDF::NcFile *, netCDF::NcDim *, netCDF::NcDim *, const Grid &);
-extern void write_netcdf_grid_weight(netCDF::NcFile *, netCDF::NcDim *, netCDF::NcDim *, const GridWeightType, const DataPlane &); 
+extern void write_netcdf_grid_weight(netCDF::NcFile *, netCDF::NcDim *, netCDF::NcDim *, const GridWeightType, const DataPlane &,
+                                     const DataPlane *area_dp = nullptr);
 extern void write_netcdf_var_times  (netCDF::NcVar *, const DataPlane &);
 extern void write_netcdf_var_times  (netCDF::NcVar *, const unixtime, const unixtime, const int);
 

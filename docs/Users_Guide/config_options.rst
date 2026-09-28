@@ -2765,10 +2765,16 @@ Three grid weighting options are currently supported:
 * COS_LAT to define the weight as the cosine of the grid point latitude.
   This an approximation for grid box area used by NCEP and WMO.
 
-* AREA to define the weight as the true area of the grid box (km^2).
+* AREA to define the weight as the true area of the grid box (km^2) divided
+  by the maximum grid box area in the verification grid. The resulting weights
+  are in the range (0, 1], consistent with the other weighting options. For a
+  regular lat/lon grid, they are approximately equal to the COS_LAT weights.
+  Since the grid box area is not defined for unstructured, semi-lat/lon, or
+  GOES grids, AREA weighting is not supported for them.
 
-If requested in the config file, the raw grid weights can be written to
-the NetCDF output from Grid-Stat and Ensemble-Stat.
+If requested in the config file, the grid weights applied can be written to
+the NetCDF output from Grid-Stat and Ensemble-Stat. For AREA weighting, the
+true grid box areas (km^2) are also written to the NetCDF output.
 
 When computing partial sums and continuous statistics, the weights are
 first normalized by dividing by the sum of the weights for the current
