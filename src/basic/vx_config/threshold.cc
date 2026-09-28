@@ -1369,6 +1369,20 @@ assign(c);
 ////////////////////////////////////////////////////////////////////////
 
 
+SingleThresh::SingleThresh(SingleThresh && c) noexcept
+
+{
+
+node = c.node;
+
+c.node = nullptr;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 SingleThresh::SingleThresh(const char * str)
 
 {
@@ -1390,6 +1404,26 @@ SingleThresh & SingleThresh::operator=(const SingleThresh & c)
 if ( this == &c ) return *this;
 
 assign(c);
+
+return *this;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+SingleThresh & SingleThresh::operator=(SingleThresh && c) noexcept
+
+{
+
+if ( this == &c ) return *this;
+
+clear();
+
+node = c.node;
+
+c.node = nullptr;
 
 return *this;
 

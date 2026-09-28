@@ -1607,6 +1607,7 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
          if (0 < cellArray.n()) {
             dataArray.clear();
             dataArray.extend(cellArray.n());
+            int single_from_index = bad_data_int;
             for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                from_index = cellArray[dIdx];
                data_value = from_data[from_index];
@@ -1616,6 +1617,7 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                }
 
                dataArray.add(data_value);
+               single_from_index = from_index;
                non_missing_cnt++;
                if(mlog.verbosity_level() >= 4) {
                   if (from_min_value > data_value) from_min_value = data_value;
@@ -1647,7 +1649,7 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                   if (1 == data_cnt)
                      mlog << Debug(9) << method_name
                           << "value: " << to_value << " to (" << to_lon << ", " << to_lat
-                          << ") from offset " << from_index << ".\n";
+                          << ") from offset " << single_from_index << ".\n";
                   else
                      mlog << Debug(9) << method_name
                           <<   "value: " << to_value

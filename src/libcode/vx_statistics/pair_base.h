@@ -239,7 +239,9 @@ class VxPairBase {
       VxPairBase();
       ~VxPairBase();
       VxPairBase(const VxPairBase &);
+      VxPairBase(VxPairBase &&) noexcept;
       VxPairBase & operator=(const VxPairBase &);
+      VxPairBase & operator=(VxPairBase &&) noexcept;
 
       //////////////////////////////////////////////////////////////////
       //

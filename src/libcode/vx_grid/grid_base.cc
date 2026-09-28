@@ -985,11 +985,45 @@ assign(g);
 ////////////////////////////////////////////////////////////////////////
 
 
+Grid::Grid(Grid && g) noexcept
+   : rep(g.rep), swap_to_north(g.swap_to_north)
+
+{
+
+g.rep = nullptr;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 Grid & Grid::operator=(const Grid & g)
 
 {
 
 if ( this != &g ) assign(g);
+
+return *this;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Grid & Grid::operator=(Grid && g) noexcept
+
+{
+
+if ( this != &g ) {
+
+   if(rep) delete rep;
+   rep = g.rep;
+   swap_to_north = g.swap_to_north;
+   g.rep = nullptr;
+
+}
 
 return *this;
 
@@ -1088,7 +1122,8 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 bool Grid::get_swap_to_north() const {
-   return swap_to_north && (info().ll != nullptr || info().rll != nullptr);
+   return swap_to_north &&
+      (info().ll != nullptr || info().rll != nullptr || info().st != nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////

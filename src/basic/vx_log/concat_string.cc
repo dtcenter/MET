@@ -73,6 +73,18 @@ ConcatString::ConcatString(const ConcatString & c)
 ////////////////////////////////////////////////////////////////////////
 
 
+ConcatString::ConcatString(ConcatString && c) noexcept
+   : Precision(c.Precision),
+     FloatFormat(move(c.FloatFormat)),
+     s(move(c.s))
+{
+   init_from_scratch();
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 ConcatString::ConcatString(const std::string & Text)
 {
    init_from_scratch();
@@ -104,6 +116,22 @@ ConcatString::ConcatString(const char * Text)
 ConcatString & ConcatString::operator=(const ConcatString & c)
 {
    assign(c);
+
+   return *this;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString & ConcatString::operator=(ConcatString && c) noexcept
+{
+   if(this != &c) {
+      s           = move(c.s);
+      FloatFormat = move(c.FloatFormat);
+      Precision   = c.Precision;
+      c.Precision = concat_string_default_precision;
+   }
 
    return *this;
 }
@@ -156,7 +184,7 @@ ConcatString & ConcatString::operator=(const char c)
 void ConcatString::init_from_scratch()
 {
    // MET #3253 Initialize to fix SonarQube reliability issue
-   Precision = 0;
+   Precision = concat_string_default_precision;
 
    set_precision(concat_string_default_precision);
 }

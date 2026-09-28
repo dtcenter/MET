@@ -36,10 +36,11 @@ class MM_Engine {
 
       void assign(const MM_Engine &);
 
-      int N_Composites;
-      // int N_Obs_Composites;
+   private:
 
-      int * comp_to_eq;   //  allocated, 0-based, both ways
+      int N_Composites;
+
+      IntArray comp_to_eq;   //  0-based, both ways
 
 
    public:
