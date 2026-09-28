@@ -3173,6 +3173,10 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
          index = 0;
          hgt_cnt = spfh_cnt = 0;
          int start_offset = (MAX_PBL_LEVEL >= pbl_level) ? 0 : (pbl_level-MAX_PBL_LEVEL);
+
+         // Number of levels actually stored in the pbl_data_* buffers, which
+         // is less than pbl_level when the lowest levels have been excluded
+         int buf_level = pbl_level - start_offset;
          for (int i=(pbl_level-1); i>=start_offset; i--,index++) {
             pqtzuv = pqtzuv_merged_array[i];
             pbl_data_pres[index] = pqtzuv[0];
@@ -3242,22 +3246,22 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
             }
          }
 
-         if (hgt_cnt < pbl_level) {
-            hgt_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_hgt);
+         if (hgt_cnt < buf_level) {
+            hgt_cnt += interpolate_by_pressure(buf_level, pbl_data_pres, pbl_data_hgt);
             mlog << Debug(6) << method_name << "interpolate Z (HGT)\n";
          }
-         if (spfh_cnt < pbl_level) {
-            spfh_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_spfh);
+         if (spfh_cnt < buf_level) {
+            spfh_cnt += interpolate_by_pressure(buf_level, pbl_data_pres, pbl_data_spfh);
             mlog << Debug(6) << method_name << "interpolate Q (SPFH)\n";
          }
 
-         if ((spfh_cnt>0) && (pbl_level>0)) {
-            mzbl = pbl_level;
+         if ((spfh_cnt>0) && (buf_level>0)) {
+            mzbl = buf_level;
             mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "mzbl: " << mzbl
-                 << "  missing count: Q: " << (pbl_level - spfh_cnt)
-                 << ", Z: " << (pbl_level - hgt_cnt) << "\n\n";
+                 << "  missing count: Q: " << (buf_level - spfh_cnt)
+                 << ", Z: " << (buf_level - hgt_cnt) << "\n\n";
             if(mlog.verbosity_level() >= PBL_DEBUG_LEVEL) {
-               log_pbl_input(pbl_level, method_name);
+               log_pbl_input(buf_level, method_name);
             }
 
             //SUBROUTINE CALPBL(T,Q,P,Z,U,V,MZBL,HPBL,jpbl)
