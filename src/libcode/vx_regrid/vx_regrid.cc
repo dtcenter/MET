@@ -8,6 +8,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <cmath>
+
 #include "vx_regrid.h"
 #include "interp_mthd.h"
 #include "GridTemplate.h"
@@ -42,6 +44,7 @@ DataPlane met_regrid(const DataPlane & in, const Grid & from_grid,
          break;
 
       case InterpMthd::AW_Mean:
+      case InterpMthd::AW_Mean_Cntr:
          out = met_regrid_area_weighted (in, from_grid, to_grid, info);
          break;
 
@@ -140,6 +143,122 @@ DataPlane met_regrid_generic(const DataPlane & from_data,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// For AW_MEAN_CNTR, compute the fraction of the 1D extent [lo, hi],
+// in to_grid index units, which overlaps each to_grid box, where box i
+// spans [i-0.5, i+0.5]. The index and weight vectors are sized to the
+// number of boxes actually spanned, which is exact and requires no fixed
+// upper limit. They are reused across calls, so the resize() below only
+// allocates when a box spans more boxes than any previous one.
+//
+// Returns the number of boxes stored, or 0 for an extent which cannot
+// be converted to integer indices, as described below. A from_grid box
+// cannot meaningfully span more than the whole to_grid, so the caller
+// passes the to_grid dimension as max_boxes.
+//
+////////////////////////////////////////////////////////////////////////
+
+static int aw_mean_overlap(double lo, double hi, int max_boxes,
+                           vector<int> &i, vector<double> &w) {
+   static const double min_width = 1.0e-5;
+
+   // Mapping a point outside the valid domain of a projection returns a
+   // finite but enormous grid coordinate. Converting one of those to an
+   // integer index overflows, and the resulting index is meaningless.
+   // For example, regridding a global grid to the Lambert Conformal G212
+   // grid produces coordinates beyond +/- 2.8e9, well past INT_MAX.
+   //
+   // The three checks below bound lo and hi to the size of the to_grid
+   // before any integer conversion, so that the rounding which follows
+   // cannot overflow. The non-finite check is defensive, since these
+   // conversions are not observed to return infinities or NaNs.
+
+   if(!std::isfinite(lo) || !std::isfinite(hi) || hi < lo) return 0;
+
+   // Reject an extent which does not intersect the to_grid, which also
+   // catches a huge coordinate whose extent happens to be small
+   if(hi < -0.5 || lo > (double) max_boxes - 0.5) return 0;
+
+   // Reject an extent wider than the to_grid, comparing in floating
+   // point since the same comparison on integer indices can overflow
+   if(hi - lo > (double) max_boxes) return 0;
+
+   // Treat a degenerate extent as a point
+   if(hi - lo < min_width) {
+      i.resize(1); w.resize(1);
+      i[0] = nint(0.5*(lo + hi)); w[0] = 1.0;
+      return 1;
+   }
+
+   int i_beg = nint(lo);
+   int i_end = nint(hi);
+   if(i_end - i_beg + 1 > max_boxes) return 0;
+
+   // Size to the exact span rather than a compile-time maximum
+   if((int) i.size() < i_end - i_beg + 1) {
+      i.resize(i_end - i_beg + 1);
+      w.resize(i_end - i_beg + 1);
+   }
+
+   int n = 0;
+   for(int k=i_beg; k<=i_end; k++) {
+      double overlap = min(hi, k + 0.5) - max(lo, k - 0.5);
+      if(overlap <= 0.0) continue;
+      i[n] = k;
+      w[n] = overlap / (hi - lo);
+      n++;
+   }
+
+   return n;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// For AW_MEAN_CNTR between grids whose rows follow lines of constant
+// latitude, recompute the y overlap fractions in proportion to true
+// area, which varies with sin(lat), rather than with grid index. This
+// matters most near the poles.
+//
+////////////////////////////////////////////////////////////////////////
+
+static bool is_lat_row_grid(const Grid &grid) {
+   GridInfo gi = grid.info();
+   return (gi.ll != nullptr || gi.g != nullptr);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static double y_to_sin_lat(const Grid &grid, double x, double y) {
+   double lat, lon;
+   grid.xy_to_latlon(x, y, lat, lon);
+   return sind(max(-90.0, min(90.0, lat)));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void aw_mean_lat_weights(const Grid &to_grid, double x_to,
+                                double y_min, double y_max,
+                                int n, const vector<int> &i,
+                                vector<double> &w) {
+   static const double min_width = 1.0e-10;
+
+   double s1 = y_to_sin_lat(to_grid, x_to, y_min);
+   double s2 = y_to_sin_lat(to_grid, x_to, y_max);
+   double s_lo = min(s1, s2);
+   double s_hi = max(s1, s2);
+
+   // Keep the index-based weights for a degenerate extent
+   if(s_hi - s_lo < min_width) return;
+
+   for(int k=0; k<n; k++) {
+      double b1 = y_to_sin_lat(to_grid, x_to, i[k] - 0.5);
+      double b2 = y_to_sin_lat(to_grid, x_to, i[k] + 0.5);
+      double overlap = min(s_hi, max(b1, b2)) - max(s_lo, min(b1, b2));
+      w[k] = max(0.0, overlap) / (s_hi - s_lo);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
 
 DataPlane met_regrid_area_weighted(const DataPlane & from_data,
                                    const Grid & from_grid,
@@ -157,6 +276,9 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
    vector<double> to_data_sum(to_grid.nxy(), 0.0);
    vector<double> wt_data_sum(to_grid.nxy(), 0.0);
 
+   // Split y overlaps by true area when rows follow constant latitude
+   bool lat_rows = is_lat_row_grid(from_grid) && is_lat_row_grid(to_grid);
+
    //
    // MET #3206 Reduction of vectors needed to prevent data races
    //           when updating to_data values 
@@ -170,7 +292,7 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
 
 #pragma omp parallel default(none) \
    shared(from_data, from_grid, to_grid, info, to_data) \
-   shared(to_data_sum, wt_data_sum)
+   shared(to_data_sum, wt_data_sum, lat_rows)
    { 
 
 #pragma omp single
@@ -180,12 +302,21 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
          to_data.set_times(from_data);
       }
 
+      // Overlap indices and weights, declared outside the loop so that
+      // each thread reuses its own vectors rather than resizing them for
+      // every from_grid box
+      vector<int>    xt(1), yt(1);
+      vector<double> xw(1), yw(1);
+
       // Loop over the from grid to accumulate sums and area weights
 #pragma omp for schedule(static) \
                 collapse(2) \
                 reduction(vec_dbl_plus : to_data_sum, wt_data_sum)
       for(int xf=0; xf<(from_grid.nx()); xf++) {
          for(int yf=0; yf<(from_grid.ny()); yf++) {
+
+            double value = from_data(xf, yf);
+            if(is_bad_data(value)) continue;
 
             double lat;
             double lon;
@@ -195,21 +326,69 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
             double y_to;
             to_grid.latlon_to_xy(lat, lon, x_to, y_to);
 
-            int xt = nint(x_to);
-            int yt = nint(y_to);
+            bool centered = (info.method == InterpMthd::AW_Mean_Cntr);
+            double weight = from_grid.calc_area(xf, yf, centered);
 
-            double value;
-            if((xt < 0) || (xt >= to_grid.nx()) ||
-               (yt < 0) || (yt >= to_grid.ny()) ) {
-               continue;
+            int n_xt = 0;
+            int n_yt = 0;
+
+            if(centered) {
+
+               // Map the from_grid box corners and edge midpoints to the
+               // to_grid. The corners are needed because a rotated or
+               // skewed mapping carries them beyond the edge midpoints,
+               // so the midpoints alone understate the box extent.
+               const double dx[8] = { -0.5, 0.5, 0.0,  0.0, -0.5, -0.5, 0.5, 0.5 };
+               const double dy[8] = {  0.0, 0.0, -0.5, 0.5, -0.5,  0.5, -0.5, 0.5 };
+               double x_min = x_to, x_max = x_to;
+               double y_min = y_to, y_max = y_to;
+               for(int k=0; k<8; k++) {
+                  double lat_e, lon_e, x_e, y_e;
+                  from_grid.xy_to_latlon(xf + dx[k], yf + dy[k], lat_e, lon_e);
+                  to_grid.latlon_to_xy(lat_e, lon_e, x_e, y_e);
+
+                  // Unwrap relative to the box center
+                  if(to_grid.wrap_lon()) {
+                     while(x_e - x_to >  0.5*to_grid.nx()) x_e -= to_grid.nx();
+                     while(x_e - x_to < -0.5*to_grid.nx()) x_e += to_grid.nx();
+                  }
+
+                  x_min = min(x_min, x_e); x_max = max(x_max, x_e);
+                  y_min = min(y_min, y_e); y_max = max(y_max, y_e);
+               }
+
+               // A from_grid box cannot span more than the whole to_grid
+               n_xt = aw_mean_overlap(x_min, x_max, to_grid.nx(), xt, xw);
+               n_yt = aw_mean_overlap(y_min, y_max, to_grid.ny(), yt, yw);
+               if(lat_rows && n_yt > 1) {
+                  aw_mean_lat_weights(to_grid, x_to, y_min, y_max, n_yt, yt, yw);
+               }
             }
-            else {
-               if(is_bad_data(value = from_data(xf, yf))) continue;
-               double weight = from_grid.calc_area(xf, yf);
 
-               int n = to_data.two_to_one(xt, yt);
-               to_data_sum[n] += value*weight;
-               wt_data_sum[n] += weight;
+            // Otherwise, assign to the nearest to_grid box
+            if(n_xt == 0 || n_yt == 0) {
+               n_xt = n_yt = 1;
+               xt[0] = nint(x_to); xw[0] = 1.0;
+               yt[0] = nint(y_to); yw[0] = 1.0;
+            }
+
+            for(int i=0; i<n_xt; i++) {
+
+               // Wrap longitudes for AW_MEAN_CNTR
+               int x = xt[i];
+               if(centered && to_grid.wrap_lon()) {
+                  x = ((x % to_grid.nx()) + to_grid.nx()) % to_grid.nx();
+               }
+               if(x < 0 || x >= to_grid.nx()) continue;
+
+               for(int j=0; j<n_yt; j++) {
+                  if(yt[j] < 0 || yt[j] >= to_grid.ny()) continue;
+
+                  double w = weight*xw[i]*yw[j];
+                  int n = to_data.two_to_one(x, yt[j]);
+                  to_data_sum[n] += value*w;
+                  wt_data_sum[n] += w;
+               }
             }
          } // for yf
       } // for xf

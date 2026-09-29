@@ -78,6 +78,26 @@
     </output>
   </test>
 
+  <test name="grid_weight_GRID_STAT_AREA_CNTR">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>AREA_CNTR_WEIGHT</value></pair>
+      <pair><name>DESC</name>            <value>AREA_CNTR_WEIGHT</value></pair>
+      <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790410</value></pair>
+      <pair><name>GRID_WEIGHT</name>     <value>AREA_CNTR</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2 \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2 \
+      &CONFIG_DIR;/GridStatConfig_grid_weight \
+      -outdir &OUTPUT_DIR;/grid_weight -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_weight/grid_stat_AREA_CNTR_WEIGHT_240000L_20120410_000000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_weight/grid_stat_AREA_CNTR_WEIGHT_240000L_20120410_000000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="grid_weight_ENSEMBLE_STAT_NONE">
     <exec>&MET_BIN;/ensemble_stat</exec>
     <env>

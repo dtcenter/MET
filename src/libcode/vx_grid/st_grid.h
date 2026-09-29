@@ -78,7 +78,7 @@ class StereographicGrid : public GridRep {
 
       void xy_to_latlon(double x, double y, double & lat, double & lon) const;
 
-      double calc_area(int x, int y) const;
+      double calc_area(int x, int y, bool centered) const;
 
       int nx() const;
       int ny() const;

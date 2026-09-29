@@ -52,7 +52,7 @@ class RotatedLatLonGrid : public LatLonGrid {
 
       virtual void xy_to_latlon(double x, double y, double & true_lat, double & true_lon) const;
 
-      virtual double calc_area(int x, int y) const;
+      virtual double calc_area(int x, int y, bool centered) const;
 
       virtual int nx() const;
       virtual int ny() const;

@@ -176,7 +176,7 @@ void UnstructuredGrid::xy_to_latlon(double x, double y, double &lat, double &lon
 ////////////////////////////////////////////////////////////////////////
 
 
-double UnstructuredGrid::calc_area(int x, int y) const {
+double UnstructuredGrid::calc_area(int x, int y, bool centered) const {
 
    double area = 0.;
 

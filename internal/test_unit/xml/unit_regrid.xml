@@ -196,6 +196,103 @@
     </output>
   </test>
 
+  <!-- MET #3178: Compare GFS 1.0 and 0.25 degree data regridded to  -->
+  <!-- a coarser grid using AW_MEAN and AW_MEAN_CNTR. The 1.0 degree   -->
+  <!-- input is an exact subsample of the 0.25 degree input.          -->
+
+  <test name="regrid_data_plane_GFS_0P25_TO_1P00_NEAREST">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f024.grib2 \
+      'latlon 360 181 -90 0 1 1' \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_0P25_TO_1P00_NEAREST.nc \
+      -field 'name="HGT"; level="P500";' \
+      -field 'name="TMP"; level="Z2";' \
+      -method NEAREST -width 1 \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_0P25_TO_1P00_NEAREST.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="regrid_grid_stat_GFS_1P00_VS_0P25_AW_MEAN">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>REGRID_METHOD</name> <value>AW_MEAN</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_0P25_TO_1P00_NEAREST.nc \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f024.grib2 \
+      &CONFIG_DIR;/GridStatConfig_regrid_aw_mean \
+      -outdir &OUTPUT_DIR;/regrid -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/regrid/grid_stat_AW_MEAN_240000L_20220925_000000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/regrid/grid_stat_AW_MEAN_240000L_20220925_000000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="regrid_grid_stat_GFS_1P00_VS_0P25_AW_MEAN_CNTR">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>REGRID_METHOD</name> <value>AW_MEAN_CNTR</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_0P25_TO_1P00_NEAREST.nc \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f024.grib2 \
+      &CONFIG_DIR;/GridStatConfig_regrid_aw_mean \
+      -outdir &OUTPUT_DIR;/regrid -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/regrid/grid_stat_AW_MEAN_CNTR_240000L_20220925_000000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/regrid/grid_stat_AW_MEAN_CNTR_240000L_20220925_000000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <!-- MET #3178: Regrid a global grid to the regional, Lambert         -->
+  <!-- Conformal G212 grid using AW_MEAN_CNTR. Input grid points which   -->
+  <!-- fall outside the valid domain of the output projection produce    -->
+  <!-- non-finite grid coordinates, which previously ran the overlap     -->
+  <!-- computation past the end of its fixed-size arrays and crashed.    -->
+
+  <test name="regrid_data_plane_GFS_0P25_TO_G212_AW_MEAN_CNTR">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f024.grib2 \
+      G212 \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_0P25_TO_G212_AW_MEAN_CNTR.nc \
+      -field 'name="HGT"; level="P500";' \
+      -field 'name="TMP"; level="Z2";' \
+      -method AW_MEAN_CNTR -width 1 \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_0P25_TO_G212_AW_MEAN_CNTR.nc</grid_nc>
+    </output>
+  </test>
+
+  <!-- MET #3178: Regrid from low to high resolution using AW_MEAN_CNTR. -->
+  <!-- Each input grid box spans many output grid boxes, which the       -->
+  <!-- overlap computation previously refused to divide the weight       -->
+  <!-- among, assigning each input grid box to a single output grid box  -->
+  <!-- and leaving the rest of the output grid unset.                    -->
+
+  <test name="regrid_data_plane_GFS_1P00_TO_0P05_AW_MEAN_CNTR">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_0P25_TO_1P00_NEAREST.nc \
+      'latlon 400 400 30 260 0.05 0.05' \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_1P00_TO_0P05_AW_MEAN_CNTR.nc \
+      -field 'name="HGT_P500"; level="(*,*)";' \
+      -method AW_MEAN_CNTR -width 1 \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_1P00_TO_0P05_AW_MEAN_CNTR.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="regrid_data_plane_GFS_TO_HMT_MIN_3">
     <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \

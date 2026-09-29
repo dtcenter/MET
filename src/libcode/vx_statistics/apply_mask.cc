@@ -142,7 +142,10 @@ void parse_grid_weight(const Grid &grid, const GridWeightType t,
                w = cosd(lat);
             }
             else if(t == GridWeightType::Area) {
-               w = grid.calc_area(x, y);
+               w = grid.calc_area(x, y, false);
+            }
+            else if(t == GridWeightType::Area_Cntr) {
+               w = grid.calc_area(x, y, true);
             }
             else {
                w = default_weight;
