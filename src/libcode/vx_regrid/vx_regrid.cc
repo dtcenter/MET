@@ -8,6 +8,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <cmath>
+
 #include "vx_regrid.h"
 #include "interp_mthd.h"
 #include "GridTemplate.h"
@@ -144,26 +146,48 @@ DataPlane met_regrid_generic(const DataPlane & from_data,
 //
 // For AW_MEAN_CNTR, compute the fraction of the 1D extent [lo, hi],
 // in to_grid index units, which overlaps each to_grid box, where box i
-// spans [i-0.5, i+0.5]. Returns the number of boxes stored in the index
-// and weight arrays, or 0 if the extent spans more than max_aw_boxes.
+// spans [i-0.5, i+0.5]. The index and weight vectors are sized to the
+// number of boxes actually spanned, which is exact and requires no fixed
+// upper limit. They are reused across calls, so the resize() below only
+// allocates when a box spans more boxes than any previous one.
+//
+// Returns the number of boxes stored, or 0 if the extent spans more than
+// max_boxes, which bounds a nonsensical extent from an xy_to_latlon() or
+// latlon_to_xy() conversion outside the valid domain of a projection. A
+// from_grid box cannot meaningfully span more than the whole to_grid, so
+// the caller passes the to_grid dimension as max_boxes.
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const int max_aw_boxes = 16;
-
-static int aw_mean_overlap(double lo, double hi,
-                           int i[max_aw_boxes], double w[max_aw_boxes]) {
+static int aw_mean_overlap(double lo, double hi, int max_boxes,
+                           vector<int> &i, vector<double> &w) {
    static const double min_width = 1.0e-5;
+
+   // Reject a non-finite extent, which a latlon_to_xy() conversion
+   // outside the valid domain of a projection can produce. Rounding one
+   // to an integer index is undefined behavior.
+   if(!std::isfinite(lo) || !std::isfinite(hi) || hi < lo) return 0;
+
+   // Reject an extent larger than the to_grid before converting it to
+   // integer indices, since doing so afterward can overflow
+   if(hi - lo > (double) max_boxes) return 0;
 
    // Treat a degenerate extent as a point
    if(hi - lo < min_width) {
+      i.resize(1); w.resize(1);
       i[0] = nint(0.5*(lo + hi)); w[0] = 1.0;
       return 1;
    }
 
    int i_beg = nint(lo);
    int i_end = nint(hi);
-   if(i_end - i_beg + 1 > max_aw_boxes) return 0;
+   if(i_end - i_beg + 1 > max_boxes) return 0;
+
+   // Size to the exact span rather than a compile-time maximum
+   if((int) i.size() < i_end - i_beg + 1) {
+      i.resize(i_end - i_beg + 1);
+      w.resize(i_end - i_beg + 1);
+   }
 
    int n = 0;
    for(int k=i_beg; k<=i_end; k++) {
@@ -203,7 +227,8 @@ static double y_to_sin_lat(const Grid &grid, double x, double y) {
 
 static void aw_mean_lat_weights(const Grid &to_grid, double x_to,
                                 double y_min, double y_max,
-                                int n, const int i[], double w[]) {
+                                int n, const vector<int> &i,
+                                vector<double> &w) {
    static const double min_width = 1.0e-10;
 
    double s1 = y_to_sin_lat(to_grid, x_to, y_min);
@@ -266,6 +291,12 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
          to_data.set_times(from_data);
       }
 
+      // Overlap indices and weights, declared outside the loop so that
+      // each thread reuses its own vectors rather than resizing them for
+      // every from_grid box
+      vector<int>    xt(1), yt(1);
+      vector<double> xw(1), yw(1);
+
       // Loop over the from grid to accumulate sums and area weights
 #pragma omp for schedule(static) \
                 collapse(2) \
@@ -287,19 +318,20 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
             bool centered = (info.method == InterpMthd::AW_Mean_Cntr);
             double weight = from_grid.calc_area(xf, yf, centered);
 
-            int xt[max_aw_boxes], yt[max_aw_boxes];
-            double xw[max_aw_boxes], yw[max_aw_boxes];
             int n_xt = 0;
             int n_yt = 0;
 
             if(centered) {
 
-               // Map the from_grid box edge midpoints to the to_grid
-               const double dx[4] = { -0.5, 0.5, 0.0, 0.0 };
-               const double dy[4] = { 0.0, 0.0, -0.5, 0.5 };
+               // Map the from_grid box corners and edge midpoints to the
+               // to_grid. The corners are needed because a rotated or
+               // skewed mapping carries them beyond the edge midpoints,
+               // so the midpoints alone understate the box extent.
+               const double dx[8] = { -0.5, 0.5, 0.0,  0.0, -0.5, -0.5, 0.5, 0.5 };
+               const double dy[8] = {  0.0, 0.0, -0.5, 0.5, -0.5,  0.5, -0.5, 0.5 };
                double x_min = x_to, x_max = x_to;
                double y_min = y_to, y_max = y_to;
-               for(int k=0; k<4; k++) {
+               for(int k=0; k<8; k++) {
                   double lat_e, lon_e, x_e, y_e;
                   from_grid.xy_to_latlon(xf + dx[k], yf + dy[k], lat_e, lon_e);
                   to_grid.latlon_to_xy(lat_e, lon_e, x_e, y_e);
@@ -313,8 +345,10 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
                   x_min = min(x_min, x_e); x_max = max(x_max, x_e);
                   y_min = min(y_min, y_e); y_max = max(y_max, y_e);
                }
-               n_xt = aw_mean_overlap(x_min, x_max, xt, xw);
-               n_yt = aw_mean_overlap(y_min, y_max, yt, yw);
+
+               // A from_grid box cannot span more than the whole to_grid
+               n_xt = aw_mean_overlap(x_min, x_max, to_grid.nx(), xt, xw);
+               n_yt = aw_mean_overlap(y_min, y_max, to_grid.ny(), yt, yw);
                if(lat_rows && n_yt > 1) {
                   aw_mean_lat_weights(to_grid, x_to, y_min, y_max, n_yt, yt, yw);
                }

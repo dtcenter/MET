@@ -904,6 +904,16 @@ The "method" entry defines the regridding method to be used.
       divided among them in proportion to the overlap. This option is
       recommended over AW_MEAN.
 
+      * The number of output grid boxes over which the weight is divided
+        is determined by the extent of each input grid box and is not
+        subject to a fixed limit.
+
+      * Prior to version 13.0.0, the AW_MEAN option computed centered grid
+        box areas for Lambert Azimuthal Equal Area grids, unlike all other
+        grid projections. Use AW_MEAN_CNTR to most closely reproduce that
+        behavior, noting that it also divides each input grid box weight by
+        the overlap and so will not match exactly.
+
     * LS_FIT       for a least-squares fit
 
     * BILIN        for bilinear interpolation (width = 2)
@@ -2770,7 +2780,7 @@ verification, which is controlled by the "point_weight_flag" option.
 It can only be defined once at the highest level of config file context
 and applies to all verification tasks for that run.
 
-Three grid weighting options are currently supported:
+Four grid weighting options are currently supported:
 
 * NONE to disable grid weighting using a constant weight of 1.0 (default).
 
