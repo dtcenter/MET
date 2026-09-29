@@ -151,11 +151,10 @@ DataPlane met_regrid_generic(const DataPlane & from_data,
 // upper limit. They are reused across calls, so the resize() below only
 // allocates when a box spans more boxes than any previous one.
 //
-// Returns the number of boxes stored, or 0 if the extent spans more than
-// max_boxes, which bounds a nonsensical extent from an xy_to_latlon() or
-// latlon_to_xy() conversion outside the valid domain of a projection. A
-// from_grid box cannot meaningfully span more than the whole to_grid, so
-// the caller passes the to_grid dimension as max_boxes.
+// Returns the number of boxes stored, or 0 for an extent which cannot
+// be converted to integer indices, as described below. A from_grid box
+// cannot meaningfully span more than the whole to_grid, so the caller
+// passes the to_grid dimension as max_boxes.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -163,13 +162,25 @@ static int aw_mean_overlap(double lo, double hi, int max_boxes,
                            vector<int> &i, vector<double> &w) {
    static const double min_width = 1.0e-5;
 
-   // Reject a non-finite extent, which a latlon_to_xy() conversion
-   // outside the valid domain of a projection can produce. Rounding one
-   // to an integer index is undefined behavior.
+   // Mapping a point outside the valid domain of a projection returns a
+   // finite but enormous grid coordinate. Converting one of those to an
+   // integer index overflows, and the resulting index is meaningless.
+   // For example, regridding a global grid to the Lambert Conformal G212
+   // grid produces coordinates beyond +/- 2.8e9, well past INT_MAX.
+   //
+   // The three checks below bound lo and hi to the size of the to_grid
+   // before any integer conversion, so that the rounding which follows
+   // cannot overflow. The non-finite check is defensive, since these
+   // conversions are not observed to return infinities or NaNs.
+
    if(!std::isfinite(lo) || !std::isfinite(hi) || hi < lo) return 0;
 
-   // Reject an extent larger than the to_grid before converting it to
-   // integer indices, since doing so afterward can overflow
+   // Reject an extent which does not intersect the to_grid, which also
+   // catches a huge coordinate whose extent happens to be small
+   if(hi < -0.5 || lo > (double) max_boxes - 0.5) return 0;
+
+   // Reject an extent wider than the to_grid, comparing in floating
+   // point since the same comparison on integer indices can overflow
    if(hi - lo > (double) max_boxes) return 0;
 
    // Treat a degenerate extent as a point
