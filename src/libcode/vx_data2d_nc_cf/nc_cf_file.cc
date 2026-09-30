@@ -1685,6 +1685,7 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
            << "assuming meters.\n\n";
     }
     else {
+      x_coord_units_name.set_lower();
            if ( x_coord_units_name == "m" ||
                 x_coord_units_name == "meter" ||
                 x_coord_units_name == "meters") x_coord_to_m_cf = 1.0;
@@ -1710,6 +1711,7 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
            << "assuming meters.\n\n";
     }
     else {
+      y_coord_units_name.set_lower();
            if ( y_coord_units_name == "m" ||
                 y_coord_units_name == "meter" ||
                 y_coord_units_name == "meters" ) y_coord_to_m_cf = 1.0;
@@ -1953,6 +1955,7 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
            << "assuming meters.\n\n";
     }
     else {
+      x_coord_units_name.set_lower();
            if ( x_coord_units_name == "m" ||
                 x_coord_units_name == "meter" ||
                 x_coord_units_name == "meters") x_coord_to_m_cf = 1.0;
@@ -1977,6 +1980,7 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
            << "assuming meters.\n\n";
     }
     else {
+      y_coord_units_name.set_lower();
            if ( y_coord_units_name == "m" ||
                 y_coord_units_name == "meter" ||
                 y_coord_units_name == "meters" ) y_coord_to_m_cf = 1.0;
@@ -2352,6 +2356,7 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
            << "assuming meters.\n\n";
     }
     else {
+      x_coord_units_name.set_lower();
            if ( x_coord_units_name == "m" ||
                 x_coord_units_name == "meter" ||
                 x_coord_units_name == "meters") x_coord_to_m_cf = 1.0;
@@ -2377,6 +2382,7 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
            << "assuming meters.\n\n";
     }
     else {
+      y_coord_units_name.set_lower();
            if ( y_coord_units_name == "m" ||
                 y_coord_units_name == "meter" ||
                 y_coord_units_name == "meters" ) y_coord_to_m_cf = 1.0;
@@ -2440,7 +2446,7 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   data.hemisphere = (proj_origin_lat > 0 ? 'N' : 'S');
   data.x_pin = x_pin;
   data.y_pin = y_pin;
-  data.scale_lat = proj_origin_lat;
+  data.scale_lat = proj_standard_parallel;
   data.lon_orient = -1.0 * proj_vertical_lon;
   data.d_km = dx_m / m_per_km;
   data.dy_km = dy_m / m_per_km;
@@ -2454,12 +2460,6 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   double false_north = 0.;
   double scale_factor = proj_origin_scale_factor;
   if(!has_scale_factor && has_standard_parallel) {
-    double lat;
-    double lon;
-    double x;
-    double y;
-    double x2;
-    double y2;
 
     false_east = get_nc_var_att_double(grid_mapping_var, "false_east", false);
     false_north = get_nc_var_att_double(grid_mapping_var, "false_north", false);
@@ -2469,8 +2469,11 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
     if(!is_spherical_earch) eccentricity = st_eccentricity_func(semi_major_axis, semi_minor_axis,
                                                                 inverse_flattening);
 
-    x = x_values[0];
-    y = y_values[0];
+    // MET #3358 Check for negative offset
+    double x = x_values[0];
+    double y = (data.dy_km > 0 ? y_values[0] : y_values.back());
+    double lat;
+    double lon;
     scale_factor = st_sf_func(proj_standard_parallel, eccentricity, is_north_hemisphere);
     st_xy_to_latlon_func(x, y, lat, lon, scale_factor, semi_major_axis,
                          proj_vertical_lon, false_east, false_north,
@@ -2488,6 +2491,8 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
       }
     }
 
+    double x2;
+    double y2;
     st_latlon_to_xy_func(lat, lon, x2, y2, scale_factor, proj_vertical_lon,
                          semi_major_axis, false_east, false_north,
                          eccentricity, is_north_hemisphere);
@@ -2512,7 +2517,8 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   grid.set(data);
   grid_ready = true;
 
-  //Note: do not set grid.set_swap_to_north()
+  // MET #3358 Support Polar Stereographic NetCDF data packed north to south
+  if (data.dy_km < 0) grid.set_swap_to_north(true);
 
   if(mlog.verbosity_level() >= 10) {
     double lat1;
