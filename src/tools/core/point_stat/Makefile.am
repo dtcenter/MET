@@ -40,6 +40,7 @@ point_stat_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_util_math \
 	-lvx_util \
+        -lvx_nav \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \

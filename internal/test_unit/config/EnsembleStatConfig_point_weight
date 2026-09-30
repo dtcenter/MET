@@ -133,9 +133,9 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid  = [];
+   grid  = [ ${MASK_GRID} ];
    poly  = [];
-   sid   = [ "${CONFIG_DIR}/SID_CONUS_ADPSFC_ELEV.txt" ];
+   sid   = [ ${MASK_SID} ];
    llpnt = [];
 }
 
@@ -207,6 +207,10 @@ rng = {
 
 grid_weight_flag  = NONE;
 point_weight_flag = ${POINT_WEIGHT};
+kde_ref_angle     = 0.75;
+write_weights     = TRUE;
+
+////////////////////////////////////////////////////////////////////////////////
 
 output_prefix = "${OUTPUT_PREFIX}";
 

@@ -332,7 +332,7 @@ References
 
 | Rodwell, M.J., D.S. Richardson, T.D. Hewson and T. Haiden, 2010: A new equitable
 |   score suitable for verifying precipitation in numerical weather prediction.
-|   *Quarterly Journal of the Royal Meteorological Society*, 136: 1344-1463.
+|   *Quarterly Journal of the Royal Meteorological Society*, 136: 1344-1363.
 |   https://doi.org/10.1002/qj.656
 |
 

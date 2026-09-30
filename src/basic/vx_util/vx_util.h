@@ -61,6 +61,7 @@
 #include "polyline.h"
 #include "mask_poly.h"
 #include "mask_sid.h"
+#include "point_weight.h"
 #include "read_fortran_binary.h"
 #include "stat_column_defs.h"
 

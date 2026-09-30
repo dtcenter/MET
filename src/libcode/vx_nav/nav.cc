@@ -71,6 +71,41 @@ return earth_radius_km*ahaversine(x);
 
 
    //
+   //  gc_angle
+   //
+   //  Calculates the angle in degrees
+   //     between the points (lat1, lon1),
+   //     (lat2, lon2) (in degrees) with the
+   //     center of the earth as the vertex
+   //
+
+
+//////////////////////////////////////////////////////////////////
+
+
+double gc_angle(double lat1, double lon1, double lat2, double lon2)
+
+{
+
+double lat1_radians = lat1 * rad_per_deg;
+double lat2_radians = lat2 * rad_per_deg;
+double lon1_radians = lon1 * rad_per_deg;
+double lon2_radians = lon2 * rad_per_deg;
+
+double dp = (lat1_radians - lat2_radians);
+double dl = (lon1_radians - lon2_radians);
+
+double x = haversine(dp) + cos(lat1_radians)*cos(lat2_radians)*haversine(dl);
+
+return deg_per_rad*ahaversine(x);
+
+}
+
+
+//////////////////////////////////////////////////////////////////
+
+
+   //
    //  haversine
    //
    //  Calculates the haversine of an
@@ -110,9 +145,7 @@ double ahaversine(double t)
 
 {
 
-double a = 2.0*asin(sqrt(t));
-
-return a;
+return 2.0*asin(sqrt(t));
 
 }
 
