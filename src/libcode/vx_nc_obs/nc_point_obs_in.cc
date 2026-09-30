@@ -95,7 +95,7 @@ bool MetNcPointObsIn::read_obs_data(int buf_size, int start, float *obs_arr_bloc
 bool MetNcPointObsIn::read_obs_data_numbers() {
    bool status = false;
    if( IS_VALID_NC_P(obs_nc) ) {
-      status = ((NcPointObsData *)obs_data)->read_obs_data_numbers(obs_vars);
+      status = static_cast<NcPointObsData *>(obs_data.get())->read_obs_data_numbers(obs_vars);
    }
    return status;
 }
@@ -105,7 +105,7 @@ bool MetNcPointObsIn::read_obs_data_numbers() {
 bool MetNcPointObsIn::read_obs_data_table_lookups() {
    bool status = false;
    if( IS_VALID_NC_P(obs_nc) ) {
-      status = ((NcPointObsData *)obs_data)->read_obs_data_table_lookups(obs_vars);
+      status = static_cast<NcPointObsData *>(obs_data.get())->read_obs_data_table_lookups(obs_vars);
    }
    return status;
 }

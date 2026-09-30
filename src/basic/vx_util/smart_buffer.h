@@ -19,6 +19,9 @@
 #define  __VX_SMART_BUFFER_H__
 
 
+#include <vector>
+
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -32,9 +35,8 @@ class SmartBuffer {
       void assign (const SmartBuffer &);
 
 
-      unsigned char * Buf;   //  allocated
+      std::vector<unsigned char> Buf;
 
-      int Size;   //  bytes
 
 
    public:
@@ -57,7 +59,7 @@ class SmartBuffer {
 
      int size () const;
 
-     bool is_empty () const;   //  Buf is zero
+     bool is_empty () const;
 
          //
          //  do stuff
@@ -90,13 +92,13 @@ class SmartBuffer {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int  SmartBuffer::size()  const { return Size; }
+inline int  SmartBuffer::size()  const { return (int) Buf.size(); }
 
-inline bool SmartBuffer::is_empty() const { return ( Buf == nullptr ); }
+inline bool SmartBuffer::is_empty() const { return Buf.empty(); }
 
-inline      SmartBuffer::operator unsigned char * () const { return Buf; }
+inline      SmartBuffer::operator unsigned char * () const { return const_cast<unsigned char *>(Buf.data()); }
 
-inline      SmartBuffer::operator void * () const { return Buf; }
+inline      SmartBuffer::operator void * () const { return const_cast<unsigned char *>(Buf.data()); }
 
 
 ////////////////////////////////////////////////////////////////////////

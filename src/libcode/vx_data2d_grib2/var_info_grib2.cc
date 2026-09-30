@@ -78,7 +78,7 @@ VarInfoGrib2 & VarInfoGrib2::operator=(const VarInfoGrib2 &f) {
 ///////////////////////////////////////////////////////////////////////////////
 
 unique_ptr<VarInfo> VarInfoGrib2::clone() const {
-   return unique_ptr<VarInfo>(new VarInfoGrib2(*this));
+   return std::make_unique<VarInfoGrib2>(*this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

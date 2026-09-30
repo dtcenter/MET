@@ -111,9 +111,6 @@ void MtdIntFile::int_init_from_scratch()
 
 {
 
-Data = 0;
-
-ObjVolume = 0;
 
 clear();
 
@@ -131,9 +128,9 @@ void MtdIntFile::clear()
 
 MtdFileBase::clear();
 
-if ( Data )  { delete [] Data;  Data = 0; }
+Data.clear();
 
-if ( ObjVolume )  { delete [] ObjVolume;  ObjVolume = 0; }
+ObjVolume.clear();
 
 DataMin = DataMax = 0;
 
@@ -187,23 +184,15 @@ FileType = f.FileType;
 
 n = Nx*Ny*Nt;
 
-if ( f.Data )  {
+if ( ! f.Data.empty() )  {
 
-   Data = new int [n];
-
-   memcpy(Data, f.Data, n*sizeof(int));
+   Data = f.Data;
 
 }
 
 n = Nobjects;
 
-if ( f.ObjVolume )  {
-
-   ObjVolume = new int [n];
-
-   memcpy(ObjVolume, f.ObjVolume, n*sizeof(int));
-
-}
+ObjVolume = f.ObjVolume;
 
    //
    //  done
@@ -267,12 +256,12 @@ void MtdIntFile::set_size(int _nx, int _ny, int _nt)
 {
 
 
-if ( Data )  { delete [] Data;  Data = 0; }
+Data.clear();
 
 int j;
 const int n3 = _nx*_ny*_nt;
 
-Data = new int [n3];
+Data.resize(n3);
 
 Nx = _nx;
 Ny = _ny;
@@ -444,7 +433,7 @@ lengths.add(Nt);
 lengths.add(Ny);
 lengths.add(Nx);
 
-if ( ! get_nc_data(&var, Data, lengths, offsets) )  {
+if ( ! get_nc_data(&var, Data.data(), lengths, offsets) )  {
 
    mlog << Error << "\nMtdIntFile::read(const char *) -> "
         << "trouble getting data\n\n";
@@ -477,7 +466,7 @@ NcVar data_var;
 NcVar volumes_var; 
 const char format [] = "%d";
 ConcatString cs;
-const bool is_split = (ObjVolume != 0);
+const bool is_split = ! ObjVolume.empty();
 
    //
    //  write stuff from parent class
@@ -543,7 +532,7 @@ lengths.add(Nt);
 lengths.add(Ny);
 lengths.add(Nx);
 
-if ( ! put_nc_data(&data_var, Data, lengths, offsets) )  {
+if ( ! put_nc_data(&data_var, Data.data(), lengths, offsets) )  {
 
    mlog << Error << "\nMtdIntFile::write(const char *) -> "
         << "trouble getting data\n\n";
@@ -560,7 +549,7 @@ if ( is_split )  {
 
    volumes_var = add_var(&f, volumes_name, ncInt, n_obj_dim);
 
-   if ( !(put_nc_data(&volumes_var, ObjVolume, Nobjects, 0)) )  {
+   if ( !(put_nc_data(&volumes_var, ObjVolume.data(), Nobjects, 0)) )  {
 
       mlog << Error << "\nMtdIntFile::write() -> "
            << "trouble writing object volumes\n\n";
@@ -650,13 +639,13 @@ f.TimeBeg = TimeBeg;
 
 f.TimeEnd = TimeEnd;
 
-f.Data = new int [Nx*Ny];
+f.Data.resize(Nx*Ny);
 
 n = mtd_three_to_one(Nx, Ny, Nt, 0, 0, t);
 
-memcpy(f.Data, Data + n, bytes);
+memcpy(f.Data.data(), Data.data() + n, bytes);
 
-d = f.Data;
+d = f.Data.data();
 
 fmin = fmax = f.Data[0];
 
@@ -721,13 +710,13 @@ f.TimeEnd = TimeEnd;
 f.DataMin = 0;
 f.DataMax = 1;
 
-f.Data = new int [Nx*Ny];
+f.Data.resize(Nx*Ny);
 
 n = mtd_three_to_one(Nx, Ny, Nt, 0, 0, t);
 
-memcpy(f.Data, Data + n, bytes);
+memcpy(f.Data.data(), Data.data() + n, bytes);
 
-d = f.Data;
+d = f.Data.data();
 
 vol = 0;
 
@@ -772,12 +761,12 @@ void MtdIntFile::fatten()
 
 int x, y, n;
 const int nxy = Nx*Ny;
-int * u = new int [nxy];
+vector<int> u(nxy);
 int * a = nullptr;
 
-a = u;
+a = u.data();
 
-memcpy(a, Data, nxy*sizeof(int));
+memcpy(a, Data.data(), nxy*sizeof(int));
 
 
    //
@@ -792,7 +781,7 @@ y = Ny - 1;
 
 n = mtd_three_to_one(Nx, Ny, Nt, 0, y, 0);
 
-a = u + n;
+a = u.data() + n;
 
 for (x=0; x<(Nx - 1); ++x)  {
 
@@ -814,7 +803,7 @@ x = Nx - 1;
 
 n = mtd_three_to_one(Nx, Ny, Nt, x, 0, 0);
 
-a = u + n;
+a = u.data() + n;
 
 for (y=0; y<(Ny - 1); ++y)  {
 
@@ -836,7 +825,7 @@ for (y = 0; y<(Ny - 2); ++y)  {
 
    n = mtd_three_to_one(Nx, Ny, Nt, 0, y, 0);
 
-   a = u + n;
+   a = u.data() + n;
 
    for (x=0; x<(Nx - 2); ++x)  {
 
@@ -863,8 +852,6 @@ for (y = 0; y<(Ny - 2); ++y)  {
    //  done
    //
 
-if ( u )  { delete [] u;  u = 0; }
-
 return;
 
 }
@@ -877,7 +864,7 @@ void MtdIntFile::zero_border(int n)
 
 {
 
-if ( !Data )  {
+if ( Data.empty() )  {
 
    mlog << Error << "\nMtdIntFile::zero_border(int) -> "
         << "no data field!\n\n";
@@ -940,7 +927,7 @@ void MtdIntFile::set_to_zeroes()
 
 {
 
-if ( !Data )  {
+if ( Data.empty() )  {
 
    mlog << Error << "\nMtdIntFile::set_to_zeroes() -> "
         << "no data!\n\n";
@@ -951,7 +938,7 @@ if ( !Data )  {
 
 int j;
 const int n3 = Nx*Ny*Nt;
-int * d = Data;
+int * d = Data.data();
 
 for (j=0; j<n3; ++j)  *d++ = 0;
 
@@ -1167,11 +1154,11 @@ const int Nxyt = Nx*Ny*Nt;
 
 if ( Nobjects == 0 )  return;
 
-old.ObjVolume = new int [Nobjects];
+old.ObjVolume.resize(Nobjects);
 
 for (j=0; j<Nobjects; ++j)  old.ObjVolume[j] = 0;
 
-d = old.Data;
+d = old.Data.data();
 if (d) {
    for (j=0; j<Nxyt; ++j, ++d)  {
 
@@ -1203,7 +1190,7 @@ int MtdIntFile::volume(int k) const
 
 {
 
-if ( !ObjVolume )  {
+if ( ObjVolume.empty() )  {
 
    mlog << Error << "\nMtdIntFile::volume(int) -> "
         << "field not split!\n\n";
@@ -1234,7 +1221,7 @@ int MtdIntFile::total_volume() const
 
 {
 
-if ( !ObjVolume )  {
+if ( ObjVolume.empty() )  {
 
    mlog << Error << "\nMtdIntFile::total_volume() -> "
         << "field not split!\n\n";
@@ -1261,9 +1248,8 @@ void MtdIntFile::toss_small_objects(int min_volume)
 {
 
 int j, n_new;
-int * new_to_old = (int *) nullptr;
 
-new_to_old = new int[Nobjects];   //  probably too big, but that's ok
+vector<int> new_to_old(Nobjects);   //  probably too big, but that's ok
 
 n_new = 0;
 
@@ -1274,14 +1260,12 @@ for (j=0; j<Nobjects; ++j)  {
 }
 
 
-sift_objects(n_new, new_to_old);
+sift_objects(n_new, new_to_old.data());
 
 
    //
    //  done
    //
-
-delete [] new_to_old;   new_to_old = (int *) nullptr;
 
 return;
 
@@ -1299,17 +1283,15 @@ if ( n_new == Nobjects )  return;
 
 int j, k;
 const int n3 = Nx*Ny*Nt;
-int * old_to_new = (int *) nullptr;
-int * new_volumes = (int *) nullptr;
-int * d = Data;
+vector<int> old_to_new;
+vector<int> new_volumes;
+int * d = Data.data();
 
 if ( n_new > 0 )  {
 
-   old_to_new = new int [Nobjects];
+   old_to_new.assign(Nobjects, -1);
 
-   for (j=0; j<Nobjects; ++j)  old_to_new[j] = -1;
-
-   new_volumes = new int [n_new];
+   new_volumes.resize(n_new);
 
    for (j=0; j<n_new; ++j)  {
 
@@ -1324,7 +1306,7 @@ if ( n_new > 0 )  {
 int replace_count = 0;
 int zero_count = 0;
 
-d = Data;
+d = Data.data();
 
 if ( n_new > 0 )  {
 
@@ -1357,18 +1339,14 @@ DataMax  = Nobjects;
 
 if ( n_new > 0 )  {
 
-   delete [] ObjVolume;  ObjVolume = (int *) nullptr;
-
    ObjVolume = new_volumes;
 
-} else ObjVolume = 0;
+} else ObjVolume.clear();
 
 
    //
    //  done
    //
-
-if ( old_to_new )  { delete [] old_to_new;   old_to_new = (int *) nullptr; }
 
 return;
 
@@ -1535,11 +1513,9 @@ void MtdIntFile::set_volumes(int n, const int * V)
 
 {
 
-if ( ObjVolume )  { delete [] ObjVolume;  ObjVolume = (int *) nullptr; }
-
 int j;
 
-ObjVolume = new int [n];
+ObjVolume.resize(n);
 
 for (j=0; j<n; ++j)  ObjVolume[j] = V[j];
 
@@ -1580,8 +1556,8 @@ s = *this;
 
 s.set_to_zeroes();
 
-int * in  = Data;
-int * out = s.Data;
+const int * in  = Data.data();
+int * out = s.Data.data();
 
 v = ObjVolume[n - 1];
 
@@ -1625,7 +1601,7 @@ int v;
 int V[2];
 MtdIntFile s;
 const int n3 = Nx*Ny*Nt;
-bool * yesno = new bool [ 1 + Nobjects ];
+vector<bool> yesno(1 + Nobjects);
 
 yesno[0] = false;
 
@@ -1640,8 +1616,8 @@ s = *this;
 
 s.set_to_zeroes();
 
-int * in  =   Data;
-int * out = s.Data;
+const int * in  =   Data.data();
+int * out = s.Data.data();
 int out_size = s.nxyt();
 
 v = 0;
@@ -1661,8 +1637,6 @@ for (j=0; j<n3; ++j)  {
 V[0] = v;
 
 s.set_volumes(1, V);
-
-if ( yesno )  { delete [] yesno;  yesno = 0; }
 
 return s;
 

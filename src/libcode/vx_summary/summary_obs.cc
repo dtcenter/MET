@@ -170,7 +170,7 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
                           summary_info);
 
    // Get the summary calculators from the summary information.
-   vector< SummaryCalc* > calculators = getSummaryCalculators(summary_info);
+   vector<std::unique_ptr<SummaryCalc>> calculators = getSummaryCalculators(summary_info);
 
    // Get a pointer into the observations
    vector< Observation >::const_iterator curr_obs = observations.begin();
@@ -190,7 +190,7 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
 
       // Initialize the map used to sort observations in this time period
       // into their correct summary groups
-      map< SummaryKey, NumArray* > summary_values;
+      map< SummaryKey, NumArray > summary_values;
 
       // Loop backwards through the observations to find the first observation
       // in the interval.  We need to do this because the user can define
@@ -251,12 +251,12 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
            }
            // If this is a new key, create a new NumArray
            if (summary_values.find(summary_key) == summary_values.end()) {
-              summary_values[summary_key] = new NumArray;
+              summary_values[summary_key] = NumArray();
               summaryKeyCount++;
            }
 
            // Add the observation to the correct summary
-           summary_values[summary_key]->add(curr_obs->getValue());
+           summary_values[summary_key].add(curr_obs->getValue());
          }
 
          // Move to the next obs
@@ -265,21 +265,21 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
 
       // Calculate the summaries and add them to the summary observations list
 
-      map< SummaryKey, NumArray* >::const_iterator curr_values;
+      map< SummaryKey, NumArray >::const_iterator curr_values;
       for (curr_values = summary_values.begin();
            curr_values != summary_values.end(); ++curr_values)
       {
         // Loop through the calculators, saving a summary for each one
-        vector< SummaryCalc* >::const_iterator calc_iter;
+        vector<std::unique_ptr<SummaryCalc>>::const_iterator calc_iter;
         for (calc_iter = calculators.begin();
              calc_iter != calculators.end(); ++calc_iter)
         {
-           SummaryCalc *calc = *calc_iter;
+           SummaryCalc *calc = calc_iter->get();
 
            // Compute the expected number of observations and check valid data ratio
            if (summary_info.vld_freq > 0 && summary_info.vld_thresh > 0) {
               int n_expect = max(1, nint(summary_info.width / summary_info.vld_freq));
-              int n_valid  = (*curr_values->second).n_valid();
+              int n_valid  = curr_values->second.n_valid();
 
               if (((double) n_valid / n_expect) < summary_info.vld_thresh) {
                  mlog << Debug(4)
@@ -315,7 +315,7 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
                        curr_values->first.getVarCode(),
                        curr_values->first.getPressureLevel(),
                        curr_values->first.getHeight(),
-                       calc->calcSummary(*curr_values->second),
+                       calc->calcSummary(curr_values->second),
                        curr_values->first.getVarName(),
                        curr_values->first.getVarUnits(),
                        curr_values->first.getVarDesc()));
@@ -323,12 +323,6 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
         } /* endfor - calc */
 
       } /* endfor - curr_values */
-
-      // Reclaim space for the summary arrays
-
-      for (curr_values = summary_values.begin();
-           curr_values != summary_values.end(); ++curr_values)
-         delete curr_values->second;
 
    } /* endfor - time_interval */
 
@@ -343,11 +337,6 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
       }
    }
 
-   // Reclaim memory
-
-   for (size_t i = 0; i < calculators.size(); ++i)
-      delete calculators[i];
-
    mlog << Debug(3)
         << "SummaryObs::summarizeObs() summary key count: " << summaryKeyCount
         << "\tsummaryCount: " << summaryCount << "\n";
@@ -357,10 +346,10 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
 
 ////////////////////////////////////////////////////////////////////////
 
-vector< SummaryCalc* > SummaryObs::getSummaryCalculators(const TimeSummaryInfo &info) const
+vector<std::unique_ptr<SummaryCalc>> SummaryObs::getSummaryCalculators(const TimeSummaryInfo &info) const
 {
    // Initialize the list of calculators
-   vector< SummaryCalc * > calculators;
+   vector<std::unique_ptr<SummaryCalc>> calculators;
 
    // Loop through the summary types, creating the calculators
    for (int i = 0; i < info.type.n_elements(); ++i) {
@@ -371,25 +360,25 @@ vector< SummaryCalc* > SummaryObs::getSummaryCalculators(const TimeSummaryInfo &
       // Create the calculator specified
 
       if (type == "mean") {
-        calculators.emplace_back(new SummaryCalcMean);
+        calculators.push_back(std::make_unique<SummaryCalcMean>());
       }
       else if (type == "stdev") {
-        calculators.emplace_back(new SummaryCalcStdev);
+        calculators.push_back(std::make_unique<SummaryCalcStdev>());
       }
       else if (type == "min") {
-        calculators.emplace_back(new SummaryCalcMin);
+        calculators.push_back(std::make_unique<SummaryCalcMin>());
       }
       else if (type == "max") {
-        calculators.emplace_back(new SummaryCalcMax);
+        calculators.push_back(std::make_unique<SummaryCalcMax>());
       }
       else if (type == "range") {
-        calculators.emplace_back(new SummaryCalcRange);
+        calculators.push_back(std::make_unique<SummaryCalcRange>());
       }
       else if (type == "median") {
-        calculators.emplace_back(new SummaryCalcMedian);
+        calculators.push_back(std::make_unique<SummaryCalcMedian>());
       }
       else if (type == "sum") {
-        calculators.emplace_back(new SummaryCalcSum);
+        calculators.push_back(std::make_unique<SummaryCalcSum>());
 
         // Check for vld_thresh = 1.0
         if (!is_eq(info.vld_thresh, 1.0)) {
@@ -400,7 +389,7 @@ vector< SummaryCalc* > SummaryObs::getSummaryCalculators(const TimeSummaryInfo &
         }
       }
       else if (type[0] == 'p') {
-        calculators.emplace_back(new SummaryCalcPercentile(type));
+        calculators.push_back(std::make_unique<SummaryCalcPercentile>(type));
       }
    }
 

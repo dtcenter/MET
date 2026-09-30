@@ -103,7 +103,7 @@ void MetGrib1DataFile::grib1_init_from_scratch()
 
 {
 
-GF = (GribFile *) nullptr;
+GF.reset();
 
 Plane.clear();
 
@@ -121,7 +121,7 @@ void MetGrib1DataFile::close()
 
 {
 
-if ( GF )  { delete GF;  GF = (GribFile *) nullptr; }
+GF.reset();
 
 CurrentRecord.reset();
 
@@ -143,7 +143,7 @@ bool MetGrib1DataFile::open(const char * _filename)
 
 close();
 
-GF = new GribFile;
+GF = std::make_unique<GribFile>();
 
 if ( ! (GF->open(_filename)) )  {
 
@@ -170,11 +170,11 @@ GF->seek_record(0);
 
 (*GF) >> CurrentRecord;
 
-Raw_Grid = new Grid;
+Raw_Grid = std::make_unique<Grid>();
 
 gds_to_grid(*(CurrentRecord.gds), *(Raw_Grid));
 
-Dest_Grid = new Grid;
+Dest_Grid = std::make_unique<Grid>();
 
 (*Dest_Grid) = (*Raw_Grid);
 

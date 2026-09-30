@@ -14,6 +14,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <vector>
+#include <memory>
 
 #include "vx_config.h"
 #include "vx_data2d_factory.h"
@@ -75,7 +77,7 @@ class RMWAnalysisConfInfo {
        std::map<ConcatString,ThreshArray> InitThreshMap;
 
        // Variable information
-       VarInfo** data_info;
+       std::vector<std::unique_ptr<VarInfo>> data_info;
 
        // Config file version
        ConcatString Version;

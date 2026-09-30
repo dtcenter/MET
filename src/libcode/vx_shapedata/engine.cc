@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <vector>
 #include <cmath>
 #include <set>
 #include <map>
@@ -56,70 +57,14 @@ ModeFuzzyEngine::~ModeFuzzyEngine() {
    //
    // Clear fcst ShapeData objects
    //
-   if(fcst_raw) {
-      delete fcst_raw;
-      fcst_raw = (ShapeData *) nullptr;
-   }
-   if(fcst_thresh) {
-      delete fcst_thresh;
-      fcst_thresh = (ShapeData *) nullptr;
-   }
-   if(fcst_conv) {
-      delete fcst_conv;
-      fcst_conv = (ShapeData *) nullptr;
-   }
-   if(fcst_mask) {
-      delete fcst_mask;
-      fcst_mask = (ShapeData *) nullptr;
-   }
-   if(fcst_split) {
-      delete fcst_split;
-      fcst_split = (ShapeData *) nullptr;
-   }
-   if(fcst_clus_split) {
-      delete fcst_clus_split;
-      fcst_clus_split = (ShapeData *) nullptr;
-   }
 
    //
    // Clear obs ShapeData objects
    //
-   if(obs_raw) {
-      delete obs_raw;
-      obs_raw = (ShapeData *) nullptr;
-   }
-   if(obs_thresh) {
-      delete obs_thresh;
-      obs_thresh = (ShapeData *) nullptr;
-   }
-   if(obs_conv) {
-      delete obs_conv;
-      obs_conv = (ShapeData *) nullptr;
-   }
-   if(obs_mask) {
-      delete obs_mask;
-      obs_mask = (ShapeData *) nullptr;
-   }
-   if(obs_split) {
-      delete obs_split;
-      obs_split = (ShapeData *) nullptr;
-   }
-   if(obs_clus_split) {
-      delete obs_clus_split;
-      obs_clus_split = (ShapeData *) nullptr;
-   }
 
    //
    // Clear fcst and obs engines
    //
-   if(fcst_engine) {
-      delete fcst_engine;
-      fcst_engine = (ModeFuzzyEngine *) nullptr;
-   }
-   if(obs_engine) {
-      delete obs_engine;
-      obs_engine = (ModeFuzzyEngine *) nullptr;
-   }
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -169,22 +114,22 @@ void ModeFuzzyEngine::init_from_scratch() {
 
    need_match           = true;
 
-   fcst_raw         = new ShapeData;
-   fcst_thresh      = new ShapeData;
-   fcst_conv        = new ShapeData;
-   fcst_mask        = new ShapeData;
-   fcst_split       = new ShapeData;
-   fcst_clus_split  = new ShapeData;
+   fcst_raw         = std::make_unique<ShapeData>();
+   fcst_thresh      = std::make_unique<ShapeData>();
+   fcst_conv        = std::make_unique<ShapeData>();
+   fcst_mask        = std::make_unique<ShapeData>();
+   fcst_split       = std::make_unique<ShapeData>();
+   fcst_clus_split  = std::make_unique<ShapeData>();
 
-   obs_raw          = new ShapeData;
-   obs_thresh       = new ShapeData;
-   obs_conv         = new ShapeData;
-   obs_mask         = new ShapeData;
-   obs_split        = new ShapeData;
-   obs_clus_split   = new ShapeData;
+   obs_raw          = std::make_unique<ShapeData>();
+   obs_thresh       = std::make_unique<ShapeData>();
+   obs_conv         = std::make_unique<ShapeData>();
+   obs_mask         = std::make_unique<ShapeData>();
+   obs_split        = std::make_unique<ShapeData>();
+   obs_clus_split   = std::make_unique<ShapeData>();
 
-   fcst_engine      = (ModeFuzzyEngine *) nullptr;
-   obs_engine       = (ModeFuzzyEngine *) nullptr;
+   fcst_engine.reset();
+   obs_engine.reset();
 
    n_fcst           = 0;
    n_obs            = 0;
@@ -774,7 +719,7 @@ void ModeFuzzyEngine::do_fcst_filtering() {
    if(conf_info.Fcst->filter_attr_map.size() > 0) {
 
       fcst_mask->threshold_attr(conf_info.Fcst->filter_attr_map,
-                                fcst_raw, conf_info.Fcst->conv_thresh, grid,
+                                fcst_raw.get(), conf_info.Fcst->conv_thresh, grid,
                                 conf_info.Fcst->var_info->is_precipitation());
 
       if(mlog.verbosity_level() >= 4) {
@@ -814,7 +759,7 @@ void ModeFuzzyEngine::do_obs_filtering() {
    if(conf_info.Obs->filter_attr_map.size() > 0) {
 
       obs_mask->threshold_attr(conf_info.Obs->filter_attr_map,
-                               obs_raw, conf_info.Obs->conv_thresh, grid,
+                               obs_raw.get(), conf_info.Obs->conv_thresh, grid,
                                conf_info.Obs->var_info->is_precipitation());
 
       if(mlog.verbosity_level() >= 4) {
@@ -1739,7 +1684,7 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config,
    //
    // Will be deleted by destructor if allocated
    //
-   fcst_engine = new ModeFuzzyEngine;
+   fcst_engine = std::make_unique<ModeFuzzyEngine>();
 
    if(!fcst_engine) {
       mlog << Error << "\nModeFuzzyEngine::do_fcst_merge_engine() -> "
@@ -1906,7 +1851,7 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
    //
    // Will be deleted by destructor if allocated
    //
-   obs_engine = new ModeFuzzyEngine;
+   obs_engine = std::make_unique<ModeFuzzyEngine>();
 
    if(!obs_engine) {
       mlog << Error << "\nModeFuzzyEngine::do_obs_merge_engine() -> "
@@ -3041,7 +2986,6 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
 double interest_percentile(ModeFuzzyEngine &eng, const double p, const int flag) {
    int i, fcst_i, obs_i, n_values;
    double interest, ptile;
-   double *v = (double *) nullptr;
    NumArray fcst_na, obs_na;
 
    if(eng.conf_info.match_flag == MatchType::None ||
@@ -3076,7 +3020,7 @@ double interest_percentile(ModeFuzzyEngine &eng, const double p, const int flag)
    //
    // Allocate memory
    //
-   v = new double [eng.n_fcst + eng.n_obs];
+   std::vector<double> v(eng.n_fcst + eng.n_obs);
 
    //
    // Add the maximum interest values for the forecast and/or observation
@@ -3098,18 +3042,17 @@ double interest_percentile(ModeFuzzyEngine &eng, const double p, const int flag)
    //
    // Sort the maximum interest values
    //
-   sort(v, n_values);
+   sort(v.data(), n_values);
 
    //
    // Get the requested percentile
    //
-   ptile = percentile(v, n_values, p/100.0);
+   ptile = percentile(v.data(), n_values, p/100.0);
 
    //
    // Done
    //
 
-   if(v) { delete [] v; v = (double *) nullptr; }
 
    return ptile;
 }

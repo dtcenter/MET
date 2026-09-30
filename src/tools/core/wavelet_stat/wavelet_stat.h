@@ -50,6 +50,7 @@
 #include "vx_gsl_prob.h"
 #include "vx_ps.h"
 #include "vx_color.h"
+#include <memory>
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -93,7 +94,7 @@ static ConcatString out_dir;
 
 // Output NetCDF file
 static ConcatString out_nc_file;
-static netCDF::NcFile       *nc_out    = (netCDF::NcFile *) nullptr;
+static std::unique_ptr<netCDF::NcFile> nc_out;
 static netCDF::NcDim        x_dim     ;
 static netCDF::NcDim        y_dim     ;
 static netCDF::NcDim        scale_dim ;
@@ -104,17 +105,17 @@ static netCDF::NcVar        diff_var  ;
 
 // Output PostScript file
 static ConcatString out_ps_file;
-static PSfile       *ps_out = (PSfile *) nullptr;
+static std::unique_ptr<PSfile> ps_out;
 
 // Output STAT file
 static ConcatString     stat_file;
-static std::ofstream    *stat_out = (std::ofstream *) nullptr;
+static std::unique_ptr<std::ofstream> stat_out;
 static AsciiTable       stat_at;
 static int              i_stat_row;
 
 // Optional ISC output file
 static ConcatString     isc_file;
-static std::ofstream    *isc_out = (std::ofstream *) nullptr;
+static std::unique_ptr<std::ofstream> isc_out;
 static AsciiTable       isc_at;
 static int              i_isc_row;
 
@@ -176,8 +177,8 @@ static Grid grid;
 static bool is_first_pass = true;
 
 // Data file factory and input files
-static Met2dDataFile *fcst_mtddf = nullptr;
-static Met2dDataFile *obs_mtddf  = nullptr;
+static std::unique_ptr<Met2dDataFile> fcst_mtddf;
+static std::unique_ptr<Met2dDataFile> obs_mtddf;
 
 // Strings to be output in the STAT and optional text files
 static StatHdrColumns shc;

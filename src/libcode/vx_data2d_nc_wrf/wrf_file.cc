@@ -128,13 +128,13 @@ void WrfFile::init_from_scratch()
 
 {
 
-Nc = (NcFile *) nullptr;
+Nc.reset();
 
-Dim = (NcDim **) nullptr;
+Dim.clear();
 
-Var = (NcVarInfo *) nullptr;
+Var.clear();
 
-Time = (unixtime *) nullptr;
+Time.clear();
 
 close();
 
@@ -150,11 +150,11 @@ void WrfFile::close()
 
 {
 
-if ( Nc )  { delete Nc;  Nc = (NcFile *) nullptr; }
+Nc.reset();
 
-if ( Dim )  { delete [] Dim;  Dim = (NcDim **) nullptr; }
+Dim.clear();
 
-if ( Time )  { delete [] Time;  Time = (unixtime *) nullptr; }
+Time.clear();
 
 Ndims = 0;
 
@@ -164,7 +164,7 @@ Tdim = (NcDim *) nullptr;
 
 Nvars = 0;
 
-if ( Var )  { delete [] Var;  Var = (NcVarInfo *) nullptr; }
+Var.clear();
 
 InitTime = (unixtime) 0;
 
@@ -203,7 +203,7 @@ Nc = open_ncfile(filename);
 mlog << Debug(5) << "\n" << method_name
      << "open \"" << filename << "\".\n\n";
 
-if ( IS_INVALID_NC_P(Nc) )  { close();  return false; }
+if ( IS_INVALID_NC_P(Nc.get()) )  { close();  return false; }
 
   //
   //  grid
@@ -214,14 +214,14 @@ if ( IS_INVALID_NC_P(Nc) )  { close();  return false; }
    //
    //  dimensions
    //
-Ndims = get_dim_count(Nc);
-Dim = new NcDim*[Ndims];
+Ndims = get_dim_count(Nc.get());
+Dim.resize(Ndims);
 
-get_dim_names(Nc, &DimNames);
+get_dim_names(Nc.get(), &DimNames);
 
 for (int j=0; j<Ndims; ++j)  {
    c = to_lower(DimNames[j]);
-   NcDim dim = get_nc_dim(Nc, DimNames[j]);
+   NcDim dim = get_nc_dim(Nc.get(), DimNames[j]);
 
    if ( c == t_dim_name ){
      Ntimes = static_cast<int>(GET_NC_SIZE(dim));
@@ -236,7 +236,7 @@ for (int j=0; j<Ndims; ++j)  {
 
 if ( Ntimes == 0 )  { close();  return false; }
 
-Time = new unixtime [Ntimes];
+Time.resize(Ntimes);
 
    //
    // attempt to parse variable "char Times(time, DateStrLen)"
@@ -244,12 +244,12 @@ Time = new unixtime [Ntimes];
    //
 
 
-if ( has_var(Nc, times_var_name) ) {
+if ( has_var(Nc.get(), times_var_name) ) {
    int str_len;
 
-   v = get_var(Nc, times_var_name);
+   v = get_var(Nc.get(), times_var_name);
 
-   get_dim(Nc, strl_dim_name, str_len, true);
+   get_dim(Nc.get(), strl_dim_name, str_len, true);
 
    for (int j=0; j<Ntimes; ++j)  {
       ConcatString tmp_time_str;
@@ -280,12 +280,12 @@ else {
 
    for (int j=0; j<Ntimes; ++j)  {
 
-      month  = get_int_var(Nc,  month_var_name, j);
-      day    = get_int_var(Nc,    day_var_name, j);
-      year   = get_int_var(Nc,   year_var_name, j);
-      hour   = get_int_var(Nc,   hour_var_name, j);
-      minute = get_int_var(Nc, minute_var_name, j);
-      second = get_int_var(Nc, second_var_name, j);
+      month  = get_int_var(Nc.get(),  month_var_name, j);
+      day    = get_int_var(Nc.get(),    day_var_name, j);
+      year   = get_int_var(Nc.get(),   year_var_name, j);
+      hour   = get_int_var(Nc.get(),   hour_var_name, j);
+      minute = get_int_var(Nc.get(), minute_var_name, j);
+      second = get_int_var(Nc.get(), second_var_name, j);
 
       Time[j] = mdyhms_to_unix(month, day, year, hour, minute, second);
 
@@ -293,7 +293,7 @@ else {
 }
 
 ConcatString att_value;
-get_global_att(Nc, start_time_att_name, att_value);
+get_global_att(Nc.get(), start_time_att_name, att_value);
 
 InitTime = parse_init_time(att_value.c_str());
 
@@ -304,20 +304,20 @@ InitTime = parse_init_time(att_value.c_str());
 
    StringArray varNames;
    StringArray dimNames;
-   Nvars = get_var_names(Nc, &varNames);
-   Var = new NcVarInfo [Nvars];
+   Nvars = get_var_names(Nc.get(), &varNames);
+   Var.resize(Nvars);
 
    for (int j=0; j<Nvars; ++j)  {
-      v = get_var(Nc, varNames[j].c_str());
+      v = get_var(Nc.get(), varNames[j].c_str());
 
-      Var[j].var = new NcVar(v);
+      Var[j].var = std::make_unique<NcVar>(v);
 
       Var[j].name = GET_NC_NAME(v).c_str();
 
       int dim_count = GET_NC_DIM_COUNT(v);
       Var[j].Ndims = dim_count;
 
-      Var[j].Dims = new NcDim * [dim_count];
+      Var[j].Dims.resize(dim_count);
 
       //
       //  parse the variable attributes
@@ -632,7 +632,7 @@ pressure = bad_data_double;
 
 for (int j=0; j<Nvars; ++j)  {
 
-   if ( Var[j].var == v )  { found = true;  var = Var + j;  break; }
+   if ( Var[j].var.get() == v )  { found = true;  var = const_cast<NcVarInfo *>(&Var[j]);  break; }
 
 }
 
@@ -677,7 +677,7 @@ if ( !found )  {
 
       c.add(a[var->z_slot]);
 
-      pressure = data(P->var, c) * pressure_unit_conversion;
+      pressure = data(P->var.get(), c) * pressure_unit_conversion;
 
    }
 
@@ -774,7 +774,7 @@ void WrfFile::handle_pressure(const NcVarInfo* var, const string& z_name, NcVarI
 
    bool found;
    StringArray varNames;
-   get_var_names(Nc, &varNames);
+   get_var_names(Nc.get(), &varNames);
    StringArray varDimNames;
    for (int j = 0; j < Nvars; ++j) {
       //
@@ -787,7 +787,7 @@ void WrfFile::handle_pressure(const NcVarInfo* var, const string& z_name, NcVarI
       }
 
       varDimNames.clear();
-      get_dim_names(Var[j].var, &varDimNames);
+      get_dim_names(Var[j].var.get(), &varDimNames);
 
       // check that the z dimension matches the var to read
       found = false;
@@ -803,7 +803,7 @@ void WrfFile::handle_pressure(const NcVarInfo* var, const string& z_name, NcVarI
       }
 
       // set pressure field
-      P = Var + j;
+      P = const_cast<NcVarInfo *>(&Var[j]);
 
       if (varNames[j] == pressure_var_wrf_name) {
 
@@ -822,7 +822,7 @@ bool WrfFile::parse_dims_for_var(const string& var_name, NcVarInfo* var, string&
    const char *method_name = "WrfFile::parse_dims_for_var(const string& var_name, NcVarInfo* var, string& z_name) const -> ";
    string c;
    StringArray varDimNames;
-   get_dim_names(var->var, &varDimNames);
+   get_dim_names(var->var.get(), &varDimNames);
    for (int k =0; k<(var->Ndims); ++k)  {
       c = to_lower(varDimNames[k]);
 
@@ -957,7 +957,7 @@ bool WrfFile::data(const char * var_name, const LongArray & a, DataPlane & plane
 
    if ( !found )  return false;
 
-   found = data(info->var, a, plane, pressure);
+   found = data(info->var.get(), a, plane, pressure);
 
    //
    //  store the times
@@ -1002,7 +1002,13 @@ bool WrfFile::get_nc_var_info(const char *var_name, NcVarInfo *&info) const {
       for (int j=0; j<Nvars; ++j)  {
          if ( Var[j].name == var_name )  {
             found = true;
-            info = &Var[j];
+            //  NOTE: this method is const, so Var[j] is a const reference now
+            //  that Var is a std::vector. It was previously a raw NcVarInfo *
+            //  member, where a const method made the POINTER const but not the
+            //  pointee, so a mutable NcVarInfo * fell out. Preserving that
+            //  rather than changing what callers may do with it - the same call
+            //  made for SummaryJob::do_output() in deferred note 10.
+            info = const_cast<NcVarInfo *>(&Var[j]);
             break;
          }
       }

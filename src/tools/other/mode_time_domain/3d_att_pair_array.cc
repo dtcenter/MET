@@ -92,8 +92,6 @@ void PairAtt3DArray::init_from_scratch()
 
 {
 
-e = (PairAtt3D *) nullptr;
-
 AllocInc = 100;   //  default value
 
 clear();
@@ -110,11 +108,7 @@ void PairAtt3DArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (PairAtt3D *) nullptr; }
-
-Nelements = 0;
-
-Nalloc = 0;
+e.clear();
 
 return;
 
@@ -142,61 +136,19 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void PairAtt3DArray::extend(int N)
-
-{
-
-if ( N <= Nalloc )  return;
-
-N = AllocInc*( (N + AllocInc - 1)/AllocInc );
-
-int j;
-PairAtt3D * u = new PairAtt3D [N];
-
-if ( !u )  {
-
-   mlog << Error << "\nPairAtt3DArray::extend(int) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for(j=0; j<Nelements; ++j)  {
-
-   u[j] = e[j];
-
-}
-
-if ( e )  { delete [] e;  e = (PairAtt3D *) nullptr; }
-
-e = u;
-
-u = (PairAtt3D *) nullptr;
-
-Nalloc = N;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void PairAtt3DArray::dump(ostream & out, int depth) const
 
 {
 
 Indent prefix(depth);
 
-out << prefix << "Nelements = " << Nelements << "\n";
-out << prefix << "Nalloc    = " << Nalloc    << "\n";
+out << prefix << "Nelements = " << e.size() << "\n";
+out << prefix << "Nalloc    = " << e.capacity() << "\n";
 out << prefix << "AllocInc  = " << AllocInc  << "\n";
 
 int j;
 
-for(j=0; j<Nelements; ++j)  {
+for(j=0; j<(int) e.size(); ++j)  {
 
    out << prefix << "Element # " << j << " ... \n";
 
@@ -242,9 +194,7 @@ void PairAtt3DArray::add(const PairAtt3D & a)
 
 {
 
-extend(Nelements + 1);
-
-e[Nelements++] = a;
+e.push_back(a);
 
 return;
 
@@ -260,7 +210,7 @@ void PairAtt3DArray::add(const PairAtt3DArray & a)
 
 int j;
 
-extend(Nelements + a.n_elements());
+e.reserve(e.size() + a.n_elements());
 
 for (j=0; j<(a.n_elements()); ++j)  {
 
@@ -280,7 +230,7 @@ PairAtt3D & PairAtt3DArray::operator[](int N) const
 
 {
 
-if ( (N < 0) || (N >= Nelements) )  {
+if ( (N < 0) || (N >= (int) e.size()) )  {
 
    mlog << Error << "\nPairAtt3DArray::operator[](int) -> "
         << "range check error ... " << N << "\n\n";
@@ -288,7 +238,7 @@ if ( (N < 0) || (N >= Nelements) )  {
    exit ( 1 );
 }
 
-return e[N];
+return const_cast<PairAtt3D &>(e[N]);
 
 }
 
@@ -300,7 +250,7 @@ int PairAtt3DArray::fcst_obj_number(int k) const
 
 {
 
-if ( (k < 0) || (k >= Nelements) )  {
+if ( (k < 0) || (k >= (int) e.size()) )  {
 
    mlog << Error << "\nPairAtt3DArray::fcst_obj_number(int) -> "
         << "range check error\n\n";
@@ -321,7 +271,7 @@ int PairAtt3DArray::obs_obj_number(int k) const
 
 {
 
-if ( (k < 0) || (k >= Nelements) )  {
+if ( (k < 0) || (k >= (int) e.size()) )  {
 
    mlog << Error << "\nPairAtt3DArray::obs_obj_number(int) -> "
         << "range check error\n\n";
@@ -342,7 +292,7 @@ int PairAtt3DArray::fcst_cluster_number(int k) const
 
 {
 
-if ( (k < 0) || (k >= Nelements) )  {
+if ( (k < 0) || (k >= (int) e.size()) )  {
 
    mlog << Error << "\nPairAtt3DArray::fcst_cluster_number(int) -> "
         << "range check error\n\n";
@@ -363,7 +313,7 @@ int PairAtt3DArray::obs_cluster_number(int k) const
 
 {
 
-if ( (k < 0) || (k >= Nelements) )  {
+if ( (k < 0) || (k >= (int) e.size()) )  {
 
    mlog << Error << "\nPairAtt3DArray::obs_cluster_number(int) -> "
         << "range check error\n\n";
@@ -384,7 +334,7 @@ double PairAtt3DArray::total_interest(int k) const
 
 {
 
-if ( (k < 0) || (k >= Nelements) )  {
+if ( (k < 0) || (k >= (int) e.size()) )  {
 
    mlog << Error << "\nPairAtt3DArray::total_interest(int) -> "
         << "range check error\n\n";
@@ -407,7 +357,7 @@ void PairAtt3DArray::patch_cluster_numbers(const MM_Engine & engine)
 
 int j, f_s_id, f_c_id, o_s_id, o_c_id;
 
-for (j=0; j<Nelements; ++j)  {
+for (j=0; j<(int) e.size(); ++j)  {
 
    f_s_id = e[j].fcst_obj_number();   //  1-based
    o_s_id = e[j].obs_obj_number();    //  1-based

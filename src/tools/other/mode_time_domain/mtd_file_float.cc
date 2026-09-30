@@ -101,7 +101,6 @@ void MtdFloatFile::float_init_from_scratch()
 
 {
 
-Data = nullptr;
 
 clear();
 
@@ -119,7 +118,7 @@ void MtdFloatFile::clear()
 
 MtdFileBase::clear();
 
-if ( Data )  { delete [] Data;  Data = nullptr; }
+Data.clear();
 
 DataMin = DataMax = 0;
 
@@ -159,11 +158,9 @@ TimeEnd = f.TimeEnd;
 
 const int n = Nx*Ny*Nt;
 
-if ( f.Data )  {
+if ( ! f.Data.empty() )  {
 
-   Data = new float [n];
-
-   memcpy(Data, f.Data, n*sizeof(float));
+   Data = f.Data;
 
 }
 
@@ -217,18 +214,18 @@ void MtdFloatFile::set_size(int _nx, int _ny, int _nt)
 {
 
 
-if ( Data )  { delete [] Data;  Data = nullptr; }
+Data.clear();
 
 int j;
 const int n3 = _nx*_ny*_nt;
 
-Data = new float [n3];
+Data.resize(n3);
 
 Nx = _nx;
 Ny = _ny;
 Nt = _nt;
 
-float * d = Data;
+float * d = Data.data();
 
 for (j=0; j<n3; ++j)  *d++ = 0.0;
 
@@ -397,7 +394,7 @@ void MtdFloatFile::calc_data_minmax()
 int j;
 const int N = Nx*Ny*Nt;
 bool ok = false;
-const float * f = Data;
+const float * f = Data.data();
 float value;
 
 DataMin = DataMax = bad_data_float;
@@ -468,7 +465,7 @@ void MtdFloatFile::threshold(double T, MtdIntFile & out) const
 
 {
 
-if ( !Data )  {
+if ( Data.empty() )  {
 
    mlog << Error << "\nMtdFloatFile::threshold(double, MtdIntFile &) const -> "
         << "no data!\n\n";
@@ -496,8 +493,8 @@ for (j=0; j<Nt; ++j)  {
 
 }
 
-float * d = Data;
-int * i = out.Data;
+const float * d = Data.data();
+int * i = out.Data.data();
 
 
 for (j=0; j<n3; ++j)  {
@@ -542,7 +539,7 @@ void MtdFloatFile::threshold(const SingleThresh & t, MtdIntFile & out) const
 
 {
 
-if ( !Data )  {
+if ( Data.empty() )  {
 
    mlog << Error << "\nMtdFloatFile::threshold(double, MtdIntFile &) const -> "
         << "no data!\n\n";
@@ -564,8 +561,8 @@ out.base_assign(*this);
 
 out.set_size(Nx, Ny, Nt);
 
-float * d = Data;
-int * i = out.Data;
+const float * d = Data.data();
+int * i = out.Data.data();
 
 
 for (j=0; j<n3; ++j)  {
@@ -661,7 +658,7 @@ lengths.add(Nt);
 lengths.add(Ny);
 lengths.add(Nx);
 
-if ( ! get_nc_data(&var, Data, lengths, offsets) )  {
+if ( ! get_nc_data(&var, Data.data(), lengths, offsets) )  {
 
    mlog << Error << "\nMtdFloatFile::read(const char *) -> "
         << "trouble getting data\n\n";
@@ -748,7 +745,11 @@ lengths.add(Nt);
 lengths.add(Ny);
 lengths.add(Nx);
 
-if ( ! get_nc_data(&data_var, Data, lengths, offsets) )  {
+// NOTE: this block inside write() const is a copy-paste of the read path
+// (get_nc_var + get_nc_data, and the error text below says "read"). It mutates
+// Data from a const method, which previously compiled only because Data was a
+// raw float *. Behaviour preserved as-is; see S5025_deferred_notes.md item 13.
+if ( ! get_nc_data(&data_var, const_cast<float *>(Data.data()), lengths, offsets) )  {
 
    mlog << Error << "\nMtdFloatFile::read(const char *) -> "
         << "trouble getting data\n\n";
@@ -833,13 +834,13 @@ f.TimeBeg = TimeBeg;
 
 f.TimeEnd = TimeEnd;
 
-f.Data = new float [Nx*Ny];
+f.Data.resize(Nx*Ny);
 
 n = mtd_three_to_one(Nx, Ny, Nt, 0, 0, t);
 
-memcpy(f.Data, Data + n, bytes);
+memcpy(f.Data.data(), Data.data() + n, bytes);
 
-d = f.Data;
+d = f.Data.data();
 
 fmin = fmax = f.Data[0];
 
@@ -995,12 +996,12 @@ DataPlane from_plane, to_plane;
 from_plane.set_size(old.nx(), old.ny());
   to_plane.set_size(old.nx(), old.ny());
 
-delete [] Data;  Data = nullptr;
+Data.clear();
 
 Nx = to_grid.nx();
 Ny = to_grid.ny();
 
-Data = new float [Nx*Ny*Nt];
+Data.resize(Nx*Ny*Nt);
 for (int t=0; t<Nx*Ny*Nt; ++t) Data[t] = bad_data_float;
 
 for (int t=0; t<old.nt(); ++t)  {

@@ -114,7 +114,7 @@ return *this;
 
 void NcVarInfo::init_from_scratch() {
 
-Dims = (NcDim **) nullptr;
+Dims.clear();
 
 clear();
 
@@ -128,7 +128,7 @@ return;
 
 void NcVarInfo::clear() {
 
-var = (NcVar *) nullptr;   //  don't delete
+var.reset();
 
 name.clear();
 
@@ -148,7 +148,7 @@ AccumTime = 0;
 
 Ndims = 0;
 
-if ( Dims )  { delete [] Dims;  Dims = (NcDim **) nullptr; }
+Dims.clear();
 
 x_slot = y_slot = z_slot = t_slot = -1;
 
@@ -176,7 +176,7 @@ Indent prefix(depth);
 
 out << prefix << "var = ";
 
-if ( var )  out << var << '\n';
+if ( var )  out << var.get() << '\n';
 else        out << "(nul)\n";
 
 out << prefix << "name = ";
@@ -208,7 +208,7 @@ out << "\n";
 
 out << prefix << "Ndims = " << Ndims;
 
-if ( Dims )  {
+if ( !Dims.empty() )  {
 
    int j;
 
@@ -261,7 +261,7 @@ void NcVarInfo::assign(const NcVarInfo & i) {
 
 clear();
 
-var = i.var;
+var = (i.var ? std::make_unique<NcVar>(*i.var) : nullptr);
 
 name = i.name;
 
@@ -295,13 +295,7 @@ y_subgrid = i.y_subgrid;
 
 is_pressure = i.is_pressure;
 
-if ( i.Dims )  {
-
-   Dims = new NcDim * [i.Ndims];
-
-   for (int j=0; j<(i.Ndims); ++j)  Dims[j] = i.Dims[j];
-
-}
+Dims = i.Dims;
 
    //
    //  done
@@ -340,7 +334,7 @@ NcVarInfo *find_var_info_by_dim_name(NcVarInfo *vars, const string dim_name,
       for (int i=0; i<nvars; i++) {
          if (vars[i].Ndims > 2) continue;
          dim_offset = vars[i].Ndims == 2 ? 1 : 0;
-         NcDim dim = get_nc_dim(vars[i].var, dim_offset);
+         NcDim dim = get_nc_dim(vars[i].var.get(), dim_offset);
          if (IS_VALID_NC(dim) && GET_NC_NAME(dim) == dim_name) {
            var = &vars[i];
            break;
@@ -357,17 +351,17 @@ NcVarInfo *find_var_info_by_dim_name(NcVarInfo *vars, const string dim_name,
 bool get_att_str(const NcVarInfo &info, const ConcatString att_name,
                  ConcatString &att_value) {
 
-   NcVarAtt *att ;
+   std::unique_ptr<netCDF::NcAtt> att;
    bool found = false;
    
    att_value.clear();
    
-   att = get_nc_att(info.var, att_name, false);
-   if (!IS_INVALID_NC_P(att)) {
-      found = get_att_value_chars(att, att_value);
+   att = get_nc_att(info.var.get(), att_name, false);
+   if (!IS_INVALID_NC_P(att.get())) {
+      found = get_att_value_chars(att.get(), att_value);
       if ( !found)  {
          // Check for the correct type
-         if ( GET_NC_TYPE_ID_P(att) != NcType::nc_CHAR ) {
+         if ( GET_NC_TYPE_ID_P(att.get()) != NcType::nc_CHAR ) {
          
             mlog << Error << "\nget_att_str(const NcVarInfo &, const ConcatString &, ConcatString &) -> "
                    << "attribute \"" << att_name << "\" should be a string.\n\n";
@@ -376,7 +370,6 @@ bool get_att_str(const NcVarInfo &info, const ConcatString att_name,
          }
       }
    }
-   if (att) delete att;
 
    //
    //  done
@@ -393,13 +386,13 @@ bool get_att_int(const NcVarInfo &info, const ConcatString att_name,
 
    att_value = bad_data_int;
    
-   NcVarAtt *att = get_nc_att(info.var, att_name, false);
-   bool found = IS_VALID_NC_P(att);
+   auto att = get_nc_att(info.var.get(), att_name, false);
+   bool found = IS_VALID_NC_P(att.get());
    if (found) {
-      att_value = get_att_value_int(att);
+      att_value = get_att_value_int(att.get());
    
       // Check for the correct type
-      nc_type att_type = GET_NC_TYPE_ID_P(att);
+      nc_type att_type = GET_NC_TYPE_ID_P(att.get());
       if ( att_type != NcType::nc_INT && att_type != NcType::nc_INT64
            && att_type != NcType::nc_SHORT && att_type != NcType::nc_BYTE ) {
    
@@ -409,7 +402,6 @@ bool get_att_int(const NcVarInfo &info, const ConcatString att_name,
          exit ( 1 );
       }
    }
-   if (att) delete att;
    
    //
    //  done
@@ -446,11 +438,10 @@ bool get_att_unixtime(const NcVar *var, const ConcatString att_name,
 
    att_value = (unixtime) bad_data_int;
 
-   NcVarAtt *att = get_nc_att(var, att_name, false);
-   bool found = IS_VALID_NC_P(att);
-   if( found ) att_value = get_att_value_unixtime(att);
+   auto att = get_nc_att(var, att_name, false);
+   bool found = IS_VALID_NC_P(att.get());
+   if( found ) att_value = get_att_value_unixtime(att.get());
 
-   if (att) delete att;
    
    //
    //  done
@@ -465,7 +456,7 @@ bool get_att_unixtime(const NcVar *var, const ConcatString att_name,
 bool get_att_unixtime(const NcVarInfo &info, const ConcatString att_name,
                       unixtime &att_value) {
 
-   return get_att_unixtime(info.var, att_name, att_value);
+   return get_att_unixtime(info.var.get(), att_name, att_value);
 
 }
 

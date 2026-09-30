@@ -744,13 +744,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-GeneralAffine * Affine::copy() const
+std::unique_ptr<GeneralAffine> Affine::copy() const
 
 {
 
-Affine * a = new Affine ( *this );
-
-return a;
+return std::make_unique<Affine>( *this );
 
 }
 
@@ -1003,13 +1001,11 @@ return ca;
 ////////////////////////////////////////////////////////////////////////
 
 
-GeneralAffine * ConformalAffine::copy() const
+std::unique_ptr<GeneralAffine> ConformalAffine::copy() const
 
 {
 
-ConformalAffine * ca = new ConformalAffine ( *this );
-
-return ca;
+return std::make_unique<ConformalAffine>( *this );
 
 }
 

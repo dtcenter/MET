@@ -93,7 +93,7 @@ void GsiRecord::gsi_init_from_scratch()
 
 {
 
-Buf = 0;
+Buf.clear();
 
 gsi_clear();
 
@@ -109,7 +109,7 @@ void GsiRecord::gsi_clear()
 
 {
 
-if ( Buf )  { delete [] Buf;  Buf = 0; }
+Buf.clear();
 
 Nalloc = 0;
 
@@ -131,13 +131,13 @@ void GsiRecord::gsi_assign(const GsiRecord & g)
 
 gsi_clear();
 
-if ( !(g.Buf) )  return;
+if ( g.Buf.empty() )  return;
 
 if (g.Nalloc > 0) {
 
    extend(g.Nalloc);
 
-   memcpy(Buf, g.Buf, Nalloc);
+   memcpy(Buf.data(), g.Buf.data(), Nalloc);
 
 }
 
@@ -159,19 +159,13 @@ void GsiRecord::extend(int n_bytes)
 
 if ( n_bytes <= Nalloc )  return;
 
-unsigned char * u = new unsigned char [n_bytes];
+   //
+   //  resize, not reserve: callers read and write through Buf.data()
+   //
 
-if ( Buf )  {
-
-   memcpy(u, Buf, Nalloc);
-
-   delete [] Buf;  Buf = 0;
-
-}
+Buf.resize(n_bytes);
 
 Nalloc = n_bytes;
-
-Buf = u;   u = 0;
 
 
 return;

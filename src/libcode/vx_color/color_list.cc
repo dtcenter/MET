@@ -261,8 +261,6 @@ void ColorList::init_from_scratch()
 
 {
 
-e = (ClistEntry *) nullptr;
-
 clear();
 
 return;
@@ -277,9 +275,7 @@ void ColorList::clear()
 
 {
 
-if ( e )  { delete [] e;   e = (ClistEntry *) nullptr; }
-
-Nelements = Nalloc = 0;
+e.clear();
 
 return;
 
@@ -295,66 +291,16 @@ void ColorList::assign(const ColorList & c)
 
 clear();
 
-if ( c.e )  {
+int j;
 
-   extend(c.Nelements);
+e.reserve(c.e.size());
 
-   int j;
+for (j=0; j<(int) c.e.size(); ++j)  {
 
-   for (j=0; j<(c.Nelements); ++j)  {
-
-      add( c.e[j] );
-
-   }
+   add( c.e[j] );
 
 }
 
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ColorList::extend(int n)
-
-{
-
-if ( Nalloc >= n )  return;
-
-int k;
-ClistEntry * u = (ClistEntry *) nullptr;
-
-
-k = n/colorlist_alloc_inc;
-
-if ( n%colorlist_alloc_inc )  ++k;
-
-n = k*colorlist_alloc_inc;
-
-u = new ClistEntry [n];
-
-if ( !u )  {
-
-   mlog << Error << "\nColorList::extend(int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( e )  {
-
-   for (k=0; k<Nelements; ++k)  u[k] = e[k];
-
-   delete [] e;   e = (ClistEntry *) nullptr;
-
-}
-
-e = u;   u = (ClistEntry *) nullptr;
-
-Nalloc = n;
 
 return;
 
@@ -370,12 +316,12 @@ void ColorList::dump(ostream & out, int depth) const
 
 Indent prefix(depth);
 
-out << prefix << "Nelements = " << Nelements << "\n";
-out << prefix << "Nalloc    = " << Nalloc    << "\n";
+out << prefix << "Nelements = " << e.size()     << "\n";
+out << prefix << "Nalloc    = " << e.capacity() << "\n";
 
 int j;
 
-for (j=0; j<Nelements; ++j)  {
+for (j=0; j<(int) e.size(); ++j)  {
 
    out << prefix << "Element # " << j << " ...\n";
 
@@ -406,7 +352,7 @@ int j;
 
 index = -1;
 
-for (j=0; j<Nelements; ++j)  {
+for (j=0; j<(int) e.size(); ++j)  {
 
    if ( e[j].name() == text )  {
 
@@ -447,9 +393,7 @@ if ( has_name(ce.name(), index) )  {
 
 } else {
 
-   extend(Nelements + 1);
-
-   e[Nelements++] = ce;
+   e.push_back(ce);
 
 }
 
@@ -468,7 +412,7 @@ ClistEntry ColorList::operator[](int n) const
 
 {
 
-if ( (n < 0) || (n >= Nelements) )  {
+if ( (n < 0) || (n >= (int) e.size()) )  {
 
    mlog << Error << "\nClist::operator[](int) const -> range check error\n\n";
 

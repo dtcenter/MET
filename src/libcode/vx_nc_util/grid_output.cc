@@ -18,6 +18,7 @@
 #include <cmath>
 
 #include <netcdf>
+#include <vector>
 
 #include "grid_output.h"
 #include "vx_log.h"
@@ -922,7 +923,7 @@ void write_semilatlon_var(NcFile * ncfile, const char * var_name,
                           const char * standard_name_str) {
 
 NcVar nc_var = ncfile->addVar(var_name, ncFloat, *nc_dim);
-float * var_data = new float [var.n()];
+vector<float> var_data(var.n());
 for (int i=0; i<var.n(); i++)  var_data[i] = var[i];
 
    //
@@ -937,9 +938,8 @@ if ( standard_name_str )  add_att(&nc_var, standard_name_att_name, standard_name
    //  write data and cleanup
    //
 
-put_nc_data(&nc_var, &var_data[0], nc_dim->getSize(), 0);
+put_nc_data(&nc_var, var_data.data(), nc_dim->getSize(), 0);
 
-if ( var_data )  { delete [] var_data; var_data = (float *) nullptr; }
 
    //
    //  done

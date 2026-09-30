@@ -27,6 +27,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <cmath>
 #include <cstdio>
 #include <iostream>
@@ -70,7 +71,7 @@ static StringArray input_files;
 
 // Output file set with -out
 static ConcatString out_file;
-static std::ofstream *sa_out = nullptr;
+static std::unique_ptr<std::ofstream> sa_out;
 
 // Config file set with -config
 static ConcatString config_file;

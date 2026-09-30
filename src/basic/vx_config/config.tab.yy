@@ -11,6 +11,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -71,7 +72,7 @@ DictionaryStack * dict_stack            = (DictionaryStack *) 0;
 
 bool              is_lhs                = true;    //  used by the scanner
 
-ThreshNode *      result                = 0;   //  for testing
+std::unique_ptr<ThreshNode> result;   //  for testing
 
 bool              test_mode             = false;
 
@@ -879,7 +880,7 @@ void do_thresh(ThreshNode * node)
 
 if ( test_mode )  {
 
-   result = node;
+   result.reset(node);
 
 }
 
@@ -986,8 +987,8 @@ ThreshNode * do_and_thresh    (ThreshNode * a, ThreshNode * b)
 
 And_Node * n = new And_Node;
 
-n->left_child  = a;
-n->right_child = b;
+n->left_child.reset(a);
+n->right_child.reset(b);
 
 n->s << a->s << "&&" << b->s;
 
@@ -1007,8 +1008,8 @@ ThreshNode * do_or_thresh (ThreshNode * a, ThreshNode * b)
 
 Or_Node * n = new Or_Node;
 
-n->left_child  = a;
-n->right_child = b;
+n->left_child.reset(a);
+n->right_child.reset(b);
 
 n->s << a->s << "||" << b->s;
 
@@ -1028,7 +1029,7 @@ ThreshNode * do_not_thresh    (ThreshNode * n)
 
 Not_Node * nn = new Not_Node;
 
-nn->child = n;
+nn->child.reset(n);
 
 nn->s << '!' << n->s;
 

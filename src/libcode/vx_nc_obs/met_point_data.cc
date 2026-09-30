@@ -38,7 +38,7 @@ using namespace std;
 
 MetPointData::MetPointData() {
    // Derived class should set obs_data
-   obs_data = (MetPointObsData *) nullptr;
+   obs_data.reset();
    init_from_scratch();
 }
 
@@ -155,7 +155,7 @@ void MetPointData::set_obs_cnt(int obs_cnt) {
 ////////////////////////////////////////////////////////////////////////
 
 MetPointDataPython::MetPointDataPython() {
-   obs_data = new MetPointObsData();
+   obs_data = std::make_unique<MetPointObsData>();
    init_from_scratch();
 }
 
@@ -163,7 +163,7 @@ MetPointDataPython::MetPointDataPython() {
 
 MetPointDataPython::MetPointDataPython(MetPointDataPython &d) {
    init_from_scratch();
-   obs_data = new MetPointObsData();
+   obs_data = std::make_unique<MetPointObsData>();
    MetPointObsData *from_obs_data = d.get_point_obs_data();
    if (from_obs_data) obs_data->assign(*from_obs_data);
    header_data.assign(*d.get_header_data());

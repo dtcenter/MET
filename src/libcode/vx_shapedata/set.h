@@ -96,11 +96,9 @@ class SetCollection {
          //  data
          //
 
-      FcstObsSet * set;   //  allocated
+      std::vector<FcstObsSet> set;
 
       int n_sets;
-
-      int n_alloc;
 
 
          //

@@ -1238,17 +1238,16 @@ if ( e[n].empty() )  {
 
 }
 
-char * out = new char [10 + w];   //  just to be safe
+vector<char> out(10 + w);   //  just to be safe
 
-justified_item(e[n].c_str(), ColWidth[c], PadChar, Just[n], out);
+justified_item(e[n].c_str(), ColWidth[c], PadChar, Just[n], out.data());
 
-s = out;
+s = out.data();
 
    //
    //  done
    //
 
-if ( out )  { delete [] out;  out = (char *) nullptr; }
 
 return s;
 

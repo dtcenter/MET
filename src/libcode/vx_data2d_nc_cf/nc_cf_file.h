@@ -21,6 +21,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
+#include <memory>
 #include <ostream>
 
 #include "vx_grid.h"
@@ -110,7 +112,7 @@ class NcCfFile {
 
       int Nvars;
 
-      NcVarInfo * Var;    //  allocated
+      std::vector<NcVarInfo> Var;
       StringArray coord_var_names;
 
          //
@@ -140,7 +142,7 @@ class NcCfFile {
 
       static const double DELTA_TOLERANCE;
 
-      netCDF::NcFile * _ncFile;      //  allocated
+      std::unique_ptr<netCDF::NcFile> _ncFile;
       bool grid_ready;
       bool has_attr_grid;
 
@@ -150,7 +152,7 @@ class NcCfFile {
 
       int _numDims;
 
-      netCDF::NcDim ** _dims;   //  allocated
+      std::vector<std::unique_ptr<netCDF::NcDim>> _dims;   //  owns its NcDims
 
       StringArray _dimNames;
 
@@ -158,9 +160,9 @@ class NcCfFile {
       // variables.  Note that these are pointers into the _dims and Var
       // arrays so should not be deleted.
 
-      netCDF::NcDim *_xDim;
-      netCDF::NcDim *_yDim;
-      netCDF::NcDim *_tDim;
+      netCDF::NcDim *_xDim;   //  borrowed: points into _dims
+      netCDF::NcDim *_yDim;   //  borrowed: points into _dims
+      std::unique_ptr<netCDF::NcDim> _tDim;
 
       netCDF::NcVar *_latVar;
       netCDF::NcVar *_lonVar;

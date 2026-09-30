@@ -35,8 +35,6 @@ static void get_semilatlon_grid     (const Python3_Dict & dict, Grid & g);
 
 static void lookup_python_num_array(const Python3_Dict &, const char *, NumArray &);
 
-static void set_string(const char * & dest, const ConcatString & src);
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -112,10 +110,11 @@ static void get_lc_grid     (const Python3_Dict & dict, Grid & g)
 
 LambertData data;
 ConcatString s;
+ConcatString name_str;   //  owns the name for the lifetime of "data"
 
-s = dict.lookup_string("name");
+name_str = dict.lookup_string("name");
 
-set_string(data.name, s);
+data.name = name_str.c_str();
 
 s = dict.lookup_string("hemisphere");
 
@@ -155,8 +154,6 @@ if ( ! west_longitude_positive )  {
 
 g.set(data);
 
-if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
-
 return;
 
 }
@@ -187,10 +184,11 @@ static void get_st_grid     (const Python3_Dict & dict, Grid & g)
 
 StereographicData data;
 ConcatString s;
+ConcatString name_str;   //  owns the name for the lifetime of "data"
 
-s = dict.lookup_string("name");
+name_str = dict.lookup_string("name");
 
-set_string(data.name, s);
+data.name = name_str.c_str();
 
 s = dict.lookup_string("hemisphere");
 
@@ -233,8 +231,6 @@ if ( ! west_longitude_positive )  {
 
 g.set(data);
 
-if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
-
 return;
 
 }
@@ -262,10 +258,11 @@ static void get_merc_grid   (const Python3_Dict & dict, Grid & g)
 
 MercatorData data;
 ConcatString s;
+ConcatString name_str;   //  owns the name for the lifetime of "data"
 
-s = dict.lookup_string("name");
+name_str = dict.lookup_string("name");
 
-set_string(data.name, s);
+data.name = name_str.c_str();
 
 data.lat_ll = dict.lookup_double("lat_ll");
 data.lon_ll = rescale_lon(dict.lookup_double("lon_ll"));
@@ -291,8 +288,6 @@ data.ny = dict.lookup_int("ny");
 
 g.set(data);
 
-if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
-
 return;
 
 }
@@ -316,10 +311,11 @@ static void get_latlon_grid (const Python3_Dict & dict, Grid & g)
 
 LatLonData data;
 ConcatString s;
+ConcatString name_str;   //  owns the name for the lifetime of "data"
 
-s = dict.lookup_string("name");
+name_str = dict.lookup_string("name");
 
-set_string(data.name, s);
+data.name = name_str.c_str();
 
 data.lat_ll = dict.lookup_double("lat_ll");
 data.lon_ll = rescale_lon(dict.lookup_double("lon_ll"));
@@ -341,8 +337,6 @@ if ( ! west_longitude_positive )  {
    //
 
 g.set(data);
-
-if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
 
 return;
 
@@ -371,10 +365,11 @@ static void get_rotated_latlon_grid (const Python3_Dict & dict, Grid & g)
 
 RotatedLatLonData data;
 ConcatString s;
+ConcatString name_str;   //  owns the name for the lifetime of "data"
 
-s = dict.lookup_string("name");
+name_str = dict.lookup_string("name");
 
-set_string(data.name, s);
+data.name = name_str.c_str();
 
 data.rot_lat_ll = dict.lookup_double("rot_lat_ll");
 data.rot_lon_ll = rescale_lon(dict.lookup_double("rot_lon_ll"));
@@ -403,8 +398,6 @@ if ( ! west_longitude_positive )  {
 
 g.set(data);
 
-if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
-
 return;
 
 }
@@ -426,10 +419,11 @@ static void get_gaussian_grid (const Python3_Dict & dict, Grid & g)
 
 GaussianData data;
 ConcatString s;
+ConcatString name_str;   //  owns the name for the lifetime of "data"
 
-s = dict.lookup_string("name");
+name_str = dict.lookup_string("name");
 
-set_string(data.name, s);
+data.name = name_str.c_str();
 
 data.lon_zero = rescale_lon(dict.lookup_double("lon_zero"));
 
@@ -447,8 +441,6 @@ if ( ! west_longitude_positive )  {
    //
 
 g.set(data);
-
-if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
 
 return;
 
@@ -488,10 +480,11 @@ static void get_laea_grid (const Python3_Dict & dict, Grid & g)
 
 LaeaData data;
 ConcatString s;
+ConcatString name_str;   //  owns the name for the lifetime of "data"
 
-s = dict.lookup_string("name");
+name_str = dict.lookup_string("name");
 
-set_string(data.name, s);
+data.name = name_str.c_str();
 
 data.lat_first = dict.lookup_double("lat_first");
 data.lon_first = rescale_lon(dict.lookup_double("lon_first"));
@@ -531,8 +524,6 @@ if ( ! west_longitude_positive )  {
 
 g.set(data);
 
-if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
-
    //
    // done
    //
@@ -560,10 +551,11 @@ static void get_range_azimuth_grid (const Python3_Dict & dict, Grid & g)
 
 RngAziData data;
 ConcatString s;
+ConcatString name_str;   //  owns the name for the lifetime of "data"
 
-s = dict.lookup_string("name");
+name_str = dict.lookup_string("name");
 
-set_string(data.name, s);
+data.name = name_str.c_str();
 
 data.range_n   = dict.lookup_int("range_n");
 data.azimuth_n = dict.lookup_int("azimuth_n");
@@ -584,8 +576,6 @@ if ( ! west_longitude_positive )  {
    //
 
 g.set(data);
-
-if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
 
 return;
 
@@ -612,10 +602,11 @@ static void get_semilatlon_grid   (const Python3_Dict & dict, Grid & g)
 
 SemiLatLonData data;
 ConcatString s;
+ConcatString name_str;   //  owns the name for the lifetime of "data"
 
-s = dict.lookup_string("name");
+name_str = dict.lookup_string("name");
 
-set_string(data.name, s);
+data.name = name_str.c_str();
 
 lookup_python_num_array(dict, "lats",   data.lats);
 lookup_python_num_array(dict, "lons",   data.lons);
@@ -627,8 +618,6 @@ lookup_python_num_array(dict, "times",  data.times);
    //
 
 g.set(data);
-
-if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
 
 return;
 
@@ -677,35 +666,6 @@ else  {
 return;
 
 }
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  the fact that our destination is "const char *" rather than
-   //
-   //    just "char *" is the only thing that makes this tricky
-   //
-
-static void set_string(const char * & dest, const ConcatString & src)
-
-{
-
-char * s = nullptr;
-const int L = src.length();
-
-s = new char [1 + L];
-
-memcpy(s, src.text(), L);
-
-s[L] = (char) 0;
-
-dest = s;
-
-return;
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 

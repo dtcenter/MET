@@ -27,6 +27,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -115,7 +116,7 @@ static IntArray filtered_times;
 
 static bool do_summary;
 static bool save_summary_only = false;
-static SummaryObs *summary_obs;
+static std::unique_ptr<SummaryObs> summary_obs;
 static MetNcPointObsOut nc_point_obs;
 
 
@@ -127,7 +128,7 @@ static vector<Observation> observations;
 //
 // Output NetCDF file, dimensions, and variables
 //
-static NcFile *f_out = (NcFile *) nullptr;
+static std::unique_ptr<NcFile> f_out;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -231,7 +232,7 @@ static void initialize() {
    core_meta_vars.add("latitude");
    core_meta_vars.add("longitude");
 
-   summary_obs = new SummaryObs();
+   summary_obs = std::make_unique<SummaryObs>();
    return;
 }
 
@@ -329,9 +330,7 @@ static void open_netcdf_output() {
    if(IS_INVALID_NC_P(f_out)) {
       mlog << Error << "\nopen_netcdf_output() -> "
            << "trouble opening output file: " << ncfile << "\n\n";
-
-      delete f_out;
-      f_out = (NcFile *) nullptr;
+      f_out.reset();
 
       exit(1);
    }
@@ -339,11 +338,11 @@ static void open_netcdf_output() {
    // Define netCDF variables
    int deflate_level = compress_level;
    if(deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
-   nc_point_obs.set_netcdf(f_out, true);
+   nc_point_obs.set_netcdf(f_out.get());
    nc_point_obs.init_obs_vars(true, deflate_level);
 
    // Add global attributes
-   write_netcdf_global(f_out, ncfile.text(), program_name);
+   write_netcdf_global(f_out.get(), ncfile.text(), program_name);
 
    return;
 }
@@ -402,30 +401,28 @@ static void process_ioda_file(int i_pb) {
    // List the IODA file being processed
    mlog << Debug(1) << "Processing IODA File:\t" << ioda_files[i_pb]<< "\n";
 
-   NcFile *f_in = open_ncfile(ioda_files[i_pb].c_str());
+   std::unique_ptr<NcFile> f_in = open_ncfile(ioda_files[i_pb].c_str());
 
    // Check for a valid file
    if(IS_INVALID_NC_P(f_in)) {
       mlog << Error << "\n" << method_name
            << "can't open input NetCDF file \"" << ioda_files[i_pb]
            << "\" for reading.\n\n";
-      delete f_in;
-      f_in = (NcFile *) nullptr;
+      f_in.reset();
       clean_up();
 
       exit(1);
    }
 
    // Read the IODA file
-   ioda_reader.read_ioda(f_in);
+   ioda_reader.read_ioda(f_in.get());
 
    // Error out for missing metadata
    if(!ioda_reader.validate_metadata()) {
       mlog << Error << "\n" << method_name
            << "Required dimensions and/or metadata variables "
            << "missing from IODA file \"" << ioda_files[i_pb] << "\".\n\n";
-      delete f_in;
-      f_in = (NcFile *) nullptr;
+      f_in.reset();
       clean_up();
       exit(1);
    }
@@ -453,8 +450,8 @@ static void process_ioda_file(int i_pb) {
                ? (npbmsg * nmsg_percent / 100) : nmsg;
    }
 
-   vector<int *> v_qc_data;
-   vector<double *> v_obs_data;
+   vector<std::vector<int>> v_qc_data;
+   vector<std::vector<double>> v_obs_data;
 
    StringArray raw_var_names;
    if(do_all_vars || obs_var_names.n() == 0) raw_var_names = ioda_reader.obs_value_vars;
@@ -465,24 +462,17 @@ static void process_ioda_file(int i_pb) {
    ConcatString unit_attr;
    ConcatString desc_attr;
    for(idx=0; idx<raw_var_names.n(); idx++ ) {
-      auto qc_data = new int[nlocs];
-      auto obs_data = new double[nlocs];
-
-      for (int idx2=0; idx2<nlocs; idx2++) {
-         qc_data[idx2] = bad_data_int;
-         obs_data[idx2] = bad_data_double;
-      }
+      std::vector<int>    qc_data(nlocs, bad_data_int);
+      std::vector<double> obs_data(nlocs, bad_data_double);
       mlog << Debug(7) << method_name
            << "processing \"" << raw_var_names[idx] << "\" variable!\n";
-      obs_var = get_var(f_in, raw_var_names[idx].c_str(), obs_group_name);
-      if (IS_INVALID_NC(obs_var)) obs_var = get_var(f_in, raw_var_names[idx].c_str(), derived_obs_group_name);
-      v_qc_data.emplace_back(qc_data);
-      v_obs_data.emplace_back(obs_data);
+      obs_var = get_var(f_in.get(), raw_var_names[idx].c_str(), obs_group_name);
+      if (IS_INVALID_NC(obs_var)) obs_var = get_var(f_in.get(), raw_var_names[idx].c_str(), derived_obs_group_name);
       unit_attr.clear();
       desc_attr.clear();
       if(IS_VALID_NC(obs_var)) {
-         get_obs_data_double(f_in, raw_var_names[idx], &obs_var, obs_data, qc_data, nlocs,
-                             ioda_reader.get_format_ver());
+         get_obs_data_double(f_in.get(), raw_var_names[idx], &obs_var, obs_data.data(),
+                             qc_data.data(), nlocs, ioda_reader.get_format_ver());
          get_var_units(&obs_var, unit_attr);
          get_att_value_string(&obs_var, "long_name", desc_attr);
       }
@@ -495,6 +485,9 @@ static void process_ioda_file(int i_pb) {
          obs_var_units.add(unit_attr);
          obs_var_descs.add(desc_attr);
       }
+
+      v_qc_data.push_back(std::move(qc_data));
+      v_obs_data.push_back(std::move(obs_data));
    }
 
    // Initialize counts
@@ -807,15 +800,12 @@ static void process_ioda_file(int i_pb) {
    
    ioda_reader.clear();
 
-   for(idx=0; idx<v_obs_data.size(); idx++ ) delete [] v_obs_data[idx];
-   for(idx=0; idx<v_qc_data.size(); idx++ ) delete [] v_qc_data[idx];
    v_obs_data.clear();
    v_qc_data.clear();
 
    // Close the input NetCDF file
    if(f_in) {
-      delete f_in;
-      f_in = (NcFile *) nullptr;
+      f_in.reset();
    }
 
    if(mlog.verbosity_level() >= debug_level_for_performance) {
@@ -841,7 +831,7 @@ static void write_netcdf_hdr_data() {
    int hdr_cnt;
 
    nc_point_obs.get_hdr_index();
-   nc_point_obs.set_nc_out_data(observations, summary_obs, conf_info.getSummaryInfo());
+   nc_point_obs.set_nc_out_data(observations, summary_obs.get(), conf_info.getSummaryInfo());
    nc_point_obs.get_dim_counts(&obs_cnt, &hdr_cnt);
 
    // Check for no messages retained
@@ -919,8 +909,7 @@ static void clean_up() {
    nc_point_obs.close();
 
    if(f_out) {
-      delete f_out;
-      f_out = (NcFile *) nullptr;
+      f_out.reset();
    }
 
    return;

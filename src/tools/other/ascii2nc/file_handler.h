@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 #include <map>
 #include <time.h>
@@ -84,7 +85,7 @@ protected:
 
   // Variables for writing output NetCDF file
 
-  netCDF::NcFile   *_ncFile;
+  std::unique_ptr<netCDF::NcFile> _ncFile;
   MetNcPointObsOut nc_point_obs;
 
   long _nhdr;
