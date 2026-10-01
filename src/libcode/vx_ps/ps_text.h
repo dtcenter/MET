@@ -19,14 +19,10 @@
 
 
 #include <iostream>
+#include <memory>
+#include <string>
 
 #include "afm.h"
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static const int vx_pstextnode_alloc_inc = 100;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -39,8 +35,6 @@ class VxpsTextNode {
       void init_from_scratch();
 
       void assign(const VxpsTextNode &);
-
-      void extend(int);
 
       void set_text(const char *);
 
@@ -58,11 +52,9 @@ class VxpsTextNode {
       double Bottom;
       double Top;
 
-      char * Text;
+      std::string Text;
 
       int Nchars;
-
-      int Nalloc;
 
    public:
 
@@ -87,7 +79,7 @@ class VxpsTextNode {
       void add_link();
 
 
-      VxpsTextNode * next;
+      std::unique_ptr<VxpsTextNode> next;
 
       int font_number() const;
 
@@ -124,7 +116,7 @@ class VxpsTextNode {
 inline int    VxpsTextNode::font_number() const { return FontNumber; }
 inline double VxpsTextNode::font_size()   const { return FontSize  ; }
 
-inline const char * VxpsTextNode::text() const { return Text; }
+inline const char * VxpsTextNode::text() const { return ( Text.empty() ? nullptr : Text.c_str() ); }
 
 inline double VxpsTextNode::width () const { return Width ; }
 
@@ -137,7 +129,7 @@ inline int VxpsTextNode::nchars() const { return Nchars; }
 
 inline double VxpsTextNode::dx () const { return Dx; }
 
-inline int VxpsTextNode::is_empty() const { return ( Text ? 0 : 1 ); }
+inline int VxpsTextNode::is_empty() const { return ( Text.empty() ? 1 : 0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////

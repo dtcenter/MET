@@ -97,7 +97,7 @@ void ModeAttributes::init_from_scratch()
 
 {
 
-poly = (MaskPoly *) nullptr;
+poly.reset();
 
 clear();
 
@@ -408,7 +408,7 @@ interest_max_set                    = 0;
 interest_max                        = 0.0;
 
 
-if ( poly )  { delete poly;  poly =(MaskPoly *) nullptr; }
+poly.reset();
 
 return;
 
@@ -722,9 +722,7 @@ interest_max                        = A.interest_max;
 
 if ( A.poly )  {
 
-   poly = new MaskPoly;
-
-   *poly = *(A.poly);
+   poly = std::make_unique<MaskPoly>(*(A.poly));
 
 }
 
@@ -4075,7 +4073,7 @@ void ModeAttributes::set_mask(const char * filename)
 
 {
 
-if ( !poly )  poly = new MaskPoly;
+if ( !poly )  poly = std::make_unique<MaskPoly>();
 
 poly->load(filename);
 

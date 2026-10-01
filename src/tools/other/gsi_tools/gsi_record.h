@@ -1,3 +1,4 @@
+#include <vector>
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -31,9 +32,9 @@ class GsiRecord {
 
       void gsi_assign(const GsiRecord &);
 
-      unsigned char * Buf;   //  allocated
+      std::vector<unsigned char> Buf;
 
-      int Nalloc;
+      int Nalloc;   //  == (int) Buf.size()
 
       void extend(int);
 

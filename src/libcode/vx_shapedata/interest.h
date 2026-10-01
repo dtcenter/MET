@@ -15,6 +15,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <vector>
 
 #include "shapedata.h"
 
@@ -79,7 +80,7 @@ class SingleFeature {
       double user_ptile;
 
       Polyline  convex_hull;
-      Polyline *boundary;   //  allocated
+      std::vector<Polyline> boundary;   //  allocated
       int       n_bdy;
 };
 

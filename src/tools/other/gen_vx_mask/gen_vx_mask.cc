@@ -65,6 +65,7 @@
 #include "dbf_file.h"
 #include "shp_file.h"
 #include "grid_closed_poly.h"
+#include <memory>
 
 using namespace std;
 using namespace netCDF;
@@ -478,7 +479,7 @@ static void get_data_plane(const ConcatString &file_name,
    if(read_gen_vx_mask_output &&
       local_cs.empty() &&
       mtddf_ptr->file_type() == FileType_NcMet &&
-      get_gen_vx_mask_config_str((MetNcMetDataFile *) mtddf_ptr, local_cs)) {
+      get_gen_vx_mask_config_str((MetNcMetDataFile *) mtddf_ptr.get(), local_cs)) {
       local_config.read_string(local_cs.c_str());
    }
 
@@ -520,7 +521,6 @@ static void get_data_plane(const ConcatString &file_name,
       data_desc_cs = vi_ptr->magic_str();
 
       // Clean up
-      if(vi_ptr) { delete vi_ptr; vi_ptr = (VarInfo *) nullptr; }
 
    } // end if
 
@@ -528,7 +528,7 @@ static void get_data_plane(const ConcatString &file_name,
    dp_grid = mtddf_ptr->grid();
 
    // Clean up
-   if(mtddf_ptr) { delete mtddf_ptr; mtddf_ptr = (Met2dDataFile *) nullptr; }
+   mtddf_ptr.reset();
 
    return;
 }
@@ -544,7 +544,7 @@ static bool get_gen_vx_mask_config_str(const MetNcMetDataFile *mnmdf_ptr,
    if(!mnmdf_ptr) return status;
 
    // Check for the MET_tool global attribute
-   if(!get_global_att(mnmdf_ptr->MetNc->Nc, (string) "MET_tool", tool)) return status;
+   if(!get_global_att(mnmdf_ptr->MetNc->Nc.get(), (string) "MET_tool", tool)) return status;
 
    // Check for gen_vx_mask output
    if(tool != program_name) return status;
@@ -1588,7 +1588,7 @@ static DataPlane combine(const DataPlane &dp_data,
 static void write_netcdf(const DataPlane &dp) {
    ConcatString cs;
 
-   NcFile *f_out = nullptr;
+   std::unique_ptr<netCDF::NcFile> f_out;
    NcDim lat_dim;
    NcDim lon_dim;
    NcVar mask_var;
@@ -1596,23 +1596,22 @@ static void write_netcdf(const DataPlane &dp) {
    // Create a new NetCDF file and open it.
    f_out = open_ncfile(out_filename.c_str(), true);
 
-   if(IS_INVALID_NC_P(f_out)) {
+   if(IS_INVALID_NC_P(f_out.get())) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "trouble opening output file " << out_filename
            << "\n\n";
-      delete f_out;
-      f_out = nullptr;
+      f_out.reset();
       exit(1);
    }
 
    // Add global attributes
-   write_netcdf_global(f_out, out_filename.c_str(), program_name);
+   write_netcdf_global(f_out.get(), out_filename.c_str(), program_name);
 
    // Add the projection information
-   write_netcdf_proj(f_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(f_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
-   write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
+   write_netcdf_latlon(f_out.get(), &lat_dim, &lon_dim, grid);
 
    // Set the mask_name, if not already set
    if(mask_name.empty()) {
@@ -1635,7 +1634,7 @@ static void write_netcdf(const DataPlane &dp) {
    if (deflate_level < 0) deflate_level = global_config.nc_compression();
 
    // Define Variables
-   mask_var = add_var(f_out, string(mask_name), ncFloat, lat_dim, lon_dim, deflate_level);
+   mask_var = add_var(f_out.get(), string(mask_name), ncFloat, lat_dim, lon_dim, deflate_level);
    cs << cs_erase << mask_name << " masking region";
    add_att(&mask_var, "long_name", string(cs));
    add_att(&mask_var, "units", string(units_cs));
@@ -1661,8 +1660,7 @@ static void write_netcdf(const DataPlane &dp) {
       exit(1);
    }
 
-   delete f_out;
-   f_out = nullptr;
+   f_out.reset();
 
    mlog << Debug(1)
         << "Output File:\t\t" << out_filename << "\n";

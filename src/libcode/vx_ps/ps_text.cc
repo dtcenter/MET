@@ -105,10 +105,6 @@ void VxpsTextNode::init_from_scratch()
 
 {
 
-Text = (char *) nullptr;
-
-next = (VxpsTextNode *) nullptr;
-
 clear();
 
 return;
@@ -127,9 +123,9 @@ void VxpsTextNode::clear()
    //  clear out this node
    //
 
-if ( Text )  { delete [] Text;  Text = (char *) nullptr; }
+Text.clear();
 
-Nchars = Nalloc = 0;
+Nchars = 0;
 
 FontNumber = -1;
 FontSize   = 0.0;
@@ -144,7 +140,7 @@ Width = 0.0;
    //  send "clear" message down the chain
    //
 
-if ( next )  { delete next;  next = (VxpsTextNode *) nullptr; }
+next.reset();
 
    //
    //  done
@@ -176,11 +172,11 @@ Top    = n.Top;
 
 Width  = n.Width;
 
-if ( n.Text )  set_text(n.Text);
+if ( !(n.Text.empty()) )  set_text(n.Text.c_str());
 
 if ( n.next )  {
 
-   next = new VxpsTextNode;
+   next = std::make_unique<VxpsTextNode>();
 
    *next = *(n.next);
 
@@ -216,10 +212,9 @@ out << prefix << "Top        = " << Top        << "\n";
 out << prefix << "Bottom     = " << Bottom     << "\n";
 out << prefix << "Dx         = " << Dx         << "\n";
 out << prefix << "Nchars     = " << Nchars     << "\n";
-out << prefix << "Nalloc     = " << Nalloc     << "\n";
 
 
-if ( Text )  {
+if ( !(Text.empty()) )  {
 
    out << prefix << "Text       = \"";
 
@@ -280,84 +275,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void VxpsTextNode::extend(int n)
-
-{
-
-if ( n < Nalloc )  return;
-
-int k;
-char * u = (char *) nullptr;
-const char *method_name = "VxpsTextNode::extend";
-
-   //
-   //  round n up to the next multiple of vx_pstextnode_alloc_inc
-   //
-
-k = n/vx_pstextnode_alloc_inc;
-
-if ( n%vx_pstextnode_alloc_inc )  ++k;
-
-n = k*vx_pstextnode_alloc_inc;
-
-   //
-   //  allocate and zero out
-   //
-
-u = new char [n];
-
-if ( !u )  {
-
-   mlog << Error << "\nVxpstextNode::extend(int) -> memory allocation error!\n\n";
-
-   exit ( 1 );
-
-}
-
-memset(u, 0, n);
-
-Nalloc = n;
-
-   //
-   //  copy the old values, if any
-   //
-
-if ( Text ) m_strncpy(u, Text, (n-1), method_name, "Text");
-
-   //
-   //  toss old, grab new
-   //
-
-if ( Text )  { delete [] Text;  Text = (char *) nullptr; }
-
-Text = u;
-
-u = (char *) nullptr;
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void VxpsTextNode::set_text(const char * s)
 
 {
 
-const char *method_name = "VxpsTextNode::set_text";
-if ( Text )  { delete [] Text;  Text = (char *) nullptr; Nalloc = 0; }
+Text = ( s ? s : "" );
 
-Nchars = m_strlen(s);
-
-extend(Nchars + 2);
-
-if (Text) m_strncpy(Text, s, Nalloc, method_name, "Text");
+Nchars = (int) Text.length();
 
 return;
 
@@ -382,9 +306,9 @@ if ( (k < 0) || (k > 255) )  {
 
 }
 
-extend(Nchars + 2);
+Text.push_back((char) k);
 
-Text[Nchars++] = (char) k;
+++Nchars;
 
    //
    //  redo bbox  ("Left" is unchanged, unless this is the first character)
@@ -431,7 +355,7 @@ while ( n )  {
 
    w += n->Dx;
 
-   n = n->next;
+   n = n->next.get();
 
 }
 
@@ -470,7 +394,7 @@ while ( n->next )  {
 
    r += n->Dx;
 
-   n = n->next;
+   n = n->next.get();
 
 }
 
@@ -497,7 +421,7 @@ while ( n )  {
 
    t = dmax(t, n->Top);
 
-   n = n->next;
+   n = n->next.get();
 
 }
 
@@ -521,7 +445,7 @@ while ( n )  {
 
    b = dmin(b, n->Bottom);
 
-   n = n->next;
+   n = n->next.get();
 
 }
 
@@ -574,7 +498,7 @@ if ( next )  {
 
 }
 
-next = new VxpsTextNode;
+next = std::make_unique<VxpsTextNode>();
 
 next->FontNumber = FontNumber;
 next->FontSize   = FontSize;

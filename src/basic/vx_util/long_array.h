@@ -22,6 +22,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -31,19 +32,11 @@ class LongArray {
 
    private:
 
-      void init_from_scratch();
-
       void assign(const LongArray &);
-
-      void extend(int, bool exact = true);
-
-      int Nelements;
-
-      int Nalloc;
 
       int AllocInc;
 
-      long * e;
+      std::vector<long> e;
 
 
    public:
@@ -78,11 +71,11 @@ class LongArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int LongArray::n_elements() const { return Nelements; }
+inline int LongArray::n_elements() const { return (int) e.size(); }
 
-inline LongArray::operator long * () const { return e; }
+inline LongArray::operator long * () const { return const_cast<long *>(e.data()); }
 
-inline void LongArray::erase() { Nelements = 0;  return; }
+inline void LongArray::erase() { e.clear();  return; }
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -519,7 +519,7 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
 
       // Build the grid template with shape circle and wrap_lon false
       GridTemplateFactory gtf;
-      GridTemplate* gt = gtf.buildGT(GridTemplateFactory::GridTemplates::Circle,
+      auto gt = gtf.buildGT(GridTemplateFactory::GridTemplates::Circle,
                                      diameter, false);
 
 #pragma omp single
@@ -598,7 +598,6 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
 
       } // end for x
 
-      delete gt;
 
    } // End of omp parallel
 

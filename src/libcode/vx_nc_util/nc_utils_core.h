@@ -11,6 +11,8 @@
 #ifndef  __NC_UTILS_CORE_H__
 #define  __NC_UTILS_CORE_H__
 
+#include <memory>
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -66,8 +68,8 @@ extern int get_dim_count(const netCDF::NcVar *);
 extern int get_dim_size(const netCDF::NcDim *);
 extern int get_dim_size(const netCDF::NcVar *, const int dim_offset);
 
-extern netCDF::NcVarAtt   *get_nc_att(const netCDF::NcVar  *, const ConcatString &, bool exit_on_error = false);
-extern netCDF::NcGroupAtt *get_nc_att(const netCDF::NcFile *, const ConcatString &, bool exit_on_error = false);
+extern std::unique_ptr<netCDF::NcVarAtt>   get_nc_att(const netCDF::NcVar  *, const ConcatString &, bool exit_on_error = false);
+extern std::unique_ptr<netCDF::NcGroupAtt> get_nc_att(const netCDF::NcFile *, const ConcatString &, bool exit_on_error = false);
 
 extern netCDF::NcDim  get_nc_dim(const netCDF::NcFile *, const std::string &dim_name);
 extern netCDF::NcDim  get_nc_dim(const netCDF::NcVar *, const std::string &dim_name);

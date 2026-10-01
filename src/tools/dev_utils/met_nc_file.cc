@@ -35,7 +35,6 @@ using namespace netCDF;
 
 MetNcFile::MetNcFile(const string &file_path) :
   _filePath(file_path),
-  _ncFile(0),
   _hdrArrDim(0),
   _obsArrDim(0),
   _nhdrDim(0),
@@ -75,27 +74,26 @@ bool MetNcFile::readFile(const int desired_grib_code,
 
   _ncFile = open_ncfile(_filePath.c_str());
 
-  if (!_ncFile || IS_INVALID_NC_P(_ncFile))
+  if (!_ncFile.get() || IS_INVALID_NC_P(_ncFile.get()))
   {
     mlog << Error << "\n" << method_name << " -> trouble opening netCDF file "
          << _filePath << "\n\n";
-    //_ncFile->close();
-    delete _ncFile;
-    _ncFile = (NcFile *) nullptr;
+    //_ncFile.get()->close();
+    _ncFile.reset();
 
     return false;
   }
 
   // Retrieve the dimensions and variable from the netCDF file
 
-  hdrArrDim = get_nc_dim(_ncFile, "hdr_arr_len");
-  obsArrDim = get_nc_dim(_ncFile, "obs_arr_len");
+  hdrArrDim = get_nc_dim(_ncFile.get(), "hdr_arr_len");
+  obsArrDim = get_nc_dim(_ncFile.get(), "obs_arr_len");
 
-  nhdrDim = get_nc_dim(_ncFile, "nhdr");
-  nobsDim = get_nc_dim(_ncFile, "nobs");
+  nhdrDim = get_nc_dim(_ncFile.get(), "nhdr");
+  nobsDim = get_nc_dim(_ncFile.get(), "nobs");
 
-  strlDim  = get_nc_dim(_ncFile, "mxstr");
-  strllDim = get_nc_dim(_ncFile, "mxstr2");
+  strlDim  = get_nc_dim(_ncFile.get(), "mxstr");
+  strllDim = get_nc_dim(_ncFile.get(), "mxstr2");
 
   _hdrArrDim = &hdrArrDim;
   _obsArrDim = &obsArrDim;
@@ -103,11 +101,11 @@ bool MetNcFile::readFile(const int desired_grib_code,
   _nobsDim   = &nobsDim;
   _strlDim   = &strlDim;
 
-  hdrArrVar  = get_nc_var(_ncFile, "hdr_arr");
-  hdrTypeVar = get_nc_var(_ncFile, "hdr_typ");
-  hdrSidVar  = get_nc_var(_ncFile, "hdr_sid");
-  hdrVldVar  = get_nc_var(_ncFile, "hdr_vld");
-  obsArrVar  = get_nc_var(_ncFile, "obs_arr");
+  hdrArrVar  = get_nc_var(_ncFile.get(), "hdr_arr");
+  hdrTypeVar = get_nc_var(_ncFile.get(), "hdr_typ");
+  hdrSidVar  = get_nc_var(_ncFile.get(), "hdr_sid");
+  hdrVldVar  = get_nc_var(_ncFile.get(), "hdr_vld");
+  obsArrVar  = get_nc_var(_ncFile.get(), "obs_arr");
 
   _hdrArrVar  = &hdrArrVar ;
   _hdrTypeVar = &hdrTypeVar;

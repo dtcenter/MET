@@ -22,7 +22,6 @@
 
 
 #include "moments.h"
-#include "node.h"
 #include "shapedata.h"
 #include "shape.h"
 #include "set.h"

@@ -26,6 +26,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
+#include <memory>
 #include <iostream>
 
 #include "afm_line.h"
@@ -85,11 +87,11 @@ class LigatureInfo {
       void dump(std::ostream &, int depth = 0) const;
 
 
-      char * successor_name;
+      ConcatString successor_name;
 
       int successor_index;   //  index into the cm array
 
-      char * ligature_name;
+      ConcatString ligature_name;
 
       int ligature_index;   //  index into the cm array
 
@@ -121,7 +123,7 @@ class AfmCharMetrics {
 
       int ascii_code;
 
-      char * name;
+      ConcatString name;
 
       int width;
 
@@ -129,7 +131,7 @@ class AfmCharMetrics {
 
       int n_ligatures;
 
-      LigatureInfo * linfo;
+      std::vector<LigatureInfo> linfo;
 
 };
 
@@ -156,7 +158,7 @@ class PCC {
 
       void dump(std::ostream &, int depth = 0) const;
 
-      char * name;
+      ConcatString name;
 
       int delta_x;
       int delta_y;
@@ -186,11 +188,11 @@ class AfmCompositeInfo {
 
       void dump(std::ostream &, int depth = 0) const;
 
-      char * name;
+      ConcatString name;
 
       int n_parts;
 
-      PCC * pcc;
+      std::vector<PCC> pcc;
 
 };
 
@@ -218,9 +220,9 @@ class KPX {
       void dump(std::ostream &, int depth = 0) const;
 
 
-      char * name1;
+      ConcatString name1;
 
-      char * name2;
+      ConcatString name2;
 
       double dx;
 
@@ -249,7 +251,7 @@ class Afm {
 
       void do_fontbbox(AfmLine &);
 
-      std::ifstream * in;      //  used for reading
+      std::unique_ptr<std::ifstream> in;      //  used for reading
       int line_number;    //
 
       void patch_ligatures(LigatureInfo &);
@@ -277,12 +279,12 @@ class Afm {
          //  data
          //
 
-      char * FontName;
-      char * FullName;
-      char * FamilyName;
-      char * Weight;
-      char * Version;
-      char * EncodingScheme;
+      ConcatString FontName;
+      ConcatString FullName;
+      ConcatString FamilyName;
+      ConcatString Weight;
+      ConcatString Version;
+      ConcatString EncodingScheme;
 
       double ItalicAngle;
 
@@ -301,17 +303,17 @@ class Afm {
 
       int n_cms;
 
-      AfmCharMetrics * cm;
+      std::vector<AfmCharMetrics> cm;
 
 
       int n_composites;
 
-      AfmCompositeInfo * compinfo;
+      std::vector<AfmCompositeInfo> compinfo;
 
 
       int n_kern_pairs;
 
-      KPX * kpx;
+      std::vector<KPX> kpx;
 
 
 };

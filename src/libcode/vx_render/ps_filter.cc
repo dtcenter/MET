@@ -48,9 +48,41 @@ PSFilter::PSFilter()
 
 {
 
-next = (PSFilter *) nullptr;
-
 set_decimal_places(default_decimal_places);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+PSFilter::PSFilter(const PSFilter & f)
+
+{
+
+DecimalPlaces = f.DecimalPlaces;
+
+m_strncpy(double_format, f.double_format, sizeof(double_format) - 1,
+          "PSFilter::PSFilter(const PSFilter &)", "double_format");
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+PSFilter & PSFilter::operator=(const PSFilter & f)
+
+{
+
+if ( this == &f )  return *this;
+
+DecimalPlaces = f.DecimalPlaces;
+
+m_strncpy(double_format, f.double_format, sizeof(double_format) - 1,
+          "PSFilter::operator=(const PSFilter &)", "double_format");
+
+return *this;
 
 }
 
@@ -62,7 +94,7 @@ PSFilter::~PSFilter()
 
 {
 
-if ( next )  { delete next;  next = (PSFilter *) nullptr; }
+next.reset();
 
 }
 

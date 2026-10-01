@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include "vx_ps.h"
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -54,9 +55,9 @@ class TableHelper {
 
       bool PinIsSet;
 
-      double * ColWidth;     //  allocated
+      std::vector<double> ColWidth;     //  allocated
 
-      double * RowHeight;    //  allocated
+      std::vector<double> RowHeight;    //  allocated
 
       PSfile * Plot;   //  not allocated
 

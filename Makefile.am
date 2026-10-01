@@ -44,7 +44,7 @@ dist-hook:
 # Run the non-standard test suite
 
 test:
-	cd scripts; make
+	cd scripts; $(MAKE)
 
 .PHONY: test
 

@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <cmath>
 #include <vx_data2d.h>
+#include <vector>
 
 #include "data2d_grib_utils.h"
 #include "angles.h"
@@ -47,7 +48,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    int code_for_lookup = vinfo.field_rec();
    double p_thresh_lo, p_thresh_hi;
 
-   Section1_Header *pds = (Section1_Header *) g.pds;
+   Section1_Header *pds = (Section1_Header *) g.pds.data();
 
    ConcatString field_name = vinfo.name();
 
@@ -111,16 +112,15 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
             vinfo_ens_type = 2;
          }
 
-         char *ens_number_str = new char[vinfo_ens.length()];
-         m_strncpy(ens_number_str, vinfo_ens.text()+1,
+         vector<char> ens_number_str(vinfo_ens.length());
+         m_strncpy(ens_number_str.data(), vinfo_ens.text()+1,
                  (size_t) vinfo_ens.length(), method_name);
          ens_number_str[vinfo_ens.length()-1] = (char) 0;
 
          // if the string is numeric
-         if( check_reg_exp("^[0-9]*$", ens_number_str) ) {
-            vinfo_ens_number= atoi(ens_number_str);
+         if( check_reg_exp("^[0-9]*$", ens_number_str.data()) ) {
+            vinfo_ens_number= atoi(ens_number_str.data());
          }
-         delete[] ens_number_str;
 
          // if one of the parameters was not set - error
          if( is_bad_data(vinfo_ens_number) ||
@@ -580,7 +580,7 @@ void read_pds(const GribRecord &r, int &bms_flag,
    unsigned char pp1[2];
    Section1_Header *pds = (Section1_Header *) nullptr;
 
-   pds = (Section1_Header *) r.pds;
+   pds = (Section1_Header *) r.pds.data();
 
    //
    // Check PDS for flag for the presence of a GDS and BMS section
@@ -754,7 +754,7 @@ void read_pds_prob(const GribRecord &r, int &p_code,
    int len;
    double t1, t2;
 
-   Section1_Header *pds = (Section1_Header *) r.pds;
+   Section1_Header *pds = (Section1_Header *) r.pds.data();
 
    // Initialize
    p_code = 0;
@@ -790,7 +790,7 @@ void read_pds_level(const GribRecord & g, int &lower, int &upper, int &type)
 {
 int j;
 
-Section1_Header *pds = (Section1_Header *) g.pds;
+Section1_Header *pds = (Section1_Header *) g.pds.data();
 
    //
    //  find the level information for this record

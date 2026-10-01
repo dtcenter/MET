@@ -58,6 +58,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -157,9 +158,9 @@ static int compress_level = -1;
 ////////////////////////////////////////////////////////////////////////
 
 static StringArray get_input_files(const ConcatString &);
-static FileHandler *create_file_handler(const ASCIIFormat,
+static std::unique_ptr<FileHandler> create_file_handler(const ASCIIFormat,
                                         const ConcatString &);
-static FileHandler *determine_ascii_format(const ConcatString &,
+static std::unique_ptr<FileHandler> determine_ascii_format(const ConcatString &,
                                            ConcatString &);
 
 static void usage(int exit_code=1);
@@ -269,7 +270,7 @@ int met_main(int argc, char *argv[]) {
    // the command line.  If one wasn't specified, we'll look in the
    // first file to guess the format.
    //
-   FileHandler *file_handler = create_file_handler(ascii_format, asfile_list[0]);
+   auto file_handler = create_file_handler(ascii_format, asfile_list[0]);
 
    if(file_handler == 0) return 0;
 
@@ -311,7 +312,6 @@ int met_main(int argc, char *argv[]) {
    }
 
    int status = file_handler->writeNetcdfFile(ncfile.text());
-   delete file_handler;
 
    if(!status) return 1;
 
@@ -348,11 +348,10 @@ static StringArray get_input_files(const ConcatString &input) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static FileHandler *create_file_handler(const ASCIIFormat format,
+static std::unique_ptr<FileHandler> create_file_handler(const ASCIIFormat format,
                                         const ConcatString &ascii_filename) {
 
    #ifdef ENABLE_PYTHON
-   PythonHandler * ph = 0;
    #endif
 
    //
@@ -362,80 +361,79 @@ static FileHandler *create_file_handler(const ASCIIFormat format,
    //
    switch(format) {
       case ASCIIFormat::MET: {
-         return (FileHandler *) new MetHandler(program_name);
+         return std::make_unique<MetHandler>(program_name);
       }
 
       case ASCIIFormat::Little_R: {
-         return (FileHandler *) new LittleRHandler(program_name);
+         return std::make_unique<LittleRHandler>(program_name);
       }
 
       case ASCIIFormat::SurfRad: {
-         return (FileHandler *) new SurfradHandler(program_name);
+         return std::make_unique<SurfradHandler>(program_name);
       }
 
       case ASCIIFormat::WWSIS: {
-         return (FileHandler *) new WwsisHandler(program_name);
+         return std::make_unique<WwsisHandler>(program_name);
       }
 
       case ASCIIFormat::Airnow_dailyv2: {
-         AirnowHandler *handler = new AirnowHandler(program_name);
+         auto handler = std::make_unique<AirnowHandler>(program_name);
          handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_DAILYV2);
-         return (FileHandler *) handler;
+         return handler;
       }
 
       case ASCIIFormat::Airnow_hourlyaqobs: {
-         AirnowHandler *handler = new AirnowHandler(program_name);
+         auto handler = std::make_unique<AirnowHandler>(program_name);
          handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_HOURLYAQOBS);
-         return (FileHandler *) handler;
+         return handler;
       }
 
       case ASCIIFormat::Airnow_hourly: {
-         AirnowHandler *handler = new AirnowHandler(program_name);
+         auto handler = std::make_unique<AirnowHandler>(program_name);
          handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_HOURLY);
-         return (FileHandler *) handler;
+         return handler;
       }
 
       case ASCIIFormat::NDBC_standard: {
-         NdbcHandler *handler = new NdbcHandler(program_name);
+         auto handler = std::make_unique<NdbcHandler>(program_name);
          handler->setFormatVersion(NdbcHandler::NDBC_FORMAT_VERSION_STANDARD);
-         return (FileHandler *) handler;
+         return handler;
       }
 
       case ASCIIFormat::ISMN: {
-         return (FileHandler *) new IsmnHandler(program_name);
+         return std::make_unique<IsmnHandler>(program_name);
       }
 
       case ASCIIFormat::IABP: {
-         return((FileHandler *) new IabpHandler(program_name));
+         return std::make_unique<IabpHandler>(program_name);
       }
 
       case ASCIIFormat::USCRN: {
-         return((FileHandler *) new UscrnHandler(program_name));
+         return std::make_unique<UscrnHandler>(program_name);
       }
 
       case ASCIIFormat::Aeronet_v2: {
-         AeronetHandler *handler = new AeronetHandler(program_name);
+         auto handler = std::make_unique<AeronetHandler>(program_name);
          handler->setFormatVersion(2);
-         return (FileHandler *) handler;
+         return handler;
       }
 
       case ASCIIFormat::Aeronet_v3: {
-         AeronetHandler *handler = new AeronetHandler(program_name);
+         auto handler = std::make_unique<AeronetHandler>(program_name);
          handler->setFormatVersion(3);
-         return (FileHandler *) handler;
+         return handler;
       }
       #ifdef ENABLE_PYTHON
       case ASCIIFormat::Python: {
          setup_python();
-         ph = new PythonHandler(program_name);
-         return (FileHandler *) ph;
+         return std::make_unique<PythonHandler>(program_name);
       }
       #endif
 
       default: {
          ConcatString format_string;
-         FileHandler *guess = determine_ascii_format(ascii_filename,
-                                                     format_string);
+         auto guess = determine_ascii_format(ascii_filename,
+                                             format_string);
          mlog << Debug(2) << "Applying \"-format " << format_string
               << "\" to read input files. Specify the \"-format\" "
               << "option to override this default setting.\n";
@@ -446,7 +444,7 @@ static FileHandler *create_file_handler(const ASCIIFormat format,
 
 ////////////////////////////////////////////////////////////////////////
 
-static FileHandler *determine_ascii_format(const ConcatString &ascii_filename,
+static std::unique_ptr<FileHandler> determine_ascii_format(const ConcatString &ascii_filename,
                                            ConcatString &format_string) {
 
    //
@@ -466,146 +464,142 @@ static FileHandler *determine_ascii_format(const ConcatString &ascii_filename,
    }
 
    //
+   // Reused across the probes below: assigning a new handler frees the
+   // previous one, which is what the explicit deletes used to do.
+   //
+   std::unique_ptr<FileHandler> probe;
+
+   //
    // See if this is an IABP file.
    // put this first as it can have the same number of columns as some
    // other ones, which look only at the number of columns
    //
    f_in.rewind();
-   IabpHandler *iabp_file = new IabpHandler(program_name);
+   probe = std::make_unique<IabpHandler>(program_name);
 
-   if(iabp_file->isFileType(f_in)) {
+   if(probe->isFileType(f_in)) {
      f_in.close();
      format_string = IabpHandler::getFormatString();
-     return((FileHandler *) iabp_file);
+     return probe;
    }
 
-   delete iabp_file;
 
    //
    // See if this is a MET file.
    //
    f_in.rewind();
-   MetHandler *met_file = new MetHandler(program_name);
+   probe = std::make_unique<MetHandler>(program_name);
 
-   if (met_file->isFileType(f_in)) {
+   if (probe->isFileType(f_in)) {
      f_in.close();
      format_string = MetHandler::getFormatString();
-     return (FileHandler *) met_file;
+     return probe;
    }
 
-   delete met_file;
 
    //
    // See if this is a Little R file.
    //
    f_in.rewind();
-   LittleRHandler *little_r_file = new LittleRHandler(program_name);
+   probe = std::make_unique<LittleRHandler>(program_name);
 
-   if (little_r_file->isFileType(f_in)) {
+   if (probe->isFileType(f_in)) {
      f_in.close();
      format_string = LittleRHandler::getFormatString();
-     return (FileHandler *) little_r_file;
+     return probe;
    }
 
-   delete little_r_file;
 
    //
    // See if this is a SURFRAD file.
    //
    f_in.rewind();
-   SurfradHandler *surfrad_file = new SurfradHandler(program_name);
+   probe = std::make_unique<SurfradHandler>(program_name);
 
-   if (surfrad_file->isFileType(f_in)) {
+   if (probe->isFileType(f_in)) {
      f_in.close();
      format_string = SurfradHandler::getFormatString();
-     return (FileHandler *) surfrad_file;
+     return probe;
    }
 
-   delete surfrad_file;
 
    //
    // See if this is a WWSIS file.
    //
    f_in.rewind();
-   WwsisHandler *wwsis_file = new WwsisHandler(program_name);
+   probe = std::make_unique<WwsisHandler>(program_name);
 
-   if(wwsis_file->isFileType(f_in)) {
+   if(probe->isFileType(f_in)) {
      f_in.close();
      format_string = WwsisHandler::getFormatString();
-     return (FileHandler *) wwsis_file;
+     return probe;
    }
 
-   delete wwsis_file;
 
    //
    // See if this is a Aeronet file.
    //
    f_in.rewind();
-   AeronetHandler *aeronet_file = new AeronetHandler(program_name);
+   probe = std::make_unique<AeronetHandler>(program_name);
 
-   if(aeronet_file->isFileType(f_in)) {
+   if(probe->isFileType(f_in)) {
      f_in.close();
      format_string = AeronetHandler::getFormatString();
-     return (FileHandler *) aeronet_file;
+     return probe;
    }
 
-   delete aeronet_file;
 
    //
    // See if this is an Airnow file.
    //
    f_in.rewind();
-   AirnowHandler *airnow_file = new AirnowHandler(program_name);
+   probe = std::make_unique<AirnowHandler>(program_name);
 
-   if(airnow_file->isFileType(f_in)) {
+   if(probe->isFileType(f_in)) {
      f_in.close();
      format_string = AirnowHandler::getFormatStringDailyV2();
-     return (FileHandler *) airnow_file;
+     return probe;
    }
 
-   delete airnow_file;
 
    //
    // See if this is an NDBC file.
    //
    f_in.rewind();
-   NdbcHandler *ndbc_file = new NdbcHandler(program_name);
+   probe = std::make_unique<NdbcHandler>(program_name);
 
-   if(ndbc_file->isFileType(f_in)) {
+   if(probe->isFileType(f_in)) {
      f_in.close();
      format_string = NdbcHandler::getFormatStringStandard();
-     return (FileHandler *) ndbc_file;
+     return probe;
    }
 
-   delete ndbc_file;
 
    //
    // See if this is an ISMN file.
    //
    f_in.rewind();
-   IsmnHandler *ismn_file = new IsmnHandler(program_name);
+   probe = std::make_unique<IsmnHandler>(program_name);
 
-   if(ismn_file->isFileType(f_in)) {
+   if(probe->isFileType(f_in)) {
      f_in.close();
      format_string = IsmnHandler::getFormatString();
-     return (FileHandler *) ismn_file;
+     return probe;
    }
 
-   delete ismn_file;
 
    //
    // See if this is a USCRN file.
    //
    f_in.rewind();
-   UscrnHandler *uscrn_file = new UscrnHandler(program_name);
+   probe = std::make_unique<UscrnHandler>(program_name);
 
-   if(uscrn_file->isFileType(f_in)) {
+   if(probe->isFileType(f_in)) {
      f_in.close();
      format_string = UscrnHandler::getFormatString();
-     return (FileHandler *) uscrn_file;
+     return probe;
    }
 
-   delete uscrn_file;
 
    //
    // If we get here, we didn't recognize the file contents.

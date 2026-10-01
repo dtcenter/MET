@@ -13,7 +13,6 @@ include ${top_srcdir}/Make-include
 noinst_LIBRARIES = libvx_shapedata.a
 libvx_shapedata_a_SOURCES = \
               moments.cc moments.h \
-              node.cc node.h \
               shape.h \
               shapedata.cc shapedata.h \
               set.cc set.h \

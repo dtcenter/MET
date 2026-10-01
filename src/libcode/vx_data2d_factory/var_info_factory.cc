@@ -40,6 +40,7 @@
 
 #include "vx_cal.h"
 #include "vx_log.h"
+#include <memory>
 
 using namespace std;
 
@@ -50,31 +51,30 @@ using namespace std;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
+unique_ptr<VarInfo> VarInfoFactory::new_var_info(GrdFileType type)
 
 {
 
-   VarInfo *vi = (VarInfo *) nullptr;
+   unique_ptr<VarInfo> vi;
    const char *method_name = "VarInfoFactory::new_var_info() -> ";
 
 #ifdef WITH_PYTHON
-   VarInfoPython * p = nullptr;
+   unique_ptr<VarInfoPython> py_vi;
 #endif
 
    //
    // Switch on file type and instantiate the appropriate class.
-   // The VarInfo object is allocated and needs to be deleted by caller.
    //
 
    switch(type) {
 
       case FileType_Gb1:
-         vi = new VarInfoGrib;
+         vi = make_unique<VarInfoGrib>();
          break;
 
       case FileType_Gb2:
 #ifdef WITH_GRIB2
-         vi = new VarInfoGrib2;
+         vi = make_unique<VarInfoGrib2>();
          break;
 #else
          mlog << Error << "\n" << method_name
@@ -84,40 +84,39 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
 #endif
 
       case FileType_NcMet:
-         vi = new VarInfoNcMet;
+         vi = make_unique<VarInfoNcMet>();
          break;
 
       case FileType_NcWrf:
       case FileType_NcPinterp:
-         vi = new VarInfoNcWrf;
+         vi = make_unique<VarInfoNcWrf>();
          break;
 
       case FileType_Python_Numpy:
       case FileType_Python_Xarray:
 #ifdef WITH_PYTHON
-         p = new VarInfoPython;
-         p->set_file_type(type);
-         vi = p;
-         p = nullptr;
+         py_vi = make_unique<VarInfoPython>();
+         py_vi->set_file_type(type);
+         vi = std::move(py_vi);
          break;
 #else
          python_compile_error(method_name);
 #endif
 
       case FileType_NcCF:
-         vi = new VarInfoNcCF;
+         vi = make_unique<VarInfoNcCF>();
          break;
 
       case FileType_UGrid:
 #ifdef WITH_UGRID
-         vi = new VarInfoUGrid;
+         vi = make_unique<VarInfoUGrid>();
          break;
 #else
          ugrid_compile_error(method_name);
 #endif
 
       case FileType_Pairs:
-         vi = new VarInfoPairs;
+         vi = make_unique<VarInfoPairs>();
          break;
 
       case FileType_HdfEos:
@@ -142,7 +141,7 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo * VarInfoFactory::new_var_info(ConcatString s) {
+unique_ptr<VarInfo> VarInfoFactory::new_var_info(ConcatString s) {
    GrdFileType type;
 
    // Convert the string to a gridded data file type
@@ -153,11 +152,11 @@ VarInfo * VarInfoFactory::new_var_info(ConcatString s) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo * VarInfoFactory::new_copy(const VarInfo *vi_in) {
+unique_ptr<VarInfo> VarInfoFactory::new_copy(const VarInfo *vi_in) {
 
    if(!vi_in) return nullptr;
 
-   VarInfo *vi_copy = new_var_info(vi_in->file_type());
+   auto vi_copy = new_var_info(vi_in->file_type());
 
    *vi_copy = *vi_in;
 

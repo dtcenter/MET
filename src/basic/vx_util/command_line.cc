@@ -234,8 +234,6 @@ void CLOptionInfoArray::init_from_scratch()
 
 {
 
-e = (CLOptionInfo *) nullptr;
-
 AllocInc = 16;   //  default value
 
 clear();
@@ -252,13 +250,7 @@ void CLOptionInfoArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (CLOptionInfo *) nullptr; }
-
-
-
-Nelements = 0;
-
-Nalloc = 0;
+e.clear();
 
 // AllocInc = 16;   //  don't reset AllocInc
 
@@ -289,63 +281,19 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void CLOptionInfoArray::extend(int n)
-
-{
-
-if ( n <= Nalloc )  return;
-
-n = AllocInc*( (n + AllocInc - 1)/AllocInc );
-
-int j;
-CLOptionInfo * u = (CLOptionInfo *) nullptr;
-
-u = new CLOptionInfo [n];
-
-if ( !u )  {
-
-   mlog << Error << "\nCLOptionInfoArray::extend(int) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for(j=0; j<Nelements; ++j)  {
-
-   u[j] = e[j];
-
-}
-
-if ( e )  { delete [] e;  e = (CLOptionInfo *) nullptr; }
-
-e = u;
-
-u = (CLOptionInfo *) nullptr;
-
-Nalloc = n;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void CLOptionInfoArray::dump(ostream & out, int depth) const
 
 {
 
 Indent prefix(depth);
 
-out << prefix << "Nelements = " << Nelements << "\n";
-out << prefix << "Nalloc    = " << Nalloc    << "\n";
+out << prefix << "Nelements = " << e.size() << "\n";
+out << prefix << "Nalloc    = " << e.capacity() << "\n";
 out << prefix << "AllocInc  = " << AllocInc  << "\n";
 
 int j;
 
-for(j=0; j<Nelements; ++j)  {
+for(j=0; j<(int) e.size(); ++j)  {
 
    out << prefix << "Element # " << j << " ... \n";
 
@@ -391,9 +339,7 @@ void CLOptionInfoArray::add(const CLOptionInfo & a)
 
 {
 
-extend(Nelements + 1);
-
-e[Nelements++] = a;
+e.push_back(a);
 
 return;
 
@@ -409,7 +355,7 @@ void CLOptionInfoArray::add(const CLOptionInfoArray & a)
 
 int j;
 
-extend(Nelements + a.n_elements());
+e.reserve(e.size() + a.n_elements());
 
 for (j=0; j<(a.n_elements()); ++j)  {
 
@@ -429,7 +375,7 @@ CLOptionInfo & CLOptionInfoArray::operator[](int n) const
 
 {
 
-if ( (n < 0) || (n >= Nelements) )  {
+if ( (n < 0) || (n >= (int) e.size()) )  {
 
    mlog << Error << "\nCLOptionInfoArray::operator[](int) -> "
         << "range check error ... " << n << "\n\n";
@@ -437,7 +383,7 @@ if ( (n < 0) || (n >= Nelements) )  {
    exit ( 1 );
 }
 
-return e[n];
+return const_cast<CLOptionInfo &>(e[n]);
 
 }
 
@@ -452,7 +398,7 @@ int CLOptionInfoArray::lookup(const string & name) const
 int j;
 ConcatString cs = name;
 
-for (j=0; j<Nelements; ++j)  {
+for (j=0; j<(int) e.size(); ++j)  {
 
   if ( e[j].option_text == cs )  return j;
 

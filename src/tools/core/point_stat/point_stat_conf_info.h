@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <vector>
 
 #include "vx_config.h"
 #include "vx_data2d.h"
@@ -221,7 +222,7 @@ class PointStatConfInfo {
       // Store data parsed from the Point-Stat configuration object
       ConcatString model;                   // Model name
 
-      PointStatVxOpt * vx_opt;              // Array of vx task options [n_vx] (allocated)
+      std::vector<PointStatVxOpt> vx_opt;              // Array of vx task options [n_vx] (allocated)
       bool             grib_codes_set;
       bool             var_units_set;
 

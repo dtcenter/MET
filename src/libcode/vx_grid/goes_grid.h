@@ -26,11 +26,23 @@ class GoesImagerGrid : public GridRep {
 
       friend class Grid;
 
+         //
+         //  Key is private, so only Grid and GoesImagerGrid itself can create
+         //  one.  It lets the constructors below be public - which is
+         //  what std::make_unique needs - without opening grid
+         //  construction up to the rest of the code.
+         //
+
+      struct Key { explicit Key() = default; };
+
+   public:
+
+     ~GoesImagerGrid();
+      GoesImagerGrid(const GoesImagerData &, Key);
+
    private:
 
       GoesImagerGrid();
-     ~GoesImagerGrid();
-      GoesImagerGrid(const GoesImagerData &);
 
       void clear();
 
@@ -72,7 +84,7 @@ class GoesImagerGrid : public GridRep {
 
       void shift_right(int);
 
-      GridRep * copy() const;
+      std::unique_ptr<GridRep> copy() const;
 
       double scale_km() const;
 };
