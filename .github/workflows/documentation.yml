@@ -11,8 +11,6 @@ on:
       - docs/**
   pull_request:
     types: [opened, reopened, synchronize]
-  schedule:
-    - cron: '0 6 * * 1'
   workflow_dispatch:
 
 jobs:
