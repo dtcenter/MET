@@ -412,7 +412,7 @@ static double compute_pbl(map<double, double*> pqtzuv_map_tq,
 static void   copy_pqtzuv(double *to_pqtzuv, const double *from_pqtzuv, bool copy_all=true);
 static void   clear_pbl_input(map<double, double*> &pqtzuv_map_tq,
                               map<double, double*> &pqtzuv_map_uv,
-                              vector<double*> &pqtzuv_list);
+                              vector<std::unique_ptr<double[]>> &pqtzuv_list);
 static bool   insert_pbl(double *obs_arr, const double pbl_value, const int pbl_code,
                          const double pbl_p, const double pbl_h, const double pbl_qm,
                          const double hdr_lat, const double hdr_lon,
@@ -3069,11 +3069,11 @@ static void copy_pqtzuv(double *to_pqtzuv, const double *from_pqtzuv, bool copy_
 
 static void clear_pbl_input(map<double, double*> &pqtzuv_map_tq,
                             map<double, double*> &pqtzuv_map_uv,
-                            vector<double*> &pqtzuv_list) {
-   for (auto &pqtzuv : pqtzuv_list) delete [] pqtzuv;
-   pqtzuv_list.clear();
+                            vector<std::unique_ptr<double[]>> &pqtzuv_list) {
+   // Clear the maps of raw pointers before releasing the owned memory
    pqtzuv_map_tq.clear();
    pqtzuv_map_uv.clear();
+   pqtzuv_list.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3357,7 +3357,6 @@ static double compute_pbl(map<double, double*> pqtzuv_map_tq,
                     << pqtzuv_merged_array.size() << "\n";
          }
       }
-      for (auto &pqtzuv_merged : pqtzuv_merged_array) delete [] pqtzuv_merged;
       pqtzuv_merged_array.clear();
    }
    return hpbl;
