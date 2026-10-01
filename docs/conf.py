@@ -127,8 +127,8 @@ numfig_format = {
 # -- linkcheck builder configuration ----------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-the-linkcheck-builder
 
-linkcheck_timeout = 10
-linkcheck_retries = 2
+linkcheck_timeout = 30
+linkcheck_retries = 3
 linkcheck_workers = 8
 
 linkcheck_ignore = [
