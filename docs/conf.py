@@ -132,15 +132,17 @@ linkcheck_retries = 2
 linkcheck_workers = 8
 
 linkcheck_ignore = [
-    # add regex patterns for URLs that should be skipped, e.g.:
-    # r'https://dtcenter\.org/.*',   # if this site blocks automated requests
-    # r'https://doi\.org/.*',
-    # r'https://journals\.ametsoc\.org/.*',
-    # 'https://agupubs\.onlinelibrary\.wiley\.com/.*',  # AGU journals, similar bot-blocking behavior
+    # AMS journals (DOI prefix 10.1175) return 403 Forbidden to automated requests
+    r'https://doi\.org/10\.1175/.*',
+    # Wiley/RMetS journals (DOI prefix 10.1002) return 403 Forbidden to automated requests
+    r'https://doi\.org/10\.1002/.*',
+    # server sends an incomplete TLS certificate chain that browsers tolerate but Python does not
+    r'https://stat\.uw\.edu/.*',
 ]
 
 linkcheck_allowed_redirects = {
-    # map of regex -> regex for redirects that are fine to follow
+    # DOIs are the canonical, persistent form of a citation and always redirect to the publisher
+    r'https://doi\.org/.*': r'.*',
 }
 
 linkcheck_anchors = True

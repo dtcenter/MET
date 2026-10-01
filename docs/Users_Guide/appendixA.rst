@@ -212,7 +212,7 @@ Q. How do I use the UNIX time conversion?
 
      Regarding TRMM data, it may be easier to work with the binary data and
      use the trmm2nc.R script described on this
-     `page <http://dtcenter.org/community-code/model-evaluation-tools-met/input-data>`_
+     `page <https://dtcenter.org/software-tools/model-evaluation-tools-met/input-data>`_
      under observation datasets.
 
      Follow the TRMM binary links to either the 3 or 24-hour accumulations,
@@ -257,7 +257,7 @@ Q. Do the ASCII output files created by MET use scientific notation?
      numbers that the AsciiTable class writes is handled by a call
      to printf. The "%g" formatting option can result in
      scientific notation:
-     http://www.cplusplus.com/reference/cstdio/printf/
+     https://cplusplus.com/reference/cstdio/printf/
 
      It has been recommended that a configuration option be added to
      MET to disable the use of scientific notation. That enhancement
@@ -713,7 +713,7 @@ Q. How do I correct a precipitation time range?
      Typically, accumulated precipitation is stored in GRIB files using an
      accumulation interval with a "time range" indicator value of 4. Here is
      a description of the different time range indicator values and
-     meanings: http://www.nco.ncep.noaa.gov/pmb/docs/on388/table5.html
+     meanings: https://www.nco.ncep.noaa.gov/pmb/docs/on388/table5.html
 
      For example, take a look at the APCP in the GRIB files included in the
      MET tar ball:
@@ -870,7 +870,7 @@ Q. How do I use Pcp-Combine when my GRIB data doesn't have the appropriate accum
      forecast time, not an accumulation interval.
 
      Here's a table describing the TR values:
-     http://www.nco.ncep.noaa.gov/pmb/docs/on388/table5.html
+     https://www.nco.ncep.noaa.gov/pmb/docs/on388/table5.html
 
      The default logic for pcp_combine is to look for GRIB code 61 (i.e. APCP)
      defined with an accumulation interval (TR = 4). Since the data doesn't
@@ -1423,7 +1423,7 @@ Q. How do I convert TRMM data files?
      Here is an example of NetCDF that the MET software is not expecting. Here
      is an option for accessing that same TRMM data, following links from the
      MET website:
-     http://dtcenter.org/community-code/model-evaluation-tools-met/input-data
+     https://dtcenter.org/software-tools/model-evaluation-tools-met/input-data
 
      .. code-block:: none
 
@@ -1749,7 +1749,7 @@ Q. How do I get help if my questions are not answered in the User's Guide?
   .. dropdown:: Answer
 
      First, look on our
-     `MET User's Guide website <https://dtcenter.org/community-code/model-evaluation-tools-met>`_.
+     `MET User's Guide website <https://dtcenter.org/software-tools/model-evaluation-tools-met>`_.
      If that doesn't answer your question, create a post in the
      `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
@@ -1779,7 +1779,7 @@ Q. What graphical features does MET provide?
      It's a free package that runs on most operating systems and provides nice
      plotting features and a wide array of powerful statistical analysis tools.
      There are sample scripts on the
-     `MET website <http://dtcenter.org/community-code/model-evaluation-tools-met/sample-analysis-scripts>`_
+     `MET website <https://dtcenter.org/software-tools/model-evaluation-tools-met/sample-analysis-scripts>`_
      that you can use and modify to perform the type of analysis you need.  If
      you create your own scripts, we encourage you to submit them to us
      through the
@@ -1920,7 +1920,7 @@ Environment Variable Settings
 
      Our online tutorial can help figure out what should be set and what the
      value should be:
-     https://met.readthedocs.io/en/latest/Users_Guide/installation.html
+     https://metplus.readthedocs.io/projects/met/en/latest/Users_Guide/installation.html
 
 NetCDF Install Issues
 ---------------------

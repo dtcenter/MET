@@ -11,6 +11,8 @@ on:
       - docs/**
   pull_request:
     types: [opened, reopened, synchronize]
+  schedule:
+    - cron: '0 6 * * 1'
   workflow_dispatch:
 
 jobs:
@@ -40,3 +42,8 @@ jobs:
           name: documentation_warnings.log
           path: artifact/doc_warnings.log
           if-no-files-found: ignore
+      - name: Check links
+        uses: dtcenter/metplus-action-linkcheck@v1
+        with:
+          fail-on-broken-links: 'true'
+          upload-artifact: 'true'

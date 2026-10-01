@@ -69,7 +69,7 @@ References
 |   *AMS 22nd Conference on Weather Analysis and Forecasting and 18th*
 |   *Conference on Numerical Weather Prediction*, 25-29 June, Park City, Utah,
 |   American Meteorological Society (Boston), Available at
-|   http://ams.confex.com/ams/pdfpapers/124856.pdf.
+|   https://ams.confex.com/ams/pdfpapers/124856.pdf.
 |
 
 .. _Bröcker-2007:
@@ -137,7 +137,7 @@ References
 | Denis, B., J. Cote, R. Laprise, 2002:
 |    Spectral Decomposition of Two-Dimensional Atmospheric Fields on Limited-Area
 |    Domains Using the Discrete Cosine Transform (DCT). *Monthly Weather Review*, 130, 1812-1829.
-|    https://doi.org/10.1175/1520-0493(2002)130<1812:SDOTDA>2.0.CO;2
+|    doi: `https://doi.org/10.1175/1520-0493(2002)130<1812:SDOTDA>2.0.CO;2 <https://doi.org/10.1175/1520-0493(2002)130\<1812:SDOTDA\>2.0.CO;2>`_
 |
 
 .. _Durran-2017:
@@ -340,7 +340,7 @@ References
 
 | Rodwell, M.J., T. Haiden, D.S. Richardson, 2011: Developments in Precipitation
 |   Verification. *ECMWF Newsletter* Number 128.
-|   https://www.ecmwf.int/node/14595
+|   https://www.ecmwf.int/en/elibrary/78205-newsletter-no-128-summer-2011
 |
 
 .. _Röpnack-2013:
