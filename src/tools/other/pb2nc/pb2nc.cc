@@ -63,6 +63,8 @@
 //   021    01/30/25  Halley Gotway  MET #3054 Fix PARUSR BUFRLIB error
 //   022    05/14/25  Halley Gotway  MET #3099 Write units and descriptions
 //                                   for derived variables
+//   023    09/28/26  Halley Gotway  MET #3450 Fix the derived PBL being
+//                                   affected by other stations
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -407,6 +409,9 @@ static int    combine_tqz_and_uv(map<float, float*>, map<float, float*>,
 static float  compute_pbl(map<float, float*> pqtzuv_map_tq,
                           map<float, float*> pqtzuv_map_uv);
 static void   copy_pqtzuv(float *to_pqtzuv, float *from_pqtzuv, bool copy_all=true);
+static void   clear_pbl_input(map<float, float*> &pqtzuv_map_tq,
+                              map<float, float*> &pqtzuv_map_uv,
+                              vector<float*> &pqtzuv_list);
 static bool   insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
                          const float pbl_p, const float pbl_h, const float pbl_qm,
                          const float hdr_lat, const float hdr_lon,
@@ -1414,6 +1419,33 @@ void process_pbfile(int i_pb) {
 
       do_pbl = cal_pbl && 0 == strcmp("ADPUPA", hdr_typ);
 
+      if (do_pbl) {
+
+         // Determine whether this message belongs to the same header as the
+         // previous one.  PBL input records are accumulated across messages
+         // which share a header and are consumed when the PBL is derived.
+         is_same_header = (prev_hdr_vld_ut == hdr_vld_ut)
+               && is_eq(prev_hdr_lat, hdr_lat)
+               && is_eq(prev_hdr_lon, hdr_lon)
+               && is_eq(prev_hdr_elv, hdr_elv)
+               && 0 == strcmp(prev_hdr_typ, hdr_typ)
+               && 0 == strcmp(prev_hdr_sid, hdr_sid.c_str());
+
+         // Starting a new header, so discard any PBL input records left over
+         // from the previous one.  The PBL could not be derived from them,
+         // and retaining them corrupts the PBL derived for this header.
+         if (!is_same_header &&
+             (pqtzuv_map_tq.size() > 0 || pqtzuv_map_uv.size() > 0)) {
+            mlog << Debug(6) << method_name
+                 << "Discarding " << pqtzuv_map_tq.size() << " TQZ and "
+                 << pqtzuv_map_uv.size() << " UV unused PBL input records "
+                 << "from the previous header before processing "
+                 << hdr_sid << "\n";
+            clear_pbl_input(pqtzuv_map_tq, pqtzuv_map_uv, pqtzuv_list);
+            pbl_qm = bad_data_float;
+         }
+      }
+
       // Search through the vertical levels
       for(lv=0, n_hdr_obs = 0; lv<buf_nlev; lv++) {
 
@@ -1949,12 +1981,6 @@ void process_pbfile(int i_pb) {
       }
 
       if (do_pbl) {
-         is_same_header = (prev_hdr_vld_ut == hdr_vld_ut)
-               && is_eq(prev_hdr_lat, hdr_lat)
-               && is_eq(prev_hdr_lon, hdr_lon)
-               && is_eq(prev_hdr_elv, hdr_elv)
-               && 0 == strcmp(prev_hdr_typ, hdr_typ)
-               && 0 == strcmp(prev_hdr_sid, hdr_sid.c_str());
          has_pbl_data = (pqtzuv_map_tq.size() > 0 && pqtzuv_map_uv.size() > 0);
          if (is_same_header && has_pbl_data) {
             float pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
@@ -1962,13 +1988,7 @@ void process_pbfile(int i_pb) {
             if (insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
                            hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid)) n_derived_obs++;
 
-            for(vector<float *>::iterator it = pqtzuv_list.begin();
-                it != pqtzuv_list.end(); ++it) {
-               delete *it;
-            }
-            pqtzuv_list.clear();
-            pqtzuv_map_tq.clear();
-            pqtzuv_map_uv.clear();
+            clear_pbl_input(pqtzuv_map_tq, pqtzuv_map_uv, pqtzuv_list);
             pbl_qm = bad_data_float;
          }
          prev_hdr_vld_ut = hdr_vld_ut;
@@ -2002,13 +2022,7 @@ void process_pbfile(int i_pb) {
       if (insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
                      hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid)) n_derived_obs++;
 
-      for(vector<float *>::iterator it = pqtzuv_list.begin();
-          it != pqtzuv_list.end(); ++it) {
-         delete *it;
-      }
-      pqtzuv_list.clear();
-      pqtzuv_map_tq.clear();
-      pqtzuv_map_uv.clear();
+      clear_pbl_input(pqtzuv_map_tq, pqtzuv_map_uv, pqtzuv_list);
    }
 
    if(showed_progress) {
@@ -2979,6 +2993,20 @@ void copy_pqtzuv(float *to_pqtzuv, float *from_pqtzuv, bool copy_all) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void clear_pbl_input(map<float, float*> &pqtzuv_map_tq,
+                     map<float, float*> &pqtzuv_map_uv,
+                     vector<float*> &pqtzuv_list) {
+   for(vector<float *>::iterator it = pqtzuv_list.begin();
+       it != pqtzuv_list.end(); ++it) {
+      delete [] *it;
+   }
+   pqtzuv_list.clear();
+   pqtzuv_map_tq.clear();
+   pqtzuv_map_uv.clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       map<float, float*> pqtzuv_map_uv, vector<float *> &pqtzuv_merged_array) {
    static const char *method_name = "combine_tqz_and_uv() ";
@@ -3147,6 +3175,10 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
          index = 0;
          hgt_cnt = spfh_cnt = 0;
          int start_offset = (MAX_PBL_LEVEL >= pbl_level) ? 0 : (pbl_level-MAX_PBL_LEVEL);
+
+         // Number of levels actually stored in the pbl_data_* buffers, which
+         // is less than pbl_level when the lowest levels have been excluded
+         int buf_level = pbl_level - start_offset;
          for (int i=(pbl_level-1); i>=start_offset; i--,index++) {
             pqtzuv = pqtzuv_merged_array[i];
             pbl_data_pres[index] = pqtzuv[0];
@@ -3216,22 +3248,22 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
             }
          }
 
-         if (hgt_cnt < pbl_level) {
-            hgt_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_hgt);
+         if (hgt_cnt < buf_level) {
+            hgt_cnt += interpolate_by_pressure(buf_level, pbl_data_pres, pbl_data_hgt);
             mlog << Debug(6) << method_name << "interpolate Z (HGT)\n";
          }
-         if (spfh_cnt < pbl_level) {
-            spfh_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_spfh);
+         if (spfh_cnt < buf_level) {
+            spfh_cnt += interpolate_by_pressure(buf_level, pbl_data_pres, pbl_data_spfh);
             mlog << Debug(6) << method_name << "interpolate Q (SPFH)\n";
          }
 
-         if ((spfh_cnt>0) && (pbl_level>0)) {
-            mzbl = pbl_level;
+         if ((spfh_cnt>0) && (buf_level>0)) {
+            mzbl = buf_level;
             mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "mzbl: " << mzbl
-                 << "  missing count: Q: " << (pbl_level - spfh_cnt)
-                 << ", Z: " << (pbl_level - hgt_cnt) << "\n\n";
+                 << "  missing count: Q: " << (buf_level - spfh_cnt)
+                 << ", Z: " << (buf_level - hgt_cnt) << "\n\n";
             if(mlog.verbosity_level() >= PBL_DEBUG_LEVEL) {
-               log_pbl_input(pbl_level, method_name);
+               log_pbl_input(buf_level, method_name);
             }
 
             //SUBROUTINE CALPBL(T,Q,P,Z,U,V,MZBL,HPBL,jpbl)
@@ -3243,7 +3275,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
                     << pqtzuv_merged_array.size() << "\n";
          }
       }
-      for (int i=0; i<pqtzuv_merged_array.size(); i++) delete pqtzuv_merged_array[i];
+      for (auto &pqtzuv_merged : pqtzuv_merged_array) delete [] pqtzuv_merged;
       pqtzuv_merged_array.clear();
    }
    return hpbl;
