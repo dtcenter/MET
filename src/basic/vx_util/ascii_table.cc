@@ -274,13 +274,6 @@ BadDataValue = a.BadDataValue;
 
 set_bad_data_str(a.BadDataStr);
 
-int f_buf_size = sizeof(a.f_FloatFormat);
-int g_buf_size = sizeof(a.g_FloatFormat);
-if (f_buf_size > ascii_table_buf_size) f_buf_size = ascii_table_buf_size;
-if (g_buf_size > ascii_table_buf_size) g_buf_size = ascii_table_buf_size;
-memcpy(f_FloatFormat, a.f_FloatFormat, f_buf_size);
-memcpy(g_FloatFormat, a.g_FloatFormat, g_buf_size);
-
 DoCommaString = a.DoCommaString;
 
 DeleteTrailingBlankRows = a.DeleteTrailingBlankRows;
@@ -706,16 +699,6 @@ if ( (k < 0) || (k > ascii_table_max_precision) )  {
 
 Precision = k;
 
-int f_buf_size = sizeof(f_FloatFormat);
-int g_buf_size = sizeof(g_FloatFormat);
-if (f_buf_size > ascii_table_buf_size) f_buf_size = ascii_table_buf_size;
-if (g_buf_size > ascii_table_buf_size) g_buf_size = ascii_table_buf_size;
-memset(f_FloatFormat, 0, f_buf_size);
-memset(g_FloatFormat, 0, g_buf_size);
-
-snprintf(f_FloatFormat, f_buf_size, "%%.%df", Precision);
-snprintf(g_FloatFormat, g_buf_size, "%%.%dg", Precision);
-
 return;
 
 }
@@ -1012,8 +995,8 @@ const char *method_name = "AsciiTable::set_entry() -> ";
 if ( fabs(x - BadDataValue) < 0.0001 )  str = BadDataStr;
 else  {
 
-  if ( fabs(x) >= 1.0 )   str.format(f_FloatFormat, x);
-  else                    str.format(g_FloatFormat, x);
+  if ( fabs(x) >= 1.0 )   str.format("%.*f", Precision, x);
+  else                    str.format("%.*g", Precision, x);
 
 }
 

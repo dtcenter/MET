@@ -15,6 +15,9 @@
 #define  __3D_PAIR_ATT_COLUMNS_H__
 
 
+#include <iterator>
+
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -46,7 +49,7 @@ static const char * att_3d_pair_cols [] = {
 };
 
 
-static const int n_att_3d_pair_cols = sizeof(att_3d_pair_cols)/sizeof(*att_3d_pair_cols);
+static const int n_att_3d_pair_cols = std::size(att_3d_pair_cols);
 
 
 ////////////////////////////////////////////////////////////////////////

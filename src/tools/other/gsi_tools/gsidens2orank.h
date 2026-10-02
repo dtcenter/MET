@@ -49,7 +49,7 @@ static const char *conv_extra_columns [] = {
 };
 
 static const int n_conv_extra_cols =
-   sizeof(conv_extra_columns)/sizeof(*conv_extra_columns);
+   std::size(conv_extra_columns);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -82,7 +82,7 @@ static const char * rad_extra_columns [] = {
 };
 
 static const int n_rad_extra_cols =
-   sizeof(rad_extra_columns)/sizeof(*rad_extra_columns);
+   std::size(rad_extra_columns);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -97,7 +97,7 @@ static const char *retr_extra_columns [] = {
 };
 
 static const int n_retr_extra_cols =
-   sizeof(retr_extra_columns)/sizeof(*retr_extra_columns);
+   std::size(retr_extra_columns);
 static const int retr_extra_begin = 12;
 
 ////////////////////////////////////////////////////////////////////////

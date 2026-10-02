@@ -15,6 +15,9 @@
 #define  __3D_TXT_HEADER_H__
 
 
+#include <iterator>
+
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -46,7 +49,7 @@ static const char * header_3d_cols [] = {
 };
 
 
-static const int n_header_3d_cols = sizeof(header_3d_cols)/sizeof(*header_3d_cols);
+static const int n_header_3d_cols = std::size(header_3d_cols);
 
 
 ////////////////////////////////////////////////////////////////////////

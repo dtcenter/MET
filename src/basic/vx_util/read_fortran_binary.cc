@@ -74,7 +74,7 @@ switch ( rec_pad_length )  {
 }
 
 int n_read;
-unsigned long long rec_size_1, rec_size_2;
+long long rec_size_1, rec_size_2;
 int bytes;
 
    //

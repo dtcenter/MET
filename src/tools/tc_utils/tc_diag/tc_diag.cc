@@ -1871,7 +1871,7 @@ void OutFileInfo::write_cira_diag() {
    write_cira_diag_section_header("CUSTOM DATA");
 
    // Write NVAR line
-   line.format("NVAR %03d\n", diag_custom_keys.size());
+   line.format("NVAR %03d\n", static_cast<int>(diag_custom_keys.size()));
    *cira_diag_out << line;
 
    // Write custom diagnostics
