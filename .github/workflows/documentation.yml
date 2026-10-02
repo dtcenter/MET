@@ -21,11 +21,10 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.8'
+          python-version: '3.12'
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade python-dateutil requests sphinx \
-          sphinx-gallery Pillow sphinx_rtd_theme sphinx-panels
+          python -m pip install --upgrade python-dateutil requests Pillow
           python -m pip install -r docs/requirements.txt
       - name: Build docs
         run: ./.github/jobs/build_documentation.sh
