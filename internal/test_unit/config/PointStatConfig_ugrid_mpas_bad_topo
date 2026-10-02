@@ -1,0 +1,58 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Point-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+// Negative test: only NEAREST is supported for topo_mask.interp on the
+// unstructured grid. Point-Stat should exit before reading the topography.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+model = "MPAS";
+
+obs_window = {
+   beg = ${BEG_DS};
+   end = ${END_DS};
+}
+
+fcst = {
+   field = [
+      { name = "temperature";  level = "P925";  message_type = "ADPSFC"; }
+   ];
+}
+obs = {
+   field = [
+      { name = "TMP";  level = "P1000-500";  message_type = "ADPSFC"; }
+   ];
+}
+
+interp = {
+   vld_thresh = 1.0;
+   type = [
+      { method = NEAREST; width = 1; }
+   ];
+}
+
+output_flag = {
+   sl1l2 = STAT;
+}
+
+output_prefix = "${OUTPUT_PREFIX}";
+
+ugrid_dataset = "mpas";
+ugrid_coordinates_file = "${MET_TEST_INPUT}/ugrid_data/mpas/static.2025-05-17.9506.OK_reduced.nc";
+
+////////////////////////////////////////////////////////////////////////////////
+
+topo_mask = {
+   flag               = TRUE;
+   file_name          = [ "${MET_TEST_INPUT}/ugrid_data/mpas/static.2025-05-17.9506.OK_reduced.nc" ];
+   field              = { name = "ter"; level = "(*)"; }
+   regrid             = { method = NEAREST; width = 1; }
+   interp             = { method = BILIN; width = 2; }
+   use_obs_thresh     = ge-100&&le100;
+   interp_fcst_thresh = ge-50&&le50;
+}
+
+////////////////////////////////////////////////////////////////////////////////

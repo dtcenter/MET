@@ -216,6 +216,65 @@ DataPlane smooth_field(const DataPlane &dp,
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Smooth the DataPlane values of an unstructured grid using the
+// interpolation method and the closest faces of each face. The number
+// of faces is the number of points of the Grid Template.
+//
+////////////////////////////////////////////////////////////////////////
+
+void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
+                  InterpMthd mthd, int width,
+                  const GridTemplateFactory::GridTemplates shape,
+                  double t, const std::vector<UGridNeighbors> &nbr_table) {
+
+   // Initialize the smoothed field to the raw field
+   smooth_dp = dp;
+
+   // For nearest neighbor, no work to do.
+   if(width == 1 && mthd == InterpMthd::Nearest) return;
+
+   // Distance-weighted mean is omitted since each face is its own
+   // closest face (distance 0). Gaussian filters require a regular grid.
+   if(mthd != InterpMthd::Min     &&
+      mthd != InterpMthd::Max     &&
+      mthd != InterpMthd::Median  &&
+      mthd != InterpMthd::UW_Mean &&
+      mthd != InterpMthd::AW_Mean) {
+      mlog << Error << "\nsmooth_field() -> "
+           << "unsupported interpolation method for the unstructured grid: "
+           << interpmthd_to_string(mthd) << "(" << enum_class_as_int(mthd)
+           << ")\n\n";
+      exit(1);
+   }
+
+   int n_face = dp.nx();
+   if(nbr_table.size() != static_cast<size_t>(n_face)) {
+      mlog << Error << "\nsmooth_field() -> "
+           << "the number of faces of the neighbor table ("
+           << nbr_table.size() << ") does not match the field ("
+           << n_face << ").\n\n";
+      exit(1);
+   }
+
+   int n_points = ugrid_interp_n_points(width, shape);
+
+   mlog << Debug(3)
+        << "Smoothing unstructured grid field using the "
+        << interpmthd_to_string(mthd) << "(" << n_points
+        << ") closest faces interpolation method.\n";
+
+#pragma omp parallel for schedule(static) default(shared)
+   for(int i=0; i<n_face; i++) {
+      smooth_dp.set(interp_ugrid(dp, nbr_table[i], mthd, n_points,
+                                 bad_data_double, nullptr, t),
+                    i, 0);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // Convert the DataPlane field to the corresponding fractional coverage
 // using the threshold critea specified.
 //

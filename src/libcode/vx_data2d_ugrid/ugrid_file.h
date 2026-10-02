@@ -32,7 +32,7 @@
 
 
 static const int UG_DIM_COUNT = 5;
-static const int UG_META_VAR_COUNT = 10;
+static const int UG_META_VAR_COUNT = 11;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -149,6 +149,7 @@ class UGridFile {
       netCDF::NcVar *_zVar;
       netCDF::NcVar *_tVar;
       netCDF::NcVar *_init_time_var;
+      netCDF::NcVar *_areaVar;        // optional face area
 
       int face_count;
 
@@ -171,6 +172,7 @@ class UGridFile {
       bool metadata_time();
       void radian_to_degree(std::vector<double> &lat_values, const int lat_count) const;
       void read_config(const ConcatString &config_filename);
+      void read_face_area(std::vector<double> &area_km2) const;
       void read_netcdf_grid();
 };
 

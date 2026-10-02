@@ -142,4 +142,102 @@
     </output>
   </test>
 
+  <!--                                    -->
+  <!--  N closest faces interpolation     -->
+  <!--                                    -->
+
+  <test name="point_stat_ugrid_mpas_npts">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>         <value>-1800</value></pair>
+      <pair><name>END_DS</name>         <value>1800</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>UGRID_MPAS_NPTS</value></pair>
+      <pair><name>CONFIG_DIR</name>     <value>&CONFIG_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2025-05-18_12.00.00.9506.OK.nc \
+      &DATA_DIR_OBS;/point_obs/gdas1.20250518.t12z.prepbufr_modified.nc \
+      &CONFIG_DIR;/PointStatConfig_ugrid_mpas_npts \
+      -outdir &OUTPUT_DIR;/point_stat_ugrid -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_NPTS_120000L_20250518_120000V.stat</stat>
+    </output>
+  </test>
+
+  <test name="grid_stat_ugrid_mpas_smooth">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_mean.19590415</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_SMOOTH</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2012-04-09_12.00.00_reduced.nc \
+      &DATA_DIR_UGRID;/mpas/mpasout.2012-04-09_12.00.00_reduced.nc \
+      &CONFIG_DIR;/GridStatConfig_ugrid_mpas_smooth \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_SMOOTH_120000L_20120409_120000V.stat</stat>
+    </output>
+  </test>
+
+  <!-- Unsupported interpolation methods for the unstructured grid -->
+  <!-- must be rejected while processing the configuration         -->
+
+  <test name="point_stat_ugrid_mpas_BAD_INTERP">
+    <exec>&MET_BIN;/point_stat</exec>
+    <retval>1</retval>
+    <env>
+      <pair><name>BEG_DS</name>         <value>-1800</value></pair>
+      <pair><name>END_DS</name>         <value>1800</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>UGRID_MPAS_BAD_INTERP</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2025-05-18_12.00.00.9506.OK.nc \
+      &DATA_DIR_OBS;/point_obs/gdas1.20250518.t12z.prepbufr_modified.nc \
+      &CONFIG_DIR;/PointStatConfig_ugrid_mpas_bad_interp \
+      -outdir &OUTPUT_DIR;/point_stat_ugrid -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_BAD_INTERP_120000L_20250518_120000V.stat</not_exist>
+    </output>
+  </test>
+
+  <test name="point_stat_ugrid_mpas_BAD_TOPO_INTERP">
+    <exec>&MET_BIN;/point_stat</exec>
+    <retval>1</retval>
+    <env>
+      <pair><name>BEG_DS</name>         <value>-1800</value></pair>
+      <pair><name>END_DS</name>         <value>1800</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>UGRID_MPAS_BAD_TOPO_INTERP</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2025-05-18_12.00.00.9506.OK.nc \
+      &DATA_DIR_OBS;/point_obs/gdas1.20250518.t12z.prepbufr_modified.nc \
+      &CONFIG_DIR;/PointStatConfig_ugrid_mpas_bad_topo \
+      -outdir &OUTPUT_DIR;/point_stat_ugrid -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_BAD_TOPO_INTERP_120000L_20250518_120000V.stat</not_exist>
+    </output>
+  </test>
+
+  <test name="grid_stat_ugrid_mpas_BAD_SMOOTH">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <retval>1</retval>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_BAD_SMOOTH</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2012-04-09_12.00.00_reduced.nc \
+      &DATA_DIR_UGRID;/mpas/mpasout.2012-04-09_12.00.00_reduced.nc \
+      &CONFIG_DIR;/GridStatConfig_ugrid_mpas_bad_smooth \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_BAD_SMOOTH_120000L_20120409_120000V.stat</not_exist>
+    </output>
+  </test>
+
 </met_test>

@@ -299,6 +299,10 @@ struct InterpInfo {
    void clear();
    void validate(); // Ensure that width and method are accordant
 
+   // Exit for methods not supported on an unstructured grid: point
+   // interpolation (smoothing = false) or gridded smoothing (true)
+   void validate_ugrid(bool smoothing, const char *caller) const;
+
    friend bool operator==(const InterpInfo &lhs, const InterpInfo &rhs) {
       return(lhs.field      == rhs.field      &&
              lhs.vld_thresh == rhs.vld_thresh &&

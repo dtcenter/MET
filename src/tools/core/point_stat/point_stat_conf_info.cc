@@ -490,6 +490,41 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void PointStatConfInfo::check_ugrid_sfc_interp(const PointStatVxOpt &vx_opt) const {
+   const char *method_name = "PointStatConfInfo::check_ugrid_sfc_interp() -> ";
+   const SurfaceInfo &sfc_info = vx_opt.vx_pd.sfc_info;
+
+   if(sfc_info.need_topo() &&
+      sfc_info.topo_interp_mthd != InterpMthd::Nearest) {
+      mlog << Error << "\n" << method_name
+           << "the \"" << interpmthd_to_string(sfc_info.topo_interp_mthd)
+           << "\" interpolation method for \"" << conf_key_topo_mask
+           << "." << conf_key_interp << "\" is not supported for the "
+           << "unstructured grid. Set it to " << interpmthd_nearest_str
+           << ".\n\n";
+      exit(1);
+   }
+
+   if(sfc_info.land_flag || sfc_info.topo_flag) {
+      for(int j=0; j<vx_opt.interp_info.n_interp; j++) {
+         if(string_to_interpmthd(vx_opt.interp_info.method[j].c_str())
+            != InterpMthd::Nearest) {
+            mlog << Error << "\n" << method_name
+                 << "only the " << interpmthd_nearest_str << " interpolation "
+                 << "method is supported with \"" << conf_key_land_mask
+                 << "\" or \"" << conf_key_topo_mask << "\" enabled for "
+                 << "the unstructured grid, not \""
+                 << vx_opt.interp_info.method[j] << "\".\n\n";
+            exit(1);
+         }
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PointStatConfInfo::process_geog(const Grid &grid,
                                      const char *fcst_file) {
    const string method_name = "PointStatConfInfo::process_geog() -> ";
@@ -518,6 +553,18 @@ void PointStatConfInfo::process_geog(const Grid &grid,
 
    // Check for no work to do
    if(!land && !topo) return;
+
+   // The surface interpolation (land/sea and topography masks) uses
+   // the grid template which supports only the nearest neighbor for
+   // the unstructured grid. Check before reading the geography data.
+   if(grid.is_ugrid()) {
+      for(int i=0; i<n_vx; i++) {
+         if(vx_opt[i].vx_pd.sfc_info.need_topo()) {
+            parse_conf_topo_mask_interp(&conf, vx_opt[i].vx_pd.sfc_info);
+         }
+         check_ugrid_sfc_interp(vx_opt[i]);
+      }
+   }
 
    mlog << Debug(2)
         << "Processing geography data.\n";
@@ -1057,6 +1104,9 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 
    // Conf: interp
    interp_info = parse_conf_interp(&odict, conf_key_interp);
+   if(ftype == FileType_UGrid) {
+      interp_info.validate_ugrid(false, "PointStatVxOpt::process_config() -> ");
+   }
 
    // Conf: hira
    hira_info = parse_conf_hira(&odict);

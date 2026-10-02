@@ -20,6 +20,9 @@
 #include "vx_log.h"
 #include "grid_base.h"
 #include "find_grid_by_name.h"
+#ifdef WITH_UGRID
+#include "unstructured_grid.h"
+#endif
 
 
 using namespace std;
@@ -398,6 +401,9 @@ void UnstructuredData::clear_data() {
    points_lonlat.clear();
    points_XYZ.clear();
    points_XYZ_km.clear();
+   face_area_km2.clear();
+   nbr_table_n = 0;
+   nbr_table.clear();
    lat_checksum = lon_checksum = alt_checksum = 0.;
 
    kdtree.reset();
@@ -860,6 +866,7 @@ if (data.has_PointLatLon()) {
 else {
    D->set_points(data.n_face, data.points_XYZ);
 }
+D->face_area_km2 = data.face_area_km2;
 us = std::move(D);
 
 }
@@ -1294,6 +1301,64 @@ bool Grid::wrap_lon() const
 
 
 return rep->wrap_lon();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Grid::is_ugrid() const
+
+{
+
+#ifdef WITH_UGRID
+return ( dynamic_cast<const UnstructuredGrid *>(rep.get()) != nullptr );
+#else
+return false;
+#endif
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Grid::ugrid_closest_faces(double lat, double lon, int n, UGridNeighbors &nbrs) const
+
+{
+
+nbrs.clear();
+
+#ifdef WITH_UGRID
+const auto ug = dynamic_cast<const UnstructuredGrid *>(rep.get());
+
+if ( !ug )  return false;
+
+ug->Data.closest_faces(lat, lon, n, nbrs);
+
+return true;
+#else
+return false;
+#endif
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const std::vector<UGridNeighbors> *Grid::ugrid_neighbor_table(int n) const
+
+{
+
+#ifdef WITH_UGRID
+const auto ug = dynamic_cast<const UnstructuredGrid *>(rep.get());
+
+if ( ug )  return &(ug->Data.neighbor_table(n));
+#endif
+
+return nullptr;
 
 }
 

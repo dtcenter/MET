@@ -32,6 +32,8 @@
 #include "GridTemplate.h"
 #include "config_gaussian.h"
 
+#include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
 
 // Exponent used in distance weighted mean calculations
@@ -83,6 +85,32 @@ struct SurfaceInfo {
    bool need_topo() const;
 };
 
+////////////////////////////////////////////////////////////////////////
+
+//
+// Neighboring faces of an unstructured grid (UGRID), sorted by distance
+// from the closest to the farthest. The x index into the DataPlane is the
+// face index and y is always 0.
+//
+
+struct UGridNeighbors {
+
+   std::vector<int>    index;    // Face index
+   std::vector<double> dist_km;  // Distance from the target point (km)
+   std::vector<double> area_km2; // Face area (km^2), empty if unknown
+
+   void clear();
+   int  n() const;
+};
+
+inline void UGridNeighbors::clear() {
+   index.clear();
+   dist_km.clear();
+   area_km2.clear();
+}
+
+inline int UGridNeighbors::n() const { return static_cast<int>(index.size()); }
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Utility functions for horizontal interpolation on a DataPlane
@@ -121,6 +149,14 @@ extern double   interp_xy      (const DataPlane &, bool wrap_lon, int x, int y, 
 extern double   interp_best    (const DataPlane &dp, const GridTemplate &gt, int x, int y, double obs_v, double t, const MaskPlane *mp = nullptr);
 
 extern void     get_xy_ll      (double x, double y, int w, int h, int &x_ll, int &y_ll);
+
+// Unstructured grid version uses the N closest faces
+extern int      ugrid_interp_n_points(const int width, const GridTemplateFactory::GridTemplates shape);
+extern NumArray interp_ugrid_points  (const DataPlane &dp, const UGridNeighbors &nbrs, int n_points);
+extern double   interp_ugrid         (const DataPlane &dp, const UGridNeighbors &nbrs,
+                                      const InterpMthd mthd, int n_points,
+                                      double obs_v, const ClimoPntInfo *cpi,
+                                      double t, const SingleThresh *cat_thresh = nullptr);
 
 ///////////////////////////////////////////////////////////////////////////////
 //

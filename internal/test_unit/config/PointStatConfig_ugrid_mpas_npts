@@ -1,0 +1,178 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Point-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+model = "WRF";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+////////////////////////////////////////////////////////////////////////////////
+
+regrid = {
+   to_grid = NONE;
+   method  = NEAREST;
+   width   = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+obs_window = {
+   beg = ${BEG_DS};
+   end = ${END_DS};
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+mpr_column  = [];
+mpr_thresh  = [];
+cnt_thresh  = [ NA ];
+cnt_logic   = UNION;
+wind_thresh = [ NA ];
+wind_logic  = UNION;
+eclv_points = 0.05;
+
+
+fcst = {
+   sid_inc = [];
+   sid_exc = [];
+   obs_quality_inc  = [];
+   obs_quality_exc  = [];
+
+   field = [
+      { name = "temperature";  level = "P925";  message_type = "ADPSFC"; cat_thresh = [ >285 ]; }
+   ];
+
+}
+
+obs = {
+   sid_inc = [];
+   sid_exc = [];
+   obs_quality_inc  = [];
+   obs_quality_exc  = [];
+
+   field = [
+      { name = "TMP";  level = "P1000-500";  message_type = "ADPSFC"; cat_thresh = [ >285 ]; }
+   ];
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+climo_mean = obs;
+climo_mean = {
+   file_name = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+mask = {
+   grid  = [];
+   poly  = [];
+   sid   = [];
+   llpnt = [{ name = "ALLLATLON"; lat_thresh = NA;   lon_thresh = NA; }];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 200;
+   rng      = "mt19937";
+   seed     = "1";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+interp = {
+   vld_thresh = 1.0;
+   shape      = SQUARE;
+
+   //
+   // For the unstructured grid, the width and shape define the number of
+   // closest faces (N = 9 for width 3 SQUARE)
+   //
+   type = [
+      { method = NEAREST; width = 1; },
+      { method = UW_MEAN; width = 3; },
+      { method = DW_MEAN; width = 3; },
+      { method = AW_MEAN; width = 3; },
+      { method = MIN;     width = 3; },
+      { method = MAX;     width = 3; },
+      { method = MEDIAN;  width = 3; },
+      { method = BEST;    width = 3; }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+hira = {
+   flag            = TRUE;
+   width           = [ 2, 3 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [ >285 ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+output_flag = {
+   fho    = STAT;
+   ctc    = STAT;
+   cts    = STAT;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = NONE;
+   sl1l2  = STAT;
+   sal1l2 = NONE;
+   vl1l2  = NONE;
+   val1l2 = NONE;
+   vcnt   = NONE;
+   pct    = STAT;
+   pstd   = STAT;
+   pjc    = NONE;
+   prc    = NONE;
+   ecnt   = STAT;
+   orank  = NONE;
+   rps    = NONE;
+   eclv   = NONE;
+   mpr    = STAT;
+   seeps  = NONE;
+   seeps_mpr = NONE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Threshold for SEEPS p1 (Probability of being dry)
+
+seeps_p1_thresh = NA;
+
+////////////////////////////////////////////////////////////////////////////////
+// Unstructured Grid (optional ecept ugrid_dataset)
+
+ugrid_dataset = "mpas";
+//ugrid_max_distance_km = 30;
+//ugrid_map_config = "";
+ugrid_coordinates_file = "${MET_TEST_INPUT}/ugrid_data/mpas/static.2025-05-17.9506.OK_reduced.nc";
+
+////////////////////////////////////////////////////////////////////////////////
+
+duplicate_flag = NONE;
+rank_corr_flag = TRUE;
+
+point_weight_flag = NONE;
+
+tmp_dir       = "/tmp";
+output_prefix = "${OUTPUT_PREFIX}";
+
+////////////////////////////////////////////////////////////////////////////////

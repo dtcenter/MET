@@ -1871,6 +1871,10 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
    shc.set_interp_mthd(InterpMthd::Nbrhd,
                        conf_info.vx_opt[i_vx].hira_info.shape);
 
+   // Closest faces for an unstructured grid
+   const bool is_ugrid = grid.is_ugrid();
+   UGridNeighbors ugrid_nbrs;
+
    // Loop over the HiRA widths
    for(int i=0; i<conf_info.vx_opt[i_vx].hira_info.width.n(); i++) {
 
@@ -1901,6 +1905,12 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
                        pd_ptr->lvl_na[j], lvl_blw, lvl_abv);
 
+         // For an unstructured grid, find the closest faces
+         if(is_ugrid) {
+            grid.ugrid_closest_faces(pd_ptr->lat_na[j], -1.0*pd_ptr->lon_na[j],
+                                     gt->size(), ugrid_nbrs);
+         }
+
          // Get the nearby forecast values
          get_interp_points(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
             pd_ptr->x_na[j], pd_ptr->y_na[j],
@@ -1908,7 +1918,8 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
             conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
             conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
-            pd_ptr->lvl_na[j], lvl_blw, lvl_abv, f_ens);
+            pd_ptr->lvl_na[j], lvl_blw, lvl_abv, f_ens,
+            is_ugrid ? &ugrid_nbrs : nullptr);
 
          // Check for values
          if(f_ens.n() == 0) continue;
@@ -2065,6 +2076,10 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
    shc.set_interp_mthd(InterpMthd::Nbrhd,
                        conf_info.vx_opt[i_vx].hira_info.shape);
 
+   // Closest faces for an unstructured grid
+   const bool is_ugrid = grid.is_ugrid();
+   UGridNeighbors ugrid_nbrs;
+
    // Loop over categorical thresholds and HiRA widths
    for(int i=0; i<conf_info.vx_opt[i_vx].fcat_ta.n(); i++) {
 
@@ -2089,6 +2104,14 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
             ClimoPntInfo cpi(pd_ptr->fcmn_na[k], pd_ptr->fcsd_na[k],
                              pd_ptr->ocmn_na[k], pd_ptr->ocsd_na[k]);
 
+            // For an unstructured grid, find the closest faces
+            if(is_ugrid) {
+               grid.ugrid_closest_faces(pd_ptr->lat_na[k], -1.0*pd_ptr->lon_na[k],
+                  ugrid_interp_n_points(conf_info.vx_opt[i_vx].hira_info.width[j],
+                                        conf_info.vx_opt[i_vx].hira_info.shape),
+                  ugrid_nbrs);
+            }
+
             // Compute the fractional coverage forecast value using the
             // observation level value
             find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
@@ -2100,7 +2123,8 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                        conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
                        conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
                        conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
-                       pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);
+                       pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh,
+                       is_ugrid ? &ugrid_nbrs : nullptr);
 
             // Check for bad data
             if(is_bad_data(f_cov)) continue;
@@ -2119,7 +2143,8 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                              conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
                              conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
                              conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
-                             pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);
+                             pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh,
+                             is_ugrid ? &ugrid_nbrs : nullptr);
 
                // Check for bad data
                if(is_bad_data(ocmn_cov)) continue;

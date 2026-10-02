@@ -8,6 +8,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <algorithm>
+#include <atomic>
 #include <cstdlib>
 #include <iostream>
 #include <limits>
@@ -912,6 +914,181 @@ void get_xy_ll(double x, double y, int w, int h, int &x_ll, int &y_ll) {
    else         y_ll = nint(floor(y) - (h/2 - 1));
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Number of closest faces to be used for the unstructured grid. It
+// matches the number of points in the GridTemplate so the width and
+// shape in the interpolation options keep the same meaning.
+//
+////////////////////////////////////////////////////////////////////////
+
+int ugrid_interp_n_points(const int width,
+                          const GridTemplateFactory::GridTemplates shape) {
+   GridTemplateFactory gtf;
+   const auto gt = gtf.buildGT(shape, width, false);
+   return std::max(1, gt->size());
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Values at the closest n_points faces, bad data if not available.
+//
+////////////////////////////////////////////////////////////////////////
+
+NumArray interp_ugrid_points(const DataPlane &dp, const UGridNeighbors &nbrs,
+                             int n_points) {
+   NumArray points;
+   points.extend(n_points);
+
+   for(int i=0; i<n_points; i++) {
+      if(i < nbrs.n() && nbrs.index[i] >= 0 && nbrs.index[i] < dp.nx()) {
+         points.add(dp.get(nbrs.index[i], 0));
+      }
+      else {
+         points.add(bad_data_double);
+      }
+   }
+
+   return points;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Interpolate using the closest n_points faces of an unstructured grid.
+// The faces beyond the maximum distance are not included in nbrs and
+// count as missing data for the valid data threshold.
+//
+////////////////////////////////////////////////////////////////////////
+
+double interp_ugrid(const DataPlane &dp, const UGridNeighbors &nbrs,
+                    const InterpMthd mthd, int n_points,
+                    double obs_v, const ClimoPntInfo *cpi,
+                    double t, const SingleThresh *cat_thresh) {
+   const char *method_name = "interp_ugrid() -> ";
+   static std::atomic<bool> warned_no_area(false);
+
+   if(n_points < 1) n_points = 1;
+
+   // Nearest neighbor uses the closest face only
+   if(mthd == InterpMthd::Nearest) {
+      if(nbrs.n() == 0 || nbrs.index[0] < 0 || nbrs.index[0] >= dp.nx()) {
+         return bad_data_double;
+      }
+      return dp.get(nbrs.index[0], 0);
+   }
+
+   // Collect the valid data values
+   NumArray values;
+   vector<double> dists;
+   vector<double> areas;
+   bool has_area = !nbrs.area_km2.empty();
+   int n_use = std::min(n_points, nbrs.n());
+   for(int i=0; i<n_use; i++) {
+      int idx = nbrs.index[i];
+      if(idx < 0 || idx >= dp.nx()) continue;
+      double v = dp.get(idx, 0);
+      if(is_bad_data(v)) continue;
+      values.add(v);
+      dists.push_back(nbrs.dist_km[i]);
+      if(has_area) areas.push_back(nbrs.area_km2[i]);
+   }
+
+   // Check whether enough valid faces were found
+   int count = values.n();
+   if(count == 0 || ((double) count)/n_points < t) return bad_data_double;
+
+   double v = bad_data_double;
+   switch(mthd) {
+
+      case InterpMthd::Min:         // Minimum
+         v = values.min();
+         break;
+
+      case InterpMthd::Max:         // Maximum
+         v = values.max();
+         break;
+
+      case InterpMthd::Median:      // Median
+         v = values.percentile_array(0.50);
+         break;
+
+      case InterpMthd::UW_Mean:     // Unweighted Mean
+         v = values.mean();
+         break;
+
+      case InterpMthd::DW_Mean: {   // Distance-Weighted Mean
+         double wght_sum = 0.0;
+         double numerator = 0.0;
+         for(int i=0; i<count; i++) {
+            // If the distance is tiny (1 meter), just use the value at this face
+            if(dists[i] <= 0.001) return values[i];
+            double weight = pow(dists[i], -1*dw_mean_pow);
+            wght_sum  += weight;
+            numerator += weight * values[i];
+         }
+         v = numerator/wght_sum;
+         break;
+      }
+
+      case InterpMthd::AW_Mean: {   // Area-Weighted Mean
+         if(!has_area) {
+            if(!warned_no_area.exchange(true)) {
+               mlog << Warning << "\n" << method_name
+                    << "the face area is not available. "
+                    << interpmthd_to_string(mthd) << " is computed with "
+                    << "equal weights (same as "
+                    << interpmthd_uw_mean_str << ").\n\n";
+            }
+            v = values.mean();
+            break;
+         }
+         double wght_sum = 0.0;
+         double numerator = 0.0;
+         for(int i=0; i<count; i++) {
+            if(is_bad_data(areas[i]) || areas[i] <= 0.0) continue;
+            wght_sum  += areas[i];
+            numerator += areas[i] * values[i];
+         }
+         v = (wght_sum > 0.0 ? numerator/wght_sum : bad_data_double);
+         break;
+      }
+
+      case InterpMthd::Nbrhd: {     // Neighborhood fractional coverage
+         if(!cat_thresh) {
+            mlog << Error << "\n" << method_name
+                 << "the categorical threshold is required for "
+                 << interpmthd_to_string(mthd) << ".\n\n";
+            exit(1);
+         }
+         int count_thr = 0;
+         for(int i=0; i<count; i++) {
+            if(cat_thresh->check(values[i], cpi)) count_thr++;
+         }
+         v = (double) count_thr/count;
+         break;
+      }
+
+      case InterpMthd::Best: {      // Best Match
+         double min_d = bad_data_double;
+         for(int i=0; i<count; i++) {
+            if(is_bad_data(min_d) || fabs(values[i] - obs_v) < min_d) {
+               min_d = fabs(values[i] - obs_v);
+               v = values[i];
+            }
+         }
+         break;
+      }
+
+      default:
+         mlog << Error << "\n" << method_name
+              << "unsupported interpolation method for the unstructured grid: "
+              << interpmthd_to_string(mthd) << "(" << enum_class_as_int(mthd) << ")\n\n";
+         exit(1);
+   }
+
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////

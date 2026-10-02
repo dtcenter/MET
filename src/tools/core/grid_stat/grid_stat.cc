@@ -192,6 +192,9 @@ static void finish_txt_files();
 
 static void clean_up();
 
+static void smooth_vx_field(const DataPlane &, DataPlane &, InterpMthd,
+                            const InterpInfo *, int);
+
 static void usage(int exit_code=1);
 static void set_outdir(const StringArray &);
 static void set_compress(const StringArray &);
@@ -354,6 +357,14 @@ void process_command_line(int argc, char **argv) {
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.vx_opt[0].fcst_info->regrid(),
                         &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
+
+   // Check the smoothing methods for the unstructured grid
+   if(grid.is_ugrid()) {
+      for(int i=0; i<conf_info.get_n_vx(); i++) {
+         conf_info.vx_opt[i].interp_info.validate_ugrid(true,
+            "process_command_line() -> ");
+      }
+   }
 
    // Compute weight for each grid point
    parse_grid_weight(grid, conf_info.grid_weight_flag, wgt_dp);
@@ -855,9 +866,7 @@ void process_scores() {
          // If requested in the config file, smooth the forecast field
          if(interp->field == FieldType::Fcst ||
             interp->field == FieldType::Both) {
-            smooth_field(fcst_dp, fcst_dp_smooth, interp_mthd,
-                         interp->width[j], interp->shape, grid.wrap_lon(),
-                         interp->vld_thresh, interp->gaussian);
+            smooth_vx_field(fcst_dp, fcst_dp_smooth, interp_mthd, interp, j);
          }
          // Do not smooth the forecast field
          else {
@@ -867,9 +876,7 @@ void process_scores() {
          // If requested in the config file, smooth the observation field
          if(interp->field == FieldType::Obs ||
             interp->field == FieldType::Both) {
-            smooth_field(obs_dp, obs_dp_smooth, interp_mthd,
-                         interp->width[j], interp->shape, grid.wrap_lon(),
-                         interp->vld_thresh, interp->gaussian);
+            smooth_vx_field(obs_dp, obs_dp_smooth, interp_mthd, interp, j);
          }
          // Do not smooth the observation field
          else {
@@ -1065,9 +1072,7 @@ void process_scores() {
                // and climatology U-wind fields
                if(interp->field == FieldType::Fcst ||
                   interp->field == FieldType::Both) {
-                  smooth_field(fu_dp, fu_dp_smooth, interp_mthd,
-                               interp->width[j], interp->shape, grid.wrap_lon(),
-                               interp->vld_thresh, interp->gaussian);
+                  smooth_vx_field(fu_dp, fu_dp_smooth, interp_mthd, interp, j);
                }
                // Do not smooth the forecast field
                else {
@@ -1078,10 +1083,7 @@ void process_scores() {
                // U-wind field
                if(interp->field == FieldType::Obs ||
                   interp->field == FieldType::Both) {
-                  smooth_field(ou_dp, ou_dp_smooth,
-                               interp_mthd, interp->width[j],
-                               interp->shape,  grid.wrap_lon(),
-                               interp->vld_thresh, interp->gaussian);
+                  smooth_vx_field(ou_dp, ou_dp_smooth, interp_mthd, interp, j);
                }
                // Do not smooth the observation field
                else {
@@ -3213,6 +3215,35 @@ void finish_txt_files() {
             close_txt_file(txt_out[i], txt_file[i].c_str());
          }
       }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Smooth the field on the verification grid. For an unstructured grid,
+// use the closest faces of each face instead of the grid template.
+//
+////////////////////////////////////////////////////////////////////////
+
+void smooth_vx_field(const DataPlane &dp, DataPlane &smooth_dp,
+                     InterpMthd interp_mthd, const InterpInfo *interp, int j) {
+
+   // No smoothing for nearest neighbor (avoid building the neighbor table)
+   if(interp->width[j] == 1 && interp_mthd == InterpMthd::Nearest) {
+      smooth_dp = dp;
+   }
+   else if(grid.is_ugrid()) {
+      int n_points = ugrid_interp_n_points(interp->width[j], interp->shape);
+      smooth_field(dp, smooth_dp, interp_mthd,
+                   interp->width[j], interp->shape, interp->vld_thresh,
+                   *grid.ugrid_neighbor_table(n_points));
+   }
+   else {
+      smooth_field(dp, smooth_dp, interp_mthd,
+                   interp->width[j], interp->shape, grid.wrap_lon(),
+                   interp->vld_thresh, interp->gaussian);
    }
 
    return;

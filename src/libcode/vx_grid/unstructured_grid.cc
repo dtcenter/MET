@@ -122,6 +122,7 @@ void UnstructuredGrid::set_from_data(const UnstructuredData &data) {
    else {
       Data.set_points(Nx, data.points_XYZ);
    }
+   Data.face_area_km2 = data.face_area_km2;
 
 }
 
@@ -130,6 +131,7 @@ void UnstructuredGrid::set_from_data(const UnstructuredData &data) {
 void UnstructuredGrid::set_max_distance_km(double max_distance) {
 
    Data.max_distance_km = max_distance;
+   Data.nbr_table_n = 0;    // the cached neighbors depend on the max distance
 
 }
 
@@ -179,6 +181,12 @@ void UnstructuredGrid::xy_to_latlon(double x, double y, double &lat, double &lon
 double UnstructuredGrid::calc_area(int x, int y) const {
 
    double area = 0.;
+
+   // Face area (km^2) if available
+   if (x >= 0 && x < (int)Data.face_area_km2.size() &&
+       !is_bad_data(Data.face_area_km2[x])) {
+      area = Data.face_area_km2[x];
+   }
 
    return area;
 
@@ -429,6 +437,68 @@ IndexKDTree::ValueList UnstructuredData::closest_points(const double &lat, const
 };
 
 ////////////////////////////////////////////////////////////////////////
+// Find the n closest faces sorted by distance. The faces beyond
+// max_distance_km are excluded. The longitude is degrees west which
+// is the same as latlon_to_xy().
+
+void UnstructuredData::closest_faces(double lat, double lon, int n,
+                                     UGridNeighbors &nbrs, double alt_m) const {
+
+   nbrs.clear();
+   if (n < 1 || n_face < 1 || !kdtree) return;
+   if (n > n_face) n = n_face;
+
+   IndexKDTree::ValueList neighbor = closest_points(lat, lon, n, alt_m);
+   bool has_area = (face_area_km2.size() == static_cast<size_t>(n_face));
+
+   nbrs.index.reserve(neighbor.size());
+   nbrs.dist_km.reserve(neighbor.size());
+   if (has_area) nbrs.area_km2.reserve(neighbor.size());
+   for (const auto &x : neighbor) {
+      double distance_km = x.distance()/1000.;
+      if (!is_in_distance(distance_km)) continue;
+      int index = x.payload();
+      nbrs.index.push_back(index);
+      nbrs.dist_km.push_back(distance_km);
+      if (has_area) nbrs.area_km2.push_back(face_area_km2[index]);
+   }
+
+   if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
+        << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredData::closest_faces() "
+        << "input=(" << lat << ", " << lon << ") requested " << n
+        << " faces, found " << nbrs.n() << " within the max distance\n";
+}
+
+////////////////////////////////////////////////////////////////////////
+// The n closest faces for each face, used to smooth the gridded field.
+// It is cached and rebuilt only when n changes.
+
+const std::vector<UGridNeighbors> &UnstructuredData::neighbor_table(int n) const {
+
+   if (n == nbr_table_n && nbr_table.size() == static_cast<size_t>(n_face)) {
+      return nbr_table;
+   }
+
+   mlog << Debug(4) << "UnstructuredData::neighbor_table() "
+        << "finding " << n << " closest faces for " << n_face << " faces\n";
+
+   nbr_table.clear();
+   nbr_table.resize(n_face);
+   for (int i=0; i<n_face; i++) {
+      if (has_PointLatLon()) {
+         closest_faces(points_lonlat[i].y(), points_lonlat[i].x(), n, nbr_table[i]);
+      }
+      else {
+         closest_faces(points_XYZ[i].y(), points_XYZ[i].x(), n, nbr_table[i],
+                       points_XYZ[i].z());
+      }
+   }
+   nbr_table_n = n;
+
+   return nbr_table;
+}
+
+////////////////////////////////////////////////////////////////////////
 
 void UnstructuredData::copy_from(const UnstructuredData &us_data) {
    if (us_data.has_PointLatLon()) {
@@ -440,6 +510,7 @@ void UnstructuredData::copy_from(const UnstructuredData &us_data) {
    n_edge = us_data.n_edge;
    n_node = us_data.n_node;
    max_distance_km = us_data.max_distance_km;
+   face_area_km2 = us_data.face_area_km2;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -454,6 +525,7 @@ void UnstructuredData::copy_from(const UnstructuredData *us_data) {
    n_edge = us_data->n_edge;
    n_node = us_data->n_node;
    max_distance_km = us_data->max_distance_km;
+   face_area_km2 = us_data->face_area_km2;
 }
 
 ////////////////////////////////////////////////////////////////////////

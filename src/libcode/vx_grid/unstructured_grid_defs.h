@@ -24,6 +24,8 @@
 #include "atlas/util/Geometry.h"
 #include "atlas/util/KDTree.h"
 
+#include "interp_util.h"   // UGridNeighbors
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -45,7 +47,12 @@ struct UnstructuredData {
    std::vector<atlas::PointLonLat> points_lonlat;
    std::vector<atlas::PointXYZ> points_XYZ;     // lat_deg, lon_der, alt_meters
    std::vector<atlas::PointXYZ> points_XYZ_km;  // x_km, y_km, z_km
+   std::vector<double> face_area_km2;           // optional, empty if unknown
    std::unique_ptr<atlas::util::IndexKDTree> kdtree;
+
+   // Cached closest faces for every face (built on demand)
+   mutable int nbr_table_n;
+   mutable std::vector<UGridNeighbors> nbr_table;
 
    UnstructuredData();
    ~UnstructuredData();
@@ -66,6 +73,10 @@ struct UnstructuredData {
    atlas::util::IndexKDTree::ValueList closest_points(
         const double &lat, const double &lon, const size_t &k,
         const double &alt_m=bad_data_double) const;
+   void closest_faces(double lat, double lon, int n,
+                      UGridNeighbors &nbrs,
+                      double alt_m=bad_data_double) const;
+   const std::vector<UGridNeighbors> &neighbor_table(int n) const;
 
 
    void dump() const;

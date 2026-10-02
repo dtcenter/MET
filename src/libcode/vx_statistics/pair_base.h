@@ -312,6 +312,13 @@ class VxPairBase {
 
       //////////////////////////////////////////////////////////////////
 
+      // Unstructured grid: closest faces to the current observation
+      bool           use_ugrid_nbrs; // True for an unstructured grid
+      int            ugrid_n_max;    // Max number of faces for all interp methods
+      UGridNeighbors ugrid_nbrs;     // Closest faces, sorted by distance
+
+      //////////////////////////////////////////////////////////////////
+
       int n_msg_typ;             // Number of verifying message types
 
       int n_mask;                // Total number of masking regions
@@ -478,7 +485,8 @@ extern double compute_interp(const DataPlaneArray &dpa,
                              const double thresh,
                              const bool spfh_flag, const LevelType lvl_typ,
                              const double to_lvl, const int i_blw, const int i_abv,
-                             const SingleThresh *cat_thresh = 0);
+                             const SingleThresh *cat_thresh = 0,
+                             const UGridNeighbors *ugrid_nbrs = nullptr);
 
 extern void get_interp_points(const DataPlaneArray &dpa,
                               const double obs_x, const double obs_y,
@@ -488,7 +496,8 @@ extern void get_interp_points(const DataPlaneArray &dpa,
                               const double thresh,
                               const bool spfh_flag, const LevelType lvl_typ,
                               const double to_lvl, const int i_blw, const int i_abv,
-                              NumArray &interp_points);
+                              NumArray &interp_points,
+                              const UGridNeighbors *ugrid_nbrs = nullptr);
 
 extern bool set_climo_flag(const NumArray &, const NumArray &);
 

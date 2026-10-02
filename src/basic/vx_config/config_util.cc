@@ -1824,6 +1824,53 @@ void InterpInfo::validate() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//
+// The unstructured grid uses the N closest faces instead of the grid
+// template. Methods that need the regular grid structure (bilinear,
+// least-squares fit, grid box corners, Gaussian filters, geography
+// match) are not supported. The distance-weighted mean is not supported
+// for smoothing since each face is its own closest face.
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void InterpInfo::validate_ugrid(bool smoothing, const char *caller) const {
+
+   for(int i=0; i<n_interp; i++) {
+
+      InterpMthd methodi = string_to_interpmthd(method[i].c_str());
+
+      bool supported = (methodi == InterpMthd::Nearest ||
+                        methodi == InterpMthd::Min     ||
+                        methodi == InterpMthd::Max     ||
+                        methodi == InterpMthd::Median  ||
+                        methodi == InterpMthd::UW_Mean ||
+                        methodi == InterpMthd::AW_Mean);
+
+      if(!smoothing) {
+         supported = supported ||
+                     methodi == InterpMthd::DW_Mean ||
+                     methodi == InterpMthd::Best;
+      }
+
+      if(!supported) {
+         ConcatString choices;
+         choices << interpmthd_nearest_str << ", " << interpmthd_min_str << ", "
+                 << interpmthd_max_str << ", " << interpmthd_median_str << ", "
+                 << interpmthd_uw_mean_str << ", ";
+         if(!smoothing) choices << interpmthd_dw_mean_str << ", ";
+         choices << interpmthd_aw_mean_str;
+         if(!smoothing) choices << ", " << interpmthd_best_str;
+
+         mlog << Error << "\n" << caller
+              << "the \"" << method[i] << "\" interpolation method is not "
+              << "supported for the unstructured grid. Choose from "
+              << choices << ".\n\n";
+         exit(1);
+      }
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 InterpInfo & InterpInfo::operator=(const InterpInfo &a) noexcept {
    if(this != &a) {
