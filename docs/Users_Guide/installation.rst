@@ -56,7 +56,7 @@ verification use and compiler language:
   if compiling support for Python embedding
 * `ecKit <https://github.com/ecmwf/eckit>`_
   Library, if compiling support for unstructured grids
-* `ATLAS <https://math-atlas.sourceforge.net/>`_
+* `ATLAS <https://github.com/ecmwf/atlas>`_
   Library, if compiling support for unstructured grids
 * `HDF4 <https://www.hdfgroup.org/download/hdf4/>`__
   library if compiling the MODIS-Regrid or lidar2nc tool
