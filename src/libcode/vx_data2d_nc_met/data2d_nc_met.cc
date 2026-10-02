@@ -68,7 +68,7 @@ MetNcMetDataFile & MetNcMetDataFile::operator=(const MetNcMetDataFile &) {
 
 void MetNcMetDataFile::nc_met_init_from_scratch() {
 
-   MetNc  = (MetNcFile *) nullptr;
+   MetNc.reset();
 
    close();
 
@@ -79,7 +79,7 @@ void MetNcMetDataFile::nc_met_init_from_scratch() {
 
 void MetNcMetDataFile::close() {
 
-   if(MetNc) { delete MetNc; MetNc = (MetNcFile *) nullptr; }
+   MetNc.reset();
 
    return;
 }
@@ -90,7 +90,7 @@ bool MetNcMetDataFile::open(const char * _filename) {
 
    close();
 
-   MetNc = new MetNcFile;
+   MetNc = std::make_unique<MetNcFile>();
 
    if(!MetNc->open(_filename)) {
       mlog << Error << "\nMetNcMetDataFile::open(const char *) -> "
@@ -102,11 +102,11 @@ bool MetNcMetDataFile::open(const char * _filename) {
 
    Filename = _filename;
 
-   Raw_Grid = new Grid;
+   Raw_Grid = std::make_unique<Grid>();
 
    *(Raw_Grid) = MetNc->grid;
 
-   Dest_Grid = new Grid;
+   Dest_Grid = std::make_unique<Grid>();
 
    (*Dest_Grid) = (*Raw_Grid);
 
@@ -137,11 +137,11 @@ void MetNcMetDataFile::set_range_azimuth_grid_center(int i_track_point) {
    if(i_track_point < 0) {
 
       // RMW-Analysis writes TrackLat_mean and TrackLon_mean variables
-      if(has_var(MetNc->Nc, "TrackLat_mean") &&
-         has_var(MetNc->Nc, "TrackLon_mean")) {
-         NcVar var_lat = get_nc_var(MetNc->Nc, "TrackLat_mean");
+      if(has_var(MetNc->Nc.get(), "TrackLat_mean") &&
+         has_var(MetNc->Nc.get(), "TrackLon_mean")) {
+         NcVar var_lat = get_nc_var(MetNc->Nc.get(), "TrackLat_mean");
          var_lat.getVar(&d.lat_center);
-         NcVar var_lon = get_nc_var(MetNc->Nc, "TrackLon_mean");
+         NcVar var_lon = get_nc_var(MetNc->Nc.get(), "TrackLon_mean");
          var_lon.getVar(&d.lon_center);
          d.lon_center *= -1.0;
       }
@@ -153,20 +153,20 @@ void MetNcMetDataFile::set_range_azimuth_grid_center(int i_track_point) {
       vector<size_t> count(1, 1);
 
       // TC-RMW writes FullTrackLat and FullTrackLon variables
-      if(has_var(MetNc->Nc, "FullTrackLat") &&
-         has_var(MetNc->Nc, "FullTrackLon")) {
-         NcVar var_lat = get_nc_var(MetNc->Nc, "FullTrackLat");
+      if(has_var(MetNc->Nc.get(), "FullTrackLat") &&
+         has_var(MetNc->Nc.get(), "FullTrackLon")) {
+         NcVar var_lat = get_nc_var(MetNc->Nc.get(), "FullTrackLat");
          var_lat.getVar(start, count, &d.lat_center);
-         NcVar var_lon = get_nc_var(MetNc->Nc, "FullTrackLon");
+         NcVar var_lon = get_nc_var(MetNc->Nc.get(), "FullTrackLon");
          var_lon.getVar(start, count, &d.lon_center);
          d.lon_center *= -1.0;
       }
       // TC-Diag writes TrackLat and TrackLon variables
-      else if(has_var(MetNc->Nc, "TrackLat") &&
-              has_var(MetNc->Nc, "TrackLon")) {
-         NcVar var_lat = get_nc_var(MetNc->Nc, "TrackLat");
+      else if(has_var(MetNc->Nc.get(), "TrackLat") &&
+              has_var(MetNc->Nc.get(), "TrackLon")) {
+         NcVar var_lat = get_nc_var(MetNc->Nc.get(), "TrackLat");
          var_lat.getVar(start, count, &d.lat_center);
-         NcVar var_lon = get_nc_var(MetNc->Nc, "TrackLon");
+         NcVar var_lon = get_nc_var(MetNc->Nc.get(), "TrackLon");
          var_lon.getVar(start, count, &d.lon_center);
          d.lon_center *= -1.0;
       }
@@ -191,25 +191,26 @@ void MetNcMetDataFile::set_range_azimuth_times(int i_track_point, DataPlane &pla
    vector<size_t> count(1, 1);
 
    // Initialization time
-   NcVar var_init = get_nc_var(MetNc->Nc, "init_time");
+   NcVar var_init = get_nc_var(MetNc->Nc.get(), "init_time");
    var_init.getVar(&ymd_hms_str);
    plane.set_init(timestring_to_unix(ymd_hms_str.c_str()));
 
    // Valid time
-   NcVar var_valid = get_nc_var(MetNc->Nc, "valid_time");
+   NcVar var_valid = get_nc_var(MetNc->Nc.get(), "valid_time");
    var_valid.getVar(start, count, &ymd_hms_str);
    plane.set_valid(timestring_to_unix(ymd_hms_str.c_str()));
 
    // Lead time
    int lead_sec;
-   NcVar var_lead = get_nc_var(MetNc->Nc, "lead_time_sec");
+   NcVar var_lead = get_nc_var(MetNc->Nc.get(), "lead_time_sec");
    var_lead.getVar(start, count, &lead_sec);
    plane.set_lead(lead_sec);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
+bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
+                                  bool do_winds) {
    bool status = false;
    ConcatString req_time_str, data_time_str;
    VarInfoNcMet * vinfo_nc = (VarInfoNcMet *) &vinfo;
@@ -236,6 +237,14 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    status = MetNc->data(vinfo_nc->req_name().c_str(),
                         vinfo_nc->dimension(),
                         plane, info);
+
+   // Assume that winds in MET output files are earth-relative
+   vinfo_nc->set_grid_relative_flag(false);
+
+   // Attempt to derive the data
+   if(!status && do_winds) {
+      status = derive_winds(vinfo_nc, plane);
+   }
 
    // Check that the times match those requested
    if(status) {
@@ -277,7 +286,10 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
          status = false;
       }
 
-      status = process_data_plane(&vinfo, plane);
+      // Handle wind rotation
+      if(status && do_winds) status = rotate_winds(&vinfo, plane);
+
+      if(status) status = process_data_plane(&vinfo, plane);
 
       // Set the VarInfo object's name, long_name, level, and units strings
       if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
@@ -293,7 +305,8 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 ////////////////////////////////////////////////////////////////////////
 
 int MetNcMetDataFile::data_plane_array(VarInfo &vinfo,
-                                       DataPlaneArray &plane_array) {
+                                       DataPlaneArray &plane_array,
+                                       bool do_winds) {
    bool status = false;
    int n_rec = 0;
    DataPlane plane;
@@ -302,7 +315,7 @@ int MetNcMetDataFile::data_plane_array(VarInfo &vinfo,
    plane_array.clear();
 
    // Can only read a single 2D data plane from a MET NetCDF file
-   status = data_plane(vinfo, plane);
+   status = data_plane(vinfo, plane, do_winds);
 
    // Add the data plane to the DataPlaneArray with no level values
    if(status) {

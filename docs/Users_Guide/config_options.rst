@@ -373,6 +373,13 @@ values and randomly perturbed ensemble member values. Values less than MIN are
 reset to the minimum value and values greater than MAX are reset to the maximum
 value. A value of NA indicates that the variable is unbounded.
 
+If the observation error table contains no entries for the variable being
+evaluated, MET prints a warning message and disables the observation error
+logic. If the table does contain entries for the variable, but the lookup for
+an individual observation fails, that observation is excluded from the analysis.
+This situation would occur, for example, when the observation value falls outside
+the range of values in the VAL_RANGE column.
+
 MET_GRIB_TABLES
 ---------------
 
@@ -401,7 +408,7 @@ The following lines consist of 4 integers followed by 3 strings:
 
 References:
 | `Office Note 388 GRIB1 <http://www.nco.ncep.noaa.gov/pmb/docs/on388>`_
-| `A Guide to the Code Form FM 92-IX Ext. GRIB Edition 1 <http://www.wmo.int/pages/prog/www/WMOCodes/Guides/GRIB/GRIB1-Contents.html>`_
+| `A Guide to the Code Form FM 92-IX Ext. GRIB Edition 1 <https://community.wmo.int/site/knowledge-hub/programmes-and-initiatives/wmo-information-system-wis/grib-edition-1>`_
 
 
 GRIB2 table files begin with "grib2" prefix and end with a ".txt" suffix.
@@ -660,6 +667,41 @@ Some tools override the temporary directory by the command line argument
 
 A description of the use of temporary files in MET can be found in
 :numref:`Contributor's Guide Section %s <tmp_file_use>`.
+
+.. _config_wind_field_names:
+
+wind_field_names
+----------------
+
+As described in :numref:`PS_wind_rotation_derivation`, MET can automatically
+derive wind variables and also rotate them from being grid-relative to earth-relative.
+Logic is provided for each supported input file type to identify input wind components
+and determine whether they are defined as being grid-relative or earth-relative.
+
+The following configuration options can be set to refine the metadata, when needed:
+
+.. code-block:: none
+
+  is_u_wind         = boolean;
+  is_v_wind         = boolean;
+  is_grid_relative  = boolean;
+  is_wind_speed     = boolean;
+  is_wind_direction = boolean;
+
+When deriving and rotating winds, MET searches the input file for matching wind
+components. That search is driven by the following configuration options and
+default values found in the "data/config/ConfigConstants" file:
+
+.. code-block:: none
+
+  u_wind_field_name = "UGRD,U";
+  v_wind_field_name = "VGRD,V";
+  wind_speed_field_name = "WIND,SP";
+  wind_direction_field_name = "WDIR,DD";
+
+Each is a comma-separated list of wind variable names to be searched. Users can
+explicity set these options to configure what data should be used in the wind
+derivation and rotation logic.
 
 message_type_group_map
 ----------------------
@@ -2409,7 +2451,7 @@ used by the World Meteorological Organization (WMO) can be found in "ConfigConst
   WMO_DPT2M_LAPSE_RATE_K_per_M = 0.0012;
 
 Note that the lapse rate value depends on the units of temperature and elevation
-and the user is responsibile for defining it appropriately.
+and the user is responsible for defining it appropriately.
 
 All "lapse_rate_correction" entries can be set separately in each "obs.field" entry.
 

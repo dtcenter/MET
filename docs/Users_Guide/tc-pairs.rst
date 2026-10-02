@@ -43,7 +43,7 @@ Diagnostics from the SHIPS Development Datasets (SHIPS_DIAG_DEV) will be support
 
 A future version of MET will also allow the CIRA model diagnostics to be computed directly from model forecast fields. Until then, users may obtain the SHIPS diagnostics at the following locations:
 
-  * SHIPS_DIAG_DEV: https://rammb2.cira.colostate.edu/research/tropical-cyclones/ships/#DevelopmentalData
+  * SHIPS_DIAG_DEV: https://rammb2.cira.colostate.edu/research/tropical-cyclones/ships/development_data
 
   * SHIPS_DIAG_RT: https://ftp.nhc.noaa.gov/atcf/lsdiag/
 

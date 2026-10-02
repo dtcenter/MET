@@ -36,8 +36,8 @@ ConcatString get_grib_code_list_str(int k, int grib_code, int ptv)
 {
 
    //  look up the name in the grib tables
-   Grib1TableEntry tab;
-   if( !GribTable.lookup_grib1(grib_code, ptv, tab) ){
+   vector<Grib1TableEntry> matches;
+   if(GribTable.lookup_grib1(grib_code, ptv, matches) == 0){
       mlog << Error << "\nget_grib_code_list_str() - unrecognized GRIB1 code "
            << grib_code << " and/or table version " << ptv << "\n\n";
       exit(1);
@@ -45,9 +45,9 @@ ConcatString get_grib_code_list_str(int k, int grib_code, int ptv)
 
    //  return the requested field
    switch(k) {
-      case 0:  return tab.full_name;      // GRIB Code Name
-      case 1:  return tab.units;          // GRIB Code Unit
-      case 2:  return tab.parm_name;      // GRIB Code Abbreviation
+      case 0:  return matches[0].full_name;      // GRIB Code Name
+      case 1:  return matches[0].units;          // GRIB Code Unit
+      case 2:  return matches[0].parm_name;      // GRIB Code Abbreviation
       default:
          mlog << Error << "\nget_grib_code_list_str() - unexpected value for k: "
               << k << "\n\n";
@@ -246,14 +246,14 @@ int str_to_grib_code(const char *c, int ptv)
    if( check_reg_exp("[0-9]+", c) ) return atoi(c);
 
    //  look up the name in the grib tables
-   int n_matches;
-   Grib1TableEntry tab;
-   if( !GribTable.lookup_grib1(c, ptv, bad_data_int,
-                               default_grib1_center, default_grib1_subcenter,
-                               tab, n_matches) )
+   vector<Grib1TableEntry> matches;
+   if(GribTable.lookup_grib1(c, ptv, bad_data_int,
+                             default_grib1_center, default_grib1_subcenter,
+                             matches) == 0) {
       return bad_data_int;
+   }
 
-   return tab.code;
+   return matches[0].code;
 
 }
 

@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <cmath>
 #include <vx_data2d.h>
+#include <vector>
 
 #include "data2d_grib_utils.h"
 #include "angles.h"
@@ -43,18 +44,19 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    unixtime ut, init_ut, valid_ut;
    const char *method_name = "is_prelim_match() -> ";
 
-   int p_code, code_for_lookup= vinfo.field_rec ();
+   int p_code;
+   int code_for_lookup = vinfo.field_rec();
    double p_thresh_lo, p_thresh_hi;
 
-   Section1_Header *pds = (Section1_Header *) g.pds;
+   Section1_Header *pds = (Section1_Header *) g.pds.data();
 
    ConcatString field_name = vinfo.name();
 
    // clean up the code - except for code 33 and 34 (UGRID and VGRID)
    // and name WIND when we derive wind speed and direction
    bool is_lookup_for_wind_components =
-      ( vinfo.code () == ugrd_grib_code || \
-        vinfo.code () == vgrd_grib_code ) && \
+      ( vinfo.code () == ugrd_grib_code ||
+        vinfo.code () == vgrd_grib_code ) &&
       field_name == "WIND";
    if ( is_lookup_for_wind_components)
    {
@@ -62,9 +64,9 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
       field_name.clear ();
       code_for_lookup = vinfo.code ();
    }
-   vinfo.set_code (bad_data_int);
-   vinfo.units ().clear ();
-   vinfo.long_name ().clear ();
+   vinfo.set_code(bad_data_int);
+   vinfo.units().clear();
+   vinfo.long_name().clear();
 
    //
    //  check ptv
@@ -110,16 +112,15 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
             vinfo_ens_type = 2;
          }
 
-         char *ens_number_str = new char[vinfo_ens.length()];
-         m_strncpy(ens_number_str, vinfo_ens.text()+1,
+         vector<char> ens_number_str(vinfo_ens.length());
+         m_strncpy(ens_number_str.data(), vinfo_ens.text()+1,
                  (size_t) vinfo_ens.length(), method_name);
          ens_number_str[vinfo_ens.length()-1] = (char) 0;
 
          // if the string is numeric
-         if( check_reg_exp("^[0-9]*$", ens_number_str) ) {
-            vinfo_ens_number= atoi(ens_number_str);
+         if( check_reg_exp("^[0-9]*$", ens_number_str.data()) ) {
+            vinfo_ens_number= atoi(ens_number_str.data());
          }
-         delete[] ens_number_str;
 
          // if one of the parameters was not set - error
          if( is_bad_data(vinfo_ens_number) ||
@@ -155,22 +156,21 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    // if it is one of APCP names - (APCP_Z0) - use 'APCP' only
    if ( check_reg_exp("^APCP_[0-9]*$", field_name.c_str()) )  field_name = "APCP";
 
-   Grib1TableEntry tab;
-   int tab_match = -1;
+   vector<Grib1TableEntry> matches;
 
    // if the name is specified, use it
    if( !field_name.empty() ) {
 
       //  look up the name in the grib tables
-      if( !GribTable.lookup_grib1(field_name.c_str(), vinfo_ptv, code_for_lookup, vinfo_center, vinfo_subcenter, tab, tab_match) )
-      {
-         //  if did not find with params from the header - try default
-         if( !GribTable.lookup_grib1(field_name.c_str(), default_grib1_ptv, code_for_lookup, default_grib1_center, default_grib1_subcenter, tab, tab_match) )
-         {
-            //  if the lookup still fails, then it's not a match
-            return false;
-         }
+      //  if did not find with params from the header - try default
 
+      if(GribTable.lookup_grib1(field_name.c_str(), vinfo_ptv, code_for_lookup,
+                                vinfo_center, vinfo_subcenter, matches) == 0 &&
+         GribTable.lookup_grib1(field_name.c_str(), default_grib1_ptv, code_for_lookup,
+                                default_grib1_center, default_grib1_subcenter, matches) == 0)
+      {
+         //  if both lookups fail, then it's not a match
+         return false;
       }
 
    }
@@ -187,22 +187,23 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
       }
 
       //  use the specified indexes to look up the field name
-      if( !GribTable.lookup_grib1(code_for_lookup, vinfo_ptv, vinfo_center, vinfo_subcenter,tab) ) {
-         //if did not find with params from the header - try default
-         if( !GribTable.lookup_grib1(code_for_lookup, default_grib1_ptv, default_grib1_center, default_grib1_subcenter, tab) )
-         {
-            mlog << Error << "\n" << method_name
-                 << "no parameter found with matching GRIB1_ptv ("
-                 << vinfo_ptv << ") " << "GRIB1_code ("
-                 << vinfo.field_rec() << "). Use the MET_GRIB_TABLES "
-                 << "environment variable to define custom GRIB tables.\n\n";
-            exit(1);
-         }
+      //  if did not find with params from the header - try default
+      if(GribTable.lookup_grib1(code_for_lookup, vinfo_ptv,
+                                vinfo_center, vinfo_subcenter, matches) == 0 &&
+         GribTable.lookup_grib1(code_for_lookup, default_grib1_ptv,
+                                default_grib1_center, default_grib1_subcenter, matches) == 0)
+      {
+         mlog << Error << "\n" << method_name
+              << "no parameter found with matching GRIB1_ptv ("
+              << vinfo_ptv << ") " << "GRIB1_code ("
+              << vinfo.field_rec() << "). Use the MET_GRIB_TABLES "
+              << "environment variable to define custom GRIB tables.\n\n";
+         exit(1);
       }
    }
-   vinfo.set_code      ( tab.code         );
-   vinfo.set_units     ( tab.units.c_str());
-   vinfo.set_long_name ( tab.full_name.c_str()    );
+   vinfo.set_code      ( matches[0].code);
+   vinfo.set_units     ( matches[0].units.c_str());
+   vinfo.set_long_name ( matches[0].full_name.c_str());
 
    //
    //  test the level type number, if specified
@@ -579,7 +580,7 @@ void read_pds(const GribRecord &r, int &bms_flag,
    unsigned char pp1[2];
    Section1_Header *pds = (Section1_Header *) nullptr;
 
-   pds = (Section1_Header *) r.pds;
+   pds = (Section1_Header *) r.pds.data();
 
    //
    // Check PDS for flag for the presence of a GDS and BMS section
@@ -753,7 +754,7 @@ void read_pds_prob(const GribRecord &r, int &p_code,
    int len;
    double t1, t2;
 
-   Section1_Header *pds = (Section1_Header *) r.pds;
+   Section1_Header *pds = (Section1_Header *) r.pds.data();
 
    // Initialize
    p_code = 0;
@@ -789,7 +790,7 @@ void read_pds_level(const GribRecord & g, int &lower, int &upper, int &type)
 {
 int j;
 
-Section1_Header *pds = (Section1_Header *) g.pds;
+Section1_Header *pds = (Section1_Header *) g.pds.data();
 
    //
    //  find the level information for this record

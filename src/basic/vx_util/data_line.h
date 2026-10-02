@@ -18,6 +18,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -192,7 +193,7 @@ class LineDataFile {
       LineDataFile();
       virtual ~LineDataFile();
 
-      std::ifstream * in;
+      std::unique_ptr<std::ifstream> in;
 
       int open(const char *);
 

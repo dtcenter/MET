@@ -6,60 +6,25 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
+////////////////////////////////////////////////////////////////////////
+
+#ifndef  __MET_GSL_FFT2D_H__
+#define  __MET_GSL_FFT2D_H__
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <vector>
 
-#ifndef  __MINIMUM_INTERPOLATOR_H__
-#define  __MINIMUM_INTERPOLATOR_H__
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-#include "interp_base.h"
-
+#include "vx_util.h"
+#include "gsl/gsl_fft_real.h"
 
 ////////////////////////////////////////////////////////////////////////
 
-
-class Min_Interp : public Interpolator {
-
-   private:
-
-      void init_from_scratch();
-
-      void assign(const Min_Interp &);
-
-   public:
-
-      Min_Interp();
-     ~Min_Interp();
-
-      Min_Interp(const Min_Interp &);
-      Min_Interp & operator=(const Min_Interp &);
-
-      void clear();
-
-         //
-         //  from the base class
-         //
-
-      InterpolationValue operator()(double x, double y) const;
-
-      Interpolator * copy() const;
-
-      void dump(std::ostream &, int = 0) const;
-
-};
-
+extern void dct_typeII_2d(double *data, int ncol, int nrow);
 
 ////////////////////////////////////////////////////////////////////////
 
-
-#endif   /*  __MINIMUM_INTERPOLATOR_H__  */
-
+#endif   /*  __MET_GSL_FFT2D_H__  */
 
 ////////////////////////////////////////////////////////////////////////
-
 

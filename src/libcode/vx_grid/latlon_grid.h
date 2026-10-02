@@ -27,11 +27,23 @@ class LatLonGrid : public GridRep {
 
       friend class Grid;
 
+         //
+         //  Key is private, so only Grid and LatLonGrid itself can create
+         //  one.  It lets the constructors below be public - which is
+         //  what std::make_unique needs - without opening grid
+         //  construction up to the rest of the code.
+         //
+
+      struct Key { explicit Key() = default; };
+
+   public:
+
+     ~LatLonGrid();
+      LatLonGrid(const LatLonData &, Key);
+
    protected:
 
       LatLonGrid();
-     ~LatLonGrid();
-      LatLonGrid(const LatLonData &);
 
       double lat_ll;
       double lon_ll;
@@ -81,7 +93,7 @@ class LatLonGrid : public GridRep {
 
       void shift_right(int);
 
-      GridRep * copy() const;
+      std::unique_ptr<GridRep> copy() const;
 
 };
 
@@ -89,7 +101,7 @@ class LatLonGrid : public GridRep {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double LatLonGrid::scale_km() const { return -1.0;    }
+inline double LatLonGrid::scale_km() const { return delta_lat * M_PI * grib_earth_radius_km / 180.0; }
 inline bool   LatLonGrid::wrap_lon() const { return wrapLon; }
 
 

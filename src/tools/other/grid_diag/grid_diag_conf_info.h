@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <iostream>
 
 #include "vx_config.h"
@@ -32,12 +33,14 @@ struct GridDiagNcOutInfo {
    bool do_hist1d;
    bool do_hist2d;
    bool do_info_theory;
+   bool do_power_spectrum;
 
    GridDiagNcOutInfo();
 
    void clear();   // sets everything to true
 
    bool all_false() const;
+   bool do_hist() const;
 
    void set_all_false();
    void set_all_true();
@@ -59,7 +62,10 @@ class GridDiagConfInfo {
       ConcatString version;        // Config file version
       ConcatString desc;           // Data description
 
-      std::vector<VarInfo *> data_info; // VarInfo pointer array [n_data]
+      std::vector<std::unique_ptr<VarInfo>> data_info; // [n_data]
+
+      // Power spectrum options
+      std::vector<PowerSpectrumInfo> ps_info; // [n_data]
 
       // Masking region names and MaskPlanes
       StringArray mask_name;
@@ -74,7 +80,7 @@ class GridDiagConfInfo {
 
       void read_config(const char *, const char *);
       void set_n_data();
-      void process_config(std::vector<GrdFileType>);
+      void process_config(std::vector<GrdFileType>, Grid &);
       void parse_output_flag();
       void process_masks(const Grid &);
 

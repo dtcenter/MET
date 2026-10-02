@@ -81,6 +81,7 @@
 //   048    10/15/24  Halley Gotway  MET #2893 Write individual pair OBTYPE.
 //   049    09/11/25  Halley Gotway  MET #3174 Orographic corrections.
 //   050    01/27/26  Halley Gotway  MET #3298 Add the FULL grid, if needed
+//   051    09/04/26  Halley Gotway  MET #3426 and #3429 Observation error
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -115,6 +116,7 @@
 #ifdef WITH_PYTHON
 #include "data2d_nc_met.h"
 #include "pointdata_python.h"
+#include <memory>
 #endif
 
 using namespace std;
@@ -143,7 +145,9 @@ static void process_grid_scores   (int,
                const DataPlane &, const DataPlane &,
                const DataPlane &, const DataPlane &,
                const DataPlane &, const MaskPlane &,
-               ObsErrorEntry *,   PairDataEnsemble &);
+               const ObsErrorEntry *,
+               const std::vector<const ObsErrorEntry *> &,
+               PairDataEnsemble &);
 
 static void do_ecnt              (const EnsembleStatVxOpt &,
                                   const SingleThresh &,
@@ -439,7 +443,7 @@ static void process_command_line(int argc, char **argv) {
    mlog << Debug(1) << "Ensemble Files["
         << n_ens_files << "]:\n";
    for(int i=0; i<n_ens_files; i++) {
-      mlog << "   " << ens_file_list[i] << "\n";
+      mlog << Debug(1) << "   " << ens_file_list[i] << "\n";
    }
 
    // List the control member file
@@ -451,7 +455,7 @@ static void process_command_line(int argc, char **argv) {
       mlog << Debug(1) << method_name << "Gridded Observation Files["
            << grid_obs_file_list.n() << "]:\n" ;
       for(int i=0; i<grid_obs_file_list.n(); i++) {
-         mlog << "   " << grid_obs_file_list[i] << "\n" ;
+         mlog << Debug(1) << "   " << grid_obs_file_list[i] << "\n" ;
       }
    }
 
@@ -460,7 +464,7 @@ static void process_command_line(int argc, char **argv) {
       mlog << Debug(1) << method_name << "Point Observation Files["
            << point_obs_file_list.n() << "]:\n" ;
       for(int i=0; i<point_obs_file_list.n(); i++) {
-         mlog << "   " << point_obs_file_list[i] << "\n" ;
+         mlog << Debug(1) << "   " << point_obs_file_list[i] << "\n" ;
       }
    }
 
@@ -534,7 +538,7 @@ static void process_grid(const Grid &fcst_grid) {
       // Store the observation grid
       obs_grid = mtddf->grid();
 
-      if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
+      mtddf.reset();
    }
    else {
       obs_grid = fcst_grid;
@@ -629,8 +633,11 @@ static void process_n_vld() {
 ////////////////////////////////////////////////////////////////////////
 
 static bool get_data_plane(const char *infile, GrdFileType ftype,
-                           VarInfo *info, DataPlane &dp, bool do_regrid) {
+                           VarInfo *info, DataPlane &dp,
+                           bool do_regrid) {
    bool found;
+
+   if(!info) return false;
 
    // Read the current ensemble file
    auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(infile, ftype);
@@ -673,8 +680,8 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
 
    } // end if found
 
-   // Deallocate the data file pointer, if necessary
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
+   // Cleanup
+   mtddf.reset();
 
    return found;
 }
@@ -685,9 +692,11 @@ static bool get_data_plane_array(const char *infile, GrdFileType ftype,
                                  VarInfo *info, DataPlaneArray &dpa,
                                  bool do_regrid) {
    bool found;
-   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(infile, ftype);
+
+   if(!info) return false;
 
    // Read the current ensemble file
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(infile, ftype);
    if(!mtddf) {
       mlog << Error << "\nget_data_plane_array() -> "
            << "trouble reading file \"" << infile << "\"\n\n";
@@ -740,8 +749,8 @@ static bool get_data_plane_array(const char *infile, GrdFileType ftype,
 
    } // end if found
 
-   // Deallocate the data file pointer, if necessary
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
+   // Cleanup
+   mtddf.reset();
 
    return found;
 }
@@ -861,9 +870,9 @@ static void process_point_vx() {
    // Loop through each of the fields to be verified
    for(int i=0; i<conf_info.get_n_vx(); i++) {
 
-      EnsVarInfo *ens_info  = conf_info.vx_opt[i].vx_pd.ens_info;
+      EnsVarInfo *ens_info  = conf_info.vx_opt[i].vx_pd.ens_info.get();
       VarInfo    *fcst_info = ens_info->get_var_info();
-      VarInfo    *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
+      VarInfo    *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info.get();
       bool print_level_mismatch_warning = true;
 
       // Initialize
@@ -1208,7 +1217,10 @@ static void process_point_scores() {
    for(int i=0; i<conf_info.get_n_vx(); i++) {
 
       VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.ens_info->get_var_info();
-      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
+      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info.get();
+
+      // Log a summary of any observation error table lookup failures
+      conf_info.vx_opt[i].vx_pd.log_obs_error_lookup_summary();
 
       // Set the description
       shc.set_desc(conf_info.vx_opt[i].vx_pd.desc.c_str());
@@ -1303,8 +1315,6 @@ static void process_grid_vx() {
    int n_miss;
    bool found;
    MaskPlane  mask_mp;
-   auto fcst_dp = (DataPlane *) nullptr;
-   auto fraw_dp = (DataPlane *) nullptr;
    DataPlane obs_dp;
    DataPlane oraw_dp;
    DataPlane emn_dp;
@@ -1314,7 +1324,7 @@ static void process_grid_vx() {
    DataPlane ocsd_dp;
    PairDataEnsemble pd;
    PairDataEnsemble pd_all;
-   auto oerr_ptr = (ObsErrorEntry *) nullptr;
+   const ObsErrorEntry * oerr_ptr = nullptr;
    VarInfo * var_info;
    ConcatString fcst_file;
 
@@ -1326,14 +1336,14 @@ static void process_grid_vx() {
 
    // Allocate space to store the forecast fields
    int num_dp = conf_info.vx_opt[0].vx_pd.ens_info->inputs_n();
-   fcst_dp = new DataPlane [num_dp];
-   fraw_dp = new DataPlane [num_dp];
+   vector<DataPlane> fcst_dp(num_dp);
+   vector<DataPlane> fraw_dp(num_dp);
 
    // Loop through each of the fields to be verified
    for(int i=0; i<conf_info.get_n_vx(); i++) {
 
       VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.ens_info->get_var_info();
-      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
+      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info.get();
 
       // Initialize
       emn_dp.clear();
@@ -1402,7 +1412,7 @@ static void process_grid_vx() {
                      mlog << Debug(3)
                           << "Observation error for gridded verification is "
                           << "defined by a table lookup for each point.\n";
-                     oerr_ptr = (ObsErrorEntry *) nullptr;
+                     oerr_ptr = nullptr;
                   }
                }
             }
@@ -1512,7 +1522,7 @@ static void process_grid_vx() {
 
       // If requested in the config file, create a NetCDF file to store
       // the verification matched pairs
-      if(out_nc_flag && nc_out == (NcFile *) nullptr) {
+      if(out_nc_flag && nc_out.get() == (NcFile *) nullptr) {
          setup_nc_file("_orank.nc");
       }
 
@@ -1521,7 +1531,7 @@ static void process_grid_vx() {
       for(int j=0; j<grid_obs_file_list.n(); j++) {
 
          found = get_data_plane(grid_obs_file_list[j].c_str(), otype,
-                                conf_info.vx_opt[i].vx_pd.obs_info,
+                                conf_info.vx_opt[i].vx_pd.obs_info.get(),
                                 obs_dp, true);
 
          // If found, break out of the loop
@@ -1603,15 +1613,28 @@ static void process_grid_vx() {
          // Store a copy of the unperturbed observation field
          oraw_dp = obs_dp;
 
+         // When no single entry applies to the whole field, resolve
+         // the observation error entry for each grid point once here
+         // rather than repeating the table lookup for the bias
+         // correction call, for every ensemble member below, and
+         // again in process_grid_scores()
+         vector<const ObsErrorEntry *> oerr_grid;
+         if(conf_info.vx_opt[i].obs_error.flag && !oerr_ptr) {
+            oerr_grid = build_obs_error_entry_grid(
+                           oraw_dp, obs_info->name().c_str(),
+                           conf_info.obtype.c_str());
+         }
+
          // Apply observation error bias correction, if requested
          if(conf_info.vx_opt[i].obs_error.flag) {
             mlog << Debug(3)
                  << "Applying observation error bias correction to "
                  << "gridded observation data.\n";
-            obs_dp = add_obs_error_bc(conf_info.rng_ptr,
-                        FieldType::Obs, oerr_ptr, oraw_dp, oraw_dp,
-                        obs_info->name().c_str(),
-                        conf_info.obtype.c_str());
+            obs_dp = oerr_ptr ?
+               add_obs_error_bc(
+                  FieldType::Obs, oerr_ptr, oraw_dp, oraw_dp,
+                  obs_info->name().c_str(), conf_info.obtype.c_str()) :
+               add_obs_error_bc(FieldType::Obs, oerr_grid, oraw_dp);
          }
 
          // Loop through the ensemble members
@@ -1633,10 +1656,12 @@ static void process_grid_vx() {
                mlog << Debug(3)
                     << "Applying observation error perturbation to "
                     << "ensemble member " << k+1 << ".\n";
-               fcst_dp[k] = add_obs_error_inc(conf_info.rng_ptr,
-                               FieldType::Fcst, oerr_ptr, fraw_dp[k], oraw_dp,
-                               obs_info->name().c_str(),
-                               conf_info.obtype.c_str());
+               fcst_dp[k] = oerr_ptr ?
+                  add_obs_error_inc(conf_info.rng_ptr,
+                     FieldType::Fcst, oerr_ptr, fraw_dp[k], oraw_dp,
+                     obs_info->name().c_str(), conf_info.obtype.c_str()) :
+                  add_obs_error_inc(conf_info.rng_ptr,
+                     FieldType::Fcst, oerr_grid, fraw_dp[k], oraw_dp);
             }
          } // end for k
 
@@ -1658,12 +1683,12 @@ static void process_grid_vx() {
 
             // Apply the current mask to the fields and compute the pairs
             process_grid_scores(i,
-                                fcst_dp, fraw_dp,
+                                fcst_dp.data(), fraw_dp.data(),
                                 obs_dp, oraw_dp,
                                 emn_dp,
                                 fcmn_dp, fcsd_dp,
                                 ocmn_dp, ocsd_dp,
-                                mask_mp, oerr_ptr,
+                                mask_mp, oerr_ptr, oerr_grid,
                                 pd_all);
 
             mlog << Debug(2)
@@ -1695,14 +1720,8 @@ static void process_grid_vx() {
       } // end for j
    } // end for i
 
-   // Delete allocated DataPlane objects
-   if(fcst_dp) { delete [] fcst_dp; fcst_dp = (DataPlane *) nullptr; }
-   if(fraw_dp) { delete [] fraw_dp; fraw_dp = (DataPlane *) nullptr; }
-
    // Close the output NetCDF file
-   if(nc_out) {
-      delete nc_out; nc_out = (NcFile *) nullptr;
-   }
+   nc_out.reset();
 
    return;
 }
@@ -1716,9 +1735,13 @@ static void process_grid_scores(int i_vx,
         const DataPlane &fcmn_dp, const DataPlane &fcsd_dp,
         const DataPlane &ocmn_dp, const DataPlane &ocsd_dp,
         const MaskPlane &mask_mp,
-        ObsErrorEntry *oerr_ptr,  PairDataEnsemble &pd) {
+        const ObsErrorEntry *oerr_ptr,
+        const vector<const ObsErrorEntry *> &oerr_grid,
+        PairDataEnsemble &pd) {
    int n_miss;
-   auto e = (ObsErrorEntry *) nullptr;
+   const ObsErrorEntry * e = nullptr;
+   int n_try_obs_error  = 0;
+   int n_fail_obs_error = 0;
 
    // Allocate memory in one big chunk based on grid size
    pd.extend(nxy);
@@ -1744,6 +1767,24 @@ static void process_grid_scores(int i_vx,
          if(is_bad_data(obs_dp(x, y)) ||
             !mask_mp.s_is_on(x, y)) continue;
 
+         // Get the observation error entry pointer
+         if(oerr_ptr) {
+            e = oerr_ptr;
+         }
+         else if(conf_info.vx_opt[i_vx].obs_error.flag) {
+            n_try_obs_error++;
+
+            // Use the entry cache built once in process_grid_vx()
+            // instead of repeating the table lookup for each point
+            e = oerr_grid[y * obs_dp.nx() + x];
+
+            // MET #3429: Skip observation if the table lookup fails
+            if(!e) { n_fail_obs_error++; continue; }
+         }
+         else {
+            e = nullptr;
+         }
+
          // Get current climatology values
          ClimoPntInfo cpi(
             (fcmn_flag ? fcmn_dp(x, y) : bad_data_double),
@@ -1754,19 +1795,6 @@ static void process_grid_scores(int i_vx,
          // Add the observation point
          pd.add_grid_obs(x, y, oraw_dp(x, y), cpi, wgt_dp(x, y));
 
-         // Get the observation error entry pointer
-         if(oerr_ptr) {
-            e = oerr_ptr;
-         }
-         else if(conf_info.vx_opt[i_vx].obs_error.flag) {
-            e = obs_error_table.lookup(
-                   conf_info.vx_opt[i_vx].vx_pd.obs_info->name().c_str(),
-                   conf_info.obtype.c_str(), oraw_dp(x,y));
-         }
-         else {
-            e = (ObsErrorEntry *) nullptr;
-         }
-
          // Store the observation error entry pointer
          pd.add_obs_error_entry(e);
 
@@ -1775,6 +1803,14 @@ static void process_grid_scores(int i_vx,
 
       } // end for y
    } // end for x
+
+   // Log a summary of any observation error table lookup failures
+   if(n_fail_obs_error > 0) {
+      mlog << Debug(2)
+           << "Skipping " << n_fail_obs_error << " of " << n_try_obs_error
+           << " grid points with no matching observation error "
+           << "table entry.\n";
+   }
 
    // Loop through the observation points
    for(int i=0; i<pd.n_obs; i++) {
@@ -1887,7 +1923,7 @@ static void setup_nc_file(const char *suffix) {
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_nc_file.c_str(), true);
 
-   if(IS_INVALID_NC_P(nc_out)) {
+   if(IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_nc_file << "\n\n";
@@ -1895,20 +1931,20 @@ static void setup_nc_file(const char *suffix) {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_nc_file.text(), program_name,
+   write_netcdf_global(nc_out.get(), out_nc_file.text(), program_name,
                        conf_info.model.c_str(), conf_info.obtype.c_str());
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(nc_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    if(conf_info.nc_info.do_latlon) {
-      write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+      write_netcdf_latlon(nc_out.get(), &lat_dim, &lon_dim, grid);
    }
 
    // Add grid weight variable
    if(conf_info.nc_info.do_weight) {
-      write_netcdf_grid_weight(nc_out, &lat_dim, &lon_dim,
+      write_netcdf_grid_weight(nc_out.get(), &lat_dim, &lon_dim,
                                conf_info.grid_weight_flag, wgt_dp);
    }
 
@@ -1966,7 +2002,7 @@ static void setup_txt_files() {
    max_col += n_header_columns;
 
    // Initialize file stream
-   stat_out = (ofstream *) nullptr;
+   stat_out.reset();
 
    // Build the file name
    stat_file << tmp_str << stat_file_ext;
@@ -2000,7 +2036,7 @@ static void setup_txt_files() {
          if(i == i_orank && !point_obs_flag) continue;
 
          // Initialize file stream
-         txt_out[i] = (ofstream *) nullptr;
+         txt_out[i].reset();
 
          // Build the file name
          txt_file[i] << tmp_str << "_" << txt_file_abbr[i]
@@ -2253,7 +2289,7 @@ static void write_txt_files(const EnsembleStatVxOpt &vx_opt,
          pd.compute_ssvar();
 
          // Make sure there are bins to process
-         if(pd.ssvar_bins) {
+         if(!pd.ssvar_bins.empty()) {
 
             // Add rows to the output AsciiTables for SSVAR
             stat_at.add_rows(pd.ssvar_bins[0].n_bin *
@@ -2341,7 +2377,6 @@ static void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
    int n_bin;
    int n_evt;
    int n_vld;
-   auto pct_info = (PCTInfo *) nullptr;
    PairDataPoint pd;
    PairDataPoint pd_pnt;
    ConcatString cs;
@@ -2365,7 +2400,7 @@ static void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
    }
 
    // Allocate memory
-   pct_info = new PCTInfo [n_bin];
+   vector<PCTInfo> pct_info(n_bin);
 
    // Store the current fcst_var value
    fcst_var_cs = shc.get_fcst_var();
@@ -2436,7 +2471,7 @@ static void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
       } // end for i_bin
 
       // Write the probabilistic output
-      write_pct_info(vx_opt, pct_info, n_bin, false);
+      write_pct_info(vx_opt, pct_info.data(), n_bin, false);
 
    } // end for i_ta
 
@@ -2444,7 +2479,6 @@ static void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
    shc.set_fcst_var(fcst_var_cs);
 
    // Dealloate memory
-   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) nullptr; }
 
    return;
 }
@@ -2456,7 +2490,6 @@ static void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
    int n_vld;
    int n_evt;
    int n_bin;
-   auto pct_info = (PCTInfo *) nullptr;
    PairDataPoint pd;
    PairDataPoint pd_pnt;
    ThreshArray ocdp_thresh;
@@ -2474,7 +2507,7 @@ static void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
         << "distribution percentile thresholds.\n";
 
    // Allocate memory
-   pct_info = new PCTInfo [n_bin];
+   vector<PCTInfo> pct_info(n_bin);
 
    // Process each probability threshold
    for(int i_bin=0; i_bin<n_bin; i_bin++) {
@@ -2531,10 +2564,9 @@ static void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
    } // end for i_bin
 
    // Write the probabilistic output
-   write_pct_info(vx_opt, pct_info, n_bin, true);
+   write_pct_info(vx_opt, pct_info.data(), n_bin, true);
 
    // Dealloate memory
-   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) nullptr; }
 
    return;
 }
@@ -2739,7 +2771,7 @@ static void write_orank_var_float(int i_vx, int i_interp, int i_mask,
    nc_orank_var_sa.add(var_name);
 
    // Define the variable
-   nc_var = add_var(nc_out, (string)var_name, ncFloat, lat_dim, lon_dim);
+   nc_var = add_var(nc_out.get(), (string)var_name, ncFloat, lat_dim, lon_dim);
 
    // Add the variable attributes
    add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.ens_info->get_var_info(),
@@ -2805,7 +2837,7 @@ static void write_orank_var_int(int i_vx, int i_interp, int i_mask,
    nc_orank_var_sa.add(var_name);
 
    // Define the variable
-   nc_var = add_var(nc_out, (string)var_name, ncInt, lat_dim, lon_dim);
+   nc_var = add_var(nc_out.get(), (string)var_name, ncInt, lat_dim, lon_dim);
 
    // Add the variable attributes
    add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.ens_info->get_var_info(),

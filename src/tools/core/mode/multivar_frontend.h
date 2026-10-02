@@ -15,6 +15,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <string>
 #include "mode_conf_info.h"
 #include "two_d_array.h"
@@ -55,7 +56,7 @@ private:
                                int rIndex, int tIndex, int n_files,
                                const StringArray &filenames, const std::vector<ModeInputData> &input,
                                BoolCalc &calc, SimpleObjects &O) const;
-   MultiVarData *_create_simple_multivar_data(ModeDataType dtype, int rIndex, int tIndex,
+   std::unique_ptr<MultiVarData> _create_simple_multivar_data(ModeDataType dtype, int rIndex, int tIndex,
                                               int j, int n_files, const std::string &filename,
                                               const ModeInputData &input) const;
    void _simple_objects(ModeExecutive::Processing_t p, ModeDataType dtype, int rIndex,

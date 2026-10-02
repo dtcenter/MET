@@ -477,7 +477,7 @@ Overview of Steps for Performing Benchmarking
      View the consolidated metrics to identify potential performance enhancements.  Refer to the CTRACK documentation to
      learn about the metrics collected, under the **Metrics & Output** section:
 
-          https://github.com/Compaile/ctrack?tab=readme-ov-file#metrics--output
+          https://github.com/Compaile/ctrack#metrics--output
 
 
      .. note::

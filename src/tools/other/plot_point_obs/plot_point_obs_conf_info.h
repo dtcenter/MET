@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <iostream>
 #include <set>
 
@@ -143,7 +144,7 @@ class PlotPointObsConfInfo {
 
       // Options to plot a field of gridded data
       Grid      grid;
-      VarInfo  *grid_data_info;
+      std::unique_ptr<VarInfo> grid_data_info;
       DataPlane grid_data;
       PlotInfo  grid_plot_info;
 

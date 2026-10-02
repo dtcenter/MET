@@ -44,6 +44,7 @@
 #include "vx_util.h"
 #include "vx_stat_out.h"
 #include "vx_gsl_prob.h"
+#include <memory>
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -125,13 +126,13 @@ static int      fcst_lead_sec = bad_data_int;
 
 // Output STAT file
 static ConcatString     stat_file;
-static std::ofstream    *stat_out = (std::ofstream *) nullptr;
+static std::unique_ptr<std::ofstream> stat_out;
 static AsciiTable       stat_at;
 static int              i_stat_row;
 
 // Optional ASCII output files
 static ConcatString     txt_file[n_txt];
-static std::ofstream    *txt_out[n_txt];
+static std::unique_ptr<std::ofstream> txt_out[n_txt];
 static AsciiTable       txt_at[n_txt];
 static int              i_txt_row[n_txt];
 
@@ -146,7 +147,7 @@ static Grid grid;
 static bool is_first_pass = true;
 
 // Data file factory and input files
-static Met2dDataFile *fcst_mtddf = nullptr;
+static std::unique_ptr<Met2dDataFile> fcst_mtddf;
 
 // Pointer to the random number generator to be used
 static gsl_rng *rng_ptr = nullptr;

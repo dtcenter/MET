@@ -19,6 +19,7 @@
 
 
 #include "fo_node.h"
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -44,7 +45,7 @@ class FO_Graph {
                      //  Note that this is the number of nodes,
                      //  not the number of bytes
 
-      FO_Node * TheGraph;   //  allocated
+      std::vector<FO_Node> TheGraph;   //  allocated
 
       void do_dump_table(AsciiTable &) const;
 

@@ -712,7 +712,7 @@ void PairBase::calc_obs_summary(){
       station_values_t * svt = &map_val[map_key[i]];
 
       //  parse the single key string
-      char** mat = nullptr;
+      StringArray mat;
       if( 5 != regex_apply("^([^:]+):([^:]+):([^:]+):([^:]+)$", 5,
                            map_key[i].c_str(), mat) ){
          mlog << Error << "\nPairBase::calc_obs_summary() -> "
@@ -722,12 +722,10 @@ void PairBase::calc_obs_summary(){
       }
 
       string msg_key = str_format("%s:%s:%s:%s",
-                                  mat[1], mat[2],
-                                  mat[3], mat[4]).text();
+                                  mat[1].c_str(), mat[2].c_str(),
+                                  mat[3].c_str(), mat[4].c_str()).text();
 
       ob_val_t ob;
-
-      regex_clean(mat);
 
       switch(obs_summary) {
          case ObsSummary::Nearest:
@@ -913,33 +911,130 @@ VxPairBase::~VxPairBase() {
 
 ////////////////////////////////////////////////////////////////////////
 
-VxPairBase::VxPairBase(const VxPairBase &vx_pb) {
+VxPairBase::VxPairBase(const VxPairBase &v) {
 
    init_from_scratch();
 
-   assign(vx_pb);
+   assign(v);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-VxPairBase & VxPairBase::operator=(const VxPairBase &vx_pb) {
+VxPairBase::VxPairBase(VxPairBase &&v) noexcept
+   : fcst_info(move(v.fcst_info)),
+     obs_info(move(v.obs_info)),
+     fclm_info(move(v.fclm_info)),
+     oclm_info(move(v.oclm_info)),
+     desc(move(v.desc)),
+     interp_thresh(v.interp_thresh),
+     fcst_dpa(move(v.fcst_dpa)),
+     fcmn_dpa(move(v.fcmn_dpa)),
+     fcsd_dpa(move(v.fcsd_dpa)),
+     ocmn_dpa(move(v.ocmn_dpa)),
+     ocsd_dpa(move(v.ocsd_dpa)),
+     fcst_ut(v.fcst_ut),
+     beg_ut(v.beg_ut),
+     end_ut(v.end_ut),
+     sid_inc_filt(move(v.sid_inc_filt)),
+     sid_exc_filt(move(v.sid_exc_filt)),
+     obs_qty_inc_filt(move(v.obs_qty_inc_filt)),
+     obs_qty_exc_filt(move(v.obs_qty_exc_filt)),
+     mpr_thr_inc_map(move(v.mpr_thr_inc_map)),
+     mpr_str_inc_map(move(v.mpr_str_inc_map)),
+     mpr_str_exc_map(move(v.mpr_str_exc_map)),
+     msg_typ_sfc(move(v.msg_typ_sfc)),
+     msg_typ_lnd(move(v.msg_typ_lnd)),
+     msg_typ_wtr(move(v.msg_typ_wtr)),
+     msg_typ_lapsert(move(v.msg_typ_lapsert)),
+     msg_typ_mslagl(move(v.msg_typ_mslagl)),
+     sfc_info(move(v.sfc_info)),
+     n_msg_typ(v.n_msg_typ),
+     n_mask(v.n_mask),
+     n_interp(v.n_interp),
+     n_vx(v.n_vx),
+     pb_ptr(move(v.pb_ptr)),
+     n_try(v.n_try),
+     rej_sid(v.rej_sid), rej_var(v.rej_var), rej_vld(v.rej_vld),
+     rej_obs(v.rej_obs), rej_grd(v.rej_grd), rej_topo(v.rej_topo),
+     rej_lvl(v.rej_lvl), rej_qty(v.rej_qty),
+     rej_typ(move(v.rej_typ)), rej_mask(move(v.rej_mask)),
+     rej_fcst(move(v.rej_fcst)), rej_cmn(move(v.rej_cmn)),
+     rej_csd(move(v.rej_csd)), rej_mpr(move(v.rej_mpr)),
+     rej_dup(move(v.rej_dup))
+{
+}
 
-   if(this == &vx_pb) return *this;
+////////////////////////////////////////////////////////////////////////
 
-   assign(vx_pb);
+VxPairBase & VxPairBase::operator=(const VxPairBase &v) {
+
+   if(this == &v) return *this;
+
+   assign(v);
 
    return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+VxPairBase & VxPairBase::operator=(VxPairBase &&v) noexcept {
+   if (this != &v) {
+      fcst_info = move(v.fcst_info);
+      obs_info  = move(v.obs_info);
+      fclm_info = move(v.fclm_info);
+      oclm_info = move(v.oclm_info);
+
+      desc = move(v.desc);
+      interp_thresh = v.interp_thresh;
+
+      fcst_dpa = move(v.fcst_dpa);
+      fcmn_dpa = move(v.fcmn_dpa);
+      fcsd_dpa = move(v.fcsd_dpa);
+      ocmn_dpa = move(v.ocmn_dpa);
+      ocsd_dpa = move(v.ocsd_dpa);
+
+      fcst_ut = v.fcst_ut;
+      beg_ut = v.beg_ut;
+      end_ut = v.end_ut;
+
+      sid_inc_filt = move(v.sid_inc_filt);
+      sid_exc_filt = move(v.sid_exc_filt);
+      obs_qty_inc_filt = move(v.obs_qty_inc_filt);
+      obs_qty_exc_filt = move(v.obs_qty_exc_filt);
+
+      mpr_thr_inc_map = move(v.mpr_thr_inc_map);
+      mpr_str_inc_map = move(v.mpr_str_inc_map);
+      mpr_str_exc_map = move(v.mpr_str_exc_map);
+
+      msg_typ_sfc = move(v.msg_typ_sfc);
+      msg_typ_lnd = move(v.msg_typ_lnd);
+      msg_typ_wtr = move(v.msg_typ_wtr);
+      msg_typ_lapsert = move(v.msg_typ_lapsert);
+      msg_typ_mslagl = move(v.msg_typ_mslagl);
+
+      sfc_info = move(v.sfc_info);
+
+      n_msg_typ = v.n_msg_typ;  n_mask = v.n_mask;
+      n_interp  = v.n_interp;   n_vx   = v.n_vx;
+
+      pb_ptr = move(v.pb_ptr);
+
+      n_try = v.n_try;
+      rej_sid = v.rej_sid;  rej_var = v.rej_var;  rej_vld = v.rej_vld;
+      rej_obs = v.rej_obs;  rej_grd = v.rej_grd;  rej_topo = v.rej_topo;
+      rej_lvl = v.rej_lvl;  rej_qty = v.rej_qty;
+
+      rej_typ  = move(v.rej_typ);   rej_mask = move(v.rej_mask);
+      rej_fcst = move(v.rej_fcst);  rej_cmn  = move(v.rej_cmn);
+      rej_csd  = move(v.rej_csd);   rej_mpr  = move(v.rej_mpr);
+      rej_dup  = move(v.rej_dup);
+   }
+   return *this;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void VxPairBase::init_from_scratch() {
-
-   fcst_info = (VarInfo *) nullptr;
-   obs_info  = (VarInfo *) nullptr;
-
-   fclm_info = (VarInfo *) nullptr;
-   oclm_info = (VarInfo *) nullptr;
 
    clear();
 
@@ -950,11 +1045,11 @@ void VxPairBase::init_from_scratch() {
 
 void VxPairBase::clear() {
 
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) nullptr; }
-   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) nullptr; }
+   fcst_info.reset();
+   obs_info.reset();
 
-   if(fclm_info) { delete fclm_info; fclm_info = (VarInfo *) nullptr; }
-   if(oclm_info) { delete oclm_info; oclm_info = (VarInfo *) nullptr; }
+   fclm_info.reset();
+   oclm_info.reset();
 
    desc.clear();
 
@@ -1021,11 +1116,11 @@ void VxPairBase::assign(const VxPairBase &vx_pb) {
 
    clear();
 
-   set_fcst_info(vx_pb.fcst_info);
-   set_obs_info(vx_pb.obs_info);
+   set_fcst_info(vx_pb.fcst_info.get());
+   set_obs_info(vx_pb.obs_info.get());
 
-   set_fcst_climo_info(vx_pb.fclm_info);
-   set_obs_climo_info(vx_pb.oclm_info);
+   set_fcst_climo_info(vx_pb.fclm_info.get());
+   set_obs_climo_info(vx_pb.oclm_info.get());
 
    desc = vx_pb.desc;
 
@@ -1083,10 +1178,7 @@ void VxPairBase::assign(const VxPairBase &vx_pb) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::copy_var_info(const VarInfo *info, VarInfo *&copy) {
-
-   // Deallocate, if necessary
-   if(copy) { delete copy; copy = (VarInfo *) nullptr; }
+void VxPairBase::copy_var_info(const VarInfo *info, std::unique_ptr<VarInfo> &copy) {
 
    // Perform a deep copy
    copy = VarInfoFactory::new_var_info(info->file_type());
@@ -1619,7 +1711,7 @@ bool VxPairBase::is_keeper_var(
         const char *pnt_obs_str, const char *var_name, int grib_code) {
    bool keep = true;
 
-   const auto obs_info_grib = (VarInfoGrib *) obs_info;
+   const auto obs_info_grib = (VarInfoGrib *) obs_info.get();
 
    // Check for matching variable name or GRIB code
    if((var_name != nullptr) && (m_strlen(var_name) > 0)) {
@@ -1711,7 +1803,7 @@ bool VxPairBase::is_keeper_obs(
    bool keep = true;
 
    // Apply observation processing logic
-   obs_v = pb_ptr[0]->process_obs(obs_info, obs_v);
+   obs_v = pb_ptr[0]->process_obs(obs_info.get(), obs_v);
 
    // Check whether the observation value contains valid data
    if(is_bad_data(obs_v)) {
@@ -2575,7 +2667,7 @@ void get_interp_points(const DataPlaneArray &dpa,
    int i, n_vld;
    NumArray pts_blw, pts_abv;
    GridTemplateFactory gtf;
-   const GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
+   const auto gt = gtf.buildGT(shape, width, wrap_lon);
 
    // Get interpolation points below the observation
    pts_blw = interp_points(dpa[i_blw], *gt, obs_x, obs_y);
@@ -2630,7 +2722,6 @@ void get_interp_points(const DataPlaneArray &dpa,
       interp_pnts.erase();
    }
 
-   if ( gt )  { delete gt;  gt = (const GridTemplate *) nullptr; }
 
    return;
 }

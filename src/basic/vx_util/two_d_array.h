@@ -17,6 +17,7 @@
 
 
 #include <string.h>
+#include <memory>
 
 #include "logger.h"
 
@@ -40,7 +41,7 @@ class TwoD_Array {
       int Nx;
       int Ny;
 
-      T * E;
+      std::unique_ptr<T[]> E;
 
 
 
@@ -83,9 +84,9 @@ class TwoD_Array {
       bool is_empty() const { return ( Nx*Ny == 0 ); }
       int  count()    const;
 
-      const T * data() const { return E; }
+      const T * data() const { return E.get(); }
 
-      T * buf() { return E; }   //  careful with this
+      T * buf() { return E.get(); }   //  careful with this
 
       T operator()(int, int) const;
 
@@ -115,8 +116,6 @@ void TwoD_Array<T>::init_from_scratch()
 
 {
 
-E = (T *) nullptr;
-
 clear();
 
 return;
@@ -133,7 +132,7 @@ void TwoD_Array<T>::clear()
 
 {
 
-if ( E )  { delete [] E;  E = (T *) nullptr; }
+E.reset();
 
 Nx = Ny = 0;
 
@@ -157,7 +156,7 @@ if ( ! (_t.E) )  return;
 
 set_size(_t.Nx, _t.Ny);
 
-memcpy(E, _t.E, Nx*Ny*sizeof(T));
+memcpy(E.get(), _t.E.get(), Nx*Ny*sizeof(T));
 
 
 return;
@@ -185,7 +184,7 @@ if ( (_nx <= 0) || (_ny <= 0) )  {
 
 clear();
 
-E = new T [_nx*_ny];
+E = std::make_unique<T[]>(_nx*_ny);
 
 Nx = _nx;
 Ny = _ny;

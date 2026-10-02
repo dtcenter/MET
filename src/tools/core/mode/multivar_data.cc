@@ -39,14 +39,8 @@ static void _debug_shape_examine(const string &name, const ShapeData &sd,
 
 void MultiVarData1::set_obj(ShapeData *sd)
 {
-   if (_obj_sd) {
-      delete _obj_sd;
-   }
-   _obj_sd = new ShapeData(*sd);
+   _obj_sd = std::make_unique<ShapeData>(*sd);
 
-   if (_obj_data) {
-      delete _obj_data;
-   }
    _obj_data = _fill_int_array(sd);
 }
 
@@ -54,9 +48,6 @@ void MultiVarData1::set_obj(ShapeData *sd)
 
 void MultiVarData1::set_raw(ShapeData *sd)
 {
-   if (_raw_data) {
-      delete _raw_data;
-   }
    _raw_data = _fill_float_array(sd);
 }
 
@@ -64,8 +55,7 @@ void MultiVarData1::set_raw(ShapeData *sd)
 
 void MultiVarData1::set_shapedata(const ShapeData &sd)
 {
-   if (_sd) delete _sd;
-   _sd = new ShapeData(sd);
+   _sd = std::make_unique<ShapeData>(sd);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -88,7 +78,7 @@ void  MultiVarData1::objects_from_arrays(bool do_clusters,
                                          BoolPlane & out)
 {
    string name = _name + "_" + sprintModeDataType(_dataType);
-   populate_bool_plane(name, _obj_data, _nx, _ny, out);
+   populate_bool_plane(name, _obj_data.data(), _nx, _ny, out);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -97,7 +87,7 @@ void MultiVarData1::print(const string &name) const
 {
    string n;
    n = name + "_" + _name + "_" + sprintModeDataType(_dataType) + "_Obj";
-   if(_obj_data) {
+   if(!_obj_data.empty()) {
       _print_summary(n, _obj_data, *_obj_sd);
    } else {
       mlog << Debug(2) << n << " is empty\n";
@@ -106,9 +96,10 @@ void MultiVarData1::print(const string &name) const
 
 ////////////////////////////////////////////////////////////////////////
 
-int *MultiVarData1::_fill_int_array(ShapeData *sd)
+std::vector<int> MultiVarData1::_fill_int_array(ShapeData *sd)
 {
-   int *ret = new int [_nx*_ny];
+   std::vector<int> out(_nx*_ny);
+   int *ret = out.data();
 
 #pragma omp parallel default(none) \
    shared(_nx, _ny, DefaultTO, sd, ret)
@@ -129,14 +120,15 @@ int *MultiVarData1::_fill_int_array(ShapeData *sd)
       } // for x
    } // End omp parallel
 
-   return ret;
+   return out;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-float *MultiVarData1::_fill_float_array(ShapeData *sd)
+std::vector<float> MultiVarData1::_fill_float_array(ShapeData *sd)
 {
-   float *ret = new float [_nx*_ny];
+   std::vector<float> out(_nx*_ny);
+   float *ret = out.data();
 
 #pragma omp parallel default(none) \
    shared(_nx, _ny, DefaultTO, sd, ret)
@@ -152,12 +144,12 @@ float *MultiVarData1::_fill_float_array(ShapeData *sd)
       } // for x
    } // End omp parallel
 
-   return ret;
+   return out;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void MultiVarData1::_print_summary(const string &name, int *data,
+void MultiVarData1::_print_summary(const string &name, const vector<int> &data,
                                    const ShapeData &sd) const
 {
    vector<int> values;
@@ -176,11 +168,8 @@ void MultiVarData1::_print_summary(const string &name, int *data,
 
 MultiVarData::MultiVarData() :
    _dataType(ModeDataType::MvMode_Both),
-   _simple(0),
-   _merge(0),
    _name("notset"),
-   _nx(0), _ny(0),
-   _grid(0)
+   _nx(0), _ny(0)
 {
 }
 
@@ -206,13 +195,13 @@ void MultiVarData::init(ModeDataType dataType,
    _name = name;
    _nx = grid.nx();
    _ny = grid.ny();
-   _grid = new Grid(grid);
+   _grid = std::make_unique<Grid>(grid);
    _units = units;
    _level = level;
    _data_min = data_min;
    _data_max = data_max;
-   _simple = new MultiVarData1(_nx, _ny, "Simple", _dataType);
-   _merge = new MultiVarData1(_nx, _ny, "Merge", _dataType);
+   _simple = std::make_unique<MultiVarData1>(_nx, _ny, "Simple", _dataType);
+   _merge = std::make_unique<MultiVarData1>(_nx, _ny, "Merge", _dataType);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -276,9 +265,9 @@ void MultiVarData::set_merge_thresh_array(const ThreshArray &t, bool simple)
 const ShapeData *MultiVarData::shapedata_ptr(bool simple) const
 {
    if (simple) {
-      return _simple->_sd;
+      return _simple->_sd.get();
    } else {
-      return _merge->_sd;
+      return _merge->_sd.get();
    }
 }
 
@@ -307,18 +296,9 @@ void  MultiVarData::print(void) const
 
 void MultiVarData::_clear()
 {
-   if (_simple) {
-      delete _simple;
-      _simple = 0;
-   }
-   if (_merge) {
-      delete _merge;
-      _merge = 0;
-   }
-   if (_grid) {
-      delete _grid;
-      _grid = 0;
-   }
+   _simple.reset();
+   _merge.reset();
+   _grid.reset();
    _nx = _ny = 0;
 }
 

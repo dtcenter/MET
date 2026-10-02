@@ -13,6 +13,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <vector>
+#include <memory>
 #include <string>
 #include <deque>
 #include <map>
@@ -44,7 +46,7 @@ struct ens_ssvar_pt {
 typedef std::deque<ens_ssvar_pt>             ssvar_pt_list;
 typedef std::map<std::string,ssvar_pt_list>  ssvar_bin_map;  // Indexed by bin min
 typedef CRC_Array<bool>                      BoolArray;
-typedef CRC_Array<ObsErrorEntry *>           ObsErrorEntryPtrArray;
+typedef CRC_Array<const ObsErrorEntry *>     ObsErrorEntryPtrArray;
 
 // Number of SSVAR bins to produce a warning
 static const int n_warn_ssvar_bins = 1000;
@@ -76,7 +78,7 @@ class PairDataEnsemble : public PairBase {
       bool                  obs_error_flag;
 
       // Ensemble, valid count, and rank values
-      NumArray  *e_na;             // Ensemble values [n_ens][n_obs]
+      std::vector<NumArray> e_na;  // Ensemble values [n_ens][n_obs]
       NumArray   v_na;             // Number of valid ensemble values [n_obs]
       NumArray   r_na;             // Observation ranks [n_obs]
 
@@ -124,7 +126,7 @@ class PairDataEnsemble : public PairBase {
       NumArray   mn_oerr_na;       // Mean of perturbed members [n_obs]
 
       double     ssvar_bin_size;   // Variance bin size for spread/skill
-      SSVARInfo *ssvar_bins;       // Ensemble spread/skill bin information [n_ssvar_bin]
+      std::vector<SSVARInfo> ssvar_bins; // Ensemble spread/skill bin information [n_ssvar_bin]
 
       double     crpss_emp;        // Empirical CRPS skill score
       double     crpss_gaus;       // Guassian CRPS skill score
@@ -150,7 +152,7 @@ class PairDataEnsemble : public PairBase {
       void add_ens_var_sums(int, double);
       void set_ens_size(int);
 
-      void add_obs_error_entry(ObsErrorEntry *);
+      void add_obs_error_entry(const ObsErrorEntry *);
 
       void compute_pair_vals(const gsl_rng *);
 
@@ -188,12 +190,17 @@ class VxPairDataEnsemble : public VxPairBase {
       //
       //////////////////////////////////////////////////////////////////
 
-      EnsVarInfo *ens_info;         // Ensemble data, allocated by EnsVarInfo
+      std::unique_ptr<EnsVarInfo> ens_info;   // Ensemble data
 
       //////////////////////////////////////////////////////////////////
 
       ObsErrorInfo *obs_error_info; // Pointer for observation error
                                     // Not allocated
+
+      // Counts of observation error table lookups attempted and failed,
+      // accumulated across calls to add_point_obs()
+      int n_try_obs_error;
+      int n_fail_obs_error;
 
       //////////////////////////////////////////////////////////////////
 
@@ -219,6 +226,9 @@ class VxPairDataEnsemble : public VxPairBase {
                          const char *, unixtime, const char *,
                          const float *, const Grid &, const char *);
       void add_ens(int, bool mn, const Grid &);
+
+      // Log and reset the accumulated observation error lookup counts
+      void log_obs_error_lookup_summary();
 };
 
 ////////////////////////////////////////////////////////////////////////

@@ -145,6 +145,7 @@
 #ifdef WITH_PYTHON
 #include "data2d_nc_met.h"
 #include "pointdata_python.h"
+#include <memory>
 #endif
 
 using namespace std;
@@ -300,7 +301,8 @@ static void process_command_line(int argc, char **argv) {
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
 
    // Read forecast file
-   if(!(fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype))) {
+   fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype);
+   if(!fcst_mtddf) {
       mlog << Error << "\n" << method_name << "Trouble reading forecast file \""
            << fcst_file << "\". Override the FileType with \"file_type = FileType_<type>;\"\n\n";
       exit(1);
@@ -322,7 +324,7 @@ static void process_command_line(int argc, char **argv) {
          double max_distance_km = conf_info.ugrid_max_distance_km;
          ConcatString ugrid_nc = conf_info.ugrid_nc;
          ConcatString ugrid_map_config_filename = conf_info.ugrid_map_config;
-         auto ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
+         auto ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf.get();
 
          ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
                                         ugrid_map_config_filename);
@@ -431,7 +433,7 @@ static void setup_txt_files() {
    max_col += n_header_columns + 1;
 
    // Initialize file stream
-   stat_out = (ofstream *) nullptr;
+   stat_out.reset();
 
    // Build the file name
    stat_file << base_name << stat_file_ext;
@@ -462,7 +464,7 @@ static void setup_txt_files() {
       if(conf_info.output_flag[i] == STATOutputType::Both) {
 
          // Initialize file stream
-         txt_out[i] = (ofstream *) nullptr;
+         txt_out[i].reset();
 
          // Build the file name
          txt_file[i] << base_name << "_" << txt_file_abbr[i]
@@ -622,8 +624,8 @@ static void process_fcst_climo_files() {
    // the forecast and climatological fields for verification
    for(int i=0; i<conf_info.get_n_vx(); i++) {
 
-      VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.fcst_info;
-      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
+      VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.fcst_info.get();
+      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info.get();
 
       // Read the gridded data from the input forecast file
       n_fcst = fcst_mtddf->data_plane_array(*fcst_info, fcst_dpa);
@@ -1876,7 +1878,7 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
       // Determine the number of points in the area
       GridTemplateFactory gtf;
-      GridTemplate* gt = gtf.buildGT(conf_info.vx_opt[i_vx].hira_info.shape,
+      auto gt = gtf.buildGT(conf_info.vx_opt[i_vx].hira_info.shape,
                                      conf_info.vx_opt[i_vx].hira_info.width[i],
                                      grid.wrap_lon());
       if (nullptr == gt) {
@@ -1954,7 +1956,6 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
       // Check for zero matched pairs
       if(hira_pd.o_na.n() == 0) {
-         if(gt) { delete gt; gt = nullptr; }
          continue;
       }
 
@@ -2025,7 +2026,6 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
                  << "\"" << conf_key_prob_cat_thresh << "\" thresholds are "
                  << "defined in the \"" << conf_key_hira
                  << "\" dictionary.\n";
-            if(gt) { delete gt; gt = nullptr; }
             break;
          }
 
@@ -2038,7 +2038,6 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
                        txt_at[i_rps], i_txt_row[i_rps]);
       } // end if RPS
 
-      if(gt) { delete gt; gt = nullptr; }
 
    } // end for i
 
@@ -2267,7 +2266,7 @@ static void clean_up() {
    finish_txt_files();
 
    // Deallocate memory for data files
-   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) nullptr; }
+   fcst_mtddf.reset();
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);

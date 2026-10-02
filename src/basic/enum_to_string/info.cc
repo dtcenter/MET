@@ -94,19 +94,8 @@ void EnumInfo::init_from_scratch()
 
 {
 
-s = (char **) nullptr;
+clear();
 
-Name = (char *) nullptr;
-
-LowerCaseName = (char *) nullptr;
-
-Scope = (char *) nullptr;
-
-U_Scope = (char *) nullptr;
-
-Header = (char *) nullptr;
-
-Nalloc = Nids = 0;
 
 return;
 
@@ -120,30 +109,24 @@ void EnumInfo::clear()
 
 {
 
-if ( !s )  return;
+   //
+   //  NOTE: this began with "if ( !s ) return;", a guard against walking a
+   //  null id array. That also skipped clearing Name/Scope/Header whenever an
+   //  EnumInfo had no ids. The containers clean themselves up, so the guard is
+   //  gone and clear() now clears everything.
+   //
 
+s.clear();
 
-int j;
+Name.clear();
 
-for (j=0; j<Nids; ++j)  {
+LowerCaseName.clear();
 
-   if ( s[j] )  { delete [] s[j];  s[j] = (char *) nullptr; }
+Scope.clear();
 
-}
+U_Scope.clear();
 
-delete [] s;   s = (char **) nullptr;
-
-if ( Name )  { delete [] Name;  Name = (char *) nullptr; }
-
-if ( LowerCaseName )  { delete [] LowerCaseName;  LowerCaseName = (char *) nullptr; }
-
-if ( Scope )  { delete [] Scope;  Scope = (char *) nullptr; }
-
-if ( U_Scope )  { delete [] U_Scope;  U_Scope = (char *) nullptr; }
-
-if ( Header )  { delete [] Header;  Header = (char *) nullptr; }
-
-Nalloc = Nids = 0;
+Header.clear();
 
 
 return;
@@ -160,24 +143,13 @@ void EnumInfo::assign(const EnumInfo & e)
 
 clear();
 
-if ( !(e.s) )  return;
+s = e.s;
 
-int j;
+set_name(e.Name.c_str());
 
-extend(e.Nids);
+set_header(e.Header.c_str());
 
-for (j=0; j<(e.Nids); ++j)  {
-
-   add_id(e.s[j]);
-
-}
-
-
-set_name(e.Name);
-
-set_header(e.Header);
-
-set_scope(e.Scope);
+set_scope(e.Scope.c_str());
 
 
 return;
@@ -188,48 +160,6 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void EnumInfo::extend(int n)
-
-{
-
-if ( n < Nalloc )  return;
-
-n = (n + enuminfo_alloc_increment - 1)/enuminfo_alloc_increment;
-
-n *= enuminfo_alloc_increment;
-
-int j;
-char ** u = (char **) nullptr;
-
-u = s;
-
-s = new char * [n];
-
-if ( !s )  {
-
-   cerr << "\n\n  EnumInfo::extend(int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for (j=0; j<n; ++j)  s[j] = (char *) nullptr;
-
-if ( u )  {
-
-   for (j=0; j<Nids; ++j)  {
-
-      s[j] = u[j];
-
-   }
-
-}
-
-Nalloc = n;
-
-return;
-
-}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -239,7 +169,7 @@ const char * EnumInfo::id(int n) const
 
 {
 
-if ( (n < 0) || (n >= Nids) )  {
+if ( (n < 0) || (n >= (int) s.size()) )  {
 
    cerr << "\n\n  EnumInfo::id(int) -> range check error\n\n";
 
@@ -247,7 +177,7 @@ if ( (n < 0) || (n >= Nids) )  {
 
 }
 
-return s[n];
+return s[n].c_str();
 
 }
 
@@ -259,16 +189,16 @@ int EnumInfo::max_id_length() const
 
 {
 
-if ( Nids == 0 )  return 0;
+if ( s.empty() )  return 0;
 
 int j, k;
 int max_len;
 
 max_len = 0;
 
-for (j=0; j<Nids; ++j)  {
+for (j=0; j<(int) s.size(); ++j)  {
 
-   k = m_strlen(s[j]);
+   k = (int) s[j].length();
 
    if ( k > max_len )  max_len = k;
 
@@ -287,20 +217,8 @@ void EnumInfo::add_id(const char * text)
 
 {
 
-int k;
-const char *method_name = "EnumInfo::add_id() -> ";
+s.push_back(text ? text : "");
 
-extend(Nids + 1);
-
-k = m_strlen(text);
-
-s[Nids] = new char [1 + k];
-
-m_strncpy(s[Nids], text, k, method_name);
-
-s[Nids][k] = (char) 0;   //  just to make sure
-
-++Nids;
 
 return;
 
@@ -313,35 +231,21 @@ return;
 void EnumInfo::set_name(const char * text)
 
 {
-const char *method_name = "EnumInfo::set_name() -> ";
 
-if ( Name )  { delete [] Name;  Name = (char *) nullptr; }
+   //  both are cleared BEFORE the null check, as the original did
 
-if ( LowerCaseName )  { delete [] LowerCaseName;  LowerCaseName = (char *) nullptr; }
+Name.clear();
+
+LowerCaseName.clear();
 
 if ( !text )  return;
 
-int j, k;
+Name = text;
 
-k = m_strlen(text);
+LowerCaseName = text;
 
-Name = new char [1 + k];
+for (char & c : LowerCaseName)  c = tolower((unsigned char) c);
 
-LowerCaseName = new char [1 + k];
-
-m_strncpy(Name, text, k, method_name, "Name");
-
-Name[k] = (char) 0;   //  just to make sure
-
-m_strncpy(LowerCaseName, text, k, method_name, "LowerCaseName");
-
-LowerCaseName[k] = (char) 0;   //  just to make sure
-
-for (j=0; j<k; ++j)  {
-
-   LowerCaseName[j] = tolower(LowerCaseName[j]);
-
-}
 
 return;
 
@@ -352,43 +256,25 @@ return;
 
 
 void EnumInfo::set_scope(const char * text)
+
 {
-const char *method_name = "EnumInfo::set_scope() -> ";
 
-if ( Scope )  { delete [] Scope;  Scope = (char *) nullptr; }
+Scope.clear();
 
-if ( U_Scope )  { delete [] U_Scope;  U_Scope = (char *) nullptr; }
+U_Scope.clear();
 
 if ( !text )  return;
 
-int j, k, m;
-char c;
+Scope = text;
 
+for (int j=0; j<(int) Scope.length(); ++j)  {
 
-k = m_strlen(text);
+   const char c = Scope[j];
 
-Scope = new char [1 + k];
-
-m_strncpy(Scope, text, k, method_name);
-
-Scope[k] = (char) 0;   //  just to make sure
-
-U_Scope = new char [1 + k];
-
-m = 0;
-
-for (j=0; j<k; ++j)  {
-
-   c = Scope[j];
-
-   if ( !c )  break;
-
-   if ( c == ':' )  { ++j;  U_Scope[m++] = '_'; }
-   else             U_Scope[m++] = c;
+   if ( c == ':' )  { ++j;  U_Scope += '_'; }
+   else             U_Scope += c;
 
 }
-
-U_Scope[m] = (char) 0;
 
 
 return;
@@ -402,19 +288,14 @@ return;
 void EnumInfo::set_header(const char * text)
 
 {
-const char *method_name = "EnumInfo::set_header() -> ";
 
-if ( Header )  { delete [] Header;  Header = (char *) nullptr; }
+   //  a null text previously yielded an empty string, which clear() reproduces
 
-int k;
+Header.clear();
 
-k = m_strlen(text);
+if ( !text )  return;
 
-Header = new char [1 + k];
-
-m_strncpy(Header, text, k, method_name);
-
-Header[k] = (char) 0;   //  just to make sure
+Header = text;
 
 
 return;
@@ -441,19 +322,19 @@ int j;
 const char * c = "(nul)";
 
 
-if ( e.Name )  c = e.Name;
+if ( !e.Name.empty() )  c = e.Name.c_str();
 
 s << "enum " << c << " from header file ";
 
 c = "(nul)";
 
-if ( e.Header )  c = e.Header;
+if ( !e.Header.empty() )  c = e.Header.c_str();
 
 s << c << "\n";
 
-s << "There are " << (e.Nids) << " ids\n";
+s << "There are " << (e.s.size()) << " ids\n";
 
-for (j=0; j<(e.Nids); ++j)  {
+for (j=0; j<(int) (e.s.size()); ++j)  {
 
    s << "    " << j << "   \"";
 

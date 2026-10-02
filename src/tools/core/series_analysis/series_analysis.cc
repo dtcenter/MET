@@ -63,6 +63,7 @@
 #include "vx_regrid.h"
 #include "vx_log.h"
 #include "enum_as_int.hpp"
+#include <memory>
 
 using namespace std;
 using namespace netCDF;
@@ -452,8 +453,9 @@ static GrdFileType get_mtddf_file_type(const StringArray &file_list,
    }
 
    // Read first valid file
-   Met2dDataFile *mtddf = nullptr;
-   if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(file_list[i].c_str(), type))) {
+   std::unique_ptr<Met2dDataFile> mtddf;
+   mtddf = Met2dDataFileFactory::new_met_2d_data_file(file_list[i].c_str(), type);
+   if(!mtddf) {
       mlog << Error << "\nTrouble reading data file: "
            << file_list[i] << "\n\n";
       exit(1);
@@ -462,7 +464,7 @@ static GrdFileType get_mtddf_file_type(const StringArray &file_list,
    GrdFileType file_type = mtddf->file_type();
 
    // Clean up 
-   if(mtddf) { delete mtddf; mtddf = nullptr; }
+   mtddf.reset();
 
    return file_type;
 }
@@ -750,7 +752,7 @@ static bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
    if(found) cur_grid = mtddf->grid();
 
    // Close the data file
-   delete mtddf; mtddf = nullptr;
+   mtddf.reset();
 
    return found;
 }
@@ -772,45 +774,45 @@ static void open_aggr_file() {
    // Update timing info based on aggregate file global attributes
    ConcatString cs;
 
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_init_beg", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "fcst_init_beg", cs)) {
       set_range(timestring_to_unix(cs.c_str()), fcst_init_beg, fcst_init_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_init_end", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "fcst_init_end", cs)) {
       set_range(timestring_to_unix(cs.c_str()), fcst_init_beg, fcst_init_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_valid_beg", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "fcst_valid_beg", cs)) {
       set_range(timestring_to_unix(cs.c_str()), fcst_valid_beg, fcst_valid_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_valid_end", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "fcst_valid_end", cs)) {
       set_range(timestring_to_unix(cs.c_str()), fcst_valid_beg, fcst_valid_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_lead_beg", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "fcst_lead_beg", cs)) {
       set_range(timestring_to_sec(cs.c_str()), fcst_lead_beg, fcst_lead_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_lead_end", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "fcst_lead_end", cs)) {
       set_range(timestring_to_sec(cs.c_str()), fcst_lead_beg, fcst_lead_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_init_beg", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "obs_init_beg", cs)) {
       set_range(timestring_to_unix(cs.c_str()), obs_init_beg, obs_init_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_init_end", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "obs_init_end", cs)) {
       set_range(timestring_to_unix(cs.c_str()), obs_init_beg, obs_init_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_valid_beg", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "obs_valid_beg", cs)) {
       set_range(timestring_to_unix(cs.c_str()), obs_valid_beg, obs_valid_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_valid_end", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "obs_valid_end", cs)) {
       set_range(timestring_to_unix(cs.c_str()), obs_valid_beg, obs_valid_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_lead_beg", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "obs_lead_beg", cs)) {
       set_range(timestring_to_sec(cs.c_str()), obs_lead_beg, obs_lead_end);
    }
-   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_lead_end", cs)) {
+   if(get_att_value_string(aggr_nc.MetNc->Nc.get(), "obs_lead_end", cs)) {
       set_range(timestring_to_sec(cs.c_str()), obs_lead_beg, obs_lead_end);
    }
 
    // Store the aggregate series length
-   n_series_aggr = get_int_var(aggr_nc.MetNc->Nc, n_series_var_name, 0);
+   n_series_aggr = get_int_var(aggr_nc.MetNc->Nc.get(), n_series_var_name, 0);
 
    mlog << Debug(3)
         << "Aggregation series has length " << n_series_aggr << ".\n";
@@ -902,11 +904,11 @@ static void process_scores() {
 
          // Store the current VarInfo objects
          fcst_info = (conf_info.get_n_fcst() > 1 ?
-                      conf_info.fcst_info[i_series] :
-                      conf_info.fcst_info[0]);
+                      conf_info.fcst_info[i_series].get() :
+                      conf_info.fcst_info[0].get());
          obs_info  = (conf_info.get_n_obs() > 1 ?
-                      conf_info.obs_info[i_series] :
-                      conf_info.obs_info[0]);
+                      conf_info.obs_info[i_series].get() :
+                      conf_info.obs_info[0].get());
 
          // Retrieve the data planes for the current series entry
          get_series_data(i_series, fcst_info, obs_info, fcst_dp, obs_dp);
@@ -984,7 +986,7 @@ static void process_scores() {
               << (ocsd_flag ? 1 : 0) << " standard deviation field(s).\n";
 
          // Setup the output NetCDF file on the first pass
-         if(!nc_out) setup_nc_file(fcst_info, obs_info);
+         if(!nc_out.get()) setup_nc_file(fcst_info, obs_info);
 
          // Update timing info
          set_range(fcst_dp.init(),  fcst_init_beg,  fcst_init_end);
@@ -1175,18 +1177,18 @@ static void process_scores() {
    write_stat_data();
 
    // Add time range information to the global NetCDF attributes
-   add_att(nc_out, "fcst_init_beg",  (string)unix_to_yyyymmdd_hhmmss(fcst_init_beg));
-   add_att(nc_out, "fcst_init_end",  (string)unix_to_yyyymmdd_hhmmss(fcst_init_end));
-   add_att(nc_out, "fcst_valid_beg", (string)unix_to_yyyymmdd_hhmmss(fcst_valid_beg));
-   add_att(nc_out, "fcst_valid_end", (string)unix_to_yyyymmdd_hhmmss(fcst_valid_end));
-   add_att(nc_out, "fcst_lead_beg",  (string)sec_to_hhmmss(fcst_lead_beg));
-   add_att(nc_out, "fcst_lead_end",  (string)sec_to_hhmmss(fcst_lead_end));
-   add_att(nc_out, "obs_init_beg",   (string)unix_to_yyyymmdd_hhmmss(obs_init_beg));
-   add_att(nc_out, "obs_init_end",   (string)unix_to_yyyymmdd_hhmmss(obs_init_end));
-   add_att(nc_out, "obs_valid_beg",  (string)unix_to_yyyymmdd_hhmmss(obs_valid_beg));
-   add_att(nc_out, "obs_valid_end",  (string)unix_to_yyyymmdd_hhmmss(obs_valid_end));
-   add_att(nc_out, "obs_lead_beg",   (string)sec_to_hhmmss(obs_lead_beg));
-   add_att(nc_out, "obs_lead_end",   (string)sec_to_hhmmss(obs_lead_end));
+   add_att(nc_out.get(), "fcst_init_beg",  (string)unix_to_yyyymmdd_hhmmss(fcst_init_beg));
+   add_att(nc_out.get(), "fcst_init_end",  (string)unix_to_yyyymmdd_hhmmss(fcst_init_end));
+   add_att(nc_out.get(), "fcst_valid_beg", (string)unix_to_yyyymmdd_hhmmss(fcst_valid_beg));
+   add_att(nc_out.get(), "fcst_valid_end", (string)unix_to_yyyymmdd_hhmmss(fcst_valid_end));
+   add_att(nc_out.get(), "fcst_lead_beg",  (string)sec_to_hhmmss(fcst_lead_beg));
+   add_att(nc_out.get(), "fcst_lead_end",  (string)sec_to_hhmmss(fcst_lead_end));
+   add_att(nc_out.get(), "obs_init_beg",   (string)unix_to_yyyymmdd_hhmmss(obs_init_beg));
+   add_att(nc_out.get(), "obs_init_end",   (string)unix_to_yyyymmdd_hhmmss(obs_init_end));
+   add_att(nc_out.get(), "obs_valid_beg",  (string)unix_to_yyyymmdd_hhmmss(obs_valid_beg));
+   add_att(nc_out.get(), "obs_valid_end",  (string)unix_to_yyyymmdd_hhmmss(obs_valid_end));
+   add_att(nc_out.get(), "obs_lead_beg",   (string)sec_to_hhmmss(obs_lead_beg));
+   add_att(nc_out.get(), "obs_lead_end",   (string)sec_to_hhmmss(obs_lead_end));
 
    // Print summary counts
    mlog << Debug(2)
@@ -1220,7 +1222,7 @@ static void do_categorical(int n, const PairDataPoint *pd_ptr) {
 
    // Allocate objects to store categorical statistics
    int n_cts = conf_info.fcat_ta.n();
-   CTSInfo *cts_info = new CTSInfo [n_cts];
+   vector<CTSInfo> cts_info(n_cts);
 
    // Setup CTSInfo objects
    for(int i=0; i<n_cts; i++) {
@@ -1265,13 +1267,13 @@ static void do_categorical(int n, const PairDataPoint *pd_ptr) {
    else if(conf_info.boot_interval == BootIntervalType::BCA) {
       compute_cts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.n_boot_rep,
-         cts_info, n_cts, true,
+         cts_info.data(), n_cts, true,
          conf_info.rank_corr_flag, conf_info.tmp_dir.c_str());
    }
    else {
       compute_cts_stats_ci_perc(rng_ptr, *pd_ptr,
          conf_info.n_boot_rep, conf_info.boot_rep_prop,
-         cts_info, n_cts, true,
+         cts_info.data(), n_cts, true,
          conf_info.rank_corr_flag, conf_info.tmp_dir.c_str());
    }
 
@@ -1301,7 +1303,6 @@ static void do_categorical(int n, const PairDataPoint *pd_ptr) {
    } // end for i
 
    // Deallocate memory
-   if(cts_info) { delete [] cts_info; cts_info = nullptr; }
 
    return;
 }
@@ -1537,7 +1538,7 @@ static int read_aggr_total(int n) {
 
       // Retrive all the aggregate file variable names
       StringArray aggr_var_names;
-      get_var_names(aggr_nc.MetNc->Nc, &aggr_var_names);
+      get_var_names(aggr_nc.MetNc->Nc.get(), &aggr_var_names);
 
       // Search for one containing TOTAL
       for(int i=0; i<aggr_var_names.n(); i++) {
@@ -2442,7 +2443,7 @@ static void setup_nc_file(const VarInfo *fcst_info,
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_file.c_str(), true);
 
-   if(IS_INVALID_NC_P(nc_out)) {
+   if(IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_file << "\n\n";
@@ -2450,30 +2451,30 @@ static void setup_nc_file(const VarInfo *fcst_info,
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_file.c_str(), program_name,
+   write_netcdf_global(nc_out.get(), out_file.c_str(), program_name,
                        conf_info.model.c_str(), conf_info.obtype.c_str(), conf_info.desc.c_str());
-   add_att(nc_out, "mask_grid",  (conf_info.mask_grid_name.nonempty() ?
+   add_att(nc_out.get(), "mask_grid",  (conf_info.mask_grid_name.nonempty() ?
                                   (string)conf_info.mask_grid_name : na_str));
-   add_att(nc_out, "mask_poly",  (conf_info.mask_poly_name.nonempty() ?
+   add_att(nc_out.get(), "mask_poly",  (conf_info.mask_poly_name.nonempty() ?
                                   (string)conf_info.mask_poly_name : na_str));
-   add_att(nc_out, "fcst_var",   (string)fcst_info->name_attr());
-   add_att(nc_out, "fcst_lev",   (string)fcst_info->level_attr());
-   add_att(nc_out, "fcst_units", (string)fcst_info->units_attr());
-   add_att(nc_out, "obs_var",    (string)obs_info->name_attr());
-   add_att(nc_out, "obs_lev",    (string)obs_info->level_attr());
-   add_att(nc_out, "obs_units",  (string)obs_info->units_attr());
+   add_att(nc_out.get(), "fcst_var",   (string)fcst_info->name_attr());
+   add_att(nc_out.get(), "fcst_lev",   (string)fcst_info->level_attr());
+   add_att(nc_out.get(), "fcst_units", (string)fcst_info->units_attr());
+   add_att(nc_out.get(), "obs_var",    (string)obs_info->name_attr());
+   add_att(nc_out.get(), "obs_lev",    (string)obs_info->level_attr());
+   add_att(nc_out.get(), "obs_units",  (string)obs_info->units_attr());
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(nc_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
-   write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+   write_netcdf_latlon(nc_out.get(), &lat_dim, &lon_dim, grid);
 
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
    // Add the series length variable
-   NcVar var = add_var(nc_out, n_series_var_name, ncInt, deflate_level);
+   NcVar var = add_var(nc_out.get(), n_series_var_name, ncInt, deflate_level);
    add_att(&var, "long_name", "length of series");
 
    int n_series = n_series_pair + n_series_aggr;
@@ -2530,7 +2531,7 @@ static void write_stat_data() {
       const NcVarData *ptr = &stat_data[key];
 
       // Add a new variable to the NetCDF file
-      NcVar nc_var = add_var(nc_out, key, ncFloat, lat_dim, lon_dim, deflate_level);
+      NcVar nc_var = add_var(nc_out.get(), key, ncFloat, lat_dim, lon_dim, deflate_level);
 
       // Add variable attributes
       add_att(&nc_var, "_FillValue", bad_data_float);
@@ -2596,14 +2597,13 @@ static void set_pair_dims(vector<PairDataPoint> &pd_block,
 static void clean_up() {
 
    // Close the output NetCDF file
-   if(nc_out) {
+   if(nc_out.get()) {
 
       // List the NetCDF file after it is finished
       mlog << Debug(1)
            << "Output file: " << out_file << "\n";
 
-      delete nc_out;
-      nc_out = nullptr;
+      nc_out.reset();
    }
 
    // Close the aggregate NetCDF file

@@ -53,8 +53,6 @@ GaussianGrid::GaussianGrid()
 
 {
 
-Latitudes = 0;
-
 clear();
 
 }
@@ -89,7 +87,7 @@ Delta_Lon = 0.0;
 
 memset(&Data, 0, sizeof(Data));
 
-if ( Latitudes )  { delete [] Latitudes;  Latitudes = 0; }
+Latitudes.clear();
 
 return;
 
@@ -99,11 +97,9 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-GaussianGrid::GaussianGrid(const GaussianData & data)
+GaussianGrid::GaussianGrid(const GaussianData & data, Key)
 
 {
-
-Latitudes = 0;
 
 clear();
 
@@ -145,11 +141,9 @@ double latitude;
 const int ny_half = Ny/2;
 
 
-Latitudes = new double [Ny];
+Latitudes.assign(Ny, 0.0);
 
 L.set_max_degree(Ny);
-
-for (j=0; j<Ny; ++j)  Latitudes[j] = 0.0;
 
 for (j=0; j<ny_half; ++j)  {
 
@@ -453,11 +447,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * GaussianGrid::copy() const
+std::unique_ptr<GridRep> GaussianGrid::copy() const
 
 {
 
-auto * p = new GaussianGrid (Data);
+auto p = std::make_unique<GaussianGrid>(Data, Key{});
 
 p->Name = Name;
 
@@ -497,16 +491,8 @@ void Grid::set(const GaussianData & data)
 
 clear();
 
-rep = new GaussianGrid ( data );
+rep = std::make_unique<GaussianGrid>(data, GaussianGrid::Key{});
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const GaussianData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 

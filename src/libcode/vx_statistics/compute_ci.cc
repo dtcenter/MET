@@ -13,6 +13,7 @@
 #include <errno.h>
 #include <fstream>
 #include <iostream>
+#include <vector>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
@@ -272,22 +273,13 @@ void compute_hk_ci(double hk, double alpha, double vif,
 
 void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
                               const PairDataPoint &pd,
-                              int b, CTSInfo *&cts_info, int n_cts,
+                              int b, CTSInfo *cts_info, int n_cts,
                               bool cts_flag, bool rank_flag,
                               const char *tmp_dir) {
    int n = 0;
    int i, j, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
-   CTSInfo *cts_tmp = (CTSInfo *) nullptr;
-
-   //
-   // Temp file streams for categorical statistics
-   //
-   ofstream *cts_i_out = (ofstream *) nullptr;
-   ofstream *cts_r_out = (ofstream *) nullptr;
-   ConcatString *cts_i_file = (ConcatString *) nullptr;
-   ConcatString *cts_r_file = (ConcatString *) nullptr;
    ConcatString prefix;
 
    //
@@ -326,11 +318,11 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    // Allocate space to store categorical stats for each threshold
    // and for the output temp file streams
    //
-   cts_tmp    = new CTSInfo      [n_cts];
-   cts_i_out  = new ofstream     [n_cts];
-   cts_r_out  = new ofstream     [n_cts];
-   cts_i_file = new ConcatString [n_cts];
-   cts_r_file = new ConcatString [n_cts];
+   vector<CTSInfo>      cts_tmp   (n_cts);
+   vector<ofstream>     cts_i_out (n_cts);
+   vector<ofstream>     cts_r_out (n_cts);
+   vector<ConcatString> cts_i_file(n_cts);
+   vector<ConcatString> cts_r_file(n_cts);
    for(i=0; i<n_cts; i++) {
       cts_tmp[i].fthresh = cts_info[i].fthresh;
       cts_tmp[i].othresh = cts_info[i].othresh;
@@ -374,12 +366,6 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
                remove_temp_file(cts_r_file[i]);
             }
 
-            // deallocate memory
-            if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      nullptr; }
-            if(cts_i_out)  { delete [] cts_i_out;  cts_i_out  = (ofstream *)     nullptr; }
-            if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     nullptr; }
-            if(cts_i_file) { delete [] cts_i_file; cts_i_file = (ConcatString *) nullptr; }
-            if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) nullptr; }
             throw 1;
          }
       }
@@ -705,15 +691,6 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
       remove_temp_file(cts_i_file[i]);
       remove_temp_file(cts_r_file[i]);
    }
-
-   //
-   // Deallocate memory
-   //
-   if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      nullptr; }
-   if(cts_i_out)  { delete [] cts_i_out;  cts_i_out  = (ofstream *)     nullptr; }
-   if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     nullptr; }
-   if(cts_i_file) { delete [] cts_i_file; cts_i_file = (ConcatString *) nullptr; }
-   if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) nullptr; }
 
    return;
 }
@@ -1410,20 +1387,13 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
 void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
                                const PairDataPoint &pd,
                                int b, double m_prop,
-                               CTSInfo *&cts_info, int n_cts,
+                               CTSInfo *cts_info, int n_cts,
                                bool cts_flag, bool rank_flag,
                                const char *tmp_dir) {
    int n = 0;
    int i, j, m, c;
    double s;
    NumArray i_na, ir_na, sr_na;
-   CTSInfo *cts_tmp = (CTSInfo *) nullptr;
-
-   //
-   // Temp file streams for categorical statistics
-   //
-   ofstream *cts_r_out = (ofstream *) nullptr;
-   ConcatString *cts_r_file = (ConcatString *) nullptr;
    ConcatString prefix;
 
    //
@@ -1467,9 +1437,9 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    // Allocate space to store categorical stats for each threshold
    // and for the output temp file streams
    //
-   cts_tmp    = new CTSInfo [n_cts];
-   cts_r_out  = new ofstream [n_cts];
-   cts_r_file = new ConcatString [n_cts];
+   vector<CTSInfo>      cts_tmp   (n_cts);
+   vector<ofstream>     cts_r_out (n_cts);
+   vector<ConcatString> cts_r_file(n_cts);
    for(i=0; i<n_cts; i++) {
       cts_tmp[i].fthresh = cts_info[i].fthresh;
       cts_tmp[i].othresh = cts_info[i].othresh;
@@ -1503,10 +1473,6 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
            // Attempt to delete temp files
            //
            for(i=0; i<n_cts; i++) remove_temp_file(cts_r_file[i]);
-
-           if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      nullptr; }
-           if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     nullptr; }
-           if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) nullptr; }
 
             throw 1;
          }
@@ -1796,13 +1762,6 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    for(i=0; i<n_cts; i++) {
       remove_temp_file(cts_r_file[i]);
    }
-
-   //
-   // Deallocate memory
-   //
-   if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      nullptr; }
-   if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     nullptr; }
-   if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) nullptr; }
 
    return;
 }
@@ -2427,22 +2386,13 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
 
 void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
                                  const PairDataPoint &pd,
-                                 int b, NBRCTSInfo *&nbrcts_info,
+                                 int b, NBRCTSInfo *nbrcts_info,
                                  int n_nbrcts, bool nbrcts_flag,
                                  const char *tmp_dir) {
    int n = 0;
    int i, j, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
-   NBRCTSInfo *nbrcts_tmp = (NBRCTSInfo *) nullptr;
-
-   //
-   // Temp file streams for categorical statistics
-   //
-   ofstream *nbrcts_i_out = (ofstream *) nullptr;
-   ofstream *nbrcts_r_out = (ofstream *) nullptr;
-   ConcatString *nbrcts_i_file = (ConcatString *) nullptr;
-   ConcatString *nbrcts_r_file = (ConcatString *) nullptr;
    ConcatString prefix;
 
    //
@@ -2482,11 +2432,11 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
    // Allocate space to store categorical stats for each threshold
    // and for the output temp file streams
    //
-   nbrcts_tmp    = new NBRCTSInfo [n_nbrcts];
-   nbrcts_i_out  = new ofstream [n_nbrcts];
-   nbrcts_r_out  = new ofstream [n_nbrcts];
-   nbrcts_i_file = new ConcatString [n_nbrcts];
-   nbrcts_r_file = new ConcatString [n_nbrcts];
+   vector<NBRCTSInfo>   nbrcts_tmp   (n_nbrcts);
+   vector<ofstream>     nbrcts_i_out (n_nbrcts);
+   vector<ofstream>     nbrcts_r_out (n_nbrcts);
+   vector<ConcatString> nbrcts_i_file(n_nbrcts);
+   vector<ConcatString> nbrcts_r_file(n_nbrcts);
    for(i=0; i<n_nbrcts; i++) {
       nbrcts_tmp[i].cts_info.fthresh = nbrcts_info[i].cts_info.fthresh;
       nbrcts_tmp[i].cts_info.othresh = nbrcts_info[i].cts_info.othresh;
@@ -2531,13 +2481,6 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
                remove_temp_file(nbrcts_i_file[i]);
                remove_temp_file(nbrcts_r_file[i]);
             }
-
-            // deallocate memory
-            if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   nullptr; }
-            if(nbrcts_i_out)  { delete [] nbrcts_i_out;  nbrcts_i_out  = (ofstream *)     nullptr; }
-            if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     nullptr; }
-            if(nbrcts_i_file) { delete [] nbrcts_i_file; nbrcts_i_file = (ConcatString *) nullptr; }
-            if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) nullptr; }
 
             throw 1;
          }
@@ -2853,15 +2796,6 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
       remove_temp_file(nbrcts_r_file[i]);
    }
 
-   //
-   // Deallocate memory
-   //
-   if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   nullptr; }
-   if(nbrcts_i_out)  { delete [] nbrcts_i_out;  nbrcts_i_out  = (ofstream *)     nullptr; }
-   if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     nullptr; }
-   if(nbrcts_i_file) { delete [] nbrcts_i_file; nbrcts_i_file = (ConcatString *) nullptr; }
-   if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) nullptr; }
-
    return;
 }
 
@@ -3082,20 +3016,13 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
 void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
                                   const PairDataPoint &pd,
                                   int b, double m_prop,
-                                  NBRCTSInfo *&nbrcts_info,
+                                  NBRCTSInfo *nbrcts_info,
                                   int n_nbrcts, bool nbrcts_flag,
                                   const char *tmp_dir) {
    int n = 0;
    int i, j, c;
    double s;
    NumArray i_na, ir_na, sr_na;
-   NBRCTSInfo *nbrcts_tmp = ( NBRCTSInfo *) nullptr;
-
-   //
-   // Temp file streams for categorical statistics
-   //
-   ofstream *nbrcts_r_out = (ofstream *) nullptr;
-   ConcatString *nbrcts_r_file = (ConcatString *) nullptr;
    ConcatString prefix;
 
    //
@@ -3135,9 +3062,9 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
    // Allocate space to store categorical stats for each threshold
    // and for the output temp file streams
    //
-   nbrcts_tmp    = new NBRCTSInfo [n_nbrcts];
-   nbrcts_r_out  = new ofstream [n_nbrcts];
-   nbrcts_r_file = new ConcatString [n_nbrcts];
+   vector<NBRCTSInfo>   nbrcts_tmp   (n_nbrcts);
+   vector<ofstream>     nbrcts_r_out (n_nbrcts);
+   vector<ConcatString> nbrcts_r_file(n_nbrcts);
    for(i=0; i<n_nbrcts; i++) {
       nbrcts_tmp[i].cts_info.fthresh = nbrcts_info[i].cts_info.fthresh;
       nbrcts_tmp[i].cts_info.othresh = nbrcts_info[i].cts_info.othresh;
@@ -3174,11 +3101,6 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
           // Attempt to delete temp files
           //
           for(i=0; i<n_nbrcts; i++) remove_temp_file(nbrcts_r_file[i]);
-         // Deallocate memory
-         //
-         if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   nullptr; }
-         if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     nullptr; }
-         if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) nullptr; }
 
             throw 1;
          }
@@ -3458,13 +3380,6 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
    for(i=0; i<n_nbrcts; i++) {
       remove_temp_file(nbrcts_r_file[i]);
    }
-
-   //
-   // Deallocate memory
-   //
-   if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   nullptr; }
-   if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     nullptr; }
-   if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) nullptr; }
 
    return;
 }

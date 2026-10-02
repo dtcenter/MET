@@ -70,7 +70,12 @@ Ny = 0;
 
 Name.clear();
 
-memset(&Data, 0, sizeof(Data));
+   //
+   //  value-initialize instead of memset because the struct
+   //  contains std::vector members
+   //
+
+Data = GoesImagerData();
 
 return;
 
@@ -80,7 +85,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-GoesImagerGrid::GoesImagerGrid(const GoesImagerData & data)
+GoesImagerGrid::GoesImagerGrid(const GoesImagerData & data, Key)
 
 {
 
@@ -336,11 +341,11 @@ exit ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * GoesImagerGrid::copy() const
+std::unique_ptr<GridRep> GoesImagerGrid::copy() const
 
 {
 
-auto * p = new GoesImagerGrid (Data);
+auto p = std::make_unique<GoesImagerGrid>(Data, Key{});
 
 p->Name = Name;
 
@@ -410,9 +415,9 @@ void GoesImagerData::compute_lat_lon()
    idx_lat_min = idx_lat_max = idx_lon_min = idx_lon_max = 0;
    buf_len = nx * ny;
 
-   if ((0 != x_values) && (0 != y_values)) {
-      lat_values = new float[buf_len];
-      lon_values = new float[buf_len];
+   if (!x_values.empty() && !y_values.empty()) {
+      lat_values.assign(buf_len, 0.0f);
+      lon_values.assign(buf_len, 0.0f);
       
       // Order matters, checked with binary coordinate file
       for (int yIdx=0; yIdx<ny; yIdx++) {
@@ -481,50 +486,28 @@ void GoesImagerData::copy(const GoesImagerData *from)
    lat_of_projection_origin = from->lat_of_projection_origin;
    lon_of_projection_origin = from->lon_of_projection_origin;
    
-   int var_x_size = sizeof(from->x_image_bounds[0]);
-   int var_y_size = sizeof(from->y_image_bounds[0]);
-   int var_x_bound = sizeof(from->x_image_bounds) / var_x_size;
-   int var_y_bound = sizeof(from->y_image_bounds) / var_y_size;
-   mlog << Debug(5) << "GoesImager copy(): bound count: x=" 
-        << var_x_bound << ", y=" << var_y_bound
-        << " data size (bytes): x=" << var_x_size << ", y=" << var_y_size << "\n";
-   if (0 != var_x_bound) {
-      x_image_bounds = new double[var_x_bound];
-      memcpy(x_image_bounds, from->x_image_bounds,
-            var_x_bound * var_x_size);
-   }
-   if (0 != var_y_bound) {
-      y_image_bounds = new double[var_y_bound];
-      memcpy(y_image_bounds, from->y_image_bounds,
-            var_y_bound * var_y_size);
-   }
+   //  NOTE: this previously sized the copy with
+   //  sizeof(from->x_image_bounds) / sizeof(from->x_image_bounds[0]), which is
+   //  sizeof(double *) / sizeof(double) - always 1, whatever the real length.
+   //  A copied GoesImagerData therefore kept only the first bound, and dump()
+   //  read the second out of bounds. A vector copy carries the real length.
+
+   x_image_bounds = from->x_image_bounds;
+   y_image_bounds = from->y_image_bounds;
+
+   mlog << Debug(5) << "GoesImager copy(): bound count: x="
+        << x_image_bounds.size() << ", y=" << y_image_bounds.size() << "\n";
    
-   if (0 != from->lat_values) {
-      if (lat_values) delete[] lat_values;
-      lat_values = new float[nx*ny];
-      memcpy(lat_values, from->lat_values, nx*ny*sizeof(lat_values[0]));
-   }
+   lat_values = from->lat_values;
    //else lat_values = 0;
    
-   if (0 != from->lon_values) {
-      if (lon_values) delete[] lon_values;
-      lon_values = new float[nx*ny];
-      memcpy(lon_values, from->lon_values, nx*ny*sizeof(lon_values[0]));
-   }
+   lon_values = from->lon_values;
    //else lon_values = 0;
 
-   if (0 != from->x_values) {
-      if (x_values) delete[] x_values;
-      x_values = new double[nx];
-      memcpy(x_values, from->x_values, nx*sizeof(x_values[0]));
-   }
+   x_values = from->x_values;
    //else x_values = 0;
    
-   if (0 != from->y_values) {
-      if (y_values) delete[] y_values;
-      y_values = new double[ny];
-      memcpy(y_values, from->y_values, ny*sizeof(y_values[0]));
-   }
+   y_values = from->y_values;
    //else from->y_values = 0;
 
 }
@@ -561,25 +544,25 @@ mlog << Debug(4)
 ////////////////////////////////////////////////////////////////////////
 
 void GoesImagerData::reset() {
-   lat_values = 0;
-   lon_values = 0;
-   x_values = 0; //radian
-   y_values = 0; //radian
-   x_image_bounds = 0;
-   y_image_bounds = 0;
-   scene_id = 0;
+   lat_values.clear();
+   lon_values.clear();
+   x_values.clear(); //radian
+   y_values.clear(); //radian
+   x_image_bounds.clear();
+   y_image_bounds.clear();
+   scene_id.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void GoesImagerData::release() {
-   if (lat_values) { delete[] lat_values; lat_values=0; }
-   if (lon_values) { delete[] lon_values; lon_values=0; }
-   if (x_values) { delete[] x_values; x_values=0; }
-   if (y_values) { delete[] y_values; y_values=0; }
-   if (x_image_bounds) { delete[] x_image_bounds; x_image_bounds=0; }
-   if (y_image_bounds) { delete[] y_image_bounds; y_image_bounds=0; }
-   if (scene_id) { delete[] scene_id; scene_id=0; }
+   lat_values.clear();
+   lon_values.clear();
+   x_values.clear();
+   y_values.clear();
+   x_image_bounds.clear();
+   y_image_bounds.clear();
+   scene_id.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -659,16 +642,8 @@ void Grid::set(const GoesImagerData & data)
 
 clear();
 
-rep = new GoesImagerGrid (data);
+rep = std::make_unique<GoesImagerGrid>(data, GoesImagerGrid::Key{});
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const GoesImagerData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 }
 

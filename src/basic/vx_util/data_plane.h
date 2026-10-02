@@ -98,8 +98,10 @@ class DataPlane {
       int      nxy() const;
 
       bool     is_empty() const;
+      bool     has_bad_data() const;
       bool     is_all_bad_data() const;
       int      n_good_data() const;
+      double   mean() const;
 
       unixtime init() const;
       unixtime valid() const;
@@ -191,7 +193,9 @@ class DataPlaneArray {
       DataPlaneArray();
      ~DataPlaneArray();
       DataPlaneArray(const DataPlaneArray &);
+      DataPlaneArray(DataPlaneArray &&) noexcept;
       DataPlaneArray & operator=(const DataPlaneArray &);
+      DataPlaneArray & operator=(DataPlaneArray &&) noexcept;
       DataPlaneArray & operator+=(const DataPlaneArray &);
       DataPlaneArray & operator/=(const double);
 
@@ -219,6 +223,7 @@ class DataPlaneArray {
 
       void levels (int, double & _low, double & _up) const;
       void level_range (double & _low, double & _up) const;
+      bool levels_match(const DataPlaneArray &) const;
 
       double data (int plane, int x, int y) const;
       void   set  (double, int plane, int x, int y);

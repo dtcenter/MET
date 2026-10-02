@@ -19,6 +19,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 #include "3d_att.h"
 #include "mm_engine.h"
@@ -35,16 +36,9 @@ class SingleAtt3DArray {
 
       void assign(const SingleAtt3DArray &);
 
-      void extend(int);
-
-
-      int Nelements;
-
-      int Nalloc;
-
       int AllocInc;
 
-      SingleAtt3D * e;
+      std::vector<SingleAtt3D> e;
 
 
    public:
@@ -77,8 +71,8 @@ class SingleAtt3DArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int SingleAtt3DArray::n_elements() const { return Nelements; }
-inline int SingleAtt3DArray::n         () const { return Nelements; }
+inline int SingleAtt3DArray::n_elements() const { return (int) e.size(); }
+inline int SingleAtt3DArray::n         () const { return (int) e.size(); }
 
 
 ////////////////////////////////////////////////////////////////////////

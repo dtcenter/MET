@@ -16,6 +16,7 @@
 #include <string.h>
 #include <cstdio>
 #include <cmath>
+#include <vector>
 
 #include "vx_util.h"
 #include "vx_math.h"
@@ -388,7 +389,6 @@ SingleAtt2D calc_2d_single_atts(const MtdIntFile & mask_2d, const DataPlane & ra
 
 SingleAtt2D a;
 Mtd_2D_Moments moments;
-float * values = (float *) nullptr;
 const int    * i = 0;
 const double * r = 0;
 const int nxy = (mask_2d.nx())*(mask_2d.ny());
@@ -417,16 +417,7 @@ a.AxisAngle = moments.calc_2D_axis_plane_angle();
    //
 
 
-values = new float [a.Area];
-
-if ( !values )  {
-
-   mlog << Error << "\ncalc_2d_single_atts() -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
+vector<float> values(a.Area);
 
 i = mask_2d.data();
 r = raw_2d.data();
@@ -445,24 +436,23 @@ for (j=0; j<nxy; ++j)  {
 }
 
 
-sort_f(values, n);
+sort_f(values.data(), n);
 
-a.Ptile_10 = percentile_f(values, n, 0.10);
-a.Ptile_25 = percentile_f(values, n, 0.25);
-a.Ptile_50 = percentile_f(values, n, 0.50);
-a.Ptile_75 = percentile_f(values, n, 0.75);
-a.Ptile_90 = percentile_f(values, n, 0.90);
+a.Ptile_10 = percentile_f(values.data(), n, 0.10);
+a.Ptile_25 = percentile_f(values.data(), n, 0.25);
+a.Ptile_50 = percentile_f(values.data(), n, 0.50);
+a.Ptile_75 = percentile_f(values.data(), n, 0.75);
+a.Ptile_90 = percentile_f(values.data(), n, 0.90);
 
 a.Ptile_Value = ptile_value;
 
-a.Ptile_User = percentile_f(values, n, (double) (a.Ptile_Value/100.0));
+a.Ptile_User = percentile_f(values.data(), n, (double) (a.Ptile_Value/100.0));
 
 
    //
    //   done
    //
 
-if ( values )  { delete [] values;  values = 0; }
 
 return a;
 

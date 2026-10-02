@@ -36,8 +36,8 @@
         <param> \
             &DATA_DIR_MODEL;/grib2/um_raw/PS.557WW_SC.U_DI.F_GP.GALWEM-GD_GR.C17KM_AR.GLOBAL_DD.20160424_CY.00_FH.000_DF.GR2 \
             &OUTPUT_DIR;/grib_tables/um_raw/PS.557WW_SC.U_DI.F_GP.GALWEM-GD_GR.C17KM_AR.GLOBAL_DD.20160424_CY.00_FH.000_DF.ps \
-            'name = "TCDC"; level = "L0";' \
-            -title "GRIB2 um_raw L0 TCDC" \
+            'name = "TCC"; level = "L0";' \
+            -title "GRIB2 um_raw L0 TCC" \
             -v 1
         </param>
         <output>

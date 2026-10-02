@@ -40,8 +40,6 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 Polyline::Polyline() {
-   u = v = (double *) nullptr;
-
    clear();
 }
 
@@ -55,8 +53,6 @@ Polyline::~Polyline() {
 ///////////////////////////////////////////////////////////////////////////////
 
 Polyline::Polyline(const Polyline &c) {
-   u = v = (double *) nullptr;
-
    assign(c);
 }
 
@@ -75,10 +71,10 @@ Polyline & Polyline::operator=(const Polyline &c) {
 
 void Polyline::clear() {
 
-   if(u)    { delete [] u;    u = (double *) nullptr; }
-   if(v)    { delete [] v;    v = (double *) nullptr; }
+   u.clear();
+   v.clear();
 
-   n_points = n_alloc = 0;
+   n_points = 0;
 
    return;
 }
@@ -86,7 +82,6 @@ void Polyline::clear() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void Polyline::assign(const Polyline &c) {
-   int i;
 
    clear();
 
@@ -94,15 +89,10 @@ void Polyline::assign(const Polyline &c) {
 
    if(c.n_points == 0) return;
 
-   extend_points(c.n_points);
+   n_points = c.n_points;
 
-   n_alloc = n_points = c.n_points;
-
-   for(i=0; i<n_points; i++) {
-
-      u[i] = c.u[i];
-      v[i] = c.v[i];
-   }
+   u = c.u;
+   v = c.v;
 
    return;
 }
@@ -119,7 +109,7 @@ Indent prefix(depth);
 Indent p2(depth + 1);
 
 out << prefix << "n_points = " << n_points << "\n";
-out << prefix << "n_alloc  = " << n_alloc  << "\n";
+out << prefix << "n_alloc  = " << u.capacity() << "\n";
 
 for (j=0; j<n_points; ++j)  {
 
@@ -167,10 +157,8 @@ void Polyline::set_name(std::string n) {
 
 void Polyline::add_point(double uu, double vv) {
 
-   extend_points(n_points + 1);
-
-   u[n_points] = uu;
-   v[n_points] = vv;
+   u.push_back(uu);
+   v.push_back(vv);
 
    n_points++;
 
@@ -181,54 +169,8 @@ void Polyline::add_point(double uu, double vv) {
 
 void Polyline::extend_points(int n) {
 
-   if(n_alloc >= n) return;
-
-   if(n_alloc == 0) {
-
-      u = new double [n];
-      v = new double [n];
-
-      if(!u || !v) {
-         mlog << Error << "\nPolyline::extend_points(int) -> "
-              << "memory allocation error 1" << "\n\n";
-
-         exit(1);
-      }
-
-      n_alloc = n;
-
-      n_points = 0;
-
-      return;
-   }
-
-   int i;
-   double *uu = (double *) nullptr;
-   double *vv = (double *) nullptr;
-
-   uu = new double [n];
-   vv = new double [n];
-
-   if(!uu || !vv) {
-      mlog << Error << "\nPolyline::extend_points(int) -> "
-           << "memory allocation error 2" << "\n\n";
-
-      exit(1);
-   }
-
-   for(i=0; i<n_points; i++) {
-
-      uu[i] = u[i];
-      vv[i] = v[i];
-   }
-
-   delete [] u; u = (double *) nullptr;
-   delete [] v; v = (double *) nullptr;
-
-   u = uu;
-   v = vv;
-
-   uu = vv = (double *) nullptr;
+   u.reserve(n);
+   v.reserve(n);
 
    return;
 }

@@ -71,9 +71,7 @@ PairDataEnsemble & PairDataEnsemble::operator=(const PairDataEnsemble &pd) {
 
 void PairDataEnsemble::init_from_scratch() {
 
-   e_na       = (NumArray *) nullptr;
    n_ens      = 0;
-   ssvar_bins = (SSVARInfo *) nullptr;
 
    clear();
 
@@ -89,8 +87,7 @@ void PairDataEnsemble::clear() {
    obs_error_entry.clear();
    obs_error_flag = false;
 
-   for(int i=0; i<n_ens; i++) e_na[i].clear();
-   if(e_na) { delete [] e_na; e_na = (NumArray *) nullptr; }
+   e_na.clear();
 
    v_na.clear();
    r_na.clear();
@@ -134,7 +131,7 @@ void PairDataEnsemble::clear() {
    mn_na.clear();
    mn_oerr_na.clear();
 
-   if(ssvar_bins) { delete [] ssvar_bins; ssvar_bins = (SSVARInfo *) nullptr; }
+   ssvar_bins.clear();
 
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
@@ -277,12 +274,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    relp_na        = pd.relp_na;
    phist_na       = pd.phist_na;
 
-   if(pd.ssvar_bins){
-      ssvar_bins = new SSVARInfo[pd.ssvar_bins[0].n_bin];
-      for(int i=0; i < pd.ssvar_bins[0].n_bin; i++){
-         ssvar_bins[i] = pd.ssvar_bins[i];
-      }
-   } else ssvar_bins = nullptr;
+   ssvar_bins = pd.ssvar_bins;
 
    ssvar_bin_size = pd.ssvar_bin_size;
    phist_bin_size = pd.phist_bin_size;
@@ -351,14 +343,14 @@ void PairDataEnsemble::set_ens_size(int n) {
 
    // Allocate a NumArray to store ensemble values for each member
    n_ens = n;
-   e_na  = new NumArray [n_ens];
+   e_na.assign(n_ens, NumArray());
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataEnsemble::add_obs_error_entry(ObsErrorEntry *e) {
+void PairDataEnsemble::add_obs_error_entry(const ObsErrorEntry *e) {
 
    obs_error_entry.add(e);
 
@@ -807,7 +799,7 @@ void PairDataEnsemble::compute_ssvar() {
    if(n_bin == 0) return;
 
    // Build a list of SSVARInfo objects
-   ssvar_bins = new SSVARInfo[n_bin];
+   ssvar_bins.assign(n_bin, SSVARInfo());
    i=0;
    for(auto set_it = sorted_bins.begin();
        set_it != sorted_bins.end(); set_it++, i++){
@@ -1014,9 +1006,6 @@ VxPairDataEnsemble & VxPairDataEnsemble::operator=(const VxPairDataEnsemble &vx_
 
 void VxPairDataEnsemble::init_from_scratch() {
 
-   ens_info = (EnsVarInfo *) nullptr;
-   obs_info = (VarInfo *)    nullptr;
-
    VxPairBase::init_from_scratch();
 
    clear();
@@ -1030,10 +1019,12 @@ void VxPairDataEnsemble::clear() {
 
    VxPairBase::clear();
 
-   if(ens_info) { delete ens_info; ens_info = (EnsVarInfo *) nullptr; }
-   if(obs_info) { delete obs_info; obs_info = (VarInfo *)    nullptr; }
+   ens_info.reset();
 
    obs_error_info = (ObsErrorInfo *) nullptr;
+
+   n_try_obs_error  = 0;
+   n_fail_obs_error = 0;
 
    pd.clear();
 
@@ -1048,10 +1039,13 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
 
    VxPairBase::assign(vx_pd);
 
-   set_ens_info(vx_pd.ens_info);
-   set_obs_info(vx_pd.obs_info);
+   set_ens_info(vx_pd.ens_info.get());
+   set_obs_info(vx_pd.obs_info.get());
 
    obs_error_info = vx_pd.obs_error_info;
+
+   n_try_obs_error  = vx_pd.n_try_obs_error;
+   n_fail_obs_error = vx_pd.n_fail_obs_error;
 
    set_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
 
@@ -1064,11 +1058,8 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
 
 void VxPairDataEnsemble::set_ens_info(const EnsVarInfo *info) {
 
-   // Deallocate, if necessary
-   if(ens_info) { delete ens_info; ens_info = (EnsVarInfo *) nullptr; }
-
    // Perform a deep copy
-   ens_info = new EnsVarInfo(*info);
+   ens_info = std::make_unique<EnsVarInfo>(*info);
 
    // Set the base pointer
    if(!fcst_info) set_fcst_info(ens_info->get_var_info());
@@ -1105,7 +1096,7 @@ void VxPairDataEnsemble::set_ens_size(int n) {
       // Handle HiRA neighborhoods
       if(it->interp_mthd == InterpMthd::HiRA) {
          GridTemplateFactory gtf;
-         const GridTemplate* gt = gtf.buildGT(it->interp_shape,
+         const auto gt = gtf.buildGT(it->interp_shape,
                                               it->interp_wdth,
                                               false);
          it->set_ens_size(n*gt->size());
@@ -1248,7 +1239,7 @@ void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
    }
 
    // Store pointer to ObsErrorEntry
-   ObsErrorEntry *oerr_ptr = nullptr;
+   const ObsErrorEntry *oerr_ptr = nullptr;
    if(obs_error_info->flag) {
 
       // Use config file setting, if specified
@@ -1270,10 +1261,14 @@ void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
             obs_error_info->flag = false;
          }
          else {
+            n_try_obs_error++;
             oerr_ptr = obs_error_table.lookup(
                obs_info->name().c_str(), hdr_typ_str, hdr_sid_str,
                hdr_typ_arr[0], hdr_typ_arr[1], hdr_typ_arr[2],
                obs_lvl, obs_hgt, obs_v);
+
+            // MET #3429: Skip observation if the table lookup fails
+            if(!oerr_ptr) { n_fail_obs_error++; return; }
          }
       }
    }
@@ -1281,7 +1276,7 @@ void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
    // Apply observation error additive and multiplicative
    // bias correction, if requested
    if(obs_error_info->flag) {
-      obs_v = add_obs_error_bc(obs_error_info->rng_ptr,
+      obs_v = add_obs_error_bc(
                                FieldType::Obs, oerr_ptr, obs_v);
    }
 
@@ -1336,6 +1331,23 @@ void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
          } // end for k
       } // end for j
    } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::log_obs_error_lookup_summary() {
+
+   if(n_fail_obs_error > 0) {
+      mlog << Debug(2)
+           << "Skipping " << n_fail_obs_error << " of " << n_try_obs_error
+           << " observations with no matching observation error "
+           << "table entry.\n";
+   }
+
+   n_try_obs_error  = 0;
+   n_fail_obs_error = 0;
 
    return;
 }

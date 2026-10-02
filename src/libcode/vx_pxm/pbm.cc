@@ -329,7 +329,7 @@ if ( !in )  {
    //
    //  copy filename
    //
-Name = m_strcpy2(filename, method_name, "Name");
+Name = filename;
 
    //
    //  read magic cookie
@@ -389,17 +389,9 @@ Nrows = parse_number(in);
 
 n = total_data_bytes();
 
-if ( !(data = new unsigned char [n]) )  {
+data.assign(n, 0);
 
-   mlog << Warning << "\n" << method_name << "memory allocation error\n\n";
-
-   clear();
-
-   return 0;
-
-}
-
-if ( !in.read((char *) data, n) )  {
+if ( !in.read((char *) data.data(), n) )  {
 
    mlog << Warning << "\n" << method_name << "trouble reading image data\n\n";
 
@@ -514,9 +506,9 @@ void Pbm::all_black()
    //  We want it the other way, though
    //
 
-if ( !data )  return;
+if ( data.empty() )  return;
 
-(void) memset(data, 255, total_data_bytes());
+(void) memset(data.data(), 255, total_data_bytes());
 
 return;
 
@@ -535,9 +527,9 @@ void Pbm::all_white()
    //  We want it the other way, though
    //
 
-if ( !data )  return;
+if ( data.empty() )  return;
 
-(void) memset(data, 0, total_data_bytes());
+(void) memset(data.data(), 0, total_data_bytes());
 
 return;
 
@@ -556,15 +548,7 @@ clear();
 Nrows = NR;
 Ncols = NC;
 
-data = new unsigned char [total_data_bytes()];
-
-if ( !data )  {
-
-   mlog << Error << "\nPbm::set_size(int, int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
+data.assign(total_data_bytes(), 0);
 
 Nalloc = total_data_bytes();
 
@@ -604,7 +588,7 @@ void Pbm::reverse_video()
 
 {
 
-if ( !data )  {
+if ( data.empty() )  {
 
    mlog << Error << "\nvoid Pbm::reverse_video() -> bad image\n\n";
 

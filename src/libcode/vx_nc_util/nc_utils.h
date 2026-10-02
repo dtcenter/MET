@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <string.h>
 #include <time.h>
 
@@ -304,7 +305,7 @@ extern netCDF::NcVar get_nc_var(netCDF::NcFile *, const char *var_name,
 extern netCDF::NcVar get_nc_var(netCDF::NcFile *, const ConcatString &var_name,
                                 const char *group_name, bool log_as_error=false);   // continue even though not exists
 
-extern netCDF::NcVar *copy_nc_var(netCDF::NcFile *,  netCDF::NcVar *,
+extern netCDF::NcVar copy_nc_var(netCDF::NcFile *,  netCDF::NcVar *,
                                   const int deflate_level=DEF_DEFLATE_LEVEL, const bool all_attrs=true);
 extern void   copy_nc_att(netCDF::NcFile *, netCDF::NcVar *, const ConcatString attr_name);
 extern void   copy_nc_att( netCDF::NcVar *,  netCDF::NcVar *, const ConcatString attr_name);
@@ -335,20 +336,22 @@ extern bool   get_dim_names(const netCDF::NcFile *nc, StringArray *dimNames);
 extern netCDF::NcVar  get_nc_var_lat(const netCDF::NcFile *nc);
 extern netCDF::NcVar  get_nc_var_lon(const netCDF::NcFile *nc);
 extern netCDF::NcVar  get_nc_var_time(const netCDF::NcFile *nc);
-extern int    get_index_at_nc_data(netCDF::NcVar *var, double value, const std::string dim_name, bool is_time=false);
-extern netCDF::NcFile* open_ncfile(const char * nc_name, bool write = false);
+extern int    get_index_at_nc_data(netCDF::NcVar *var, double value, const std::string &dim_name, bool is_time=false);
+extern int    get_index_at_nc_data(netCDF::NcVar *var, double value_min, double value_max, const std::string &dim_name, bool is_time=false);
+extern std::unique_ptr<netCDF::NcFile> open_ncfile(const char * nc_name, bool write = false);
 
 // Moved from nc_cf_file.cc
-extern unixtime get_init_time(netCDF::NcFile *nc_file);
+extern unixtime get_init_time(netCDF::NcVar *var);
+extern unixtime get_init_time(netCDF::NcFile *nc_file, const char *time_var_name=nullptr);
 
 extern unixtime get_reference_unixtime(netCDF::NcVar *time_var, int &sec_per_unit,
-                                       bool &no_leap_year);
+                                       bool &no_leap_year, const char *caller=nullptr);
 
 extern bool is_nc_unit_time(const char *units);
 extern bool is_nc_unit_longitude(const char *units);
 extern bool is_nc_unit_latitude(const char *units);
 
-extern void parse_cf_time_string(const char *str, unixtime &ref_ut,
+extern bool parse_cf_time_string(const char *str, unixtime &ref_ut,
                                  int &sec_per_unit);
 extern void parse_time_string(const char *str, unixtime &ut);
 

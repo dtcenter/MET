@@ -46,34 +46,6 @@ void m_strcpy(char *to_str, const char *from_str, const char *method_name,
 }
 
 ////////////////////////////////////////////////////////////////////////
-// to_string should not allocated. This allocates and return to_str after copying
-
-char *m_strcpy2(const char *from_str, const char *method_name, const char *extra_msg) {
-   char *to_str = (char *) nullptr;
-   if (from_str) {
-      int str_len = m_strlen(from_str);
-
-      to_str = new char[str_len + 1];
-
-      if(!to_str) {
-         mlog << Error << "\n" << method_name
-              << "memory allocation error (m_strcpy)"
-              << (extra_msg == 0 ? "" : extra_msg) << "\n\n";
-         exit(1);
-      }
-
-      m_strncpy(to_str, from_str, str_len, method_name, extra_msg);
-   }
-   else {
-      mlog << Error << "\n" << method_name 
-           << " Do not copy the string because a from_string is nullptr. " 
-           << (extra_msg == 0 ? "" : extra_msg) << "\n\n";
-   }
-
-   return to_str;
-}
-
-////////////////////////////////////////////////////////////////////////
 
 void m_strncpy(char *to_str, const char *from_str, const int buf_len,
                const char *method_name, const char *extra_msg, bool truncate) {

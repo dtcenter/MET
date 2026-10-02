@@ -79,7 +79,7 @@ MetNcCFDataFile & MetNcCFDataFile::operator=(const MetNcCFDataFile &) {
 
 void MetNcCFDataFile::nccf_init_from_scratch() {
 
-   _file = (NcCfFile *) nullptr;
+   _file.reset();
    cur_time_index = -1;
    cur_z_index = -1;
 
@@ -113,7 +113,7 @@ NcVarInfo *MetNcCFDataFile::find_first_data_var() {
 
 void MetNcCFDataFile::close() {
 
-   if(_file) { delete _file; _file = (NcCfFile *) nullptr; }
+   _file.reset();
 
    return;
 }
@@ -124,7 +124,7 @@ bool MetNcCFDataFile::open(const char * _filename) {
 
    close();
 
-   _file = new NcCfFile;
+   _file = std::make_unique<NcCfFile>();
 
    if(!_file->open(_filename)) {
       mlog << Error << "\nMetNcCFDataFile::open(const char *) -> "
@@ -136,11 +136,11 @@ bool MetNcCFDataFile::open(const char * _filename) {
 
    Filename = _filename;
 
-   Raw_Grid = new Grid;
+   Raw_Grid = std::make_unique<Grid>();
 
    (*Raw_Grid) = _file->grid;
 
-   Dest_Grid = new Grid;
+   Dest_Grid = std::make_unique<Grid>();
 
    (*Dest_Grid) = (*Raw_Grid);
 
@@ -159,7 +159,7 @@ void MetNcCFDataFile::dump(ostream & out, int depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 int MetNcCFDataFile::add_data_planes_by_time(VarInfo &vinfo, const LevelInfo &level,
-                                             DataPlaneArray &plane_array) {
+                                             DataPlaneArray &plane_array, bool do_winds) {
    int n_rec = 0;
    const auto *vinfo_nc = (VarInfoNcCF *)&vinfo;
    const NcVarInfo *data_var = get_data_var(vinfo);
@@ -192,7 +192,7 @@ int MetNcCFDataFile::add_data_planes_by_time(VarInfo &vinfo, const LevelInfo &le
          auto time_idx = time_offsets[idx];
          if (time_idx < time_cnt) {
             dimension[t_slot] = time_offsets[idx];
-            if (data_plane(vinfo, plane, dimension)) {
+            if (read_data_plane(vinfo, plane, dimension, do_winds)) {
                plane_array.add(plane, (double)time_lower, (double)time_upper);
                n_rec++;
                if (mlog.verbosity_level() >= nc_cf_debug_level) {
@@ -210,7 +210,7 @@ int MetNcCFDataFile::add_data_planes_by_time(VarInfo &vinfo, const LevelInfo &le
 ////////////////////////////////////////////////////////////////////////
 
 int MetNcCFDataFile::add_data_planes_by_z(VarInfo &vinfo, const LevelInfo &level,
-                                          DataPlaneArray &plane_array) {
+                                          DataPlaneArray &plane_array, bool do_winds) {
    int n_rec = 0;
    const auto *vinfo_nc = (VarInfoNcCF *)&vinfo;
    const NcVarInfo *data_var = get_data_var(vinfo);
@@ -242,7 +242,7 @@ int MetNcCFDataFile::add_data_planes_by_z(VarInfo &vinfo, const LevelInfo &level
          auto z_idx = (int)z_offsets[idx];
          if (z_idx < z_cnt) {
             dimension[z_slot] = z_offsets[idx];
-            if (data_plane(vinfo, plane, dimension)) {
+            if (read_data_plane(vinfo, plane, dimension, do_winds)) {
                plane_array.add(plane, z_lower, z_upper);
                n_rec++;
             }
@@ -270,24 +270,18 @@ Grid MetNcCFDataFile::build_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_va
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
-{
-  // Not sure why we do this
+bool MetNcCFDataFile::get_real_dimension(VarInfo &vinfo, NcVarInfo *data_var,
+                                         LongArray &dimension) {
+   static const string method_name
+         = "MetNcCFDataFile::get_real_dimension() ->";
 
-  auto vinfo_nc = (VarInfoNcCF *)&vinfo;
-  static const string method_name
-      = "MetNcCFDataFile::data_plane(VarInfo &, DataPlane &) -> ";
+   int time_dim_slot = data_var->t_slot;
+   int zdim_slot = data_var->z_slot;
 
-  LongArray dimension = vinfo_nc->dimension();
-  NcVarInfo *data_var = get_data_var(vinfo);
-  if (nullptr != data_var) {
-    int time_dim_slot = data_var->t_slot;
-    int zdim_slot = data_var->z_slot;
+   // set vlevels if needed
+   _file->set_vlevels(data_var);
 
-    // set vlevels if needed
-    _file->set_vlevels(data_var);
-
-    for (int idx=0; idx<dimension.n_elements(); idx++) {
+   for (int idx=0; idx<dimension.n_elements(); idx++) {
       long dim_offset = dimension[idx];
       if (dim_offset == vx_data2d_star) continue;
       if (idx == time_dim_slot) {
@@ -299,27 +293,53 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       else {
          mlog << Debug(7) << method_name << "parsing generic dimension " << idx
               << " for \"" << vinfo.req_name() << "\" variable.\n\n";
-
-         dimension[idx] = long(find_generic_offset(vinfo, data_var, idx));
+          dimension[idx] = long(find_generic_offset(vinfo, data_var, idx));
       }
-    }
-  }
-
-  // Read the data
-  bool status = data_plane(vinfo, plane, dimension);
-
-  return status;
+   }
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, const LongArray &dimension)
-{
-  // Not sure why we do this
+bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
+                                 bool do_winds) {
+   auto vinfo_nc = (VarInfoNcCF *) &vinfo;
+   static const string method_name
+      = "MetNcCFDataFile::data_plane() -> ";
 
+   LongArray dimension = vinfo_nc->dimension();
+   NcVarInfo *data_var = get_data_var(vinfo);
+   if (nullptr != data_var) {
+      get_real_dimension(vinfo, data_var, dimension);
+   }
+   else if (!do_winds) {
+      mlog << Error << "\n" << method_name
+           << "\"" << vinfo.req_name() << "\" variable does not exist\n\n";
+      return false;
+   }
+
+   // Read the data
+   bool status = read_data_plane(vinfo, plane, dimension, do_winds);
+
+   // Assume that CF-compliant NetCDF winds are earth-relative
+   vinfo_nc->set_grid_relative_flag(false);
+
+   // Attempt to derive the data
+   if(!status && do_winds) {
+      status = derive_winds(vinfo_nc, plane);
+   }
+
+   return status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool MetNcCFDataFile::read_data_plane(VarInfo &vinfo, DataPlane &plane,
+                                      const LongArray &dimension, bool do_winds)
+{
   auto vinfo_nc = (VarInfoNcCF *)&vinfo;
   static const string method_name
-      = "MetNcCFDataFile::data_plane(VarInfo &, DataPlane &, LongArray &) -> ";
+      = "MetNcCFDataFile::read_data_plane() -> ";
 
   Grid grid_attr = vinfo.grid_attr();
   _file->update_grid(grid_attr);
@@ -368,7 +388,10 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, const LongArr
       }
     }
 
-    status = process_data_plane(&vinfo, plane);
+    // Handle wind rotation
+    if(status && do_winds) status = rotate_winds(&vinfo, plane);
+
+    if(status) status = process_data_plane(&vinfo, plane);
 
     // Set the VarInfo object's name, long_name, level, and units strings
 
@@ -393,10 +416,10 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, const LongArr
 ////////////////////////////////////////////////////////////////////////
 
 int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
-                                      DataPlaneArray &plane_array) {
+                                      DataPlaneArray &plane_array,
+                                      bool do_winds) {
    int n_rec = 0;
    DataPlane plane;
-   bool status = false;
    static const string method_name
          = "MetNcCFDataFile::data_plane_array(VarInfo &, DataPlaneArray &) -> ";
 
@@ -420,14 +443,22 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
    cur_time_index = cur_z_index = 0;
 
    if (0 <= t_dim_slot && range_flag == dimension[t_dim_slot] && level.type() == LevelType_Time) {
-      n_rec = add_data_planes_by_time(vinfo, level, plane_array);
+      n_rec = add_data_planes_by_time(vinfo, level, plane_array, do_winds);
    }
    else if (0 <= z_dim_slot && range_flag == dimension[z_dim_slot] && level.type() == LevelType_Pres) {
-      n_rec = add_data_planes_by_z(vinfo, level, plane_array);
+      n_rec = add_data_planes_by_z(vinfo, level, plane_array, do_winds);
    }
-   else if (data_plane(vinfo, plane)) {
+   else if (data_plane(vinfo, plane, do_winds)) {
       plane_array.add(plane, bad_data_int, bad_data_int);
       n_rec++;
+   }
+
+   // Assume that CF-compliant NetCDF winds are earth-relative
+   vinfo_nc->set_grid_relative_flag(true);
+
+   // Attempt to derive the data
+   if(n_rec == 0 && do_winds) {
+      derive_winds(vinfo_nc, plane_array);
    }
 
    return n_rec;
@@ -831,9 +862,9 @@ long MetNcCFDataFile::convert_generic_to_offset(double value, const string &dim_
    }
 
    if (offset == (long) bad_data_int && !dim_name.empty()) {
-      NcVarInfo *var_info = find_var_info_by_dim_name(_file->Var, dim_name, _file->Nvars);
+      NcVarInfo *var_info = find_var_info_by_dim_name(_file->Var.data(), dim_name, _file->Nvars);
       if (var_info) {
-         long new_offset = get_index_at_nc_data(var_info->var, value, dim_name);
+         long new_offset = get_index_at_nc_data(var_info->var.get(), value, dim_name);
          if (new_offset != bad_data_int) offset = new_offset;
       }
    }
@@ -1066,10 +1097,10 @@ long MetNcCFDataFile::find_generic_offset(VarInfo &vinfo, const NcVarInfo *data_
    string dim_name = get_dim_name(data_var, index);
    NcVarInfo* dim_var_info = _file->find_var_by_dim_name(dim_name.c_str());
 
-   int dim_size = get_data_size(dim_var_info->var);
+   int dim_size = get_data_size(dim_var_info->var.get());
    vector<double> values(dim_size);
 
-   if( !get_nc_data(dim_var_info->var, values.data()) ) {
+   if( !get_nc_data(dim_var_info->var.get(), values.data()) ) {
       mlog << Error << "\n" << method_name << "failed to get data from " << dim_name << "\n\n";
       exit(1);
    }
@@ -1122,7 +1153,7 @@ NcVarInfo *MetNcCFDataFile::get_data_var(VarInfo &vinfo) {
 string MetNcCFDataFile::get_dim_name(const NcVarInfo *data_var, int index) const {
    string dim_name;
    if (index >= 0) {
-      NcDim dim = get_nc_dim(data_var->var, index);
+      NcDim dim = get_nc_dim(data_var->var.get(), index);
       if (IS_VALID_NC(dim)) dim_name = GET_NC_NAME(dim);
    }
    return dim_name;

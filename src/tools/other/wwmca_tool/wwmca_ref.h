@@ -26,6 +26,7 @@
 #include "vx_config.h"
 #include "vx_grid.h"
 #include "interp_util.h"
+#include <memory>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -89,16 +90,16 @@ class WwmcaRegridder {
 
       GridHemisphere Hemi;
 
-      const Grid * NHgrid;           //  allocated
-      const Grid * SHgrid;           //  allocated
+      std::unique_ptr<const Grid> NHgrid;
+      std::unique_ptr<const Grid> SHgrid;
 
-      const AFCloudPctFile * cp_nh;  //  allocated
-      const AFCloudPctFile * cp_sh;  //  allocated
+      std::unique_ptr<const AFCloudPctFile> cp_nh;
+      std::unique_ptr<const AFCloudPctFile> cp_sh;
 
-      const AFPixelTimeFile * pt_nh; //  allocated
-      const AFPixelTimeFile * pt_sh; //  allocated
+      std::unique_ptr<const AFPixelTimeFile> pt_nh;
+      std::unique_ptr<const AFPixelTimeFile> pt_sh;
 
-      const Grid * ToGrid;           //  allocated
+      std::unique_ptr<const Grid> ToGrid;
 
       MetConfig * Config;            //  not allocated
 

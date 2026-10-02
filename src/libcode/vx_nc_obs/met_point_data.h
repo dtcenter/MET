@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <ostream>
 #include <vector>
 
@@ -74,6 +75,13 @@ struct MetPointObsData {
    StringArray qty_names;
    
    MetPointObsData();
+
+   //
+   //  virtual: obs_data below holds an NcPointObsData through this type
+   //
+
+   virtual ~MetPointObsData() = default;
+
    void allocate();
    void assign(MetPointObsData &d);
    void clear();
@@ -96,7 +104,7 @@ class MetPointData {
       bool use_arr_vars;
 
       MetPointHeader header_data;
-      MetPointObsData *obs_data;
+      std::unique_ptr<MetPointObsData> obs_data;
 
       void init_from_scratch();
 
@@ -166,7 +174,7 @@ inline int MetPointData::get_grib_code_or_var_index(const float obs_arr[OBS_ARRA
 inline int MetPointData::get_hdr_cnt() { return nhdr; }
 inline int MetPointData::get_header_offset(const float obs_arr[OBS_ARRAY_LEN]) { return obs_arr[0]; };
 inline int MetPointData::get_obs_cnt() { return nobs; }
-inline MetPointObsData *MetPointData::get_point_obs_data() { return obs_data; }
+inline MetPointObsData *MetPointData::get_point_obs_data() { return obs_data.get(); }
 inline StringArray MetPointData::get_qty_data() { return obs_data->qty_names; }
 inline StringArray MetPointData::get_var_names() { return obs_data->var_names; }
 inline StringArray MetPointData::get_var_units() { return obs_data->var_units; }

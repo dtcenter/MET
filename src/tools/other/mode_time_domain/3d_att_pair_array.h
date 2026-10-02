@@ -19,6 +19,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 #include "3d_att.h"
 #include "mm_engine.h"
@@ -35,16 +36,9 @@ class PairAtt3DArray {
 
       void assign(const PairAtt3DArray &);
 
-      void extend(int);
-
-
-      int Nelements;
-
-      int Nalloc;
-
       int AllocInc;
 
-      PairAtt3D * e;
+      std::vector<PairAtt3D> e;
 
 
    public:
@@ -98,8 +92,8 @@ class PairAtt3DArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int PairAtt3DArray::n_elements() const { return  Nelements; }
-inline int PairAtt3DArray::n         () const { return  Nelements; }
+inline int PairAtt3DArray::n_elements() const { return (int) e.size(); }
+inline int PairAtt3DArray::n         () const { return (int) e.size(); }
 
 
 ////////////////////////////////////////////////////////////////////////

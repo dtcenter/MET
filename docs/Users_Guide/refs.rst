@@ -132,6 +132,22 @@ References
 |   *the Royal Statistical Society* A147, 278-292.
 |
 
+.. _Denis-2002:
+
+| Denis, B., J. Cote, R. Laprise, 2002:
+|    Spectral Decomposition of Two-Dimensional Atmospheric Fields on Limited-Area
+|    Domains Using the Discrete Cosine Transform (DCT). *Monthly Weather Review*, 130, 1812-1829.
+|    https://doi.org/10.1175/1520-0493(2002)130<1812:SDOTDA>2.0.CO;2
+|
+
+.. _Durran-2017:
+
+| Durran, D., J. Weyn, M. Menchaca, 2017:
+|    Practical Considerations for Computing Dimensional Spectra from
+|    Gridded Data. *Monthly Weather Review*, 145, 3901-3910.
+|    https://doi.org/10.1175/MWR-D-17-0056.1
+|
+
 .. _Ebert-2008:
 
 | Ebert, E.E., 2008: Fuzzy verification of high-resolution gridded forecasts:
@@ -215,7 +231,7 @@ References
 |   *Probabilistic Forecasting Using Ensemble Model Output Statistics and*
 |   *Minimum CRPS Estimation*. Technical Report no. 449, Department of
 |   Statistics, University of Washington. Available at
-|   http://www.stat.washington.edu/www/research/reports/
+|   https://stat.uw.edu/research/tech-reports/calibrated-probabilistic-forecasting-using-ensemble-model-output-statistics-and-minimum-crps
 |
 
 .. _Haiden-2012:

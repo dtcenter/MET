@@ -193,10 +193,18 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
             // NC_STRING attributes do not parse well with Intel compilers
             int num_elements_sub = 8096;
             int num_elements = att->getAttLength();
-            vector <char *> att_value(num_elements);
-            for(int i=0; i<num_elements; i++) {
-               att_value[i] = (char*) calloc(num_elements_sub, sizeof(char));
-            }
+            //
+            //  these buffers were calloc'd and then freed with delete, which
+            //  is undefined behaviour twice over - wrong allocator, and the
+            //  scalar form for an array.  netCDF still needs a char *[], so
+            //  the storage is a vector of vectors and att_value just points
+            //  into it.
+            //
+
+            vector<vector<char>> att_buf(num_elements,
+                                         vector<char>(num_elements_sub, '\0'));
+            vector<char *> att_value(num_elements);
+            for(int i=0; i<num_elements; i++) att_value[i] = att_buf[i].data();
             try {
                att->getValues(att_value.data());
                value = att_value[0];
@@ -208,8 +216,6 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
                     << GET_NC_TYPE_NAME_P(att) << " type).\n"
                     << "Please check the encoding of the "<< GET_NC_NAME_P(att) << " attribute.\n\n";
             }
-            // Cleanup
-            for(int i=0; i<num_elements; i++) delete att_value[i];
          }
       }
       else { // MET-788: to handle a custom modified NetCDF
@@ -276,72 +282,64 @@ unsigned short get_att_value_ushort(const NcAtt *att) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_att_value_string(const NcVar *var, const ConcatString &att_name, ConcatString &value) {
-   NcVarAtt *att = get_nc_att(var, att_name);
-   bool status =  get_att_value_chars(att, value);
-   if (att) delete att;
+   auto att = get_nc_att(var, att_name);
+   bool status =  get_att_value_chars(att.get(), value);
    return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int  get_att_value_int   (const NcVar *var, const ConcatString &att_name) {
-   NcVarAtt *att = get_nc_att(var, att_name);
-   int att_val = get_att_value_int(att);
-   if (att) delete att;
+   auto att = get_nc_att(var, att_name);
+   int att_val = get_att_value_int(att.get());
    return att_val;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 long long  get_att_value_llong (const NcVar *var, const ConcatString &att_name) {
-   NcVarAtt *att = get_nc_att(var, att_name);
-   long long att_val = get_att_value_llong(att);
-   if (att) delete att;
+   auto att = get_nc_att(var, att_name);
+   long long att_val = get_att_value_llong(att.get());
    return att_val;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double get_att_value_double(const NcVar *var, const ConcatString &att_name) {
-   NcVarAtt *att = get_nc_att(var, att_name);
-   double att_val = get_att_value_double(att);
-   if (att) delete att;
+   auto att = get_nc_att(var, att_name);
+   double att_val = get_att_value_double(att.get());
    return att_val;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_att_value_string(const NcFile *nc, const ConcatString &att_name, ConcatString &value) {
-   NcGroupAtt *att = get_nc_att(nc, att_name);
-   bool status = get_att_value_chars(att, value);
-   if (att) delete att;
+   auto att = get_nc_att(nc, att_name);
+   bool status = get_att_value_chars(att.get(), value);
    return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int  get_att_value_int   (const NcFile *nc, const ConcatString &att_name) {
-   NcGroupAtt *att = get_nc_att(nc, att_name);
-   int att_val = get_att_value_int(att);
-   if (att) delete att;
+   auto att = get_nc_att(nc, att_name);
+   int att_val = get_att_value_int(att.get());
    return att_val;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 long long  get_att_value_llong (const NcFile *nc, const ConcatString &att_name) {
-   NcGroupAtt *att = get_nc_att(nc, att_name);
-   long long att_val = get_att_value_llong(att);
-   if (att) delete att;
+   auto att = get_nc_att(nc, att_name);
+   long long att_val = get_att_value_llong(att.get());
    return att_val;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double  get_att_value_double(const NcFile *nc, const ConcatString &att_name) {
-   NcGroupAtt *att = get_nc_att(nc, att_name);
-   double att_val = get_att_value_double(att);
-   if (att) delete att;
+   auto att = get_nc_att(nc, att_name);
+   double att_val = get_att_value_double(att.get());
    return att_val;
 }
 
@@ -349,16 +347,15 @@ double  get_att_value_double(const NcFile *nc, const ConcatString &att_name) {
 
 bool    get_att_no_leap_year(const NcVar *var) {
    bool no_leap_year = false;
-   NcVarAtt *calendar_att = get_nc_att(var, string("calendar"), false);
-   if (IS_VALID_NC_P(calendar_att)) {
+   auto calendar_att = get_nc_att(var, string("calendar"), false);
+   if (IS_VALID_NC_P(calendar_att.get())) {
       ConcatString calendar_value;
-      if (get_att_value_chars(calendar_att, calendar_value)) {
+      if (get_att_value_chars(calendar_att.get(), calendar_value)) {
          no_leap_year = ( "noleap" == calendar_value
                         || "365_day" == calendar_value
                         || "365 days" == calendar_value);
       }
    }
-   if (calendar_att) delete calendar_att;
    return no_leap_year;
 }
 
@@ -415,8 +412,8 @@ ConcatString get_log_msg_for_att(const NcVarAtt *att, string var_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-NcVarAtt *get_nc_att(const NcVar * var, const ConcatString &att_name, bool exit_on_error) {
-   NcVarAtt *att = (NcVarAtt *) nullptr;
+std::unique_ptr<NcVarAtt> get_nc_att(const NcVar * var, const ConcatString &att_name, bool exit_on_error) {
+   std::unique_ptr<NcVarAtt> att;
    static const char *method_name = "get_nc_att(NcVar) -> ";
 
    //
@@ -432,7 +429,7 @@ NcVarAtt *get_nc_att(const NcVar * var, const ConcatString &att_name, bool exit_
       map<string,NcVarAtt> mapAttrs = var->getAtts();
       for (itAtt = mapAttrs.begin(); itAtt != mapAttrs.end(); ++itAtt) {
          if ( att_name == (*itAtt).first) {
-            att = new NcVarAtt();
+            att = std::make_unique<NcVarAtt>();
             *att = (*itAtt).second;
             break;
          }
@@ -450,8 +447,8 @@ NcVarAtt *get_nc_att(const NcVar * var, const ConcatString &att_name, bool exit_
 
 ////////////////////////////////////////////////////////////////////////
 
-NcGroupAtt *get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exit_on_error) {
-   NcGroupAtt *att = (NcGroupAtt *) nullptr;
+std::unique_ptr<NcGroupAtt> get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exit_on_error) {
+   std::unique_ptr<NcGroupAtt> att;
    static const char *method_name = "get_nc_att(NcFile) -> ";
 
    //
@@ -468,7 +465,7 @@ NcGroupAtt *get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exi
       multimap<string,NcGroupAtt> mapAttrs = nc->getAtts();
       for (itAtt = mapAttrs.begin(); itAtt != mapAttrs.end(); ++itAtt) {
          if ( att_name == (*itAtt).first ) {
-            att = new NcGroupAtt();
+            att = std::make_unique<NcGroupAtt>();
             *att = (*itAtt).second;
             break;
          }
@@ -489,7 +486,7 @@ NcGroupAtt *get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exi
 bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
                       ConcatString &att_val, int grp_id, bool exit_on_error) {
    bool status = false;
-   NcVarAtt *att = (NcVarAtt *) nullptr;
+   std::unique_ptr<NcVarAtt> att;
 
    // Initialize
    att_val.clear();
@@ -497,8 +494,7 @@ bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
    att = get_nc_att(var, att_name);
 
    // Look for a match
-   status = get_att_value_chars(att, att_val);
-   if (att) delete att;
+   status = get_att_value_chars(att.get(), att_val);
 
    return status;
 }
@@ -590,10 +586,10 @@ bool get_nc_att_value(const NcVarAtt *att, double &att_val, bool exit_on_error) 
 
 bool has_att(NcFile *ncfile, const ConcatString att_name, bool do_log) {
    bool status = false;
-   NcGroupAtt *att;
+   std::unique_ptr<NcGroupAtt> att;
 
    att = get_nc_att(ncfile, att_name);
-   if (IS_VALID_NC_P(att)) {
+   if (IS_VALID_NC_P(att.get())) {
       status = true;
    }
    else if (do_log) {
@@ -601,7 +597,6 @@ bool has_att(NcFile *ncfile, const ConcatString att_name, bool do_log) {
            << "can't find global NetCDF attribute " << att_name
            << ".\n\n";
    }
-   if (att) delete att;
    return status;
 }
 
@@ -610,8 +605,8 @@ bool has_att(NcFile *ncfile, const ConcatString att_name, bool do_log) {
 bool has_att(NcVar *var, const ConcatString att_name, bool do_log) {
    bool status = false;
 
-   NcVarAtt *att = get_nc_att(var, att_name);
-   if (IS_VALID_NC_P(att)) {
+   auto att = get_nc_att(var, att_name);
+   if (IS_VALID_NC_P(att.get())) {
       status = true;
    }
    else if (do_log) {
@@ -619,7 +614,6 @@ bool has_att(NcVar *var, const ConcatString att_name, bool do_log) {
            << "can't find NetCDF variable attribute " << att_name
            << ".\n\n";
    }
-   if (att) delete att;
    return status;
 }
 
@@ -640,13 +634,12 @@ bool has_scale_factor_attr(NcVar *var) {
 bool has_unsigned_attribute(NcVar *var) {
    bool is_unsigned = false;
    static const char *method_name = "has_unsigned_attribute() -> ";
-   NcVarAtt *att_unsigned = get_nc_att(var, string("_Unsigned"));
-   if (IS_VALID_NC_P(att_unsigned)) {
+   auto att_unsigned = get_nc_att(var, string("_Unsigned"));
+   if (IS_VALID_NC_P(att_unsigned.get())) {
       ConcatString att_value;
-      get_att_value_chars(att_unsigned, att_value);
+      get_att_value_chars(att_unsigned.get(), att_value);
       is_unsigned = ( att_value == "true" );
    }
-   if(att_unsigned) delete att_unsigned;
    mlog << Debug(6) << method_name
         << GET_NC_NAME_P(var) << " " << (is_unsigned ? "has " : "does not have" )
         << " _Unsigned attribute.\n";
@@ -682,12 +675,10 @@ bool get_global_att(const char *nc_name, const ConcatString &att_name,
    // Initialize
    att_val.clear();
 
-   NcFile *nc = open_ncfile(nc_name);
-   if (0 != nc && IS_VALID_NC_P(nc)) {
-      status = get_global_att(nc, att_name, att_val, false);
+   std::unique_ptr<NcFile> nc = open_ncfile(nc_name);
+   if (nc && IS_VALID_NC_P(nc.get())) {
+      status = get_global_att(nc.get(), att_name, att_val, false);
    }
-
-   if(nc) delete nc;
 
    return status;
 }
@@ -699,12 +690,10 @@ bool get_global_att(const char *nc_name, const ConcatString &att_name,
    bool status = false;
 
    // Initialize
-   NcFile *nc = open_ncfile(nc_name);
-   if (0 != nc && IS_VALID_NC_P(nc)) {
-      status = get_global_att(nc, att_name, att_val, false);
+   std::unique_ptr<NcFile> nc = open_ncfile(nc_name);
+   if (nc && IS_VALID_NC_P(nc.get())) {
+      status = get_global_att(nc.get(), att_name, att_val, false);
    }
-
-   if(nc) delete nc;
 
    return status;
 }
@@ -714,19 +703,18 @@ bool get_global_att(const char *nc_name, const ConcatString &att_name,
 bool get_global_att(const NcFile *nc, const ConcatString &att_name,
                     ConcatString &att_val, bool error_out) {
    bool status = false;
-   NcGroupAtt *att;
+   std::unique_ptr<NcGroupAtt> att;
 
    // Initialize
    att_val.clear();
 
    att = get_nc_att(nc, att_name);
-   if(IS_VALID_NC_P(att)) {
+   if(IS_VALID_NC_P(att.get())) {
       string attr_val;
       att->getValues(attr_val);
       att_val = attr_val.c_str();
       status = true;
    }
-   if (att) delete att;
 
    // Check error_out status
    if(error_out && !status) {
@@ -1157,12 +1145,11 @@ int get_int_var(NcVar * var, const int index) {
 ////////////////////////////////////////////////////////////////////////
 
 double get_nc_time(NcVar * var, const int index) {
-   double k;
    vector<size_t> start;
    vector<size_t> count;
    const char *method_name = "get_nc_time() -> ";
 
-   k = bad_data_double;
+   double k = bad_data_double;
    if (IS_VALID_NC_P(var)) {
       int dim_idx = 0;
       int dim_size = get_dim_size(var, dim_idx);
@@ -1183,19 +1170,25 @@ double get_nc_time(NcVar * var, const int index) {
          exit(1);
       }
 
+      int buf_len = 512;
+      int dataType = GET_NC_TYPE_ID_P(var);
+      int dim_count = get_dim_count(var);
+      if (dataType == NC_CHAR) {
+         buf_len = get_dim_size(var, (dim_count-1));
+      }
+
       int vi;
       short vs;
       float vf;
       ncbyte vb;
       long long vl;
       unixtime ref_ut;
-      int buf_len = 512;
-      vector<char> tmp_buf(buf_len);
-      int dataType = GET_NC_TYPE_ID_P(var);
+      vector<char> tmp_buf(buf_len+1);
 
       start.emplace_back(index);
       count.emplace_back(1);
       tmp_buf[0] = 0;
+      tmp_buf[buf_len] = 0;
 
       switch (dataType) {
          case NC_DOUBLE:
@@ -1214,12 +1207,13 @@ double get_nc_time(NcVar * var, const int index) {
             k = (double)vb;
             break;
          case NC_CHAR:
-            if (2 == get_dim_count(var)) {
-               buf_len = get_dim_size(var, 1);
+            if (2 == dim_count) {
                start.emplace_back(0);
                count.emplace_back(buf_len);
             }
+            else count[0] = buf_len;
             for (int i=0; i<buf_len; i++) tmp_buf[i] = 0;
+
             var->getVar(start, count, tmp_buf.data());
             parse_time_string(tmp_buf.data(), ref_ut);
             k = ref_ut;
@@ -1790,9 +1784,9 @@ bool get_nc_data(NcVar *var, unsigned short *data) {
    if (NC_USHORT == data_type) return_status = get_nc_data_t(var, data);
    else if (NC_SHORT == data_type && has_unsigned_attribute(var)) {
       short fill_value = (short)bad_data_int;
-      NcVarAtt *att_fill_value = get_nc_att(var, (string)"_FillValue");
-      bool has_fill_value = IS_VALID_NC_P(att_fill_value);
-      if (has_fill_value) fill_value = get_att_value_int(att_fill_value);
+      auto att_fill_value = get_nc_att(var, (string)"_FillValue");
+      bool has_fill_value = IS_VALID_NC_P(att_fill_value.get());
+      if (has_fill_value) fill_value = get_att_value_int(att_fill_value.get());
 
       vector<short> short_data(cell_count);
       return_status = get_nc_data_t(var, short_data.data());
@@ -1804,7 +1798,6 @@ bool get_nc_data(NcVar *var, unsigned short *data) {
                data[idx] = (unsigned short)short_data[idx];
          }
       }
-      if (att_fill_value) delete att_fill_value;
    }
    else {
       mlog << Error << "\n" << method_name
@@ -1889,9 +1882,18 @@ bool get_nc_data(NcVar *var, ncbyte *data, const LongArray &dims, const LongArra
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+ConcatString get_value_string(double value, bool is_time) {
+   ConcatString value_str;
+   if (is_time && (value > 10000000.)) value_str << unix_to_yyyymmdd_hhmmss(value);
+   else value_str << value;
+   return value_str;
+}
+
+////////////////////////////////////////////////////////////////////////
 // returns matching offset or bad_data_int if not found
 
-int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool is_time) {
+int get_index_at_nc_data(NcVar *var, double value, const string &dim_name, bool is_time) {
    int offset = bad_data_int;
    static const char *method_name = "get_index_at_nc_data() -> ";
    if (IS_VALID_NC_P(var)) {
@@ -1915,23 +1917,24 @@ int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool i
                     << units_att_name << "\" attribute.\n\n";
             }
          }
+         bool found = false;
          for (int idx=0; idx<data_size; idx++) {
             if (is_eq(values[idx], value)) {
+               found = true;
+            }
+            if (!found && is_time) {
+               if (is_eq(add_to_unixtime(ut, sec_per_unit, values[idx], no_leap_year), value)) {
+                  found = true;
+               }
+            }
+            if (found) {
                offset = idx;
                break;
-            }
-            if (is_time) {
-               if (is_eq(add_to_unixtime(ut, sec_per_unit, values[idx], no_leap_year), value)) {
-                  offset = idx;
-                  break;
-               }
             }
          }
       }
 
-      ConcatString value_str;
-      if (is_time && (value > 10000000.)) value_str << unix_to_yyyymmdd_hhmmss(value);
-      else value_str << value;
+      ConcatString value_str = get_value_string(value, is_time);
       if (offset == bad_data_int)
          mlog << Debug(7) << method_name << "Not found value " << value_str
               << " at " << GET_NC_NAME_P(var)
@@ -1940,6 +1943,78 @@ int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool i
          mlog << Debug(7) << method_name << "Found value " << value_str
               << " (index=" << offset << ") at " << GET_NC_NAME_P(var)
               << " by dimension name \"" << dim_name << "\"\n";
+   }
+   else {
+      mlog << Debug(7) << method_name << "Not found a dimension variable for \""
+           << dim_name << "\"\n";
+   }
+   return offset;
+}
+
+////////////////////////////////////////////////////////////////////////
+// returns matching offset or bad_data_int if not found
+
+int get_index_at_nc_data(NcVar *var, double value_min, double value_max,
+                         const string &dim_name, bool is_time) {
+   int offset = bad_data_int;
+   static const char *method_name = "get_index_at_nc_data(min,max) -> ";
+   if (IS_VALID_NC_P(var)) {
+      int data_size = get_data_size(var);
+      vector<double> values(data_size);
+
+      if (get_nc_data(var, values.data())) {
+         unixtime ut;
+         int sec_per_unit;
+         bool no_leap_year = get_att_no_leap_year(var);
+         ut = sec_per_unit = 0;
+         if (is_time) {
+            ConcatString units;
+            bool has_attr = get_var_units(var, units);
+            if (has_attr && (!units.empty()))
+                parse_cf_time_string(units.c_str(), ut, sec_per_unit);
+            else {
+               mlog << Warning << "\n" << method_name
+                    << "the time variable \"" << GET_NC_NAME_P(var)
+                    << "\" must contain a \""
+                    << units_att_name << "\" attribute.\n\n";
+            }
+         }
+         bool found = false;
+         // Select the first offset between value_min and value_max
+         for (int idx=0; idx<data_size; idx++) {
+            if (is_eq(values[idx], value_min)
+                || is_eq(values[idx], value_max)
+                || (values[idx] >= value_min && values[idx] <= value_max)) {
+               found = true;
+            }
+            if (!found && is_time) {
+               unixtime time_value = add_to_unixtime(ut, sec_per_unit,
+                                                     values[idx], no_leap_year);
+               if (is_eq(time_value, value_min)
+                   || is_eq(time_value, value_max)
+                   || (time_value >= value_min && time_value <= value_max)) {
+                  found = true;
+               }
+            }
+            if (found) {
+               offset = idx;
+               break;
+            }
+         }
+      }
+
+      ConcatString value_max_str = get_value_string(value_max, is_time);
+      ConcatString value_min_str = get_value_string(value_min, is_time);
+      if (offset == bad_data_int)
+         mlog << Debug(7) << method_name << "Not found value between " << value_min_str
+              << " and " << value_max_str << " at " << GET_NC_NAME_P(var)
+              << " by dimension name \"" << dim_name << "\"\n";
+      else {
+         ConcatString value_str = get_value_string(values[offset], is_time);
+         mlog << Debug(7) << method_name << "Found value " << value_str
+              << " (index=" << offset << ") at " << GET_NC_NAME_P(var)
+              << " by dimension name \"" << dim_name << "\"\n";
+      }
    }
    else {
       mlog << Debug(7) << method_name << "Not found a dimension variable for \""
@@ -2648,7 +2723,7 @@ void copy_nc_att_short(NcVar *var_to, NcVarAtt *from_att) {
 
 ////////////////////////////////////////////////////////////////////////
 
-NcVar *copy_nc_var(NcFile *to_nc, NcVar *from_var,
+NcVar copy_nc_var(NcFile *to_nc, NcVar *from_var,
       const int deflate_level, const bool all_attrs) {
    vector<NcDim> dims = from_var->getDims();
    for(unsigned int idx=0; idx<dims.size(); idx++) {
@@ -2657,38 +2732,37 @@ NcVar *copy_nc_var(NcFile *to_nc, NcVar *from_var,
          add_dim(to_nc, GET_NC_NAME(dim), dim.getSize());
       }
    }
-   NcVar tmp_var = add_var(to_nc, GET_NC_NAME_P(from_var),
+   NcVar to_var = add_var(to_nc, GET_NC_NAME_P(from_var),
          from_var->getType(), dims, deflate_level);
-   NcVar *to_var = new NcVar(tmp_var);
-   copy_nc_atts(from_var, to_var, all_attrs);
-   copy_nc_var_data(from_var, to_var);
+   copy_nc_atts(from_var, &to_var, all_attrs);
+   copy_nc_var_data(from_var, &to_var);
    return to_var;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_att(NcFile *nc_from, NcVar *var_to, const ConcatString attr_name) {
-   NcGroupAtt *from_att = get_nc_att(nc_from, attr_name);
-   if (IS_VALID_NC_P(from_att)) {
-      int dataType = GET_NC_TYPE_ID_P(from_att);
+   auto from_att = get_nc_att(nc_from, attr_name);
+   if (IS_VALID_NC_P(from_att.get())) {
+      int dataType = GET_NC_TYPE_ID_P(from_att.get());
       switch (dataType) {
       case NC_DOUBLE:
-         copy_nc_att_double(var_to, from_att);
+         copy_nc_att_double(var_to, from_att.get());
          break;
       case NC_FLOAT:
-         copy_nc_att_float(var_to, from_att);
+         copy_nc_att_float(var_to, from_att.get());
          break;
       case NC_SHORT:
-         copy_nc_att_short(var_to, from_att);
+         copy_nc_att_short(var_to, from_att.get());
          break;
       case NC_INT:
-         copy_nc_att_int(var_to, from_att);
+         copy_nc_att_int(var_to, from_att.get());
          break;
       case NC_INT64:
-         copy_nc_att_int64(var_to, from_att);
+         copy_nc_att_int64(var_to, from_att.get());
          break;
       case NC_CHAR:
-         copy_nc_att_char(var_to, from_att);
+         copy_nc_att_char(var_to, from_att.get());
          break;
       default:
          mlog << Error << "\ncopy_nc_att(NcFile, NcVar, attr_name) -> "
@@ -2696,33 +2770,32 @@ void copy_nc_att(NcFile *nc_from, NcVar *var_to, const ConcatString attr_name) {
          exit(1);
       }
    }
-   if(from_att) delete from_att;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_att(NcVar *var_from, NcVar *var_to, const ConcatString attr_name) {
-   NcVarAtt *from_att = get_nc_att(var_from, attr_name);
-   if (IS_VALID_NC_P(from_att)) {
-      int dataType = GET_NC_TYPE_ID_P(from_att);
+   auto from_att = get_nc_att(var_from, attr_name);
+   if (IS_VALID_NC_P(from_att.get())) {
+      int dataType = GET_NC_TYPE_ID_P(from_att.get());
       switch (dataType) {
       case NC_DOUBLE:
-         copy_nc_att_double(var_to, from_att);
+         copy_nc_att_double(var_to, from_att.get());
          break;
       case NC_FLOAT:
-         copy_nc_att_float(var_to, from_att);
+         copy_nc_att_float(var_to, from_att.get());
          break;
       case NC_SHORT:
-         copy_nc_att_short(var_to, from_att);
+         copy_nc_att_short(var_to, from_att.get());
          break;
       case NC_INT:
-         copy_nc_att_int(var_to, from_att);
+         copy_nc_att_int(var_to, from_att.get());
          break;
       case NC_INT64:
-         copy_nc_att_int64(var_to, from_att);
+         copy_nc_att_int64(var_to, from_att.get());
          break;
       case NC_CHAR:
-         copy_nc_att_char(var_to, from_att);
+         copy_nc_att_char(var_to, from_att.get());
          break;
       default:
          mlog << Error << "\ncopy_nc_att(NcVar) -> "
@@ -2731,7 +2804,6 @@ void copy_nc_att(NcVar *var_from, NcVar *var_to, const ConcatString attr_name) {
          exit(1);
       }
    }
-   if(from_att) delete from_att;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3504,21 +3576,22 @@ NcVar get_nc_var_time(const NcFile *nc) {
 
 ////////////////////////////////////////////////////////////////////////
 
-NcFile *open_ncfile(const char * nc_name, bool write) {
-   NcFile *nc = (NcFile *) nullptr;
+std::unique_ptr<NcFile> open_ncfile(const char * nc_name, bool write) {
+   std::unique_ptr<NcFile> nc;
 
    try {
       if (write) {
-         nc = new NcFile(nc_name, NcFile::replace, NcFile::nc4);
+         nc = std::make_unique<NcFile>(nc_name, NcFile::replace, NcFile::nc4);
       }
       else {
          struct stat fileInfo;
          if (stat(nc_name, &fileInfo) == 0) {
-            nc = new NcFile(nc_name, NcFile::read);
+            nc = std::make_unique<NcFile>(nc_name, NcFile::read);
          }
       }
    }
    catch(NcException& e) {
+      nc.reset();
    }
    return nc;
 }
@@ -3536,60 +3609,82 @@ int get_data_size(NcVar *var) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Moved from nc_cf_file.cc
-// init_time or valid_time from filename`
 
-string init_time_var_name = "forecast_reference_time";
-unixtime get_init_time(NcFile *nc_file) {
+unixtime get_init_time(NcVar *time_var) {
    unixtime init_time = 0;
-   NcVar init_time_var = get_var(nc_file, init_time_var_name.c_str());
+   const char *method_name = "get_init_time(NcVar *) -> ";
+
+   if (IS_INVALID_NC_P(time_var)) {
+      mlog << Debug(4) << method_name
+           << "could not extract init time\n";
+      return init_time;
+   }
+
+   int data_type = GET_NC_TYPE_ID_P(time_var);
+   bool is_string_time = (NC_CHAR == data_type || NC_STRING == data_type);
+   double time_value = get_nc_time(time_var, 0);
+   init_time = (unixtime)time_value;
+   if (!is_string_time) {
+      int sec_per_unit = 0;
+      bool no_leap_year = true;
+      unixtime ref_ut = get_reference_unixtime(time_var, sec_per_unit,
+                                               no_leap_year, method_name);
+      init_time = ref_ut + (unixtime)(sec_per_unit * time_value);
+   }
+
+   mlog << Debug(4) << method_name
+        << "get InitTime (" << unix_to_yyyymmdd_hhmmss(init_time)
+        << ") from \"" << GET_NC_NAME_P(time_var) << "\" variable (value="
+        << time_value << ").\n";
+
+   return init_time;
+}
+////////////////////////////////////////////////////////////////////////
+// Moved from nc_cf_file.cc
+// init_time from NetCDF, default variable name is forecast_reference_time
+// Can get valid_time id byte or char type with variable name
+
+const string init_time_var_name = "forecast_reference_time";
+
+unixtime get_init_time(NcFile *nc_file, const char *time_var_name) {
+   unixtime init_time = 0;
    const char *method_name = "get_init_time(NcFile *, string &) -> ";
 
-   if (IS_INVALID_NC(init_time_var)) {
+   if (time_var_name == nullptr) time_var_name = init_time_var_name.c_str();
+
+   NcVar time_var = get_var(nc_file, time_var_name);
+   if (IS_INVALID_NC(time_var)) {
       mlog << Debug(4) << method_name
            << "could not extract init time from the "
-           << "\"" << init_time_var_name << "\" variable.\n";
+           << "\"" << time_var_name << "\" variable.\n";
    }
    else {
-      unixtime ut = 0;
-      int sec_per_unit = 0;
-      ConcatString units;
-
-      // Parse the units for the time variable.
-      if (get_var_units(&init_time_var, units)) {
-         if (units.empty()) {
-            mlog << Warning << "\n" << method_name
-                 << "the \"" << init_time_var_name << "\" variable must contain a \"units\" attribute.\n\n";
-         }
-         else {
-            parse_cf_time_string(units.c_str(), ut, sec_per_unit);
-         }
-      }
-
-      double time_value = get_nc_time(&init_time_var,0);
-      init_time = ut + (unixtime)(sec_per_unit * time_value);
-      mlog << Debug(4) << method_name
-           << "get InitTime (" << unix_to_yyyymmdd_hhmmss(init_time)
-           << ") from \"" << init_time_var_name << "\" variable (value=" << time_value<< ").\n";
+      init_time = get_init_time(&time_var);
    }
    return init_time;
 }
 
 ////////////////////////////////////////////////////////////////////////
+// retrurn 0 if units attribute is missing
 
 unixtime get_reference_unixtime(NcVar *time_var, int &sec_per_unit,
-                                bool &no_leap_year) {
+                                bool &no_leap_year, const char *caller) {
    unixtime ref_ut = 0;
    ConcatString time_unit_str;
    static const char *method_name = "get_reference_unixtime() -> ";
 
+   sec_per_unit = 1;
    if (get_var_units(time_var, time_unit_str)) {
-      parse_cf_time_string(time_unit_str.c_str(), ref_ut, sec_per_unit);
-      no_leap_year = (sec_per_day == sec_per_unit) ? get_att_no_leap_year(time_var) : false;
+      if (time_unit_str.empty()) {
+         mlog << Warning << "\n" << (caller != nullptr ? caller : method_name)
+              << "the \"" << GET_NC_NAME_P(time_var)
+              << "\" variable does not have a \"units\" attribute.\n\n";
+      }
+      else {
+         parse_cf_time_string(time_unit_str.c_str(), ref_ut, sec_per_unit);
+      }
    }
-   else {
-      sec_per_unit = 1;
-   }
+   no_leap_year = (sec_per_day == sec_per_unit) ? get_att_no_leap_year(time_var) : false;
 
    return ref_ut;
 }
@@ -3626,7 +3721,7 @@ bool is_nc_unit_time(const char *units) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void parse_cf_time_string(const char *str, unixtime &ref_ut,
+bool parse_cf_time_string(const char *str, unixtime &ref_ut,
                           int &sec_per_unit) {
    static const char *method_name = "parse_cf_time_string() -> ";
 
@@ -3639,7 +3734,7 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut,
       mlog << Warning << "\n" << method_name
            << "unexpected NetCDF CF convention time unit \""
            << str << "\"\n\n";
-      return;
+      return false;
    }
    else {
       // Tokenize the input string
@@ -3674,7 +3769,7 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut,
          mlog << Warning << "\n" << method_name
               << "Unsupported time step in the CF convention time unit \""
               << str << "\"\n\n";
-         return;
+         return false;
       }
 
       // Parse the reference time
@@ -3693,7 +3788,7 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut,
         << "\"\n\t\t as a reference time of " << unix_to_yyyymmdd_hhmmss(ref_ut)
         << " and " << sec_per_unit << " second(s) per time step.\n";
 
-   return;
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3718,16 +3813,17 @@ void parse_time_string(const char *str, unixtime &ut) {
       //   2016-01-28T12:00:00Z
       //   1977-08-07 12:00:00Z
       StringArray tok;
+      StringArray hms;
+      StringArray ymd;
       tok.parse_delim(str, " _T");
       // Parse the reference time
-      StringArray ymd, hms;
       ymd.parse_delim(tok[0], "-");
       if(tok.n_elements() > 1) hms.parse_delim(tok[1], ":");
       else                     hms.parse_delim("00:00:00", ":");
       ut = mdyhms_to_unix(atoi(ymd[1].c_str()), atoi(ymd[2].c_str()),
-                              atoi(ymd[0].c_str()), atoi(hms[0].c_str()),
-                              hms.n_elements() > 1 ? atoi(hms[1].c_str()) : 0,
-                              hms.n_elements() > 2 ? atoi(hms[2].c_str()) : 0);
+                          atoi(ymd[0].c_str()), atoi(hms[0].c_str()),
+                          hms.n_elements() > 1 ? atoi(hms[1].c_str()) : 0,
+                          hms.n_elements() > 2 ? atoi(hms[2].c_str()) : 0);
    }
 
    mlog << Debug(4) << method_name

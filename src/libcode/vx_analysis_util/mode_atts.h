@@ -35,6 +35,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 
 #include "vx_util.h"
@@ -73,7 +74,7 @@ class ModeAttributes {
 
       void augment(const ModeAttributes &);
 
-      MaskPoly * poly;
+      std::unique_ptr<MaskPoly> poly;
 
          //
          //  toggles

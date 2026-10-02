@@ -95,7 +95,6 @@ void DbfHeader::init_from_scratch()
 
 {
 
-subrec = 0;
 
 clear();
 
@@ -111,7 +110,7 @@ void DbfHeader::clear()
 
 {
 
-if ( subrec )  { delete [] subrec;  subrec = 0; }
+subrec.clear();
 
 type = 0;
 
@@ -153,11 +152,11 @@ table_flag       = h.table_flag;
 code_page_mark   = h.code_page_mark;
 n_subrecs        = h.n_subrecs;
 
-if ( h.subrec )  {
+if ( !h.subrec.empty() )  {
 
    int j;
 
-   subrec = new DbfSubRecord [h.n_subrecs];
+   subrec.resize(h.n_subrecs);
 
    for (j=0; j<(h.n_subrecs); ++j)  subrec[j] = h.subrec[j];
 
@@ -207,7 +206,7 @@ pos = 0;
    //  subrecords (if any)
    //
 
-if ( subrec )  {
+if ( !subrec.empty() )  {
 
    out << p0 << "\n";
    out << p0 << "SubRecords ... \n";
@@ -301,7 +300,7 @@ int bytes, n_read;
 int pos;
 
 
-subrec = new DbfSubRecord [n_subrecs];
+subrec.resize(n_subrecs);
 
 unsigned char buf[32];
 
@@ -378,7 +377,7 @@ int j;
 
 for (j=0; j<n_subrecs; ++j)  {
 
-   if ( text == subrec[j].field_name )  return ( subrec + j );
+   if ( text == subrec[j].field_name )  return const_cast<DbfSubRecord *>( subrec.data() + j );
 
 }
 
@@ -614,7 +613,7 @@ int pos, len, k_max;
 int max_name_len;
 Indent p0 (depth);
 const char * line = (const char *) buf;
-const DbfSubRecord * s = h.subrec;
+const DbfSubRecord * s = h.subrec.data();
 
 max_name_len = 0;
 
@@ -948,7 +947,7 @@ StringArray sa;
    //  subrecords (if any)
    //
 
-if ( Header.subrec )  {
+if ( !Header.subrec.empty() )  {
 
    for (int j=0; j<Header.n_subrecs; ++j)  {
 

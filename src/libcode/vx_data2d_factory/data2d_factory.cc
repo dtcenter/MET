@@ -35,6 +35,7 @@
 #endif
 
 #include "vx_log.h"
+#include <memory>
 
 using namespace std;
 
@@ -44,31 +45,30 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType type)
+unique_ptr<Met2dDataFile> Met2dDataFileFactory::new_met_2d_data_file(GrdFileType type)
 
 {
 
-   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
+   unique_ptr<Met2dDataFile> mtddf;
    const char *method_name ="Met2dDataFileFactory::new_met_2d_data_file() -> ";
 
 #ifdef WITH_PYTHON
-MetPythonDataFile * p = nullptr;
+unique_ptr<MetPythonDataFile> py_mtddf;
 #endif
 
    //
    // Switch on file type and instantiate the appropriate class.
-   // The Met2dDataFile object is allocated and needs to be deleted by caller.
    //
 
    switch(type) {
 
       case FileType_Gb1:
-         mtddf = new MetGrib1DataFile;
+         mtddf = make_unique<MetGrib1DataFile>();
          break;
 
       case FileType_Gb2:
 #ifdef WITH_GRIB2
-         mtddf = new MetGrib2DataFile;
+         mtddf = make_unique<MetGrib2DataFile>();
 #else
          mlog << Error << "\n" << method_name
               << "Support for GRIB2 has not been compiled!\n"
@@ -78,30 +78,25 @@ MetPythonDataFile * p = nullptr;
          break;
 
       case FileType_NcMet:
-         mtddf = new MetNcMetDataFile;
+         mtddf = make_unique<MetNcMetDataFile>();
          break;
 
       case FileType_NcWrf:
       case FileType_NcPinterp:
-         mtddf = new MetNcWrfDataFile;
+         mtddf = make_unique<MetNcWrfDataFile>();
          break;
 
       case FileType_NcCF:
-         mtddf = new MetNcCFDataFile;
+         mtddf = make_unique<MetNcCFDataFile>();
          break;
 
 #ifdef WITH_PYTHON
 
       case FileType_Python_Numpy:
-         p = new MetPythonDataFile;
-         p->set_type(type);
-         mtddf = p;
-         break;
-
       case FileType_Python_Xarray:
-         p = new MetPythonDataFile;
-         p->set_type(type);
-         mtddf = p;
+         py_mtddf = make_unique<MetPythonDataFile>();
+         py_mtddf->set_type(type);
+         mtddf = std::move(py_mtddf);
          break;
 
 #else
@@ -130,7 +125,7 @@ MetPythonDataFile * p = nullptr;
       case FileType_UGrid:
 #ifdef WITH_UGRID
          // For FileType_None, silently return a nullptr pointer
-         mtddf = new MetUGridDataFile;
+         mtddf = make_unique<MetUGridDataFile>();
 #else
          ugrid_compile_error(method_name);
 #endif
@@ -138,7 +133,7 @@ MetPythonDataFile * p = nullptr;
 
       case FileType_None:
          // For FileType_None, silently return a nullptr pointer
-         mtddf = (Met2dDataFile *) nullptr;
+         mtddf.reset();
          break;
 
       default:
@@ -159,9 +154,9 @@ MetPythonDataFile * p = nullptr;
 
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename) {
+unique_ptr<Met2dDataFile> Met2dDataFileFactory::new_met_2d_data_file(const char *filename) {
    GrdFileType type;
-   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
+   unique_ptr<Met2dDataFile> mtddf;
 
    //
    // Determine the file type
@@ -191,11 +186,11 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename)
 
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename, GrdFileType type)
+unique_ptr<Met2dDataFile> Met2dDataFileFactory::new_met_2d_data_file(const char *filename, GrdFileType type)
 
 {
 
-   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
+   unique_ptr<Met2dDataFile> mtddf;
 
    //
    // Use the file type, if valid
@@ -246,7 +241,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
 bool is_2d_data_file(const ConcatString &filename,
                      const ConcatString &config_str) {
    Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
+   unique_ptr<Met2dDataFile> mtddf;
    GrdFileType type = FileType_None;
 
    // Check for a requested file type
@@ -258,11 +253,8 @@ bool is_2d_data_file(const ConcatString &filename,
    }
 
    mtddf = mtddf_factory.new_met_2d_data_file(filename.c_str(), type);
-   bool status = (mtddf != 0);
 
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
-
-   return status;
+   return (bool) mtddf;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

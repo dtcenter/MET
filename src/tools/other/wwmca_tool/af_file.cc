@@ -102,8 +102,6 @@ void AFDataFile::init_from_scratch()
 
 {
 
-grid = (const Grid *) nullptr;
-
 clear();
 
 return;
@@ -118,7 +116,7 @@ void AFDataFile::clear()
 
 {
 
-if ( grid )  { delete grid;  grid = (const Grid *) nullptr; }
+grid.reset();
 
 Filename.clear();
 
@@ -153,11 +151,11 @@ Valid = a.Valid;
 switch ( Hemisphere )  {
 
    case 'N':
-      grid = new Grid(wwmca_north_data);
+      grid = std::make_unique<const Grid>(wwmca_north_data);
       break;
 
    case 'S':
-      grid = new Grid(wwmca_south_data);
+      grid = std::make_unique<const Grid>(wwmca_south_data);
       break;
 
    default:
@@ -225,8 +223,8 @@ if ( Valid == (unixtime) 0 )  {
 
 }
 
-if ( Hemisphere == 'N' )  grid = new Grid(wwmca_north_data);
-else                      grid = new Grid(wwmca_south_data);
+if ( Hemisphere == 'N' )  grid = std::make_unique<const Grid>(wwmca_north_data);
+else                      grid = std::make_unique<const Grid>(wwmca_south_data);
 
 return true;
 

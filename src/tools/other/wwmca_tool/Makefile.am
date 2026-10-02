@@ -19,10 +19,6 @@ wwmca_regrid_SOURCES = gridhemisphere_to_string.cc gridhemisphere_to_string.h \
 	af_cp_file.cc af_cp_file.h \
 	af_pt_file.cc af_pt_file.h \
 	interp_base.cc interp_base.h \
-	min_interp.cc min_interp.h \
-	max_interp.cc max_interp.h \
-	ave_interp.cc ave_interp.h \
-	nearest_interp.cc nearest_interp.h \
 	wwmca_ref.cc wwmca_ref.h \
 	nc_output.cc
 wwmca_regrid_CPPFLAGS = ${MET_CPPFLAGS}
@@ -69,10 +65,6 @@ wwmca_plot_SOURCES = gridhemisphere_to_string.cc gridhemisphere_to_string.h \
 	af_cp_file.cc af_cp_file.h \
 	af_pt_file.cc af_pt_file.h \
 	interp_base.cc interp_base.h \
-	min_interp.cc min_interp.h \
-	max_interp.cc max_interp.h \
-	ave_interp.cc ave_interp.h \
-	nearest_interp.cc nearest_interp.h \
 	wwmca_ref.cc wwmca_ref.h
 wwmca_plot_CPPFLAGS = ${MET_CPPFLAGS}
 wwmca_plot_LDFLAGS = ${MET_LDFLAGS}
@@ -116,6 +108,16 @@ wwmca_plot_LDADD = -lvx_pxm \
 # in a distribution because the enum_to_string utility isn't available.
 
 if ENABLE_DEVELOPMENT
+
+# BUILT_SOURCES so these are generated before anything that
+# includes them is compiled.  Without it, a development build
+# whose .deps are empty - as after the make clean that removes
+# these very files - compiles sources in _SOURCES order and can
+# reach a consumer before its header has been generated.
+
+BUILT_SOURCES = gridhemisphere_to_string.cc \
+                gridhemisphere_to_string.h
+
 gridhemisphere_to_string.cc gridhemisphere_to_string.h: wwmca_ref.h
 	${ENUM_TO_STRING} -concat_string wwmca_ref.h
 

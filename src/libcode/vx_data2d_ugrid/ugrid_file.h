@@ -17,6 +17,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
+#include <memory>
 #include <ostream>
 
 #include "vx_grid.h"
@@ -30,7 +32,7 @@
 
 
 static const int UG_DIM_COUNT = 5;
-static const int UG_META_VAR_COUNT = 9;
+static const int UG_META_VAR_COUNT = 10;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -58,14 +60,12 @@ class UGridFile {
 
 
       int getNx() const {
-        return (_faceDim == nullptr) ? 0 : GET_NC_SIZE_P(_faceDim);
+        return (!_faceDim) ? 0 : GET_NC_SIZE_P(_faceDim.get());
       }
       
       int getNy() const {
         return 1;
       }
-      
-      NcVarInfo *get_time_var_info() const { return _time_var_info; }
       
          //
          //  time
@@ -87,7 +87,7 @@ class UGridFile {
 
       int Nvars;
 
-      NcVarInfo *Var;    //  allocated
+      std::vector<NcVarInfo> Var;
       std::array<NcVarInfo, UG_META_VAR_COUNT>MetaVar;
       ConcatString z_var_name;
 
@@ -118,8 +118,8 @@ class UGridFile {
 
       static const double DELTA_TOLERANCE;
       
-      netCDF::NcFile * _ncFile;      //  allocated
-      netCDF::NcFile * _ncMetaFile;  //  allocated
+      std::unique_ptr<netCDF::NcFile> _ncFile;
+      std::unique_ptr<netCDF::NcFile> _ncMetaFile;
 
       ConcatString dataset_name;
       ConcatString coordinate_file;
@@ -138,15 +138,17 @@ class UGridFile {
       // variables.  Note that these are pointers into the _dims and Var
       // arrays so should not be deleted.
 
-      netCDF::NcDim *_faceDim;
-      netCDF::NcDim *_edgeDim;
-      netCDF::NcDim *_nodeDim;
-      netCDF::NcDim *_virtDim;
-      netCDF::NcDim *_tDim;
+      std::unique_ptr<netCDF::NcDim> _faceDim;
+      std::unique_ptr<netCDF::NcDim> _edgeDim;
+      std::unique_ptr<netCDF::NcDim> _nodeDim;
+      std::unique_ptr<netCDF::NcDim> _virtDim;
+      std::unique_ptr<netCDF::NcDim> _tDim;
 
       netCDF::NcVar *_latVar;
       netCDF::NcVar *_lonVar;
-      NcVarInfo *_time_var_info;
+      netCDF::NcVar *_zVar;
+      netCDF::NcVar *_tVar;
+      netCDF::NcVar *_init_time_var;
 
       int face_count;
 
@@ -160,20 +162,22 @@ class UGridFile {
       // Read the grid information from the netCDF file and fill in the
       // grid member with that information.
 
-      void assign_dim_from_metadata(netCDF::NcFile* ncFile, netCDF::NcDim*& dim_ptr,
+      void assign_dim_from_metadata(const netCDF::NcFile* ncFile, std::unique_ptr<netCDF::NcDim>& dim_ptr,
                                     const std::string& key, const StringArray& dim_names);
 
       std::string find_metadata_name(const std::string &key, const StringArray &available_names);
       StringArray get_metadata_names(const std::string &key);
+      void metadata_coord_variables();
+      bool metadata_time();
+      void radian_to_degree(std::vector<double> &lat_values, const int lat_count) const;
       void read_config(const ConcatString &config_filename);
       void read_netcdf_grid();
-
 };
 
 
 ////////////////////////////////////////////////////////////////////////
 
-inline netCDF::NcDim *UGridFile::get_vert_dim() const { return _virtDim; }
+inline netCDF::NcDim *UGridFile::get_vert_dim() const { return _virtDim.get(); }
 inline ConcatString UGridFile::coordinate_nc() const { return coordinate_file; }
 
 ////////////////////////////////////////////////////////////////////////

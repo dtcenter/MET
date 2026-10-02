@@ -193,12 +193,12 @@ switch ( Type )  {   //  assumes Type is already set
 
 Filename = file_name;
 
-Raw_Grid = new Grid;
+Raw_Grid = std::make_unique<Grid>();
 
 bool status = python_dataplane(file_name.c_str(), sa,
                                use_xarray, Plane, *Raw_Grid, VInfo);
 
-Dest_Grid = new Grid;
+Dest_Grid = std::make_unique<Grid>();
 
 (*Dest_Grid) = (*Raw_Grid);
 
@@ -295,7 +295,8 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MetPythonDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
+bool MetPythonDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
+                                   bool do_winds)
 
 {
 
@@ -332,7 +333,9 @@ if ( status ) {
 
    plane = Plane;
 
-   status = process_data_plane(&vinfo, plane);
+   if(status && do_winds)  status = rotate_winds(&vinfo, plane);
+
+   if(status)  status = process_data_plane(&vinfo, plane);
 
 }
 
@@ -360,7 +363,9 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-int MetPythonDataFile::data_plane_array(VarInfo &vinfo, DataPlaneArray &plane_array)
+int MetPythonDataFile::data_plane_array(VarInfo &vinfo,
+                                        DataPlaneArray &plane_array,
+                                        bool do_winds)
 
 {
 
@@ -398,7 +403,9 @@ if ( status ) {
 
    plane = Plane;
 
-   status = process_data_plane(&vinfo, plane);
+   if(status && do_winds)  status = rotate_winds(&vinfo, plane);
+
+   if(status) status = process_data_plane(&vinfo, plane);
 
 }
 

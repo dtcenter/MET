@@ -21,6 +21,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
+#include <vector>
 #include <netcdf>
 
 #include "vx_util.h"
@@ -59,7 +61,7 @@ class NcVarInfo {
       void dump(std::ostream &, int = 0) const;
 
 
-      netCDF::NcVar * var;   //  not allocated
+      std::unique_ptr<netCDF::NcVar> var;   //  owned: the readers hand over a copy of the NcVar handle
 
       ConcatString name;
 
@@ -81,7 +83,7 @@ class NcVarInfo {
 
       int Ndims;
 
-      netCDF::NcDim ** Dims; //  allocated
+      std::vector<netCDF::NcDim *> Dims;   //  the array is owned; the NcDims are not
 
       int x_slot;       //   starting from zero
       int y_slot;       //

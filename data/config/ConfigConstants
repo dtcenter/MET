@@ -24,6 +24,18 @@ tmp_dir = "/tmp";
 
 ////////////////////////////////////////////////////////////////////////////////
 //
+// Settings to define wind vector metadata.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+// Comma-separated lists of wind variable names for rotating and deriving
+u_wind_field_name = "UGRD,U";
+v_wind_field_name = "VGRD,V";
+wind_speed_field_name = "WIND,SP";
+wind_direction_field_name = "WDIR,DD";
+
+////////////////////////////////////////////////////////////////////////////////
+//
 // Standard unit conversion functions.
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -202,3 +214,7 @@ CLIMO_STD_ANOM = 3;
 FCST_ANOM      = 4;
 FCST_STD_ANOM  = 5;
 
+// Power spectrum missing flag types
+NONE  = 1;
+MEAN  = 2;
+VALUE = 3;

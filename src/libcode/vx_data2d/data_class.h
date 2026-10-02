@@ -18,6 +18,7 @@
 
 
 #include <iostream>
+#include <memory>
 
 #include "vx_cal.h"
 #include "vx_grid.h"
@@ -83,12 +84,19 @@ class Met2dDataFile : public Met2dData {
 
       void mtddf_init_from_scratch();
 
+      bool read_wind_data(VarInfo *,
+                          const char *, const StringArray &,
+                          DataPlane &);
+      bool read_wind_data(VarInfo *,
+                          const char *, const StringArray &,
+                          DataPlaneArray &);
+
       bool GridShifted;
 
    protected:
 
-      Grid * Raw_Grid;       //  Grid for raw data ... allocated
-      Grid * Dest_Grid;      //  Grid for destination data ... allocated
+      std::unique_ptr<Grid> Raw_Grid;    //  Grid for raw data
+      std::unique_ptr<Grid> Dest_Grid;   //  Grid for destination data
 
       void copy_raw_grid_to_dest();
 
@@ -141,11 +149,11 @@ class Met2dDataFile : public Met2dData {
 
          //  retrieve the first matching data plane
 
-      virtual bool data_plane(VarInfo &, DataPlane &) = 0;
+      virtual bool data_plane(VarInfo &, DataPlane &, bool do_winds = true) = 0;
 
          //  retrieve all matching data planes
 
-      virtual int data_plane_array(VarInfo &, DataPlaneArray &) = 0;
+      virtual int data_plane_array(VarInfo &, DataPlaneArray &, bool do_winds = true) = 0;
 
          //  retrieve the indexes of the first matching data plane
 
@@ -153,8 +161,15 @@ class Met2dDataFile : public Met2dData {
 
          //  retrieve a vector of all requested data planes
 
-      int data_planes(std::vector<VarInfo*>&,
+      int data_planes(const std::vector<std::unique_ptr<VarInfo>>&,
                       std::vector<DataPlane>&);
+
+         //  derive and rotate wind fields
+
+      bool derive_winds(VarInfo *, DataPlane &);
+      bool derive_winds(VarInfo *, DataPlaneArray &);
+      bool rotate_winds(const VarInfo *, DataPlane &);
+      bool rotate_winds(const VarInfo *, DataPlaneArray &);
 
          //  post-process data after reading it
 

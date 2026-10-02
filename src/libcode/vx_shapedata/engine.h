@@ -13,6 +13,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <memory>
+
 #include "mode_conf_info.h"
 #include "mode_data_type.h"
 
@@ -308,22 +310,22 @@ class ModeFuzzyEngine {
 
       const Grid * grid;             //  not allocated
 
-      ShapeData * fcst_raw;          //  allocated
-      ShapeData * fcst_thresh;       //  allocated  thresholded raw  (values are 1 or 0)
-      ShapeData * fcst_conv;         //  allocated  convolve of raw  
-      ShapeData * fcst_mask;         //  allocated  thresholded convolved, filtered using attribute logic (values are 1 or 0)
-      ShapeData * fcst_split;        //  allocated split of fcst_mask.. final one, numbers 1, 2, ...
-      ShapeData * fcst_clus_split;   //  allocated numbered 1 and up
+      std::unique_ptr<ShapeData> fcst_raw;          //
+      std::unique_ptr<ShapeData> fcst_thresh;       //  thresholded raw  (values are 1 or 0)
+      std::unique_ptr<ShapeData> fcst_conv;         //  convolve of raw  
+      std::unique_ptr<ShapeData> fcst_mask;         //  thresholded convolved, filtered using attribute logic (values are 1 or 0)
+      std::unique_ptr<ShapeData> fcst_split;        // split of fcst_mask.. final one, numbers 1, 2, ...
+      std::unique_ptr<ShapeData> fcst_clus_split;   // numbered 1 and up
 
-      ShapeData * obs_raw;           //  allocated
-      ShapeData * obs_thresh;        //  allocated
-      ShapeData * obs_conv;          //  allocated
-      ShapeData * obs_mask;          //  allocated
-      ShapeData * obs_split;         //  allocated
-      ShapeData * obs_clus_split;    //  allocated
+      std::unique_ptr<ShapeData> obs_raw;           //
+      std::unique_ptr<ShapeData> obs_thresh;        //
+      std::unique_ptr<ShapeData> obs_conv;          //
+      std::unique_ptr<ShapeData> obs_mask;          //
+      std::unique_ptr<ShapeData> obs_split;         //
+      std::unique_ptr<ShapeData> obs_clus_split;    //
 
-      ModeFuzzyEngine * fcst_engine;   //  allocated
-      ModeFuzzyEngine * obs_engine;    //  allocated
+      std::unique_ptr<ModeFuzzyEngine> fcst_engine;
+      std::unique_ptr<ModeFuzzyEngine> obs_engine;
 
       int n_fcst;
       int n_obs;

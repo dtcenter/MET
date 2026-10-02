@@ -96,9 +96,7 @@ void Wchar_Argv::init_from_scratch()
 
 {
 
-W_Buf = nullptr;
 
-W_Argv = nullptr;
 
 
 return;
@@ -113,9 +111,9 @@ void Wchar_Argv::clear()
 
 {
 
-if ( W_Argv )  { delete [] W_Argv;  W_Argv = nullptr; }
+W_Argv.clear();
 
-if ( W_Buf )  { delete [] W_Buf;  W_Buf = nullptr; }
+W_Buf.clear();
 
 Argc = 0;
 
@@ -216,7 +214,7 @@ for (int j=0; j<_argc; ++j)  {
    //     (even though they are))
    //
 
-W_Buf = new wchar_t [argv_len];
+W_Buf.resize(argv_len);
 
 for (int j=0; j<argv_len; ++j)  {
 
@@ -232,7 +230,7 @@ k = 0;
 
 for (int j=0; j<Argc; ++j)  {
 
-   if ( _argv != nullptr && mbstowcs(W_Buf + k, _argv[j], len[j]) == (size_t) -1 )  {
+   if ( _argv != nullptr && mbstowcs(W_Buf.data() + k, _argv[j], len[j]) == (size_t) -1 )  {
 
       mlog << Error << "\nWchar_Argv::set() -> "
            << "mbstowcs failed for string \"" << _argv[j] << "\"\n\n";
@@ -252,13 +250,13 @@ for (int j=0; j<Argc; ++j)  {
    //      are stored in contiguous memory)
    //
 
-W_Argv = new wchar_t * [Argc];
+W_Argv.resize(Argc);
 
 k = 0;
 
 for (int j=0; j<Argc; ++j)  {
 
-   W_Argv[j] = W_Buf + k;
+   W_Argv[j] = W_Buf.data() + k;
 
    k += (len[j] + 1);
 

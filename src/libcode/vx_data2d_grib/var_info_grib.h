@@ -18,6 +18,7 @@
 #include "vx_config.h"
 
 #include "data_file_type.h"
+#include "table_lookup.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -30,10 +31,6 @@ static const char * const CONFIG_GRIB_PTV     = "GRIB_PTV";
 static const char * const CONFIG_GRIB_Code    = "GRIB_Code";
 static const char * const CONFIG_GRIB_LvlType = "GRIB_Level";
 static const char * const CONFIG_GRIB_PCode   = "GRIB_Prob_Code";
-
-///////////////////////////////////////////////////////////////////////////////
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -67,7 +64,7 @@ class VarInfoGrib : public VarInfo
       ~VarInfoGrib() override;
       VarInfoGrib(const VarInfoGrib &);
       VarInfoGrib & operator=(const VarInfoGrib &);
-      VarInfo *clone() const override;
+      std::unique_ptr<VarInfo> clone() const override;
 
       void dump(std::ostream &) const override;
       void clear();
