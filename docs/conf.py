@@ -132,11 +132,14 @@ linkcheck_retries = 3
 linkcheck_workers = 8
 
 linkcheck_ignore = [
-    # AMS journals (DOI prefix 10.1175) return 403 Forbidden to automated requests
+    # AMS journals (DOI prefix 10.1175) and Wiley/RMetS journals (DOI prefix 10.1002)
+    # return 403 Forbidden to automated requests, so Sphinx skips the publisher's site.
+    # dtcenter/metplus-action-linkcheck still checks that each DOI is registered
+    # using the DOI API (https://doi.org/api/handles/<doi>).
     r'https://doi\.org/10\.1175/.*',
-    # Wiley/RMetS journals (DOI prefix 10.1002) return 403 Forbidden to automated requests
     r'https://doi\.org/10\.1002/.*',
-    # unreachable from GitHub Actions runners (Network is unreachable) but valid
+    # www.gnu.org is often slow or unreachable, both from GitHub Actions runners
+    # and elsewhere, so these links are listed in the job summary to check by hand
     r'https://www\.gnu\.org/.*',
 ]
 
