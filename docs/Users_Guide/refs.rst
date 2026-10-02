@@ -225,13 +225,12 @@ References
 |   doi: https://doi.org/10.5194/ascmo-7-13-2021
 |
 
-.. _Gneiting-2004:
+.. _Gneiting-2005:
 
-| Gneiting, T., A. Westveld, A. Raferty, and T. Goldman, 2004: *Calibrated*
-|   *Probabilistic Forecasting Using Ensemble Model Output Statistics and*
-|   *Minimum CRPS Estimation*. Technical Report no. 449, Department of
-|   Statistics, University of Washington. Available at
-|   https://stat.uw.edu/research/tech-reports/calibrated-probabilistic-forecasting-using-ensemble-model-output-statistics-and-minimum-crps
+| Gneiting, T., A. E. Raftery, A. H. Westveld, and T. Goldman, 2005: Calibrated
+|   probabilistic forecasting using ensemble model output statistics and
+|   minimum CRPS estimation. *Monthly Weather Review*, 133 (5), 1098-1118.
+|   doi: https://doi.org/10.1175/MWR2904.1
 |
 
 .. _Haiden-2012:

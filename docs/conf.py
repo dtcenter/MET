@@ -136,8 +136,6 @@ linkcheck_ignore = [
     r'https://doi\.org/10\.1175/.*',
     # Wiley/RMetS journals (DOI prefix 10.1002) return 403 Forbidden to automated requests
     r'https://doi\.org/10\.1002/.*',
-    # server sends an incomplete TLS certificate chain that browsers tolerate but Python does not
-    r'https://stat\.uw\.edu/.*',
     # unreachable from GitHub Actions runners (Network is unreachable) but valid
     r'https://www\.gnu\.org/.*',
 ]
