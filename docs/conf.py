@@ -140,8 +140,6 @@ linkcheck_ignore = [
     r'https://stat\.uw\.edu/.*',
     # unreachable from GitHub Actions runners (Network is unreachable) but valid
     r'https://www\.gnu\.org/.*',
-    # intermittently unreachable from some GitHub Actions runners (Network is unreachable) but valid
-    r'https://ladsweb\.modaps\.eosdis\.nasa\.gov.*',
 ]
 
 linkcheck_allowed_redirects = {
