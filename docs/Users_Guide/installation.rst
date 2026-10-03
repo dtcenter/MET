@@ -193,7 +193,7 @@ Environment Variable Descriptions
 
     **TEST_BASE** – Format is */d1/met/13.0.0*. This is the MET
     installation directory that was created
-    the beginning of, :numref:`compile_script_install` and contains the
+    at the beginning of :numref:`compile_script_install` and contains the
     **compile_MET_all.sh** script, **tar_files.tgz**,
     and the *tar_files* directory from the untar command.
 
@@ -441,7 +441,7 @@ To confirm that MET was installed successfully, run the following command from t
 
 If no errors are returned, the installation was successful.
 Due to the highly variable nature of hardware systems, users may encounter issues during
-the installation process that result in MET not being installed. If this occurs please
+the installation process that result in MET not being installed. If this occurs, please
 first recheck that the location of all the necessary data files and scripts is correct.
 Next, recheck the environment variables in the environment configuration file and
 ensure there are no spelling errors or improperly set variables.
@@ -468,7 +468,7 @@ down system environment settings and meet with success faster) alike.
 
 MET has numerous version images for Docker users and continues to be released as
 images at the same interval as system releases. While the advantages of Docker can
-make it an appealing installation route for first time users, it does require
+make it an appealing installation route for first-time users, it does require
 privileged user access that will result in an unsuccessful installation if not
 available. Please ensure the user has high system access
 (e.g. admin access) before attempting this method.
@@ -523,7 +523,7 @@ the same way the latest image of MET was pulled:
 
   docker run -it --rm dtcenter/met:13.0.0 /bin/bash
 
-If the  usage MET via Docker images was successful, it is highly
+If the usage of MET via Docker images was successful, it is highly
 recommended to move on
 to using the METplus wrappers of the tools, which have their own
 Docker image.
@@ -564,7 +564,7 @@ Loading the Latest MET Image
 Similar to Docker, Apptainer will build the container based off of the
 MET image in a single command. To accomplish this, Apptainer’s
 “Swiss army knife”  :code:`build`
-command is used. Use the the latest MET version number in
+command is used. Use the latest MET version number in
 conjunction with :code:`build`
 to make the container:
 
