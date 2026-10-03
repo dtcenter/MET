@@ -82,7 +82,7 @@ or exclude (exc). Tracks whose initial time meets the specified
 criteria will be used. An empty string indicates that all times
 should be used.
 
-In TC-Stat, the **-init_beg**, **-init_end**, **init_inc** and **-int_exc** job command options can be used to further refine these selections.
+In TC-Stat, the **-init_beg**, **-init_end**, **-init_inc** and **-init_exc** job command options can be used to further refine these selections.
 
 For example:
 
@@ -109,7 +109,7 @@ tracks will be subset down to the points which meet that criteria. Empty
 begin/end time strings and empty include/exclude lists indicate that all
 valid times should be used.
 
-In TC-Stat, the **-valid_beg**, **-valid_end**, **valid_inc** and **-valid_exc** job command options can be used to further refine these selections.
+In TC-Stat, the **-valid_beg**, **-valid_end**, **-valid_inc** and **-valid_exc** job command options can be used to further refine these selections.
 
 For example:
 
@@ -228,7 +228,7 @@ name ends in '2' (e.g. AHW2) and apply the following logic:
 
 * NONE to do nothing.
 
-* FILL to create a copy of '2' track and rename it as 'I' only when the
+* FILL to create a copy of the '2' track and rename it as 'I' only when the
   'I' track does not already exist.
 
 * REPLACE to create a copy of the '2' track and rename it as 'I' in all
@@ -358,7 +358,7 @@ watch/warning information to be used.  At each track point, the most severe
 watch/warning status in effect, if any, will be written to the output.
 Also specify a time offset in seconds to be added to each watch/warning
 time processed.  NHC applies watch/warning information to all track points
-occurring 4 hours (-14400 second) prior to the watch/warning time.
+occurring 4 hours (-14400 seconds) prior to the watch/warning time.
 
 
 .. code-block:: none
@@ -505,7 +505,7 @@ column_thresh_name_and_val
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Stratify by applying thresholds to numeric data columns.
-Specify a comma-separated list of columns names and thresholds
+Specify a comma-separated list of column names and thresholds
 to be applied.  May add using the "-column_thresh name thresh" job command
 options.
 
@@ -523,7 +523,7 @@ column_str_name, column_str_val
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Stratify by performing string matching on non-numeric data columns.
-Specify a comma-separated list of columns names and values
+Specify a comma-separated list of column names and values
 to be included in the analysis.
 May add using the "-column_str name string" job command options.
 
@@ -541,7 +541,7 @@ column_str_name val
 ^^^^^^^^^^^^^^^^^^^
 
 Stratify by performing string matching on non-numeric data columns.
-Specify a comma-separated list of columns names and values
+Specify a comma-separated list of column names and values
 to be excluded from the analysis.
 May add using the "-column_str_exc name string" job command options.
 
@@ -710,8 +710,8 @@ event equalization logic.
   event_equal_lead = [ "12", "24", "36" ];
 
 
-out_int_mask
-^^^^^^^^^^^^
+out_init_mask
+^^^^^^^^^^^^^
 
 Apply polyline masking logic to the location of the ADECK track at the
 initialization time.  If it falls outside the mask, discard the entire track.
@@ -781,7 +781,7 @@ analysis will be performed over their union.
   "-init_inc    YYYYMMDD[_HH[MMSS]]" (use once)
   "-init_exc    YYYYMMDD[_HH[MMSS]]" (use once)
   "-init_hour   HH[MMSS]"
-  "-valid_hour  HH[MMSS]
+  "-valid_hour  HH[MMSS]"
   "-init_mask          name"
   "-valid_mask         name"
   "-line_type          name"
@@ -843,7 +843,7 @@ Optional Args:
 
 -job rirw
 """""""""
-To define rapid intensification/weakening contingency table using
+To define a rapid intensification/weakening contingency table using
 the ADECK and BDECK RI/RW settings and the matching time window
 and output contingency table counts and statistics.
 
@@ -908,11 +908,11 @@ probability values greater than 0:
 For example:
 
 | jobs = [
-|   "-job filter -amodel AHW4 -dumprow ./tc_filter_job.tcst",
+|   "-job filter -amodel AHW4 -dump_row ./tc_filter_job.tcst",
 |   "-job filter -column_min TK_ERR 100.000 \
-|   -dumprow ./tc_filter_job.tcst",
+|   -dump_row ./tc_filter_job.tcst",
 |   "-job summary -line_type TCMPR -column AC \
-|   -dumprow  ./tc_summary_job.tcst",
+|   -dump_row  ./tc_summary_job.tcst",
 |   "-job rirw -amodel AHW4 -dump_row ./tc_rirw_job" ]
 |
 
@@ -992,7 +992,7 @@ oper_genesis
 
 Operational track genesis event criteria.  Defined as tracks reaching the
 specified intensity category, maximum wind speed threshold, and minimum
-sea-level pressure threshold.  The operational track genesis time is valid
+sea-level pressure threshold.  The operational track genesis time is the valid
 time of the first track point where all of these criteria are met.
 
 .. code-block:: none
