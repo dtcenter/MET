@@ -72,7 +72,7 @@ An example of the plot_point_obs calling sequence is shown below:
 
   plot_point_obs sample_pb.nc sample_data.ps
 
-In this example, the Plot-Point-Obs tool will process the input sample_pb.nc file and write a PostScript file containing a plot to a file named sample_pb.ps.
+In this example, the Plot-Point-Obs tool will process the input sample_pb.nc file and write a PostScript file containing a plot to a file named sample_data.ps.
 
 An equivalent command using Python embedding for point observations is shown below. Note that the entire Python command is enclosed in single quotes to prevent embedded whitespace from causing parsing errors:
 
@@ -147,7 +147,7 @@ ______________________
   obs_var     = [];
   obs_quality = [];
 
-The options listed above define filtering criteria for the input point observation strings. If empty, no filtering logic is applied. If a comma-separated list of strings is provided, only those observations meeting all of the criteria are included. The **msg_typ** entry specifies the message type. The **sid_inc** and **sid_exc** entries explicitly specify station ID's to be included or excluded. The **obs_var** entry specifies the observation variable names, and **obs_quality** specifies quality control strings.
+The options listed above define filtering criteria for the input point observation strings. If empty, no filtering logic is applied. If a comma-separated list of strings is provided, only those observations meeting all of the criteria are included. The **msg_typ** entry specifies the message type. The **sid_inc** and **sid_exc** entries explicitly specify station IDs to be included or excluded. The **obs_var** entry specifies the observation variable names, and **obs_quality** specifies quality control strings.
 
 ______________________
 
@@ -301,7 +301,7 @@ MODE Tool Examples
 
 When using the MODE tool, it is possible to think of matched objects as hits and unmatched objects as false alarms or misses depending on whether the unmatched object is from the forecast or observed field, respectively. Because the objects can have greatly differing sizes, it is useful to weight the statistics by the areas, which are given in the output as numbers of grid squares. When doing this, it is possible to have different matched observed object areas from matched forecast object areas so that the number of hits will be different depending on which is chosen to be a hit. When comparing multiple forecasts to the same observed field, it is perhaps wise to always use the observed field for the hits so that there is consistency for subsequent comparisons. Defining hits, misses and false alarms in this way allows one to compute many traditional verification scores without the problem of small-scale discrepancies; the matched objects are defined as being matched because they are "close" by the fuzzy logic criteria. Note that scores involving the number of correct negatives may be more difficult to interpret as it is not clear how to define a correct negative in this context. It is also important to evaluate the number and area attributes for these objects in order to provide a more complete picture of how the forecast is performing.
 
-:numref:`plotting_verification` gives an example of two traditional verification scores (Bias and CSI) along with bar plots showing the total numbers of objects for the forecast and observed fields, as well as bar plots showing their total areas. These data are from the same set of 13-km WRF model runs analyzed in :numref:`plotting_verification`. The model runs were initialized at 0 UTC and cover the period 15 July to 15 August 2005. For the forecast evaluation, we compared 3-hour accumulated precipitation for lead times of 3-24 hours to Stage II radar-gauge precipitation. Note that for the 3-hr lead time, indicated as the 0300 UTC valid time in :numref:`plotting_Gilbert_skill_score`, the Bias is significantly larger than the other lead times. This is evidenced by the fact that there are both a larger number of forecast objects, and a larger area of forecast objects for this lead time, and only for this lead time. Dashed lines show about 2 bootstrap standard deviations from the estimate.
+:numref:`plotting_verification` gives an example of two traditional verification scores (Bias and CSI) along with bar plots showing the total numbers of objects for the forecast and observed fields, as well as bar plots showing their total areas. These data are from the same set of 13-km WRF model runs analyzed in :numref:`plotting_Gilbert_skill_score`. The model runs were initialized at 0 UTC and cover the period 15 July to 15 August 2005. For the forecast evaluation, we compared 3-hour accumulated precipitation for lead times of 3-24 hours to Stage II radar-gauge precipitation. Note that for the 3-hr lead time, indicated as the 0300 UTC valid time in :numref:`plotting_verification`, the Bias is significantly larger than the other lead times. This is evidenced by the fact that there are both a larger number of forecast objects, and a larger area of forecast objects for this lead time, and only for this lead time. Dashed lines show about 2 bootstrap standard deviations from the estimate.
 
 .. _plotting_verification:
 
@@ -332,7 +332,7 @@ The supplied R script can generate a number of different plot types including bo
 
 .. figure:: figure/plotting_fig5.jpg
 
-   Example boxplot from plot_tcmpr.R. Track error distributions by lead time for three operational models GFNI, GHMI, HFWI.
+   Example boxplot from plot_tcmpr.R. Track error distributions by lead time for three operational models GFNI, GHMI, HWFI.
 
 .. _plotting_fig6:
 

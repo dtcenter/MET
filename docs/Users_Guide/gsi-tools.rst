@@ -230,7 +230,7 @@ The GSID2MPR tool writes the same set of MPR output columns for the conventional
     - Double
   * - 60
     - CTOP_PRS   TC_PWAT
-    - Cloud top pressure (hPa) :raw-html:`<br />`  Total column precip. water (km/m**2) (microwave only)
+    - Cloud top pressure (hPa) :raw-html:`<br />`  Total column precip. water (kg/m**2) (microwave only)
     - Double
   * - 61
     - TFND

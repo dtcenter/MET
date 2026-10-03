@@ -652,7 +652,7 @@ The example above reads MPR lines, stratifies the data by forecast variable name
   -mask_poly file
   -mask_sid  file|list
 
-When processing input MPR lines, these options may be used to define a masking grid, polyline, or list of station ID's to filter the matched pair data geographically prior to computing statistics. The **-mask_sid** option is a station ID masking file or a comma-separated list of station ID's for filtering the matched pairs spatially. See the description of the "sid" entry in :numref:`config_options`.
+When processing input MPR lines, these options may be used to define a masking grid, polyline, or list of station IDs to filter the matched pair data geographically prior to computing statistics. The **-mask_sid** option is a station ID masking file or a comma-separated list of station IDs for filtering the matched pairs spatially. See the description of the "sid" entry in :numref:`config_options`.
 
 .. code-block:: none
 
