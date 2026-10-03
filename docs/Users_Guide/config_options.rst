@@ -48,7 +48,7 @@ The configuration file language supports the following data types:
 
 * Threshold:
 
-  * A threshold type (<, <=, ==, !-, >=, or >) followed by a numeric value.
+  * A threshold type (<, <=, ==, !=, >=, or >) followed by a numeric value.
 
   * The threshold type may also be specified using two letter abbreviations
     (lt, le, eq, ne, ge, gt).
@@ -170,13 +170,13 @@ The configuration file language supports the following data types:
 
 * Piecewise-Linear Function (currently used only by MODE):
 
-  * A list of (x, y) points enclosed in parenthesis ().
+  * A list of (x, y) points enclosed in parentheses ().
 
   * The (x, y) points are *NOT* separated by commas.
 
 * User-defined function of a single variable:
 
-  * Left side is a function name followed by variable name in parenthesis.
+  * Left side is a function name followed by variable name in parentheses.
 
   * Right side is an equation which includes basic math functions (+,-,*,/),
     built-in functions (listed below), or other user-defined functions.
@@ -274,12 +274,12 @@ The MET_AIRNOW_STATIONS environment variable can be used to specify a file that
 will override the default file. If set, it should be the full path to the file.
 The default table can be found in the installed
 *share/met/table_files/airnow_monitoring_site_locations_v2.dat*. This file contains
-ascii column data that allows lookups of latitude, longitude, and elevation for all
+ASCII column data that allows lookups of latitude, longitude, and elevation for all
 AirNow stations based on stationId and/or AqSid.
 
 Additional information and updated site locations can be found at the
 `EPA AirNow website <https://www.airnow.gov>`_. While some monitoring stations are
-permanent, others are temporary, and theirs locations can change. When running the
+permanent, others are temporary, and their locations can change. When running the
 ASCII2NC tool with the :code:`-format airnowhourly` option, users should
 `download <https://files.airnowtech.org>`_ the **Monitoring_Site_Locations_V2.dat**
 data file for the date being processed and set the MET_AIRNOW_STATIONS environment
@@ -291,7 +291,7 @@ MET_NDBC_STATIONS
 -----------------
 
 The MET_NDBC_STATIONS environment variable can be used to specify a file that
-will override the default file. If set it should be a full path to the file.
+will override the default file. If set, it should be a full path to the file.
 The default table can be found in the installed
 *share/met/table_files/ndbc_stations.xml*. This file contains
 XML content for all stations that allows lookups of latitude, longitude,
@@ -317,7 +317,7 @@ To run this utility:
   Usage: build_ndbc_stations_from_web.py [options]
   Options:
     -h, --help            show this help message and exit
-    -d, --diagnostic      Rerun using downlaoded files, skipping download step (optional, default: False)
+    -d, --diagnostic      Rerun using downloaded files, skipping download step (optional, default: False)
     -p, --prune           Prune files that are no longer online (optional, default: False)
     -o OUT_FILE, --out=OUT_FILE
                           Save the text into the named file (optional, default: merged.txt)
@@ -456,7 +456,7 @@ Further expanded use of parallelism is planned for future versions of MET.
 Due to the broad application of OpenMP, nearly all MET applications benefit
 from it. However, initializing OpenMP threads does incur some overhead cost.
 Typically the runtime benefit dramatically outweighs the setup cost. Generally,
-more threads produces faster runtimes, but that is not always the case. The
+more threads produce faster runtimes, but that is not always the case. The
 optimal number of threads for any single run of a MET tool is data dependent.
 
 Setting the number of threads
@@ -503,7 +503,7 @@ observed in practice, however.
 
 A lower thread count is appropriate when time-to-solution is not so critical,
 because cores remain idle when the code is not inside a parallel region. Fewer
-threads typically means better resource utilization.
+threads typically mean better resource utilization.
 
 Thread Binding
 ^^^^^^^^^^^^^^
@@ -538,7 +538,7 @@ and debugging to keep them for further inspection. Setting this environment vari
 to a value of :code:`yes` or :code:`true` instructs the MET tools to retain temporary
 files instead of deleting them.
 
-Note that doing so may fill up the temporary directory. It is the responsiblity of
+Note that doing so may fill up the temporary directory. It is the responsibility of
 the user to monitor the temporary directory usage and remove temporary files that
 are no longer needed.
 
@@ -576,7 +576,7 @@ MET_USE_WRF_SUBGRID
 
 The MET_USE_WRF_SUBGRID environment variable controls how the grid information is
 read from WRF files.
-Some WRF files contain fields that are on a subgrid, which contain more grid points
+Some WRF files contain fields that are on a subgrid, which contains more grid points
 and require a computation to determine the d_km value.
 MET reads the grid information from a file before any fields are read and assumes
 that there is one grid definition per file.
@@ -623,7 +623,7 @@ The "nc_compression" entry in ConfigConstants defines the compression level
 for the NetCDF variables. Setting this option in the config file of one of
 the tools overrides the default value set in ConfigConstants. The
 environment variable MET_NC_COMPRESS overrides the compression level
-from configuration file. The command line argument "-compress n" for some
+from the configuration file. The command line argument "-compress n" for some
 tools overrides it.
 The range is 0 to 9.
 
@@ -659,7 +659,7 @@ The "tmp_dir" entry in ConfigConstants defines the directory for the
 temporary files. The directory must exist and be writable. The environment
 variable MET_TMP_DIR overrides the default value at the configuration file.
 Some tools override the temporary directory by the command line argument
-"-tmp_dir <diretory_name>".
+"-tmp_dir <directory_name>".
 
 .. code-block:: none
 
@@ -700,7 +700,7 @@ default values found in the "data/config/ConfigConstants" file:
   wind_direction_field_name = "WDIR,DD";
 
 Each is a comma-separated list of wind variable names to be searched. Users can
-explicity set these options to configure what data should be used in the wind
+explicitly set these options to configure what data should be used in the wind
 derivation and rotation logic.
 
 message_type_group_map
@@ -761,7 +761,7 @@ or "AIRCFT", based on the input message type of each point observation.
 
 .. code-block:: none
 
-  obtyp_as_group_val_flag = FALSE;
+  obtype_as_group_val_flag = FALSE;
 
 message_type_map
 ----------------
@@ -770,7 +770,7 @@ The "message_type_map" entry is an array of dictionaries, each containing
 a "key" string and "val" string. This defines a mapping of input strings
 to output message types. This mapping is applied in ASCII2NC when
 converting input little_r report types to output message types. This mapping
-is also supported in PBN2NC as a way of renaming input PREPBUFR message
+is also supported in PB2NC as a way of renaming input PREPBUFR message
 types.
 
 .. code-block:: none
@@ -949,7 +949,7 @@ smoothing. The default is 120. Ignored if not Gaussian method.
 
 .. note::
   The "gaussian_dx" and "gaussian_radius" settings must be in the same
-  units, such as kilometers or degress. Their ratio
+  units, such as kilometers or degrees. Their ratio
   (sigma = gaussian_radius / gaussian_dx) determines the Gaussian weighting
   function.
 
@@ -1141,7 +1141,7 @@ field.mpr_column and field.mpr_thresh
 The "mpr_column" and "mpr_thresh" entries are arrays of strings and
 thresholds to specify which matched pairs should be included in the
 statistics. These options apply to the Point-Stat and Grid-Stat tools.
-They are parsed seperately for each "obs.field" array entry.
+They are parsed separately for each "obs.field" array entry.
 The "mpr_column" strings specify MPR column names (FCST, OBS,
 CLIMO_MEAN, CLIMO_STDEV, or CLIMO_CDF), differences of columns
 (FCST-OBS), or the absolute value of those differences (ABS(FCST-OBS)).
@@ -1215,7 +1215,7 @@ The "file_type" entry specifies the input gridded data file type rather
 than letting the code determine it. MET determines the file type by
 checking for known suffixes and examining the file contents. Use this
 option to override the code's choice. The valid file_type values are
-listed the "data/config/ConfigConstants" file and are described below.
+listed in the "data/config/ConfigConstants" file and are described below.
 This entry should be defined within the "fcst" and/or "obs" dictionaries.
 For example:
 
@@ -1389,8 +1389,8 @@ GRIB1 and GRIB2
     templates 4.46 and 4.48.
 
   * The GRIB2_aerosol_size_lower and "GRIB2_aerosol_size_upper" are doubles
-    specifying the endpoints of the aerosol size interval. These applies only
-    to GRIB2 product defintion templates 4.46 and 4.48.
+    specifying the endpoints of the aerosol size interval. These apply only
+    to GRIB2 product definition templates 4.46 and 4.48.
 
   * The GRIB2_ipdtmpl_index and GRIB2_ipdtmpl_val entries are arrays
     of integers which specify the product description template values to
@@ -1639,7 +1639,7 @@ list of station ID's. All of the station ID's indicated will be concatenated
 into one long list of station ID's to be included or excluded.
 
 As with "message_type" above, the "sid_inc" and "sid_exc" settings can be
-placed in the in the "field" array element to control which station ID's
+placed in the "field" array element to control which station ID's
 are included or excluded for each verification task.
 
 .. code-block:: none
@@ -1665,7 +1665,7 @@ field
 ^^^^^
 The "field" entry is an array of dictionaries, specified the same
 way as those in the "fcst" and "obs" dictionaries. If the array has
-length zero, not climatology data will be read and all climatology
+length zero, no climatology data will be read and all climatology
 statistics will be written as missing data. Otherwise, the array
 length must match the length of "field" in the "fcst" and "obs"
 dictionaries.
@@ -1733,7 +1733,7 @@ configuration file context to use the same data for both. The "climo_mean" and
 assuming normality. These climatological distributions are used in two ways:
 
 (1)
-    To define climatological distribution percentiles thresholds (FCDP and
+    To define climatological distribution percentile thresholds (FCDP and
     OCDP) which can be used as categorical (cat_thresh), continuous (cnt_thresh),
     or wind speed (wind_thresh) thresholds.
 
@@ -1779,7 +1779,7 @@ dictionaries, as shown below.
 climo_cdf
 ---------
 
-The "climo_cdf" dictionary specifies how the the observation climatological
+The "climo_cdf" dictionary specifies how the observation climatological
 mean ("climo_mean") and standard deviation ("climo_stdev") data are used to
 evaluate model performance relative to where the observation value falls
 within the observation climatological distribution. It can be set inside the
@@ -1867,7 +1867,7 @@ true, the climatological probability is computed directly from the
 climatological distribution at each point as the area to the left of
 the event threshold value. For greater-than or greater-than-or-equal-to
 thresholds, 1.0 minus the area is used. When "direct_prob" is false, the
-"cdf_bins" values are sampled from climatological distribution. The probability
+"cdf_bins" values are sampled from the climatological distribution. The probability
 is computed as the proportion of those samples which meet the threshold criteria.
 In this way, the number of bins impacts the resolution of the climatological
 probabilities. These derived probability values are used to compute the
@@ -1929,7 +1929,7 @@ The "obs_window" entry is a dictionary specifying a beginning ("beg"
 entry) and ending ("end" entry) time offset values in seconds. It defines
 the time window over which observations are retained for scoring. These time
 offsets are defined relative to a reference time t, as [t+beg, t+end].
-In PB2NC, the reference time is the PREPBUFR files center time. In
+In PB2NC, the reference time is the PREPBUFR file's center time. In
 Point-Stat and Ensemble-Stat, the reference time is the forecast valid time.
 
 .. code-block:: none
@@ -1968,7 +1968,7 @@ three digit grid number. Supplying a value of "FULL" indicates that the
 verification should be performed over the entire grid on which the data
 resides.
 See: `ON388 - TABLE B, GRID IDENTIFICATION (PDS Octet 7), MASTER LIST OF NCEP STORAGE GRIDS, GRIB Edition 1 (FM92) <https://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html>`_.
-The "grid" entry can be the gridded data file defining grid.
+The "grid" entry can be the gridded data file defining the grid.
 
 poly
 ^^^^
@@ -2010,7 +2010,7 @@ These three options are described below:
   lat/lon polygon points are converted into x/y values in the grid. The
   lat/lon values for the observation points are also converted into x/y
   grid coordinates. The computations performed to check whether the
-  observation point falls within the polygon defined is done in x/y
+  observation point falls within the polygon defined are done in x/y
   grid space.
 
   .. code-block:: none
@@ -2044,14 +2044,14 @@ These three options are described below:
 
     The syntax for the Option 3 is complicated since it includes quotes
     embedded within another quoted string. Any such embedded quotes must
-    be escaped using a preceeding backslash character.
+    be escaped using a preceding backslash character.
 
 sid and llpnt
 ^^^^^^^^^^^^^
 The "sid" entry is an array of strings which define groups of observation station
 ID's over which to compute statistics. Each station ID string can be followed by an
-optional numeric weight enclosed in parenethesis and used by the "point_weight_flag"
-configuration option. Each entry in the "sid" "array is either a filename or a
+optional numeric weight enclosed in parentheses and used by the "point_weight_flag"
+configuration option. Each entry in the "sid" array is either a filename or a
 comma-separated list.
 
 * For an ASCII filename, the strings contained within it are whitespace-separated.
@@ -2079,9 +2079,9 @@ longitude values meet this threshold criteria are used. A threshold set
 to "NA" always evaluates to true.
 
 The masking logic for processing point observations in Point-Stat and
-Ensemble-Stat fall into two cateogries. The "sid" and "llpnt" options apply
+Ensemble-Stat falls into two categories. The "sid" and "llpnt" options apply
 directly to the point observations. Only those observations for the specified
-station id's are included in the "sid" masks. Only those observations meeting
+station ID's are included in the "sid" masks. Only those observations meeting
 the latitude and longitude threshold criteria are included in the "llpnt"
 masks.
 
@@ -2167,7 +2167,7 @@ Setting this variable to zero disables the computation of bootstrap
 confidence intervals, which may be necessary to run MET in realtime or
 near-realtime over large domains since bootstrapping is computationally
 expensive. Setting this variable to 1000 indicates that bootstrap
-confidence interval should be computed over 1000 subsamples of the
+confidence intervals should be computed over 1000 subsamples of the
 matched pairs.
 
 rng
@@ -2187,7 +2187,7 @@ of bootstrap confidence intervals fully repeatable. When left empty
 the random number generator seed is chosen automatically which will lead
 to slightly different bootstrap confidence intervals being computed each
 time the data is run. Specifying a value here ensures that the bootstrap
-confidence intervals will be reproducable over multiple runs on the same
+confidence intervals will be reproducible over multiple runs on the same
 computing platform.
 
 .. code-block:: none
@@ -2341,7 +2341,7 @@ comma-separated lists of message types whose observations exist on land or water
 respectively. For point observations whose message type appears in the "LANDSF"
 entry, only interpolate using forecast grid points where land = TRUE. For point
 observations whose message type appears in the "WATERSF" entry, only interpolate
-using forecast grids points where land = FALSE. By default, "ADPSFC" and "MSONET"
+using forecast grid points where land = FALSE. By default, "ADPSFC" and "MSONET"
 message types exist over land while the "SFCSHP" message type exists over water.
 
 .. code-block:: none
@@ -2353,7 +2353,6 @@ message types exist over land while the "SFCSHP" message type exists over water.
     ...
   ];
 
-The "topo_mask.flag", "topo_mask.use_obs_thresh", and "topo_mask.interp_fcst_thresh"
 The "land_mask.flag" entry may be set separately in each "obs.field" entry.
 
 .. code-block:: none
@@ -2371,7 +2370,7 @@ topo_mask
 
 The "topo_mask" dictionary defines the model topography field used when
 verifying at the surface. The flag entry enables/disables this logic.
-Only use point observations where the model topography minus station elevation
+Only use point observations where the model topography minus station
 elevation difference meets the "use_obs_thresh" threshold entry.
 For the observations kept, when interpolating forecast data to the
 observation location, only use forecast grid points where the topo minus station
@@ -2482,7 +2481,7 @@ forecast value using the model topography height and convert the observation
 value using the station elevation.
 The "thresh" option specifies the valid range of values to be converted. Values not
 meeting this threshold criteria are left unchanged. The default threshold of "NA"
-always evaulates to true, but it can be set to avoid converting flag values. For example,
+always evaluates to true, but it can be set to avoid converting flag values. For example,
 set "thresh = ne99999;" to avoid converting a cloud base height flag value of 99999
 which may indicate clear sky.
 The "msl_to_agl" entry is a boolean. When "TRUE", the elevation correction is
@@ -2535,7 +2534,7 @@ the ratio of the nearby forecast values that meet the threshold criteria.
 Point-Stat evaluates those fractional coverage values as if they were a
 probability forecast. When applying HiRA, users should enable the matched
 pair (MPR), probabilistic (PCT, PSTD, PJC, or PRC), or ensemble statistics
-(ECNT or PRS) line types in the output_flag dictionary. The number of
+(ECNT or RPS) line types in the output_flag dictionary. The number of
 probabilistic HiRA output lines is determined by the number of categorical
 forecast thresholds and HiRA neighborhood widths chosen.
 This dictionary may include the following entries:
@@ -2666,13 +2665,13 @@ The "nc_pairs_flag" can be set either to a boolean value or a dictionary
 in either Grid-Stat, Wavelet-Stat or MODE. The dictionary (with slightly
 different entries for the various tools ... see the default config files)
 has individual boolean settings turning on or off the writing out of the
-various fields in the netcdf output file for the tool. Setting all
-dictionary entries to false means the netcdf file will not be generated.
+various fields in the NetCDF output file for the tool. Setting all
+dictionary entries to false means the NetCDF file will not be generated.
 
 "nc_pairs_flag" can also be set to a boolean value. In this case, a value
 of true means to just accept the default settings (which will turn on
 the output of all the different fields). A value of false means no
-netcdf output will be generated.
+NetCDF output will be generated.
 
 .. code-block:: none
 
@@ -2686,7 +2685,7 @@ netcdf output will be generated.
      nbrhd        = FALSE;
      fourier      = FALSE;
      gradient     = FALSE;
-     distance_map = FLASE;
+     distance_map = FALSE;
      apply_mask   = TRUE;
   }
 
@@ -2726,7 +2725,7 @@ For example:
 
 .. note::
 
-  Prior to MET version 9.0.0, this option was named "nc_pairs_var_str",'
+  Prior to MET version 9.0.0, this option was named "nc_pairs_var_str",
   which is now deprecated.
 
 .. code-block:: none
@@ -2763,7 +2762,7 @@ Three grid weighting options are currently supported:
 * NONE to disable grid weighting using a constant weight of 1.0 (default).
 
 * COS_LAT to define the weight as the cosine of the grid point latitude.
-  This an approximation for grid box area used by NCEP and WMO.
+  This is an approximation for grid box area used by NCEP and WMO.
 
 * AREA to define the weight as the true area of the grid box (km^2).
 
@@ -2825,7 +2824,7 @@ divided by the CTC or MCTC table dimension. For example, for a 2x2 CTC table,
 the default hss_ec_value is 1.0 / 2 = 0.5. For a 4x4 MCTC table, the
 default hss_ec_value is 1.0 / 4 = 0.25.
 
-If set, it must greater than or equal to 0.0 and less than 1.0. A value of
+If set, it must be greater than or equal to 0.0 and less than 1.0. A value of
 0.0 produces an HSS_EC statistic equal to the Accuracy statistic.
 
 .. code-block:: none
@@ -3069,7 +3068,7 @@ The "vld_freq" and "vld_thresh" options may be used to require that a certain
 ratio of observations must be present and contain valid data within the time
 window in order for a summary value to be computed. The "vld_freq" entry
 defines the expected observation frequency in seconds. For example, when
-summarizing 1-minute data (vld_freq = 60) over a 30 minute time window,
+summarizing 1-minute data (vld_freq = 60) over a 30-minute time window,
 setting "vld_thresh = 0.5" requires that at least 15 of the 30 expected
 observations be present and valid for a summary value to be written. The
 default "vld_thresh = 0.0" setting will skip over this logic.
@@ -3214,13 +3213,13 @@ centered on the current point, and the width array specifies the candidate
 neighborhood sizes to be considered. Each width specifies the width of the
 square or diameter of the circle as an odd integer. The vld_thresh entry is a
 number between 0 and 1 specifying the required ratio of valid data in the
-neighborhood for an output value to be computed. The alpha entry is number
+neighborhood for an output value to be computed. The alpha entry is a number
 between 0 and 1 specifying the EAS distance criteria. For each grid point,
 the smallest width for which the distance criteria is satisfied is used.
 If the distance criteria is never satisfied, the largest width is used.
 
 The gaussian_dx and gaussian_radius entries define the Gaussian smoother
-which is applied to be raw EAS probabilities.
+which is applied to the raw EAS probabilities.
 
 If ensemble_flag.eas is set to TRUE, EAS probabilities are written for each
 categorical threshold (cat_thresh) specified. If ensemble_flag.eas_width is
@@ -3240,7 +3239,7 @@ set to TRUE, the widths chosen to compute EAS are written for each threshold.
 ensemble_flag
 ^^^^^^^^^^^^^
 
-The "ensemble_flag" entry is a dictionary of boolean value indicating
+The "ensemble_flag" entry is a dictionary of boolean values indicating
 which ensemble products should be generated:
 
 * "latlon" for a grid of the Latitude and Longitude fields
@@ -3486,7 +3485,7 @@ Toggles
 The MODE line options described in this section are shown in pairs.
 These toggles represent parameters that can have only one (or none) of two
 values. Any of these toggles may be left unspecified. However, if neither
-option for toggle is indicated, the analysis will produce results that
+option for a toggle is indicated, the analysis will produce results that
 combine data from both toggles. This may produce unintended results.
 
 
@@ -3531,13 +3530,13 @@ separated by spaces. Each of these options must be indicated as a string.
 String values that include spaces may be used by enclosing the string in
 quotation marks.
 
-This options specifies which model to use
+This option specifies which model to use.
 
 .. code-block:: none
 
   // model    = [];
 
-These two options specify thresholds for forecast and observations objects to
+These two options specify thresholds for forecast and observation objects to
 be used in the analysis, respectively.
 
 .. code-block:: none
@@ -3597,7 +3596,7 @@ time.
   // fcst_accum      = [];
   // obs_accum      = [];
 
-These options indicate the convolution radius used for forecast of observed
+These options indicate the convolution radius used for forecast or observed
 objects, respectively.
 
 .. code-block:: none
@@ -3656,11 +3655,11 @@ Date/time max/min Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 These options set limits on various date/time
 attributes. The values can be specified in one of three ways:  First, the
-options may be indicated by a string of the form YYYMMDD_HHMMSS. This
+options may be indicated by a string of the form YYYYMMDD_HHMMSS. This
 specifies a complete calendar date and time. Second, they may be indicated
-by a string of the form YYYYMMMDD_HH. Here, the minutes and seconds are
+by a string of the form YYYYMMDD_HH. Here, the minutes and seconds are
 assumed to be zero. The third way of indicating date/time attributes is by a
-string of the form YYYMMDD. Here, hours, minutes, and seconds are assumed to
+string of the form YYYYMMDD. Here, hours, minutes, and seconds are assumed to
 be zero.
 
 These options indicate minimum/maximum values for the forecast valid time.
@@ -3847,7 +3846,7 @@ fcst/obs.filter_attr_name and fcst/obs.filter_attr_thresh
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 The "filter_attr_name" and "filter_attr_thresh" entries are arrays of
 the same length which specify object filtering criteria. By default, no
-object filtering criteria is defined.
+object filtering criteria are defined.
 
 The "filter_attr_name" entry is an array of strings specifying the MODE
 output header column names for the object attributes of interest, such
@@ -3860,7 +3859,7 @@ The "filter_attr_thresh" entry is an array of thresholds for the
 object attributes. Any simple objects not meeting all of these
 filtering criteria are discarded.
 
-Note that the "area_thresh" and "inten_perc_thresh" entries form
+Note that the "area_thresh" and "inten_perc_thresh" entries from
 earlier versions of MODE are replaced by these options and are now
 deprecated.
 
@@ -3913,7 +3912,7 @@ grid_res
 The "grid_res" entry is the nominal spacing for each grid square in
 kilometers. The variable is not used directly in the code, but subsequent
 variables in the configuration files are defined in terms of it. Therefore,
-setting the appropriately will help ensure that appropriate default values
+setting it appropriately will help ensure that appropriate default values
 are used for these variables.
 
 .. code-block:: none
@@ -4113,7 +4112,7 @@ following criteria:
 
 (1) by message type: supply a list of PREPBUFR message types to retain
 
-(2) by station id: supply a list of observation stations to retain
+(2) by station ID: supply a list of observation stations to retain
 
 (3) by valid time: supply the beginning and ending time offset values
     in the obs_window entry described above.
@@ -4127,7 +4126,7 @@ following criteria:
 (6) by report type: supply a list of report types to retain using
     pb_report_type and in_report_type entries described below
 
-(7) by instrument type: supply a list of instrument type to
+(7) by instrument type: supply a list of instrument types to
     retain
 
 (8) by vertical level: supply beg/end vertical levels using the
@@ -4190,8 +4189,8 @@ For example:
 station_id
 ^^^^^^^^^^
 
-The "station_id" entry is an array of station ids to be retained or
-the filename which contains station ids. An array of station ids
+The "station_id" entry is an array of station IDs to be retained or
+the filename which contains station IDs. An array of station IDs
 contains a comma-separated list. An empty list indicates that all
 stations should be retained.
 
@@ -4205,7 +4204,7 @@ elevation_range
 ^^^^^^^^^^^^^^^
 
 The "elevation_range" entry is a dictionary which contains "beg" and "end"
-entries specifying the range of observing locations elevations to be
+entries specifying the range of observing location elevations to be
 retained.
 
 .. code-block:: none
@@ -4336,7 +4335,7 @@ command line option to see the list of available observation variables.
 obs_bufr_map
 ^^^^^^^^^^^^
 
-Mapping of input BUFR variable names to output variables names.
+Mapping of input BUFR variable names to output variable names.
 The default PREPBUFR map, obs_prepbufr_map, is appended to this map.
 Users may choose to rename BUFR variables to match the naming convention
 of the forecast the observation is used to verify.
@@ -4504,7 +4503,7 @@ logic:
 * square root of the mean of the statistic squared
   (applied to columns listed in "wmo_sqrt_stats")
 
-*  apply fisher transform
+*  apply Fisher transform
    (applied to columns listed in "wmo_fisher_stats")
 
 The columns of data to be summarized are specified in one of two
@@ -4852,7 +4851,7 @@ these options may only be used ONCE per analysis job:
      of unique values.
 
   -set_hdr col_name value
-     May be used multiple times to explicity specify what should be
+     May be used multiple times to explicitly specify what should be
      written to the header columns of the output .stat file for
      aggregate and aggregate_stat jobs or output dump_row file
        for filter jobs.
@@ -4865,9 +4864,9 @@ of the output .stat output file:
 .. code-block:: none
 
   -job aggregate_stat -line_type MPR -out_line_type CNT \
-  -by OBS_SID -set_hdr VX_MASK OBS_SID -stat_out out.stat
-  When using mulitple "-by" options, use "CASE" to reference the full string:
-  -by FCST_VAR,OBS_SID -set_hdr DESC CASE -stat_out out.stat
+  -by OBS_SID -set_hdr VX_MASK OBS_SID -out_stat out.stat
+  When using multiple "-by" options, use "CASE" to reference the full string:
+  -by FCST_VAR,OBS_SID -set_hdr DESC CASE -out_stat out.stat
 
 
 .. code-block:: none
@@ -4885,7 +4884,7 @@ of the output .stat output file:
       -vx_mask DTC166 -fcst_var TMP \
       -dump_row  job_aggregate_stat_SL1L2_CNT_in.stat",
      "-job aggregate_stat -line_type MPR   -out_line_type CNT -vx_mask DTC165 \
-      -vx_mask DTC166 -fcat_var TMP -dump_row job_aggregate_stat_MPR_CNT_in.stat",
+      -vx_mask DTC166 -fcst_var TMP -dump_row job_aggregate_stat_MPR_CNT_in.stat",
      "-job aggregate      -line_type CTC   -fcst_thresh <300.000 -vx_mask DTC165 \
       -vx_mask DTC166 -fcst_var TMP -dump_row job_aggregate_CTC_in.stat",
      "-job aggregate_stat -line_type CTC   -out_line_type CTS \
@@ -4915,7 +4914,7 @@ wmo_sqrt_stats and wmo_fisher_stats
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The "wmo_sqrt_stats" and "wmo_fisher_stats" entries are arrays of strings to
 control the logic used to compute the WMO mean value for the summary job type,
-as described in the `:ref:-job summary` section. Each entry is a line type
+as described in the "-job summary" section. Each entry is a line type
 followed by a statistic column name. Statistics computed using the default
 arithmetic mean method do not need to be listed.
 
