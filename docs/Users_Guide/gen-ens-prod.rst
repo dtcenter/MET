@@ -44,7 +44,7 @@ This section contains information about configuring and running the Gen-Ens-Prod
 gen_ens_prod Usage
 ------------------
 
-The usage statement for the Ensemble Stat tool is shown below:
+The usage statement for the Gen-Ens-Prod tool is shown below:
 
 .. code-block:: none
 
@@ -58,8 +58,8 @@ The usage statement for the Ensemble Stat tool is shown below:
 
 gen_ens_prod has three required arguments and accepts several optional ones.
 
-Required Arguments gen_ens_prod
--------------------------------
+Required Arguments for gen_ens_prod
+-----------------------------------
 
 1. The **-ens file_1 ... file_n | file_list** option specifies the ensemble member files or ASCII file list of file names to be used, as described in :numref:`ascii_file_lists`.
 
@@ -92,7 +92,7 @@ gen_ens_prod Configuration File
 
 The default configuration file for the Gen-Ens-Prod tool named **GenEnsProdConfig_default** can be found in the installed *share/met/config* directory. Another version is located in *scripts/config*. We encourage users to make a copy of these files prior to modifying their contents. The contents of the configuration file are described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
+Note that environment variables may be used when editing configuration files, as described in :numref:`config_env_vars`.
 
 ____________________
 
@@ -129,11 +129,11 @@ _____________________
 
 The **ens** dictionary defines which ensemble fields should be processed.
 
-When summarizing the ensemble, compute a ratio of the number of valid ensemble fields to the total number of ensemble members. If this ratio is less than the **ens_thresh**, then quit with an error. This threshold must be between 0 and 1. Setting this threshold to 1 requires that all ensemble members input files exist and all requested data be present.
+When summarizing the ensemble, compute a ratio of the number of valid ensemble fields to the total number of ensemble members. If this ratio is less than the **ens_thresh**, then quit with an error. This threshold must be between 0 and 1. Setting this threshold to 1 requires that all ensemble member input files exist and all requested data be present.
 
 When summarizing the ensemble, for each grid point compute a ratio of the number of valid data values to the number of ensemble members. If that ratio is less than **vld_thresh**, write out bad data for that grid point. This threshold must be between 0 and 1. Setting this threshold to 1 requires  that each grid point contain valid data for all ensemble members in order to compute ensemble product values for that grid point.
 
-For each dictionary entry in the **field** array, give the name and vertical or accumulation level, plus one or more categorical thresholds in the **cat_thresh** entry. The formatting for threshold are described in :numref:`config_options`. It is the user's responsibility to know the units for each model variable and choose appropriate threshold values. The thresholds are used to define ensemble relative frequencies. For example, a threshold of >=5 is used to define the proportion of ensemble members predicting precipitation of at least 5mm at each grid point.
+For each dictionary entry in the **field** array, give the name and vertical or accumulation level, plus one or more categorical thresholds in the **cat_thresh** entry. The formatting for thresholds is described in :numref:`config_options`. It is the user's responsibility to know the units for each model variable and choose appropriate threshold values. The thresholds are used to define ensemble relative frequencies. For example, a threshold of >=5 is used to define the proportion of ensemble members predicting precipitation of at least 5mm at each grid point.
 
 _______________________
 
@@ -197,7 +197,7 @@ _____________________
 
   normalize = NONE;
 
-The **normalize** option defines if and how the input ensemble member data should be normalized. Options are provided to normalize relative to an external climatology, specified using the **climo_mean** and **climo_stdev** dictionaries, or relative to current ensemble forecast being processed. The anomaly is computed by subtracting the (climatological or ensemble) mean from each ensemble memeber. The standard anomaly is computed by dividing the anomaly by the (climatological or ensemble) standard deviation. Values for the **normalize** option are described below:
+The **normalize** option defines if and how the input ensemble member data should be normalized. Options are provided to normalize relative to an external climatology, specified using the **climo_mean** and **climo_stdev** dictionaries, or relative to current ensemble forecast being processed. The anomaly is computed by subtracting the (climatological or ensemble) mean from each ensemble member. The standard anomaly is computed by dividing the anomaly by the (climatological or ensemble) standard deviation. Values for the **normalize** option are described below:
 
 • **NONE** (default) to skip the normalization step and process the raw ensemble member data.
 
@@ -246,7 +246,7 @@ _____________________
 
 Similar to the **interp** dictionary, the **nmep_smooth** dictionary includes a **type** array of dictionaries to define one or more methods for smoothing the NMEP data. Setting the interpolation method to nearest neighbor (**NEAREST**) effectively disables this smoothing step.
 
-If **ensemble_flag.nmep** is set to TRUE, NMEP output is created for each combination of the categorical threshold (**cat_thresh**), neighborhood width (**nbrhd_prob.width**), and smoothing method(**nmep_smooth.type**) specified.
+If **ensemble_flag.nmep** is set to TRUE, NMEP output is created for each combination of the categorical threshold (**cat_thresh**), neighborhood width (**nbrhd_prob.width**), and smoothing method (**nmep_smooth.type**) specified.
 
 _____________________
 
@@ -263,7 +263,7 @@ _____________________
 
 The **eas_prob** dictionary defines the options for the Ensemble Agreement Scale (EAS) probability method.
 
-The **shape** is a **SQUARE** or **CIRCLE** centered on the current point, and the **width** array specifies the candidate widths of the square or diameter of the circle as an odd integer. The **vld_thresh** entry is a number between 0 and 1 specifying the required ratio of valid data in the neighborhood for an output value to be computed. **alpha** is a number between 0 and 1 that defines the EAS distance criteria. **guassian_dx** and **gaussian_radius** define the Gaussian smoother that is applied to the raw EAS probability values.
+The **shape** is a **SQUARE** or **CIRCLE** centered on the current point, and the **width** array specifies the candidate widths of the square or diameter of the circle as an odd integer. The **vld_thresh** entry is a number between 0 and 1 specifying the required ratio of valid data in the neighborhood for an output value to be computed. **alpha** is a number between 0 and 1 that defines the EAS distance criteria. **gaussian_dx** and **gaussian_radius** define the Gaussian smoother that is applied to the raw EAS probability values.
 
 If **ensemble_flag.eas** or **ensemble_flag.eas_width** is set to TRUE, the EAS algorithm is run for each categorical threshold (**cat_thresh**) specified. The **eas** and **eas_width** flags control the writing of the EAS probabilities and widths chosen, respectively.
 
@@ -310,7 +310,7 @@ The **ensemble_flag** specifies which derived ensemble fields should be calculat
 
 9. Ensemble Valid Data Count
 
-10. Ensemble Relative Frequency (i.e. uncalibrate probability forecast) for each categorical threshold (**cat_thresh**) specified
+10. Ensemble Relative Frequency (i.e. uncalibrated probability forecast) for each categorical threshold (**cat_thresh**) specified
 
 11. Neighborhood Ensemble Probability for each categorical threshold (**cat_thresh**) and neighborhood width (**nbrhd_prob.width**) specified
 
@@ -325,6 +325,6 @@ The **ensemble_flag** specifies which derived ensemble fields should be calculat
 gen_ens_prod Output
 -------------------
 
-The Gen-Ens-Prod tools writes a gridded NetCDF output file whose file name is specified using the -out command line option. The contents of that file depend on the contents of the **ens.field** array, the **ensemble_flag** options selected, and the presence of climatology data. The NetCDF variable names are self-describing and include the name/level of the field being processed, the type of ensemble product, and any relevant threshold information. If **nc_var_str** is defined for an **ens.field** array entry, that string is included in the corresponding NetCDF output variable names.
+The Gen-Ens-Prod tool writes a gridded NetCDF output file whose file name is specified using the -out command line option. The contents of that file depend on the contents of the **ens.field** array, the **ensemble_flag** options selected, and the presence of climatology data. The NetCDF variable names are self-describing and include the name/level of the field being processed, the type of ensemble product, and any relevant threshold information. If **nc_var_str** is defined for an **ens.field** array entry, that string is included in the corresponding NetCDF output variable names.
 
-The Gen-Ens-Prod NetCDF output can be passed as input to the MET statistics tools, like Point-Stat and Grid-Stat, for futher processing and comparison against observations.
+The Gen-Ens-Prod NetCDF output can be passed as input to the MET statistics tools, like Point-Stat and Grid-Stat, for further processing and comparison against observations.

@@ -12,7 +12,7 @@ The Series-Analysis Tool accumulates statistics separately for each horizontal g
 Practical Information
 =====================
 
-This Series-Analysis tool performs verification of gridded model fields using matching gridded observation fields. It computes a variety of user-selected statistics. These statistics are a subset of those produced by the Grid-Stat tool, with options for statistic types, thresholds, and conditional verification options as discussed in :numref:`grid-stat`. However, these statistics are computed separately for each grid location and accumulated over some series such as time or height, rather than accumulated over the whole domain for a single time or height as is done by Grid-Stat.
+The Series-Analysis tool performs verification of gridded model fields using matching gridded observation fields. It computes a variety of user-selected statistics. These statistics are a subset of those produced by the Grid-Stat tool, with options for statistic types, thresholds, and conditional verification options as discussed in :numref:`grid-stat`. However, these statistics are computed separately for each grid location and accumulated over some series such as time or height, rather than accumulated over the whole domain for a single time or height as is done by Grid-Stat.
 
 This tool computes statistics for exactly one series each time it is run. Multiple series may be processed by running the tool multiple times. The length of the series to be processed is determined by the first of the following that is greater than one: the number of forecast fields in the configuration file, the number of observation fields in the configuration file, the number of input forecast files, the number of input observation files. Several examples of defining series are described below.
 
@@ -43,8 +43,8 @@ The usage statement for the Series-Analysis tool is shown below:
 
 series_analysis has four required arguments and accepts several optional ones.
 
-Required Arguments series_stat
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Required Arguments for series_analysis
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-fcst file_1 ... file_n | file_list** option specifies the gridded forecast files or ASCII file list of file names to be used, as described in :numref:`ascii_file_lists`.
 
@@ -98,7 +98,7 @@ series_analysis Configuration File
 ----------------------------------
 The default configuration file for the Series-Analysis tool named **SeriesAnalysisConfig_default** can be found in the installed *share/met/config* directory. The contents of the configuration file are described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
+Note that environment variables may be used when editing configuration files, as described in :numref:`config_env_vars`.
 
 ____________________
 
@@ -176,7 +176,7 @@ The output_stats array controls the type of output that the Series-Analysis tool
 
 7. SL1L2 for Scalar L1L2 Partial Sums (See :numref:`table_PS_format_info_SL1L2`)
 
-8. SAL1L2 for Scalar Anomaly L1L2 Partial Sums climatological data is supplied (See :numref:`table_PS_format_info_SAL1L2`)
+8. SAL1L2 for Scalar Anomaly L1L2 Partial Sums when climatological data is supplied (See :numref:`table_PS_format_info_SAL1L2`)
 
 9. PCT for Contingency Table Counts for Probabilistic forecasts (See :numref:`table_PS_format_info_PCT`)
 

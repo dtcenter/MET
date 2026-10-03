@@ -40,7 +40,7 @@ gsid2mpr has one required argument and accepts several optional ones.
 Required Arguments for gsid2mpr
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **gsi_file_1 [gsi_file2 ... gsi_file_n]** argument indicates the GSI diagnostic files (conventional or radiance) to be reformatted.
+1. The **gsi_file_1 [gsi_file_2 ... gsi_file_n]** argument indicates the GSI diagnostic files (conventional or radiance) to be reformatted.
 
 Optional Arguments for gsid2mpr
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -69,12 +69,12 @@ An example of the gsid2mpr calling sequence is shown below:
   -set_hdr MODEL GSI_MEM001 \
   -outdir out
 
-In this example, the GSID2MPR tool will process a single input file named **diag_conv_ges.mem001** file, set the output **MODEL** header column to **GSI_MEM001**, and write output to the **out** directory. The output file is named the same as the input file but a **.stat** suffix is added to indicate its format.
+In this example, the GSID2MPR tool will process a single input file named **diag_conv_ges.mem001**, set the output **MODEL** header column to **GSI_MEM001**, and write output to the **out** directory. The output file is named the same as the input file but a **.stat** suffix is added to indicate its format.
 
 gsid2mpr Output
 ---------------
 
-The GSID2MPR tool performs a simple reformatting step and thus requires no configuration file. It can read both conventional and radiance binary GSI diagnostic files. Support for additional GSI diagnostic file type may be added in future releases. Conventional files are determined by the presence of the string **conv** in the filename. Files that are not conventional are assumed to contain radiance data. Multiple files of either type may be passed in a single call to the GSID2MPR tool. For each input file, an output file will be generated containing the corresponding matched pair data.
+The GSID2MPR tool performs a simple reformatting step and thus requires no configuration file. It can read both conventional and radiance binary GSI diagnostic files. Support for additional GSI diagnostic file types may be added in future releases. Conventional files are determined by the presence of the string **conv** in the filename. Files that are not conventional are assumed to contain radiance data. Multiple files of either type may be passed in a single call to the GSID2MPR tool. For each input file, an output file will be generated containing the corresponding matched pair data.
 
 The GSID2MPR tool writes the same set of MPR output columns for the conventional and radiance data types. However, it also writes additional columns at the end of the MPR line which depend on the input file type. Those additional columns are described in the following tables.
 
@@ -266,7 +266,7 @@ The GSID2MPR tool writes the same set of MPR output columns for the conventional
     - Double
   * - 69
     - PRS_MAX_WGT
-    - Pressure of the maximum weighing function
+    - Pressure of the maximum weighting function
     - Double
 
 The gsid2mpr output may be passed to the Stat-Analysis tool to derive additional statistics. In particular, users should consider running the **aggregate_stat** job type to read MPR lines and compute partial sums (SL1L2), continuous statistics (CNT), contingency table counts (CTC), or contingency table statistics (CTS). Stat-Analysis has been enhanced to parse any extra columns found at the end of the input lines. Users can filter the values in those extra columns using the **-column_thresh**, **-column_str**, and **-column_str_exc** job command options.
@@ -347,7 +347,7 @@ gsidens2orank Output
 
 The GSIDENS2ORANK tool performs a simple reformatting step and thus requires no configuration file. The multiple files passed to it are interpreted as members of the same ensemble. Therefore, each call to the tool processes exactly one ensemble. All input ensemble GSI diagnostic files must be of the same type. Mixing conventional and radiance files together will result in a runtime error. The GSIDENS2ORANK tool processes each ensemble member and keeps track of the observations it encounters. It constructs a list of the ensemble values corresponding to each observation and writes an output ORANK line listing the observation value, its rank, and all the ensemble values. The random number generator is used by the GSIDENS2ORANK tool to randomly assign a rank value in the case of ties.
 
-The GSID2MPR tool writes the same set of ORANK output columns for the conventional and radiance data types. However, it also writes additional columns at the end of the ORANK line which depend on the input file type. The extra columns are limited to quantities which remain constant over all the ensemble members and are therefore largely a subset of the extra columns written by the GSID2MPR tool. Those additional columns are described in the following tables.
+The GSIDENS2ORANK tool writes the same set of ORANK output columns for the conventional and radiance data types. However, it also writes additional columns at the end of the ORANK line which depend on the input file type. The extra columns are limited to quantities which remain constant over all the ensemble members and are therefore largely a subset of the extra columns written by the GSID2MPR tool. Those additional columns are described in the following tables.
 
 .. list-table:: Format information for GSI Diagnostic Conventional ORANK (Observation Rank) output line type.
   :widths: auto
@@ -488,7 +488,7 @@ The GSID2MPR tool writes the same set of ORANK output columns for the convention
     - d(Tz)/d(Tr)
     - Double
 
-The gsidens2orank output may be passed to the Stat-Analysis tool to derive additional statistics. In particular, users should consider running the **aggregate_stat** job type to read ORANK lines and ranked histograms (RHIST), probability integral transform histograms (PHIST), and spread-skill variance output (SSVAR). Stat-Analysis has been enhanced to parse any extra columns found at the end of the input lines. Users can filter the values in those extra columns using the **-column_thresh**, **-column_str**, and **-column_str_exc** job command options.
+The gsidens2orank output may be passed to the Stat-Analysis tool to derive additional statistics. In particular, users should consider running the **aggregate_stat** job type to read ORANK lines and compute ranked histograms (RHIST), probability integral transform histograms (PHIST), and spread-skill variance output (SSVAR). Stat-Analysis has been enhanced to parse any extra columns found at the end of the input lines. Users can filter the values in those extra columns using the **-column_thresh**, **-column_str**, and **-column_str_exc** job command options.
 
 An example of the Stat-Analysis calling sequence is shown below:
 
@@ -498,4 +498,4 @@ An example of the Stat-Analysis calling sequence is shown below:
   -job aggregate_stat -line_type ORANK -out_line_type RHIST \
   -by fcst_var -column_thresh N_USE eq20
 
-In this example, the Stat-Analysis tool will read ORANK lines from **diag_conv_ges_ens_mean_orank.txt**, retain only those lines where the **N_USE** column indicates that all 20 ensemble members were used, and write ranked histogram (RHIST) output lines for each unique value of encountered in the **FCST_VAR** column.
+In this example, the Stat-Analysis tool will read ORANK lines from **diag_conv_ges_ens_mean_orank.txt**, retain only those lines where the **N_USE** column indicates that all 20 ensemble members were used, and write ranked histogram (RHIST) output lines for each unique value encountered in the **FCST_VAR** column.
