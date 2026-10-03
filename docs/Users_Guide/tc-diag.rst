@@ -39,7 +39,7 @@ The following sections describe the usage statement, required arguments, and opt
 
   Usage: tc_diag
          -data domain tech_id_list [ file_1 ... file_n | file_list ]
-         -deck file
+         -deck source
          -config file
          [-outdir path]
          [-log file]
@@ -340,11 +340,11 @@ When the **nc_diag_flag** configuration entry is set to true, a NetCDF output fi
 
 **NetCDF Range-Azimuth Output**
 
-When the **nc_rng_azi_flag** configuration entry is set to true, a NetCDF output file containing the cylindrical range-azimuth data is written for each combination of model track provided and domain specified. For example, if three model tracks are provided and data for both *parent* and *nest* domains are provided, six of these NetCDF output files will be written.
+When the **nc_cyl_grid_flag** configuration entry is set to true, a NetCDF output file containing the cylindrical range-azimuth data is written for each combination of model track provided and domain specified. For example, if three model tracks are provided and data for both *parent* and *nest* domains are provided, six of these NetCDF output files will be written.
 
 The NetCDF range-azimuth output is named using the **output_base_format**, described above, followed by **_cyl_grid_{DOMAIN}.nc**, where **{DOMAIN}** is specified by the **domain** string in each **domain_info** array entry.
 
-This NetCDF file contains a concatenation of the data from the temporary NetCDF files created for each track point. For each track point, TC-Diag creates a temporary NetCDF file and calls Python code to read the cylindrical grid data and compute diagnostics. By default, these temporary NetCDF files are deleted at the end of each run, but if the **nc_rng_azi_flag** is true, the data for each track point is concatenated into a single output file for each track.
+This NetCDF file contains a concatenation of the data from the temporary NetCDF files created for each track point. For each track point, TC-Diag creates a temporary NetCDF file and calls Python code to read the cylindrical grid data and compute diagnostics. By default, these temporary NetCDF files are deleted at the end of each run, but if the **nc_cyl_grid_flag** is true, the data for each track point is concatenated into a single output file for each track.
 
 .. note:: Setting the **MET_KEEP_TEMP_FILE** (:numref:`met_keep_temp_file`) environment variable retains the temporary NetCDF cylindrical grid files for development, testing, and debugging purposes.
 

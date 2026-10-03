@@ -47,7 +47,7 @@ To specify a Lambert Conformal Grid, the syntax is
 
 Here, **Nx** and **Ny** are the number of points in the **x** and **y** grid directions, respectively. These two numbers give the overall size of the grid. **lat_ll** and **lon_ll** are the latitude and longitude, in degrees, of the lower left point of the grid. North latitude and east longitude are considered positive. **lon_orient** is the orientation longitude of the grid. It's the meridian of longitude that's parallel to one of the vertical grid directions. **D_km** and **R_km** are the grid resolution and the radius of the Earth, both in kilometers. **standard_lat_1** and **standard_lat_2** are the standard parallels of the Lambert projection. If the two latitudes are the same, then only one needs to be given. **N|S** means to write either **N** or **S** depending on whether the Lambert projection is from the north pole or the south pole.
 
-As an example of specifying a Lambert grid, suppose you have a northern hemisphere Lambert grid with 614 points in the x direction and 428 points in the y direction. The lower left corner of the grid is at latitude :math:`12.190^\circ` north and longitude :math:`133.459^\circ` west. The orientation longitude is :math:`95^\circ` west. The grid spacing is :math:`12.19058^\circ` km. The radius of the Earth is the default value used in many GRIB files: 6367.47 km. Both standard parallels are at :math:`25^\circ` north. To specify this grid in the config file, you would write
+As an example of specifying a Lambert grid, suppose you have a northern hemisphere Lambert grid with 614 points in the x direction and 428 points in the y direction. The lower left corner of the grid is at latitude :math:`12.190^\circ` north and longitude :math:`133.459^\circ` west. The orientation longitude is :math:`95^\circ` west. The grid spacing is 12.19058 km. The radius of the Earth is the default value used in many GRIB files: 6367.47 km. Both standard parallels are at :math:`25^\circ` north. To specify this grid in the config file, you would write
 
 .. code-block:: none
 
@@ -131,7 +131,7 @@ For a Range/Azimuth grid, the syntax is
 
   rngazi range_n azimuth_n range_max_km lat_center lon_center
 
-The parameters **lat_center** and **lon_center** define the latitude and longitude for the center of the grid. The **range_n** and **max_range_km** parameters define the number of and maximum value of the ranges, with spacing in kilometers defined as **max_range_km** / ( **range_n** - 1 ). The **azimuth_n** parameter defines the number of equally-spaced azimuth values, with spacing of 360 / **azimuth_n** degrees clockwise from due east.
+The parameters **lat_center** and **lon_center** define the latitude and longitude for the center of the grid. The **range_n** and **range_max_km** parameters define the number of and maximum value of the ranges, with spacing in kilometers defined as **range_max_km** / ( **range_n** - 1 ). The **azimuth_n** parameter defines the number of equally-spaced azimuth values, with spacing of 360 / **azimuth_n** degrees clockwise from due east.
 
 Semi Lat/Lon Grid
 -----------------

@@ -149,7 +149,7 @@ __attribute__((noreturn)) static void usage(int exit_code) {
         << ") ***\n\n"
         << "Usage: " << program_name << "\n"
         << "\t-data domain tech_id_list [ file_1 ... file_n | file_list ]\n"
-        << "\t-deck file\n"
+        << "\t-deck source\n"
         << "\t-config file\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"

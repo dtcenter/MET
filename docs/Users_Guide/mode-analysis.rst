@@ -49,7 +49,7 @@ The MODE-Analysis tool has two required arguments and can accept several optiona
 Required Arguments for mode_analysis:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-lookin path** specifies the name of a specific STAT file (any file ending in .stat) or the name of a directory where the Stat-Analysis tool will search for STAT files. This option may be used multiple times to specify multiple locations.
+1. The **-lookin path** specifies the name of a specific MODE object file (any file ending in _obj.txt) or the name of a directory where the MODE-Analysis tool will search for MODE object files. This option may be used multiple times to specify multiple locations.
 
 2. The MODE-Analysis tool can perform two basic types of jobs **-summary** or **-bycase**. Exactly one of these job types must be specified.
 
