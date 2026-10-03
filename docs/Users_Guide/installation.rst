@@ -23,7 +23,7 @@ using the provided
 Some organizations have access to precompiled versions of MET on
 shared systems, making the need for self-installation unnecessary.
 Users should check the
-`METplus Downloads page <https://dtcenter.org/community-code/metplus/download>`_
+`METplus Downloads page <https://dtcenter.org/software-tools/metplus/download>`_
 for the latest coordinated release’s Existing Builds page for
 existing MET installations before continuing.
 
@@ -37,7 +37,7 @@ The required libraries are listed below:
 
 * `BUFRLIB <https://emc.ncep.noaa.gov/emc/pages/infrastructure/bufrlib.php>`_
   for reading PrepBufr Observation files
-* `NetCDF4 <http://www.unidata.ucar.edu/software/netcdf>`_
+* `NetCDF4 <https://www.unidata.ucar.edu/software/netcdf>`_
   in C and CXX, for intermediate and output file formats
 * `HDF5 <https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.2/src/hdf5-1.12.2.tar.gz>`__
   is required to support NetCDF 4. HDF5 should be built with
@@ -45,7 +45,7 @@ The required libraries are listed below:
 * `GSL <https://www.gnu.org/software/gsl/doc/html/index.html>`_
   GNU Scientific Library Developer's Version for computing
   confidence intervals (use **GSL-1.11** for **PGI** compilers)
-* `Proj <https://proj.org/>`_ Library used to instantiate grids within MET
+* `Proj <https://proj.org/en/stable/>`_ Library used to instantiate grids within MET
 
 The following libraries are conditionally required, depending on the intended
 verification use and compiler language:
@@ -56,13 +56,13 @@ verification use and compiler language:
   if compiling support for Python embedding
 * `ecKit <https://github.com/ecmwf/eckit>`_
   Library, if compiling support for unstructured grids
-* `ATLAS <https://math-atlas.sourceforge.net/>`_
+* `ATLAS <https://github.com/ecmwf/atlas>`_
   Library, if compiling support for unstructured grids
-* `HDF4 <http://www.hdfgroup.org/products/hdf4>`__
+* `HDF4 <https://www.hdfgroup.org/download/hdf4/>`__
   library if compiling the MODIS-Regrid or lidar2nc tool
 * `HDF-EOS2 <http://www.hdfeos.org/software/library.php#HDF-EOS2>`__
   library if compiling the MODIS-Regrid or lidar2nc tool
-* `f2c <http://www.netlib.org/f2c>`_
+* `f2c <https://www.netlib.org/f2c/>`_
   library for interfacing between Fortran and C
   (**Not required for most compilers**)
 
@@ -78,11 +78,11 @@ Suggested External Utilities
 The following utilities have been used with success by other METplus users in their verification processes.
 They are not required for MET to function, but depending on the user’s intended verification needs, they may be of use:
 
-* `copygb utility <http://www.cpc.ncep.noaa.gov/products/wesley/copygb.html>`_
+* `copygb utility <https://www.cpc.ncep.noaa.gov/products/wesley/copygb.html>`_
   for re-gridding GRIB version 1 data
 * `wgrib2 utility <https://www.cpc.ncep.noaa.gov/products/wesley/wgrib2/>`_
   for re-gridding GRIB version 2 data
-* `Integrated Data Viewer (IDV) <http://www.unidata.ucar.edu/software/idv>`_
+* `Integrated Data Viewer (IDV) <https://www.unidata.ucar.edu/software/idv>`_
   for displaying gridded data, including GRIB and NetCDF
 * `ncview utility <https://anaconda.org/channels/conda-forge/packages/ncview/overview>`_
   for viewing gridded NetCDF data (e.g. the output of pcp_combine)
@@ -143,7 +143,7 @@ The next step will be to identify and download the latest MET release as a
 tar file (e.g. v13.0.0.tar.gz) and place it in
 the *tar_files* directory. The file is available from the
 MET line under the “RECOMMENDED - COMPONENTS” section on the
-`METplus website <https://dtcenter.org/community-code/metplus/download>`_ or
+`METplus website <https://dtcenter.org/software-tools/metplus/download>`_ or
 by using a wget command while in the *tar_files* directory:
 
 .. code-block:: ini
@@ -448,7 +448,7 @@ ensure there are no spelling errors or improperly set variables.
 After these checks are complete, run the script again.
 
 If there are still errors, users still have options to obtain a successful
-MET installation. Check the `FAQ section of the User’s Guide on topics relevant to installation <https://met.readthedocs.io/en/latest/Users_Guide/appendixA.html#met-won-t-compile>`_.
+MET installation. Check the `FAQ section of the User’s Guide on topics relevant to installation <https://metplus.readthedocs.io/projects/met/en/latest/Users_Guide/appendixA.html#met-won-t-compile>`_.
 Next, review previously asked questions on the installation topic in
 `GitHub Discussions <https://github.com/dtcenter/METplus/discussions/categories/installation>`_.
 Users are welcome to post any questions they might have that have not been asked.
@@ -478,7 +478,7 @@ Installing Docker
 
 To begin, download and install the correct version of Docker for the
 intended system.
-`The Docker installation webpage <https://www.docker.com/products/overview>`_
+`The Docker installation webpage <https://www.docker.com/>`_
 should detect what
 system is accessing the webpage and auto select the appropriate
 version. If a different version is required, select the correct
@@ -598,7 +598,7 @@ Now that MET is successfully installed, it is highly recommended to
 next install the METplus wrappers to take full advantage of
 `Python integration <https://metplus.readthedocs.io/en/latest/Users_Guide/installation.html>`_.
 Users can also proceed to the
-`Tutorial <https://dtcenter.org/community-code/metplus/online-tutorial>`_
+`Tutorial <https://dtcenter.org/software-tools/metplus/online-tutorial>`_
 and run through the examples that only utilize the MET processes
 (METplus wrapper applications and commands will not work unless
 METplus wrappers are also installed).

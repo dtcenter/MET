@@ -127,20 +127,25 @@ numfig_format = {
 # -- linkcheck builder configuration ----------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-the-linkcheck-builder
 
-linkcheck_timeout = 10
-linkcheck_retries = 2
+linkcheck_timeout = 30
+linkcheck_retries = 3
 linkcheck_workers = 8
 
 linkcheck_ignore = [
-    # add regex patterns for URLs that should be skipped, e.g.:
-    # r'https://dtcenter\.org/.*',   # if this site blocks automated requests
-    # r'https://doi\.org/.*',
-    # r'https://journals\.ametsoc\.org/.*',
-    # 'https://agupubs\.onlinelibrary\.wiley\.com/.*',  # AGU journals, similar bot-blocking behavior
+    # AMS journals (DOI prefix 10.1175) and Wiley/RMetS journals (DOI prefix 10.1002)
+    # return 403 Forbidden to automated requests, so Sphinx skips the publisher's site.
+    # dtcenter/metplus-action-linkcheck still checks that each DOI is registered
+    # using the DOI API (https://doi.org/api/handles/<doi>).
+    r'https://doi\.org/10\.1175/.*',
+    r'https://doi\.org/10\.1002/.*',
+    # www.gnu.org is often slow or unreachable, both from GitHub Actions runners
+    # and elsewhere, so these links are listed in the job summary to check by hand
+    r'https://www\.gnu\.org/.*',
 ]
 
 linkcheck_allowed_redirects = {
-    # map of regex -> regex for redirects that are fine to follow
+    # DOIs are the canonical, persistent form of a citation and always redirect to the publisher
+    r'https://doi\.org/.*': r'.*',
 }
 
 linkcheck_anchors = True

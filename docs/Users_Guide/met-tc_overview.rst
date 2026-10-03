@@ -107,7 +107,7 @@ All operational model aids and the BEST can be obtained from the `NHC ftp server
 
 `Click here for detailed information on the ATCF format description and specifications. <https://science.nrlmry.navy.mil/atcf/docs/database/new/abdeck.txt>`_
 
-If a user has gridded model output, the model data must be run through a vortex tracking algorithm in order to obtain the ATCF-formatted input that MET-TC requires. Many vortex tracking algorithms have been developed in order to obtain basic position, maximum wind, and minimum sea level pressure information from model forecasts. One vortex tracking algorithm that is supported and freely available is the `GFDL vortex tracker package. <https://dtcenter.org/community-code/gfdl-vortex-tracker>`_
+If a user has gridded model output, the model data must be run through a vortex tracking algorithm in order to obtain the ATCF-formatted input that MET-TC requires. Many vortex tracking algorithms have been developed in order to obtain basic position, maximum wind, and minimum sea level pressure information from model forecasts. One vortex tracking algorithm that is supported and freely available is the `GFDL vortex tracker package. <https://dtcenter.org/community-code-legacy-tools>`_
 
 Output Data Format
 ==================

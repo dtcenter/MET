@@ -435,21 +435,21 @@ While initial versions of the ASCII2NC tool only supported a simple 11 column AS
 
 • `little_r format <https://www2.mmm.ucar.edu/wrf/users/wrfda/OnlineTutorial/Help/littler.html>`_
 
-• `SURFace RADiation (SURFRAD) <http://www.esrl.noaa.gov/gmd/grad/surfrad/>`_ and Integrated Surface Irradiance Study (ISIS) formats
+• `SURFace RADiation (SURFRAD) <https://gml.noaa.gov/grad/surfrad/>`_ and Integrated Surface Irradiance Study (ISIS) formats
 
 • Western Wind and Solar Integration Study (WWSIS) format. WWSIS data are available by request from National Renewable Energy Laboratory (NREL) in Boulder, CO.
 
 • `AirNow DailyData_v2, AirNow HourlyData, and AirNow HourlyAQObs formats <https://www.epa.gov/outdoor-air-quality-data>`_. See the :ref:`MET_AIRNOW_STATIONS` environment variable.
 
-• `National Data Buoy (NDBC) Standard Meteorological Data format <https://www.ndbc.noaa.gov/measdes.shtml>`_. See the :ref:`MET_NDBC_STATIONS` environment variable.
+• `National Data Buoy (NDBC) Standard Meteorological Data format <https://www.ndbc.noaa.gov/faq/measdes.shtml>`_. See the :ref:`MET_NDBC_STATIONS` environment variable.
 
 • `International Soil Moisture Network (ISMN) Data format <https://ismn.bafg.de/en/>`_.
 
 • `International Arctic Buoy Programme (IABP) Data format <https://iabp.apl.uw.edu/>`_.
 
-• `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format <http://aeronet.gsfc.nasa.gov/>`_.
+• `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format <https://aeronet.gsfc.nasa.gov/>`_.
 
-• `U.S. Climate Reference Network (USCRN) Quality Controlled Datasets <https://www.ncei.noaa.gov/access/crn/qcdatasets.html>`_, where the specific data format is determined by the prefix and suffix of the input file name.
+• `U.S. Climate Reference Network (USCRN) Quality Controlled Datasets <https://www.ncei.noaa.gov/access/crn/products.html>`_, where the specific data format is determined by the prefix and suffix of the input file name.
 
 • Python embedding of point observations, as described in :numref:`pyembed-point-obs-data`. See example below in :numref:`ascii2nc-pyembed`.
 
@@ -864,7 +864,7 @@ We will not give a detailed description of each CALIPSO data product that lidar2
 IODA2NC Tool
 ============
 
-This section describes the IODA2NC tool which is used to reformat IODA (Interface for Observation Data Access) point observations from the `Joint Center for Satellite Data Assimilation (JCSDA) <http://jcsda.org>`_ into the NetCDF format expected by the MET statistics tools. An optional configuration file controls the processing of the point observations. The IODA2NC tool reads NetCDF point observation files created by the `IODA Converters <https://github.com/JCSDA-internal/ioda-converters>`_. Support for interfacing with data from IODA may be added in the future based on user feedback.
+This section describes the IODA2NC tool which is used to reformat IODA (Interface for Observation Data Access) point observations from the `Joint Center for Satellite Data Assimilation (JCSDA) <https://www.jcsda.org/>`_ into the NetCDF format expected by the MET statistics tools. An optional configuration file controls the processing of the point observations. The IODA2NC tool reads NetCDF point observation files created by the `IODA Converters <https://github.com/JCSDA-internal/ioda-converters>`_. Support for interfacing with data from IODA may be added in the future based on user feedback.
 
 ioda2nc Usage
 -------------

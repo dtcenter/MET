@@ -24,7 +24,7 @@ The optional **-outdir** argument specifies a directory where the output PostScr
 
 .. figure:: figure/reformat_grid_fig2.png
 
-	    Example output of WWMCA-Plot tool.
+            Example output of WWMCA-Plot tool.
 
 The usage statement for wwmca_regrid is
 
