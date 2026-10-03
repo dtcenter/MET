@@ -56,7 +56,7 @@ Optional Arguments for plot_point_obs
 
 6. The **-title string** option specifies the plot title string.
 
-7. The **-gc code** and **-obs_var name** options specify observation types to be plotted. These overrides the corresponding configuration file entries.
+7. The **-gc code** and **-obs_var name** options specify observation types to be plotted. These override the corresponding configuration file entries.
 
 8. The **-msg_typ name** option specifies the message type to be plotted. This overrides the corresponding configuration file entry.
 
@@ -72,9 +72,9 @@ An example of the plot_point_obs calling sequence is shown below:
 
   plot_point_obs sample_pb.nc sample_data.ps
 
-In this example, the Plot-Point-Obs tool will process the input sample_pb.nc file and write a postscript file containing a plot to a file named sample_pb.ps.
+In this example, the Plot-Point-Obs tool will process the input sample_pb.nc file and write a PostScript file containing a plot to a file named sample_pb.ps.
 
-An equivalent command using python embedding for point observations is shown below. Note that the entire python command is enclosed in single quotes to prevent embedded whitespace for causing parsing errors:
+An equivalent command using Python embedding for point observations is shown below. Note that the entire Python command is enclosed in single quotes to prevent embedded whitespace from causing parsing errors:
 
 .. code-block:: none
 
@@ -87,7 +87,7 @@ plot_point_obs Configuration File
 
 The default configuration file for the Plot-Point-Obs tool named **PlotPointObsConfig_default** can be found in the installed *share/met/config* directory. The contents of the configuration file are described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
+Note that environment variables may be used when editing configuration files, as described in :numref:`config_env_vars`.
 
 ________________________
 
@@ -125,7 +125,7 @@ The **grid_data** dictionary defines a gridded field of data to be plotted as a 
 
 The **to_grid** entry in the **regrid** dictionary specifies if and how the requested gridded data should be regridded prior to plotting. Please see :numref:`config_options` for a description of the **regrid** dictionary options.
 
-The **grid_plot_info** dictionary inside **grid_data** specifies the options for for plotting the gridded data. The options within **grid_plot_info** are described in :numref:`config_options`.
+The **grid_plot_info** dictionary inside **grid_data** specifies the options for plotting the gridded data. The options within **grid_plot_info** are described in :numref:`config_options`.
 
 ______________________
 
@@ -147,7 +147,7 @@ ______________________
   obs_var     = [];
   obs_quality = [];
 
-The options listed above define filtering criteria for the input point observation strings. If empty, no filtering logic is applied. If a comma-separated list of strings is provided, only those observations meeting all of the criteria are included. The **msg_typ** entry specifies the message type. The **sid_inc** and **sid_exc** entries explicitly specify station id's to be included or excluded. The **obs_var** entry specifies the observation variable names, and **obs_quality** specifies quality control strings.
+The options listed above define filtering criteria for the input point observation strings. If empty, no filtering logic is applied. If a comma-separated list of strings is provided, only those observations meeting all of the criteria are included. The **msg_typ** entry specifies the message type. The **sid_inc** and **sid_exc** entries explicitly specify station ID's to be included or excluded. The **obs_var** entry specifies the observation variable names, and **obs_quality** specifies quality control strings.
 
 ______________________
 
@@ -204,7 +204,7 @@ ______________________
   line_color = [];
   line_width = 1;
 
-The **line_color** and **line_width** entries define the color and thickness of the outline for each circle plotted. When **line_color** is left as an empty array, no outline is drawn. Otherwise, **line_color** should be specified using 3 intergers between 0 and 255 to define the red, green, and blue components of the color.
+The **line_color** and **line_width** entries define the color and thickness of the outline for each circle plotted. When **line_color** is left as an empty array, no outline is drawn. Otherwise, **line_color** should be specified using 3 integers between 0 and 255 to define the red, green, and blue components of the color.
 
 ______________________
 
@@ -223,7 +223,7 @@ The circles are filled in based on the setting of the **fill_color** and **fill_
 
 Users are encouraged to define as many **point_data** array entries as needed to filter and plot the input observations in the way they would like. Each point observation is plotted using the options specified in the first matching array entry. Note that the filtering, processing, and plotting options specified inside each **point_data** array entry take precedence over ones specified at the higher level of configuration file context.
 
-For each observation, this tool stores the observation latitude, longitude, and value. However, unless the **dotsize(x)** function is not constant or the **fill_plot_info.flag** entry is set to true, the observation value is simply set to a flag value. For each **point_data** array entry, the tool stores and plots only the unique combination of observation latitude, longitude, and value. Therefore multiple obsevations at the same location will typically be plotted as a single circle.
+For each observation, this tool stores the observation latitude, longitude, and value. However, unless the **dotsize(x)** function is not constant or the **fill_plot_info.flag** entry is set to true, the observation value is simply set to a flag value. For each **point_data** array entry, the tool stores and plots only the unique combination of observation latitude, longitude, and value. Therefore multiple observations at the same location will typically be plotted as a single circle.
 
 .. _plot_data_plane-usage:
 
@@ -280,7 +280,7 @@ A second example of the plot_data_plane calling sequence is shown below:
 
   plot_data_plane test.grb2 test.ps 'name="DSWRF"; level="L0";' -v 4
 
-In the first example, the Plot-Data-Plane tool will process the input test.grb file and write a PostScript image to a file named test.ps showing temperature at 2 meters. The second example plots downward shortwave radiation flux at the surface. The second example is run at verbosity level 4 so that the user can inspect the output and make sure its plotting the intended record.
+In the first example, the Plot-Data-Plane tool will process the input test.grb file and write a PostScript image to a file named test.ps showing temperature at 2 meters. The second example plots downward shortwave radiation flux at the surface. The second example is run at verbosity level 4 so that the user can inspect the output and make sure it's plotting the intended record.
 
 Examples of Plotting MET Output
 ===============================
@@ -324,7 +324,7 @@ TC-Stat Tool Example
 
 There is a basic R script located in the MET installation, *share/met/Rscripts/plot_tcmpr.R*. The usage statement with a short description of the options for *plot_tcmpr.R* can be obtained by typing: Rscript *plot_tcmpr.R* with no additional arguments. The only required argument is the **-lookin** source, which is the path to the TC-Pairs TCST output files. The R script reads directly from the TC-Pairs output, and calls TC-Stat directly for filter jobs specified in the *"-filter options"* argument.
 
-In order to run this script, the MET_INSTALL_DIR environment variable must be set to the MET installation directory and the MET_BASE environment variable must be set to the *MET_INSTALL_DIR/share/met* directory. In addition, the Tc-Stat tool under *MET_INSTALL_DIR/bin* must be in your system path.
+In order to run this script, the MET_INSTALL_DIR environment variable must be set to the MET installation directory and the MET_BASE environment variable must be set to the *MET_INSTALL_DIR/share/met* directory. In addition, the TC-Stat tool under *MET_INSTALL_DIR/bin* must be in your system path.
 
 The supplied R script can generate a number of different plot types including boxplots, mean, median, rank, and relative performance. Pairwise differences can be plotted for the boxplots, mean, and median. Normal confidence intervals are applied to all figures unless the no_ci option is set to TRUE. Below are two example plots generated from the tools.
 

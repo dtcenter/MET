@@ -53,7 +53,7 @@ Q. How do I use map_data?
 
      Users can modify the ConfigMapData contents prior to running
      'make install'.
-     This will change the default map data for all of the MET tools which plots.
+     This will change the default map data for all of the MET tools which plot.
      Alternatively, users can copy/paste/modify the map_data dictionary into the
      configuration file for a MET tool. For example, you could add map_data to
      the end of the MODE configuration file to customize plots created by MODE.
@@ -63,7 +63,7 @@ Q. How do I use map_data?
 
      .. code-block:: none
 
-          plot_data_plane
+          plot_data_plane \
           sample.grib china_tmp_2m_admin.ps \
           'name="TMP"; level="Z2"; \
           map_data = { source = [ { file_name = \
@@ -85,7 +85,7 @@ Q. How can I understand the number of matched pairs?
      For example, if the forecast field contains missing data around the
      edge of the domain, then that is a reason there may be 992 matched pairs
      instead of 1369. Users can use the ncview tool to look at an example
-     netCDF file or run their files through plot_data_plane to help identify
+     NetCDF file or run their files through plot_data_plane to help identify
      any potential issues.
 
      One common support question is "Why am I getting 0 matched pairs from
@@ -141,7 +141,7 @@ Q. What types of NetCDF files can MET read?
      3. NetCDF data following the `climate-forecast (CF) convention
         <https://cfconventions.org/cf-conventions/cf-conventions.html>`_
 
-     Lastly, users can write python scripts to pass data that's gridded to the
+     Lastly, users can write Python scripts to pass data that's gridded to the
      MET tools in memory. If the data doesn't fall into one of those categories,
      then it's not a gridded dataset that MET can handle directly.
      Satellite data, in general, will not be gridded. Typically it
@@ -150,7 +150,7 @@ Q. What types of NetCDF files can MET read?
      a regular grid.
 
      While MET's point2grid tool does support some satellite data inputs, it is
-     limited. Using python embedding is another option for handling new datasets
+     limited. Using Python embedding is another option for handling new datasets
      not supported natively by MET.
 
 Q. How do I choose a time slice in a NetCDF file?
@@ -219,7 +219,7 @@ Q. How do I use the UNIX time conversion?
      save the files, and run them through that script. That is faster
      and easier than trying to get an ASCII dump. That Rscript can also
      subset the TRMM data if needed. Look for the section of it titled
-     "Output domain specification" and define the lat/lon's that needs
+     "Output domain specification" and define the lat/lon's that need
      to be included in the output.
 
 Q. Does MET use a fixed-width output format for its ASCII output files?
@@ -289,7 +289,7 @@ Q. I have a list of stations to use for verification. I also have a poly region 
 
      If so, your options are:
 
-     1. Define one single SID list which include all the points currently
+     1. Define one single SID list which includes all the points currently
         inside the polyline as well as the extra ones outside.
 
      2. Continue verifying using one polyline and one SID list and
@@ -343,7 +343,7 @@ Q. How do I define a complex masking region?
 
      A user can define intersections and unions of multiple fields to
      define masks.
-     Prior to running Grid-Stat, the user can run the Gen-VX-Mask tool one or
+     Prior to running Grid-Stat, the user can run the Gen-Vx-Mask tool one or
      more times to define a more complex masking area by thresholding multiple
      fields.
 
@@ -358,14 +358,14 @@ Q. How do I define a complex masking region?
 
                      gen_vx_mask fcst.grb fcst.grb tmp_mask.nc \
                      -type data \
-                     -mask_field 'name="TMP"; level="Z2"' -thresh le273
+                     -mask_field 'name="TMP"; level="Z2"' -thresh le273 \
                      gen_vx_mask tmp_mask.nc fcst.grb tmp_and_precip_mask.nc \
                      -type data \
                      -input_field 'name="TMP_Z2"; level="(*,*)";' \
                      -mask_field 'name="APCP"; level="A6";' -thresh gt0 \
                      -intersection -name "FREEZING_PRECIP"
 
-     The first one is pretty straight-forward.
+     The first one is pretty straightforward.
 
      1. The input field (fcst.grb) defines the domain for the mask.
 
@@ -439,8 +439,8 @@ Q. How do I use neighborhood methods to compute fraction skill score?
      points where all NxN values contain valid data. Setting it to 0.5 only
      requires half of them.
 
-Q. Is an example of verifying forecast probabilities?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Q. Is there an example of verifying forecast probabilities?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
   .. dropdown:: Answer
 
@@ -540,7 +540,7 @@ Q. What is an example of using Grid-Stat with regridding and masking turned on?
      Examine the resulting plot of that difference field.
 
      Lastly, there is another option for defining that masking region.
-     Rather than passing the ascii CONUS.poly file to grid_stat, run the
+     Rather than passing the ASCII CONUS.poly file to grid_stat, run the
      gen_vx_mask tool and pass the NetCDF output of that tool to grid_stat.
      The advantage to gen_vx_mask is that it will make grid_stat run a
      bit faster. It can be used to construct much more complex masking areas.
@@ -563,7 +563,7 @@ Q. How do I use one mask for the forecast field and a different mask for the obs
 
      Below is an example using sample data that is included with the MET
      release tarball. To illustrate, this command will read 3-hour
-     precip and 2-meter temperature, and resets the precip at any grid
+     precip and 2-meter temperature, and reset the precip at any grid
      point where the temperature is less than 290 K to a value of 0:
 
      .. code-block:: none
@@ -681,11 +681,11 @@ Q. How do I combine 12-hour accumulated precipitation from two different initial
      describing the field to use from the NetCDF file. For the second file,
      list the file name followed by the accumulation interval to use
      (12 for 12 hours). The output file, Sum.nc, will contain the
-     combine 12-hour accumulated precipitation.
+     combined 12-hour accumulated precipitation.
 
      Here is a small excerpt from the pcp_combine usage statement:
 
-     Note: For “-add” and "-subtract”, the accumulation intervals may be
+     Note: For "-add" and "-subtract", the accumulation intervals may be
      substituted with config file strings. For that first file, we replaced
      the accumulation interval with a config file string.
 
@@ -699,7 +699,7 @@ Q. How do I combine 12-hour accumulated precipitation from two different initial
      .. code-block:: none
 
                      plot_data_plane WRFPRS_d01_1997-06-04_00_APCP_A12.grb \
-                     WRFPRS_d01_1997-06-04_00_APCP_A12.ps 'name="APCP" level="A12";'
+                     WRFPRS_d01_1997-06-04_00_APCP_A12.ps 'name="APCP"; level="A12";'
 
      .. code-block:: none
 
@@ -740,7 +740,7 @@ Q. How do I correct a precipitation time range?
                      TR=5:P1=0:P2=24:TimeU=1:sfc:0-24hr diff:NAve=0
 
      pcp_combine is looking in "rmf_gra_2016040600.24" for a 24 hour
-     *accumulation*, but since the time range indicator is no 4, it doesn't
+     *accumulation*, but since the time range indicator is not 4, it doesn't
      find a match.
 
      If possible switch the time range indicator to 4 on the GRIB files. If
@@ -796,13 +796,13 @@ Q. How do I use Pcp-Combine as a pass-through to simply reformat from GRIB to Ne
                      'name="REFC"; level="L0"; GRIB1_ptv=129; lead_time="120000";' \
                      forecast.nc -name CompositeReflectivity
 
-Q. How do I use “-pcprx" to run a project faster?
+Q. How do I use "-pcprx" to run a project faster?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
   .. dropdown:: Answer
 
      To run a project faster, the “-pcprx” option may be used to narrow the
-     search down to whatever regular expression you provide. Here are a two
+     search down to whatever regular expression you provide. Here are two
      examples:
 
      .. code-block:: none
@@ -811,7 +811,7 @@ Q. How do I use “-pcprx" to run a project faster?
                      pcp_combine -sum 00000000_000000 06 \
                      20161015_18 12 ST4.2016101518.APCP_12_SUM.nc -pcprx "ST4.*.06h"
 
-                     # Specify that files starting with pgbq[number][number]be used:
+                     # Specify that files starting with pgbq[number][number] be used:
                      pcp_combine \
                      -sum 20160221_18 06 20160222_18 24 \
                      gfs_APCP_24_20160221_18_F00_F24.nc \
@@ -906,26 +906,26 @@ Q. How do I use Pcp-Combine when my GRIB data doesn't have the appropriate accum
         certain to get exactly the data that is needed.
 
      5. The default output variable name pcp_combine would write would be
-        "APCP_L0". However, to indicate that its a 50-minute
+        "APCP_L0". However, to indicate that it's a 50-minute
         "accumulation interval" use a
         different output variable name (APCP_A005000). Any string name is
         possible. Maybe "Precip50Minutes" or "RAIN50". But whatever string is
         chosen will be used in the Grid-Stat, Point-Stat, or MODE config file
         to tell that tool what variable to process.
 
-Q. How do I use “-sum”, “-add”, and “-subtract“ to achieve the same accumulation interval?
+Q. How do I use "-sum", "-add", and "-subtract" to achieve the same accumulation interval?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
   .. dropdown:: Answer
 
-     Here is an example of using pcp_combine to put GFS into 24- hour intervals
+     Here is an example of using pcp_combine to put GFS into 24-hour intervals
      for comparison against 24-hourly StageIV precipitation with GFS data
      through the pcp_combine tool. Be aware that the 24-hour StageIV data is
      defined as an accumulation from 12Z on one day to 12Z on the next day:
      https://water.noaa.gov/about/precipitation-data-access
 
      Therefore, only the 24-hour StageIV data can be used to evaluate 12Z to
-     12Z accumulations from the model. Alternatively, the 6- hour StageIV
+     12Z accumulations from the model. Alternatively, the 6-hour StageIV
      accumulations could be used to evaluate any 24 hour accumulation from
      the model. For the latter, run the 6-hour StageIV files through
      pcp_combine to generate the desired 24-hour accumulation.
@@ -963,7 +963,7 @@ Q. How do I use “-sum”, “-add”, and “-subtract“ to achieve the same 
 
      The "-sum" command is meant to make things easier by searching the
      directory. But instead of using "-sum", another option would be the
-     "- add" command. Explicitly list the 4 files that need to be extracted
+     "-add" command. Explicitly list the 4 files that need to be extracted
      from the 6-hour APCP and add them up to 24. In the directory structure,
      the previous "-sum" job could be rewritten with "-add" like this:
 
@@ -980,7 +980,7 @@ Q. How do I use “-sum”, “-add”, and “-subtract“ to achieve the same 
      what accumulation interval (6 hours) to extract from them. The resulting
      output should be identical to the output of the "-sum" command.
 
-Q. What is the difference between “-sum” vs. “-add”?
+Q. What is the difference between "-sum" vs. "-add"?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
   .. dropdown:: Answer
@@ -1003,7 +1003,7 @@ Q. How do I select a specific GRIB record?
                      -name "APCP_01" HRRR_wrfnat.20160101_i12_f015.nc
 
      Instead of having the level as "L0", tell it to use "R735" to select
-     grib record 735.
+     GRIB record 735.
 
 Plot-Data-Plane
 ---------------
@@ -1024,7 +1024,7 @@ Q. How do I inspect Gen-Vx-Mask output?
                      out/gen_vx_mask/CONUS_poly.ps \
                      'name="CONUS"; level="(*,*)";'
 
-     View that postscript output file, using something like "gv"
+     View that PostScript output file, using something like "gv"
      for ghostview:
 
      .. code-block:: none
@@ -1032,7 +1032,7 @@ Q. How do I inspect Gen-Vx-Mask output?
                      gv out/gen_vx_mask/CONUS_poly.ps
 
      Please review a map of 0's and 1's over the USA to determine if the output
-     file is what the user expects. It always a good idea to start with
+     file is what the user expects. It is always a good idea to start with
      plot_data_plane when working with data to make sure MET
      is plotting the data correctly and in the expected location.
 
@@ -1041,12 +1041,12 @@ Q. How do I specify the GRIB version?
 
   .. dropdown:: Answer
 
-     When MET reads Gridded data files, it must determine the type of
+     When MET reads gridded data files, it must determine the type of
      file it's reading. The first thing it checks is the suffix of the file.
      The following are all interpreted as GRIB1: .grib, .grb, and .gb.
      While these mean GRIB2: .grib2, .grb2, and .gb2.
 
-     There are 2 choices to control how MET interprets a grib file. Renaming
+     There are 2 choices to control how MET interprets a GRIB file. Renaming
      the files to use a particular suffix, or keep them
      named and explicitly tell MET to interpret them as GRIB1 or GRIB2 using
      the "file_type" configuration option.
@@ -1057,7 +1057,7 @@ Q. How do I specify the GRIB version?
 
                      "file_type = GRIB2;"
 
-     To keep the files named this as they are, add "file_type = GRIB2;"
+     To keep the files named as they are, add "file_type = GRIB2;"
      to all the MET configuration files (i.e. Grid-Stat, MODE, and so on)
      that you use:
 
@@ -1079,10 +1079,10 @@ Q. How do I test the variable naming convention? (Record number example.)
 
      .. code-block:: none
 
-                     plot_data_plane LTIA98_KWBR_201305180600.grb2 tmp_z2.ps 'name="TMP"; level="R2";
+                     plot_data_plane LTIA98_KWBR_201305180600.grb2 tmp_z2.ps 'name="TMP"; level="R2";'
 
      "R2" tells MET to plot record number 2. Record numbers 1 and 2 both
-     contain temperature data and 2-meters. Here's some wgrib2 output:
+     contain temperature data at 2-meters. Here's some wgrib2 output:
 
      .. code-block:: none
 
@@ -1109,9 +1109,9 @@ Q. How do I compute and verify wind speed?
      .. code-block:: none
 
                      plot_data_plane wrf.grb wrf_wind.ps \
-                     'name"WIND"; level="Z10";' -v 3
+                     'name="WIND"; level="Z10";' -v 3
                      plot_data_plane rtma.grb2 rtma_wind.ps \
-                     'name"WIND"; level="Z10";' -v 3
+                     'name="WIND"; level="Z10";' -v 3
 
      In the first call, the log message should be similar to this:
 
@@ -1165,7 +1165,7 @@ Q. How does '-aggregate_stat' work?
                      -set_hdr VX_MASK SID_GROUP_NAME \
                      -out_stat mpr_to_cnt.stat
 
-     Where SID1...SIDN is a comma-separated list of the station id's in the
+     Where SID1...SIDN is a comma-separated list of the station ID's in the
      group. Notice that a value for the output VX_MASK column using the
      "-set_hdr" option has been specified. Otherwise, this would show a list
      of the unique values found in that column. Presumably, all the input
@@ -1255,7 +1255,7 @@ Q. How do I use '-filter' to refine my output?
                      FMEAN 0.05 -dump_row filter_cts.txt
                      DEBUG 2: Job 1 used 36 out of 36 STAT lines.
 
-     This job reads find 56 CTS lines, but only keeps 36 of them where both
+     This job finds 56 CTS lines, but only keeps 36 of them where both
      the BASER and FMEAN columns are at least 0.05.
 
 Q. How do I use the “-by” flag to stratify results?
@@ -1452,9 +1452,9 @@ Q. How do I convert TRMM data files?
         to specify the tile of data to be selected.
 
      2. As of version 5.1, MET includes support for regridding the
-        data it reads. Keep TRMM on it's native domain and use the
+        data it reads. Keep TRMM on its native domain and use the
         MET tools to do the regridding.
-        For example, the Regrid-Data-Plane" tool reads a NetCDF file, regrids
+        For example, the Regrid-Data-Plane tool reads a NetCDF file, regrids
         the data, and writes a NetCDF file. Alternatively, the "regrid" section
         of the configuration files for the MET tools may be used to do the
         regridding on the fly. For example, run Grid-Stat to compare to
@@ -1487,7 +1487,7 @@ Q. How do I convert a PostScript to png?
                      convert mode_out.ps mode_out.png
 
      Will result in all 6-7 pages in the PostScript file be written out to a
-     seperate .png with the following naming convention:
+     separate .png with the following naming convention:
 
      mode_out-0.png, mode_out-1.png, mode_out-2.png, etc.
 
@@ -1547,7 +1547,7 @@ Q. Regrid-Data-Plane - How do I define a LatLon grid?
                      :Nlat = "224 grid_points" ;
                      :Nlon = "464 grid_points" ;
 
-     This can be created by running the Regrid-Data-Plane" tool to regrid
+     This can be created by running the Regrid-Data-Plane tool to regrid
      some GFS data to a LatLon grid:
 
      .. code-block:: none
@@ -1705,7 +1705,7 @@ Q. Why is the grid upside down?
      stand-alone tool, the capability is also included to automatically regrid
      data in most of the MET tools that handle gridded data. This "regrid"
      entry is a dictionary containing information about how to handle input
-     gridded data files. The "regird" entry specifies regridding logic and
+     gridded data files. The "regrid" entry specifies regridding logic and
      has a "to_grid" entry that can be set to NONE, FCST, OBS, a named grid,
      the path to a gridded data file defining the grid, or an explicit grid
      specification string. See the :ref:`regrid` entry in
@@ -1715,7 +1715,7 @@ Q. Why is the grid upside down?
 
      A single model level can be plotted using the plot_data_plane utility.
      This tool can assist the user by showing the data to be verified to
-     ensure that times and locations matchup as expected.
+     ensure that times and locations match up as expected.
 
 Q. Why was the MET written largely in C++ instead of FORTRAN?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1770,7 +1770,7 @@ Q. What graphical features does MET provide?
      be plotted
      with a wide variety of plotting packages, including R, NCL, IDL,
      and GNUPlot.
-     METViewer is also currently being developed and used by the DTC and NOAA
+     METViewer is also currently being developed and used by the DTC and NOAA.
      It creates basic plots of MET output verification statistics. The types of
      plots include series plots with confidence intervals, box plots,
      x-y scatter plots and histograms.
@@ -1846,10 +1846,10 @@ BUFRLIB Errors During MET Installation
 
                      export MET_BUFRLIB=/home/username/BUFRLIB_v11.3.0:$MET_BUFRLIB
 
-     It isn't making it's way into the configuration because BUFRLIB_v11.3.0
+     It isn't making its way into the configuration because BUFRLIB_v11.3.0
      isn't showing up in the output of make. This may indicate the wrong shell
      type. The .bashrc file sets the environment for the Bourne shell, but
-     the above error could indicate that the c- shell is being used instead.
+     the above error could indicate that the C shell is being used instead.
 
      Try the following 2 things:
 
@@ -1885,7 +1885,7 @@ Command Line Double Quotes
 
                      ['regrid_data_plane',
                      '/h/data/global/WXQC/data/umm/1701150006',
-                     'G003', '/h/data/global/WXQC/data/met/nc_mdl/umm/1701150006', '- field',
+                     'G003', '/h/data/global/WXQC/data/met/nc_mdl/umm/1701150006', '-field',
                      '\'name="HGT"; level="P500";\'', '-v', '6']
 
 Environment Variable Settings
@@ -1902,7 +1902,7 @@ Environment Variable Settings
                      export MET_GSLINC=$MET_LIB_DIR/gsl/include/gsl
                      export MET_GSLLIB=$MET_LIB_DIR/gsl/lib
 
-     **only MET_GSL *OR *MET_GSLINC *AND *MET_GSLLIB need to be set.**
+     **only MET_GSL OR MET_GSLINC AND MET_GSLLIB need to be set.**
      So, for example, either set:
 
      .. code-block:: none
