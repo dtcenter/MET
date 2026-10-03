@@ -4,7 +4,7 @@
 MET Data I/O
 ************
 
-Data must often be preprocessed prior to using it for verification. Several MET tools exist for this purpose. In addition to preprocessing observations, some plotting utilities for data checking are also provided and described at the end of this section. Both the input and output file formats are described in this section. :numref:`Input data formats` and :numref:`Intermediate data formats` are primarily concerned with re-formatting input files into the intermediate files required by some MET modules. These steps are represented by the first three columns in the MET flowchart depicted in :numref:`overview-figure`. Output data formats are described in :numref:`Output data formats`. Common configuration files options are described in :numref:`Configuration File Details`. Description of software modules used to reformat the data may now be found in :numref:`reformat_point`  and :numref:`reformat_grid`.
+Data must often be preprocessed prior to using it for verification. Several MET tools exist for this purpose. In addition to preprocessing observations, some plotting utilities for data checking are also provided and described at the end of this section. Both the input and output file formats are described in this section. :numref:`Input data formats` and :numref:`Intermediate data formats` are primarily concerned with re-formatting input files into the intermediate files required by some MET modules. These steps are represented by the first three columns in the MET flowchart depicted in :numref:`overview-figure`. Output data formats are described in :numref:`Output data formats`. Common configuration file options are described in :numref:`Configuration File Details`. Description of software modules used to reformat the data may now be found in :numref:`reformat_point`  and :numref:`reformat_grid`.
 
 .. _Input data formats:
 
@@ -47,7 +47,7 @@ Here is an example ASCII file list for three input files, each listed on a separ
 Requirements for CF Compliant NetCDF
 ------------------------------------
 
-The MET tools use following attributes and variables for input "`CF Compliant NetCDF data <https://cfconventions.org/>`_".
+The MET tools use the following attributes and variables for input "`CF Compliant NetCDF data <https://cfconventions.org/>`_".
 
 1. The global attribute "Conventions".
 
@@ -63,7 +63,7 @@ The MET tools use following attributes and variables for input "`CF Compliant Ne
 
 7. (Optional) the "`vertical coordinate <https://cfconventions.org/cf-conventions/cf-conventions.html#vertical-coordinate>`_" variable must include a supported units attribute to allow range selection.
 
-MET processes the CF-Compliant gridded NetCDF files with the projection information. The CF-Compliant NetCDF is defined by the global attribute "Conventions" whose value begins with "CF-" ("CF-<Version_number>"). The global attribute "Conventions" is mandatory. MET accepts the variation of this attribute ("conventions" and "CONVENTIONS"). The value should be started with "CF-" and followed by the version number. MET accepts the attribute value that begins with "CF " ("CF" and a space instead of a hyphen) or "COARDS".
+MET processes the CF-Compliant gridded NetCDF files with the projection information. The CF-Compliant NetCDF is defined by the global attribute "Conventions" whose value begins with "CF-" ("CF-<Version_number>"). The global attribute "Conventions" is mandatory. MET accepts the variation of this attribute ("conventions" and "CONVENTIONS"). The value should start with "CF-" and followed by the version number. MET accepts the attribute value that begins with "CF " ("CF" and a space instead of a hyphen) or "COARDS".
 
 The grid mapping variable contains the projection information. The grid mapping variable can be found by looking at the variable attribute "grid_mapping" from the data variables. The "standard_name" attribute is used to filter out the coordinate variables like time, latitude, and longitude variables. The value of the "grid_mapping" attribute is the name of the grid mapping variable. Four projections are supported with grid mapping variables: latitude_longitude, lambert_conformal_conic, polar_stereographic, and geostationary. In case of the latitude_longitude projection, the latitude and longitude variable names should be the same as the dimension names and the "units" attribute should be valid.
 
@@ -113,7 +113,7 @@ When the grid mapping variable is not available, MET can detect either a latitud
 
 3. the lat/lon projection from the latitude and longitude variables by the "standard_name" attribute
 
-MET is looking for variables with the same name as the dimension and checking the "units" attribute to find the latitude and longitude variables. The valid "units" strings are listed in the table below. MET accepts the variable "tlat" and "tlon" if the dimension names are "nlat" and "nlon”.
+MET is looking for variables with the same name as the dimension and checking the "units" attribute to find the latitude and longitude variables. The valid "units" strings are listed in the table below. MET accepts the variable "tlat" and "tlon" if the dimension names are "nlat" and "nlon".
 
 If there are no latitude and longitude variables from dimensions, MET gets coordinate variable names from the "coordinates" attribute. The matching coordinate variables should have the proper "units" attribute.
 
@@ -133,7 +133,7 @@ For rotated_latitude_longitude projections, MET detects the projection using the
 
 3. Checking to see if the standard name attribute is called grid_latitude for latitude variables and grid_longitude for the longitude variable.
 
-The latitude and longitude variables must be one dimensional and with their size matching the corresponding dimension for latitude_longitude and rotated_latitude_longitude grids.
+The latitude and longitude variables must be one-dimensional and with their size matching the corresponding dimension for latitude_longitude and rotated_latitude_longitude grids.
 
 .. list-table:: Valid strings for the "units" attribute.
   :widths: auto
@@ -188,13 +188,13 @@ The STAT format consists of tabular ASCII data that can be easily read by many a
 
 For this reason, ASCII output is also available as an alternative for these tools. The ASCII files contain exactly the same output as the STAT files but each STAT line type is grouped into a single ASCII file with a column header row making the output more human-readable. The configuration files control which line types are output and whether or not the optional ASCII files are generated.
 
-The MODE tool creates two ASCII output files as well (although they are not in a STAT format). It generates an ASCII file containing contingency table counts and statistics comparing the model and observation fields being compared. The MODE tool also generates a second ASCII file containing all of the attributes for the single objects and pairs of objects. Each line in this file contains the same number of columns, and those columns not applicable to a given line type contain fill data. Similarly, the MTD tool writes one ASCII output file for 2D objects attributes and four ASCII output files for 3D object attributes.
+The MODE tool creates two ASCII output files as well (although they are not in a STAT format). It generates an ASCII file containing contingency table counts and statistics comparing the model and observation fields being compared. The MODE tool also generates a second ASCII file containing all of the attributes for the single objects and pairs of objects. Each line in this file contains the same number of columns, and those columns not applicable to a given line type contain fill data. Similarly, the MTD tool writes one ASCII output file for 2D object attributes and four ASCII output files for 3D object attributes.
 
 The TC-Pairs and TC-Stat utilities produce ASCII output, similar in style to the STAT files, but with TC relevant fields.
 
-Many of the tools generate gridded NetCDF output. Generally, this output acts as input to other MET tools or plotting programs. The point observation preprocessing tools produce NetCDF output as input to the statistics tools. Full details of the contents of the NetCDF files is found in :numref:`Data format summary` below.
+Many of the tools generate gridded NetCDF output. Generally, this output acts as input to other MET tools or plotting programs. The point observation preprocessing tools produce NetCDF output as input to the statistics tools. Full details of the contents of the NetCDF files are found in :numref:`Data format summary` below.
 
-The MODE, Wavelet-Stat and plotting tools produce PostScript plots summarizing the spatial approach used in the verification. The PostScript plots are generated using internal libraries and do not depend on an external plotting package. The MODE plots contain several summary pages at the beginning, but the total number of pages will depend on the merging options chosen. Additional pages will be created if merging is performed using the double thresholding or fuzzy engine merging techniques for the forecast and observation fields. The number of pages in the Wavelet-Stat plots depend on the number of masking tiles used and the dimension of those tiles. The first summary page is followed by plots for the wavelet decomposition of the forecast and observation fields. The generation of these PostScript output files can be disabled using command line options.
+The MODE, Wavelet-Stat and plotting tools produce PostScript plots summarizing the spatial approach used in the verification. The PostScript plots are generated using internal libraries and do not depend on an external plotting package. The MODE plots contain several summary pages at the beginning, but the total number of pages will depend on the merging options chosen. Additional pages will be created if merging is performed using the double thresholding or fuzzy engine merging techniques for the forecast and observation fields. The number of pages in the Wavelet-Stat plots depends on the number of masking tiles used and the dimension of those tiles. The first summary page is followed by plots for the wavelet decomposition of the forecast and observation fields. The generation of these PostScript output files can be disabled using command line options.
 
 Users can use the optional plotting utilities Plot-Data-Plane and Plot-Point-Obs to produce graphics showing forecast and observation data.
 
@@ -284,7 +284,7 @@ The following is a summary of the input and output formats for each of the tools
 
     * **Output**: One STAT file containing all of the requested line types, several ASCII files for each line type requested, and one NetCDF file containing the matched pair data and difference field for each verification region and variable type/level being verified.
 
-#. **Ensemble Stat Tool**
+#. **Ensemble-Stat Tool**
 
     * **Input**: An arbitrary number of gridded model files, one or more gridded and/or point observation files, and one configuration file. Point and gridded observations are both accepted.
 
@@ -310,7 +310,7 @@ The following is a summary of the input and output formats for each of the tools
 
 #. **Stat-Analysis Tool**
 
-    * **Input**: One or more STAT files output from the Point-Stat, Grid-Stat, Ensemble Stat, Wavelet-Stat, or TC-Gen tools and, optionally, one configuration file containing specifications for the analysis job(s) to be run on the STAT data.
+    * **Input**: One or more STAT files output from the Point-Stat, Grid-Stat, Ensemble-Stat, Wavelet-Stat, or TC-Gen tools and, optionally, one configuration file containing specifications for the analysis job(s) to be run on the STAT data.
 
     * **Output**: ASCII output of the analysis jobs is printed to the screen unless redirected to a file using the "-out" option or redirected to a STAT output file using the "-out_stat" option.
 
@@ -382,7 +382,7 @@ The following is a summary of the input and output formats for each of the tools
 
 #. **Plot-Point-Obs Tool**
 
-    * **Input**: One NetCDF file containing point observation from the ASCII2NC, PB2NC, MADIS2NC, or LIDAR2NC tool.
+    * **Input**: One NetCDF file containing point observations from the ASCII2NC, PB2NC, MADIS2NC, or LIDAR2NC tool.
 
     * **Output**: One postscript file containing a plot of the requested field.
 
