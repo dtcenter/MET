@@ -35,7 +35,7 @@ The Intensity Scale approach can be summarized in the following 5 steps:
 
 2. The binary forecast and observation fields obtained from the thresholding are then decomposed into the sum of components on different scales, by using a 2D Haar wavelet filter (:numref:`wavelet-stat_NIMROD_diff`). Note that the scale components are fields, and their sum adds up to the original binary field. For a forecast defined over square domain of :math:`{2^n} \times {2^n}` grid-points, the scale components are **n+1: n** mother wavelet components + the largest father wavelet (or scale-function) component. The **n** mother wavelet components have resolution equal to **1, 2, 4, ...** :math:`{2^{n-1}}`  grid-points. The largest father wavelet component is a constant field over the :math:`{2^n} \times {2^n}` grid-point domain with value equal to the field mean.
 
-**Note** that the wavelet transform is a linear operator: this implies that the difference of the spatial scale components of the binary forecast and observation fields (:numref:`wavelet-stat_NIMROD_diff`) are equal to the spatial scale components of the difference of the binary forecast and observation fields (:numref:`wavelet-stat_NIMROD_binary_fcst_and_obs`), and these scale components also add up to the original binary field difference (:numref:`wavelet-stat_NIMROD_3h_fcst`). The intensity-scale technique considers thus the spatial scale of the error. For the case illustrated (:numref:`wavelet-stat_NIMROD_3h_fcst` and :numref:`wavelet-stat_NIMROD_binary_fcst_and_obs`) note the large error associated at the scale of 160 km, due the storm, 160km displaced almost its entire length.
+**Note** that the wavelet transform is a linear operator: this implies that the difference of the spatial scale components of the binary forecast and observation fields (:numref:`wavelet-stat_NIMROD_diff`) are equal to the spatial scale components of the difference of the binary forecast and observation fields (:numref:`wavelet-stat_NIMROD_binary_fcst_and_obs`), and these scale components also add up to the original binary field difference (:numref:`wavelet-stat_NIMROD_3h_fcst`). The intensity-scale technique considers thus the spatial scale of the error. For the case illustrated (:numref:`wavelet-stat_NIMROD_3h_fcst` and :numref:`wavelet-stat_NIMROD_binary_fcst_and_obs`) note the large error associated at the scale of 160 km, due to the storm, 160km displaced almost its entire length.
 
 **Note** also that the means of the binary forecast and observation fields (i.e. their largest father wavelet components) are equal to the proportion of forecast and observed events above the threshold, **(a+b)/n** and **(a+c)/n**, evaluated from the contingency table counts (:numref:`contingency_table_counts`) obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields. This relation is intuitive when observing forecast and observation binary fields and their corresponding contingency table image (:numref:`wavelet-stat_NIMROD_3h_fcst`). The comparison of the largest father wavelet component of binary forecast and observation fields therefore provides feedback on the whole field bias.
 
@@ -92,7 +92,7 @@ The Intensity-Scale (IS) skill score evaluates the forecast skill as a function 
 
 .. figure:: figure/wavelet-stat_NIMROD_diff.png
 
-   NIMROD binary field difference spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scales 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refers to the largest father wavelet component (1280 km resolution). Note the large error at the scale 6 = 160 km, due to the storm, 160 km displaced almost of its entire length.
+   NIMROD binary field difference spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scales 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refers to the largest father wavelet component (1280 km resolution). Note the large error at the scale 6 = 160 km, due to the storm, 160 km displaced almost its entire length.
 
 .. _wavelet-stat_MSE_percent_NIMROD:
 
@@ -114,7 +114,7 @@ In addition to the MSE and the SS, the energy squared is also evaluated, for eac
 
 .. figure:: figure/wavelet-stat_energy_squared_NIMROD.png
 
-   Energy squared and energy squared percentages, for each threshold and sale, for the NIMROD forecast and analysis, and forecast and analysis En2 and En2% relative differences.
+   Energy squared and energy squared percentages, for each threshold and scale, for the NIMROD forecast and analysis, and forecast and analysis En2 and En2% relative differences.
 
 The En2 bias for each threshold and scale is assessed by the En2 relative difference, equal to the difference between forecast and observed squared energies normalized by their sum: :math:`{En2}(F)- {En2}(O)]/[{En2}(F)+ {En2}(O)]`. Since defined in such a fashion, the En2 relative difference accounts for the difference between forecast and observation squared energies relative to their magnitude, and it is sensitive therefore to the ratio of the forecast and observed squared energies. The En2 relative difference ranges between -1 and 1, positive values indicate over-forecast and negative values indicate under-forecast. For the NIMROD case illustrated the forecast exhibits over-forecast for small thresholds, quite pronounced on the large scales, and under-forecast for high thresholds.
 
@@ -129,7 +129,7 @@ Note that the energy squared of the observation binary field is identical to the
 The Spatial Domain Constraints
 ------------------------------
 
-The Intensity-Scale technique is constrained by the fact that orthogonal wavelets (discrete wavelet transforms) are usually performed dyadic domains, square domains of :math:`{2^n} \times {2^n}` grid-points. The Wavelet-Stat tool handles this issue based on settings in the configuration file by defining tiles of dimensions :math:`{2^n} \times {2^n}` over the input domain in the following ways:
+The Intensity-Scale technique is constrained by the fact that orthogonal wavelets (discrete wavelet transforms) are usually performed on dyadic domains, square domains of :math:`{2^n} \times {2^n}` grid-points. The Wavelet-Stat tool handles this issue based on settings in the configuration file by defining tiles of dimensions :math:`{2^n} \times {2^n}` over the input domain in the following ways:
 
 1. User-Defined Tiling: The user may define one or more tiles of size :math:`{2^n} \times {2^n}` over their domain to be applied. This is done by selecting the grid coordinates for the lower-left corner of the tile(s) and the tile dimension to be used. If the user specifies more than one tile, the Intensity-Scale method will be applied to each tile separately. At the end, the results will automatically be aggregated across all the tiles and written out with the results for each of the individual tiles. Users are encouraged to select tiles which consist entirely of valid data.
 
@@ -147,7 +147,7 @@ The MSE and forecast and observation squared energy for each scale and threshold
 Practical Information
 =====================
 
-The following sections describe the usage statement, required arguments and optional arguments for the Stat-Analysis tool.
+The following sections describe the usage statement, required arguments and optional arguments for the Wavelet-Stat tool.
 
 wavelet_stat Usage
 ------------------
@@ -205,7 +205,7 @@ wavelet_stat Configuration File
 
 The default configuration file for the Wavelet-Stat tool, **WaveletStatConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
 
-Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
+Note that environment variables may be used when editing configuration files, as described in :numref:`config_env_vars`.
 
 _______________________
 
@@ -263,7 +263,7 @@ The **grid_decomp_flag** variable specifies how tiling should be performed:
 
 • **TILE** indicates that the user-defined tiles should be applied.
 
-• **PAD** indicated that the data should be padded out to the nearest dimension of :math:`{2^n} \times {2^n}`
+• **PAD** indicates that the data should be padded out to the nearest dimension of :math:`{2^n} \times {2^n}`
 
 The **width** and **location** variables allow users to manually define the tiles of dimension they would like to apply. The x_ll and y_ll variables specify the location of one or more lower-left tile grid (x, y) points.
 
@@ -326,7 +326,7 @@ The output ASCII files are named similarly:
 
 wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is isc to indicate that this is an intensity-scale line type.
 
-The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to the format of the STAT and ASCII output of the Point-Stat tool. Please refer to the tables in :numref:`point_stat-output` for a description of the common output for STAT files types. The information contained in the STAT and isc files are identical. However, for consistency with the STAT files produced by other tools, the STAT file will only have names for the header columns. The isc file contains names for all columns. The format of the ISC line type is explained in the following table.
+The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to the format of the STAT and ASCII output of the Point-Stat tool. Please refer to the tables in :numref:`point_stat-output` for a description of the common output for STAT file types. The information contained in the STAT and isc files are identical. However, for consistency with the STAT files produced by other tools, the STAT file will only have names for the header columns. The isc file contains names for all columns. The format of the ISC line type is explained in the following table.
 
 .. _table_WS_header_info_ws_outputs:
 

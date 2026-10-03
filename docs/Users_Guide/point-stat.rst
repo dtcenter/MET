@@ -23,9 +23,9 @@ Interpolation/Matching Methods
 
 This section provides information about the various methods available in MET to match gridded model output to point observations. Matching in the vertical and horizontal are completed separately using different methods.
 
-In the vertical, if forecasts and observations are at the same vertical level, then they are paired as-is. If any discrepancy exists between the vertical levels, then the forecasts are interpolated to the level of the observation. The vertical interpolation is done in the natural log of pressure coordinates, except for specific humidity, which is interpolated using the natural log of specific humidity in the natural log of pressure coordinates. Vertical interpolation for heights above ground are done linear in height coordinates. When forecasts are for the surface, no interpolation is done. They are matched to observations with message types that are mapped to "SURFACE" in the **message_type_group_map** configuration option. By default, the surface message types include ADPSFC, SFCSHP, and MSONET. The regular expression is applied to the message type list at the message_type_group_map. The derived message types from the time summary ("ADPSFC_MIN_hhmmss" and "ADPSFC_MAX_hhmmss") are accepted as "ADPSFC".
+In the vertical, if forecasts and observations are at the same vertical level, then they are paired as-is. If any discrepancy exists between the vertical levels, then the forecasts are interpolated to the level of the observation. The vertical interpolation is done in the natural log of pressure coordinates, except for specific humidity, which is interpolated using the natural log of specific humidity in the natural log of pressure coordinates. Vertical interpolation for heights above ground is done linearly in height coordinates. When forecasts are for the surface, no interpolation is done. They are matched to observations with message types that are mapped to "SURFACE" in the **message_type_group_map** configuration option. By default, the surface message types include ADPSFC, SFCSHP, and MSONET. The regular expression is applied to the message type list at the message_type_group_map. The derived message types from the time summary ("ADPSFC_MIN_hhmmss" and "ADPSFC_MAX_hhmmss") are accepted as "ADPSFC".
 
-To match forecasts and observations in the horizontal plane, the user can select from a number of methods described below. Many of these methods require the user to define the width of the forecast grid W, around each observation point P, that should be considered. In addition, the user can select the interpolation shape, either a SQUARE or a CIRCLE. For example, a square of width 2 defines the 2 x 2 set of grid points enclosing P, or simply the 4 grid points closest to P. A square of width of 3 defines a 3 x 3 square consisting of 9 grid points centered on the grid point closest to P. :numref:`point_stat_fig1`  provides illustration. The point P denotes the observation location where the interpolated value is calculated. The interpolation width W, shown is five.
+To match forecasts and observations in the horizontal plane, the user can select from a number of methods described below. Many of these methods require the user to define the width of the forecast grid W, around each observation point P, that should be considered. In addition, the user can select the interpolation shape, either a SQUARE or a CIRCLE. For example, a square of width 2 defines the 2 x 2 set of grid points enclosing P, or simply the 4 grid points closest to P. A square of width 3 defines a 3 x 3 square consisting of 9 grid points centered on the grid point closest to P. :numref:`point_stat_fig1`  provides illustration. The point P denotes the observation location where the interpolated value is calculated. The interpolation width W, shown is five.
 
 This section describes the options for interpolation in the horizontal.
 
@@ -57,7 +57,7 @@ _____________________
 
 **Gaussian**
 
-The forecast value at P is a weighted sum of the values in the interpolation area. The weight given to each forecast point follows the Gaussian distribution with nearby points contributing more the far away points. The shape of the distribution is configured using sigma.
+The forecast value at P is a weighted sum of the values in the interpolation area. The weight given to each forecast point follows the Gaussian distribution with nearby points contributing more than far away points. The shape of the distribution is configured using sigma.
 
 When used for regridding, with the **regrid** configuration option, or smoothing, with the **interp** configuration option in grid-to-grid comparisons, the Gaussian method is named **MAXGAUSS** and is implemented as a 2-step process. First, the data is regridded or smoothed using the maximum value interpolation method described below, where the **width** and **shape** define the interpolation area. Second, the Gaussian smoother, defined by the **gaussian_dx** and **gaussian_radius** configuration options, is applied.
 
@@ -123,12 +123,12 @@ Wind Rotation and Derivation
 ----------------------------
 
 Numerical weather prediction model output often defines winds relative to the orientation of the model grid rather than true north-south and east-west directions on the earth.
-However point observations typically define winds relative to true earth directions. Prior to comparing them, the model wind data must be rotated from grid-relative to
+However point observations typically define winds relative to true earth directions. Prior to comparing them, the model wind data must be rotated from grid-relative
 to earth-relative. While the degree of grid-to-earth rotation varies based on the projection type and location, failing to rotate the winds can have a significant impact on
 the verification results.
 
 For simplicity, the MET library code attempts to rotate all wind components from being grid-relative to earth-relative regardless of whether they are being compared to point
-observations with the Point-Stat tool or gridded analyses with the Grid-Stat tool. Running the MET tools at verbosity level 3 (-v 3) prints log messages to describing the wind
+observations with the Point-Stat tool or gridded analyses with the Grid-Stat tool. Running the MET tools at verbosity level 3 (-v 3) prints log messages describing the wind
 rotation process. While the logic to determine whether input winds are grid-relative varies by file type, specifying the **is_grid_relative = FALSE;** configuration option
 manually overrides that logic and prevents winds from being rotated.
 
@@ -138,11 +138,11 @@ required to rotate either component. When processing U-wind data, MET attempts t
 The configuration options for wind rotation and derivation in MET are described in section :numref:`config_wind_field_names`.
 
 When reading V-wind data to rotate U-wind or U-wind data to rotate V-wind, MET first searches using the same field name, but with both upper and lowercase U's and V's
-swapped (e.g. for "U_PL" search for "V_PL"). If the result is unsuccesful, it searches other common field names specified by the **u_wind_field_name** and **v_wind_field_name**
+swapped (e.g. for "U_PL" search for "V_PL"). If the result is unsuccessful, it searches other common field names specified by the **u_wind_field_name** and **v_wind_field_name**
 configuration options. If needed, users should set these configuration options to indicate how the U-wind and V-wind data should be paired.
 
 In addition to rotating winds, MET can also derive them. If U-wind and V-wind are present in the input file, request field names of **WDIR**, **WIND**, or **KENG**
-to derive wind direction, wind speed, and kinetic engery from the U and V components, respectively. If wind speed and direction are present in the input file, request field
+to derive wind direction, wind speed, and kinetic energy from the U and V components, respectively. If wind speed and direction are present in the input file, request field
 names of **UGRD** or **VGRD** for MET to derive the U and V components from them. Depending on the wind field naming conventions, the configuration options described in
 :numref:`config_wind_field_names` may be required to configure this derivation logic.
 
@@ -155,7 +155,7 @@ The Point-Stat tool has been enhanced to include the High Resolution Assessment 
 
 The HiRA framework provides a unique method for evaluating models in the neighborhood of point observations, allowing for some spatial and temporal uncertainty in the forecast and/or the observations. Additionally, the HiRA framework can be used to compare deterministic forecasts to ensemble forecasts. In MET, the neighborhood is a circle or square centered on the grid point closest to the observation location. An event is defined, then the proportion of points with events in the neighborhood is calculated. This proportion is treated as an ensemble probability, though it is likely to be uncalibrated.
 
-:numref:`point_stat_fig3` shows a couple of examples of how the HiRA proportion is derived at a single model level using square neighborhoods. Events (in our case, model accretion values > 0) are separated from non-events (model accretion value = 0). Then, in each neighborhood, the total proportion of events is calculated. In the leftmost panel, four events exist in the 25 point neighborhood, making the HiRA proportion is 4/25 = 0.16. For the neighborhood of size 9 centered in that same panel, the HiRA proportion is 1/9. In the right panel, the size 25 neighborhood has HiRA proportion of 6/25, with the centered 9-point neighborhood having a HiRA value of 2/9. To extend this method into 3-dimensions, all layers within the user-defined layer are also included in the calculation of the proportion in the same manner.
+:numref:`point_stat_fig3` shows a couple of examples of how the HiRA proportion is derived at a single model level using square neighborhoods. Events (in our case, model accretion values > 0) are separated from non-events (model accretion value = 0). Then, in each neighborhood, the total proportion of events is calculated. In the leftmost panel, four events exist in the 25 point neighborhood, making the HiRA proportion 4/25 = 0.16. For the neighborhood of size 9 centered in that same panel, the HiRA proportion is 1/9. In the right panel, the size 25 neighborhood has HiRA proportion of 6/25, with the centered 9-point neighborhood having a HiRA value of 2/9. To extend this method into 3-dimensions, all layers within the user-defined layer are also included in the calculation of the proportion in the same manner.
 
 .. _point_stat_fig3:
 
@@ -195,7 +195,7 @@ Measures for Continuous Variables
 
 For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by :ref:`Murphy and Winkler (1987) <Murphy-1987>`. The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure. See :numref:`Appendix C, Section %s <appendixC>` for specific information.
 
-A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as``'conditional verification''. For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these thresholds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference).
+A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as "conditional verification". For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these thresholds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !=, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference).
 
 .. _PS_Probability:
 
@@ -208,13 +208,13 @@ Probabilistic forecast values are assumed to have a range of either 0 to 1 or 0 
 
 MET supports multiple methods for defining probability bins:
 
-1. As an explicit list of greater-than-or-equal-to-type thresholds whose values begin at 0.0, end at 1.0, and are monotonically increasing. For example :code:`>=0.00,>=0.25,>=0.50,>=0.75,>=1.00` defines 4 probability bins of equal width. Explicity listing the thresholds enables the definition of non-equal bin widths, such as :code:`>=0.00,>=0.50,>=0.75,>=1.00` with one bin of width 0.5 followed by two of width 0.25.
+1. As an explicit list of greater-than-or-equal-to-type thresholds whose values begin at 0.0, end at 1.0, and are monotonically increasing. For example :code:`>=0.00,>=0.25,>=0.50,>=0.75,>=1.00` defines 4 probability bins of equal width. Explicitly listing the thresholds enables the definition of non-equal bin widths, such as :code:`>=0.00,>=0.50,>=0.75,>=1.00` with one bin of width 0.5 followed by two of width 0.25.
 
 2. Since equal bin widths are commonly used, a shorthand notation of :code:`==0.25` is also supported. This defines the same 4 probability bins of equal width between 0 and 1, as shown in the example above.
 
-3. As of MET version 12.0.0, an additional shorthand notation of :code:`==N`, where :code:`N` is an integer greater than 1, is also supported. With this notation, :code:`N` is interpreted as the number of ensemble members from which probabilities have been dervied. Often ensemble-derived probabilities are limited to N + 1 values, 0/N, 1/N, 2/N ... N/N. For :code:`==N`, MET defines thresholds to create N + 1 probability bins centered on each of the possible outcomes. For example, :code:`==4` expands to :code:`>=-0.125,>=0.125,>=0.375,>=0.625,>=0.875,>=1.125` which has 5 bins, each centered on 0.00, 0.25, 0.50, 0.75, and 1.00. Note that this convention results thresholds starting less than 0.0 and extending greater than 1.0. While this looks odd, it is necessary to create bins centered of the values of 0.0 and 1.0.
+3. As of MET version 12.0.0, an additional shorthand notation of :code:`==N`, where :code:`N` is an integer greater than 1, is also supported. With this notation, :code:`N` is interpreted as the number of ensemble members from which probabilities have been derived. Often ensemble-derived probabilities are limited to N + 1 values, 0/N, 1/N, 2/N ... N/N. For :code:`==N`, MET defines thresholds to create N + 1 probability bins centered on each of the possible outcomes. For example, :code:`==4` expands to :code:`>=-0.125,>=0.125,>=0.375,>=0.625,>=0.875,>=1.125` which has 5 bins, each centered on 0.00, 0.25, 0.50, 0.75, and 1.00. Note that this convention results in thresholds starting less than 0.0 and extending greater than 1.0. While this looks odd, it is necessary to create bins centered on the values of 0.0 and 1.0.
 
-When computing probabilistic statistics, MET first bins the forecast probabilities into an Nx2 probabilistic contingency table. Probabilistic statistics are derived from the Nx2 contingency table rather than the raw probabilities. When doing so, the value of the mid-point is used for all values falling in that bin. Because of this, the choice of probability bins impacts the statistics. For a well-calibrated, smooth distribution of probabilities, the impact of binning is relatively minor. However the impact may be larger for less continuous probabilities. In particular, when evaluating ensemble-derived probability values, users are encouarged to define probability bins with the :code:`==N` option to create bins centered on the possible ensemble-derived probability outcomes.
+When computing probabilistic statistics, MET first bins the forecast probabilities into an Nx2 probabilistic contingency table. Probabilistic statistics are derived from the Nx2 contingency table rather than the raw probabilities. When doing so, the value of the mid-point is used for all values falling in that bin. Because of this, the choice of probability bins impacts the statistics. For a well-calibrated, smooth distribution of probabilities, the impact of binning is relatively minor. However the impact may be larger for less continuous probabilities. In particular, when evaluating ensemble-derived probability values, users are encouraged to define probability bins with the :code:`==N` option to create bins centered on the possible ensemble-derived probability outcomes.
 
 When the "prob" entry is set as a dictionary to define the field of interest, setting "prob_as_scalar = TRUE" indicates that this data should be processed as regular scalars rather than probabilities. For example, this option can be used to compute traditional 2x2 contingency tables and neighborhood verification statistics for probability data. It can also be used to compare two probability fields directly.
 
@@ -238,7 +238,7 @@ For continuous fields (e.g., temperature), it is possible to estimate confidence
 
 For the measures relating the two fields (i.e., mean error, correlation and standard deviation of the errors), confidence intervals are based on either the joint distributions of the two fields (e.g., with correlation) or on a function of the two fields. For the correlation, the underlying assumption is that the two fields follow a bivariate normal distribution. In the case of the mean error and the standard deviation of the mean error, the assumption is that the errors are normally distributed, which for continuous variables, is usually a reasonable assumption, even for the standard deviation of the errors.
 
-Bootstrap confidence intervals for any verification statistic are available in MET. Bootstrapping is a nonparametric statistical method for estimating parameters and uncertainty information. The idea is to obtain a sample of the verification statistic(s) of interest (e.g., bias, ETS, etc.) so that inferences can be made from this sample. The assumption is that the original sample of matched forecast-observation pairs is representative of the population. Several replicated samples are taken with replacement from this set of forecast-observation pairs of variables (e.g., precipitation, temperature, etc.), and the statistic(s) are calculated for each replicate. That is, given a set of n forecast-observation pairs, we draw values at random from these pairs, allowing the same pair to be drawn more than once, and the statistic(s) is (are) calculated for each replicated sample. This yields a sample of the statistic(s) based solely on the data without making any assumptions about the underlying distribution of the sample. It should be noted, however, that if the observed sample of matched pairs is dependent, then this dependence should be taken into account somehow. Currently, the confidence interval methods in MET do not take into account dependence, but future releases will support a robust method allowing for dependence in the original sample. More detailed information about the bootstrap algorithm is found in the :numref:`Appendix D, Section %s <appendixD>`. Note that MET writes temporary files whenever bootstrap confidence intervals are computed, as described in :numref:`Contributor's Guide Section %s <tmp_files_bootstrap>`.
+Bootstrap confidence intervals for any verification statistic are available in MET. Bootstrapping is a nonparametric statistical method for estimating parameters and uncertainty information. The idea is to obtain a sample of the verification statistic(s) of interest (e.g., bias, ETS, etc.) so that inferences can be made from this sample. The assumption is that the original sample of matched forecast-observation pairs is representative of the population. Several replicated samples are taken with replacement from this set of forecast-observation pairs of variables (e.g., precipitation, temperature, etc.), and the statistic(s) are calculated for each replicate. That is, given a set of n forecast-observation pairs, we draw values at random from these pairs, allowing the same pair to be drawn more than once, and the statistic(s) is (are) calculated for each replicated sample. This yields a sample of the statistic(s) based solely on the data without making any assumptions about the underlying distribution of the sample. It should be noted, however, that if the observed sample of matched pairs is dependent, then this dependence should be taken into account somehow. Currently, the confidence interval methods in MET do not take into account dependence, but future releases will support a robust method allowing for dependence in the original sample. More detailed information about the bootstrap algorithm is found in :numref:`Appendix D, Section %s <appendixD>`. Note that MET writes temporary files whenever bootstrap confidence intervals are computed, as described in :numref:`Contributor's Guide Section %s <tmp_files_bootstrap>`.
 
 Confidence intervals can be calculated from the sample of verification statistics obtained through the bootstrap algorithm. The most intuitive method is to simply take the appropriate quantiles of the sample of statistic(s). For example, if one wants a 95% CI, then one would take the 2.5 and 97.5 percentiles of the resulting sample. This method is called the percentile method, and has some nice properties. However, if the original sample is biased and/or has non-constant variance, then it is well known that this interval is too optimistic. The most robust, accurate, and well-behaved way to obtain accurate CIs from bootstrapping is to use the bias corrected and adjusted percentile method (or BCa). If there is no bias, and the variance is constant, then this method will yield the usual percentile interval. The only drawback to the approach is that it is computationally intensive. Therefore, both the percentile and BCa methods are available in MET, with the considerably more efficient percentile method being the default.
 
@@ -371,7 +371,7 @@ point_stat Configuration File
 
 The default configuration file for the Point-Stat tool named **PointStatConfig_default** can be found in the installed *share/met/config* directory. Another version is located in *scripts/config*. We encourage users to make a copy of these files prior to modifying their contents. The contents of the configuration file are described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
+Note that environment variables may be used when editing configuration files, as described in :numref:`config_env_vars`.
 
 ________________________
 
@@ -421,9 +421,9 @@ _________________________
 
 Setting up the **fcst** and **obs** dictionaries of the configuration file is described in :numref:`config_options`. The following are some special considerations for the Point-Stat tool.
 
-The **obs** dictionary looks very similar to the **fcst** dictionary. When the forecast and observation variables follow the same naming convention, one can easily copy over the forecast settings to the observation dictionary using **obs = fcst;**. However when verifying forecast data in NetCDF format or verifying against not-standard observation variables, users will need to specify the **fcst** and **obs** dictionaries separately. The number of fields specified in the **fcst** and **obs** dictionaries must match.
+The **obs** dictionary looks very similar to the **fcst** dictionary. When the forecast and observation variables follow the same naming convention, one can easily copy over the forecast settings to the observation dictionary using **obs = fcst;**. However when verifying forecast data in NetCDF format or verifying against non-standard observation variables, users will need to specify the **fcst** and **obs** dictionaries separately. The number of fields specified in the **fcst** and **obs** dictionaries must match.
 
-The **message_type** entry, defined in the **obs** dictionary, contains a comma-separated list of the message types to use for verification. At least one entry must be provided. The Point-Stat tool performs verification using observations for one message type at a time. See `Table 1.a Current Table A Entries in PREPBUFR mnemonic table <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_ for a list of the possible types. If using **obs = fcst;**, it can be defined in the forecast dictionary and the copied into the observation dictionary.
+The **message_type** entry, defined in the **obs** dictionary, contains a comma-separated list of the message types to use for verification. At least one entry must be provided. The Point-Stat tool performs verification using observations for one message type at a time. See `Table 1.a Current Table A Entries in PREPBUFR mnemonic table <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_ for a list of the possible types. If using **obs = fcst;**, it can be defined in the forecast dictionary and then copied into the observation dictionary.
 
 ________________________
 
@@ -438,7 +438,7 @@ ________________________
      prob_cat_thresh = [];
   }
 
-The **hira** dictionary that is very similar to the **interp** and **nbrhd** entries. It specifies information for applying the High Resolution Assessment (HiRA) verification logic described in section :numref:`PS_HiRA_framework`. The **flag** entry is a boolean which toggles HiRA on (**TRUE**) and off (**FALSE**). The **width** and **shape** entries define the neighborhood size and shape, respectively. Since HiRA applies to point observations, the width may be even or odd. The **vld_thresh** entry is the required ratio of valid data within the neighborhood to compute an output value. The **cov_thresh** entry is an array of probabilistic thresholds used to populate the Nx2 probabilistic contingency table written to the PCT output line and used for computing probabilistic statistics. The **prob_cat_thresh** entry defines the thresholds to be used in computing the ranked probability score in the RPS output line type. If left empty but climatology data is provided, the **climo_cdf** thresholds will be used instead of **prob_cat_thresh**.
+The **hira** dictionary is very similar to the **interp** and **nbrhd** entries. It specifies information for applying the High Resolution Assessment (HiRA) verification logic described in section :numref:`PS_HiRA_framework`. The **flag** entry is a boolean which toggles HiRA on (**TRUE**) and off (**FALSE**). The **width** and **shape** entries define the neighborhood size and shape, respectively. Since HiRA applies to point observations, the width may be even or odd. The **vld_thresh** entry is the required ratio of valid data within the neighborhood to compute an output value. The **cov_thresh** entry is an array of probabilistic thresholds used to populate the Nx2 probabilistic contingency table written to the PCT output line and used for computing probabilistic statistics. The **prob_cat_thresh** entry defines the thresholds to be used in computing the ranked probability score in the RPS output line type. If left empty but climatology data is provided, the **climo_cdf** thresholds will be used instead of **prob_cat_thresh**.
 
 ________________________
 
@@ -795,23 +795,23 @@ The first set of header columns are common to all of the output files generated 
     - Logarithm of the Odds Ratio including normal and bootstrap upper and lower confidence limits
     - Double
   * - 90-94
-    - ORSS, :raw-html:`<br />` ORSS _NCL, :raw-html:`<br />` ORSS _NCU, :raw-html:`<br />` ORSS _BCL, :raw-html:`<br />` ORSS _BCU
+    - ORSS, :raw-html:`<br />` ORSS_NCL, :raw-html:`<br />` ORSS_NCU, :raw-html:`<br />` ORSS_BCL, :raw-html:`<br />` ORSS_BCU
     - Odds Ratio Skill Score including normal and bootstrap upper and lower confidence limits
     - Double
   * - 95-99
-    - EDS, :raw-html:`<br />` EDS _NCL, :raw-html:`<br />` EDS _NCU, :raw-html:`<br />` EDS _BCL, :raw-html:`<br />` EDS _BCU
+    - EDS, :raw-html:`<br />` EDS_NCL, :raw-html:`<br />` EDS_NCU, :raw-html:`<br />` EDS_BCL, :raw-html:`<br />` EDS_BCU
     - Extreme Dependency Score including normal and bootstrap upper and lower confidence limits
     - Double
   * - 100-104
-    - SEDS, :raw-html:`<br />` SEDS _NCL, :raw-html:`<br />` SEDS _NCU, :raw-html:`<br />` SEDS _BCL, :raw-html:`<br />` SEDS _BCU
+    - SEDS, :raw-html:`<br />` SEDS_NCL, :raw-html:`<br />` SEDS_NCU, :raw-html:`<br />` SEDS_BCL, :raw-html:`<br />` SEDS_BCU
     - Symmetric Extreme Dependency Score including normal and bootstrap upper and lower confidence limits
     - Double
   * - 105-109
-    - EDI, :raw-html:`<br />` EDI _NCL, :raw-html:`<br />` EDI _NCU, :raw-html:`<br />` EDI _BCL, :raw-html:`<br />` EDI _BCU
+    - EDI, :raw-html:`<br />` EDI_NCL, :raw-html:`<br />` EDI_NCU, :raw-html:`<br />` EDI_BCL, :raw-html:`<br />` EDI_BCU
     - Extreme Dependency Index including normal and bootstrap upper and lower confidence limits
     - Double
   * - 111-113
-    - SEDI, :raw-html:`<br />` SEDI _NCL, :raw-html:`<br />` SEDI _NCU, :raw-html:`<br />` SEDI _BCL, :raw-html:`<br />` SEDI _BCU
+    - SEDI, :raw-html:`<br />` SEDI_NCL, :raw-html:`<br />` SEDI_NCU, :raw-html:`<br />` SEDI_BCL, :raw-html:`<br />` SEDI_BCU
     - Symmetric Extremal Dependency Index including normal and bootstrap upper and lower confidence limits
     - Double
   * - 115-117
@@ -922,7 +922,7 @@ The first set of header columns are common to all of the output files generated 
     - 10th, 25th, 50th, 75th, and 90th percentiles of the error including bootstrap upper and lower confidence limits
     - Double
   * - 96-98
-    - EIQR, :raw-html:`<br />` IQR _BCL, :raw-html:`<br />` IQR _BCU
+    - EIQR, :raw-html:`<br />` EIQR_BCL, :raw-html:`<br />` EIQR_BCU
     - The Interquartile Range of the error including bootstrap upper and lower confidence limits
     - Double
   * - 99-101
@@ -1580,7 +1580,7 @@ The first set of header columns are common to all of the output files generated 
     - Double
   * - 65-67
     - VDIFF_DIR, :raw-html:`<br />` VDIFF_DIR_BCL, :raw-html:`<br />` VDIFF_DIR_BCU
-    - Direction of the vector difference between the average forecast and average wind vectors including bootstrap upper and lower confidence limits
+    - Direction of the vector difference between the average forecast and average observed wind vectors including bootstrap upper and lower confidence limits
     - Double
   * - 68-70
     - SPEED_ERR, :raw-html:`<br />` SPEED_ERR_BCL, :raw-html:`<br />` SPEED_ERR_BCU
@@ -1596,7 +1596,7 @@ The first set of header columns are common to all of the output files generated 
     - Double
   * - 77-79
     - DIR_ABSERR, :raw-html:`<br />` DIR_ABSERR_BCL, :raw-html:`<br />` DIR_ABSERR_BCU
-    - Absolute value of DIR_ABSERR including bootstrap upper and lower confidence limits
+    - Absolute value of DIR_ERR including bootstrap upper and lower confidence limits
     - Double
   * - 80-84
     - ANOM_CORR, :raw-html:`<br />` ANOM_CORR_NCL, :raw-html:`<br />` ANOM_CORR_NCU, :raw-html:`<br />` ANOM_CORR_BCL, :raw-html:`<br />` ANOM_CORR_BCU
