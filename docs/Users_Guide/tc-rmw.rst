@@ -179,17 +179,17 @@ _______________________
   tangential_velocity_long_field_name = "Tangential Velocity";
 
 
-The **tangential_velocity_field_name** and **tangential_velocity_long_field_name** parameters define the field names to give the output tangential velocity grid in the netCDF output file. The parameters are used only if **compute_tangential_and_radial_winds** is set to TRUE.
+The **tangential_velocity_field_name** and **tangential_velocity_long_field_name** parameters define the field names to give the output tangential velocity grid in the NetCDF output file. The parameters are used only if **compute_tangential_and_radial_winds** is set to TRUE.
 
 _______________________
 
 .. code-block:: none
 
-  radial_velocity_field_name = "VT";
+  radial_velocity_field_name = "VR";
   radial_velocity_long_field_name = "Radial Velocity";
 
 
-The **radial_velocity_field_name** and **radial_velocity_long_field_name** parameters define the field names to give the output radial velocity grid in the netCDF output file. The parameters are used only if **compute_radial_and_radial_winds** is set to TRUE.
+The **radial_velocity_field_name** and **radial_velocity_long_field_name** parameters define the field names to give the output radial velocity grid in the NetCDF output file. The parameters are used only if **compute_tangential_and_radial_winds** is set to TRUE.
 
 
 tc_rmw Output File
@@ -199,7 +199,7 @@ The NetCDF output file contains the following dimensions:
 
 1. *track_point* - the track points corresponding to the model output valid times
 
-2. *pressure* - if any pressure levels are specified in the data variable list, they will be sorted and combined into a 3D NetCDF variable, which pressure as the vertical dimension and range and azimuth as the horizontal dimensions
+2. *pressure* - if any pressure levels are specified in the data variable list, they will be sorted and combined into a 3D NetCDF variable, with pressure as the vertical dimension and range and azimuth as the horizontal dimensions
 
 3. *range* - the radial dimension of the range-azimuth grid
 

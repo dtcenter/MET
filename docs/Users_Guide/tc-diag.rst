@@ -126,17 +126,17 @@ Configuring Domain Information
      }
   ];
 
-The **domain_info** entry is an array of dictionaries. Each dictionary consists of five entries. The **domain** entry is a user-specified string that provides a name for the domain. Each **domain** name must also appear in a **-deck** command line option, and the reverse is also true.
+The **domain_info** entry is an array of dictionaries. Each dictionary consists of five entries. The **domain** entry is a user-specified string that provides a name for the domain. Each **domain** name must also appear in a **-data** command line option, and the reverse is also true.
 
 The **n_range** entry is an integer specifying the number of equally spaced range intervals in the range-azimuth grid to be used for this data source.
 
-The **n_azimuth** entry is an integer specifying the number of equally spaced azimuth intervals in the range-azimuth grid to be used for this data source. The azimuthal grid spacing is 360 / **n_azimuth** degrees. Azimuths are defined by MET as *degrees clockwise* from due east. However, the TC-Diag Python code expects them as *radians counter-clockwise* from due east. The **tc_diag_driver/post_resample_driver.py** driver script performs the neccessary rotation and conversion operations.
+The **n_azimuth** entry is an integer specifying the number of equally spaced azimuth intervals in the range-azimuth grid to be used for this data source. The azimuthal grid spacing is 360 / **n_azimuth** degrees. Azimuths are defined by MET as *degrees clockwise* from due east. However, the TC-Diag Python code expects them as *radians counter-clockwise* from due east. The **tc_diag_driver/post_resample_driver.py** driver script performs the necessary rotation and conversion operations.
 
 The **delta_range_km** entry is a floating point value specifying the spacing of the range rings in kilometers.
 
 The **diag_script** entry is an array of strings. Each string specifies the path to a Python script to be executed to compute diagnostics from the transformed cylindrical coordinates data for this domain. When multiple Python diagnostics scripts are run, the union of the diagnostics computed are written to the output.
 
-The **override_diags** entry is an array of strings. Each string specifies the name of diagnostic value to be used for that domain. If set to an empty list, all diagnostics computed by the Python scripts in **diag_script** for that domain will be used. If non-empty, only the specific diagnostics listed will be used.
+The **override_diags** entry is an array of strings. Each string specifies the name of a diagnostic value to be used for that domain. If set to an empty list, all diagnostics computed by the Python scripts in **diag_script** for that domain will be used. If non-empty, only the specific diagnostics listed will be used.
 
 In the default configuration, seen above, the same Python script is run for both the *parent* and *nest* domains, each using a different configuration file. For the *parent* domain, all computed diagnostics are used since **override_diags** is empty. For the *nest* domain, only the specific diagnostics listed in **override_diags** are used to override the *parent* values. In general, diagnostics computed earlier in the list of **domain_info** entries can be overridden by diagnostics computed later in the list.
 
@@ -163,7 +163,7 @@ Configuring regridding options
      shape      = SQUARE;
   }
 
-The **regrid** dictionary is common to multiple MET tools and is described in :numref:`config_options`. It specifies how the input data should be regridded to cylindrical coordinates prior to compute diagnostics. It can be specified separately in each **data.field** array entry, described below. The default setting uses bilinear interpolation for all fields.
+The **regrid** dictionary is common to multiple MET tools and is described in :numref:`config_options`. It specifies how the input data should be regridded to cylindrical coordinates prior to computing diagnostics. It can be specified separately in each **data.field** array entry, described below. The default setting uses bilinear interpolation for all fields.
 
 Configuring Fields, Levels, and Domains
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -207,7 +207,7 @@ Configuring Vortex Removal Option
 
 .. code-block:: none
 
-  vortex_removel = FALSE;
+  vortex_removal = FALSE;
 
 The **vortex_removal** flag entry is a boolean specifying whether or not vortex removal logic should be applied.
 
@@ -233,7 +233,7 @@ If true, all input fields are read efficiently from each file in a single call. 
 These three flag entries are booleans specifying what output data types should be written. At least one of these flags must be set to true.
 
   - The **nc_cyl_grid_flag** entry controls the writing of a NetCDF file containing the cylindrical coordinate range-azimuth data used to compute the diagnostics. These files are written with a `_cyl_grid_{domain}.nc` suffix, where `{domain}` is the domain name specified in the configuration file. One output file is written for each combination of model track and domain.
-  - The **nc_diag_file** entry controls the writing of the computed diagnostics to a NetCDF file. These files are written with a `_diag.nc` suffix. One output file is written for each model track processed.
+  - The **nc_diag_flag** entry controls the writing of the computed diagnostics to a NetCDF file. These files are written with a `_diag.nc` suffix. One output file is written for each model track processed.
   - The **cira_diag_flag** entry controls the writing of the computed diagnostics to a formatted ASCII output file. These files are written with a `_diag.dat` suffix. One output file is written for each model track processed.
 
 .. code-block:: none
@@ -263,7 +263,7 @@ These output files contain tabular ASCII data with diagnostic values either extr
 
     - Diagnostic name (with or without the level) e.g. **SHR_MAG** for magnitude of wind shear
 
-    - Units string enclosed in parenthesis e.g. **(KT)** for knots
+    - Units string enclosed in parentheses e.g. **(KT)** for knots
 
     - The diagnostic values computed for each lead time e.g. **13 10 14 ...**
 
