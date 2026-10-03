@@ -552,7 +552,7 @@ Optional Arguments for ascii2nc
 
 9. The **-mask_poly** file option is a polyline masking file to filter the point observations spatially.
 
-10. The **-mask_sid** file|list option is a station ID masking file or a comma-separated list of station ID's to filter the point observations spatially. See the description of the "sid" entry in :numref:`config_options`.
+10. The **-mask_sid** file|list option is a station ID masking file or a comma-separated list of station IDs to filter the point observations spatially. See the description of the "sid" entry in :numref:`config_options`.
 
 11. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
@@ -673,7 +673,7 @@ Optional Arguments for madis2nc
 
 9. The **-mask_poly file** option defines a polyline masking file for filtering the point observations spatially.
 
-10. The **-mask_sid file|list** option is a station ID masking file or a comma-separated list of station ID's for filtering the point observations spatially. See the description of the "sid" entry in  :numref:`config_options`.
+10. The **-mask_sid file|list** option is a station ID masking file or a comma-separated list of station IDs for filtering the point observations spatially. See the description of the "sid" entry in  :numref:`config_options`.
 
 11. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
@@ -922,7 +922,7 @@ An example of the ioda2nc calling sequence is shown below:
    ioda.NC001007.2020031012.nc ioda2nc.2020031012.nc \
    -config IODA2NCConfig -v 3 -log run_ioda2nc.log
 
-In this example, the IODA2NC tool will reformat the data in the input ioda.NC001007.2020031012.nc file and write the output to a file named ioda2nc.2020031012.nc. The data to be processed is specified by IODA2NCConfig, log messages will be written to the ioda2nc.log file, and the verbosity level is three.
+In this example, the IODA2NC tool will reformat the data in the input ioda.NC001007.2020031012.nc file and write the output to a file named ioda2nc.2020031012.nc. The data to be processed is specified by IODA2NCConfig, log messages will be written to the run_ioda2nc.log file, and the verbosity level is three.
 
 ioda2nc Configuration File
 --------------------------
@@ -1099,7 +1099,7 @@ For the GOES-East and GOES-West data, computing the latitude and longitude pixel
       -method MAX
 
 
-When processing GOES data, the **-goes_qc** option may also be used to specify the acceptable quality control flag values. The example above regrids the GOES-East AOD values to NCEP Grid number 212 (which QC flags are high, medium, and low), writing to the output the maximum AOD value falling inside each grid box.
+When processing GOES data, the **-goes_qc** option may also be used to specify the acceptable quality control flag values. The example above regrids the GOES-East AOD values to NCEP Grid number 212 using only pixels whose QC flags are 0, 1, or 2 (high, medium, and low quality), writing to the output the maximum AOD value falling inside each grid box.
 
 The grid name or the grid definition can be given with the -field option when the grid information is missing from the input NetCDF file for the latitude_longitude projection. The latitude and longitude variable names should be defined by the user, and the grid information from the set_attr_grid is ignored in this case except nx and ny.
 

@@ -302,7 +302,7 @@ ____________________
   skip_const = FALSE;
 
 
-Setting **skip_const** to true tells Ensemble-Stat to exclude pairs where all the ensemble members and the observation have a constant value. For example, exclude points with zero precipitation amounts from all output line types. This option may be set separately for each **obs.field** entry. When set to false, constant points are and the observation rank is chosen at random.
+Setting **skip_const** to true tells Ensemble-Stat to exclude pairs where all the ensemble members and the observation have a constant value. For example, exclude points with zero precipitation amounts from all output line types. This option may be set separately for each **obs.field** entry. When set to false, constant points are included and the observation rank is chosen at random.
 
 ____________________
 
@@ -735,7 +735,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool is described b
     - Integer
   * - 49
     - ME_LT_OBS
-    - The Mean Error of the ensemble values less than or equal to their observations
+    - The Mean Error of the ensemble values less than their observations
     - Double
   * - 50
     - IGN_CONV_OERR
@@ -1056,7 +1056,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool is described b
     - Double
   * - 39-41
     - FSTDEV, :raw-html:`<br />` FSTDEV_NCL, :raw-html:`<br />` FSTDEV_NCU
-    - Standard deviation of the error including normal upper and lower confidence limits
+    - Standard deviation of the forecasts including normal upper and lower confidence limits
     - Double
   * - 42-43
     - OBAR_NCL, :raw-html:`<br />` OBAR_NCU
@@ -1064,7 +1064,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool is described b
     - Double
   * - 44-46
     - OSTDEV, :raw-html:`<br />` OSTDEV_NCL, :raw-html:`<br />` OSTDEV_NCU
-    - Standard deviation of the error including normal upper and lower confidence limits
+    - Standard deviation of the observations including normal upper and lower confidence limits
     - Double
   * - 47-49
     - PR_CORR, :raw-html:`<br />` PR_CORR_NCL, :raw-html:`<br />` PR_CORR_NCU
