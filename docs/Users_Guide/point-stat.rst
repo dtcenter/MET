@@ -97,7 +97,7 @@ _____________________
 
 To perform least squares interpolation of a gridded field at a location P, MET uses an **WxW** subgrid centered (as closely as possible) at P. :numref:`point_stat_fig1` shows the case where W = 5.
 
-If we denote the horizontal coordinate in this subgrid by x, and vertical coordinate by y, then we can assign coordinates to the point P relative to this subgrid. These coordinates are chosen so that the center of the grid is. For example, in :numref:`point_stat_fig1`, P has coordinates (-0.4, 0.2). Since the grid is centered near P, the coordinates of P should always be at most 0.5 in absolute value. At each of the vertices of the grid (indicated by black dots in the figure), we have data values. We would like to use these values to interpolate a value at P. We do this using least squares. If we denote the interpolated value by z, then we fit an expression of the form :math:`z=\alpha (x) + \beta (y) + \gamma` over the subgrid. The values of :math:`\alpha, \beta, \gamma` are calculated from the data values at the vertices. Finally, the coordinates (**x,y**) of P are substituted into this expression to give z, our least squares interpolated data value at P.
+If we denote the horizontal coordinate in this subgrid by x, and vertical coordinate by y, then we can assign coordinates to the point P relative to this subgrid. These coordinates are chosen so that the center of the grid is at the origin (0, 0). For example, in :numref:`point_stat_fig1`, P has coordinates (-0.4, 0.2). Since the grid is centered near P, the coordinates of P should always be at most 0.5 in absolute value. At each of the vertices of the grid (indicated by black dots in the figure), we have data values. We would like to use these values to interpolate a value at P. We do this using least squares. If we denote the interpolated value by z, then we fit an expression of the form :math:`z=\alpha (x) + \beta (y) + \gamma` over the subgrid. The values of :math:`\alpha, \beta, \gamma` are calculated from the data values at the vertices. Finally, the coordinates (**x,y**) of P are substituted into this expression to give z, our least squares interpolated data value at P.
 
 _______________________
 
@@ -1159,7 +1159,7 @@ The first set of header columns are common to all of the output files generated 
     - Data Type
   * - 24
     - PJC
-    - Probabilistic Joint/Continuous line type
+    - Probabilistic Joint and Conditional factorization line type
     - String
   * - 25
     - TOTAL

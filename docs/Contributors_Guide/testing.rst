@@ -169,7 +169,7 @@ Note that the unit tests are only run for develop/main branches or running via w
 A push event to a branch will not run the full unit test suite and therefore will not update the input data.
 
 In the *MET_unit_test* directory, there is a directory called *unit_test*.
-These files are the full set of fields and fields used for the unit tests.
+These files are the full set of input files used for the unit tests.
 **These files are used by the MET regression tests that are run locally.**
 
 First, add any new files to the *unit_test* directory so they will be available to the MET regression tests.
