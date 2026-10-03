@@ -101,7 +101,7 @@ The **spatial centroid distance** is the purely spatial part of the centroid sep
 
 .. math:: \sqrt{(\bar{x_1} - \bar{x_2})^2 + (\bar{y_1} - \bar{y_2})^2 }
 
-The **time centroid delta** is the difference between the time coordinates of the centroid. Since this is a simple difference, it can be either positive or negative.
+The **time centroid delta** is the difference between the time coordinates of the centroid. Unlike the other deltas, it is computed as "observed minus forecast". Since this is a simple difference, it can be either positive or negative.
 
 The **axis difference** is the smaller of the two angles that the two spatial axis planes make with each other. :numref:`mtd-axis_diff` shows the idea. In the figure, the axis angle would be reported as angle :math:`\alpha`, not angle :math:`\beta`.
 
@@ -293,7 +293,7 @@ ______________________
 
   min_volume = 2000;
 
-The **min_volume** entry tells MTD to throw away objects whose "volume" (as described elsewhere in this section) is smaller than the given value. Spacetime objects whose volume is less than this will not participate in the matching and merging process, and no attribute information will be written to the ASCII output files. The default value is 10,000. If this seems rather large, consider the following example: Suppose the user is running MTD on a :math:`600 \times 400` grid, using 24 time steps. Then the volume of the whole data field is 600 :math:`\times` 400 :math:`\times` 24 = 5,760,000 cells. An object of volume 10,000 represents only 10,000/5,760,000 = 1/576 of the total data field. Setting **min\_volume** too small will typically produce a very large number of small objects, slowing down the MTD run and increasing the size of the output files. The configuration options listed above are common to MODE and are described in :numref:`MODE-configuration-file`.
+The **min_volume** entry tells MTD to throw away objects whose "volume" (as described elsewhere in this section) is smaller than the given value. Spacetime objects whose volume is less than this will not participate in the matching and merging process, and no attribute information will be written to the ASCII output files. The default value is 2,000. If this seems rather large, consider the following example: Suppose the user is running MTD on a :math:`600 \times 400` grid, using 24 time steps. Then the volume of the whole data field is 600 :math:`\times` 400 :math:`\times` 24 = 5,760,000 cells. An object of volume 2,000 represents only 2,000/5,760,000 = 1/2,880 of the total data field. Setting **min\_volume** too small will typically produce a very large number of small objects, slowing down the MTD run and increasing the size of the output files. The configuration options listed above are common to MODE and are described in :numref:`MODE-configuration-file`.
 
 ______________________
 
