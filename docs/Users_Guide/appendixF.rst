@@ -375,7 +375,7 @@ The Gen-Ens-Prod, Ensemble-Stat, Series-Analysis, and MTD tools all have the abi
 .. code-block::
    :caption: Gen-Ens-Prod Command Line
 
-   gen_ens_prod ens1.nc ens2.nc ens3.nc ens4.nc -out ens_prod.nc -config GenEnsProd_config
+   gen_ens_prod -ens ens1.nc ens2.nc ens3.nc ens4.nc -out ens_prod.nc -config GenEnsProd_config
 
 In this case, a user is passing 4 ensemble members to Gen-Ens-Prod to be evaluated, and each member is in a separate file. If a user wishes to use Python embedding to process the ensemble input files, then the same exact command is used; however special modifications inside the GenEnsProd_config file are needed. In the config file dictionary, the user must set the **file_type** entry to either **PYTHON_NUMPY** or **PYTHON_XARRAY** to activate the Python embedding for these tools. Then, in the **name** entry of the config file dictionaries for the forecast or observation data, the user must list the **full path** to the Python script to be run. However, in the Python command, replace the name of the input gridded data file to the Python script with the constant string **MET_PYTHON_INPUT_ARG**. When looping over all of the input files, the MET tools will replace that constant **MET_PYTHON_INPUT_ARG** with the path to the input file currently being processed and optionally, any command line arguments for the Python script. Here is what this looks like in the GenEnsProd_config file for the above example:
 
@@ -390,7 +390,7 @@ In the event the user requires command line arguments to their Python script, th
 .. code-block::
    :caption: Gen-Ens-Prod Command Line with Python Args
 
-   gen_ens_prod ens1.nc,arg1,arg2 ens2.nc,arg1,arg2 ens3.nc,arg1,arg2 ens4.nc,arg1,arg2 \
+   gen_ens_prod -ens ens1.nc,arg1,arg2 ens2.nc,arg1,arg2 ens3.nc,arg1,arg2 ens4.nc,arg1,arg2 \
    -out ens_prod.nc -config GenEnsProd_config
 
 In this case, the user's Python script will receive "ens1.nc,arg1,arg2" as a single command line argument for each execution of the Python script (i.e. 1 time per file). The user must parse this argument inside their Python script to obtain **arg1** and **arg2** as separate arguments. The list of input files and optionally, any command line arguments can be written to a single file (called **python_input_list** in the example below) that is substituted for the file names and command line arguments. ASCII file list elements are white-space separated (space-separated in the example below), as described in :numref:`ascii_file_lists`. For example:
@@ -399,14 +399,14 @@ In this case, the user's Python script will receive "ens1.nc,arg1,arg2" as a sin
    :caption: Gen-Ens-Prod File List
 
    echo "file_list ens1.nc,arg1,arg2 ens2.nc,arg1,arg2 ens3.nc,arg1,arg2 ens4.nc,arg1,arg2" > python_input_list
-   gen_ens_prod python_input_list -out ens_prod.nc -config GenEnsProd_config
+   gen_ens_prod -ens python_input_list -out ens_prod.nc -config GenEnsProd_config
 
 Finally, the above tools do not require data files to be present on a local disk. If the user wishes, their Python script can obtain data from other sources based upon only the command line arguments to their Python script. For example:
 
 .. code-block::
    :caption: Gen-Ens-Prod Python Args Only
 
-   gen_ens_prod 20230101,0 20230102,0 20230103,0 -out ens_prod.nc -config GenEnsProd_config
+   gen_ens_prod -ens 20230101,0 20230102,0 20230103,0 -out ens_prod.nc -config GenEnsProd_config
 
 In the above command, each of the arguments "20230101,0", "20230102,0", and "20230103,0" are provided to the user's Python script in separate calls. Then, inside the Python script these arguments are used to construct a filename or query to a data server or other mechanism to return the desired data and format it the way MET expects inside the Python script, prior to calling Gen-Ens-Prod.
 
