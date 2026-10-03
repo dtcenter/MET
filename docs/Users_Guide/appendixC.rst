@@ -25,7 +25,7 @@ Which statistics are the same, but with different names?
   * - Gilbert Skill Score
     - Equitable Threat Score
   * - Hanssen and Kuipers Discriminant
-    - True Skill Statistic, Pierce's Skill Score
+    - True Skill Statistic, Peirce's Skill Score
   * - Heidke Skill Score
     - Cohen's K
   * - Odds Ratio Skill Score
@@ -327,7 +327,7 @@ The extreme dependency index measures the association between forecast and obser
 
 where *H* and *F* are the Hit Rate and False Alarm Rate, respectively.
 
-EDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of EDI = 1 (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
+EDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of EDI = 1 (:ref:`Ferro and Stephenson, 2011 <Ferro-2011>`).
 
 Symmetric Extreme Dependency Score (SEDS)
 -----------------------------------------
@@ -338,7 +338,7 @@ The symmetric extreme dependency score measures the association between forecast
 
 .. math:: \text{SEDS } = \frac{2 \ln [\frac{(n_{11} + n_{01}) (n_{11} + n_{10})}{T^2}]}{\ln (\frac{n_{11}}{T})} - 1.
 
-SEDS can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDS = 1 (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
+SEDS can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDS = 1 (:ref:`Ferro and Stephenson, 2011 <Ferro-2011>`).
 
 Symmetric Extremal Dependency Index (SEDI)
 ------------------------------------------
@@ -351,7 +351,7 @@ The symmetric extremal dependency index measures the association between forecas
 
 where :math:`H = \frac{n_{11}}{n_{11} + n_{01}}` and :math:`F = \frac{n_{10}}{n_{00} + n_{10}}` are the Hit Rate and False Alarm Rate, respectively.
 
-SEDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDI = 1. SEDI approaches 1 only as the forecast approaches perfection (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
+SEDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDI = 1. SEDI approaches 1 only as the forecast approaches perfection (:ref:`Ferro and Stephenson, 2011 <Ferro-2011>`).
 
 Bias-Adjusted Gilbert Skill Score (BAGSS)
 -----------------------------------------
@@ -463,7 +463,7 @@ Called "SP_CORR" in CNT :numref:`table_PS_format_info_CNT`
 
 The Spearman rank correlation coefficient (:math:`\rho_{s}`) is a robust measure of association that is based on the ranks of the forecast and observed values rather than the actual values. That is, the forecast and observed samples are ordered from smallest to largest and rank values (from 1 to **n**, where **n** is the total number of pairs) are assigned. The pairs of forecast-observed ranks are then used to compute a correlation coefficient, analogous to the Pearson correlation coefficient, **r**.
 
-A simpler formulation of the Spearman-rank correlation is based on differences between the each of the pairs of ranks (denoted as :math:`d_{i}`):
+A simpler formulation of the Spearman-rank correlation is based on differences between each of the pairs of ranks (denoted as :math:`d_{i}`):
 
 .. math:: \rho_{s} = \frac{6}{n(n^2 - 1)} \sum_{i=1}^n d_i^2
 
@@ -478,7 +478,7 @@ Kendall's Tau statistic ( :math:`\tau`) is a robust measure of the level of asso
 
 .. math:: \tau = \frac{N_C - N_D}{n(n - 1) / 2}
 
-where :math:`N_C` is the number of "concordant" pairs and :math:`N_D` is the number of "discordant" pairs. Concordant pairs are identified by comparing each pair with all other pairs in the sample; this can be done most easily by ordering all of the ( :math:`f_{i}, o_{i}`) pairs according to :math:`f_{i}`, in which case the :math:`o_{i}` values won't necessarily be in order. The number of concordant matches of a particular pair with other pairs is computed by counting the number of pairs (with larger values) for which the value of :math:`o_i` for the current pair is exceeded (that is, pairs for which the values of **f** and **o** are both larger than the value for the current pair). Once this is done, :math:`N_C` is computed by summing the counts for all pairs. The total number of possible pairs is :math:`N_C`; thus, the number of discordant pairs is :math:`N_D`.
+where :math:`N_C` is the number of "concordant" pairs and :math:`N_D` is the number of "discordant" pairs. Concordant pairs are identified by comparing each pair with all other pairs in the sample; this can be done most easily by ordering all of the ( :math:`f_{i}, o_{i}`) pairs according to :math:`f_{i}`, in which case the :math:`o_{i}` values won't necessarily be in order. The number of concordant matches of a particular pair with other pairs is computed by counting the number of pairs (with larger values) for which the value of :math:`o_i` for the current pair is exceeded (that is, pairs for which the values of **f** and **o** are both larger than the value for the current pair). Once this is done, :math:`N_C` is computed by summing the counts for all pairs. The total number of possible pairs is :math:`n(n - 1) / 2`; thus, the number of discordant pairs is :math:`N_D = n(n - 1) / 2 - N_C`.
 
 Like **r** and :math:`\rho_{s}`, Kendall's Tau ( :math:`\tau`) ranges between -1 and 1; a value of 1 indicates perfect association (concordance) and a value of -1 indicates perfect negative association. A value of 0 indicates that the forecasts and observations are not associated.
 
@@ -566,7 +566,7 @@ MAE is less influenced by large errors and also does not depend on the mean erro
 InterQuartile Range of the Errors (IQR)
 ---------------------------------------
 
-Called "IQR" in CNT output :numref:`table_PS_format_info_CNT`
+Called "EIQR" in CNT output :numref:`table_PS_format_info_CNT`
 
 The InterQuartile Range of the Errors (IQR) is the difference between the 75th and 25th percentiles of the errors. It is defined as :math:`\text{IQR} = p_{75} (f_i - o_i) - p_{25} (f_i - o_i)`.
 
@@ -741,7 +741,7 @@ Gradient Values
 
 Called "TOTAL", "FGBAR", "OGBAR", "MGBAR", "EGBAR", "S1", "S1_OG", "FGOG_RATIO", "FGMAG", "OGMAG", "MAG_RMSE", and "LAPLACE_RMSE" in GRAD output :numref:`table_GS_format_info_GRAD`
 
-These statistics are only computed by the Grid-Stat tool and require vectors. Here :math:`\nabla` is the gradient operator, which in this applications signifies the difference between adjacent grid points in both the grid-x and grid-y directions. TOTAL is the count of grid locations used in the calculations. The remaining measures are defined below:
+These statistics are only computed by the Grid-Stat tool and require vectors. Here :math:`\nabla` is the gradient operator, which in this application signifies the difference between adjacent grid points in both the grid-x and grid-y directions. TOTAL is the count of grid locations used in the calculations. The remaining measures are defined below:
 
 .. math::
   \text{FGBAR} = \text{Mean}|\nabla f| = \frac{1}{n} \sum_{i=1}^n | \nabla f_i|
@@ -891,7 +891,7 @@ The Brier score is the mean squared probability error. In MET, the Brier Score (
 
 .. math:: \text{BS} = \frac{1}{T} \sum_{i=1}^K [n_{i1} (1 - p_i)^2 + n_{i0} p_i^2]
 
-The equation you will most often see in references uses the individual probability forecasts ( :math:`\rho_{i}`) and the corresponding observations ( :math:`o_{i}`), and is given as :math:`\text{BS} = \frac{1}{T}\sum (p_i - o_i)^2`. This equation is equivalent when the midpoints of the binned probability values are used as the :math:`p_i` .
+The equation you will most often see in references uses the individual probability forecasts ( :math:`p_{i}`) and the corresponding observations ( :math:`o_{i}`), and is given as :math:`\text{BS} = \frac{1}{T}\sum (p_i - o_i)^2`. This equation is equivalent when the midpoints of the binned probability values are used as the :math:`p_i` .
 
 BS can be partitioned into three terms: (1) reliability, (2) resolution, and (3) uncertainty (:ref:`Murphy, 1987 <Murphy-1987>`).
 
@@ -977,7 +977,7 @@ The ideal forecast (i.e., one with perfect reliability) has conditional observed
 
 .. figure:: figure/appendixC-rel_diag.jpg
 
-	    Example of Reliability Diagram
+            Example of Reliability Diagram
 
 Receiver Operating Characteristic
 ---------------------------------
@@ -992,7 +992,7 @@ A ROC curve shows how well the forecast discriminates between two outcomes, so i
 
 .. figure:: figure/appendixC-roc_example.jpg
 
-	    Example of ROC Curve
+            Example of ROC Curve
 
 Area Under the ROC Curve (AUC)
 ------------------------------
@@ -1013,7 +1013,7 @@ MET Verification Measures for Ensemble Forecasts
 RPS
 ---
 
-Called "RPS" in RPS output :numref:`table_ES_header_info_es_out_ECNT`
+Called "RPS" in RPS output :numref:`table_ES_header_info_es_out_RPS`
 
 While the above probabilistic verification measures utilize dichotomous observations, the Ranked Probability Score (RPS, :ref:`Epstein, 1969 <Epstein-1969>`, :ref:`Murphy, 1969 <Murphy-1969>`) is the only probabilistic verification measure for discrete multiple-category events available in MET. It is assumed that the categories are ordinal as nominal categorical variables can be collapsed into sequences of binary predictands, which can in turn be evaluated with the above measures for dichotomous variables (:ref:`Wilks, 2011 <Wilks-2011>`). The RPS is the multi-category extension of the Brier score (:ref:`Tödter and Ahrens, 2012 <Tödter-2012>`), and is a proper score (:ref:`Mason, 2008 <Mason-2008>`).
 
@@ -1026,14 +1026,14 @@ To clarify, :math:`F_1 = f_1` is the first component of :math:`F_m`, :math:`F_2 
 
 .. math:: \text{RPS} = \sum_{m=1}^J (F_m - O_m)^2 = \sum_{m=1}^J BS_m,
 
-where :math:`BS_m` is the Brier score for the m-th category (:ref:`Tödter and Ahrens, 2012 <Tödter-2012>`). Subsequently, the RPS lends itself to a decomposition into reliability, resolution and uncertainty components, noting that each component is aggregated over the different categories; these are written to the columns named "RPS_REL", "RPS_RES" and "RPS_UNC" in RPS output :numref:`table_ES_header_info_es_out_ECNT`.
+where :math:`BS_m` is the Brier score for the m-th category (:ref:`Tödter and Ahrens, 2012 <Tödter-2012>`). Subsequently, the RPS lends itself to a decomposition into reliability, resolution and uncertainty components, noting that each component is aggregated over the different categories; these are written to the columns named "RPS_REL", "RPS_RES" and "RPS_UNC" in RPS output :numref:`table_ES_header_info_es_out_RPS`.
 
 CRPS
 ----
 
 Called "CRPS", "CRPSCL", "CRPS_EMP", "CRPS_EMP_FAIR" and "CRPSCL_EMP" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). In MET, the CRPS is calculated two ways: using a normal distribution fit to the ensemble forecasts (CRPS and CRPSCL), and using the empirical ensemble distribution (CRPS_EMP and CRPSCL_EMP). The empirical ensemble CRPS can be adjusted (bias corrected) by subtracting 1/(2*m) times the mean absolute difference of the ensemble members, where m is the ensemble size. This is reported as a separate statistic called CRPS_EMP_FAIR. In some cases, use of other distributions would be better.
+The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (:ref:`Gneiting et al., 2005 <Gneiting-2005>`). In MET, the CRPS is calculated two ways: using a normal distribution fit to the ensemble forecasts (CRPS and CRPSCL), and using the empirical ensemble distribution (CRPS_EMP and CRPSCL_EMP). The empirical ensemble CRPS can be adjusted (bias corrected) by subtracting 1/(2*m) times the mean absolute difference of the ensemble members, where m is the ensemble size. This is reported as a separate statistic called CRPS_EMP_FAIR. In some cases, use of other distributions would be better.
 
 WARNING: The normal distribution is probably a good fit for temperature and pressure, and possibly a not horrible fit for winds. However, the normal approximation will not work on most precipitation forecasts and may fail for many other atmospheric variables.
 
@@ -1041,7 +1041,7 @@ Closed form expressions for the CRPS are difficult to define when using data rat
 
 .. math:: \text{crps}_i (N( \mu, \sigma^2),y) = \sigma ( \frac{y - \mu}{\sigma} (2 \Phi (\frac{y - \mu}{\sigma}) -1) + 2 \phi (\frac{y - \mu}{\sigma}) - \frac{1}{\sqrt{\pi}})
 
-In this equation, the y represents the event threshold. The estimated mean and standard deviation of the ensemble forecasts ( :math:`\mu \text{ and } \sigma`) are used as the parameters of the normal distribution. The values of the normal distribution are represented by the probability density function (PDF) denoted by :math:`\Phi` and the cumulative distribution function (CDF), denoted in the above equation by :math:`\phi`.
+In this equation, the y represents the event threshold. The estimated mean and standard deviation of the ensemble forecasts ( :math:`\mu \text{ and } \sigma`) are used as the parameters of the normal distribution. The values of the normal distribution are represented by the probability density function (PDF) denoted by :math:`\phi` and the cumulative distribution function (CDF), denoted in the above equation by :math:`\Phi`.
 
 The overall CRPS is calculated as the average of the individual measures. In equation form:
 
@@ -1122,7 +1122,7 @@ The bias ratio (BIAS_RATIO) is computed when verifying an ensemble against gridd
 
   .. math:: \text{BIAS_RATIO} = \frac{ \text{ME}_{f >= o} }{ |\text{ME}_{f < o}| }
 
-A perfect forecast has ME = 0. Since BIAS_RATIO is computed as the high bias (ME_GE_OBS) divide by the absolute value of the low bias (ME_LT_OBS), a perfect forecast has BIAS_RATIO = 0/0, which is undefined. In practice, the high and low bias values are unlikely to be 0.
+A perfect forecast has ME = 0. Since BIAS_RATIO is computed as the high bias (ME_GE_OBS) divided by the absolute value of the low bias (ME_LT_OBS), a perfect forecast has BIAS_RATIO = 0/0, which is undefined. In practice, the high and low bias values are unlikely to be 0.
 
 The range for BIAS_RATIO is 0 to infinity. A score of 1 indicates that the high and low biases are equal. A score greater than 1 indicates that the high bias is larger than the magnitude of the low bias. A score less than 1 indicates the opposite behavior.
 
@@ -1131,7 +1131,7 @@ IGN
 
 Called "IGN" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-The ignorance score (IGN) is the negative logarithm of a predictive probability density function (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). In MET, the IGN is calculated based on a normal approximation to the forecast distribution (i.e. a normal pdf is fit to the forecast values). This approximation may not be valid, especially for discontinuous forecasts like precipitation, and also for very skewed forecasts. For a single normal distribution **N** with parameters :math:`\mu \text{ and } \sigma`, the ignorance score is
+The ignorance score (IGN) is the negative logarithm of a predictive probability density function (:ref:`Gneiting et al., 2005 <Gneiting-2005>`). In MET, the IGN is calculated based on a normal approximation to the forecast distribution (i.e. a normal pdf is fit to the forecast values). This approximation may not be valid, especially for discontinuous forecasts like precipitation, and also for very skewed forecasts. For a single normal distribution **N** with parameters :math:`\mu \text{ and } \sigma`, the ignorance score is
 
 .. math:: \text{ign} (N( \mu, \sigma),y) = \frac{1}{2} \ln (2 \pi \sigma^2 ) + \frac{(y - \mu)^2}{2\sigma^2}.
 
@@ -1149,7 +1149,7 @@ Observation Error Logarithmic Scoring Rules
 
 Called "IGN_CONV_OERR" and "IGN_CORR_OERR" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-One approach that is used to take observation error into account in a summary measure is to add error to the forecast by a convolution with the observation model (e.g., :ref:`Anderson, 1996 <Andersen-1996>`; :ref:`Hamill, 2001 <Hamill-2001>`; :ref:`Saetra et. al., 2004 <Saetra-2004>`; :ref:`Bröcker and Smith, 2007 <Bröcker-2007>`; :ref:`Candille et al., 2007 <Candille-2007>`; :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Röpnack et al., 2013 <Röpnack-2013>`). Specifically, suppose :math:`y=x+w`, where :math:`y` is the observed value, :math:`x` is the true value, and :math:`w` is the error. Then, if :math:`f` is the density forecast for :math:`x` and :math:`\nu` is the observation model, then the implied density forecast for :math:`y` is given by the convolution:
+One approach that is used to take observation error into account in a summary measure is to add error to the forecast by a convolution with the observation model (e.g., :ref:`Anderson, 1996 <Andersen-1996>`; :ref:`Hamill, 2001 <Hamill-2001>`; :ref:`Saetra et al., 2004 <Saetra-2004>`; :ref:`Bröcker and Smith, 2007 <Bröcker-2007>`; :ref:`Candille et al., 2007 <Candille-2007>`; :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Röpnack et al., 2013 <Röpnack-2013>`). Specifically, suppose :math:`y=x+w`, where :math:`y` is the observed value, :math:`x` is the true value, and :math:`w` is the error. Then, if :math:`f` is the density forecast for :math:`x` and :math:`\nu` is the observation model, then the implied density forecast for :math:`y` is given by the convolution:
 
 .. math:: (f*\nu)(y) = \int\nu(y|x)f(x)dx
 
@@ -1163,7 +1163,7 @@ One approach that is used to take observation error into account in a summary me
 
   .. math:: \text{IGN_CONV_OERR} = s(f,y) = \frac{1}{2}\log(2 \pi (\sigma^2 + c^2)) + \frac{(y - \mu)^2}{2 (\sigma^2 + c^2)}
 
-Another approach to incorporation of observation uncertainty into a measure is the error-correction approach. The approach merely ensures that the scoring rule, :math:`s`, is unbiased for a scoring rule :math:`s_0` if they have the same expected value. :ref:`Ferro, 2017 <Ferro-2017>` gives the error-corrected ignorance scoring rule (which is also proposer when :math:`w\sim N(0,c^2)`) as
+Another approach to incorporation of observation uncertainty into a measure is the error-correction approach. The approach merely ensures that the scoring rule, :math:`s`, is unbiased for a scoring rule :math:`s_0` if they have the same expected value. :ref:`Ferro, 2017 <Ferro-2017>` gives the error-corrected ignorance scoring rule (which is also proper when :math:`w\sim N(0,c^2)`) as
 
 .. only:: latex
 
@@ -1267,14 +1267,14 @@ The Uniform Fractions Skill Score (UFSS) is a reference statistic for the Fracti
 Forecast Rate
 -------------
 
-Called "F_rate" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
+Called "F_RATE" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
 
 The overall proportion of grid points with forecast events to total grid points in the domain. The forecast rate will match the observation rate in unbiased forecasts.
 
 Observation Rate
 ----------------
 
-Called "O_rate" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
+Called "O_RATE" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
 
 The overall proportion of grid points with observed events to total grid points in the domain. The forecast rate will match the observation rate in unbiased forecasts. This quantity is sometimes referred to as the base rate.
 

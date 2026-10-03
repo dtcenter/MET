@@ -5,12 +5,12 @@ Testing
 make test
 =========
 
-After MET has been compiled, run ``make test`` from the top-level directory to execute the scripts found in the ``scripts/examples`` directory. These scripts run a subset of the MET tools reading input data from the top-level ``data`` directory and configuration files from the ``scripts/config`` directory and write output to top-level ``out`` directory. Successful completion of these tests provides reasonable assurance that MET has been compiled well and is running properly. However, these sample scripts are not comprehensive and do not exercise all possible configuration options. So it's possible for the ``make test`` scripts to run without error, but for users to later encounter issues when running MET with new inputs files and configuration options.
+After MET has been compiled, run ``make test`` from the top-level directory to execute the scripts found in the ``scripts/examples`` directory. These scripts run a subset of the MET tools reading input data from the top-level ``data`` directory and configuration files from the ``scripts/config`` directory and write output to the top-level ``out`` directory. Successful completion of these tests provides reasonable assurance that MET has been compiled well and is running properly. However, these sample scripts are not comprehensive and do not exercise all possible configuration options. So it's possible for the ``make test`` scripts to run without error, but for users to later encounter issues when running MET with new input files and configuration options.
 
 Unit Tests
 ==========
 
-The MET unit tests offer much more thorough testing coverage of the MET tools than running ``make test``, as described above. These units tests provide the basis for the regression testing performed for each pull request. Logic exists in GitHub automation to run these unit tests and check for differences in the output. However, these unit tests can also be run locally and instructions for doing so are provided in this section.
+The MET unit tests offer much more thorough testing coverage of the MET tools than running ``make test``, as described above. These unit tests provide the basis for the regression testing performed for each pull request. Logic exists in GitHub automation to run these unit tests and check for differences in the output. However, these unit tests can also be run locally and instructions for doing so are provided in this section.
 
 Running Unit Tests
 ------------------
@@ -138,7 +138,7 @@ release so that it can be updated while preserving the test data used for an off
 For example, if the *main_v12.1* branch was created when the *12.1.0-rc1* release was created,
 then a data directory to store data for *v13.0* (or similar) should be created.
 
-Pull changes from develop to ensure that the latest version of script is used.
+Pull changes from develop to ensure that the latest version of the script is used.
 ::
 
     runas met_test
@@ -169,7 +169,7 @@ Note that the unit tests are only run for develop/main branches or running via w
 A push event to a branch will not run the full unit test suite and therefore will not update the input data.
 
 In the *MET_unit_test* directory, there is a directory called *unit_test*.
-These files are the full set of fields and fields used for the unit tests.
+These files are the full set of input files used for the unit tests.
 **These files are used by the MET regression tests that are run locally.**
 
 First, add any new files to the *unit_test* directory so they will be available to the MET regression tests.
@@ -189,7 +189,7 @@ If any of the files are very large, consider creating a subset of these files.
 For example, GRIB2 files can be subset with *wgrib2* and NetCDF files can be subset using NCO tools.
 After the updates have been made, run the script to update the test data tarfile.
 
-Pull changes from develop to ensure that the latest version of script is used.
+Pull changes from develop to ensure that the latest version of the script is used.
 ::
 
     runas met_test
@@ -202,7 +202,7 @@ If the script is linked from the home directory, run::
 
     ~/update_met_unit_test_data.sh v13.0
 
-This will save a copy the input data tarfile with the current date in YYYYMMDD format in case it needs to be recovered,
+This will save a copy of the input data tarfile with the current date in YYYYMMDD format in case it needs to be recovered,
 then create the tarfile using the contents of the *unit_test* directory.
 
 

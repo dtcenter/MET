@@ -7,7 +7,7 @@ TC-Stat Tool
 Introduction
 ============
 
-The TC-Stat tool ties together results from the TC-Pairs tool by providing summary statistics and filtering jobs on TCST output files. The TC-Stat tool requires TCST output from the TC-Pairs tool. See :numref:`tc_stat-output` of this user's guide for information on the TCST output format of the TC-Pairs tool. The TC-Stat tool supports several analysis job types. The **filter** job stratifies the TCST data using various conditions and thresholds described in :numref:`tc_stat-configuration-file`. The **summary** job produces summary statistics including frequency of superior performance, time-series independence calculations, and confidence intervals on the mean. The **rirw** job processes TCMPR lines, identifies adeck and bdeck rapid intensification or weakening events, populates a 2x2 contingency table, and derives contingency table statistics. The **probrirw job** processes PROBRIRW lines, populates an Nx2 probabilistic contingency table, and derives probabilistic statistics. The statistical aspects are described in :numref:`Statistical-aspects`, and practical use information for the TC-Stat tool is described in :numref:`Practical-information-1`.
+The TC-Stat tool ties together results from the TC-Pairs tool by providing summary statistics and filtering jobs on TCST output files. The TC-Stat tool requires TCST output from the TC-Pairs tool. See :numref:`tc_pairs-output` of this user's guide for information on the TCST output format of the TC-Pairs tool. The TC-Stat tool supports several analysis job types. The **filter** job stratifies the TCST data using various conditions and thresholds described in :numref:`tc_stat-configuration-file`. The **summary** job produces summary statistics including frequency of superior performance, time-series independence calculations, and confidence intervals on the mean. The **rirw** job processes TCMPR lines, identifies adeck and bdeck rapid intensification or weakening events, populates a 2x2 contingency table, and derives contingency table statistics. The **probrirw** job processes PROBRIRW lines, populates an Nx2 probabilistic contingency table, and derives probabilistic statistics. The statistical aspects are described in :numref:`Statistical-aspects`, and practical use information for the TC-Stat tool is described in :numref:`Practical-information-1`.
 
 .. _Statistical-aspects:
 
@@ -66,7 +66,7 @@ Probability of Rapid Intensification
 
 The TC-Stat tool can be used to accumulate multiple PROBRIRW lines and derive probabilistic statistics summarizing performance. The PROBRIRW line contains a probabilistic forecast for a specified intensity change along with the actual intensity change that occurred in the BEST track. Accurately forecasting the likelihood of large changes in intensity is a challenging problem and this job helps quantify a model's ability to do so.
 
-Users may specify several job command options to configure the behavior of this job. The TC-Stat tools reads the input PROBI lines, applies the configurable options to extract a forecast probability value and BEST track event, and bins those probabilistic pairs into an Nx2 contingency table. This job writes up to four probabilistic output line types summarizing the performance.
+Users may specify several job command options to configure the behavior of this job. The TC-Stat tool reads the input PROBI lines, applies the configurable options to extract a forecast probability value and BEST track event, and bins those probabilistic pairs into an Nx2 contingency table. This job writes up to four probabilistic output line types summarizing the performance.
 
 .. _Practical-information-1:
 
@@ -96,7 +96,7 @@ The usage statement for the TC-Stat tool includes the "job" term, which refers t
 Required Arguments for tc_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-lookin source** argument indicates the location of the input TCST files generated from tc_pairs. This argument can be used one or more times to specify the name of a TCST file or top-level directory containing TCST files to be processed. Multiple tcst files may be specified by using a wild card (\*).
+1. The **-lookin source** argument indicates the location of the input TCST files generated from tc_pairs. This argument can be used one or more times to specify the name of a TCST file or top-level directory containing TCST files to be processed. Multiple TCST files may be specified by using a wild card (\*).
 
 2. Either a configuration file must be specified with the **-config** option, or a **JOB COMMAND LINE** must be denoted. The **JOB COMMAND LINE** options are described in :numref:`tc_stat-configuration-file`.
 
@@ -229,7 +229,7 @@ Option 4. A forecast is verified when a watch/warning is NOT in effect
   column_str_name = ["WATCH_WARN"];
   column_str_val = ["NA"];
 
-Further information on the **column_str** and **init_str** fields are described below. Listing a comma-separated list of watch/warning types in the **column_str_val** field will be stratified by a single or multiple types of warnings.
+Further information on the **column_str** and **init_str** fields is described below. Listing a comma-separated list of watch/warning types in the **column_str_val** field will be stratified by a single or multiple types of warnings.
 
 _________________________
 
@@ -247,7 +247,7 @@ _________________________
   column_str_name = [];
   column_str_val  = [];
 
-The **column_str_name** and **column_str_val** fields stratify by performing string matching on non-numeric data columns. Specify a comma-separated list of columns names and values to be **included** in the analysis. The length of the **column_str_val** should match that of the **column_str_name**. Using the **-column_str name value** option within the job command lines may further refine these selections.
+The **column_str_name** and **column_str_val** fields stratify by performing string matching on non-numeric data columns. Specify a comma-separated list of column names and values to be **included** in the analysis. The length of the **column_str_val** should match that of the **column_str_name**. Using the **-column_str name value** option within the job command lines may further refine these selections.
 
 _________________________
 
@@ -256,7 +256,7 @@ _________________________
   column_str_exc_name = [];
   column_str_exc_val  = [];
 
-The **column_str_exc_name** and **column_str_exc_val** fields stratify by performing string matching on non-numeric data columns. Specify a comma-separated list of columns names and values to be **excluded** from the analysis. The length of the **column_str_exc_val** should match that of the **column_str_exc_name**. Using the **-column_str_exc name value** option within the job command lines may further refine these selections.
+The **column_str_exc_name** and **column_str_exc_val** fields stratify by performing string matching on non-numeric data columns. Specify a comma-separated list of column names and values to be **excluded** from the analysis. The length of the **column_str_exc_val** should match that of the **column_str_exc_name**. Using the **-column_str_exc name value** option within the job command lines may further refine these selections.
 
 _________________________
 
@@ -334,7 +334,7 @@ _________________________
   landfall_beg = "-24";
   landfall_end = "00";
 
-The **landfall, landfall_beg**, and **landfall_end** fields specify whether only those track points occurring near landfall should be retained. The landfall retention window is defined as the hours offset from the time of landfall. Landfall is defined as the last bmodel track point before the distance to land switches from water to land. When **landfall_end** is set to zero, the track is retained from the **landfall_beg** to the time of landfall. Using the **-landfall_window** option with the job command lines may further refine these selections. The **-landfall_window** job command option takes one or two arguments in HH[MMSS] format. Use one argument to define a symmetric time window. For example, **-landfall_window 06** defines the time window +/- six hours around the landfall time. Use two arguments to define an asymmetric time window. For example, **-landfall_window 00 12** defines the time window from the landfall event to twelve hours after.
+The **landfall, landfall_beg**, and **landfall_end** fields specify whether only those track points occurring near landfall should be retained. The landfall retention window is defined as the hours offset from the time of landfall. Landfall is defined as the last bmodel track point before the distance to land switches from water to land. When **landfall_end** is set to zero, the track is retained from the **landfall_beg** to the time of landfall. Using the **-landfall_window** option within the job command lines may further refine these selections. The **-landfall_window** job command option takes one or two arguments in HH[MMSS] format. Use one argument to define a symmetric time window. For example, **-landfall_window 06** defines the time window +/- six hours around the landfall time. Use two arguments to define an asymmetric time window. For example, **-landfall_window 00 12** defines the time window from the landfall event to twelve hours after.
 
 _________________________
 
@@ -415,7 +415,7 @@ This job produces summary statistics for the column name specified by the **-col
 3.
 "SUMMARY", which is followed by the total, mean (with confidence intervals), standard deviation, minimum value, percentiles (10th, 25th, 50th, 75th, 90th), maximum value, interquartile range, range, sum, time to independence, and frequency of superior performance.
 
-The output columns are shown below in :numref:`table_columnar_output_summary_tc_stat` The **-by** option can also be used one or more times to make this job more powerful. Rather than running the specified job once, it will be run once for each unique combination of the entries found in the column(s) specified with the **-by** option.
+The output columns are shown below in :numref:`table_columnar_output_summary_tc_stat`. The **-by** option can also be used one or more times to make this job more powerful. Rather than running the specified job once, it will be run once for each unique combination of the entries found in the column(s) specified with the **-by** option.
 
 .. _table_columnar_output_summary_tc_stat:
 
@@ -490,16 +490,16 @@ When using multiple "-by" options, use "CASE" to reference the full case informa
 
 The PROBRIRW job produces probabilistic contingency table counts and statistics defined by placing forecast probabilities and BEST track rapid intensification events into an Nx2 contingency table. Users may specify several job command options to configure the behavior of this job:
 
-• The **-prob_thresh n** option is required and defines which probability threshold should be evaluated. It determines which **PROB_i** column from the PROBRIRW line type is selected for the job. For example, use **-prob_thresh 30** to evaluate forecast probabilities of a 30 kt increase or use **-prob_thresh -30** to evaluate forecast probabilities of a 30 kt decrease in intensity. The default is a 30 kt increase.
+• The **-probrirw_thresh n** option is required and defines which probability threshold should be evaluated. It determines which **PROB_i** column from the PROBRIRW line type is selected for the job. For example, use **-probrirw_thresh 30** to evaluate forecast probabilities of a 30 kt increase or use **-probrirw_thresh -30** to evaluate forecast probabilities of a 30 kt decrease in intensity. There is no default value.
 
-• The **-prob_exact bool** option is a boolean defining whether the exact or maximum BEST track intensity change over the time window should be used. If true, the values in the **BDELTA** column are used. If false, the values in the **BDELTA_MAX** column are used. The default is true.
+• The **-probrirw_exact bool** option is a boolean defining whether the exact or maximum BEST track intensity change over the time window should be used. If true, the values in the **BDELTA** column are used. If false, the values in the **BDELTA_MAX** column are used. The default is false.
 
-• The **-probrirw_bdelta_thresh** threshold option defines the BEST track intensity change event threshold. This should typically be set consistent with the probability threshold (**-prob_thresh**) chosen above. The default is greater than or equal to 30 kts.
+• The **-probrirw_bdelta_thresh** threshold option defines the BEST track intensity change event threshold. This should typically be set consistent with the probability threshold (**-probrirw_thresh**) chosen above. The default is greater than or equal to 30 kts.
 
 • The **-probrirw_prob_thresh threshold_list** option defines the probability thresholds used to create the output Nx2 contingency table. The default is probability bins of width 0.1. These probabilities may be specified as a list (>0.00,>0.25,>0.50,>0.75,>1.00) or using shorthand notation (==0.25) for bins of equal width.
 
 • The **-out_line_type** option defines the output data that should be written. This job can write PCT, PSTD, PJC, and PRC output line types. The default is PCT and PSTD.  Please see :numref:`table_PS_format_info_PCT` through :numref:`table_PS_format_info_PRC` for more details.
 
-Users may also specify the **-out_alpha** option to define the alpha value for the confidence intervals in the PSTD output line type. Multiple values in the **RI_WINDOW** column cannot be combined in a single PROBRIRW job since the BEST track intensity threshold should change for each. Using the **-by RI_WINDOW** option or **-column_thresh RI_WINDOW ==24** option provide convenient ways avoiding this problem.
+Users may also specify the **-out_alpha** option to define the alpha value for the confidence intervals in the PSTD output line type. Multiple values in the **RI_WINDOW** column cannot be combined in a single PROBRIRW job since the BEST track intensity threshold should change for each. Using the **-by RI_WINDOW** option or **-column_thresh RI_WINDOW ==24** option provide convenient ways of avoiding this problem.
 
 Users should note that for the PROBRIRW line type, **PROBRI_PROB** is a derived column name. The -probrirw_thresh option defines the probabilities of interest (e.g. **-probrirw_thresh 30**) and the **PROBRI_PROB** column name refers to those probability values, regardless of their column number. For example, the job command options **-probrirw_thresh 30 -column_thresh PROBRI_PROB >0** select 30 kt probabilities and match probability values greater than 0.

@@ -84,7 +84,7 @@ pb2nc Configuration File
 
 The default configuration file for the PB2NC tool named **PB2NCConfig_default** can be found in the installed *share/met/config* directory. The version used for the installation test cases is available in *scripts/config*. It is recommended that users make a copy of configuration files prior to modifying their contents.
 
-Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
+Note that environment variables may be used when editing configuration files, as described in :numref:`config_env_vars`.
 
 ____________________
 
@@ -243,11 +243,11 @@ _____________________
       { key = 'D_MIXR';   val = 'MIXR';  },
       { key = 'D_PRMSL';  val = 'PRMSL'; },
       { key = 'D_PBL';    val = 'PBL';   },
-      { key = 'D_CAPE';   val = 'CAPE';  }
+      { key = 'D_CAPE';   val = 'CAPE';  },
       { key = 'D_MLCAPE'; val = 'MLCAPE';  }
    ];
 
-The BUFR variable names are not shared with other forecast data. This map is used to convert the BUFR name to the common name, like GRIB2. It allows to share the configuration for forecast data with PB2NC observation data. If there is no mapping, the BUFR variable name will be saved to output NetCDF file.
+The BUFR variable names are not shared with other forecast data. This map is used to convert the BUFR name to the common name, like GRIB2. It allows the configuration for forecast data to be shared with PB2NC observation data. If there is no mapping, the BUFR variable name will be saved to the output NetCDF file.
 
 _____________________
 
@@ -263,7 +263,7 @@ _____________________
 
    event_stack_flag = TOP;
 
-A PrepBUFR message may contain duplicate observations with different quality mark values. The **event_stack_flag** indicates whether to use the observations at the top of the event stack (observation values have had more quality control processing applied) or the bottom of the event stack (observation values have had no quality control processing applied). The flag value of **TOP** listed above indicates the observations with the most amount of quality control processing should be used, the **BOTTOM** option uses the data closest to raw values.
+A PrepBUFR message may contain duplicate observations with different quality mark values. The **event_stack_flag** indicates whether to use the observations at the top of the event stack (observation values have had more quality control processing applied) or the bottom of the event stack (observation values have had no quality control processing applied). The flag value of **TOP** listed above indicates the observations with the most amount of quality control processing should be used; the **BOTTOM** option uses the data closest to raw values.
 
 _____________________
 
@@ -286,7 +286,7 @@ _____________________
 
 The **time_summary** dictionary enables additional processing for observations with high temporal resolution. The **flag** entry toggles the **time_summary** on (**TRUE**) and off (**FALSE**). If the **raw_data** flag is set to TRUE, then both the individual observation values and the derived time summary value will be written to the output. If FALSE, only the summary values are written. Observations may be summarized across the user specified time period defined by the **beg** and **end** entries in HHMMSS format. The **step** entry defines the time between intervals in seconds. The **width** entry specifies the summary interval in seconds. It may either be set as an integer number of seconds for a centered time interval or a dictionary with beginning and ending time offsets in seconds.
 
-This example listed above does a 10-minute time summary (width = 600;) every 5 minutes (step = 300;) throughout the day (beg = "000000"; end = 235959";). The first interval will be from 23:55:00 the previous day through 00:04:59 of the current day. The second interval will be from 0:00:00 through 00:09:59. And so on.
+This example listed above does a 10-minute time summary (width = 600;) every 5 minutes (step = 300;) throughout the day (beg = "000000"; end = "235959";). The first interval will be from 23:55:00 the previous day through 00:04:59 of the current day. The second interval will be from 0:00:00 through 00:09:59. And so on.
 
 The two **width** settings listed above are equivalent. Both define a centered 10-minute time interval. Use the **beg** and **end** entries to define uncentered time intervals. The following example requests observations for one hour prior:
 
@@ -295,7 +295,7 @@ The two **width** settings listed above are equivalent. Both define a centered 1
    width = { beg = -3600; end = 0; }
 
 
-The summaries will only be calculated for the observations specified in the **grib_code** or **obs_var** entries. The **grib_code** entry is an array of integers while the **obs_var** entries is an array of strings. The supported summaries are **min** (minimum), **max** (maximum), **range, mean, stdev** (standard deviation), **median** and **p##** (percentile, with the desired percentile value specified in place of ##). If multiple summaries are selected in a single run, a string indicating the summary method applied will be appended to the output message type.
+The summaries will only be calculated for the observations specified in the **grib_code** or **obs_var** entries. The **grib_code** entry is an array of integers while the **obs_var** entry is an array of strings. The supported summaries are **min** (minimum), **max** (maximum), **range, mean, stdev** (standard deviation), **median** and **p##** (percentile, with the desired percentile value specified in place of ##). If multiple summaries are selected in a single run, a string indicating the summary method applied will be appended to the output message type.
 
 The **vld_freq** and **vld_thresh** entries specify the required ratio of valid data for an output time summary value to be computed. This option is only applied when these entries are set to non-zero values. The **vld_freq** entry specifies the expected frequency of observations in seconds. The width of the time window is divided by this frequency to compute the expected number of observations for the time window. The actual number of valid observations is divided by the expected number to compute the ratio of valid data. An output time summary value will only be written if that ratio is greater than or equal to the **vld_thresh** entry. Detailed information about which observations are excluded is provided at debug level 4.
 
@@ -396,12 +396,12 @@ Each NetCDF file generated by the PB2NC tool contains the dimensions and variabl
      - Integer instrument type value
      - Integer
    * - hdr_typ_table
-     - nhdr_typ,
-     - mxstr2 Lookup table containing unique message type strings
+     - nhdr_typ, mxstr2
+     - Lookup table containing unique message type strings
      - String
    * - hdr_sid_table
      - nhdr_sid, mxstr2
-     - mxstr2 Lookup table containing unique station ID strings
+     - Lookup table containing unique station ID strings
      - String
    * - hdr_vld_table
      - nhdr_vld, mxstr
@@ -429,27 +429,27 @@ ASCII2NC Tool
 
 This section describes how to run the ASCII2NC tool. The ASCII2NC tool is used to reformat ASCII point observations into the NetCDF format expected by the Point-Stat tool. For those users wishing to verify against point observations that are not available in PrepBUFR format, the ASCII2NC tool provides a way of incorporating those observations into MET. If the ASCII2NC tool is used to perform a reformatting step, no configuration file is needed. However, for more complex processing, such as summarizing time series observations, a configuration file may be specified. For details on the configuration file options, see :numref:`config_options` and example configuration files distributed with the MET code.
 
-While initial versions of the ASCII2NC tool only supported a simple 11 column ASCII point observation format, support for several additional formats has been added. It currently supports point observation data in the following formats:
+While initial versions of the ASCII2NC tool only supported a simple 11-column ASCII point observation format, support for several additional formats has been added. It currently supports point observation data in the following formats:
 
-• Default 11 column MET point observation format, as described in :numref:`table_reformat-point_ascii2nc_format`
+• Default 11-column MET point observation format, as described in :numref:`table_reformat-point_ascii2nc_format`
 
 • `little_r format <https://www2.mmm.ucar.edu/wrf/users/wrfda/OnlineTutorial/Help/littler.html>`_
 
-• `SURFace RADiation (SURFRAD) <http://www.esrl.noaa.gov/gmd/grad/surfrad/>`_ and Integrated Surface Irradiance Study (ISIS) formats
+• `SURFace RADiation (SURFRAD) <https://gml.noaa.gov/grad/surfrad/>`_ and Integrated Surface Irradiance Study (ISIS) formats
 
 • Western Wind and Solar Integration Study (WWSIS) format. WWSIS data are available by request from National Renewable Energy Laboratory (NREL) in Boulder, CO.
 
 • `AirNow DailyData_v2, AirNow HourlyData, and AirNow HourlyAQObs formats <https://www.epa.gov/outdoor-air-quality-data>`_. See the :ref:`MET_AIRNOW_STATIONS` environment variable.
 
-• `National Data Buoy (NDBC) Standard Meteorological Data format <https://www.ndbc.noaa.gov/measdes.shtml>`_. See the :ref:`MET_NDBC_STATIONS` environment variable.
+• `National Data Buoy (NDBC) Standard Meteorological Data format <https://www.ndbc.noaa.gov/faq/measdes.shtml>`_. See the :ref:`MET_NDBC_STATIONS` environment variable.
 
 • `International Soil Moisture Network (ISMN) Data format <https://ismn.bafg.de/en/>`_.
 
 • `International Arctic Buoy Programme (IABP) Data format <https://iabp.apl.uw.edu/>`_.
 
-• `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format <http://aeronet.gsfc.nasa.gov/>`_.
+• `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format <https://aeronet.gsfc.nasa.gov/>`_.
 
-• `U.S. Climate Reference Network (USCRN) Quality Controlled Datasets <https://www.ncei.noaa.gov/access/crn/qcdatasets.html>`_, where the specific data format is determined by the prefix and suffix of the input file name.
+• `U.S. Climate Reference Network (USCRN) Quality Controlled Datasets <https://www.ncei.noaa.gov/access/crn/products.html>`_, where the specific data format is determined by the prefix and suffix of the input file name.
 
 • Python embedding of point observations, as described in :numref:`pyembed-point-obs-data`. See example below in :numref:`ascii2nc-pyembed`.
 
@@ -469,7 +469,7 @@ The default ASCII point observation format consists of one row of data per obser
     - Text string containing the observation message type as described in the previous section on the PB2NC tool (max 40 characters).
   * - 2
     - Station_ID
-    - Text string containing the station id (max 40 characters).
+    - Text string containing the station ID (max 40 characters).
   * - 3
     - Valid_Time
     - Text string containing the observation valid time in YYYYMMDD_HHMMSS format.
@@ -501,7 +501,7 @@ The default ASCII point observation format consists of one row of data per obser
 ascii2nc Usage
 --------------
 
-Once the ASCII point observations have been formatted as expected, the ASCII file is ready to be processed by the ASCII2NC tool. The usage statement for ASCII2NC tool is shown below:
+Once the ASCII point observations have been formatted as expected, the ASCII file is ready to be processed by the ASCII2NC tool. The usage statement for the ASCII2NC tool is shown below:
 
 .. code-block:: none
 
@@ -529,7 +529,7 @@ Required Arguments for ascii2nc
 
    - a regular file
    - an ASCII file list, as described in :numref:`ascii_file_lists`
-   - a top-level diretory to be recursively searched for files matching the **-inputrx reg_exp**, described below
+   - a top-level directory to be recursively searched for files matching the **-inputrx reg_exp**, described below
 
 If using Python embedding with the **-format python** option, specify inputs as quoted strings containing the Python script to be run followed by any command line arguments for that script.
 
@@ -552,7 +552,7 @@ Optional Arguments for ascii2nc
 
 9. The **-mask_poly** file option is a polyline masking file to filter the point observations spatially.
 
-10. The **-mask_sid** file|list option is a station ID masking file or a comma-separated list of station ID's to filter the point observations spatially. See the description of the "sid" entry in :numref:`config_options`.
+10. The **-mask_sid** file|list option is a station ID masking file or a comma-separated list of station IDs to filter the point observations spatially. See the description of the "sid" entry in :numref:`config_options`.
 
 11. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
@@ -617,7 +617,7 @@ ascii2nc Output
 
 The NetCDF output of the ASCII2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
 
-"obs_vid" variable is replaced with "obs_gc" when the GRIB code is given instead of the variable names. In this case, the global attribute "use_var_id" does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
+"obs_vid" variable is replaced with "obs_gc" when the GRIB code is given instead of the variable names. In this case, the global attribute "use_var_id" does not exist or is set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related to variable names are not added.
 
 MADIS2NC Tool
 =============
@@ -663,7 +663,7 @@ Optional Arguments for madis2nc
 
 4. The **-config file** option specifies the configuration file to generate summaries of the fields in the ASCII files.
 
-5. The **-qc_dd list** option specifies a comma-separated list of QC flag values to be accepted(Z,C,S,V,X,Q,K,G,B).
+5. The **-qc_dd list** option specifies a comma-separated list of QC flag values to be accepted (Z,C,S,V,X,Q,K,G,B).
 
 6. The **-lvl_dim list** option specifies a comma-separated list of vertical level dimensions to be processed.
 
@@ -673,7 +673,7 @@ Optional Arguments for madis2nc
 
 9. The **-mask_poly file** option defines a polyline masking file for filtering the point observations spatially.
 
-10. The **-mask_sid file|list** option is a station ID masking file or a comma-separated list of station ID's for filtering the point observations spatially. See the description of the "sid" entry in  :numref:`config_options`.
+10. The **-mask_sid file|list** option is a station ID masking file or a comma-separated list of station IDs for filtering the point observations spatially. See the description of the "sid" entry in  :numref:`config_options`.
 
 11. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
@@ -748,7 +748,7 @@ madis2nc Output
 
 The NetCDF output of the MADIS2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
 
-"obs_vid" variable is replaced with "obs_gc" when the GRIB code is given instead of the variable names. In this case, the global attribute "use_var_id" does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
+"obs_vid" variable is replaced with "obs_gc" when the GRIB code is given instead of the variable names. In this case, the global attribute "use_var_id" does not exist or is set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related to variable names are not added.
 
 Starting from MET version 12.2.0, the GRIB codes were replaced with variable names which are defined in the **grib_var_map** dictionary within **Madis2NcConfig_default**.
 
@@ -761,7 +761,7 @@ The LIDAR2NC tool creates a NetCDF point observation file from a CALIPSO HDF dat
 lidar2nc Usage
 --------------
 
-The usage statement for LIDAR2NC tool is shown below:
+The usage statement for the LIDAR2NC tool is shown below:
 
 .. code-block:: none
 
@@ -864,7 +864,7 @@ We will not give a detailed description of each CALIPSO data product that lidar2
 IODA2NC Tool
 ============
 
-This section describes the IODA2NC tool which is used to reformat IODA (Interface for Observation Data Access) point observations from the `Joint Center for Satellite Data Assimilation (JCSDA) <http://jcsda.org>`_ into the NetCDF format expected by the MET statistics tools. An optional configuration file controls the processing of the point observations. The IODA2NC tool reads NetCDF point observation files created by the `IODA Converters <https://github.com/JCSDA-internal/ioda-converters>`_. Support for interfacing with data from IODA may be added in the future based on user feedback.
+This section describes the IODA2NC tool which is used to reformat IODA (Interface for Observation Data Access) point observations from the `Joint Center for Satellite Data Assimilation (JCSDA) <https://www.jcsda.org/>`_ into the NetCDF format expected by the MET statistics tools. An optional configuration file controls the processing of the point observations. The IODA2NC tool reads NetCDF point observation files created by the `IODA Converters <https://github.com/JCSDA-internal/ioda-converters>`_. Support for interfacing with data from IODA may be added in the future based on user feedback.
 
 ioda2nc Usage
 -------------
@@ -898,13 +898,13 @@ Required Arguments for ioda2nc
 Optional Arguments for ioda2nc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3. The **-config config_file** is a IODA2NCConfig file to filter the point observations and define time summaries.
+3. The **-config config_file** is an IODA2NCConfig file to filter the point observations and define time summaries.
 
-4. The **-obs_var var_list** setting is a comma-separated list of variables to be saved from input the input file (by defaults, saves "all").
+4. The **-obs_var var_list** setting is a comma-separated list of variables to be saved from the input file (by default, saves "all").
 
 5. The **-iodafile ioda_file** option specifies additional input IODA observation files to be processed.
 
-6. The **-valid_beg time** and **-valid_end time** options in YYYYMMDD[_HH[MMSS]] format overrides the retention time window from the configuration file.
+6. The **-valid_beg time** and **-valid_end time** options in YYYYMMDD[_HH[MMSS]] format override the retention time window from the configuration file.
 
 7. The  **-nmsg n** indicates the number of IODA records to process.
 
@@ -920,16 +920,16 @@ An example of the ioda2nc calling sequence is shown below:
 
    ioda2nc \
    ioda.NC001007.2020031012.nc ioda2nc.2020031012.nc \
-   -config IODA2NCConfig -v 3 -lg run_ioda2nc.log
+   -config IODA2NCConfig -v 3 -log run_ioda2nc.log
 
-In this example, the IODA2NC tool will reformat the data in the input ioda.NC001007.2020031012.nc file and write the output to a file named ioda2nc.2020031012.nc. The data to be processed is specified by IODA2NCConfig, log messages will be written to the ioda2nc.log file, and the verbosity level is three.
+In this example, the IODA2NC tool will reformat the data in the input ioda.NC001007.2020031012.nc file and write the output to a file named ioda2nc.2020031012.nc. The data to be processed is specified by IODA2NCConfig, log messages will be written to the run_ioda2nc.log file, and the verbosity level is three.
 
 ioda2nc Configuration File
 --------------------------
 
 The default configuration file for the IODA2NC tool named **IODA2NcConfig_default** can be found in the installed *share/met/config* directory. It is recommended that users make a copy of this file prior to modifying its contents.
 
-The IODA2NC configuration file is optional and only necessary when defining filtering the input observations or defining time summaries. The contents of the default IODA2NC configuration file are described below.
+The IODA2NC configuration file is optional and only necessary when filtering the input observations or defining time summaries. The contents of the default IODA2NC configuration file are described below.
 
 _____________________
 
@@ -985,7 +985,7 @@ _____________________
    ];
 
 This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of metadata for IODA data files.
-The "nlocs" is for the dimension name of the locations. The following key can be added: "nstring", "latitude" and "longitude".
+The "nlocs" is for the dimension name of the locations. The following keys can be added: "nstring", "latitude" and "longitude".
 
 _____________________
 
@@ -1014,7 +1014,7 @@ The NetCDF output of the IODA2NC tool is structured in the same way as the outpu
 Point2Grid Tool
 ===============
 
-The Point2Grid tool reads point observations from a MET NetCDF point obseravtion file, via python embedding, or from GOES NetCDF input files (especially, Aerosol Optical Depth) and creates a gridded NetCDF file. Future development may add support for additional input types.
+The Point2Grid tool reads point observations from a MET NetCDF point observation file, via Python embedding, or from GOES NetCDF input files (especially, Aerosol Optical Depth) and creates a gridded NetCDF file. Future development may add support for additional input types.
 
 point2grid Usage
 ----------------
@@ -1047,13 +1047,13 @@ Required Arguments for point2grid
 
 1. The **input_filename** argument indicates the name of the input file to be processed. The input can be a MET NetCDF point observation file generated by other MET tools or a GOES NetCDF AOD dataset. Python embedding for point observations is also supported, as described in :numref:`pyembed-point-obs-data`.
 
-The MET point observation NetCDF file name as **input_filename** argument is equivalent with "PYTHON_NUMPY=MET_BASE/python/examples/read_met_point_obs.py netcdf_filename".
+The MET point observation NetCDF file name as **input_filename** argument is equivalent to "PYTHON_NUMPY=MET_BASE/python/examples/read_met_point_obs.py netcdf_filename".
 
 2. The **to_grid** argument defines the output grid as: (1) a named grid, (2) the path to a gridded data file, or (3) an explicit grid specification string.
 
 3. The **output_filename** argument is the name of the output NetCDF file to be written.
 
-4. The **-field** string argument is a string that defines the data to be regridded. It may be used multiple times. If **-adp** option is given (for GOES AOD data), the name consists with the variable name from the input data file and the variable name from ADP data file (for example, "AOD_Smoke" or "AOD_Dust": getting AOD variable from the input data and applying smoke or dust variable from ADP data file).
+4. The **-field** string argument is a string that defines the data to be regridded. It may be used multiple times. If **-adp** option is given (for GOES AOD data), the name consists of the variable name from the input data file and the variable name from ADP data file (for example, "AOD_Smoke" or "AOD_Dust": getting AOD variable from the input data and applying smoke or dust variable from ADP data file).
 
 Optional Arguments for point2grid
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1064,7 +1064,7 @@ Optional Arguments for point2grid
 
 7. The **-goes_qc** flags option specifies a comma-separated list of quality control (QC) flags, for example "0,1". Only used if grid_mapping is set to "goes_imager_projection" and the QC variable exists. Note that the older **-qc** option name is also supported.
 
-9. The **-adp adp_filename** option provides an additional Aerosol Detection Product (ADP) information on aerosols, dust, and smoke. This option is ignored if the requested variable is not GOES AOD ("AOD_Dust" or "AOD_Smoke"). The gridded data is filtered by the presence of dust/smoke. If -goes_qc options are given, it's applied to QC of dust/smoke, too (First filtering with AOD QC values and the second filtering with dust/smoke QC values).
+8. The **-adp adp_filename** option provides an additional Aerosol Detection Product (ADP) information on aerosols, dust, and smoke. This option is ignored if the requested variable is not GOES AOD ("AOD_Dust" or "AOD_Smoke"). The gridded data is filtered by the presence of dust/smoke. If -goes_qc options are given, it's applied to QC of dust/smoke, too (First filtering with AOD QC values and the second filtering with dust/smoke QC values).
 
 9. The **-method type** option specifies the regridding method. The default method is UW_MEAN.
 
@@ -1099,7 +1099,7 @@ For the GOES-East and GOES-West data, computing the latitude and longitude pixel
       -method MAX
 
 
-When processing GOES data, the **-goes_qc** option may also be used to specify the acceptable quality control flag values. The example above regrids the GOES-East AOD values to NCEP Grid number 212 (which QC flags are high, medium, and low), writing to the output the maximum AOD value falling inside each grid box.
+When processing GOES data, the **-goes_qc** option may also be used to specify the acceptable quality control flag values. The example above regrids the GOES-East AOD values to NCEP Grid number 212 using only pixels whose QC flags are 0, 1, or 2 (high, medium, and low quality), writing to the output the maximum AOD value falling inside each grid box.
 
 The grid name or the grid definition can be given with the -field option when the grid information is missing from the input NetCDF file for the latitude_longitude projection. The latitude and longitude variable names should be defined by the user, and the grid information from the set_attr_grid is ignored in this case except nx and ny.
 
@@ -1138,7 +1138,7 @@ The point2grid tool will output a gridded NetCDF file containing the following:
 
 3. The variable specified in the -field string regridded to the grid defined in the **to_grid** argument.
 
-4. The count field which represents the number of point observations that were included calculating the value of the variable at that grid cell.
+4. The count field which represents the number of point observations that were included in calculating the value of the variable at that grid cell.
 
 5. The mask field which is a binary field representing the presence or lack thereof of point observations at that grid cell. A value of "1" indicates that there was at least one point observation within the bounds of that grid cell and a value of "0" indicates the lack of point observations at that grid cell.
 
@@ -1146,7 +1146,7 @@ The point2grid tool will output a gridded NetCDF file containing the following:
 
 7. The probability mask field which is a binary field that represents whether or not there is probability data at that grid point. Can be either "0" or "1" with "0" meaning the probability value does not exist and a value of "1" meaning that the probability value does exist.
 
-For MET observation input and CF complaint NetCDF input with 2D time variable: The latest observation time within the target grid is saved as the observation time. If the "valid_time" is configured at the configuration file, the valid_time from the configuration file is saved into the output file.
+For MET observation input and CF-compliant NetCDF input with 2D time variable: The latest observation time within the target grid is saved as the observation time. If the "valid_time" is configured in the configuration file, the valid_time from the configuration file is saved into the output file.
 
 point2grid Configuration File
 -----------------------------
@@ -1187,12 +1187,12 @@ _____________________
       { key = "15";    val = "TMAX"; },        // GRIB: Max Temperature
       ...
       { key = "lat_vname"; val = "NLAT"; },    // NetCDF latitude variable name
-      { key = "lon_vname"; val = "NLON"; },    // NetCDF longitude varialbe name
+      { key = "lon_vname"; val = "NLON"; },    // NetCDF longitude variable name
       ...
    ]
 
 This entry is an array of dictionaries, each containing a **GRIB code** string and matching **variable name** string which define a mapping of GRIB code to the output variable names.
-The latitude and longitude variables for NetCDF input can be overridden by the configurations. There are two special keys, **lat_vname** and **lon_vname**, are applied to the NetCDF input, not for a GRIB code.
+The latitude and longitude variables for NetCDF input can be overridden by the configurations. There are two special keys, **lat_vname** and **lon_vname**, which are applied to the NetCDF input, not for a GRIB code.
 
 Point NetCDF to ASCII Python Utility
 ====================================
@@ -1214,7 +1214,7 @@ For how to use the script, issue the command:
 IABP retrieval Python Utilities
 ====================================
 
-`International Arctic Buoy Programme (IABP) Data <https://iabp.apl.uw.edu/>`_ is one of the data types supported by ascii2nc.  A utility script that pulls all this data from the web and stores it locally, called get_iabp_from_web.py is included.  This script accesses the appropriate webpage and downloads the ascii files for all buoys.  It is straightforward, but can be time intensive as the archive of this data is extensive and files are downloaded one at a time.
+`International Arctic Buoy Programme (IABP) Data <https://iabp.apl.uw.edu/>`_ is one of the data types supported by ascii2nc.  A utility script that pulls all this data from the web and stores it locally, called get_iabp_from_web.py is included.  This script accesses the appropriate webpage and downloads the ASCII files for all buoys.  It is straightforward, but can be time intensive as the archive of this data is extensive and files are downloaded one at a time.
 
 The script can be found at:
 
@@ -1228,7 +1228,7 @@ For how to use the script, issue the command:
 
    python3 MET_BASE/python/utility/get_iabp_from_web.py -h
 
-Another IABP utility script is included for users, to be run after all files have been downloaded using get_iabp_from_web.py.  This script examines all the files and lists those files that contain entries that fall within a user specified range of days.  It is called find_iabp_in_timerange.py.
+Another IABP utility script is included for users, to be run after all files have been downloaded using get_iabp_from_web.py.  This script examines all the files and lists those files that contain entries that fall within a user-specified range of days.  It is called find_iabp_in_timerange.py.
 
 The script can be found at:
 

@@ -36,7 +36,7 @@ Users should be aware that in some cases, the C-language Python header files and
 
 The **NumPy**, **Xarray**, and **Pandas** Python packages are required by the Python scripts included with the MET software that facilitate the passing of data in memory. The **SciPy** and **YAML** Python packages are required by the tropical cyclone diagnostics Python scripts called by the TC-Diag tool. The **netCDF4** package is used for reading and writing temporary files for Python embedding, but only when the **MET_PYTHON_TMP_FORMAT** environment variable is set to `netcdf` at runtime.
 
-In addition to using **\-\-enable-python** with **configure** as mentioned above, the following environment variables must also be set prior to executing **configure**: **MET_PYTHON_BIN_EXE**, **MET_PYTHON_CC**, and **MET_PYTHON_LD**. These may either be set as environment variables or as command line options to **configure**. These environment variables are used when building MET to enable the compiler to find the requisite Python executable, header files, and libraries in the user's local filesystem. Fortunately, Python provides a way to set these variables properly. This frees the user from the necessity of having any expert knowledge of the compiling and linking process. Along with the **Python** executable in the users local Python installation, there should be another executable called **python3-config**, whose output can be used to set these environment variables as follows:
+In addition to using **\-\-enable-python** with **configure** as mentioned above, the following environment variables must also be set prior to executing **configure**: **MET_PYTHON_BIN_EXE**, **MET_PYTHON_CC**, and **MET_PYTHON_LD**. These may either be set as environment variables or as command line options to **configure**. These environment variables are used when building MET to enable the compiler to find the requisite Python executable, header files, and libraries in the user's local filesystem. Fortunately, Python provides a way to set these variables properly. This frees the user from the necessity of having any expert knowledge of the compiling and linking process. Along with the **Python** executable in the user's local Python installation, there should be another executable called **python3-config**, whose output can be used to set these environment variables as follows:
 
 • Set **MET_PYTHON_BIN_EXE** to the full path of the desired Python executable.
 
@@ -198,7 +198,7 @@ Alternatively, the user can choose to replace their special values with one of t
 
 .. _pyembed-grid-attrs:
 
-The grid entry in the **attrs** dictionary must contain the grid size and projection information in the same format that is used in the netCDF files written out by the MET tools. The value of this item in the dictionary can either be a string, or another dictionary. Examples of the **grid** entry defined as a string are:
+The grid entry in the **attrs** dictionary must contain the grid size and projection information in the same format that is used in the NetCDF files written out by the MET tools. The value of this item in the dictionary can either be a string, or another dictionary. Examples of the **grid** entry defined as a string are:
 
 • Using a named grid supported by MET:
 
@@ -349,7 +349,7 @@ Listed below is an example of running the Plot-Data-Plane tool to call a Python 
    'name="scripts/python/examples/read_ascii_numpy.py data/python/fcst.txt FCST";' \
    -title "Python enabled plot_data_plane"
 
-The first argument for the Plot-Data-Plane tool is the gridded data file to be read. When calling Python script that has a two-dimensional gridded dataplane stored in a NumPy N-D array object, set this to the constant string **PYTHON_NUMPY**. The second argument is the name of the output PostScript file to be written. The third argument is a string describing the data to be plotted. When calling a Python script, set **name** to the full path of the Python script to be run along with any command line arguments for that script. Lastly, the **-title** option is used to add a title to the plot. Note that any print statements included in the Python script will be printed to the screen. The above example results in the following log messages:
+The first argument for the Plot-Data-Plane tool is the gridded data file to be read. When calling a Python script that has a two-dimensional gridded dataplane stored in a NumPy N-D array object, set this to the constant string **PYTHON_NUMPY**. The second argument is the name of the output PostScript file to be written. The third argument is a string describing the data to be plotted. When calling a Python script, set **name** to the full path of the Python script to be run along with any command line arguments for that script. Lastly, the **-title** option is used to add a title to the plot. Note that any print statements included in the Python script will be printed to the screen. The above example results in the following log messages:
 
 .. code-block:: none
 
@@ -375,7 +375,7 @@ The Gen-Ens-Prod, Ensemble-Stat, Series-Analysis, and MTD tools all have the abi
 .. code-block::
    :caption: Gen-Ens-Prod Command Line
 
-   gen_ens_prod ens1.nc ens2.nc ens3.nc ens4.nc -out ens_prod.nc -config GenEnsProd_config
+   gen_ens_prod -ens ens1.nc ens2.nc ens3.nc ens4.nc -out ens_prod.nc -config GenEnsProd_config
 
 In this case, a user is passing 4 ensemble members to Gen-Ens-Prod to be evaluated, and each member is in a separate file. If a user wishes to use Python embedding to process the ensemble input files, then the same exact command is used; however special modifications inside the GenEnsProd_config file are needed. In the config file dictionary, the user must set the **file_type** entry to either **PYTHON_NUMPY** or **PYTHON_XARRAY** to activate the Python embedding for these tools. Then, in the **name** entry of the config file dictionaries for the forecast or observation data, the user must list the **full path** to the Python script to be run. However, in the Python command, replace the name of the input gridded data file to the Python script with the constant string **MET_PYTHON_INPUT_ARG**. When looping over all of the input files, the MET tools will replace that constant **MET_PYTHON_INPUT_ARG** with the path to the input file currently being processed and optionally, any command line arguments for the Python script. Here is what this looks like in the GenEnsProd_config file for the above example:
 
@@ -390,7 +390,7 @@ In the event the user requires command line arguments to their Python script, th
 .. code-block::
    :caption: Gen-Ens-Prod Command Line with Python Args
 
-   gen_ens_prod ens1.nc,arg1,arg2 ens2.nc,arg1,arg2 ens3.nc,arg1,arg2 ens4.nc,arg1,arg2 \
+   gen_ens_prod -ens ens1.nc,arg1,arg2 ens2.nc,arg1,arg2 ens3.nc,arg1,arg2 ens4.nc,arg1,arg2 \
    -out ens_prod.nc -config GenEnsProd_config
 
 In this case, the user's Python script will receive "ens1.nc,arg1,arg2" as a single command line argument for each execution of the Python script (i.e. 1 time per file). The user must parse this argument inside their Python script to obtain **arg1** and **arg2** as separate arguments. The list of input files and optionally, any command line arguments can be written to a single file (called **python_input_list** in the example below) that is substituted for the file names and command line arguments. ASCII file list elements are white-space separated (space-separated in the example below), as described in :numref:`ascii_file_lists`. For example:
@@ -399,14 +399,14 @@ In this case, the user's Python script will receive "ens1.nc,arg1,arg2" as a sin
    :caption: Gen-Ens-Prod File List
 
    echo "file_list ens1.nc,arg1,arg2 ens2.nc,arg1,arg2 ens3.nc,arg1,arg2 ens4.nc,arg1,arg2" > python_input_list
-   gen_ens_prod python_input_list -out ens_prod.nc -config GenEnsProd_config
+   gen_ens_prod -ens python_input_list -out ens_prod.nc -config GenEnsProd_config
 
 Finally, the above tools do not require data files to be present on a local disk. If the user wishes, their Python script can obtain data from other sources based upon only the command line arguments to their Python script. For example:
 
 .. code-block::
    :caption: Gen-Ens-Prod Python Args Only
 
-   gen_ens_prod 20230101,0 20230102,0 20230103,0 -out ens_prod.nc -confg GenEnsProd_config
+   gen_ens_prod -ens 20230101,0 20230102,0 20230103,0 -out ens_prod.nc -config GenEnsProd_config
 
 In the above command, each of the arguments "20230101,0", "20230102,0", and "20230103,0" are provided to the user's Python script in separate calls. Then, inside the Python script these arguments are used to construct a filename or query to a data server or other mechanism to return the desired data and format it the way MET expects inside the Python script, prior to calling Gen-Ens-Prod.
 
@@ -568,7 +568,7 @@ The MET Pair-Stat tool also supports Python embedding of matched pair (MPR) data
 
 .. note::
 
-   While Stat-Analysis can read all STAT line types through Python embedding, Pair-Stat only reads the MPR line type. Note that the MET statistics tools write all output line types to a STAT file, but can also be configured to write each line type to separate text (TXT) files. The example below reads data from an MPR text file generated by Point-Stat where each line has the same number of columns. It will not work for STAT files, in general, where the number of columns vary by line type.
+   While Stat-Analysis can read all STAT line types through Python embedding, Pair-Stat only reads the MPR line type. Note that the MET statistics tools write all output line types to a STAT file, but can also be configured to write each line type to separate text (TXT) files. The example below reads data from an MPR text file generated by Point-Stat where each line has the same number of columns. It will not work for STAT files, in general, where the number of columns varies by line type.
 
 Python Script Requirements for MPR Data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -577,7 +577,7 @@ Python Script Requirements for MPR Data
 
 2. The **mpr_data** variable must be a Python list representation of a NumPy N-D Array created from a Pandas DataFrame
 
-3. The **met_data** variable must have data in **exactly** 36 columns for MPR data, corresponding to the summation of the :ref:`common STAT output<table_PS_header_info_point-stat_out>` and the :ref:`MPR line type output<table_PS_format_info_MPR>`.
+3. The **mpr_data** variable must have data in **exactly** 36 columns for MPR data, corresponding to the summation of the :ref:`common STAT output<table_PS_header_info_point-stat_out>` and the :ref:`MPR line type output<table_PS_format_info_MPR>`.
 
 If a user does not have an existing MPR line type file created by the MET tools, they will need to map their data into the 36 columns expected by Stat-Analysis for the MPR line type data. If a user already has MPR line type files, the most direct way for a user to read MPR line type data is to model their Python script after the sample **read_ascii_mpr.py** script. Sample code is included here for convenience:
 

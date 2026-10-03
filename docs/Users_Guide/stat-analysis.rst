@@ -9,7 +9,7 @@ Introduction
 
 The Stat-Analysis tool ties together results from the Point-Stat, Grid-Stat, Ensemble-Stat, Wavelet-Stat, and TC-Gen tools by providing summary statistical information and a way to filter their STAT output files. It processes the STAT output created by the other MET tools in a variety of ways which are described in this section.
 
-MET version 9.0 adds support for the passing matched pair data (MPR) into Stat-Analysis using a Python script with the "-lookin python ..." option. An example of running Stat-Analysis with Python embedding can be found in :numref:`Appendix F, Section %s <appendixF>`.
+MET version 9.0 adds support for passing matched pair data (MPR) into Stat-Analysis using a Python script with the "-lookin python ..." option. An example of running Stat-Analysis with Python embedding can be found in :numref:`Appendix F, Section %s <appendixF>`.
 
 Scientific and Statistical Aspects
 ==================================
@@ -29,7 +29,7 @@ The Stat-Analysis "summary" job produces summary information for columns of data
 
 Confidence intervals are computed for the mean and standard deviation of the column of data. For the mean, the confidence interval is computed two ways - based on an assumption of normality and also using the bootstrap method. For the standard deviation, the confidence interval is computed using the bootstrap method. In this application of the bootstrap method, the values in the column of data being summarized are resampled, and for each replicated sample, the mean and standard deviation are computed.
 
-The columns to be summarized can be specified in one of two ways. Use the **-line_type** option exactly once to specify a single input line type and use the **-column** option one or more times to select the columns of data to be summarized. Alternatively, use the **-column** option one or more times formatting the entries as **LINE_TYPE:COLUMN**. For example, the RMSE column from the CNT line type can be selected using **-line_type CNT -column RMSE** or using **-column CNT:RMSE**. With the second option, columns from multiple input line types may be selected. For example, **-column CNT:RMSE,CNT:MAE,CTS:CSI** select two CNT columns and one CTS column.
+The columns to be summarized can be specified in one of two ways. Use the **-line_type** option exactly once to specify a single input line type and use the **-column** option one or more times to select the columns of data to be summarized. Alternatively, use the **-column** option one or more times formatting the entries as **LINE_TYPE:COLUMN**. For example, the RMSE column from the CNT line type can be selected using **-line_type CNT -column RMSE** or using **-column CNT:RMSE**. With the second option, columns from multiple input line types may be selected. For example, **-column CNT:RMSE,CNT:MAE,CTS:CSI** selects two CNT columns and one CTS column.
 
 The WMO mean values are computed in one of three ways, as determined by the configuration file settings for **wmo_sqrt_stats** and **wmo_fisher_stats**. The statistics listed in the first option are square roots. When computing WMO means, the input values are first squared, then averaged, and the square root of the average value is reported. The statistics listed in the second option are correlations to which the Fisher transformation is applied. For any statistic not listed, the WMO mean is computed as a simple arithmetic mean. The **WMO_TYPE** output column indicates the method applied (**SQRT, FISHER**, or **MEAN**). The **WMO_MEAN** and **WMO_WEIGHTED_MEAN** columns contain the unweighted and weighted means, respectively. The value listed in the **TOTAL** column of each input line is used as the weight.
 
@@ -45,9 +45,9 @@ The Stat-Analysis "aggregate" job aggregates values from multiple STAT lines of 
 Aggregate STAT Lines and Produce Aggregated Statistics
 ------------------------------------------------------
 
-The Stat-Analysis "aggregate-stat" job aggregates multiple STAT lines of the same type together and produces relevant statistics from the aggregated line. This may be done in the same manner listed above in :numref:`StA_Aggregated-values-from`. However, rather than writing out the aggregated STAT line itself, the relevant statistics generated from that aggregated line are provided in the output. Specifically, if a contingency table line type (FHO, CTC, PCT, MCTC, or NBRCTC) has been aggregated, contingency table statistics (CTS, ECLV, PSTD, MCTS, or NBRCTS) line types can be computed. If a partial sums line type (SL1L2 or SAL1L2) has been aggregated, the continuous statistics (CNT) line type can be computed. If a vector partial sums line type (VL1L2 or VAL1L2) has been aggregated, the vector continuous statistics (VCNT) line type can be computed. For ensembles, the ORANK line type can be accumulated into ECNT, RPS, RHIST, PHIST, RELP, or SSVAR output. If a SEEPS matched pair line type (SEEPS_MPR) has been aggregated, the aggregated SEEPS line type (SEEPS) can be computed. If the matched pair line type (MPR) has been aggregated, may output line types (FHO, CTC, CTS, CNT, MCTC, MCTS, SL1L2, SAL1L2, VL1L2, VCNT, WDIR, PCT, PSTD, PJC, PRC, or ECLV) can be computed. Multiple output line types may be specified for each "aggregate-stat" job, as long as each output is derivable from the input.
+The Stat-Analysis "aggregate-stat" job aggregates multiple STAT lines of the same type together and produces relevant statistics from the aggregated line. This may be done in the same manner listed above in :numref:`StA_Aggregated-values-from`. However, rather than writing out the aggregated STAT line itself, the relevant statistics generated from that aggregated line are provided in the output. Specifically, if a contingency table line type (FHO, CTC, PCT, MCTC, or NBRCTC) has been aggregated, contingency table statistics (CTS, ECLV, PSTD, MCTS, or NBRCTS) line types can be computed. If a partial sums line type (SL1L2 or SAL1L2) has been aggregated, the continuous statistics (CNT) line type can be computed. If a vector partial sums line type (VL1L2 or VAL1L2) has been aggregated, the vector continuous statistics (VCNT) line type can be computed. For ensembles, the ORANK line type can be accumulated into ECNT, RPS, RHIST, PHIST, RELP, or SSVAR output. If a SEEPS matched pair line type (SEEPS_MPR) has been aggregated, the aggregated SEEPS line type (SEEPS) can be computed. If the matched pair line type (MPR) has been aggregated, many output line types (FHO, CTC, CTS, CNT, MCTC, MCTS, SL1L2, SAL1L2, VL1L2, VCNT, WDIR, PCT, PSTD, PJC, PRC, or ECLV) can be computed. Multiple output line types may be specified for each "aggregate-stat" job, as long as each output is derivable from the input.
 
-When aggregating the matched pair line type (MPR), additional required job command options are determined by the requested output line type(s). For example, the "-out_thresh" (or "-out_fcst_thresh" and  "-out_obs_thresh" options) are required to compute contingnecy table counts (FHO, CTC) or statistics (CTS). Those same job command options can also specify filtering thresholds when computing continuous partial sums (SL1L2, SAL1L2) or statistics (CNT). Output is written for each threshold specified.
+When aggregating the matched pair line type (MPR), additional required job command options are determined by the requested output line type(s). For example, the "-out_thresh" (or "-out_fcst_thresh" and  "-out_obs_thresh" options) are required to compute contingency table counts (FHO, CTC) or statistics (CTS). Those same job command options can also specify filtering thresholds when computing continuous partial sums (SL1L2, SAL1L2) or statistics (CNT). Output is written for each threshold specified.
 
 When aggregating the matched pair line type (MPR) and computing an output contingency table statistics (CTS) or continuous statistics (CNT) line type, the bootstrapping method can be applied to compute confidence intervals. The bootstrapping method is applied here in the same way that it is applied in the statistics tools. For a set of n matched forecast-observation pairs, the matched pairs are resampled with replacement many times. For each replicated sample, the corresponding statistics are computed. The confidence intervals are derived from the statistics computed for each replicated sample.
 
@@ -60,17 +60,17 @@ The Stat-Analysis "ss_index", "go_index", and "cbs_index" jobs calculate skill s
 
 In general, a skill score index is computed over several terms and the number and definition of those terms is configurable. It is computed by aggregating the output from earlier runs of the Point-Stat and/or Grid-Stat tools over one or more cases. When configuring a skill score index job, the following requirements apply:
 
-1. Exactly two models names must be chosen. The first is interpreted as the forecast model and the second is the reference model, against which the performance of the forecast should be measured. Specify this with the "model" configuration file entry or using the "-model" job command option.
+1. Exactly two model names must be chosen. The first is interpreted as the forecast model and the second is the reference model, against which the performance of the forecast should be measured. Specify this with the "model" configuration file entry or using the "-model" job command option.
 
 2. The forecast variable name, level, lead time, line type, column, and weight options must be specified. If the value remains constant for all the terms, set it to an array of length one. If the value changes for at least one term, specify an array entry for each term. Specify these with the "fcst_var", "fcst_lev", "lead_time", "line_type", "column", and "weight" configuration file entries, respectively, or use the corresponding job command options.
 
-3. While these line types are required, additional options may be provided for each term, including the observation type ("obtype"), verification region ("vx_mask"), and interpolation method ("interp_mthd"). Specify each as single value or provide a value for each term.
+3. While these line types are required, additional options may be provided for each term, including the observation type ("obtype"), verification region ("vx_mask"), and interpolation method ("interp_mthd"). Specify each as a single value or provide a value for each term.
 
 4. Only the SL1L2 and CTC input line types are supported, and the input Point-Stat and/or Grid-Stat output must contain these line types.
 
 5. For the SL1L2 line type, set the "column" entry to the CNT output column that contains the statistic of interest (e.g. RMSE for root-mean-squared-error). Note, only those continuous statistics that are derivable from SL1L2 lines can be used.
 
-6. For the CTC line type, set the "column" entry to the CTS output column that contains the statistic of intereest (e.g. PODY for probability of detecting yes). Note, consider specifying the "fcst_thresh" for the CTC line type.
+6. For the CTC line type, set the "column" entry to the CTS output column that contains the statistic of interest (e.g. PODY for probability of detecting yes). Note, consider specifying the "fcst_thresh" for the CTC line type.
 
 For each term, all matching SL1L2 (or CTC) input lines are aggregated separately for the forecast and reference models. The requested statistic ("column") is derived from the aggregated partial sums or counts. For each term, a skill score is defined as:
 
@@ -258,7 +258,7 @@ Once the appropriate lines have been generated for each verification time of int
 
 2. For the "AGGR_WDIR" line, the input VL1L2 lines are first aggregated into a single line of partial sums where the weight for each line is determined by the number of points it represents. From this aggregated line, the mean forecast wind direction, observation wind direction, and the associated error are computed and written out.
 
-Note that wind direction is undefined for zero length vectors. Any inputs with zero length forecast or observation vectors are automatically excluded from the "ROW_MEAN_WDIR" output line since the direction error is also undefined. However, those inputs are included in the aggregated statistics in the "AGGR_WDIR" output line. For this reason, the "TOTAL" column value, indicating the number of inputs used, may larger in "AGGR_WDIR" than "ROW_MEAN_WDIR", from which zero length vectors have been excluded. Users can also specify the "-out_wind_thresh gt0 -out_wind_logic INTERSECTION" job command options to explicitly exclude all pairs containing zero length vectors from the analysis. In that case, the "ROW_MEAN_WDIR" and "AGGR_WDIR" "TOTAL" column values would match.
+Note that wind direction is undefined for zero length vectors. Any inputs with zero length forecast or observation vectors are automatically excluded from the "ROW_MEAN_WDIR" output line since the direction error is also undefined. However, those inputs are included in the aggregated statistics in the "AGGR_WDIR" output line. For this reason, the "TOTAL" column value, indicating the number of inputs used, may be larger in "AGGR_WDIR" than "ROW_MEAN_WDIR", from which zero length vectors have been excluded. Users can also specify the "-out_wind_thresh gt0 -out_wind_logic INTERSECTION" job command options to explicitly exclude all pairs containing zero length vectors from the analysis. In that case, the "ROW_MEAN_WDIR" and "AGGR_WDIR" "TOTAL" column values would match.
 
 Practical Information
 =====================
@@ -284,7 +284,7 @@ The usage statement for the Stat-Analysis tool is shown below:
 
 stat_analysis has two required arguments and accepts several optional ones.
 
-In the usage statement for the Stat-Analysis tool, some additional terminology is introduced. In the Stat-Analysis tool, the term "job" refers to a set of tasks to be performed after applying user-specified options (i.e., "filters"). The filters are used to pare down a collection of output from the MET statistics tools to only those lines that are desired for the analysis. The job and its filters together comprise the "job command line". The "job command line" may be specified either on the command line to run a single analysis job or within the configuration file to run multiple analysis jobs at the same time. If jobs are specified in both the configuration file and the command line, only the jobs indicated in the configuration file will be run. The various jobs types are described in :numref:`Des_components_STAT_analysis_tool` and the filtering options are described in :numref:`stat_analysis-configuration-file`.
+In the usage statement for the Stat-Analysis tool, some additional terminology is introduced. In the Stat-Analysis tool, the term "job" refers to a set of tasks to be performed after applying user-specified options (i.e., "filters"). The filters are used to pare down a collection of output from the MET statistics tools to only those lines that are desired for the analysis. The job and its filters together comprise the "job command line". The "job command line" may be specified either on the command line to run a single analysis job or within the configuration file to run multiple analysis jobs at the same time. If jobs are specified in both the configuration file and the command line, only the jobs indicated in the configuration file will be run. The various job types are described in :numref:`Des_components_STAT_analysis_tool` and the filtering options are described in :numref:`stat_analysis-configuration-file`.
 
 Required Arguments for stat_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -322,7 +322,7 @@ stat_analysis Configuration File
 
 The default configuration file for the Stat-Analysis tool named **STATAnalysisConfig_default** can be found in the installed *share/met/config* directory. The version used for the example run in :numref:`installation` is also available in *scripts/config*. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
 
-The configuration file for the Stat-Analysis tool is optional. Users may find it more convenient initially to run Stat-Analysis jobs on the command line specifying job command options directly. Once the user has a set of or more jobs they would like to run routinely on the output of the MET statistics tools, they may find grouping those jobs together into a configuration file to be more convenient.
+The configuration file for the Stat-Analysis tool is optional. Users may find it more convenient initially to run Stat-Analysis jobs on the command line specifying job command options directly. Once the user has a set of one or more jobs they would like to run routinely on the output of the MET statistics tools, they may find grouping those jobs together into a configuration file to be more convenient.
 
 Most of the user-specified parameters listed in the Stat-Analysis configuration file are used to filter the ASCII statistical output from the MET statistics tools down to a desired subset of lines over which statistics are to be computed. Only output that meets all of the parameters specified in the Stat-Analysis configuration file will be retained.
 
@@ -330,7 +330,7 @@ In earlier versions, the Stat-Analysis tool always performed a two step process 
 
 In practice, the benefit of writing a temporary file varies considerably based on the amount of input data and filtering options. When running multiple jobs on a small subset of the input data, defining common filtering criteria in the top-level section should enable Stat-Analysis to run more efficiently. Applying the common filters once is faster than re-applying them for multiple jobs. However, if running a single job or with no common filtering criteria, writing an intermediate temporary file would provide no benefit.
 
-Filtering options specified in the first section of the configuration file are applied to every task in the **jobs** entry. However, if an individual job specifies an option already set above, the job-specific setting overrides the top-level one. For example, if **model = ["Run1, "Run2"];** is set at the top but a job sets **-model Run1**, that job will be performed only on the "Run1" data. Also note that environment variables may be used when editing configuration files, as described in the :numref:`pb2nc configuration file` for the PB2NC tool.
+Filtering options specified in the first section of the configuration file are applied to every task in the **jobs** entry. However, if an individual job specifies an option already set above, the job-specific setting overrides the top-level one. For example, if **model = ["Run1", "Run2"];** is set at the top but a job sets **-model Run1**, that job will be performed only on the "Run1" data. Also note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
 
 ________________________
 
@@ -408,7 +408,7 @@ ___________________
   obs_init_exc   = [];
   obs_init_hour  = [];
 
-These time filtering options are the same as described above but applied to initialization times rather than valid times. These selections may be further refined by using the **"-fcst_init_beg", "-fcst_init_end", "-fcst_init_inc", "-fcst_init_exc", "-fcst_init_hour"," "-obs_init_beg", "-obs_init_end", "-obs_init_inc", "-obs_init_exc"** and **"-obs_init_hour"** options within the job command line.
+These time filtering options are the same as described above but applied to initialization times rather than valid times. These selections may be further refined by using the **"-fcst_init_beg", "-fcst_init_end", "-fcst_init_inc", "-fcst_init_exc", "-fcst_init_hour", "-obs_init_beg", "-obs_init_end", "-obs_init_inc", "-obs_init_exc"** and **"-obs_init_hour"** options within the job command line.
 
 ___________________
 
@@ -485,7 +485,7 @@ ___________________
 
   alpha = [];
 
-The user may specify a comma-separated list alpha confidence values to be used for all analyses. If alpha values are listed, the analyses will be performed on their union. These selections may be further refined by using the **"-alpha"** option within the job command line.
+The user may specify a comma-separated list of alpha confidence values to be used for all analyses. If alpha values are listed, the analyses will be performed on their union. These selections may be further refined by using the **"-alpha"** option within the job command line.
 
 ___________________
 
@@ -511,7 +511,7 @@ ___________________
   ss_index_name       = "SS_INDEX";
   ss_index_vld_thresh = 1.0;
 
-The ss_index_name and ss_index_vld_thresh options are used to define a skill score index. The ss_index_name entry is a string which defines the output name for the current skill score index configuration. The ss_index_vld_thresh entry is a number between 0.0 and 1.0 that defines the required ratio of valid terms. If the ratio of valid skill score index terms to the total is less than than this number, no output is written for that case. The default value of 1.0 indicates that all terms are required.
+The ss_index_name and ss_index_vld_thresh options are used to define a skill score index. The ss_index_name entry is a string which defines the output name for the current skill score index configuration. The ss_index_vld_thresh entry is a number between 0.0 and 1.0 that defines the required ratio of valid terms. If the ratio of valid skill score index terms to the total is less than this number, no output is written for that case. The default value of 1.0 indicates that all terms are required.
 
 ___________________
 
@@ -532,7 +532,7 @@ All possible tasks for **job_name** are listed in :numref:`Des_components_STAT_a
 
 .. _Des_components_STAT_analysis_tool:
 
-.. list-table:: Description of components of the job command lines for the Stat-Analysis tool.Variables, levels, and weights used to compute the GO Index.
+.. list-table:: Description of components of the job command lines for the Stat-Analysis tool.
   :widths: 15 55 20
   :header-rows: 1
 
@@ -614,7 +614,7 @@ This job command option is extremely useful. It can be used multiple times to sp
   -column_str     col_name string
   -column_str_exc col_name string
 
-The column filtering options may be used when the **-line_type** has been set to a single value. These options take two arguments, the name of the data column to be used followed by a value, string, or threshold to be applied. If multiple column_min/max/eq/thresh/str options are listed, the job will be performed on their intersection. Each input line is only retained if its value meets the numeric filtering criteria defined, matches one of the strings defined by the **-column_str** option, or does not match any of the string defined by the **-column_str_exc** option. Multiple filtering strings may be listed using commas. Defining thresholds in MET is described in :numref:`config_options`.
+The column filtering options may be used when the **-line_type** has been set to a single value. These options take two arguments, the name of the data column to be used followed by a value, string, or threshold to be applied. If multiple column_min/max/eq/thresh/str options are listed, the job will be performed on their intersection. Each input line is only retained if its value meets the numeric filtering criteria defined, matches one of the strings defined by the **-column_str** option, or does not match any of the strings defined by the **-column_str_exc** option. Multiple filtering strings may be listed using commas. Defining thresholds in MET is described in :numref:`config_options`.
 
 .. code-block:: none
 
@@ -652,7 +652,7 @@ The example above reads MPR lines, stratifies the data by forecast variable name
   -mask_poly file
   -mask_sid  file|list
 
-When processing input MPR lines, these options may be used to define a masking grid, polyline, or list of station ID's to filter the matched pair data geographically prior to computing statistics. The **-mask_sid** option is a station ID masking file or a comma-separated list of station ID's for filtering the matched pairs spatially. See the description of the "sid" entry in :numref:`config_options`.
+When processing input MPR lines, these options may be used to define a masking grid, polyline, or list of station IDs to filter the matched pair data geographically prior to computing statistics. The **-mask_sid** option is a station ID masking file or a comma-separated list of station IDs for filtering the matched pairs spatially. See the description of the "sid" entry in :numref:`config_options`.
 
 .. code-block:: none
 
