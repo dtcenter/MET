@@ -273,7 +273,7 @@ Q. I have a list of stations to use for verification. I also have a poly region 
 
      These settings are defined in the "mask" section of the Point-Stat
      configuration file. You can define masking regions in one of 3 ways,
-     as a "grid", a "poly" line file, or a "sid" list of station ID's.
+     as a "grid", a "poly" line file, or a "sid" list of station IDs.
 
      If you specify one entry for "poly" and one entry for "sid", you
      should see output for those two different masks. Note that each of
@@ -321,7 +321,7 @@ Q. How do I define a masking region with a GFS file?
 
      .. code-block:: none
 
-		     gen_vx_mask gfs_euro.nc POLAND.poly POLAND_mask.nc
+		     gen_vx_mask gfs_euro.nc POLAND.poly POLAND_mask.nc -type poly
 
      Run the MET plot_data_plane tool to display the resulting mask field:
 
@@ -681,7 +681,7 @@ Q. How do I combine 12-hour accumulated precipitation from two different initial
      describing the field to use from the NetCDF file. For the second file,
      list the file name followed by the accumulation interval to use
      (12 for 12 hours). The output file, Sum.nc, will contain the
-     combined 12-hour accumulated precipitation.
+     combined 24-hour accumulated precipitation.
 
      Here is a small excerpt from the pcp_combine usage statement:
 
@@ -703,7 +703,7 @@ Q. How do I combine 12-hour accumulated precipitation from two different initial
 
      .. code-block:: none
 
-		     plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)";'
+		     plot_data_plane Sum.nc Sum.ps 'name="APCP_24"; level="(*,*)";'
 
 Q. How do I correct a precipitation time range?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -941,7 +941,7 @@ Q. How do I use "-sum", "-add", and "-subtract" to achieve the same accumulation
 		     -pcprx "gfs_4_20150220_00.*grb2" \
 		     -pcpdir /d1/model_data/20150220
 
-     pcp_combine is looking in the */d1/SBU/GFS/model_data/20150220* directory
+     pcp_combine is looking in the */d1/model_data/20150220* directory
      at files which match this regular expression "gfs_4_20150220_00.*grb2".
      That directory contains data for 00, 06, 12, and 18 hour initializations,
      but the "-pcprx" option narrows the search down to the 00 hour
@@ -1051,11 +1051,7 @@ Q. How do I specify the GRIB version?
      named and explicitly tell MET to interpret them as GRIB1 or GRIB2 using
      the "file_type" configuration option.
 
-     The examples below use the plot_data_plane tool to plot the data. Set
-
-     .. code-block:: none
-
-		     "file_type = GRIB2;"
+     The example below uses the plot_data_plane tool to plot the data.
 
      To keep the files named as they are, add "file_type = GRIB2;"
      to all the MET configuration files (i.e. Grid-Stat, MODE, and so on)
@@ -1151,9 +1147,10 @@ Q. How does '-aggregate_stat' work?
      using the "-mask_poly" option for a lat/lon polyline and the "-mask_grid"
      option to define a retention grid.
 
-     However, there is currently no "-mask_sid" option.
+     The "-mask_sid" option filters MPR lines using a station ID masking
+     file or a comma-separated list of station IDs.
 
-     With MET-5.2 and later versions, one option is to apply column string
+     Alternatively, one option is to apply column string
      matching using the "-column_str" option to define the list of station
      ID's you would like to aggregate. That job would look something like this:
 
@@ -1165,7 +1162,7 @@ Q. How does '-aggregate_stat' work?
 		     -set_hdr VX_MASK SID_GROUP_NAME \
 		     -out_stat mpr_to_cnt.stat
 
-     Where SID1...SIDN is a comma-separated list of the station ID's in the
+     Where SID1...SIDN is a comma-separated list of the station IDs in the
      group. Notice that a value for the output VX_MASK column using the
      "-set_hdr" option has been specified. Otherwise, this would show a list
      of the unique values found in that column. Presumably, all the input
@@ -1231,7 +1228,7 @@ Q. How do I use '-filter' to refine my output?
   .. dropdown:: Answer
 
      Here is an example of running a Stat-Analysis filter job to discard any
-     CNT lines (continuous statistics) where the forecast rate and observation
+     CTS lines (contingency table statistics) where the forecast rate and observation
      rate are less than 0.05. This is an alternative way of tossing out those
      cases without having to modify the source code.
 
@@ -1255,7 +1252,7 @@ Q. How do I use '-filter' to refine my output?
 		     FMEAN 0.05 -dump_row filter_cts.txt
 		     DEBUG 2: Job 1 used 36 out of 36 STAT lines.
 
-     This job finds 56 CTS lines, but only keeps 36 of them where both
+     This job reads 436 STAT lines, but only keeps the 36 CTS lines where both
      the BASER and FMEAN columns are at least 0.05.
 
 Q. How do I use the “-by” flag to stratify results?
@@ -1893,8 +1890,8 @@ Environment Variable Settings
 
   .. dropdown:: Troubleshooting Help
 
-     In the below incorrect example for many environment variables have both
-     the main variable set and the INC and LIB variables set:
+     The incorrect example below, which applies to many environment variables,
+     has both the main variable and the INC and LIB variables set:
 
      .. code-block:: none
 

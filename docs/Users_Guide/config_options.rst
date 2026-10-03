@@ -299,7 +299,7 @@ and, in some cases, elevation for all stations based on stationId.
 
 This set of stations comes from 2 online sources: the
 `active stations website <https://www.ndbc.noaa.gov/activestations.xml>`_
-and the `complete stations website <https://www.airnow.gov>`_.
+and the `complete stations website <https://www.ndbc.noaa.gov/to_station.shtml>`_.
 
 As these lists can change as a function of time, a script can be run to pull
 down the contents of both websites and merge any changes with the existing stations
@@ -1623,23 +1623,23 @@ than one "message_type" entry is desired within the config file. For example:
 sid_inc and sid_exc
 ^^^^^^^^^^^^^^^^^^^
 The "sid_inc" entry is an array of station ID groups indicating which
-station ID's should be included in the verification task. If specified,
-only those station ID's appearing in the list will be included.  Note
+station IDs should be included in the verification task. If specified,
+only those station IDs appearing in the list will be included.  Note
 that filtering by station ID may also be accomplished using the "mask.sid"
 option. However, when using the "sid_inc" option, statistics are reported
 separately for each masking region.
 
 The "sid_exc" entry is an array of station ID groups indicating which
-station ID's should be excluded from the verification task.
+station IDs should be excluded from the verification task.
 
 Each element in the "sid_inc" and "sid_exc" arrays is either the name of
 a single station ID or the full path to a station ID group file name.
 A station ID group file consists of a name for the group followed by a
-list of station ID's. All of the station ID's indicated will be concatenated
-into one long list of station ID's to be included or excluded.
+list of station IDs. All of the station IDs indicated will be concatenated
+into one long list of station IDs to be included or excluded.
 
 As with "message_type" above, the "sid_inc" and "sid_exc" settings can be
-placed in the "field" array element to control which station ID's
+placed in the "field" array element to control which station IDs
 are included or excluded for each verification task.
 
 .. code-block:: none
@@ -1822,7 +1822,7 @@ an even number of bins can only be  uncentered. For example:
   4 uncentered bins (cdf_bins = 4; center_bins = FALSE;) yields:
     0.0, 0.25, 0.50, 0.75, 1.0
   5 uncentered bins (cdf_bins = 5; center_bins = FALSE;) yields:
-    0.0, 0.2, 0.4, 0.6, 0.8, 0.9, 1.0
+    0.0, 0.2, 0.4, 0.6, 0.8, 1.0
   5   centered bins (cdf_bins = 5; center_bins = TRUE;) yields:
     0.0, 0.125, 0.375, 0.625, 0.875, 1.0
 
@@ -2059,7 +2059,7 @@ comma-separated list.
   ID's to be used.
 * For a comma-separated list, optionally use a colon to specify a name.
   For "MY_LIST:SID1(WGT1),SID2(WGT2)", name = MY_LIST which consists of
-  two station ID's (SID1 and SID2) and optional numeric weights (WGT1 and WGT2).
+  two station IDs (SID1 and SID2) and optional numeric weights (WGT1 and WGT2).
 * For a comma-separated list of length one with no name specified, the
   mask "name" and value are both set to the single station ID string.
   For "SID1", name = SID1 and value = SID1.
@@ -2081,7 +2081,7 @@ to "NA" always evaluates to true.
 The masking logic for processing point observations in Point-Stat and
 Ensemble-Stat falls into two categories. The "sid" and "llpnt" options apply
 directly to the point observations. Only those observations for the specified
-station ID's are included in the "sid" masks. Only those observations meeting
+station IDs are included in the "sid" masks. Only those observations meeting
 the latitude and longitude threshold criteria are included in the "llpnt"
 masks.
 
@@ -2801,7 +2801,7 @@ It is not applied for grid-to-grid verification which is controlled by the
 "grid_weight_flag" option. It can only be defined once at the highest level
 of config file context and applies to all verification tasks for that run.
 
-While only one point weighting option is currently supported, additional
+The following point weighting options are currently supported, and additional
 methods are planned for future versions:
 
 * NONE to disable point weighting using a constant weight of 1.0 (default).

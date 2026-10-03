@@ -218,7 +218,7 @@ Overview of Steps for Performing Benchmarking
 
          #
          # filename
-         # Timestamp in ISO 1806 format is used to generate output filename
+         # Timestamp in ISO 8601 format is used to generate output filename
          # If filename setting is empty string, then timestamp is used.
          # Otherwise, the specified filename followed by the timestamp will
          # be used for the output filename.
@@ -283,7 +283,7 @@ Overview of Steps for Performing Benchmarking
         - filename
 
           - **optional**
-          - the supplied filename prepended with a Timestamp that follows ISO 8601 format
+          - the supplied filename followed by a timestamp that follows ISO 8601 format
           - if left empty, the timestamp alone will be used as the filename
 
         - run_met_directly
@@ -325,7 +325,7 @@ Overview of Steps for Performing Benchmarking
         - filename
 
           - **optional**
-          - the supplied filename prepended with a Timestamp that follows ISO 8601 format
+          - the supplied filename followed by a timestamp that follows ISO 8601 format
           - if left empty, the timestamp alone will be used as the filename
 
 

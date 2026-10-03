@@ -70,7 +70,7 @@ Users can take advantage of the compilation script to download and install all o
 libraries automatically, both required and conditionally required
 :ref:`compile_script_install`.
 
-.. _suggested_external_utiliites:
+.. _suggested_external_utilities:
 
 Suggested External Utilities
 ============================
