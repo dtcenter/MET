@@ -327,7 +327,7 @@ The extreme dependency index measures the association between forecast and obser
 
 where *H* and *F* are the Hit Rate and False Alarm Rate, respectively.
 
-EDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of EDI = 1 (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
+EDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of EDI = 1 (:ref:`Ferro and Stephenson, 2011 <Ferro-2011>`).
 
 Symmetric Extreme Dependency Score (SEDS)
 -----------------------------------------
@@ -338,7 +338,7 @@ The symmetric extreme dependency score measures the association between forecast
 
 .. math:: \text{SEDS } = \frac{2 \ln [\frac{(n_{11} + n_{01}) (n_{11} + n_{10})}{T^2}]}{\ln (\frac{n_{11}}{T})} - 1.
 
-SEDS can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDS = 1 (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
+SEDS can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDS = 1 (:ref:`Ferro and Stephenson, 2011 <Ferro-2011>`).
 
 Symmetric Extremal Dependency Index (SEDI)
 ------------------------------------------
@@ -351,7 +351,7 @@ The symmetric extremal dependency index measures the association between forecas
 
 where :math:`H = \frac{n_{11}}{n_{11} + n_{01}}` and :math:`F = \frac{n_{10}}{n_{00} + n_{10}}` are the Hit Rate and False Alarm Rate, respectively.
 
-SEDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDI = 1. SEDI approaches 1 only as the forecast approaches perfection (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
+SEDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDI = 1. SEDI approaches 1 only as the forecast approaches perfection (:ref:`Ferro and Stephenson, 2011 <Ferro-2011>`).
 
 Bias-Adjusted Gilbert Skill Score (BAGSS)
 -----------------------------------------
@@ -478,7 +478,7 @@ Kendall's Tau statistic ( :math:`\tau`) is a robust measure of the level of asso
 
 .. math:: \tau = \frac{N_C - N_D}{n(n - 1) / 2}
 
-where :math:`N_C` is the number of "concordant" pairs and :math:`N_D` is the number of "discordant" pairs. Concordant pairs are identified by comparing each pair with all other pairs in the sample; this can be done most easily by ordering all of the ( :math:`f_{i}, o_{i}`) pairs according to :math:`f_{i}`, in which case the :math:`o_{i}` values won't necessarily be in order. The number of concordant matches of a particular pair with other pairs is computed by counting the number of pairs (with larger values) for which the value of :math:`o_i` for the current pair is exceeded (that is, pairs for which the values of **f** and **o** are both larger than the value for the current pair). Once this is done, :math:`N_C` is computed by summing the counts for all pairs. The total number of possible pairs is :math:`N_C`; thus, the number of discordant pairs is :math:`N_D`.
+where :math:`N_C` is the number of "concordant" pairs and :math:`N_D` is the number of "discordant" pairs. Concordant pairs are identified by comparing each pair with all other pairs in the sample; this can be done most easily by ordering all of the ( :math:`f_{i}, o_{i}`) pairs according to :math:`f_{i}`, in which case the :math:`o_{i}` values won't necessarily be in order. The number of concordant matches of a particular pair with other pairs is computed by counting the number of pairs (with larger values) for which the value of :math:`o_i` for the current pair is exceeded (that is, pairs for which the values of **f** and **o** are both larger than the value for the current pair). Once this is done, :math:`N_C` is computed by summing the counts for all pairs. The total number of possible pairs is :math:`n(n - 1) / 2`; thus, the number of discordant pairs is :math:`N_D = n(n - 1) / 2 - N_C`.
 
 Like **r** and :math:`\rho_{s}`, Kendall's Tau ( :math:`\tau`) ranges between -1 and 1; a value of 1 indicates perfect association (concordance) and a value of -1 indicates perfect negative association. A value of 0 indicates that the forecasts and observations are not associated.
 
@@ -566,7 +566,7 @@ MAE is less influenced by large errors and also does not depend on the mean erro
 InterQuartile Range of the Errors (IQR)
 ---------------------------------------
 
-Called "IQR" in CNT output :numref:`table_PS_format_info_CNT`
+Called "EIQR" in CNT output :numref:`table_PS_format_info_CNT`
 
 The InterQuartile Range of the Errors (IQR) is the difference between the 75th and 25th percentiles of the errors. It is defined as :math:`\text{IQR} = p_{75} (f_i - o_i) - p_{25} (f_i - o_i)`.
 
@@ -891,7 +891,7 @@ The Brier score is the mean squared probability error. In MET, the Brier Score (
 
 .. math:: \text{BS} = \frac{1}{T} \sum_{i=1}^K [n_{i1} (1 - p_i)^2 + n_{i0} p_i^2]
 
-The equation you will most often see in references uses the individual probability forecasts ( :math:`\rho_{i}`) and the corresponding observations ( :math:`o_{i}`), and is given as :math:`\text{BS} = \frac{1}{T}\sum (p_i - o_i)^2`. This equation is equivalent when the midpoints of the binned probability values are used as the :math:`p_i` .
+The equation you will most often see in references uses the individual probability forecasts ( :math:`p_{i}`) and the corresponding observations ( :math:`o_{i}`), and is given as :math:`\text{BS} = \frac{1}{T}\sum (p_i - o_i)^2`. This equation is equivalent when the midpoints of the binned probability values are used as the :math:`p_i` .
 
 BS can be partitioned into three terms: (1) reliability, (2) resolution, and (3) uncertainty (:ref:`Murphy, 1987 <Murphy-1987>`).
 
@@ -1013,7 +1013,7 @@ MET Verification Measures for Ensemble Forecasts
 RPS
 ---
 
-Called "RPS" in RPS output :numref:`table_ES_header_info_es_out_ECNT`
+Called "RPS" in RPS output :numref:`table_ES_header_info_es_out_RPS`
 
 While the above probabilistic verification measures utilize dichotomous observations, the Ranked Probability Score (RPS, :ref:`Epstein, 1969 <Epstein-1969>`, :ref:`Murphy, 1969 <Murphy-1969>`) is the only probabilistic verification measure for discrete multiple-category events available in MET. It is assumed that the categories are ordinal as nominal categorical variables can be collapsed into sequences of binary predictands, which can in turn be evaluated with the above measures for dichotomous variables (:ref:`Wilks, 2011 <Wilks-2011>`). The RPS is the multi-category extension of the Brier score (:ref:`Tödter and Ahrens, 2012 <Tödter-2012>`), and is a proper score (:ref:`Mason, 2008 <Mason-2008>`).
 
@@ -1026,7 +1026,7 @@ To clarify, :math:`F_1 = f_1` is the first component of :math:`F_m`, :math:`F_2 
 
 .. math:: \text{RPS} = \sum_{m=1}^J (F_m - O_m)^2 = \sum_{m=1}^J BS_m,
 
-where :math:`BS_m` is the Brier score for the m-th category (:ref:`Tödter and Ahrens, 2012 <Tödter-2012>`). Subsequently, the RPS lends itself to a decomposition into reliability, resolution and uncertainty components, noting that each component is aggregated over the different categories; these are written to the columns named "RPS_REL", "RPS_RES" and "RPS_UNC" in RPS output :numref:`table_ES_header_info_es_out_ECNT`.
+where :math:`BS_m` is the Brier score for the m-th category (:ref:`Tödter and Ahrens, 2012 <Tödter-2012>`). Subsequently, the RPS lends itself to a decomposition into reliability, resolution and uncertainty components, noting that each component is aggregated over the different categories; these are written to the columns named "RPS_REL", "RPS_RES" and "RPS_UNC" in RPS output :numref:`table_ES_header_info_es_out_RPS`.
 
 CRPS
 ----
@@ -1041,7 +1041,7 @@ Closed form expressions for the CRPS are difficult to define when using data rat
 
 .. math:: \text{crps}_i (N( \mu, \sigma^2),y) = \sigma ( \frac{y - \mu}{\sigma} (2 \Phi (\frac{y - \mu}{\sigma}) -1) + 2 \phi (\frac{y - \mu}{\sigma}) - \frac{1}{\sqrt{\pi}})
 
-In this equation, the y represents the event threshold. The estimated mean and standard deviation of the ensemble forecasts ( :math:`\mu \text{ and } \sigma`) are used as the parameters of the normal distribution. The values of the normal distribution are represented by the probability density function (PDF) denoted by :math:`\Phi` and the cumulative distribution function (CDF), denoted in the above equation by :math:`\phi`.
+In this equation, the y represents the event threshold. The estimated mean and standard deviation of the ensemble forecasts ( :math:`\mu \text{ and } \sigma`) are used as the parameters of the normal distribution. The values of the normal distribution are represented by the probability density function (PDF) denoted by :math:`\phi` and the cumulative distribution function (CDF), denoted in the above equation by :math:`\Phi`.
 
 The overall CRPS is calculated as the average of the individual measures. In equation form:
 

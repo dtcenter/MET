@@ -187,6 +187,14 @@ References
 |   doi: https://doi.org/10.1002/qj.3115
 |
 
+.. _Ferro-2011:
+
+| Ferro, C. A. T., and D. B. Stephenson, 2011: Extremal Dependence Indices: Improved
+|   Verification Measures for Deterministic Forecasts of Rare Binary Events.
+|   *Weather and Forecasting*, 26 (5), 699-713.
+|   doi: https://doi.org/10.1175/WAF-D-10-05030.1
+|
+
 .. _Gilleland-2010:
 
 | Gilleland, E., 2010: Confidence intervals for forecast verification.
