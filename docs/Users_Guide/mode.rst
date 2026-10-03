@@ -455,7 +455,7 @@ _____________________
      corner             = 0.8;
      ratio_if           = ( ( 0.0, 0.0 )
                           ( corner, 1.0 )
-			  ( 1.0, 1.0 ) );
+                          ( 1.0, 1.0 ) );
      area_ratio         = ratio_if;
      int_area_ratio     = ( ... );
      curvature_ratio    = ratio_if;
