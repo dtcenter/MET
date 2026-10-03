@@ -126,7 +126,7 @@ FDIR and ODIR are the direction (angle) of :math:`\mathbf{F}_a \text{ and } \mat
 
 ________________________
 
-FBAR_SPEED and OBAR_SPEED are the lengths of the average forecast and observed wind vectors. Note that this is *not* the same as the average forecast and observed wind speeds (*ie.,* the length of an average vector :math:`\neq` the average length of the vector).
+FBAR_SPEED and OBAR_SPEED are the lengths of the average forecast and observed wind vectors. Note that this is *not* the same as the average forecast and observed wind speeds (*i.e.,* the length of an average vector :math:`\neq` the average length of the vector).
 
 .. only:: latex
 
@@ -146,7 +146,7 @@ FBAR_SPEED and OBAR_SPEED are the lengths of the average forecast and observed w
 
 ________________________
 
-VDIFF_SPEED is the length (*ie. speed*) of the vector difference between the average forecast and average observed wind vectors.
+VDIFF_SPEED is the length (*i.e. speed*) of the vector difference between the average forecast and average observed wind vectors.
 
 .. only:: latex
 

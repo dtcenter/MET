@@ -25,7 +25,7 @@ Which statistics are the same, but with different names?
   * - Gilbert Skill Score
     - Equitable Threat Score
   * - Hanssen and Kuipers Discriminant
-    - True Skill Statistic, Pierce's Skill Score
+    - True Skill Statistic, Peirce's Skill Score
   * - Heidke Skill Score
     - Cohen's K
   * - Odds Ratio Skill Score
@@ -463,7 +463,7 @@ Called "SP_CORR" in CNT :numref:`table_PS_format_info_CNT`
 
 The Spearman rank correlation coefficient (:math:`\rho_{s}`) is a robust measure of association that is based on the ranks of the forecast and observed values rather than the actual values. That is, the forecast and observed samples are ordered from smallest to largest and rank values (from 1 to **n**, where **n** is the total number of pairs) are assigned. The pairs of forecast-observed ranks are then used to compute a correlation coefficient, analogous to the Pearson correlation coefficient, **r**.
 
-A simpler formulation of the Spearman-rank correlation is based on differences between the each of the pairs of ranks (denoted as :math:`d_{i}`):
+A simpler formulation of the Spearman-rank correlation is based on differences between each of the pairs of ranks (denoted as :math:`d_{i}`):
 
 .. math:: \rho_{s} = \frac{6}{n(n^2 - 1)} \sum_{i=1}^n d_i^2
 
@@ -741,7 +741,7 @@ Gradient Values
 
 Called "TOTAL", "FGBAR", "OGBAR", "MGBAR", "EGBAR", "S1", "S1_OG", "FGOG_RATIO", "FGMAG", "OGMAG", "MAG_RMSE", and "LAPLACE_RMSE" in GRAD output :numref:`table_GS_format_info_GRAD`
 
-These statistics are only computed by the Grid-Stat tool and require vectors. Here :math:`\nabla` is the gradient operator, which in this applications signifies the difference between adjacent grid points in both the grid-x and grid-y directions. TOTAL is the count of grid locations used in the calculations. The remaining measures are defined below:
+These statistics are only computed by the Grid-Stat tool and require vectors. Here :math:`\nabla` is the gradient operator, which in this application signifies the difference between adjacent grid points in both the grid-x and grid-y directions. TOTAL is the count of grid locations used in the calculations. The remaining measures are defined below:
 
 .. math::
   \text{FGBAR} = \text{Mean}|\nabla f| = \frac{1}{n} \sum_{i=1}^n | \nabla f_i|
@@ -1122,7 +1122,7 @@ The bias ratio (BIAS_RATIO) is computed when verifying an ensemble against gridd
 
   .. math:: \text{BIAS_RATIO} = \frac{ \text{ME}_{f >= o} }{ |\text{ME}_{f < o}| }
 
-A perfect forecast has ME = 0. Since BIAS_RATIO is computed as the high bias (ME_GE_OBS) divide by the absolute value of the low bias (ME_LT_OBS), a perfect forecast has BIAS_RATIO = 0/0, which is undefined. In practice, the high and low bias values are unlikely to be 0.
+A perfect forecast has ME = 0. Since BIAS_RATIO is computed as the high bias (ME_GE_OBS) divided by the absolute value of the low bias (ME_LT_OBS), a perfect forecast has BIAS_RATIO = 0/0, which is undefined. In practice, the high and low bias values are unlikely to be 0.
 
 The range for BIAS_RATIO is 0 to infinity. A score of 1 indicates that the high and low biases are equal. A score greater than 1 indicates that the high bias is larger than the magnitude of the low bias. A score less than 1 indicates the opposite behavior.
 
@@ -1149,7 +1149,7 @@ Observation Error Logarithmic Scoring Rules
 
 Called "IGN_CONV_OERR" and "IGN_CORR_OERR" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-One approach that is used to take observation error into account in a summary measure is to add error to the forecast by a convolution with the observation model (e.g., :ref:`Anderson, 1996 <Andersen-1996>`; :ref:`Hamill, 2001 <Hamill-2001>`; :ref:`Saetra et. al., 2004 <Saetra-2004>`; :ref:`Bröcker and Smith, 2007 <Bröcker-2007>`; :ref:`Candille et al., 2007 <Candille-2007>`; :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Röpnack et al., 2013 <Röpnack-2013>`). Specifically, suppose :math:`y=x+w`, where :math:`y` is the observed value, :math:`x` is the true value, and :math:`w` is the error. Then, if :math:`f` is the density forecast for :math:`x` and :math:`\nu` is the observation model, then the implied density forecast for :math:`y` is given by the convolution:
+One approach that is used to take observation error into account in a summary measure is to add error to the forecast by a convolution with the observation model (e.g., :ref:`Anderson, 1996 <Andersen-1996>`; :ref:`Hamill, 2001 <Hamill-2001>`; :ref:`Saetra et al., 2004 <Saetra-2004>`; :ref:`Bröcker and Smith, 2007 <Bröcker-2007>`; :ref:`Candille et al., 2007 <Candille-2007>`; :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Röpnack et al., 2013 <Röpnack-2013>`). Specifically, suppose :math:`y=x+w`, where :math:`y` is the observed value, :math:`x` is the true value, and :math:`w` is the error. Then, if :math:`f` is the density forecast for :math:`x` and :math:`\nu` is the observation model, then the implied density forecast for :math:`y` is given by the convolution:
 
 .. math:: (f*\nu)(y) = \int\nu(y|x)f(x)dx
 
@@ -1163,7 +1163,7 @@ One approach that is used to take observation error into account in a summary me
 
   .. math:: \text{IGN_CONV_OERR} = s(f,y) = \frac{1}{2}\log(2 \pi (\sigma^2 + c^2)) + \frac{(y - \mu)^2}{2 (\sigma^2 + c^2)}
 
-Another approach to incorporation of observation uncertainty into a measure is the error-correction approach. The approach merely ensures that the scoring rule, :math:`s`, is unbiased for a scoring rule :math:`s_0` if they have the same expected value. :ref:`Ferro, 2017 <Ferro-2017>` gives the error-corrected ignorance scoring rule (which is also proposer when :math:`w\sim N(0,c^2)`) as
+Another approach to incorporation of observation uncertainty into a measure is the error-correction approach. The approach merely ensures that the scoring rule, :math:`s`, is unbiased for a scoring rule :math:`s_0` if they have the same expected value. :ref:`Ferro, 2017 <Ferro-2017>` gives the error-corrected ignorance scoring rule (which is also proper when :math:`w\sim N(0,c^2)`) as
 
 .. only:: latex
 
@@ -1267,14 +1267,14 @@ The Uniform Fractions Skill Score (UFSS) is a reference statistic for the Fracti
 Forecast Rate
 -------------
 
-Called "F_rate" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
+Called "F_RATE" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
 
 The overall proportion of grid points with forecast events to total grid points in the domain. The forecast rate will match the observation rate in unbiased forecasts.
 
 Observation Rate
 ----------------
 
-Called "O_rate" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
+Called "O_RATE" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
 
 The overall proportion of grid points with observed events to total grid points in the domain. The forecast rate will match the observation rate in unbiased forecasts. This quantity is sometimes referred to as the base rate.
 

@@ -34,7 +34,7 @@ The following map projections are currently supported in MET:
 Grid Specification Strings
 ==========================
 
-Several configuration file and command line options support the definition of grids as a grid specification string. A description of the that string for each of the supported grid types is provided below.
+Several configuration file and command line options support the definition of grids as a grid specification string. A description of that string for each of the supported grid types is provided below.
 
 Lambert Conformal Grid
 ----------------------
@@ -47,7 +47,7 @@ To specify a Lambert Conformal Grid, the syntax is
 
 Here, **Nx** and **Ny** are the number of points in the **x** and **y** grid directions, respectively. These two numbers give the overall size of the grid. **lat_ll** and **lon_ll** are the latitude and longitude, in degrees, of the lower left point of the grid. North latitude and east longitude are considered positive. **lon_orient** is the orientation longitude of the grid. It's the meridian of longitude that's parallel to one of the vertical grid directions. **D_km** and **R_km** are the grid resolution and the radius of the Earth, both in kilometers. **standard_lat_1** and **standard_lat_2** are the standard parallels of the Lambert projection. If the two latitudes are the same, then only one needs to be given. **N|S** means to write either **N** or **S** depending on whether the Lambert projection is from the north pole or the south pole.
 
-As an example of specifying a Lambert grid, suppose you have a northern hemisphere Lambert grid with 614 points in the x direction and 428 points in the y direction. The lower left corner of the grid is at latitude :math:`12.190^\circ` north and longitude :math:`133.459^\circ` west. The orientation longitude is :math:`95^\circ` west. The grid spacing is :math:`12.19058^\circ` km. The radius of the Earth is the default value used in many grib files: 6367.47 km. Both standard parallels are at :math:`25^\circ` north. To specify this grid in the config file, you would write
+As an example of specifying a Lambert grid, suppose you have a northern hemisphere Lambert grid with 614 points in the x direction and 428 points in the y direction. The lower left corner of the grid is at latitude :math:`12.190^\circ` north and longitude :math:`133.459^\circ` west. The orientation longitude is :math:`95^\circ` west. The grid spacing is :math:`12.19058^\circ` km. The radius of the Earth is the default value used in many GRIB files: 6367.47 km. Both standard parallels are at :math:`25^\circ` north. To specify this grid in the config file, you would write
 
 .. code-block:: none
 
@@ -62,7 +62,7 @@ To specify a Lambert Azimuthal Equal Area grid, the syntax is
 
   laea Nx Ny lat_first lon_first central_lon Dx_km Dy_km standard_lat equatorial_radius_km [ polar_radius_km ]
 
-Here, **Nx** and **Ny** are the number of points in the **x** and **y** grid directions, respectively. **lat_first** and **lon_first** are the latitude and longitude, in degrees, of the lower left point of the grid. **central_lon** is the orientation longitude of the grid. **Dx_km** and **Dy_km** are the grid resolution in the **x** and **y** directions, both in kilometers. **standard_lat** is the stardard parallel of the Lambert projection. **equatorial_radius_km** is the radius of the Earth at the equator in kilometers. For an elliptical earth, **polar_radius_km** is the radius of the Earth at the poles in kilometers. If both are provided, an elliptical Earth is assumed. If only **equatorial_radius_km** is provided, a spherical Earth is assumed.
+Here, **Nx** and **Ny** are the number of points in the **x** and **y** grid directions, respectively. **lat_first** and **lon_first** are the latitude and longitude, in degrees, of the lower left point of the grid. **central_lon** is the orientation longitude of the grid. **Dx_km** and **Dy_km** are the grid resolution in the **x** and **y** directions, both in kilometers. **standard_lat** is the standard parallel of the Lambert projection. **equatorial_radius_km** is the radius of the Earth at the equator in kilometers. For an elliptical earth, **polar_radius_km** is the radius of the Earth at the poles in kilometers. If both are provided, an elliptical Earth is assumed. If only **equatorial_radius_km** is provided, a spherical Earth is assumed.
 
 
 Polar Stereographic Grid
@@ -90,13 +90,13 @@ The parameters **Nx, Ny, lat_ll** and **lon_ll** are as before. **delta_lat** an
 Rotated Lat/Lon Grid
 --------------------
 
-For a Rotated Plate Carrée (i.e. Rotated Lat/Lon) grids, the syntax is
+For a Rotated Plate Carrée (i.e. Rotated Lat/Lon) grid, the syntax is
 
 .. code-block:: none
 
   rotlatlon Nx Ny lat_ll lon_ll delta_lat delta_lon true_lat_sp true_lon_sp aux_rotation
 
-The parameters **Nx, Ny, lat_ll, lon_ll, delta_lat,** and **delta_lon** are as before. **true_lat_sp** and **true_lon_sp** are the latitude and longitude for the south pole. **aux_rotation** is the auxilary rotation in degrees.
+The parameters **Nx, Ny, lat_ll, lon_ll, delta_lat,** and **delta_lon** are as before. **true_lat_sp** and **true_lon_sp** are the latitude and longitude for the south pole. **aux_rotation** is the auxiliary rotation in degrees.
 
 Mercator Grid
 -------------
@@ -136,7 +136,7 @@ The parameters **lat_center** and **lon_center** define the latitude and longitu
 Semi Lat/Lon Grid
 -----------------
 
-For a Semi Lat/Lon grid, no grid specification string is supported. This grid type is only supported via Python embedding or when reading NetCDF files generated by another MET tool. A Semi Lat/Lon grid defines the information about 2D field of data whose dimension are defined by arrays of latitude (**lats**), longitude (**lons**), level (**levels**), and time (**times**). Times are defined as unixtime, the number of seconds since January 1, 1970. Typically, the lats or lons array and the levels or times array has non-zero length. For example, a zonal mean field is defined using the lats and levels array. A meridional mean field is defined using the lons and levels array. A Hovmoeller field is defined using lats or lons versus times. An arbitrary cross-section is defined by specifying both the lats and lons array with exactly the same length versus levels or times.
+For a Semi Lat/Lon grid, no grid specification string is supported. This grid type is only supported via Python embedding or when reading NetCDF files generated by another MET tool. A Semi Lat/Lon grid defines the information about 2D field of data whose dimensions are defined by arrays of latitude (**lats**), longitude (**lons**), level (**levels**), and time (**times**). Times are defined as unixtime, the number of seconds since January 1, 1970. Typically, the lats or lons array and the levels or times array has non-zero length. For example, a zonal mean field is defined using the lats and levels array. A meridional mean field is defined using the lons and levels array. A Hovmoeller field is defined using lats or lons versus times. An arbitrary cross-section is defined by specifying both the lats and lons array with exactly the same length versus levels or times.
 
 Statistics can be computed from data on Semi Lat/Lon grids but only when all data resides on the same Semi Lat/Lon grid. Two Semi Lat/Lon grids are equal when their lats, lons, levels, and times arrays match. No functionality is provided to regrid Semi Lat/Lon data. The MET tools can plot Semi Lat/Lon data, however no map data is overlaid since these grids lack two spatial dimensions.
 
