@@ -358,7 +358,8 @@ Q. How do I define a complex masking region?
 
                      gen_vx_mask fcst.grb fcst.grb tmp_mask.nc \
                      -type data \
-                     -mask_field 'name="TMP"; level="Z2"' -thresh le273 \
+                     -mask_field 'name="TMP"; level="Z2"' -thresh le273
+
                      gen_vx_mask tmp_mask.nc fcst.grb tmp_and_precip_mask.nc \
                      -type data \
                      -input_field 'name="TMP_Z2"; level="(*,*)";' \
