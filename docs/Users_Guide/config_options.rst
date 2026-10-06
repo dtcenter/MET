@@ -407,7 +407,7 @@ The following lines consist of 4 integers followed by 3 strings:
 | Column 7: units
 
 References:
-| `Office Note 388 GRIB1 <http://www.nco.ncep.noaa.gov/pmb/docs/on388>`_
+| `Office Note 388 GRIB1 <https://www.nco.ncep.noaa.gov/pmb/docs/on388/>`_
 | `A Guide to the Code Form FM 92-IX Ext. GRIB Edition 1 <https://community.wmo.int/site/knowledge-hub/programmes-and-initiatives/wmo-information-system-wis/grib-edition-1>`_
 
 
@@ -428,7 +428,7 @@ The following lines consist of 8 integers followed by 3 strings.
 | Column 11: units
 
 References:
-| `NCEP WMO GRIB2 Documentation <http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc>`_
+| `NCEP WMO GRIB2 Documentation <https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/>`_
 
 .. _omp_num_threads:
 
@@ -1306,9 +1306,9 @@ GRIB1 and GRIB2
 
   * The "name" entry specifies a GRIB code number or abbreviation.
 
-    * `GRIB1 Product Definition Section <http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html>`_
+    * `GRIB1 Product Definition Section <https://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html>`_
 
-    * `GRIB2 Product Definition Section <http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc>`_
+    * `GRIB2 Product Definition Section <https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/>`_
 
   * The "level" entry specifies a level type and value:
 
@@ -1967,7 +1967,7 @@ used. The standard NCEP grids are named "GNNN" where NNN indicates the
 three digit grid number. Supplying a value of "FULL" indicates that the
 verification should be performed over the entire grid on which the data
 resides.
-See: `ON388 - TABLE B, GRID IDENTIFICATION (PDS Octet 7), MASTER LIST OF NCEP STORAGE GRIDS, GRIB Edition 1 (FM92) <http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html>`_.
+See: `ON388 - TABLE B, GRID IDENTIFICATION (PDS Octet 7), MASTER LIST OF NCEP STORAGE GRIDS, GRIB Edition 1 (FM92) <https://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html>`_.
 The "grid" entry can be the gridded data file defining grid.
 
 poly
@@ -3422,7 +3422,7 @@ The "dist_parm" entry is an array of length 1 or 2 specifying the parameters
 for the distribution selected in dist_type. The NORMAL, EXPONENTIAL, and
 CHISQUARED distributions are defined by a single parameter. The GAMMA,
 UNIFORM, and BETA distributions are defined by two parameters. See the
-`GNU Scientific Library Reference Manual <https://www.gnu.org/software/gsl/manual>`_
+`GNU Scientific Library Reference Manual <https://www.gnu.org/software/gsl/doc/html/>`_
 for more information on these distributions.
 
 obs_error.inst_bias_scale and obs_error.inst_bias_offset
@@ -4181,7 +4181,7 @@ For example:
 
 | message_type[] = [ "ADPUPA", "AIRCAR" ];
 
-`Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
+`Current Table A Entries in PREPBUFR mnemonic table <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
 
 .. code-block:: none
 
@@ -4223,7 +4223,7 @@ retained. The numeric "pb_report_type" entry allows for further
 stratification within message types. An empty list indicates that all should
 be retained.
 
-See: `Code table for PREPBUFR report types used by Regional NAM GSI analyses <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_4.htm>`_
+See: `Code table for PREPBUFR report types used by Regional NAM GSI analyses <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_4.htm>`_
 
 For example:
 
@@ -4243,7 +4243,7 @@ retained. The numeric "in_report_type" entry provides additional
 stratification of observations. An empty list indicates that all should
 be retained.
 
-See: `Code table for input report types <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm>`_
+See: `Code table for input report types <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm>`_
 
 For example:
 
@@ -4306,7 +4306,7 @@ categories should be retained:
 
 An empty list indicates that all should be retained.
 
-See: `Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
+See: `Current Table A Entries in PREPBUFR mnemonic table <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
 
 .. code-block:: none
 
@@ -4378,7 +4378,7 @@ The "quality_mark_thresh" entry specifies a threshold to filter observations
 based on their quality mark value. Only those observations whose quality
 mark value meets this threshold criteria will be used.
 
-See `Code table for observation quality markers <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_7.htm>`_
+See `Code table for observation quality markers <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_7.htm>`_
 
 .. code-block:: none
 

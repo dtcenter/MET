@@ -15,7 +15,7 @@ components are documented in the `METplus Contributor's Guide
 These common workflows include:
 
 - `Testing (testing.yml) <https://metplus.readthedocs.io/en/latest/Contributors_Guide/continuous_integration.html#testing-testing-yml>`_ to perform regression testing.
-- `Documentation (documentation.yml) <https://metplus.readthedocs.io/en/latest/Contributors_Guide/continuous_integration.html#documentation-documentation-yml>`_ to check for problems building the documentation.
+- `Documentation (documentation.yml) <https://metplus.readthedocs.io/en/latest/Contributors_Guide/continuous_integration.html#documentation-documentation-yml>`_ to check for problems building the documentation and for broken links.
 - `SonarQube (sonarqube.yml) <https://metplus.readthedocs.io/en/latest/Contributors_Guide/continuous_integration.html#sonarqube-sonarqube-yml>`_ to perform static code analysis.
 - `Build Docker Image and Trigger METplus Workflow (build_docker_and_trigger_metplus.yml) <https://metplus.readthedocs.io/en/latest/Contributors_Guide/continuous_integration.html#build-docker-image-and-trigger-metplus-workflow-build-docker-and-trigger-metplus-yml>`_ to confirm that changes to METplus components do not break existing METplus use cases.
 - `Release Checksum (release-checksum.yml) <https://metplus.readthedocs.io/en/latest/Contributors_Guide/continuous_integration.html#add-checksum-to-release-release-checksum-yml>`_ to create and attach checksum file assets to software releases.
