@@ -318,7 +318,7 @@ The usage statement for the shift_data_plane utility is shown below:
          -to lat lon
          [-method type]
          [-width n]
-	 [-shape SHAPE]
+         [-shape SHAPE]
          [-log file]
          [-v level]
          [-compress level]

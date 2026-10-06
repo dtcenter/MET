@@ -977,7 +977,7 @@ The ideal forecast (i.e., one with perfect reliability) has conditional observed
 
 .. figure:: figure/appendixC-rel_diag.jpg
 
-	    Example of Reliability Diagram
+            Example of Reliability Diagram
 
 Receiver Operating Characteristic
 ---------------------------------
@@ -992,7 +992,7 @@ A ROC curve shows how well the forecast discriminates between two outcomes, so i
 
 .. figure:: figure/appendixC-roc_example.jpg
 
-	    Example of ROC Curve
+            Example of ROC Curve
 
 Area Under the ROC Curve (AUC)
 ------------------------------
