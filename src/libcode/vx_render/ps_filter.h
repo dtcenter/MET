@@ -46,7 +46,6 @@ static const int FlateEncode      =  4;
 
 
 static const int max_filters = 10;
-static const int filter_buf_size = 32;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -73,7 +72,6 @@ class PSFilter {
 
       int DecimalPlaces;
 
-      char double_format[filter_buf_size];
 
       virtual void eat(unsigned char);
 

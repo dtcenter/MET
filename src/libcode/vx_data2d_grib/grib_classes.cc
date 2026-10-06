@@ -781,7 +781,7 @@ if ( (n_read = read(rep->buf.data(), bytes)) == 0 ) return 0;
 
 memcpy(g.is.get(), rep->buf.data(), 8);
 
-if ( (n_read < 0) || (n_read != bytes) )  {
+if ( n_read != bytes )  {
 
    mlog << Error << "\nGribFile::read_record() -> error reading section 0 header ... nread = " << n_read << "\n\n";
 
@@ -1030,7 +1030,7 @@ int GribFile::skip_header()
 
 {
 
-size_t j, n_read;
+ssize_t j, n_read;
 off_t pos;
 
 bool found = false;
@@ -1062,7 +1062,7 @@ if ( n_read < 0 )  {
 
 }
 
-for (j=0; j<=min(grib_search_bytes, (n_read - 4)); ++j)  {
+for (j=0; j<=min<ssize_t>(grib_search_bytes, (n_read - 4)); ++j)  {
 
    if ( strncmp((char *) (rep->buf.data() + j), "GRIB", 4) == 0 )  {
       found = true;
@@ -1127,7 +1127,7 @@ size_t GribFile::read()
 
 {
 
-size_t n_read;
+ssize_t n_read;
 
 if ( (n_read = ::read(rep->fd, (char *) rep->buf.data(), rep->buf_size)) < 0 )  {
 
@@ -1137,7 +1137,7 @@ if ( (n_read = ::read(rep->fd, (char *) rep->buf.data(), rep->buf_size)) < 0 )  
 
 }
 
-return n_read;
+return static_cast<size_t>(n_read);
 
 }
 
@@ -1149,7 +1149,7 @@ size_t GribFile::read(size_t bytes)
 
 {
 
-size_t n_read;
+ssize_t n_read;
 
 if ( bytes > rep->buf_size )  {
 
@@ -1168,7 +1168,7 @@ if ( (n_read = ::read(rep->fd, (char *) rep->buf.data(), bytes)) < 0 )  {
 
 }
 
-return n_read;
+return static_cast<size_t>(n_read);
 
 }
 
@@ -1867,7 +1867,7 @@ long find_magic_cookie(int fd)
 {
 
 int j;
-size_t n_read;
+ssize_t n_read;
 long pos = 0;
 char buf[100];
 

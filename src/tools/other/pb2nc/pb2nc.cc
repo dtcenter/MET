@@ -81,6 +81,7 @@
 #include <unistd.h>
 #include <assert.h>
 
+#include <algorithm>
 #include <array>
 #include <netcdf>
 
@@ -603,7 +604,7 @@ static void initialize() {
    prepbufr_derive_vars.add("D_MLCAPE");
    prepbufr_derive_vars.add("D_PBL");
 
-   for (int idx=0; idx<(sizeof(hdr) / sizeof(hdr[0])); idx++) {
+   for (int idx=0; idx<(std::size(hdr)); idx++) {
       hdr[idx] = r8bfms * 10;
    }
 
@@ -722,9 +723,22 @@ bool is_prepbufr_file(const StringArray *events) {
 void get_variable_info(ConcatString &blk_file, int unit) {
    static const char *method_name = "  get_variable_info()";
 
-   FILE * fp;
-   char * line = nullptr;
-   size_t len = 1024;
+   ifstream in;
+   string line_str;
+
+   // Lines are padded with spaces so that every fixed-width field
+   // can be read without running past the end of the line
+   constexpr size_t min_line_len = max({
+      BUFR_NUMBER_START + 1,
+      BUFR_NAME_START + BUFR_NAME_LEN,
+      BUFR_DESCRIPTION_START + BUFR_DESCRIPTION_LEN,
+      BUFR_UNIT_START + BUFR_UNIT_LEN,
+      BUFR_SEQUENCE_START + BUFR_SEQUENCE_LEN });
+   auto read_line = [&in, &line_str]() -> bool {
+      if (!getline(in, line_str)) return false;
+      if (line_str.size() < min_line_len) line_str.resize(min_line_len, ' ');
+      return true;
+   };
 
    event_names.clear();
    event_members.clear();
@@ -736,22 +750,17 @@ void get_variable_info(ConcatString &blk_file, int unit) {
 
    ConcatString tbl_filename = save_bufr_table_to_file(blk_file.c_str(), unit);
 
-   fp = fopen(tbl_filename.c_str(), "r");
-   if (fp != nullptr) {
+   in.open(tbl_filename.c_str());
+   if (in.is_open()) {
       char var_name[BUFR_NAME_LEN+1];
       char var_desc[max(BUFR_DESCRIPTION_LEN,BUFR_SEQUENCE_LEN)+1];
       char var_unit_str[BUFR_UNIT_LEN+1];
       bool find_mnemonic = false;
 
-      line = (char *)malloc(len * sizeof(char));
-      if( line == nullptr) {
-         mlog << Error << "\n" << method_name << " -> "
-              << "Unable to allocate buffer\n\n";
-         exit(1);
-      }
       // Processing section 1
       int var_count1 = 0;
-      while (getline(&line, &len, fp) != -1) {
+      while (read_line()) {
+         const char *line = line_str.c_str();
          if (nullptr != strstr(line,"--------")) continue;
          if (nullptr != strstr(line,"MNEMONIC")) {
             if (find_mnemonic) break;
@@ -786,7 +795,8 @@ void get_variable_info(ConcatString &blk_file, int unit) {
       }
 
       // Skip section 2
-      while (getline(&line, &len, fp) != -1) {
+      while (read_line()) {
+         const char *line = line_str.c_str();
          if (nullptr != strstr(line,"MNEMONIC")) break;
          if (nullptr == strstr(line,"EVENT")) continue;
 
@@ -812,10 +822,11 @@ void get_variable_info(ConcatString &blk_file, int unit) {
          event_names.add(var_name);
          event_members.add(var_desc);
       }
-      getline(&line, &len, fp);
+      read_line();
 
       // Processing section 3
-      while (getline(&line, &len, fp) != -1) {
+      while (read_line()) {
+         const char *line = line_str.c_str();
          if (' ' == line[BUFR_NAME_START]) continue;
          if ('-' == line[BUFR_NAME_START]) break;
 
@@ -849,8 +860,7 @@ void get_variable_info(ConcatString &blk_file, int unit) {
          }
       }
 
-      fclose(fp);
-      if (line) free(line);
+      in.close();
 
    }
 
@@ -2837,9 +2847,10 @@ static void cleanup_hdr_typ(char *hdr_typ, bool is_prepbufr) {
 ////////////////////////////////////////////////////////////////////////
 
 static void dbl2str(double *d, ConcatString & str) {
-   const char *fmt_str = "%s";
-
-   str.format(fmt_str, d);
+   // BUFR character data is packed into the bytes of a double and is only
+   // null-terminated when shorter than sizeof(double)
+   const char *c = reinterpret_cast<const char *>(d);
+   str = string(c, strnlen(c, sizeof(double)));
    if (str.empty()) {
       str = "NA";
    }

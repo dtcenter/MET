@@ -11,6 +11,8 @@
 #ifndef  __UTIL_CONSTANTS_H__
 #define  __UTIL_CONSTANTS_H__
 
+
+#include <iterator>
 #if HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -65,12 +67,6 @@ static const char range_azimuth_proj_type  [] = "Range Azimuth";
 static const char laea_proj_type           [] = "Lambert Azimuthal Equal Area";
 static const char semilatlon_proj_type     [] = "SemiLatLon";
 
-// String containing all valid PrepBufr message types
-static const char vld_msg_typ_str[] =
-   "ADPUPA AIRCAR AIRCFT ADPSFC ERS1DA GOESND GPSIPW MSONET \
-    PROFLR QKSWND RASSDA SATEMP SATWND SFCBOG SFCSHP SPSSMI \
-    SYNDAT VADWND ANYAIR ANYSFC ONLYSF ASCATW WDSATR";
-
 // Array of valid PrepBufr message types
 static const char *vld_msg_typ_list[] = {
    "ADPUPA", "AIRCAR", "AIRCFT", "ADPSFC", "ERS1DA", "GOESND",
@@ -80,7 +76,7 @@ static const char *vld_msg_typ_list[] = {
 
 // Number of valid PrepBufr message types
 static const int n_vld_msg_typ =
-   sizeof(vld_msg_typ_list)/sizeof(*vld_msg_typ_list);
+   std::size(vld_msg_typ_list);
 
 // Message type group names
 static const char surface_msg_typ_group_str [] = "SURFACE"; // Surface message type group

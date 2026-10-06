@@ -16,6 +16,7 @@ static const bool verbose = true;
 #include <string.h>
 #include <cstdio>
 #include <cmath>
+#include <iterator>
 
 
 #include "vx_log.h"
@@ -106,7 +107,7 @@ inline bool have_putback() { return ( n_putback_chars > 0 ); }
 
 static const char * fort_thresh_string [] = { "lt", "le", "gt", "ge", "ne", "eq" };
 
-static const int n_fort_thresh_strings = sizeof(fort_thresh_string)/sizeof(*fort_thresh_string);
+static const int n_fort_thresh_strings = std::size(fort_thresh_string);
 
 
 ////////////////////////////////////////////////////////////////////////

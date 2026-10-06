@@ -17,6 +17,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <iterator>
+
 #include "vx_grid.h"
 
 
@@ -78,7 +80,7 @@ static const LambertData dtc_lambert_grids [] = {
 };
 
 
-static const int n_dtc_lambert_grids = sizeof(dtc_lambert_grids)/sizeof(*dtc_lambert_grids);
+static const int n_dtc_lambert_grids = std::size(dtc_lambert_grids);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -139,7 +141,7 @@ static const LatLonData ncep_latlon_grids [] = {
 
 };
 
-static const int n_ncep_latlon_grids = sizeof(ncep_latlon_grids)/sizeof(*ncep_latlon_grids);
+static const int n_ncep_latlon_grids = std::size(ncep_latlon_grids);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -156,7 +158,7 @@ static const LatLonData misc_latlon_grids [] = {
 
 };
 
-static const int n_misc_latlon_grids = sizeof(misc_latlon_grids)/sizeof(*misc_latlon_grids);
+static const int n_misc_latlon_grids = std::size(misc_latlon_grids);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -221,7 +223,7 @@ static const StereographicData ncep_st_grids [] = {
 
 };
 
-static const int n_ncep_st_grids = sizeof(ncep_st_grids)/sizeof(*ncep_st_grids);
+static const int n_ncep_st_grids = std::size(ncep_st_grids);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -236,7 +238,7 @@ static const StereographicData wwmca_south_data  = { "wwmca_south", 'S', -60.0, 
 
 static const StereographicData misc_st_grids [] = { wwmca_north_data, wwmca_south_data };
 
-static const int n_misc_st_grids = sizeof(misc_st_grids)/sizeof(*misc_st_grids);
+static const int n_misc_st_grids = std::size(misc_st_grids);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -285,7 +287,7 @@ static const LambertData ncep_lambert_grids [] = {
 };
 
 
-static const int n_ncep_lambert_grids = sizeof(ncep_lambert_grids)/sizeof(*ncep_lambert_grids);
+static const int n_ncep_lambert_grids = std::size(ncep_lambert_grids);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -312,7 +314,7 @@ static const MercatorData ncep_mercator_grids [] = {
 
 };
 
-static const int n_ncep_mercator_grids = sizeof(ncep_mercator_grids)/sizeof(*ncep_mercator_grids);
+static const int n_ncep_mercator_grids = std::size(ncep_mercator_grids);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -334,7 +336,7 @@ static const GaussianData ncep_gaussian_grids [] = {
 
 };
 
-static const int n_ncep_gaussian_grids = sizeof(ncep_gaussian_grids)/sizeof(*ncep_gaussian_grids);
+static const int n_ncep_gaussian_grids = std::size(ncep_gaussian_grids);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -351,7 +353,7 @@ static const LaeaData misc_laea_grids [] = {
 
 };
 
-static const int n_misc_laea_grids = sizeof(misc_laea_grids)/sizeof(*misc_laea_grids);
+static const int n_misc_laea_grids = std::size(misc_laea_grids);
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -13,6 +13,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <iterator>
+
 #include "vx_stat_out.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -27,7 +29,7 @@ static const char  *micro_id_str [] = {
    "msu",   "hsb",   "ssmi",
    "ssmis", "amsre", "atms"
 };
-static const int n_micro_id_str = sizeof(micro_id_str)/sizeof(*micro_id_str);
+static const int n_micro_id_str = std::size(micro_id_str);
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -11,6 +11,9 @@
 #ifndef  __MODE_COLUMNS_H__
 #define  __MODE_COLUMNS_H__
 
+#include <iterator>
+
+
 ////////////////////////////////////////////////////////////////////////
 
 static const std::string mode_hdr_columns [] = {
@@ -119,13 +122,13 @@ static const char * mode_cts_columns [] = {
 ////////////////////////////////////////////////////////////////////////
 
 static const int n_mode_hdr_columns =
-                    sizeof(mode_hdr_columns)/sizeof(*mode_hdr_columns);
+                    std::size(mode_hdr_columns);
 
 static const int n_mode_obj_columns =
-                    sizeof(mode_obj_columns)/sizeof(*mode_obj_columns);
+                    std::size(mode_obj_columns);
 
 static const int n_mode_cts_columns =
-                    sizeof(mode_cts_columns)/sizeof(*mode_cts_columns);
+                    std::size(mode_cts_columns);
 
 ////////////////////////////////////////////////////////////////////////
 
