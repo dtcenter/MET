@@ -70,9 +70,9 @@ Ensemble Observation Error
 
 In an attempt to ameliorate the effect of observation errors on the verification of forecasts, a random perturbation approach has been implemented. A great deal of user flexibility has been built in, but the methods detailed in :ref:`Candille and Talagrand (2008) <Candille-2008>` can be replicated using the appropriate options. Additional variations of the ignorance score that include observational uncertainty recommended by :ref:`Ferro, 2017 <Ferro-2017>` are also provided.
 
-Observation error information can be defined directly in the Ensemble-Stat configuration file or through a more flexible observation error lookup table. The user selects a distribution for the observation error, along with parameters for that distribution. Rescaling and bias correction can also be specified prior to the perturbation. Random draws from the distribution can then be added to either, or both of the forecast and observed fields, including ensemble members. Details about the effects of the choices on verification statistics should be considered, with many details provided in the literature (*e.g.* :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Saetra et al., 2004 <Saetra-2004>`; :ref:`Santos and Ghelli, 2012 <Santos-2012>`). Generally, perturbation makes verification statistics better when applied to ensemble members, and worse when applied to the observations themselves.
+Observation error information can be defined directly in the Ensemble-Stat configuration file or through a more flexible observation error lookup table. The user selects a distribution for the observation error, along with parameters for that distribution. Rescaling and bias correction can also be specified prior to the perturbation. Random draws from the distribution can then be added to either, or both of the forecast and observed fields, including ensemble members. Details about the effects of the choices on verification statistics should be considered, with many details provided in the literature (*e.g.*, :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Saetra et al., 2004 <Saetra-2004>`; :ref:`Santos and Ghelli, 2012 <Santos-2012>`). Generally, perturbation makes verification statistics better when applied to ensemble members, and worse when applied to the observations themselves.
 
-Normal and uniform are common choices for the observation error distribution. The uniform distribution provides the benefit of being bounded on both sides, thus preventing the perturbation from taking on extreme values. Normal is the most common choice for observation error. However, the user should realize that with the very large samples typical in NWP, some large outliers will almost certainly be introduced with the perturbation. For variables that are bounded below by 0, and that may have inconsistent observation errors (e.g. larger errors with larger measurements), a lognormal distribution may be selected. Wind speeds and precipitation measurements are the most common of this type of NWP variable. The lognormal error perturbation prevents measurements of 0 from being perturbed, and applies larger perturbations when measurements are larger. This is often the desired behavior in these cases, but this distribution can also lead to some outliers being introduced in the perturbation step.
+Normal and uniform are common choices for the observation error distribution. The uniform distribution provides the benefit of being bounded on both sides, thus preventing the perturbation from taking on extreme values. Normal is the most common choice for observation error. However, the user should realize that with the very large samples typical in NWP, some large outliers will almost certainly be introduced with the perturbation. For variables that are bounded below by 0, and that may have inconsistent observation errors (e.g., larger errors with larger measurements), a lognormal distribution may be selected. Wind speeds and precipitation measurements are the most common of this type of NWP variable. The lognormal error perturbation prevents measurements of 0 from being perturbed, and applies larger perturbations when measurements are larger. This is often the desired behavior in these cases, but this distribution can also lead to some outliers being introduced in the perturbation step.
 
 Observation errors differ according to instrument, temporal and spatial representation, and variable type. Unfortunately, many observation errors have not been examined or documented in the literature. Those that have usually lack information regarding their distributions and approximate parameters. Instead, a range or typical value of observation error is often reported and these are often used as an estimate of the standard deviation of some distribution. Where possible, it is recommended to use the appropriate type and size of perturbation for the observation to prevent spurious results.
 
@@ -211,7 +211,7 @@ When processing the **fcst** data, compute a ratio of the number of valid ensemb
 
 When processing the **fcst** data, for each grid point compute a ratio of the number of valid data values to the number of ensemble members. If that ratio is less than **vld_thresh**, write out bad data. This threshold must be between 0 and 1. Setting this threshold to 1 will require each grid point to contain valid data for all ensemble members.
 
-For each **field** listed in the forecast field, give the name and vertical or accumulation level, plus one or more categorical thresholds. The thresholds are specified using symbols, as shown above. It is the user's responsibility to know the units for each model variable and to choose appropriate threshold values. The thresholds are used to define ensemble relative frequencies, e.g. a threshold of >=5 can be used to compute the proportion of ensemble members predicting precipitation of at least 5mm at each grid point.
+For each **field** listed in the forecast field, give the name and vertical or accumulation level, plus one or more categorical thresholds. The thresholds are specified using symbols, as shown above. It is the user's responsibility to know the units for each model variable and to choose appropriate threshold values. The thresholds are used to define ensemble relative frequencies, e.g., a threshold of >=5 can be used to compute the proportion of ensemble members predicting precipitation of at least 5mm at each grid point.
 
 _______________________
 
@@ -671,15 +671,15 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool is described b
     - Double
   * - 33
     - ME_OERR
-    - The Mean Error of the PERTURBED ensemble mean (e.g. with Observation Error)
+    - The Mean Error of the PERTURBED ensemble mean (e.g., with Observation Error)
     - Double
   * - 34
     - RMSE_OERR
-    - The Root Mean Square Error of the PERTURBED ensemble mean (e.g. with Observation Error)
+    - The Root Mean Square Error of the PERTURBED ensemble mean (e.g., with Observation Error)
     - Double
   * - 35
     - SPREAD_OERR
-    - The square root of the mean of the variance of the PERTURBED ensemble member values (e.g. with Observation Error) at each observation location
+    - The square root of the mean of the variance of the PERTURBED ensemble member values (e.g., with Observation Error) at each observation location
     - Double
   * - 36
     - SPREAD_PLUS_OERR
@@ -715,7 +715,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool is described b
     - Double
   * - 44
     - MAE_OERR
-    - The Mean Absolute Error of the PERTURBED ensemble mean (e.g. with Observation Error)
+    - The Mean Absolute Error of the PERTURBED ensemble mean (e.g., with Observation Error)
     - Double
   * - 45
     - BIAS_RATIO
@@ -739,11 +739,11 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool is described b
     - Double
   * - 50
     - IGN_CONV_OERR
-    - Error-convolved logarithmic scoring rule (i.e. ignorance score) from Equation 5 of :ref:`Ferro, 2017 <Ferro-2017>`
+    - Error-convolved logarithmic scoring rule (i.e., ignorance score) from Equation 5 of :ref:`Ferro, 2017 <Ferro-2017>`
     - Double
   * - 51
     - IGN_CORR_OERR
-    - Error-corrected logarithmic scoring rule (i.e. ignorance score) from Equation 7 of :ref:`Ferro, 2017 <Ferro-2017>`
+    - Error-corrected logarithmic scoring rule (i.e., ignorance score) from Equation 7 of :ref:`Ferro, 2017 <Ferro-2017>`
     - Double
 
 .. _table_ES_header_info_es_out_RPS:
@@ -766,7 +766,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool is described b
     - Integer
   * - 26
     - N_PROB
-    - Number of probability thresholds (i.e. number of ensemble members in Ensemble-Stat)
+    - Number of probability thresholds (i.e., number of ensemble members in Ensemble-Stat)
     - Integer
   * - 27
     - RPS_REL
@@ -962,11 +962,11 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool is described b
     - Double
   * - Last-5
     - ENS_MEAN_OERR
-    - The PERTURBED ensemble mean (e.g. with Observation Error)
+    - The PERTURBED ensemble mean (e.g., with Observation Error)
     - Double
   * - Last-4
     - SPREAD_OERR
-    - The spread (standard deviation) of the PERTURBED ensemble member values (e.g. with Observation Error)
+    - The spread (standard deviation) of the PERTURBED ensemble member values (e.g., with Observation Error)
     - Double
   * - Last-3
     - SPREAD_PLUS_OERR

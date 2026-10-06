@@ -79,7 +79,7 @@ Here, **Nx, Ny, lat_ll, lon_ll, lon_orient, D_km** and **R_km** have the same me
 Lat/Lon Grid
 ------------
 
-For Plate Carrée (i.e. Lat/Lon) grids, the syntax is
+For Plate Carrée (i.e., Lat/Lon) grids, the syntax is
 
 .. code-block:: none
 
@@ -90,7 +90,7 @@ The parameters **Nx, Ny, lat_ll** and **lon_ll** are as before. **delta_lat** an
 Rotated Lat/Lon Grid
 --------------------
 
-For a Rotated Plate Carrée (i.e. Rotated Lat/Lon) grid, the syntax is
+For a Rotated Plate Carrée (i.e., Rotated Lat/Lon) grid, the syntax is
 
 .. code-block:: none
 

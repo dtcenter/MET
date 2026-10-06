@@ -15,7 +15,7 @@ Q. How do I improve the speed of MET tools using Gen-Vx-Mask?
    .. dropdown:: Answer
 
      The main reason to run gen_vx_mask is to make the MET
-     statistics tools (e.g. point_stat, grid_stat, or ensemble_stat) run
+     statistics tools (e.g., point_stat, grid_stat, or ensemble_stat) run
      faster. The verification masking regions in those tools can be specified
      as Lat/Lon polyline files or the NetCDF output of gen_vx_mask. However,
      determining which grid points are inside/outside a polyline region can be
@@ -421,7 +421,7 @@ Q. How do I use neighborhood methods to compute fraction skill score?
 		     stat_analysis -job aggregate -line_type NBRCNT \
 		     -lookin out/grid_stat
 
-     Be sure to pick thresholds (e.g. for the thunderstorms and monsoons)
+     Be sure to pick thresholds (e.g., for the thunderstorms and monsoons)
      that capture the "events" that are of interest in studying.
 
      Also be aware that MET uses the "vld_thresh" setting in the configuration
@@ -872,7 +872,7 @@ Q. How do I use Pcp-Combine when my GRIB data doesn't have the appropriate accum
      Here's a table describing the TR values:
      http://www.nco.ncep.noaa.gov/pmb/docs/on388/table5.html
 
-     The default logic for pcp_combine is to look for GRIB code 61 (i.e. APCP)
+     The default logic for pcp_combine is to look for GRIB code 61 (i.e., APCP)
      defined with an accumulation interval (TR = 4). Since the data doesn't
      meet that criteria, the default logic of pcp_combine won't work. The
      arguments need to be more specific to tell pcp_combine exactly what to do.
@@ -1054,7 +1054,7 @@ Q. How do I specify the GRIB version?
      The example below uses the plot_data_plane tool to plot the data.
 
      To keep the files named as they are, add "file_type = GRIB2;"
-     to all the MET configuration files (i.e. Grid-Stat, MODE, and so on)
+     to all the MET configuration files (i.e., Grid-Stat, MODE, and so on)
      that you use:
 
      .. code-block:: none
@@ -1445,7 +1445,7 @@ Q. How do I convert TRMM data files?
      It may be possible that the domain of the data is smaller.
      Here are some options:
 
-     1. In that Rscript, choose different boundaries (i.e. out_lat/lon_ll/ur)
+     1. In that Rscript, choose different boundaries (i.e., out_lat/lon_ll/ur)
 	to specify the tile of data to be selected.
 
      2. As of version 5.1, MET includes support for regridding the
@@ -1685,7 +1685,7 @@ Q. Why is the grid upside down?
      but the data is packed upside down.
 
      Try using the "file_type" entry. The "file_type" entry specifies the
-     input file type (e.g. GRIB1, GRIB2, NETCDF_MET, NETCDF_WRF, NETCDF_PINT, NETCDF_NCCF)
+     input file type (e.g., GRIB1, GRIB2, NETCDF_MET, NETCDF_WRF, NETCDF_PINT, NETCDF_NCCF)
      rather than letting the code determine it itself. For valid file_type
      values, see "File types" in the *data/config/ConfigConstants* file. This
      entry should be defined within the "fcst" or "obs" dictionaries.
@@ -1694,7 +1694,7 @@ Q. Why is the grid upside down?
 
      Another option is to use the Regrid-Data-Plane tool. The Regrid-Data-Plane
      tool may be run to read data from any gridded data file MET supports
-     (i.e. GRIB1, GRIB2, and a variety of NetCDF formats), interpolate to a
+     (i.e., GRIB1, GRIB2, and a variety of NetCDF formats), interpolate to a
      user-specified grid, and write the field(s) out in NetCDF format. See the
      Regrid-Data-Plane tool :numref:`regrid-data-plane` in the MET
      User's Guide for more
@@ -1799,7 +1799,7 @@ Q. What are MET's conventions for latitude, longitude, azimuth and bearing angle
      MET considers north latitude and east longitude positive. However,
      internally MET considers east longitude negative so users may encounter
      DEBUG statements with longitude of a different sign than they provided
-     (e.g. for observation locations or grid metadata). Latitudes have
+     (e.g., for observation locations or grid metadata). Latitudes have
      range from :math:`-90^\circ` to :math:`+90^\circ`. Longitudes have
      range from :math:`-180^\circ` to :math:`+180^\circ`. Plane angles such
      as azimuths and bearing (example: horizontal wind direction) have
@@ -1966,8 +1966,8 @@ General Troubleshooting
   .. dropdown:: Troubleshooting Help
 
      * For configuration files used, make certain to use empty square brackets
-       (e.g. [ ]) to indicate no stratification is desired. Do NOT use empty
-       double quotation marks inside square brackets (e.g. [""]).
+       (e.g., [ ]) to indicate no stratification is desired. Do NOT use empty
+       double quotation marks inside square brackets (e.g., [""]).
 
      * Have you designated all the required command line arguments?
 

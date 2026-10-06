@@ -84,7 +84,7 @@ Overview of Steps for Performing Benchmarking
 
        The CTRACK directive is placed at the top of the function of interest.  Use the preprocessor directive for WITH_PROFILER:
 
-       e.g. ensemble_stat.cc:
+       e.g., ensemble_stat.cc:
 
         .. code-block:: ini
 
@@ -98,7 +98,7 @@ Overview of Steps for Performing Benchmarking
       and the *ctrack::result_print* is placed within the corresponding MET tool's
       **main()/met_main()** function
 
-       e.g. ensemble_stat.cc
+       e.g., ensemble_stat.cc
 
          .. code-block:: ini
 
@@ -339,7 +339,7 @@ Overview of Steps for Performing Benchmarking
           - **required**
           - location of the METplus source code, specified by one of the following methods:
 
-             - indicated as a full path e.g. /home/username/METplus
+             - indicated as a full path e.g., /home/username/METplus
              - setting the METPLUS_BASE environment variable and using the current environment syntax like the following:
 
               .. code-block:: ini
@@ -387,7 +387,7 @@ Overview of Steps for Performing Benchmarking
 
     .. dropdown::  Running MET command
 
-       Define any necessary environment variables for the corresponding MET tool (e.g. Ensemble-Stat tool environment
+       Define any necessary environment variables for the corresponding MET tool (e.g., Ensemble-Stat tool environment
        variables specified in the $HOME/METplus/metplus/parm/met_config/EnsembleStatConfig_wrapped)
 
       .. dropdown:: Example Ensemble-Stat config

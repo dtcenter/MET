@@ -13,7 +13,7 @@ Originally developed for the Statistical Hurricane Intensity Prediction Scheme (
 
 .. note:: A future version of the tool will include the capability to remove the model's own vortex, which will allow the user to specify any arbitrary track (such as the operational center's official forecast). Until then, users are advised that the track selected must be consistent with the model's predicted track.
 
-TC-Diag is run once for each initialization time to produce diagnostics for each user-specified combination of TC tracks and model fields. The user provides track data (such as one or more ATCF a-deck track files), along with track filtering criteria as needed, to select one or more tracks to be processed. The user also provides gridded model data from which diagnostics should be computed. Gridded data can be provided for multiple concurrent storms, multiple models, and/or multiple domains (i.e. parent and nest) in a single run.
+TC-Diag is run once for each initialization time to produce diagnostics for each user-specified combination of TC tracks and model fields. The user provides track data (such as one or more ATCF a-deck track files), along with track filtering criteria as needed, to select one or more tracks to be processed. The user also provides gridded model data from which diagnostics should be computed. Gridded data can be provided for multiple concurrent storms, multiple models, and/or multiple domains (i.e., parent and nest) in a single run.
 
 TC-Diag first determines the list of valid times that appear in any one of the tracks. For each valid time, it processes all track points for that time. For each track point, it reads the gridded model fields requested in the configuration file and transforms the gridded data to a range-azimuth cylindrical coordinates grid, as described for the TC-RMW tool in :numref:`tc-rmw`. For each domain, it writes the range-azimuth data to a temporary NetCDF file, as described in :numref:`Contributor's Guide Section %s <tmp_files_tc_diag>`.
 
@@ -257,15 +257,15 @@ These output files contain tabular ASCII data with diagnostic values either extr
 
   - The **STORM DATA** section contains single diagnostic values either extracted from the ATCF track file or computed from the cylindrical grid for each forecast lead time. This section begins with a line named **TIME** defining the forecast lead time of each track point in hours. The following lines contain the requested storm diagnostics. For example, **MAXWIND** contains the maximum wind speed reported in the ATCF track file and **SST** contains the average sea surface temperature computed in the range/azimuth grid.
 
-  - The **SOUNDING DATA** section contains diagnostics computed separately for each vertical level. The vertical levels are typically the surface (e.g. **SURF**) followed by pressure levels (e.g. **0850**). This section begins with two lines named **NLEV** and **TIME** defining the number of vertical levels and their values and the forecast lead times for which diagnostics were computed, respectively. The level name is appended to each diagnostic name. For example, the **T_0850** contains the average temperature value within the range/azimuth grid at the 850 mb pressure level.
+  - The **SOUNDING DATA** section contains diagnostics computed separately for each vertical level. The vertical levels are typically the surface (e.g., **SURF**) followed by pressure levels (e.g., **0850**). This section begins with two lines named **NLEV** and **TIME** defining the number of vertical levels and their values and the forecast lead times for which diagnostics were computed, respectively. The level name is appended to each diagnostic name. For example, the **T_0850** contains the average temperature value within the range/azimuth grid at the 850 mb pressure level.
 
   - Each diagnostic output line contains:
 
-    - Diagnostic name (with or without the level) e.g. **SHR_MAG** for magnitude of wind shear
+    - Diagnostic name (with or without the level) e.g., **SHR_MAG** for magnitude of wind shear
 
-    - Units string enclosed in parentheses e.g. **(KT)** for knots
+    - Units string enclosed in parentheses e.g., **(KT)** for knots
 
-    - The diagnostic values computed for each lead time e.g. **13 10 14 ...**
+    - The diagnostic values computed for each lead time e.g., **13 10 14 ...**
 
 **NetCDF Diagnostics Output**
 
@@ -455,12 +455,12 @@ The NetCDF range-azimuth file contains the dimensions and variables shown in :nu
     - Longitude in degrees east for each range-azimuth grid point
     - Double
   * - single level data
-      (e.g. TMP_Z2, PRMSL_L0)
+      (e.g., TMP_Z2, PRMSL_L0)
     - time, range, azimuth
     - Gridded range-azimuth data on a single level
     - Double
   * - pressure level data
-      (e.g. TMP, HGT)
+      (e.g., TMP, HGT)
     - time, pressure, range, azimuth
     - Gridded range-azimuth data on pressure levels
     - Double

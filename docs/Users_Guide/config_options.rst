@@ -88,26 +88,26 @@ The configuration file language supports the following data types:
   * The following percentile threshold types are supported:
 
     * SFP for a percentile of the sample forecast values.
-      e.g. ">SFP33.3" means greater than the 33.3-rd forecast percentile.
+      e.g., ">SFP33.3" means greater than the 33.3-rd forecast percentile.
 
     * SOP for a percentile of the sample observation values.
-      e.g. ">SOP75" means greater than the 75-th observation percentile.
+      e.g., ">SOP75" means greater than the 75-th observation percentile.
 
     * SFCP for a percentile of the sample forecast climatology values.
-      e.g. ">SFCP90" means greater than the 90-th forecast climatology
+      e.g., ">SFCP90" means greater than the 90-th forecast climatology
       percentile.
 
     * SOCP for a percentile of the sample observation climatology values.
-      e.g. ">SOCP90" means greater than the 90-th observation climatology
+      e.g., ">SOCP90" means greater than the 90-th observation climatology
       percentile. For backward compatibility, the "SCP" threshold type
       is processed the same as "SOCP".
 
     * USP for a user-specified percentile threshold.
-      e.g. "<USP90(2.5)" means less than the 90-th percentile values which
+      e.g., "<USP90(2.5)" means less than the 90-th percentile values which
       the user has already determined to be 2.5 outside of MET.
 
     * ==FBIAS for a user-specified frequency bias value.
-      e.g. "==FBIAS1" to automatically de-bias the data, "==FBIAS0.9" to
+      e.g., "==FBIAS1" to automatically de-bias the data, "==FBIAS0.9" to
       select a low-bias threshold, or "==FBIAS1.1" to select a high-bias
       threshold. This option must be used in conjunction with a simple
       threshold in the other field. For example, when "obs.cat_thresh = >5.0"
@@ -122,7 +122,7 @@ The configuration file language supports the following data types:
       conditional (cnt_thresh), or wind speed (wind_thresh) thresholds can
       be defined relative to the climatological distribution at each point.
       Therefore, the actual numeric threshold applied can change for each point.
-      e.g. ">FCDP50" means greater than the 50-th percentile of the
+      e.g., ">FCDP50" means greater than the 50-th percentile of the
       climatological distribution for each point.
 
     * OCDP for observation climatological distribution percentile thresholds.
@@ -398,9 +398,9 @@ GRIB1 table files begin with "grib1" prefix and end with a ".txt" suffix.
 The first line of the file must contain GRIB1.
 The following lines consist of 4 integers followed by 3 strings:
 
-| Column 1: GRIB code (e.g. 11 for temperature)
+| Column 1: GRIB code (e.g., 11 for temperature)
 | Column 2: parameter table version number
-| Column 3: center id (e.g. 07 for US Weather Service- National Met. Center)
+| Column 3: center id (e.g., 07 for US Weather Service- National Met. Center)
 | Column 4: subcenter id
 | Column 5: variable name
 | Column 6: variable description
@@ -751,9 +751,9 @@ The "obtype_as_group_val_flag" entry is a boolean that controls how the
 OBTYPE header column is populated for message type groups defined in
 "message_type_group_map". If set to TRUE and when writing matched pair
 line types (MPR, SEEPS_MPR, and ORANK), write OBTYPE as the group map
-*value*, i.e. the input message type for each individual observation.
+*value*, i.e., the input message type for each individual observation.
 If set to FALSE (default) and for all other line types, write OBTYPE
-as the group map key, i.e. the name of the message type group.
+as the group map key, i.e., the name of the message type group.
 
 For example, if FALSE, write the OBTYPE column in the MPR line type
 as the "ANYAIR" message type group name. If TRUE, write OBTYPE as "AIRCAR"
@@ -794,7 +794,7 @@ The "model" entry specifies a name for the model being verified. This name
 is written to the MODEL column of the ASCII output generated. If you're
 verifying multiple models, you should choose descriptive model names (no
 whitespace) to distinguish between their output.
-e.g. model = "GFS";
+e.g., model = "GFS";
 
 .. code-block:: none
 
@@ -810,7 +810,7 @@ entry or simply once at the top level of the configuration file. If you're
 verifying the same field multiple times with different quality control
 flags, you should choose description strings (no whitespace) to distinguish
 between their output.
-e.g. desc = "QC_9";
+e.g., desc = "QC_9";
 
 .. code-block:: none
 
@@ -1004,7 +1004,7 @@ The "level" entry specifies level information for the field. Setting
 field.prob
 """"""""""
 The "prob" entry in the forecast dictionary defines probability
-information. It may either be set as a boolean (i.e. TRUE or FALSE)
+information. It may either be set as a boolean (i.e., TRUE or FALSE)
 or as a dictionary defining probabilistic field information.
 
 When set as a boolean to TRUE, it indicates that the "fcst.field" data
@@ -1044,10 +1044,10 @@ data, one could configure the Grid-Stat or Point-Stat tools as follows:
 
 The example above selects two probabilistic fields. In both, "name"
 is set to "PROB", the GRIB abbreviation for probabilities. The "level"
-entry defines the level information (i.e. "A24" for a 24-hour
+entry defines the level information (i.e., "A24" for a 24-hour
 accumulation and "P850" for 850mb). The "prob" dictionary defines the
 event for which the probability is defined. The "thresh_lo"
-(i.e. APCP > 2.54) and/or "thresh_hi" (i.e. TMP < 273) entries are
+(i.e., APCP > 2.54) and/or "thresh_hi" (i.e., TMP < 273) entries are
 used to define the event threshold(s).
 
 Probability fields should contain values in the range
@@ -1097,7 +1097,7 @@ The "convert" entry is a user-defined function of a single variable
 for processing input data values. Any input values that are not bad
 data are replaced by the value of this function. The convert function
 is applied prior to regridding or thresholding. This function may
-include any of the built-in math functions (e.g. sqrt, log10)
+include any of the built-in math functions (e.g., sqrt, log10)
 described above.
 Several standard unit conversion functions are already defined in
 *data/config/ConfigConstants*.
@@ -1988,7 +1988,7 @@ These three options are described below:
   If providing an ASCII file containing the lat/lon points defining the mask
   polygon, the file must contain a name for the region followed by the latitude
   (degrees north) and longitude (degrees east) for each vertex of the polygon.
-  The values are separated by whitespace (e.g. spaces or newlines), and the
+  The values are separated by whitespace (e.g., spaces or newlines), and the
   first and last polygon points are connected.
   The general form is "poly_name lat1 lon1 lat2 lon2... latn lonn".
   Here is an example of a rectangle consisting of 4 points:
@@ -2253,9 +2253,9 @@ For squares, a width of 2 defines a 2 x 2 box of grid points around
 the observation point (the 4 closest model grid points), while a width
 of 3 defines a 3 x 3 box of grid points around the observation point,
 and so on. For odd widths in grid-to-point comparisons
-(i.e. Point-Stat), the interpolation area is centered on the model
+(i.e., Point-Stat), the interpolation area is centered on the model
 grid point closest to the observation point. For grid-to-grid
-comparisons (i.e. Grid-Stat), the width must be odd.
+comparisons (i.e., Grid-Stat), the width must be odd.
 
 type.method
 """""""""""
@@ -2302,7 +2302,7 @@ applied to the points in the box:
 .. note::
 
   Requesting the GEOG_MATCH interpolation method without providing any
-  land/sea mask (e.g. "land_mask.flag = FALSE") or topography data (e.g.
+  land/sea mask (e.g., "land_mask.flag = FALSE") or topography data (e.g.,
   "topo_mask.flag = FALSE") results in a warning message. Without input
   geography data, GEOG_MATCH produces the same result as NEAREST.
 
@@ -3353,7 +3353,7 @@ empty string, meaning that no customization is applied to the output variable
 names. When the Ensemble-Stat config file contains two fields with the same
 name and level value, this entry is used to make the resulting variable names
 unique.
-e.g. nc_var_str = "MIN";
+e.g., nc_var_str = "MIN";
 
 .. code-block:: none
 
@@ -3473,7 +3473,7 @@ lines are read in and processed. The MODE line options are numerous. They
 fall into seven categories: toggles, multiple set string options, multiple
 set integer options, integer max/min options, date/time max/min options,
 floating-point max/min options, and miscellaneous options. **In order to be
-applied, the options must be uncommented (i.e. remove  the "//" marks) before
+applied, the options must be uncommented (i.e., remove  the "//" marks) before
 running.** These options are described in subsequent sections. Please note
 that this configuration file is processed differently than the other config
 files.
@@ -4410,7 +4410,7 @@ block_size
 
 Computation may be memory intensive, especially for large grids.
 The "block_size" entry sets the number of grid points to be processed
-concurrently (i.e. in one pass through a time series). Smaller values
+concurrently (i.e., in one pass through a time series). Smaller values
 require less memory but increase the number of passes through the data.
 If set less than or equal to 0, it is automatically reset to the number
 of grid points, and they are all processed concurrently.

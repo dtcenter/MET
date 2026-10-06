@@ -32,9 +32,9 @@ The Gen-Ens-Prod tool writes the gridded relative frequencies, NEP, NMEP, and EA
 Climatology Data
 ----------------
 
-The ensemble relative frequencies derived by Gen-Ens-Prod are computed by applying threshold(s) to the input ensemble member data. Those thresholds can be simple and remain constant over the entire domain (e.g. >0) or can be defined relative to the climatological distribution at each grid point (e.g. >OCDP90, for exceeding the 90-th percentile of the observation climatology data provided).
+The ensemble relative frequencies derived by Gen-Ens-Prod are computed by applying threshold(s) to the input ensemble member data. Those thresholds can be simple and remain constant over the entire domain (e.g., >0) or can be defined relative to the climatological distribution at each grid point (e.g., >OCDP90, for exceeding the 90-th percentile of the observation climatology data provided).
 
-To use climatological distribution percentile thresholds, users must specify the climatological mean ("climo_mean") and standard deviation ("climo_stdev") entries in the configuration file. With forecast climatology inputs, use forecast climatology distribution percentile thresholds (e.g. >FCDP90). With observation climatology inputs, use observation climatological distribution percentile thresholds instead (e.g. >OCDP90). However, Gen-Ens-Prod cannot actually determine the input climatology data source and both "FCDP" and "OCDP" threshold types will work.
+To use climatological distribution percentile thresholds, users must specify the climatological mean ("climo_mean") and standard deviation ("climo_stdev") entries in the configuration file. With forecast climatology inputs, use forecast climatology distribution percentile thresholds (e.g., >FCDP90). With observation climatology inputs, use observation climatological distribution percentile thresholds instead (e.g., >OCDP90). However, Gen-Ens-Prod cannot actually determine the input climatology data source and both "FCDP" and "OCDP" threshold types will work.
 
 Practical Information
 =====================
@@ -310,7 +310,7 @@ The **ensemble_flag** specifies which derived ensemble fields should be calculat
 
 9. Ensemble Valid Data Count
 
-10. Ensemble Relative Frequency (i.e. uncalibrated probability forecast) for each categorical threshold (**cat_thresh**) specified
+10. Ensemble Relative Frequency (i.e., uncalibrated probability forecast) for each categorical threshold (**cat_thresh**) specified
 
 11. Neighborhood Ensemble Probability for each categorical threshold (**cat_thresh**) and neighborhood width (**nbrhd_prob.width**) specified
 

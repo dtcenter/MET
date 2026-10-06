@@ -117,7 +117,7 @@ The **multivar_logic** configuration entry, described in :numref:`MODE-configura
 
 The **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** configuration entries, described in :numref:`MODE-configuration-file`, define the field array indexes for which to optionally compare intensities for individual input fields when the input is masked to non-missing only inside the *super* objects and are required to be the same length. For example, if **multivar_intensity_compare_fcst = [ 1, 2 ];** and **multivar_intensity_compare_obs = [ 2, 3 ];**, then index 1 (2) of the forecast field array will be compared with index 2 (3) of the observation field array. If an intensity comparison is requested, the corresponding pair of fields (fcst and obs) are masked to non-missing inside the fcst and obs super objects, and traditional mode is run on that pair of masked inputs producing uniquely named outputs. If **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty, the forecast and observation *super* objects are written to NetCDF, text, and PostScript output files in the standard mode output format, but with no intensity information.
 
-When regridding to the FCST or OBS field (e.g. to_grid = FCST), the first field of the field array is used from the forecast and observation field dictionaries, respectively. All regridding is then done to that grid. Other regrid options described in :ref:`regrid` can also be used as normal.
+When regridding to the FCST or OBS field (e.g., to_grid = FCST), the first field of the field array is used from the forecast and observation field dictionaries, respectively. All regridding is then done to that grid. Other regrid options described in :ref:`regrid` can also be used as normal.
 
 "file_type" can be set independently for each input in multivariate mode. If not set for an input, MET uses file names and file content to determine the type.
 
@@ -128,16 +128,16 @@ In multivariate mode, with quilt=**TRUE**, for all inputs the number of forecast
 When setting a threshold to a percentile, some choices require both an observation input and a forecast input.  When this is the case, it's assumed the indices match, so for example if forecast input 1 has such a percentile setting, then observation input 1 will be used to compute the percentile.  Percentiles in which this will happen are:
 
 * SFP in an observation input.
-  * The matching forecast input will be used to determine the threshold.  e.g. ">SFP33.3" in the 2nd observation input means greater than 33.3-rd percentile of the 2nd forecast input will be used as the threshold for that observation input.
+  * The matching forecast input will be used to determine the threshold.  e.g., ">SFP33.3" in the 2nd observation input means greater than 33.3-rd percentile of the 2nd forecast input will be used as the threshold for that observation input.
 
 * SOP in a forecast input.
-  * The matching observation input will be used to determine the threshold. e.g. ">SOP33.3" in the 2nd forecast input means greater than 33.3-rd percentile of the 2nd observation input will be used as the threshold for that forecast input.
+  * The matching observation input will be used to determine the threshold. e.g., ">SOP33.3" in the 2nd forecast input means greater than 33.3-rd percentile of the 2nd observation input will be used as the threshold for that forecast input.
 
 * "==FBIAS" in an observation input.
-  * e.g. "==FBIAS1" in an observation input to automatically de-bias the data, using a simple threshold in the matching forecast input. For example, when observation input 3 has "==FBIAS1", and forecast input 3 has ">5.0", MET applies the >5.0 threshold to the forecast and then chooses an observation threshold which results in a frequency bias of 1. The frequency bias can be any float value > 0.0.
+  * e.g., "==FBIAS1" in an observation input to automatically de-bias the data, using a simple threshold in the matching forecast input. For example, when observation input 3 has "==FBIAS1", and forecast input 3 has ">5.0", MET applies the >5.0 threshold to the forecast and then chooses an observation threshold which results in a frequency bias of 1. The frequency bias can be any float value > 0.0.
 
 * "==FBIAS" in a forecast input.
-  * e.g. "==FBIAS1" in a forecast input to automatically de-bias the data, using a simple threshold in the matching observation input. For example, when forecast input 2 has "==FBIAS1", and observation input 2 has ">5.0", MET applies the >5.0 threshold to the observation and then chooses a forecast threshold which results in a frequency bias of 1.  The frequency bias can be any float value > 0.0.
+  * e.g., "==FBIAS1" in a forecast input to automatically de-bias the data, using a simple threshold in the matching observation input. For example, when forecast input 2 has "==FBIAS1", and observation input 2 has ">5.0", MET applies the >5.0 threshold to the observation and then chooses a forecast threshold which results in a frequency bias of 1.  The frequency bias can be any float value > 0.0.
 
 
 Practical Information
@@ -319,9 +319,9 @@ When **field** is set to an array of dictionaries rather than a single one, the 
 
 The **censor_thresh** and **censor_val** entries are used to censor the raw data as described in :numref:`config_options`. Their functionality replaces the **raw_thresh** entry, which is deprecated in met-6.1. Prior to defining objects, it is recommended that the raw fields should be made to look similar to each other. For example, if the model only predicts values for a variable above some threshold, the observations should be thresholded at that same level. The censor thresholds can be specified using symbols. By default, no censor thresholding is applied.
 
-The **conv_radius** entry defines the radius of the circular convolution applied to smooth the raw fields. The radii are specified in terms of grid units. The default convolution radii are defined in terms of the previously defined **grid_res** entry. Multiple convolution radii may be specified as an array (e.g. **conv_radius = [ 5, 10, 15 ];**).
+The **conv_radius** entry defines the radius of the circular convolution applied to smooth the raw fields. The radii are specified in terms of grid units. The default convolution radii are defined in terms of the previously defined **grid_res** entry. Multiple convolution radii may be specified as an array (e.g., **conv_radius = [ 5, 10, 15 ];**).
 
-The **conv_thresh** entry specifies the threshold values to be applied to the convolved field to define objects. By default, objects are defined using a convolution threshold of 5.0. Multiple convolution thresholds may be specified as an array (e.g. **conv_thresh = [ >=5.0, >=10.0, >=15.0 ];**).
+The **conv_thresh** entry specifies the threshold values to be applied to the convolved field to define objects. By default, objects are defined using a convolution threshold of 5.0. Multiple convolution thresholds may be specified as an array (e.g., **conv_thresh = [ >=5.0, >=10.0, >=15.0 ];**).
 
 Multiple convolution radii and thresholds are processed using the logic defined by the **quilt** entry.  The logic specific to multivariate mode is described in the multivariate mode section above.
 
@@ -335,7 +335,7 @@ The **filter_attr_thresh** entry is an array of thresholds for these object attr
 
 Note that the **area_thresh** and **inten_perc_thresh** entries from earlier versions of MODE are replaced by these options and are now deprecated.
 
-The **merge_thresh** entry is used to define larger objects for use in merging the original objects. It defines the threshold value used in the double thresholding merging technique. Note that in order to use this merging technique, it must be requested for both the forecast and observation fields. These thresholds should be chosen to define larger objects that fully contain the originally defined objects. For example, for objects defined as >=5.0, a merge threshold of >=2.5 will define larger objects that fully contain the original objects. Any two original objects contained within the same larger object will be merged. By default, the merge thresholds are set to be greater than or equal to 1.25. Multiple merge thresholds may be specified as an array (e.g. **merge_thresh = [ >=1.0, >=2.0, >=3.0 ];**). The number of **merge_thresh** entries must match the number of **conv_thresh** entries.
+The **merge_thresh** entry is used to define larger objects for use in merging the original objects. It defines the threshold value used in the double thresholding merging technique. Note that in order to use this merging technique, it must be requested for both the forecast and observation fields. These thresholds should be chosen to define larger objects that fully contain the originally defined objects. For example, for objects defined as >=5.0, a merge threshold of >=2.5 will define larger objects that fully contain the original objects. Any two original objects contained within the same larger object will be merged. By default, the merge thresholds are set to be greater than or equal to 1.25. Multiple merge thresholds may be specified as an array (e.g., **merge_thresh = [ >=1.0, >=2.0, >=3.0 ];**). The number of **merge_thresh** entries must match the number of **conv_thresh** entries.
 
 The **merge_flag** entry controls what type of merging techniques will be applied to the objects defined in each field.
 
@@ -1051,9 +1051,9 @@ The dimensions and variables included in the mode NetCDF files are described in 
   * - NetCDF Dimension
     - Description
   * - lat
-    - Dimension of the latitude (i.e. Number of grid points in the North-South direction)
+    - Dimension of the latitude (i.e., Number of grid points in the North-South direction)
   * - lon
-    - Dimension of the longitude (i.e. Number of grid points in the East-West direction)
+    - Dimension of the longitude (i.e., Number of grid points in the East-West direction)
   * - fcst_thresh_length
     - Number of thresholds applied to the forecast
   * - obs_thresh_length

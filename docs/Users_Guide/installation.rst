@@ -85,7 +85,7 @@ They are not required for MET to function, but depending on the user’s intende
 * `Integrated Data Viewer (IDV) <http://www.unidata.ucar.edu/software/idv>`_
   for displaying gridded data, including GRIB and NetCDF
 * `ncview utility <https://anaconda.org/channels/conda-forge/packages/ncview/overview>`_
-  for viewing gridded NetCDF data (e.g. the output of pcp_combine)
+  for viewing gridded NetCDF data (e.g., the output of pcp_combine)
 
 .. _compile_script_install:
 
@@ -106,7 +106,7 @@ format from GitHub, which the script will then install.
 To begin, create and change to a directory where the latest version of MET will be
 installed. Assuming that the following guidance uses “/d1” as the parent directory,
 a suggested format is a path to a “met” directory, followed by the version number
-subdirectory (e.g. /d1/met/13.0.0).
+subdirectory (e.g., /d1/met/13.0.0).
 Next, download the
 `compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/HEAD/internal/scripts/installation/compile_MET_all.sh>`_
 script and
@@ -140,7 +140,7 @@ Now change directories to the one that was created from expanding the tar files:
   cd tar_files
 
 The next step will be to identify and download the latest MET release as a
-tar file (e.g. v13.0.0.tar.gz) and place it in
+tar file (e.g., v13.0.0.tar.gz) and place it in
 the *tar_files* directory. The file is available from the
 MET line under the “RECOMMENDED - COMPONENTS” section on the
 `METplus website <https://dtcenter.org/community-code/metplus/download>`_ or
@@ -197,7 +197,7 @@ Environment Variable Descriptions
     **compile_MET_all.sh** script, **tar_files.tgz**,
     and the *tar_files* directory from the untar command.
 
-    **COMPILER** – Format is *compiler_version* (e.g. gnu_8.3.0). For the GNU family of compilers,
+    **COMPILER** – Format is *compiler_version* (e.g., gnu_8.3.0). For the GNU family of compilers,
     use “gnu”; for the Intel family of compilers, use “intel”, "intel-classic",
     “intel-oneapi”, “ics”, “ips”, or “PrgEnv-intel”,
     depending on the system. If using an Intel compiler, users that have also
@@ -208,7 +208,7 @@ Environment Variable Descriptions
 
     **MET_SUBDIR** – Format is */d1/met/13.0.0*. This is the location where the top-level MET
     subdirectory will
-    be installed and is often set equivalent to **TEST_BASE** (e.g. ${TEST_BASE}).
+    be installed and is often set equivalent to **TEST_BASE** (e.g., ${TEST_BASE}).
 
     **MET_TARBALL** – Format is *v13.0.0.tar.gz*. This is the name of the downloaded MET tarball.
 
@@ -218,7 +218,7 @@ Environment Variable Descriptions
     If the **USE_MODULES** setting is set to true and the compiler is an Intel compiler, please
     review the additional information below for proper configuration file setup.
 
-    **PYTHON_MODULE** -  Format is *PythonModuleName_version* (e.g. python_3.10.4). This environment variable
+    **PYTHON_MODULE** -  Format is *PythonModuleName_version* (e.g., python_3.10.4). This environment variable
     is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load
     followed by an underscore and version number. For example, setting
     **PYTHON_MODULE** =python_3.10.4
@@ -260,7 +260,7 @@ Environment Variable Descriptions
     containing the bin, include, lib, and share directories for Python.
 
     **MET_PYTHON_CC** - Format is -I followed by the directory containing
-    the Python include files (e.g. -I/usr/local/python3/include/python3.10).
+    the Python include files (e.g., -I/usr/local/python3/include/python3.10).
     This information may be obtained by
     running :code:`python3-config --cflags`;
     however, this command can, on certain systems,
@@ -270,14 +270,14 @@ Environment Variable Descriptions
     the Python library
     files then a space, then -l followed by the necessary Python
     libraries to link to
-    (e.g. -L/usr/local/python3/lib/\\ -lpython3.10\\
+    (e.g., -L/usr/local/python3/lib/\\ -lpython3.10\\
     -lpthread\\ -ldl\\ -lutil\\ -lm).
     The backslashes are necessary in the example shown because of
     the spaces, which will be
     recognized as the end of the value unless preceded by the “\\”
     character. Alternatively,
     a user can provide the value in quotations
-    (e.g. export MET_PYTHON_LD="-L/usr/local/python3/lib/
+    (e.g., export MET_PYTHON_LD="-L/usr/local/python3/lib/
     -lpython3.10 -lpthread -ldl -lutil -lm").
     This information may be obtained by running
     :code:`python3-config --ldflags --embed`; however,
@@ -298,11 +298,11 @@ Environment Variable Descriptions
     without a specified value of cores to use.  The automated MET
     testing scripts in the
     Docker environment have been successful with a value of
-    5 (e.g. export MAKE_ARGS=”-j 5”).
+    5 (e.g., export MAKE_ARGS=”-j 5”).
 
     **export MET_CXX_STANDARD** - Specify the version of the supported
     C++ standard. Values may be 11, 14, or 17. The default value is 17.
-    (e.g. export MET_CXX_STANDARD=11)
+    (e.g., export MET_CXX_STANDARD=11)
 
 
 External Library Handling in compile_MET_all.sh
@@ -471,7 +471,7 @@ images at the same interval as system releases. While the advantages of Docker c
 make it an appealing installation route for first-time users, it does require
 privileged user access that will result in an unsuccessful installation if not
 available. Please ensure the user has high system access
-(e.g. admin access) before attempting this method.
+(e.g., admin access) before attempting this method.
 
 Installing Docker
 -----------------

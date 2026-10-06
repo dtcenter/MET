@@ -75,7 +75,7 @@ Input Data
 ----------
 
 Input data used to run the MET unit tests in CI workflows are pulled from the DTC web server and stored on DockerHub.
-On the web server, data is stored for each supported version, e.g. *v12.0*, *v12.1*, etc.
+On the web server, data is stored for each supported version, e.g., *v12.0*, *v12.1*, etc.
 There is also a directory called *develop* that includes symbolic links to the latest version,
 which is the version that is currently in development.
 This is done so that the latest state of the input data is used for new development
@@ -93,7 +93,7 @@ The GitHub Actions custom action
 `metplus-action-data-update <https://github.com/dtcenter/metplus-action-data-update>`_
 expects a specific URL defined in *update_data_volumes.py* script in its repo.
 This directory should exist on the web server.
-This can be a link to another directory, but the name must match the repo name, e.g. MET.
+This can be a link to another directory, but the name must match the repo name, e.g., MET.
 If this path must differ on a new web server, then modifications will be needed to the custom action.
 
 The directory should also be linked from the *met_test* user's home directory with the name *MET_unit_test*.
@@ -162,7 +162,7 @@ Adding new test files
 
    These instructions require access to run commands as the *met_test* user on the DTC web server.
 
-Updates to the input data, e.g. adding new test files, are made on the DTC web server.
+Updates to the input data, e.g., adding new test files, are made on the DTC web server.
 The next time the MET CI unit tests are run,
 the web server will be checked and the input data will be updated automatically.
 Note that the unit tests are only run for develop/main branches or running via workflow dispatch.

@@ -272,7 +272,7 @@ Instead of C2 being calculated by the user’s dataset,
 .. math:: \text{HSS } = \text{T*EC },
 
 where EC is allowed to be prescribed by the user ranging from 0 to 1. By default the EC is set to 1 divided by the number of contingency table categories,
-e.g. EC is set to 0.33333 for a 3 category (tercile) forecast and 0.5 for a two category (binary) forecast.
+e.g., EC is set to 0.33333 for a 3 category (tercile) forecast and 0.5 for a two category (binary) forecast.
 
 HSS_EC can range from minus infinity to 1. A perfect forecast would have HSS_EC = 1.
 
@@ -641,7 +641,7 @@ Partial Sums Lines (SL1L2, SAL1L2, VL1L2, VAL1L2)
 
 :numref:`table_PS_format_info_SL1L2`, :numref:`table_PS_format_info_SAL1L2`, :numref:`table_PS_format_info_VL1L2`, and :numref:`table_PS_format_info_VAL1L2`
 
-The SL1L2, SAL1L2, VL1L2, and VAL1L2 line types are used to store data summaries (e.g. partial sums) that can later be accumulated into verification statistics. These are divided according to scalar or vector summaries (S or V). The climate anomaly values (A) can be stored in place of the actuals, which is just a re-centering of the values around the climatological average. L1 and L2 refer to the L1 and L2 norms, the distance metrics commonly referred to as the "city block" and "Euclidean" distances. The city block is the absolute value of a distance while the Euclidean distance is the square root of the squared distance.
+The SL1L2, SAL1L2, VL1L2, and VAL1L2 line types are used to store data summaries (e.g., partial sums) that can later be accumulated into verification statistics. These are divided according to scalar or vector summaries (S or V). The climate anomaly values (A) can be stored in place of the actuals, which is just a re-centering of the values around the climatological average. L1 and L2 refer to the L1 and L2 norms, the distance metrics commonly referred to as the "city block" and "Euclidean" distances. The city block is the absolute value of a distance while the Euclidean distance is the square root of the squared distance.
 
 The partial sums can be accumulated over individual cases to produce statistics for a longer period without any loss of information because these sums are *sufficient* for resulting statistics such as RMSE, bias, correlation coefficient, and MAE (:ref:`Mood et al., 1974 <Mood-1974>`). Thus, the individual errors need not be stored, all of the information relevant to calculation of statistics are contained in the sums. As an example, the sum of all data points and the sum of all squared data points (or equivalently, the sample mean and sample variance) are *jointly sufficient* for estimates of the Gaussian distribution mean and variance.
 
@@ -933,7 +933,7 @@ Calibration
 
 Called "CALIBRATION" in PJC output :numref:`table_PS_format_info_PJC`
 
-Calibration is the conditional probability of an event given each probability forecast category (i.e. each row in the **nx2** contingency table). This set of measures is paired with refinement in the calibration-refinement factorization discussed in :ref:`Wilks, 2011 <Wilks-2011>`. A well-calibrated forecast will have calibration values that are near the forecast probability. For example, a 50% probability of precipitation should ideally have a calibration value of 0.5. If the calibration value is higher, then the probability has been underestimated, and vice versa.
+Calibration is the conditional probability of an event given each probability forecast category (i.e., each row in the **nx2** contingency table). This set of measures is paired with refinement in the calibration-refinement factorization discussed in :ref:`Wilks, 2011 <Wilks-2011>`. A well-calibrated forecast will have calibration values that are near the forecast probability. For example, a 50% probability of precipitation should ideally have a calibration value of 0.5. If the calibration value is higher, then the probability has been underestimated, and vice versa.
 
 .. math:: \text{Calibration}(i) = \frac{n_{i1}}{n_{1.}} = \text{probability}(o_1|p_i)
 
@@ -962,7 +962,7 @@ Base Rate
 
 Called "BASER" in PJC output :numref:`table_PS_format_info_PJC`
 
-This is the probability of an event for each forecast category :math:`p_i` (row), i.e. the conditional base rate. This set of measures is paired with likelihood in the likelihood-base rate factorization, see :ref:`Wilks, 2011 <Wilks-2011>` for further information. This measure is calculated for each row of the contingency table. Ideally, the event should become more frequent as the probability forecast increases.
+This is the probability of an event for each forecast category :math:`p_i` (row), i.e., the conditional base rate. This set of measures is paired with likelihood in the likelihood-base rate factorization, see :ref:`Wilks, 2011 <Wilks-2011>` for further information. This measure is calculated for each row of the contingency table. Ideally, the event should become more frequent as the probability forecast increases.
 
 .. math:: \text{Base Rate}(i) = \frac{n_{i1}}{n_{i.}} = \text{probability}(o_{i1})
 
@@ -1131,7 +1131,7 @@ IGN
 
 Called "IGN" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-The ignorance score (IGN) is the negative logarithm of a predictive probability density function (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). In MET, the IGN is calculated based on a normal approximation to the forecast distribution (i.e. a normal pdf is fit to the forecast values). This approximation may not be valid, especially for discontinuous forecasts like precipitation, and also for very skewed forecasts. For a single normal distribution **N** with parameters :math:`\mu \text{ and } \sigma`, the ignorance score is
+The ignorance score (IGN) is the negative logarithm of a predictive probability density function (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). In MET, the IGN is calculated based on a normal approximation to the forecast distribution (i.e., a normal pdf is fit to the forecast values). This approximation may not be valid, especially for discontinuous forecasts like precipitation, and also for very skewed forecasts. For a single normal distribution **N** with parameters :math:`\mu \text{ and } \sigma`, the ignorance score is
 
 .. math:: \text{ign} (N( \mu, \sigma),y) = \frac{1}{2} \ln (2 \pi \sigma^2 ) + \frac{(y - \mu)^2}{2\sigma^2}.
 
@@ -1262,7 +1262,7 @@ Uniform Fractions Skill Score
 
 Called "UFSS" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
 
-The Uniform Fractions Skill Score (UFSS) is a reference statistic for the Fractions Skill score based on a uniform distribution of the total observed events across the grid. UFSS represents the FSS that would be obtained at the grid scale from a forecast with a fraction/probability equal to the total observed event proportion at every point. The formula is :math:`UFSS = (1 + f_o)/2` (i.e., halfway between perfect skill and random forecast skill) where :math:`f_o` is the total observed event proportion (i.e. observation rate).
+The Uniform Fractions Skill Score (UFSS) is a reference statistic for the Fractions Skill score based on a uniform distribution of the total observed events across the grid. UFSS represents the FSS that would be obtained at the grid scale from a forecast with a fraction/probability equal to the total observed event proportion at every point. The formula is :math:`UFSS = (1 + f_o)/2` (i.e., halfway between perfect skill and random forecast skill) where :math:`f_o` is the total observed event proportion (i.e., observation rate).
 
 Forecast Rate
 -------------

@@ -164,7 +164,7 @@ entries in each array entry vary based on the input file format:
 
   IODA files typically use NetCDF4 groups, and the **name** entry should specify both the
   group and variable names, formatted as ``name = "/GROUP_NAME/VARIABLE_NAME";``
-  (e.g. ``name = "/hofx/air_temperature";``).
+  (e.g., ``name = "/hofx/air_temperature";``).
 
 _________________________
 

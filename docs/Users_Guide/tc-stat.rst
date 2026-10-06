@@ -28,7 +28,7 @@ The TC-Stat tool can be used to produce summary information for a single column 
 
 Confidence intervals are computed for the mean of the column of data. Confidence intervals are computed using the assumption of normality for the mean. For further information on computing confidence intervals, refer to :numref:`App_D-Confidence-Intervals` of the MET user's guide.
 
-When operating on columns, a specific column name can be listed (e.g. TK_ERR), as well as the differences of two columns (e.g. AMAX_WIND-BMAX_WIND), and the absolute difference of the column(s) (e.g. abs(AMAX_WIND-BMAX_WIND)). Additionally, several shortcuts can be applied to choose multiple columns with a single entry. Shortcut options for the -column entry are as follows:
+When operating on columns, a specific column name can be listed (e.g., TK_ERR), as well as the differences of two columns (e.g., AMAX_WIND-BMAX_WIND), and the absolute difference of the column(s) (e.g., abs(AMAX_WIND-BMAX_WIND)). Additionally, several shortcuts can be applied to choose multiple columns with a single entry. Shortcut options for the -column entry are as follows:
 
 **TRACK:** track error (TK_ERR), along-track error (ALTK_ERR), and cross-track error (CRTK_ERR)
 
@@ -45,7 +45,7 @@ The TC-Stat tool can also be used to generate frequency of superior performance 
 Frequency of Superior Performance
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The frequency of superior performance (FSP) looks at multiple model forecasts (adecks), and ranks each model relative to other model performance for the column specified in the summary job. The summary job output lists the total number of cases included in the FSP, the number of cases where the model of interest is the best (e.g.: lowest track error), the number of ties between the models, and the FSP (percent). Ties are not included in the FSP percentage; therefore the percentage may not equal 100%.
+The frequency of superior performance (FSP) looks at multiple model forecasts (adecks), and ranks each model relative to other model performance for the column specified in the summary job. The summary job output lists the total number of cases included in the FSP, the number of cases where the model of interest is the best (e.g., lowest track error), the number of ties between the models, and the FSP (percent). Ties are not included in the FSP percentage; therefore the percentage may not equal 100%.
 
 Time-Series Independence
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -55,9 +55,9 @@ The time-series independence evaluates effective forecast separation time using 
 Rapid Intensification/Weakening
 -------------------------------
 
-The TC-Stat tool can be used to read TCMPR lines and compare the occurrence of rapid intensification (i.e. increase in intensity) or weakening (i.e. decrease in intensity) between the adeck and bdeck. The rapid intensification or weakening is defined by the change of maximum wind speed (i.e. **AMAX_WIND** and **BMAX_WIND** columns) over a specified amount of time. Accurately forecasting large changes in intensity is a challenging problem and this job helps quantify a model's ability to do so.
+The TC-Stat tool can be used to read TCMPR lines and compare the occurrence of rapid intensification (i.e., increase in intensity) or weakening (i.e., decrease in intensity) between the adeck and bdeck. The rapid intensification or weakening is defined by the change of maximum wind speed (i.e., **AMAX_WIND** and **BMAX_WIND** columns) over a specified amount of time. Accurately forecasting large changes in intensity is a challenging problem and this job helps quantify a model's ability to do so.
 
-Users may specify several job command options to configure the behavior of this job. Using these configurable options, the TC-Stat tool analyzes paired tracks and for each track point (i.e. each TCMPR line) determines whether rapid intensification or weakening occurred. For each point in time, it uses the forecast and BEST track event occurrence to populate a 2x2 contingency table. The job may be configured to require that forecast and BEST track events occur at exactly the same time to be considered a hit. Alternatively, the job may be configured to define a hit as long as the forecast and BEST track events occurred within a configurable time window. Using this relaxed matching criteria false alarms may be considered hits and misses may be considered correct negatives as long as the adeck and bdeck events were close enough in time. Each rirw job applies a single intensity change threshold. Therefore, assessing a model's performance with rapid intensification and weakening requires that two separate jobs be run.
+Users may specify several job command options to configure the behavior of this job. Using these configurable options, the TC-Stat tool analyzes paired tracks and for each track point (i.e., each TCMPR line) determines whether rapid intensification or weakening occurred. For each point in time, it uses the forecast and BEST track event occurrence to populate a 2x2 contingency table. The job may be configured to require that forecast and BEST track events occur at exactly the same time to be considered a hit. Alternatively, the job may be configured to define a hit as long as the forecast and BEST track events occurred within a configurable time window. Using this relaxed matching criteria false alarms may be considered hits and misses may be considered correct negatives as long as the adeck and bdeck events were close enough in time. Each rirw job applies a single intensity change threshold. Therefore, assessing a model's performance with rapid intensification and weakening requires that two separate jobs be run.
 
 The RIRW job supports the **-out_stat** option to write the contingency table counts and statistics to a STAT output file.
 
@@ -117,7 +117,7 @@ An example of the tc_stat calling sequence is shown below:
 
   tc_stat -lookin /home/tc_pairs/*al092010.tcst -config TCStatConfig
 
-In this example, the TC-Stat tool uses any TCST file (output from tc_pairs) in the listed directory for the 9th Atlantic Basin storm in 2010. Filtering options and aggregated statistics are generated following configuration options specified in the **TCStatConfig** file. Further, using flags (e.g. **-basin, -column, -storm_name,** etc...) option within the job command lines may further refine these selections. See :numref:`tc_stat-configuration-file` for options available for the job command line and :numref:`config_options_tc` for how to use them.
+In this example, the TC-Stat tool uses any TCST file (output from tc_pairs) in the listed directory for the 9th Atlantic Basin storm in 2010. Filtering options and aggregated statistics are generated following configuration options specified in the **TCStatConfig** file. Further, using flags (e.g., **-basin, -column, -storm_name,** etc...) option within the job command lines may further refine these selections. See :numref:`tc_stat-configuration-file` for options available for the job command line and :numref:`config_options_tc` for how to use them.
 
 .. _tc_stat-configuration-file:
 
@@ -162,7 +162,7 @@ _________________________
   amodel = [];
   bmodel = [];
 
-The **amodel** and **bmodel** fields stratify by the amodel and bmodel columns based on a comma-separated list of model names used for all analysis performed. The names must be in double quotation marks (e.g.: "HWFI"). The **amodel** list specifies the model to be verified against the listed bmodel. The **bmodel** specifies the reference dataset, generally the BEST track analysis. Using the **-amodel** and **-bmodel** options within the job command lines may further refine these selections.
+The **amodel** and **bmodel** fields stratify by the amodel and bmodel columns based on a comma-separated list of model names used for all analysis performed. The names must be in double quotation marks (e.g., "HWFI"). The **amodel** list specifies the model to be verified against the listed bmodel. The **bmodel** specifies the reference dataset, generally the BEST track analysis. Using the **-amodel** and **-bmodel** options within the job command lines may further refine these selections.
 
 _________________________
 
@@ -400,7 +400,7 @@ The output generated from the TC-Stat tool contains statistics produced by the a
 
 This job command finds and filters TCST lines down to those meeting the criteria selected by the filter's options. The filtered TCST lines are written to a file specified by the **-dump_row** option. The TCST output from this job follows the TCST output description in :numref:`tc-dland` and :numref:`tc-pairs`.
 
- The "-set_hdr" job command option can be used to override any of the output header strings (e.g. "-set_hdr DESC EVENT_EQUAL" sets the output DESC column to "EVENT_EQUAL").
+ The "-set_hdr" job command option can be used to override any of the output header strings (e.g., "-set_hdr DESC EVENT_EQUAL" sets the output DESC column to "EVENT_EQUAL").
 
 **Job: Summary**
 
@@ -502,4 +502,4 @@ The PROBRIRW job produces probabilistic contingency table counts and statistics 
 
 Users may also specify the **-out_alpha** option to define the alpha value for the confidence intervals in the PSTD output line type. Multiple values in the **RI_WINDOW** column cannot be combined in a single PROBRIRW job since the BEST track intensity threshold should change for each. Using the **-by RI_WINDOW** option or **-column_thresh RI_WINDOW ==24** option provide convenient ways of avoiding this problem.
 
-Users should note that for the PROBRIRW line type, **PROBRI_PROB** is a derived column name. The -probrirw_thresh option defines the probabilities of interest (e.g. **-probrirw_thresh 30**) and the **PROBRI_PROB** column name refers to those probability values, regardless of their column number. For example, the job command options **-probrirw_thresh 30 -column_thresh PROBRI_PROB >0** select 30 kt probabilities and match probability values greater than 0.
+Users should note that for the PROBRIRW line type, **PROBRI_PROB** is a derived column name. The -probrirw_thresh option defines the probabilities of interest (e.g., **-probrirw_thresh 30**) and the **PROBRI_PROB** column name refers to those probability values, regardless of their column number. For example, the job command options **-probrirw_thresh 30 -column_thresh PROBRI_PROB >0** select 30 kt probabilities and match probability values greater than 0.

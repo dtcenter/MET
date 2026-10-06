@@ -316,7 +316,7 @@ ___________________
   }
 
 
-The **fourier** entry is a dictionary which specifies the application of the Fourier decomposition method. It consists of two arrays of the same length which define the beginning and ending wave numbers to be included. If the arrays have length zero, no Fourier decomposition is applied. For each array entry, the requested Fourier decomposition is applied to the forecast and observation fields. The beginning and ending wave numbers are indicated in the MET ASCII output files by the INTERP_MTHD column (e.g. WV1_0-3 for waves 0 to 3 or WV1_10 for only wave 10). This 1-dimensional Fourier decomposition is computed along the Y-dimension only (i.e. the columns of data). It is applied to the forecast and observation fields as well as the climatological mean field, if specified. It is only defined when each grid point contains valid data. If any input field contains missing data, no Fourier decomposition is computed.
+The **fourier** entry is a dictionary which specifies the application of the Fourier decomposition method. It consists of two arrays of the same length which define the beginning and ending wave numbers to be included. If the arrays have length zero, no Fourier decomposition is applied. For each array entry, the requested Fourier decomposition is applied to the forecast and observation fields. The beginning and ending wave numbers are indicated in the MET ASCII output files by the INTERP_MTHD column (e.g., WV1_0-3 for waves 0 to 3 or WV1_10 for only wave 10). This 1-dimensional Fourier decomposition is computed along the Y-dimension only (i.e., the columns of data). It is applied to the forecast and observation fields as well as the climatological mean field, if specified. It is only defined when each grid point contains valid data. If any input field contains missing data, no Fourier decomposition is computed.
 
 The available wave numbers start at 0 (the mean across each row of data) and end at (Nx+1)/2 (the finest level of detail), where Nx is the X-dimension of the verification grid:
 
@@ -340,7 +340,7 @@ _____________________
      beta_value(n)     = n * n / 2.0;
   }
 
-The **distance_map** entry is a dictionary containing options related to the distance map statistics in the **DMAP** output line type. The **baddeley_p** entry is an integer specifying the exponent used in the Lp-norm when computing the Baddeley :math:`\Delta` metric. The **baddeley_max_dist** entry is a floating point number specifying the maximum allowable distance for each distance map. Any distances larger than this number will be reset to this constant. A value of **NA** indicates that no maximum distance value should be used. The **fom_alpha** entry is a floating point number specifying the scaling constant to be used when computing Pratt's Figure of Merit. The **zhu_weight** specifies a value between 0 and 1 to define the importance of the RMSE of the binary fields (i.e. amount of overlap) versus the mean-error distance (MED). The default value of 0.5 gives equal weighting. This configuration option may be set separately in each **obs.field** entry. The **beta_value** entry is defined as a function of n, where n is the total number of grid points in the full verification domain containing valid data in both the forecast and observation fields. The resulting beta_value is used to compute the :math:`G_\beta` statistic. The default function, :math:`N^2 / 2`, is recommended in :ref:`Gilleland, 2021 <Gilleland-2021>` but can be modified as needed.
+The **distance_map** entry is a dictionary containing options related to the distance map statistics in the **DMAP** output line type. The **baddeley_p** entry is an integer specifying the exponent used in the Lp-norm when computing the Baddeley :math:`\Delta` metric. The **baddeley_max_dist** entry is a floating point number specifying the maximum allowable distance for each distance map. Any distances larger than this number will be reset to this constant. A value of **NA** indicates that no maximum distance value should be used. The **fom_alpha** entry is a floating point number specifying the scaling constant to be used when computing Pratt's Figure of Merit. The **zhu_weight** specifies a value between 0 and 1 to define the importance of the RMSE of the binary fields (i.e., amount of overlap) versus the mean-error distance (MED). The default value of 0.5 gives equal weighting. This configuration option may be set separately in each **obs.field** entry. The **beta_value** entry is defined as a function of n, where n is the total number of grid points in the full verification domain containing valid data in both the forecast and observation fields. The resulting beta_value is used to compute the :math:`G_\beta` statistic. The default function, :math:`N^2 / 2`, is recommended in :ref:`Gilleland, 2021 <Gilleland-2021>` but can be modified as needed.
 
 _____________________
 
@@ -969,9 +969,9 @@ The output NetCDF file contains the dimensions and variables shown in :numref:`t
   * - NetCDF Dimension
     - Description
   * - Lat
-    - Dimension of the latitude (i.e. Number of grid points in the North-South direction)
+    - Dimension of the latitude (i.e., Number of grid points in the North-South direction)
   * - Lon
-    - Dimension of the longitude (i.e. Number of grid points in the East-West direction)
+    - Dimension of the longitude (i.e., Number of grid points in the East-West direction)
 
 
 .. role:: raw-html(raw)

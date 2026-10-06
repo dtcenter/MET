@@ -144,7 +144,7 @@ grid_diag Output File
 
 The output NetCDF file contains variables for **grid_size** and **n_series** which specify the number of points in the grid and the number of files that were processed, respectively. The range of the initialization, valid, and lead times processed is written to the global attributes. These variables and global attributes are written for each run.
 
-If histogram or information theory output is requested, dimensions are created for the number of masking regions and one for each of the specified data variable and level combinations, e.g. APCP_L0 and PWAT_L0. The bin minimum and maximum values are indicated with an _min or _max appended to the variable/level. For each variable and level combination, a coordinate variable is written to indicate the midpoint value for each histogram bin.
+If histogram or information theory output is requested, dimensions are created for the number of masking regions and one for each of the specified data variable and level combinations, e.g., APCP_L0 and PWAT_L0. The bin minimum and maximum values are indicated with an _min or _max appended to the variable/level. For each variable and level combination, a coordinate variable is written to indicate the midpoint value for each histogram bin.
 
 The **mask_name** and **mask_size** variables have dimensions based on the number of masking regions and indicate the name of each masking region and the number of grid points it includes, respectively. Masking variables are written when histogram or information theory output is requested whereas power spectrum output is computed over the full input grid.
 

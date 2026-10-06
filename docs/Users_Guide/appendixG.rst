@@ -146,7 +146,7 @@ FBAR_SPEED and OBAR_SPEED are the lengths of the average forecast and observed w
 
 ________________________
 
-VDIFF_SPEED is the length (*i.e. speed*) of the vector difference between the average forecast and average observed wind vectors.
+VDIFF_SPEED is the length (*i.e., speed*) of the vector difference between the average forecast and average observed wind vectors.
 
 .. only:: latex
 

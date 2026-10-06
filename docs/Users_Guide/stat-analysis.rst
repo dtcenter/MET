@@ -68,9 +68,9 @@ In general, a skill score index is computed over several terms and the number an
 
 4. Only the SL1L2 and CTC input line types are supported, and the input Point-Stat and/or Grid-Stat output must contain these line types.
 
-5. For the SL1L2 line type, set the "column" entry to the CNT output column that contains the statistic of interest (e.g. RMSE for root-mean-squared-error). Note, only those continuous statistics that are derivable from SL1L2 lines can be used.
+5. For the SL1L2 line type, set the "column" entry to the CNT output column that contains the statistic of interest (e.g., RMSE for root-mean-squared-error). Note, only those continuous statistics that are derivable from SL1L2 lines can be used.
 
-6. For the CTC line type, set the "column" entry to the CTS output column that contains the statistic of interest (e.g. PODY for probability of detecting yes). Note, consider specifying the "fcst_thresh" for the CTC line type.
+6. For the CTC line type, set the "column" entry to the CTS output column that contains the statistic of interest (e.g., PODY for probability of detecting yes). Note, consider specifying the "fcst_thresh" for the CTC line type.
 
 For each term, all matching SL1L2 (or CTC) input lines are aggregated separately for the forecast and reference models. The requested statistic ("column") is derived from the aggregated partial sums or counts. For each term, a skill score is defined as:
 
@@ -240,7 +240,7 @@ The Stat-Analysis "ramp" job identifies ramp events (large increases or decrease
 Wind Direction Statistics
 -------------------------
 
-The Stat-Analysis "aggregate_stat" job can read vector partial sums and derive wind direction error statistics (WDIR). The vector partial sums (VL1L2 or VAL1L2) or matched pairs (MPR) for the UGRD and VGRD must have been computed in a previous step, i.e. by Point-Stat or Grid-Stat tools. This job computes an average forecast wind direction and an average observed wind direction along with their difference. The output is in degrees. In Point-Stat and Grid-Stat, the UGRD and VGRD can be verified using thresholds on their values or on the calculated wind speed. If thresholds have been applied, the wind direction statistics are calculated for each threshold.
+The Stat-Analysis "aggregate_stat" job can read vector partial sums and derive wind direction error statistics (WDIR). The vector partial sums (VL1L2 or VAL1L2) or matched pairs (MPR) for the UGRD and VGRD must have been computed in a previous step, i.e., by Point-Stat or Grid-Stat tools. This job computes an average forecast wind direction and an average observed wind direction along with their difference. The output is in degrees. In Point-Stat and Grid-Stat, the UGRD and VGRD can be verified using thresholds on their values or on the calculated wind speed. If thresholds have been applied, the wind direction statistics are calculated for each threshold.
 
 The first step in verifying wind direction is running the Grid-Stat and/or Point-Stat tools to verify each forecast of interest and generate the VL1L2 or MPR line(s). When running these tools, please note:
 
@@ -782,7 +782,7 @@ Job: ss_index, go_index, cbs_index
 
 While the inputs for the "ss_index", "go_index", and "cbs_index" jobs may vary, the output is the same. By default, the job output is written to the screen or to a "-out" file, if specified. If the "-out_stat" job command option is specified, a STAT output file is written containing the skill score index (SSIDX) output line type.
 
-The SSIDX line type consists of the common STAT header columns described in :numref:`table_PS_header_info_point-stat_out` followed by the columns described below. In general, when multiple input header strings are encountered, the output is reported as a comma-separated list of the unique values. The "-set_hdr" job command option can be used to override any of the output header strings (e.g. "-set_hdr VX_MASK MANY" sets the output VX_MASK column to "MANY"). Special logic applied to some of the STAT header columns are also described below.
+The SSIDX line type consists of the common STAT header columns described in :numref:`table_PS_header_info_point-stat_out` followed by the columns described below. In general, when multiple input header strings are encountered, the output is reported as a comma-separated list of the unique values. The "-set_hdr" job command option can be used to override any of the output header strings (e.g., "-set_hdr VX_MASK MANY" sets the output VX_MASK column to "MANY"). Special logic applied to some of the STAT header columns are also described below.
 
 ..  _table_SA_format_info_SSIDX:
 

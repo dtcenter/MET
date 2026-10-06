@@ -7,7 +7,7 @@ TC-Gen Tool
 Introduction
 ============
 
-The TC-Gen tool provides verification of deterministic and probabilistic tropical cyclone genesis forecasts in the ATCF file and shapefile formats. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by genesis tracking software (e.g. GFDL vortex tracker), ATCF edeck files containing probability of genesis forecasts, operational shapefile warning areas, and ATCF reference track dataset(s) (e.g. Best Track analysis and CARQ operational tracks). It writes categorical counts and statistics. The capability to modify the spatial and temporal tolerances when matching forecasts to reference genesis events, as well as scoring those matched pairs, gives users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlined in :numref:`tc-gen_stat_aspects` and practical aspects of the TC-Gen tool are described in :numref:`tc-gen_practical_info`.
+The TC-Gen tool provides verification of deterministic and probabilistic tropical cyclone genesis forecasts in the ATCF file and shapefile formats. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by genesis tracking software (e.g., GFDL vortex tracker), ATCF edeck files containing probability of genesis forecasts, operational shapefile warning areas, and ATCF reference track dataset(s) (e.g., Best Track analysis and CARQ operational tracks). It writes categorical counts and statistics. The capability to modify the spatial and temporal tolerances when matching forecasts to reference genesis events, as well as scoring those matched pairs, gives users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlined in :numref:`tc-gen_stat_aspects` and practical aspects of the TC-Gen tool are described in :numref:`tc-gen_practical_info`.
 
 .. _tc-gen_stat_aspects:
 
@@ -28,7 +28,7 @@ The shapes are then subset based on the filtering criteria in the configuration 
 
 Other considerations for interpreting the output of the TC-Gen tool involve the size of the contingency table output. The size of the contingency table will change depending on the number of matches. Additionally, the number of misses is based on the forecast duration and interval (specified in the configuration file). This change is due to the number of model opportunities to forecast the event, which is determined by the specified duration/interval.
 
-Care should be taken when interpreting the statistics for filtered data. In some cases, variables (e.g. storm name) are only available in either the forecast or reference datasets, rather than both. When filtering on a field that is only present in one dataset, the contingency table counts will be impacted. Similarly, the initialization field only impacts the model forecast data. If the valid time (which will impact the reference dataset) isn't also specified, the forecasts will be filtered and matched such that the number of misses will erroneously increase. See :numref:`tc-gen_practical_info` for more detail.
+Care should be taken when interpreting the statistics for filtered data. In some cases, variables (e.g., storm name) are only available in either the forecast or reference datasets, rather than both. When filtering on a field that is only present in one dataset, the contingency table counts will be impacted. Similarly, the initialization field only impacts the model forecast data. If the valid time (which will impact the reference dataset) isn't also specified, the forecasts will be filtered and matched such that the number of misses will erroneously increase. See :numref:`tc-gen_practical_info` for more detail.
 
 .. _tc-gen_practical_info:
 
@@ -67,7 +67,7 @@ Required Arguments for tc_gen
 
 Note: At least one of the **-genesis**, **-edeck**, or **-shape** command line options is required.
 
-4. The **-track source** argument is one or more ATCF reference track files or an ASCII file list or top-level directory containing them, with files ending in ".dat". This tool processes either Best track data from bdeck files, or operational track data (e.g. CARQ) from adeck files, or both. Providing both bdeck and adeck files will result in a richer dataset to match with the **-genesis** files.  Both adeck and bdeck data should be provided using the **-track** option. The **-track** option must be used at least once.
+4. The **-track source** argument is one or more ATCF reference track files or an ASCII file list or top-level directory containing them, with files ending in ".dat". This tool processes either Best track data from bdeck files, or operational track data (e.g., CARQ) from adeck files, or both. Providing both bdeck and adeck files will result in a richer dataset to match with the **-genesis** files.  Both adeck and bdeck data should be provided using the **-track** option. The **-track** option must be used at least once.
 
 5. The **-config** file argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
@@ -135,7 +135,7 @@ The TC-Gen tool implements the following logic:
 
 * For **-shape** inputs:
 
- * For each input shapefile, parse the timestamp from the "gtwo_areas_YYYYMMDDHHMM.shp" naming convention, and error out otherwise. Round the timestamp to the nearest synoptic time (e.g. 00, 06, 12, 18) and store that as the issuance time.
+ * For each input shapefile, parse the timestamp from the "gtwo_areas_YYYYMMDDHHMM.shp" naming convention, and error out otherwise. Round the timestamp to the nearest synoptic time (e.g., 00, 06, 12, 18) and store that as the issuance time.
 
  * Open the shapefile and corresponding database file. Process each record.
 
@@ -313,7 +313,7 @@ ______________________
 
   basin_mask = [];
 
-The **basin_mask** entry is an array of strings listing tropical cyclone basin abbreviations (e.g. AL, EP, CP, WP, NI, SI, AU, and SP). The configuration entry **basin_file** defines the path to a NetCDF file which defines these regions. The default file (**basin_global_tenth_degree.nc**) is bundled with MET. If **basin_mask** is left empty, genesis events for all basins will be included. If non-empty, the union of specified basins will be used. If **vx_mask** is also specified, the analysis is done on the intersection of those masking areas.
+The **basin_mask** entry is an array of strings listing tropical cyclone basin abbreviations (e.g., AL, EP, CP, WP, NI, SI, AU, and SP). The configuration entry **basin_file** defines the path to a NetCDF file which defines these regions. The default file (**basin_global_tenth_degree.nc**) is bundled with MET. If **basin_mask** is left empty, genesis events for all basins will be included. If non-empty, the union of specified basins will be used. If **vx_mask** is also specified, the analysis is done on the intersection of those masking areas.
 
 The **vx_mask** and **basin_mask** names are concatenated and written to the **VX_MASK** output column.
 

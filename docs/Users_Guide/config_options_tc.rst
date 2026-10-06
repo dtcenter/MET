@@ -191,7 +191,7 @@ init_mask, valid_mask
 
 Specify spatial masking regions to be applied. These masks can be specified as lat/lon polyline files,
 the NetCDF output of the gen_vx_mask tool, or any gridded data file directly supported by MET.
-Tracks whose initial location (i.e. lead time of 0) falls within the "init_mask" region will be used.
+Tracks whose initial location (i.e., lead time of 0) falls within the "init_mask" region will be used.
 Generally, tracks for which all locations fall within the "valid_mask" region will be used.
 However, in RMW-Analysis, only data for track points falling inside the "valid_mask" region will be used.
 
@@ -223,8 +223,8 @@ interp12
 ^^^^^^^^
 
 Specify whether special processing should be performed for interpolated model
-names ending in 'I' (e.g. AHWI).  Search for corresponding tracks whose model
-name ends in '2' (e.g. AHW2) and apply the following logic:
+names ending in 'I' (e.g., AHWI).  Search for corresponding tracks whose model
+name ends in '2' (e.g., AHW2) and apply the following logic:
 
 * NONE to do nothing.
 
