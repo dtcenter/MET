@@ -138,12 +138,12 @@ An example of the ensemble_stat calling sequence is shown below:
 
 .. code-block:: none
 
-     ensemble_stat \
-     6 sample_fcst/2009123112/*gep*/d01_2009123112_02400.grib \
-     config/EnsembleStatConfig \
-     -grid_obs sample_obs/ST4/ST4.2010010112.24h \
-     -point_obs out/ascii2nc/precip24_2010010112.nc \
-     -outdir out/ensemble_stat -v 2
+  ensemble_stat \
+  6 sample_fcst/2009123112/*gep*/d01_2009123112_02400.grib \
+  config/EnsembleStatConfig \
+  -grid_obs sample_obs/ST4/ST4.2010010112.24h \
+  -point_obs out/ascii2nc/precip24_2010010112.nc \
+  -outdir out/ensemble_stat -v 2
 
 In this example, the Ensemble-Stat tool will process six forecast files specified in the file list into an ensemble forecast. Observations in both point and grid format will be included, and be used to compute ensemble statistics separately. Ensemble-Stat will create a NetCDF file containing requested ensemble fields and an output STAT file.
 
@@ -446,7 +446,7 @@ __________________
 
 .. code-block:: none
 
-    nc_var_str = "";
+  nc_var_str = "";
 
 
 The **nc_var_str** entry specifies a string for each ensemble field and verification task. This string is parsed from each **ens.field** and **obs.field** dictionary entry and is used to customize the variable names written to the NetCDF output file. The default is an empty string, meaning that no customization is applied to the output variable names. When the Ensemble-Stat config file contains two fields with the same name and level value, this entry is used to make the resulting variable names unique.

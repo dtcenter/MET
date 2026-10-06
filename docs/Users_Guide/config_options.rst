@@ -1466,9 +1466,9 @@ Using PYTHON_NUMPY or PYTHON_XARRAY:
 
       .. code-block:: none
 
-         field = [
-           { name = "read_ascii_numpy.py data/python/fcst.txt FCST"; }
-         ];
+        field = [
+          { name = "read_ascii_numpy.py data/python/fcst.txt FCST"; }
+        ];
 
   Option 2:
 
@@ -1530,48 +1530,48 @@ length of the "fcst.field" array.  For example:
 
 .. code-block:: none
 
-        obs = fcst;
+  obs = fcst;
 
 or
 
 .. code-block:: none
 
-   fcst = {
-     censor_thresh = [];
-     censor_val    = [];
-     cnt_thresh    = [ NA ];
-     cnt_logic     = UNION;
-     wind_thresh   = [ NA ];
-     wind_logic    = UNION;
+  fcst = {
+    censor_thresh = [];
+    censor_val    = [];
+    cnt_thresh    = [ NA ];
+    cnt_logic     = UNION;
+    wind_thresh   = [ NA ];
+    wind_logic    = UNION;
 
-     field = [
-        {
-           name       = "PWAT";
-           level      = [ "L0" ];
-           cat_thresh = [ >2.5 ];
-        }
-      ];
-   }
+    field = [
+       {
+          name       = "PWAT";
+          level      = [ "L0" ];
+          cat_thresh = [ >2.5 ];
+       }
+     ];
+  }
 
 
-   obs = {
-     censor_thresh = [];
-     censor_val    = [];
-     mpr_column    = [];
-     mpr_thresh    = [];
-     cnt_thresh    = [ NA ];
-     cnt_logic     = UNION;
-     wind_thresh   = [ NA ];
-     wind_logic    = UNION;
+  obs = {
+    censor_thresh = [];
+    censor_val    = [];
+    mpr_column    = [];
+    mpr_thresh    = [];
+    cnt_thresh    = [ NA ];
+    cnt_logic     = UNION;
+    wind_thresh   = [ NA ];
+    wind_logic    = UNION;
 
-     field = [
-        {
-           name       = "IWV";
-           level      = [ "L0" ];
-           cat_thresh = [ >25.0 ];
-        }
-      ];
-   }
+    field = [
+       {
+          name       = "IWV";
+          level      = [ "L0" ];
+          cat_thresh = [ >25.0 ];
+       }
+     ];
+  }
 
 message_type
 ^^^^^^^^^^^^
@@ -1592,33 +1592,33 @@ than one "message_type" entry is desired within the config file. For example:
 
 .. code-block:: none
 
-   fcst = {
-       censor_thresh = [];
-       censor_val    = [];
-       cnt_thresh    = [ NA ];
-       cnt_logic     = UNION;
-       wind_thresh   = [ NA ];
-       wind_logic    = UNION;
+  fcst = {
+      censor_thresh = [];
+      censor_val    = [];
+      cnt_thresh    = [ NA ];
+      cnt_logic     = UNION;
+      wind_thresh   = [ NA ];
+      wind_logic    = UNION;
 
-       field = [
-          {
-            message_type = [ "ADPUPA" ];
-            sid_inc      = [];
-            sid_exc      = [];
-            name         = "TMP";
-            level        = [ "P250", "P500", "P700", "P850", "P1000" ];
-            cat_thresh   = [ <=273.0 ];
-          },
-          {
-            message_type = [ "ADPSFC" ];
-            sid_inc      = [];
-            sid_exc      = [ "KDEN", "KDET" ];
-            name         = "TMP";
-            level        = [ "Z2" ];
-            cat_thresh   = [ <=273.0 ];
-          }
-       ];
-     }
+      field = [
+         {
+           message_type = [ "ADPUPA" ];
+           sid_inc      = [];
+           sid_exc      = [];
+           name         = "TMP";
+           level        = [ "P250", "P500", "P700", "P850", "P1000" ];
+           cat_thresh   = [ <=273.0 ];
+         },
+         {
+           message_type = [ "ADPSFC" ];
+           sid_inc      = [];
+           sid_exc      = [ "KDEN", "KDET" ];
+           name         = "TMP";
+           level        = [ "Z2" ];
+           cat_thresh   = [ <=273.0 ];
+         }
+      ];
+    }
 
 sid_inc and sid_exc
 ^^^^^^^^^^^^^^^^^^^
@@ -1994,13 +1994,13 @@ These three options are described below:
   Here is an example of a rectangle consisting of 4 points:
 
   .. code-block:: none
-     :caption: ASCII Rectangle Polygon Mask
+    :caption: ASCII Rectangle Polygon Mask
 
-     RECTANGLE
-     25  -120
-     55  -120
-     55   -70
-     25   -70
+    RECTANGLE
+    25  -120
+    55  -120
+    55   -70
+    25   -70
 
   Several masking polygons used by NCEP are predefined in the
   installed *share/met/poly* directory. Creating a new polygon is as
@@ -2015,7 +2015,7 @@ These three options are described below:
 
   .. code-block:: none
 
-     mask = { poly = [ "share/met/poly/CONUS.poly" ]; }
+    mask = { poly = [ "share/met/poly/CONUS.poly" ]; }
 
 * Option 2 - Gen-Vx-Mask output:
 
@@ -2024,7 +2024,7 @@ These three options are described below:
 
   .. code-block:: none
 
-     mask = { poly = [ "/path/to/gen_vx_mask_output.nc" ]; }
+    mask = { poly = [ "/path/to/gen_vx_mask_output.nc" ]; }
 
 * Option 3 - Any gridded data file:
 
@@ -2038,7 +2038,7 @@ These three options are described below:
 
   .. code-block:: none
 
-     mask = { poly = [ "/path/to/sample.grib {name = \"TMP\"; level = \"Z2\";} >273" ]; }
+    mask = { poly = [ "/path/to/sample.grib {name = \"TMP\"; level = \"Z2\";} >273" ]; }
 
   .. note::
 
@@ -3032,11 +3032,11 @@ For example:
 
 .. code-block:: none
 
-   beg = "00";
-   end = "235959";
-   step = 300;
-   width = 600;
-   width = { beg = -300; end = 300; }
+  beg = "00";
+  end = "235959";
+  step = 300;
+  width = 600;
+  width = { beg = -300; end = 300; }
 
 This example does a 10-minute time summary every 5 minutes throughout the
 day. The first interval will be from 23:55:00 the previous day through
@@ -4920,14 +4920,14 @@ arithmetic mean method do not need to be listed.
 
 .. code-block:: none
 
-   wmo_sqrt_stats   = [ "CNT:FSTDEV",  "CNT:OSTDEV",  "CNT:ESTDEV",
-                        "CNT:RMSE",    "CNT:RMSFA",   "CNT:RMSOA",
-                        "VCNT:FS_RMS", "VCNT:OS_RMS", "VCNT:RMSVE",
-                        "VCNT:FSTDEV", "VCNT:OSTDEV" ];
+  wmo_sqrt_stats   = [ "CNT:FSTDEV",  "CNT:OSTDEV",  "CNT:ESTDEV",
+                       "CNT:RMSE",    "CNT:RMSFA",   "CNT:RMSOA",
+                       "VCNT:FS_RMS", "VCNT:OS_RMS", "VCNT:RMSVE",
+                       "VCNT:FSTDEV", "VCNT:OSTDEV" ];
 
-   wmo_fisher_stats = [ "CNT:PR_CORR", "CNT:SP_CORR",
-                        "CNT:KT_CORR", "CNT:ANOM_CORR",
-                        "CNT:ANOM_CORR_UNCNTR" ];
+  wmo_fisher_stats = [ "CNT:PR_CORR", "CNT:SP_CORR",
+                       "CNT:KT_CORR", "CNT:ANOM_CORR",
+                       "CNT:ANOM_CORR_UNCNTR" ];
 
 vif_flag
 ^^^^^^^^
@@ -5051,10 +5051,10 @@ Supply the NetCDF output information.  For example:
 
 .. code-block:: none
 
-   variable_name = "Cloud_Pct";
-   units         = "percent";
-   long_name     = "cloud cover percent";
-   level         = "SFC";
+  variable_name = "Cloud_Pct";
+  units         = "percent";
+  long_name     = "cloud cover percent";
+  level         = "SFC";
 
 .. code-block:: none
 

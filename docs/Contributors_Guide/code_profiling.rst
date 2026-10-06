@@ -88,12 +88,12 @@ Overview of Steps for Performing Benchmarking
 
         .. code-block:: ini
 
-           void process_grid(const Grid &fcst_grid) {
-               #ifdef WITH_PROFILER
-               CTRACK;
-               #endif
-               Grid obs_grid;
-              ... more code
+          void process_grid(const Grid &fcst_grid) {
+              #ifdef WITH_PROFILER
+              CTRACK;
+              #endif
+              Grid obs_grid;
+             ... more code
 
       and the *ctrack::result_print* is placed within the corresponding MET tool's
       **main()/met_main()** function
@@ -139,13 +139,13 @@ Overview of Steps for Performing Benchmarking
 
            .. code-block:: ini
 
-              ./configure --prefix=`pwd` --enable-grib2 --enable-modis --enable-lidar2nc --enable-python --enable-ugrid --enable-profiler
+             ./configure --prefix=`pwd` --enable-grib2 --enable-modis --enable-lidar2nc --enable-python --enable-ugrid --enable-profiler
 
-               or
+              or
 
            .. code-block:: ini
 
-               ./configure --prefix=`pwd` --enable-all --enable-ugrid --enable-profiler
+             ./configure --prefix=`pwd` --enable-all --enable-ugrid --enable-profiler
 
     .. dropdown:: Run make install and test
 
@@ -153,8 +153,8 @@ Overview of Steps for Performing Benchmarking
 
           .. code-block:: ini
 
-             make install test >& make.log &
-             tail -f make.log
+            make install test >& make.log &
+            tail -f make.log
 
 
 
@@ -344,7 +344,7 @@ Overview of Steps for Performing Benchmarking
 
               .. code-block:: ini
 
-                 !ENV '${SOME_ENV_NAME}'
+                !ENV '${SOME_ENV_NAME}'
 
               Make sure that the *SOME_ENV_NAME* environment variable is defined
 

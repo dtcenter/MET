@@ -71,9 +71,9 @@ An example of the pb2nc calling sequence is shown below:
 
 .. code-block:: none
 
-   pb2nc sample_pb.blk \
-   sample_pb.nc \
-   PB2NCConfig
+  pb2nc sample_pb.blk \
+  sample_pb.nc \
+  PB2NCConfig
 
 In this example, the PB2NC tool will process the input **sample_pb.blk** file applying the configuration specified in the **PB2NCConfig** file and write the output to a file named **sample_pb.nc**.
 
@@ -90,10 +90,10 @@ ____________________
 
 .. code-block:: none
 
-   obs_window = { beg  = -5400; end  = 5400; }
-   mask       = { grid = "";    poly = "";   }
-   tmp_dir    = "/tmp";
-   version    = "VN.N";
+  obs_window = { beg  = -5400; end  = 5400; }
+  mask       = { grid = "";    poly = "";   }
+  tmp_dir    = "/tmp";
+  version    = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 The use of temporary files in PB2NC is described in :numref:`Contributor's Guide Section %s <tmp_files_pb2nc>`.
@@ -102,7 +102,7 @@ _____________________
 
 .. code-block:: none
 
-   message_type = [];
+  message_type = [];
 
 Each PrepBUFR message is tagged with one of eighteen message types as listed in the :numref:`config_options` file. The **message_type** refers to the type of observation from which the observation value (or 'report') was derived. The user may specify a comma-separated list of message types to be retained. Providing an empty list indicates that all message types should be retained.
 
@@ -110,7 +110,7 @@ _____________________
 
 .. code-block:: none
 
-   message_type_map = [ { key = "AIRCAR"; val = "AIRCAR_PROFILES"; } ];
+  message_type_map = [ { key = "AIRCAR"; val = "AIRCAR_PROFILES"; } ];
 
 The **message_type_map** entry is an array of dictionaries, each containing a **key** string and **val** string. This defines a mapping of input PrepBUFR message types to output message types. This provides a method for renaming input PrepBUFR message types.
 
@@ -118,12 +118,12 @@ _____________________
 
 .. code-block:: none
 
-   message_type_group_map = [
-      { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
-      { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
-      { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
-      { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
-   ];
+  message_type_group_map = [
+     { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
+     { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
+     { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
+     { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
+  ];
 
 The **message_type_group_map** entry is an array of dictionaries, each containing a **key** string and **val** string. This defines a mapping of message type group names to a comma-separated list of values. This map is defined in the config files for PB2NC, Point-Stat, or Ensemble-Stat. Modify this map to define sets of message types that should be processed together as a group. The **SURFACE** entry must be present to define message types for which surface verification logic should be applied.
 
@@ -131,7 +131,7 @@ _____________________
 
 .. code-block:: none
 
-   station_id = [];
+  station_id = [];
 
 Each PrepBUFR message has a station identification string associated with it. The user may specify a comma-separated list of station IDs to be retained. Providing an empty list indicates that messages from all station IDs will be retained. It can be a file name containing a list of stations.
 
@@ -139,7 +139,7 @@ _____________________
 
 .. code-block:: none
 
-   elevation_range = { beg = -1000; end = 100000; }
+  elevation_range = { beg = -1000; end = 100000; }
 
 The **beg** and **end** variables are used to stratify the elevation (in meters) of the observations to be retained. The range shown above is set to -1000 to 100000 meters, which essentially retains every observation.
 
@@ -147,9 +147,9 @@ _____________________
 
 .. code-block:: none
 
-   pb_report_type  = [];
-   in_report_type  = [];
-   instrument_type = [];
+  pb_report_type  = [];
+  in_report_type  = [];
+  instrument_type = [];
 
 The **pb_report_type, in_report_type**, and **instrument_type** variables are used to specify comma-separated lists of PrepBUFR report types, input report types, and instrument types to be retained, respectively. If left empty, all PrepBUFR report types, input report types, and instrument types will be retained. See the following for more details:
 
@@ -161,8 +161,8 @@ _____________________
 
 .. code-block:: none
 
-   level_range    = { beg = 1; end = 255; }
-   level_category = [];
+  level_range    = { beg = 1; end = 255; }
+  level_category = [];
 
 The **beg** and **end** variables are used to stratify the model level of observations to be retained. The range shown above is 1 to 255.
 
@@ -229,23 +229,23 @@ _____________________
 
 .. code-block:: none
 
-   obs_bufr_map = [
-      { key = 'POB';      val = 'PRES';  },
-      { key = 'QOB';      val = 'SPFH';  },
-      { key = 'TOB';      val = 'TMP';   },
-      { key = 'ZOB';      val = 'HGT';   },
-      { key = 'UOB';      val = 'UGRD';  },
-      { key = 'VOB';      val = 'VGRD';  },
-      { key = 'D_DPT';    val = 'DPT';   },
-      { key = 'D_WDIR';   val = 'WDIR';  },
-      { key = 'D_WIND';   val = 'WIND';  },
-      { key = 'D_RH';     val = 'RH';    },
-      { key = 'D_MIXR';   val = 'MIXR';  },
-      { key = 'D_PRMSL';  val = 'PRMSL'; },
-      { key = 'D_PBL';    val = 'PBL';   },
-      { key = 'D_CAPE';   val = 'CAPE';  },
-      { key = 'D_MLCAPE'; val = 'MLCAPE';  }
-   ];
+  obs_bufr_map = [
+     { key = 'POB';      val = 'PRES';  },
+     { key = 'QOB';      val = 'SPFH';  },
+     { key = 'TOB';      val = 'TMP';   },
+     { key = 'ZOB';      val = 'HGT';   },
+     { key = 'UOB';      val = 'UGRD';  },
+     { key = 'VOB';      val = 'VGRD';  },
+     { key = 'D_DPT';    val = 'DPT';   },
+     { key = 'D_WDIR';   val = 'WDIR';  },
+     { key = 'D_WIND';   val = 'WIND';  },
+     { key = 'D_RH';     val = 'RH';    },
+     { key = 'D_MIXR';   val = 'MIXR';  },
+     { key = 'D_PRMSL';  val = 'PRMSL'; },
+     { key = 'D_PBL';    val = 'PBL';   },
+     { key = 'D_CAPE';   val = 'CAPE';  },
+     { key = 'D_MLCAPE'; val = 'MLCAPE';  }
+  ];
 
 The BUFR variable names are not shared with other forecast data. This map is used to convert the BUFR name to the common name, like GRIB2. It allows the configuration for forecast data to be shared with PB2NC observation data. If there is no mapping, the BUFR variable name will be saved to the output NetCDF file.
 
@@ -253,7 +253,7 @@ _____________________
 
 .. code-block:: none
 
-   quality_mark_thresh = <=2;
+  quality_mark_thresh = <=2;
 
 Each observation has an integer quality mark value associated with it. The **quality_mark_thresh** is used to stratify which quality marks will be retained. By default, observations with quality marks less than or equal to 2 will be kept. This can be specified as a threshold string (e.g., :code:`<=2||==9` for less than or equal to 2 or exactly equal to 9) or as an integer defining the maximum allowable quality mark value. Earlier versions of MET only supported the integer setting.
 
@@ -261,7 +261,7 @@ _____________________
 
 .. code-block:: none
 
-   event_stack_flag = TOP;
+  event_stack_flag = TOP;
 
 A PrepBUFR message may contain duplicate observations with different quality mark values. The **event_stack_flag** indicates whether to use the observations at the top of the event stack (observation values have had more quality control processing applied) or the bottom of the event stack (observation values have had no quality control processing applied). The flag value of **TOP** listed above indicates the observations with the most amount of quality control processing should be used; the **BOTTOM** option uses the data closest to raw values.
 
@@ -269,20 +269,20 @@ _____________________
 
 .. code-block:: none
 
-   time_summary = {
-      flag       = FALSE;
-      raw_data   = FALSE;
-      beg        = "000000";
-      end        = "235959";
-      step       = 300;
-      width      = 600;
-      // width   = { beg = -300; end = 300; }
-      grib_code  = [];
-      obs_var    = [ "TMP", "WDIR", "RH" ];
-      type       = [ "min", "max", "range", "mean", "stdev", "median", "p80" ];
-      vld_freq   = 0;
-      vld_thresh = 0.0;
-   }
+  time_summary = {
+     flag       = FALSE;
+     raw_data   = FALSE;
+     beg        = "000000";
+     end        = "235959";
+     step       = 300;
+     width      = 600;
+     // width   = { beg = -300; end = 300; }
+     grib_code  = [];
+     obs_var    = [ "TMP", "WDIR", "RH" ];
+     type       = [ "min", "max", "range", "mean", "stdev", "median", "p80" ];
+     vld_freq   = 0;
+     vld_thresh = 0.0;
+  }
 
 The **time_summary** dictionary enables additional processing for observations with high temporal resolution. The **flag** entry toggles the **time_summary** on (**TRUE**) and off (**FALSE**). If the **raw_data** flag is set to TRUE, then both the individual observation values and the derived time summary value will be written to the output. If FALSE, only the summary values are written. Observations may be summarized across the user specified time period defined by the **beg** and **end** entries in HHMMSS format. The **step** entry defines the time between intervals in seconds. The **width** entry specifies the summary interval in seconds. It may either be set as an integer number of seconds for a centered time interval or a dictionary with beginning and ending time offsets in seconds.
 
@@ -292,7 +292,7 @@ The two **width** settings listed above are equivalent. Both define a centered 1
 
 .. code-block:: none
 
-   width = { beg = -3600; end = 0; }
+  width = { beg = -3600; end = 0; }
 
 
 The summaries will only be calculated for the observations specified in the **grib_code** or **obs_var** entries. The **grib_code** entry is an array of integers while the **obs_var** entry is an array of strings. The supported summaries are **min** (minimum), **max** (maximum), **range, mean, stdev** (standard deviation), **median** and **p##** (percentile, with the desired percentile value specified in place of ##). If multiple summaries are selected in a single run, a string indicating the summary method applied will be appended to the output message type.
@@ -564,8 +564,8 @@ An example of the ascii2nc calling sequence is shown below:
 
 .. code-block:: none
 
-   ascii2nc sample_ascii_obs.txt \
-   sample_ascii_obs.nc
+  ascii2nc sample_ascii_obs.txt \
+  sample_ascii_obs.nc
 
 In this example, the ASCII2NC tool will reformat the input **sample_ascii_obs.txt file** into NetCDF format and write the output to a file named **sample_ascii_obs.nc**.
 
@@ -582,7 +582,7 @@ _____________________
 
 .. code-block:: none
 
-   version = "VN.N";
+  version = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
@@ -590,7 +590,7 @@ _____________________
 
 .. code-block:: none
 
-   time_summary = { ... }
+  time_summary = { ... }
 
 The **time_summary** feature was implemented to allow additional processing of observations with high temporal resolution, such as SURFRAD data every 5 minutes. This option is described in :numref:`pb2nc configuration file`.
 
@@ -598,17 +598,17 @@ _____________________
 
 .. code-block:: none
 
-   message_type_map = [
-      { key = "FM-12 SYNOP";  val = "ADPSFC"; },
-      { key = "FM-13 SHIP";   val = "SFCSHP"; },
-      { key = "FM-15 METAR";  val = "ADPSFC"; },
-      { key = "FM-18 BUOY";   val = "SFCSHP"; },
-      { key = "FM-281 QSCAT"; val = "ASCATW"; },
-      { key = "FM-32 PILOT";  val = "ADPUPA"; },
-      { key = "FM-35 TEMP";   val = "ADPUPA"; },
-      { key = "FM-88 SATOB";  val = "SATWND"; },
-      { key = "FM-97 ACARS";  val = "AIRCFT"; }
-   ];
+  message_type_map = [
+     { key = "FM-12 SYNOP";  val = "ADPSFC"; },
+     { key = "FM-13 SHIP";   val = "SFCSHP"; },
+     { key = "FM-15 METAR";  val = "ADPSFC"; },
+     { key = "FM-18 BUOY";   val = "SFCSHP"; },
+     { key = "FM-281 QSCAT"; val = "ASCATW"; },
+     { key = "FM-32 PILOT";  val = "ADPUPA"; },
+     { key = "FM-35 TEMP";   val = "ADPUPA"; },
+     { key = "FM-88 SATOB";  val = "SATWND"; },
+     { key = "FM-97 ACARS";  val = "AIRCFT"; }
+  ];
 
 This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of input strings to output message types. This mapping is currently only applied when converting input little_r report types to output message types.
 
@@ -685,8 +685,8 @@ An example of the madis2nc calling sequence is shown below:
 
 .. code-block:: none
 
-   madis2nc sample_madis_obs.nc \
-   sample_madis_obs_met.nc -log madis.log -v 3
+  madis2nc sample_madis_obs.nc \
+  sample_madis_obs_met.nc -log madis.log -v 3
 
 In this example, the MADIS2NC tool will reformat the input sample_madis_obs.nc file into NetCDF format and write the output to a file named sample_madis_obs_met.nc. Warnings and error messages will be written to the madis.log file, and the verbosity level of logging is three.
 
@@ -701,7 +701,7 @@ _____________________
 
 .. code-block:: none
 
-   version = "VN.N";
+  version = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
@@ -709,7 +709,7 @@ _____________________
 
 .. code-block:: none
 
-   time_summary = { ... }
+  time_summary = { ... }
 
 The **time_summary** dictionary is described in :numref:`pb2nc configuration file`.
 
@@ -717,29 +717,29 @@ _____________________
 
 .. code-block:: none
 
-   grib_var_map = [
-      { key = "1"  ;   val =  "PRES,Pa"      ; },  // Station Pressure
-      { key = "2"  ;   val = "PRMSL,Pa"      ; },  // Sea Level Pressure
-      { key = "7"  ;   val =   "HGT,gpm"     ; },  // Height
-      { key = "11" ;   val =   "TMP,K"       ; },  // Temperature
-      { key = "15" ;   val =  "TMAX,K"       ; },  // Maximum Temperature
-      { key = "16" ;   val =  "TMIN,K"       ; },  // Minimum Temperature
-      { key = "17" ;   val =   "DPT,K"       ; },  // Dewpoint
-      { key = "20" ;   val = "VISIB,W/m^2"   ; },  // Visibility
-      { key = "31" ;   val =  "WDIR,deg"     ; },  // Wind Direction
-      { key = "32" ;   val =  "WIND,m/s"     ; },  // Wind Speed
-      { key = "33" ;   val =  "UGRD,m/s"     ; },  // Write U-component of wind
-      { key = "34" ;   val =  "VGRD,m/s"     ; },  // Write V-component of wind
-      { key = "52" ;   val =    "RH,%"       ; },  // Relative Humidity
-      { key = "54" ;   val =  "PWAT,kg/m^2"  ; },  // Precipitable Water
-      { key = "59" ;   val = "PRATE,kg/m^2/s"; },  // Precipitation Rate
-      { key = "61" ;   val =  "APCP,kg/m^2"  ; },  // Precipitation
-      { key = "66" ;   val =  "SNOD,m"       ; },  // Snow Cover
-      { key = "80" ;   val =  "WTMP,K"       ; },  // Sea Surface Temperature
-      { key = "85" ;   val = "TSOIL,K"       ; },  // Soil Temperature
-      { key = "180";   val =  "GUST,m/s"     ; },  // Wind Gust
-      { key = "250";   val =  "SWHR,K/s"     ; }   // Solar Radiation
-   ];
+  grib_var_map = [
+     { key = "1"  ;   val =  "PRES,Pa"      ; },  // Station Pressure
+     { key = "2"  ;   val = "PRMSL,Pa"      ; },  // Sea Level Pressure
+     { key = "7"  ;   val =   "HGT,gpm"     ; },  // Height
+     { key = "11" ;   val =   "TMP,K"       ; },  // Temperature
+     { key = "15" ;   val =  "TMAX,K"       ; },  // Maximum Temperature
+     { key = "16" ;   val =  "TMIN,K"       ; },  // Minimum Temperature
+     { key = "17" ;   val =   "DPT,K"       ; },  // Dewpoint
+     { key = "20" ;   val = "VISIB,W/m^2"   ; },  // Visibility
+     { key = "31" ;   val =  "WDIR,deg"     ; },  // Wind Direction
+     { key = "32" ;   val =  "WIND,m/s"     ; },  // Wind Speed
+     { key = "33" ;   val =  "UGRD,m/s"     ; },  // Write U-component of wind
+     { key = "34" ;   val =  "VGRD,m/s"     ; },  // Write V-component of wind
+     { key = "52" ;   val =    "RH,%"       ; },  // Relative Humidity
+     { key = "54" ;   val =  "PWAT,kg/m^2"  ; },  // Precipitable Water
+     { key = "59" ;   val = "PRATE,kg/m^2/s"; },  // Precipitation Rate
+     { key = "61" ;   val =  "APCP,kg/m^2"  ; },  // Precipitation
+     { key = "66" ;   val =  "SNOD,m"       ; },  // Snow Cover
+     { key = "80" ;   val =  "WTMP,K"       ; },  // Sea Surface Temperature
+     { key = "85" ;   val = "TSOIL,K"       ; },  // Soil Temperature
+     { key = "180";   val =  "GUST,m/s"     ; },  // Wind Gust
+     { key = "250";   val =  "SWHR,K/s"     ; }   // Solar Radiation
+  ];
 
 The GRIB code mappings for variable names and units are defined in the **grib_var_map** dictionary within **Madis2NcConfig_default**. In this mapping, each key is a GRIB code, and the corresponding value is a pair: the first element is the variable name, and the second is the unit.
 
@@ -918,9 +918,9 @@ An example of the ioda2nc calling sequence is shown below:
 
 .. code-block:: none
 
-   ioda2nc \
-   ioda.NC001007.2020031012.nc ioda2nc.2020031012.nc \
-   -config IODA2NCConfig -v 3 -log run_ioda2nc.log
+  ioda2nc \
+  ioda.NC001007.2020031012.nc ioda2nc.2020031012.nc \
+  -config IODA2NCConfig -v 3 -log run_ioda2nc.log
 
 In this example, the IODA2NC tool will reformat the data in the input ioda.NC001007.2020031012.nc file and write the output to a file named ioda2nc.2020031012.nc. The data to be processed is specified by IODA2NCConfig, log messages will be written to the run_ioda2nc.log file, and the verbosity level is three.
 
@@ -935,10 +935,10 @@ _____________________
 
 .. code-block:: none
 
-   obs_window = { beg  = -5400; end  = 5400; }
-   mask       = { grid = "";    poly = "";   }
-   tmp_dir    = "/tmp";
-   version    = "VN.N";
+  obs_window = { beg  = -5400; end  = 5400; }
+  mask       = { grid = "";    poly = "";   }
+  tmp_dir    = "/tmp";
+  version    = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
@@ -946,15 +946,15 @@ _____________________
 
 .. code-block:: none
 
-   message_type           = [];
-   message_type_group_map = [];
-   message_type_map       = [];
-   station_id             = [];
-   elevation_range        = { ... };
-   level_range            = { ... };
-   obs_var                = [];
-   quality_mark_thresh    = NA;
-   time_summary           = { ... }
+  message_type           = [];
+  message_type_group_map = [];
+  message_type_map       = [];
+  station_id             = [];
+  elevation_range        = { ... };
+  level_range            = { ... };
+  obs_var                = [];
+  quality_mark_thresh    = NA;
+  time_summary           = { ... }
 
 The configuration options listed above are supported by other point observation pre-processing tools and are described in :numref:`pb2nc configuration file`.
 
@@ -967,7 +967,7 @@ _____________________
 
 .. code-block:: none
 
-   obs_name_map = [];
+  obs_name_map = [];
 
 This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of input IODA variable names to output variable names. The default IODA map, obs_var_map, is appended to this map.
 
@@ -975,14 +975,14 @@ _____________________
 
 .. code-block:: none
 
-   metadata_map = [
-      { key = "message_type"; val = "msg_type,station_ob"; },
-      { key = "station_id";   val = "station_id,report_identifier"; },
-      { key = "pressure";     val = "air_pressure,pressure"; },
-      { key = "height";       val = "height,height_above_mean_sea_level"; },
-      { key = "elevation";    val = "elevation,station_elevation"; },
-      { key = "nlocs";        val = "Location"; }
-   ];
+  metadata_map = [
+     { key = "message_type"; val = "msg_type,station_ob"; },
+     { key = "station_id";   val = "station_id,report_identifier"; },
+     { key = "pressure";     val = "air_pressure,pressure"; },
+     { key = "height";       val = "height,height_above_mean_sea_level"; },
+     { key = "elevation";    val = "elevation,station_elevation"; },
+     { key = "nlocs";        val = "Location"; }
+  ];
 
 This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of metadata for IODA data files.
 The "nlocs" is for the dimension name of the locations. The following keys can be added: "nstring", "latitude" and "longitude".
@@ -991,10 +991,10 @@ _____________________
 
 .. code-block:: none
 
-   obs_to_qc_map  = [
-      { key = "wind_from_direction"; val = "eastward_wind,northward_wind"; },
-      { key = "wind_speed";          val = "eastward_wind,northward_wind"; }
-   ];
+  obs_to_qc_map  = [
+     { key = "wind_from_direction"; val = "eastward_wind,northward_wind"; },
+     { key = "wind_speed";          val = "eastward_wind,northward_wind"; }
+  ];
 
 This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of QC variable name for IODA data files.
 
@@ -1002,7 +1002,7 @@ _____________________
 
 .. code-block:: none
 
-   missing_thresh = [ <=-1e9, >=1e9, ==-9999 ];
+  missing_thresh = [ <=-1e9, >=1e9, ==-9999 ];
 
 The **missing_thresh** option is an array of thresholds. Any data values which meet any of these thresholds are interpreted as being bad, or missing, data.
 
@@ -1090,13 +1090,13 @@ For the GOES-East and GOES-West data, computing the latitude and longitude pixel
 
 .. code-block:: none
 
-   point2grid \
-      OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
-      G212 \
-      regrid_data_plane_GOES-16_AOD_TO_G212.nc \
-      -field 'name="AOD"; level="(*,*)";' \
-      -goes_qc 0,1,2 \
-      -method MAX
+  point2grid \
+     OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
+     G212 \
+     regrid_data_plane_GOES-16_AOD_TO_G212.nc \
+     -field 'name="AOD"; level="(*,*)";' \
+     -goes_qc 0,1,2 \
+     -method MAX
 
 
 When processing GOES data, the **-goes_qc** option may also be used to specify the acceptable quality control flag values. The example above regrids the GOES-East AOD values to NCEP Grid number 212 using only pixels whose QC flags are 0, 1, or 2 (high, medium, and low quality), writing to the output the maximum AOD value falling inside each grid box.
@@ -1105,24 +1105,24 @@ The grid name or the grid definition can be given with the -field option when th
 
 .. code-block:: none
 
-   point2grid \
-      iceh.2018-01-03.c00.tlat_tlon.nc \
-      G231 \
-      point2grid_cice_to_G231.nc \
-      -config Point2GridConfig_tlat_tlon \
-      -field 'name="hi_d"; level="(0,*,*)"; set_attr_grid="latlon 1440 1080 -79.80672 60.28144 0.04 0.04";'
+  point2grid \
+     iceh.2018-01-03.c00.tlat_tlon.nc \
+     G231 \
+     point2grid_cice_to_G231.nc \
+     -config Point2GridConfig_tlat_tlon \
+     -field 'name="hi_d"; level="(0,*,*)"; set_attr_grid="latlon 1440 1080 -79.80672 60.28144 0.04 0.04";'
 
 
 Listed below is an example of using Python embedding to pass point observations as input to point2grid:
 
 .. code-block:: none
 
-   point2grid \
-      'PYTHON_NUMPY=MET_BASE/python/examples/read_met_point_obs.py ascii2nc_edr_hourly.20130827.nc' \
-      G212 \
-      python_gridded_ascii_python.nc -config Point2GridConfig_edr \
-      -field 'name="200"; level="*"; valid_time="20130827_205959";' \
-      -method MAX
+  point2grid \
+     'PYTHON_NUMPY=MET_BASE/python/examples/read_met_point_obs.py ascii2nc_edr_hourly.20130827.nc' \
+     G212 \
+     python_gridded_ascii_python.nc -config Point2GridConfig_edr \
+     -field 'name="200"; level="*"; valid_time="20130827_205959";' \
+     -method MAX
 
 
 Please refer to :numref:`Appendix F, Section %s <appendixF>` for more details about Python embedding in MET.
@@ -1159,11 +1159,11 @@ _____________________
 
 .. code-block:: none
 
-   obs_window = { beg = -5400; end =  5400; }
-   message_type    = [];
-   obs_quality_inc = [];
-   obs_quality_exc = [];
-   version = "VN.N";
+  obs_window = { beg = -5400; end =  5400; }
+  message_type    = [];
+  obs_quality_inc = [];
+  obs_quality_exc = [];
+  version = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
@@ -1171,7 +1171,7 @@ _____________________
 
 .. code-block:: none
 
-   valid_time = "YYYYMMDD_HHMMSS";
+  valid_time = "YYYYMMDD_HHMMSS";
 
 This entry is a string to override the observation time into the output and to filter observation data by time.
 
@@ -1179,17 +1179,17 @@ _____________________
 
 .. code-block:: none
 
-   var_name_map = [
-      { key = "1";     val = "PRES"; },        // GRIB: Pressure
-      { key = "2";     val = "PRMSL"; },       // GRIB: Pressure reduced to MSL
-      { key = "7";     val = "HGT"; },         // GRIB: Geopotential height
-      { key = "11";    val = "TMP"; },         // GRIB: Temperature
-      { key = "15";    val = "TMAX"; },        // GRIB: Max Temperature
-      ...
-      { key = "lat_vname"; val = "NLAT"; },    // NetCDF latitude variable name
-      { key = "lon_vname"; val = "NLON"; },    // NetCDF longitude variable name
-      ...
-   ]
+  var_name_map = [
+     { key = "1";     val = "PRES"; },        // GRIB: Pressure
+     { key = "2";     val = "PRMSL"; },       // GRIB: Pressure reduced to MSL
+     { key = "7";     val = "HGT"; },         // GRIB: Geopotential height
+     { key = "11";    val = "TMP"; },         // GRIB: Temperature
+     { key = "15";    val = "TMAX"; },        // GRIB: Max Temperature
+     ...
+     { key = "lat_vname"; val = "NLAT"; },    // NetCDF latitude variable name
+     { key = "lon_vname"; val = "NLON"; },    // NetCDF longitude variable name
+     ...
+  ]
 
 This entry is an array of dictionaries, each containing a **GRIB code** string and matching **variable name** string which define a mapping of GRIB code to the output variable names.
 The latitude and longitude variables for NetCDF input can be overridden by the configurations. There are two special keys, **lat_vname** and **lon_vname**, which are applied to the NetCDF input, not for a GRIB code.
@@ -1203,13 +1203,13 @@ The script can be found at:
 
 .. code-block:: none
 
-   MET_BASE/python/utility/print_pointnc2ascii.py
+  MET_BASE/python/utility/print_pointnc2ascii.py
 
 For how to use the script, issue the command:
 
 .. code-block:: none
 
-   python3 MET_BASE/python/utility/print_pointnc2ascii.py -h
+  python3 MET_BASE/python/utility/print_pointnc2ascii.py -h
 
 IABP retrieval Python Utilities
 ====================================
@@ -1220,13 +1220,13 @@ The script can be found at:
 
 .. code-block:: none
 
-   MET_BASE/python/utility/get_iabp_from_web.py
+  MET_BASE/python/utility/get_iabp_from_web.py
 
 For how to use the script, issue the command:
 
 .. code-block:: none
 
-   python3 MET_BASE/python/utility/get_iabp_from_web.py -h
+  python3 MET_BASE/python/utility/get_iabp_from_web.py -h
 
 Another IABP utility script is included for users, to be run after all files have been downloaded using get_iabp_from_web.py.  This script examines all the files and lists those files that contain entries that fall within a user-specified range of days.  It is called find_iabp_in_timerange.py.
 
@@ -1234,10 +1234,10 @@ The script can be found at:
 
 .. code-block:: none
 
-   MET_BASE/python/utility/find_iabp_in_timerange.py
+  MET_BASE/python/utility/find_iabp_in_timerange.py
 
 For how to use the script, issue the command:
 
 .. code-block:: none
 
-   python3 MET_BASE/python/utility/find_iabp_in_timerange.py -h
+  python3 MET_BASE/python/utility/find_iabp_in_timerange.py -h
