@@ -39,7 +39,7 @@ The following sections describe the usage statement, required arguments, and opt
 
   Usage: tc_diag
          -data domain tech_id_list [ file_1 ... file_n | file_list ]
-         -deck source
+         -deck path
          -config file
          [-outdir path]
          [-log file]
@@ -52,7 +52,7 @@ Required Arguments for tc_diag
 
 1. The **-data domain tech_id_list [ file_1 ... file_n | file_list ]** option specifies a domain name, a comma-separated list of ATCF tech ID's, and a list of gridded data files or an ASCII file containing a list of files to be used, as described in :numref:`ascii_file_lists`. Specify **-data** once for each gridded data source.
 
-2. The **-deck source** option is the ATCF format track data source.
+2. The **-deck path** option is the ATCF format track data source.
 
 3. The **-config file** option is the TCDiagConfig file to be used. The contents of the configuration file are discussed below.
 

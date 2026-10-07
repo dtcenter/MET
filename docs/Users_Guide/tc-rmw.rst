@@ -23,7 +23,7 @@ The following sections describe the usage statement, required arguments, and opt
 
   Usage: tc_rmw
          -data file_1 ... file_n | file_list
-         -deck file
+         -deck path
          -config file
          -out file
          [-log file]
@@ -36,7 +36,7 @@ Required Arguments for tc_rmw
 
 1. The **-data file_1 ... file_n | file_list** option specifies the gridded data files or an ASCII file containing a list of files to be used, as described in :numref:`ascii_file_lists`.
 
-2. The **-deck source** argument is the ATCF format data source.
+2. The **-deck path** argument is the ATCF format data source.
 
 3. The **-config file** argument is the configuration file to be used. The contents of the configuration file are discussed below.
 
