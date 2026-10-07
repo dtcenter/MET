@@ -92,7 +92,7 @@ The Series-Analysis tool produces NetCDF files containing output statistics for 
 
 .. figure:: figure/series-analysis_Glibert_precip.png
 
-   An example of the Gilbert Skill Score for precipitation forecasts at each grid location for a month of files.
+  An example of the Gilbert Skill Score for precipitation forecasts at each grid location for a month of files.
 
 series_analysis Configuration File
 ----------------------------------

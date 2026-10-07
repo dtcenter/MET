@@ -93,9 +93,9 @@ Where {LINE_TYPE} is :code:`cnt`, :code:`cts`, :code:`mcts`,
 :code:`nbrcnt`, or :code:`nbrcts`.
 
 .. note::
-   Consider whether or not it's realistic to hold the resampled
-   statistics in memory rather than writing them to temporary files.
-   If so, that would reduce the I/O.
+  Consider whether or not it's realistic to hold the resampled
+  statistics in memory rather than writing them to temporary files.
+  If so, that would reduce the I/O.
 
 .. _tmp_files_stat_analysis:
 
@@ -122,10 +122,10 @@ input data for each job.
   criteria, and perform the requested operation.
 
 .. note::
-   Earlier versions of Stat-Analysis always wrote a temporary file
-   regardless of the number of jobs and filtering criteria. That
-   logic has been refined to only use temporary files when they may
-   increase efficiency.
+  Earlier versions of Stat-Analysis always wrote a temporary file
+  regardless of the number of jobs and filtering criteria. That
+  logic has been refined to only use temporary files when they may
+  increase efficiency.
 
 .. _tmp_files_python_embedding:
 

@@ -960,8 +960,8 @@ The configuration options listed above are supported by other point observation 
 
 .. note::
 
-   Setting "quality_mark_thresh" as an NA threshold, as shown above, always evaluates to true.
-   So by default, IODA2NC performs no filtering of observations based on their quality mark value.
+  Setting "quality_mark_thresh" as an NA threshold, as shown above, always evaluates to true.
+  So by default, IODA2NC performs no filtering of observations based on their quality mark value.
 
 _____________________
 

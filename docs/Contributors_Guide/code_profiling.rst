@@ -128,33 +128,33 @@ Overview of Steps for Performing Benchmarking
 
     .. dropdown:: Configure
 
-        From the $HOME/MET directory:
+      From the $HOME/MET directory:
 
-          * source ./internal/scripts/environment/development.xyz
-          *  *xyz* is the name of the host
+        * source ./internal/scripts/environment/development.xyz
+        *  *xyz* is the name of the host
 
-        **By default, CTRACK is disabled**. Enable it with the --enable-profiler option.
+      **By default, CTRACK is disabled**. Enable it with the --enable-profiler option.
 
-         Run one of the following configure commands (to enable all the components and the CTRACK macro):
+       Run one of the following configure commands (to enable all the components and the CTRACK macro):
 
-           .. code-block:: ini
+         .. code-block:: ini
 
-             ./configure --prefix=`pwd` --enable-grib2 --enable-modis --enable-lidar2nc --enable-python --enable-ugrid --enable-profiler
+           ./configure --prefix=`pwd` --enable-grib2 --enable-modis --enable-lidar2nc --enable-python --enable-ugrid --enable-profiler
 
-              or
+            or
 
-           .. code-block:: ini
+         .. code-block:: ini
 
-             ./configure --prefix=`pwd` --enable-all --enable-ugrid --enable-profiler
+           ./configure --prefix=`pwd` --enable-all --enable-ugrid --enable-profiler
 
     .. dropdown:: Run make install and test
 
-        Redirect the output to a log file named make.log:
+      Redirect the output to a log file named make.log:
 
-          .. code-block:: ini
+        .. code-block:: ini
 
-            make install test >& make.log &
-            tail -f make.log
+          make install test >& make.log &
+          tail -f make.log
 
 
 
@@ -167,10 +167,10 @@ Overview of Steps for Performing Benchmarking
 
       .. note::
 
-         The CTRACK output is formatted using *BeautifulTable*.
-         Therefore **concatenation** (vs viewing via a text editor like vim) facilitates viewing the human-readable
-         version of the tables. The human-readable form of the tables is also available while running the
-         *tail -f* command when viewing the make.log during compilation.
+        The CTRACK output is formatted using *BeautifulTable*.
+        Therefore **concatenation** (vs viewing via a text editor like vim) facilitates viewing the human-readable
+        version of the tables. The human-readable form of the tables is also available while running the
+        *tail -f* command when viewing the make.log during compilation.
 
       From the command line:
 
@@ -205,8 +205,8 @@ Overview of Steps for Performing Benchmarking
 
      .. note::
 
-        The benchmark.py and benchmark.yaml files **must** reside in the same directory
-        (the benchmark.yaml file does **NOT** need to be specified at the command line)
+       The benchmark.py and benchmark.yaml files **must** reside in the same directory
+       (the benchmark.yaml file does **NOT** need to be specified at the command line)
 
 
      .. dropdown:: The following is an example benchmark.yaml config file that utilizes environment variables and full directory paths
@@ -271,105 +271,105 @@ Overview of Steps for Performing Benchmarking
 
      .. dropdown::  Config settings for running via MET command:
 
-        - benchmark_output_path
+       - benchmark_output_path
 
-          - **required**
-          - output directory where the output files will be saved
-          - specify in one of two ways:
+         - **required**
+         - output directory where the output files will be saved
+         - specify in one of two ways:
 
-            - setting the BENCHMARK_OUTPUT_BASE env variable
-            - explicitly setting the **full** directory path
+           - setting the BENCHMARK_OUTPUT_BASE env variable
+           - explicitly setting the **full** directory path
 
-        - filename
+       - filename
 
-          - **optional**
-          - the supplied filename followed by a timestamp that follows ISO 8601 format
-          - if left empty, the timestamp alone will be used as the filename
+         - **optional**
+         - the supplied filename followed by a timestamp that follows ISO 8601 format
+         - if left empty, the timestamp alone will be used as the filename
 
-        - run_met_directly
+       - run_met_directly
 
-          - **required**
-          - set to **True**
+         - **required**
+         - set to **True**
 
-        - met_command
+       - met_command
 
-          - **required**
-          - the command to run the MET tool with the appropriate arguments
-          - this is the same command that would be ordinarily used when running a
-            MET tool from the command line
-          - make sure the specified *-outdir* directory exists
+         - **required**
+         - the command to run the MET tool with the appropriate arguments
+         - this is the same command that would be ordinarily used when running a
+           MET tool from the command line
+         - make sure the specified *-outdir* directory exists
 
-        - met_subdir_name
+       - met_subdir_name
 
-          - **optional**
-          - if left empty, the consolidated benchmark metrics will be saved to a subdirectory (in the
-            benchmark_output_path) named after the MET tool
+         - **optional**
+         - if left empty, the consolidated benchmark metrics will be saved to a subdirectory (in the
+           benchmark_output_path) named after the MET tool
 
-        - num_runs
+       - num_runs
 
-          - **optional**
-          - to be used for stress-testing/running command multiple times
-          - if not set, default value is 1
+         - **optional**
+         - to be used for stress-testing/running command multiple times
+         - if not set, default value is 1
 
      .. dropdown:: Config settings for running via METplus usecase(s):
 
-        - benchmark_output_path
+       - benchmark_output_path
 
-          - **required**
-          - output directory where the output files will be saved
-          - specify in one of two ways:
+         - **required**
+         - output directory where the output files will be saved
+         - specify in one of two ways:
 
-            - setting the BENCHMARK_OUTPUT_BASE env variable
-            - explicitly setting the full directory path
+           - setting the BENCHMARK_OUTPUT_BASE env variable
+           - explicitly setting the full directory path
 
-        - filename
+       - filename
 
-          - **optional**
-          - the supplied filename followed by a timestamp that follows ISO 8601 format
-          - if left empty, the timestamp alone will be used as the filename
+         - **optional**
+         - the supplied filename followed by a timestamp that follows ISO 8601 format
+         - if left empty, the timestamp alone will be used as the filename
 
 
-        - run_met_directly
+       - run_met_directly
 
-          - **required**
-          - set to **False**
+         - **required**
+         - set to **False**
 
-        - metplus_base
+       - metplus_base
 
-          - **required**
-          - location of the METplus source code, specified by one of the following methods:
+         - **required**
+         - location of the METplus source code, specified by one of the following methods:
 
-             - indicated as a full path e.g., /home/username/METplus
-             - setting the METPLUS_BASE environment variable and using the current environment syntax like the following:
+            - indicated as a full path e.g., /home/username/METplus
+            - setting the METPLUS_BASE environment variable and using the current environment syntax like the following:
 
-              .. code-block:: ini
+             .. code-block:: ini
 
-                !ENV '${SOME_ENV_NAME}'
+               !ENV '${SOME_ENV_NAME}'
 
-              Make sure that the *SOME_ENV_NAME* environment variable is defined
+             Make sure that the *SOME_ENV_NAME* environment variable is defined
 
-        - system.conf
+       - system.conf
 
-          - **required**
-          - file location of the system.conf file
-          - full path and file name
-          - pre-condition: generate a valid system.conf file
+         - **required**
+         - file location of the system.conf file
+         - full path and file name
+         - pre-condition: generate a valid system.conf file
 
-        - wrapper_conf
+       - wrapper_conf
 
-          - **required**
-          - the location of the METplus wrapper use case config file(s)
-          - more than one use case can be run
-          - full path and file name
-          - pre-condition: generate the necessary wrapper config file(s)
+         - **required**
+         - the location of the METplus wrapper use case config file(s)
+         - more than one use case can be run
+         - full path and file name
+         - pre-condition: generate the necessary wrapper config file(s)
 
-        - num_runs
+       - num_runs
 
-          - **not yet supported**
-          - to be used for stress-testing/running command multiple times
-          - set to 1
+         - **not yet supported**
+         - to be used for stress-testing/running command multiple times
+         - set to 1
 
-        .. note::
+       .. note::
 
          A subdirectory under the output base directory (specified in benchmark_output_path) is created for each use case
          (based on the use case config filename).
@@ -380,7 +380,7 @@ Overview of Steps for Performing Benchmarking
 
     .. note::
 
-       Use Python 3.12 or above for running the benchmark.py script
+      Use Python 3.12 or above for running the benchmark.py script
 
 
     **Pre-conditions:**
@@ -392,50 +392,50 @@ Overview of Steps for Performing Benchmarking
 
       .. dropdown:: Example Ensemble-Stat config
 
-       .. code-block:: ini
+        .. code-block:: ini
 
-         #!/usr/bin/bash
+          #!/usr/bin/bash
 
-         export METPLUS_CENSOR_THRESH="";
-         export METPLUS_CENSOR_VAL="";
-         export METPLUS_CI_ALPHA="ci_alpha = [0.05];";
-         export METPLUS_CLIMO_CDF_DICT="";
-         export METPLUS_CLIMO_MEAN_DICT=“”;
-         export METPLUS_CLIMO_STDEV_DICT="";
-         export METPLUS_CONTROL_ID="";
-         export METPLUS_DESC="desc = \"NA\";";
-         export METPLUS_DUPLICATE_FLAG="";
-         export METPLUS_ECLV_POINTS="";
-         export METPLUS_ENS_MEMBER_IDS="";
-         export METPLUS_ENS_PHIST_BIN_SIZE="";
-         export METPLUS_ENS_SSVAR_BIN_SIZE="";
-         export METPLUS_ENS_THRESH="ens_thresh = 1.0;";
-         export METPLUS_FCST_CLIMO_STDEV_DICT="";
-         export METPLUS_FCST_FIELD="field = [{ name=\"APCP\"; level=\"A01\"; }];";
-         export METPLUS_FCST_FILE_TYPE=""; export METPLUS_GRID_WEIGHT_FLAG="";
-         export METPLUS_INTERP_DICT="interp = {vld_thresh = 1.0;shape = SQUARE;type = {method = [NEAREST];width = [1];}}";
-         export METPLUS_MASK_GRID="";
-         export METPLUS_MASK_POLY="";
-         export METPLUS_MESSAGE_TYPE="";
-         export METPLUS_MET_CONFIG_OVERRIDES="";
-         export METPLUS_MODEL="model = \"RRFS\";";
-         export METPLUS_NC_ORANK_FLAG_DICT="nc_orank_flag = {latlon = TRUE;mean = TRUE;raw = TRUE;rank = TRUE;pit = TRUE;vld_count = TRUE;weight = FALSE;}";
-         export METPLUS_OBS_CLIMO_MEAN_DICT="";
-         export METPLUS_OBS_CLIMO_STDEV_DICT="";
-         export METPLUS_OBS_ERROR_FLAG="";
-         export METPLUS_OBS_FIELD="field = [{ name=\"APCP\"; level=\"A01\"; }];";
-         export METPLUS_OBS_FILE_TYPE=""; export METPLUS_OBS_QUALITY_EXC="";
-         export METPLUS_OBS_QUALITY_INC=""; export METPLUS_OBS_THRESH="";
-         export METPLUS_OBS_WINDOW_DICT="obs_window = {beg = -1800;end = 1800;}";
-         export METPLUS_OBTYPE="obtype = \"CCPA\";";
-         export METPLUS_OBTYPE_AS_GROUP_VAL_FLAG="";
-         export METPLUS_OUTPUT_FLAG_DICT="output_flag = {ecnt = NONE;rps = NONE;rhist = STAT;phist = STAT;orank = STAT;ssvar = STAT;relp = STAT;}";
-         export METPLUS_OUTPUT_PREFIX="";
-         export METPLUS_POINT_WEIGHT_FLAG="";
-         export METPLUS_PROB_CAT_THRESH="";
-         export METPLUS_PROB_PCT_THRESH="";
-         export METPLUS_REGRID_DICT="regrid = {to_grid = OBS;method = NEAREST;width = 1;vld_thresh = 0.5;shape = SQUARE;}";
-         export METPLUS_SKIP_CONST=""; exp
+          export METPLUS_CENSOR_THRESH="";
+          export METPLUS_CENSOR_VAL="";
+          export METPLUS_CI_ALPHA="ci_alpha = [0.05];";
+          export METPLUS_CLIMO_CDF_DICT="";
+          export METPLUS_CLIMO_MEAN_DICT=“”;
+          export METPLUS_CLIMO_STDEV_DICT="";
+          export METPLUS_CONTROL_ID="";
+          export METPLUS_DESC="desc = \"NA\";";
+          export METPLUS_DUPLICATE_FLAG="";
+          export METPLUS_ECLV_POINTS="";
+          export METPLUS_ENS_MEMBER_IDS="";
+          export METPLUS_ENS_PHIST_BIN_SIZE="";
+          export METPLUS_ENS_SSVAR_BIN_SIZE="";
+          export METPLUS_ENS_THRESH="ens_thresh = 1.0;";
+          export METPLUS_FCST_CLIMO_STDEV_DICT="";
+          export METPLUS_FCST_FIELD="field = [{ name=\"APCP\"; level=\"A01\"; }];";
+          export METPLUS_FCST_FILE_TYPE=""; export METPLUS_GRID_WEIGHT_FLAG="";
+          export METPLUS_INTERP_DICT="interp = {vld_thresh = 1.0;shape = SQUARE;type = {method = [NEAREST];width = [1];}}";
+          export METPLUS_MASK_GRID="";
+          export METPLUS_MASK_POLY="";
+          export METPLUS_MESSAGE_TYPE="";
+          export METPLUS_MET_CONFIG_OVERRIDES="";
+          export METPLUS_MODEL="model = \"RRFS\";";
+          export METPLUS_NC_ORANK_FLAG_DICT="nc_orank_flag = {latlon = TRUE;mean = TRUE;raw = TRUE;rank = TRUE;pit = TRUE;vld_count = TRUE;weight = FALSE;}";
+          export METPLUS_OBS_CLIMO_MEAN_DICT="";
+          export METPLUS_OBS_CLIMO_STDEV_DICT="";
+          export METPLUS_OBS_ERROR_FLAG="";
+          export METPLUS_OBS_FIELD="field = [{ name=\"APCP\"; level=\"A01\"; }];";
+          export METPLUS_OBS_FILE_TYPE=""; export METPLUS_OBS_QUALITY_EXC="";
+          export METPLUS_OBS_QUALITY_INC=""; export METPLUS_OBS_THRESH="";
+          export METPLUS_OBS_WINDOW_DICT="obs_window = {beg = -1800;end = 1800;}";
+          export METPLUS_OBTYPE="obtype = \"CCPA\";";
+          export METPLUS_OBTYPE_AS_GROUP_VAL_FLAG="";
+          export METPLUS_OUTPUT_FLAG_DICT="output_flag = {ecnt = NONE;rps = NONE;rhist = STAT;phist = STAT;orank = STAT;ssvar = STAT;relp = STAT;}";
+          export METPLUS_OUTPUT_PREFIX="";
+          export METPLUS_POINT_WEIGHT_FLAG="";
+          export METPLUS_PROB_CAT_THRESH="";
+          export METPLUS_PROB_PCT_THRESH="";
+          export METPLUS_REGRID_DICT="regrid = {to_grid = OBS;method = NEAREST;width = 1;vld_thresh = 0.5;shape = SQUARE;}";
+          export METPLUS_SKIP_CONST=""; exp
 
 
     .. dropdown:: Running via METplus Usecase(s)
@@ -449,8 +449,8 @@ Overview of Steps for Performing Benchmarking
    
 
     .. note::
-       An AssertionError message is printed to the terminal if the benchmark.py script is not run in the $BASE/MET/internal/scripts/benchmark
-       directory.
+      An AssertionError message is printed to the terminal if the benchmark.py script is not run in the $BASE/MET/internal/scripts/benchmark
+      directory.
 
 
     .. code-block:: ini
@@ -461,10 +461,10 @@ Overview of Steps for Performing Benchmarking
 
     .. note::
 
-       The intermediate summary_output.txt and detail_output.txt files generated by CTRACK are found in the
-       directory from which the benchmark.py script was invoked (in the $BASE/MET/internal/scripts/benchmark directory).
-       The final, consolidated report is saved as a .csv and a tabular .txt file as specified in the
-       **benchmark_output_path** setting.
+      The intermediate summary_output.txt and detail_output.txt files generated by CTRACK are found in the
+      directory from which the benchmark.py script was invoked (in the $BASE/MET/internal/scripts/benchmark directory).
+      The final, consolidated report is saved as a .csv and a tabular .txt file as specified in the
+      **benchmark_output_path** setting.
 
 
 5. .. dropdown:: View results
@@ -517,11 +517,11 @@ Keywords
 
 .. note::
 
- - CTRACK
- - benchmarking
- - profiling
- - code profiler
- - code profiling
+  - CTRACK
+  - benchmarking
+  - profiling
+  - code profiler
+  - code profiling
 
 
 

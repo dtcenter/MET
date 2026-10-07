@@ -435,7 +435,7 @@ In this example, the Modis-Regrid tool will process the Cloud_Fraction field fro
 
 .. figure:: figure/reformat_grid_fig1.png
 
-   Example plot showing surface temperature from a MODIS file.
+  Example plot showing surface temperature from a MODIS file.
 
 WWMCA Tool Documentation
 ========================
@@ -478,7 +478,7 @@ Optional Arguments for wwmca_plot
 
 .. figure:: figure/reformat_grid_fig2.png
 
-   Example output of WWMCA-Plot tool.
+  Example output of WWMCA-Plot tool.
 
 wwmca_regrid Usage
 ------------------

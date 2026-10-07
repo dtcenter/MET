@@ -66,9 +66,9 @@ Extracting individual commands to be executed in this way can be convenient duri
 
 .. note::
 
-   Some unit tests depend on the output of other unit tests.
-   For example, *unit_plot_data_plane.xml* requires output from *unit_pcp_combine.xml*.
-   Those dependencies are generally noted in comments at the top of each unit test xml file.
+  Some unit tests depend on the output of other unit tests.
+  For example, *unit_plot_data_plane.xml* requires output from *unit_pcp_combine.xml*.
+  Those dependencies are generally noted in comments at the top of each unit test xml file.
 
 
 Input Data
@@ -87,7 +87,7 @@ Setting up a new web server
 
 .. note::
 
-   These instructions require access to run commands as the *met_test* user on the DTC web server.
+  These instructions require access to run commands as the *met_test* user on the DTC web server.
 
 The GitHub Actions custom action
 `metplus-action-data-update <https://github.com/dtcenter/metplus-action-data-update>`_
@@ -130,7 +130,7 @@ Setup next development cycle
 
 .. note::
 
-   These instructions require access to run commands as the *met_test* user on the DTC web server.
+  These instructions require access to run commands as the *met_test* user on the DTC web server.
 
 Once the *main_vX.Y* branch for a release has been created, the *develop* branch will contain development
 towards the next release. At this time, a new set of test data should be created for the next
@@ -160,7 +160,7 @@ Adding new test files
 
 .. note::
 
-   These instructions require access to run commands as the *met_test* user on the DTC web server.
+  These instructions require access to run commands as the *met_test* user on the DTC web server.
 
 Updates to the input data, e.g., adding new test files, are made on the DTC web server.
 The next time the MET CI unit tests are run,

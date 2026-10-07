@@ -1951,10 +1951,10 @@ used in the computation of statistics.
 
 .. note::
 
-   Masking regions can be defined in a variety of ways, described below.
-   However, if no geographic masking regions are specified, the MET tools
-   automatically set "grid" equal to "FULL" to verify all data in the
-   entire input domain.
+  Masking regions can be defined in a variety of ways, described below.
+  However, if no geographic masking regions are specified, the MET tools
+  automatically set "grid" equal to "FULL" to verify all data in the
+  entire input domain.
 
 Masking regions may be specified in the following ways:
 
@@ -4385,11 +4385,11 @@ See `Code table for observation quality markers <http://www.emc.ncep.noaa.gov/mm
 
 .. note::
 
-   In earlier versions of MET, "quality_mark_thresh" was defined as an
-   integer. Observations with quality marks LESS THAN OR EQUAL TO the
-   value were included while those with quality marks GREATER THAN it
-   were excluded. For backward compatibility, setting this entry as
-   an integer "N" results in a "<=N" threshold being defined.
+  In earlier versions of MET, "quality_mark_thresh" was defined as an
+  integer. Observations with quality marks LESS THAN OR EQUAL TO the
+  value were included while those with quality marks GREATER THAN it
+  were excluded. For backward compatibility, setting this entry as
+  an integer "N" results in a "<=N" threshold being defined.
 
 event_stack_flag
 ^^^^^^^^^^^^^^^^
