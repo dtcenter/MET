@@ -41,8 +41,10 @@ Code that is currently instrumented
 The following code is instrumented using CTRACK:
 
 - MET/src/basic/vx_util/main.cpp
-   - do_pre_process function
-   - do_post_process function
+
+  - do_pre_process function
+  - do_post_process function
+
 - MET/src/tools/core/ensemble_stat/ensemble_stat.cc
 - MET/src/tools/core/ensemble_stat/ensemble_stat_conf.cc
 - MET/src/tools/other/grid_diag/grid_diag.cc

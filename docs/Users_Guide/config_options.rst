@@ -1329,7 +1329,7 @@ GRIB1 and GRIB2
   * The "GRIB_lvl_typ" entry is an integer specifying the level type.
 
   * The "GRIB_lvl_val1" and "GRIB_lvl_val2" entries are floats specifying
-      the first and second level values.
+    the first and second level values.
 
   * The "GRIB_ens" entry is a string specifying NCEP's usage of the
     extended PDS for ensembles. Set to "hi_res_ctl", "low_res_ctl",
@@ -1733,15 +1733,15 @@ configuration file context to use the same data for both. The "climo_mean" and
 assuming normality. These climatological distributions are used in two ways:
 
 (1)
-    To define climatological distribution percentile thresholds (FCDP and
-    OCDP) which can be used as categorical (cat_thresh), continuous (cnt_thresh),
-    or wind speed (wind_thresh) thresholds.
+  To define climatological distribution percentile thresholds (FCDP and
+  OCDP) which can be used as categorical (cat_thresh), continuous (cnt_thresh),
+  or wind speed (wind_thresh) thresholds.
 
 (2)
-    To subset matched pairs into climatological bins based on where the
-    observation value falls within the observation climatological distribution.
-    See the "climo_cdf" dictionary. Note that only the observation climatology
-    data is used for this purpose, not the forecast climatology data.
+  To subset matched pairs into climatological bins based on where the
+  observation value falls within the observation climatological distribution.
+  See the "climo_cdf" dictionary. Note that only the observation climatology
+  data is used for this purpose, not the forecast climatology data.
 
 This dictionary is identical to the "climo_mean" dictionary described above
 but points to files containing climatological standard deviation values
@@ -1787,14 +1787,14 @@ within the observation climatological distribution. It can be set inside the
 dictionary consists of the following entries:
 
 (1)
-    The "cdf_bins" entry defines the climatological bins either as an integer
-    or an array of floats between 0 and 1.
+  The "cdf_bins" entry defines the climatological bins either as an integer
+  or an array of floats between 0 and 1.
 
 (2)
-    The "center_bins" entry may be set to TRUE or FALSE.
+  The "center_bins" entry may be set to TRUE or FALSE.
 
 (3)
-    The "write_bins" entry may be set to TRUE or FALSE.
+  The "write_bins" entry may be set to TRUE or FALSE.
 
 (4) The "direct_prob" entry may be set to TRUE or FALSE.
 

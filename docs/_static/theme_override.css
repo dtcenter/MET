@@ -10,7 +10,7 @@ div[class^="highlight"] a:hover {
 
 /* Background highlight color (white) */
 div[class^="highlight"] {
-  background-color: #FFFFFF;
+    background-color: #FFFFFF;
 }
 
 /* override table width restrictions */
