@@ -132,7 +132,7 @@ __attribute__((noreturn)) static void usage(int exit_code) {
          << "\t\t\"-deck path\" is the ATCF format data source "
          << "(required).\n"
 
-         << "\t\t\"config_file\" is a TCRMWConfig file to be used "
+         << "\t\t\"-config file\" is a TCRMWConfig file to be used "
          << "(required).\n"
 
          << "\t\t\"-out file\" is the NetCDF output file to be written "
