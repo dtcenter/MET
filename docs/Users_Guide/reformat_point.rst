@@ -1160,7 +1160,7 @@ _____________________
 .. code-block:: none
 
   obs_window = { beg = -5400; end =  5400; }
-  message_type    = [];
+  message_type = [];
   obs_quality_inc = [];
   obs_quality_exc = [];
   version = "VN.N";

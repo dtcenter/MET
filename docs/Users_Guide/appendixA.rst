@@ -614,7 +614,7 @@ Q. How do I use one mask for the forecast field and a different mask for the obs
   .. code-block:: none
 
     plot_data_plane \
-         APCP_03_where_2m_TMPge290.nc \
+    APCP_03_where_2m_TMPge290.nc \
     APCP_03_where_2m_TMPge290.ps \
     'name="data_mask"; level="(*,*)";'
 
