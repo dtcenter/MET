@@ -2,11 +2,9 @@
 Code Profiling
 **************
 
-Benchmarking (also referred to as profiling) of MET tools is accomplished using the CTRACK tool:
-  https://github.com/Compaile/ctrack
+Benchmarking (also referred to as profiling) of MET tools is accomplished using the `CTRACK tool <https://github.com/Compaile/ctrack>`_.
 
-This code is licensed under the MIT License:
-  https://github.com/Compaile/ctrack/blob/main/LICENSE
+This code is licensed under the `MIT License <https://github.com/Compaile/ctrack/blob/main/LICENSE>`_.
 
 Benchmarking uses a macro and the C++ source code is readily instrumented by
 including ctrack.hpp and by adding **CTRACK** at the top of the function of interest.
