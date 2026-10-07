@@ -89,73 +89,73 @@ The TC-Gen tool implements the following logic:
 
 * For **-track** inputs:
 
- * Parse the forecast genesis data and identify forecast genesis events separately for each model present.
+  * Parse the forecast genesis data and identify forecast genesis events separately for each model present.
 
- * Loop over the filters defined in the configuration file and apply the following logic for each.
+  * Loop over the filters defined in the configuration file and apply the following logic for each.
 
-  * For each Best track genesis event meeting the filter criteria, determine the initialization and lead times for which the model had an opportunity to forecast that genesis event. Store an unmatched genesis pair for each case.
+    * For each Best track genesis event meeting the filter criteria, determine the initialization and lead times for which the model had an opportunity to forecast that genesis event. Store an unmatched genesis pair for each case.
 
-  * For each forecast genesis event, search for a matching Best track. A configurable boolean option controls whether all Best track points are considered for a match or only the single Best track genesis point. A match occurs if the Best track point valid time is within a configurable window around the forecast genesis time and the Best track point location is within a configurable radius of the forecast genesis location. If a Best track match is found, store the storm ID.
+    * For each forecast genesis event, search for a matching Best track. A configurable boolean option controls whether all Best track points are considered for a match or only the single Best track genesis point. A match occurs if the Best track point valid time is within a configurable window around the forecast genesis time and the Best track point location is within a configurable radius of the forecast genesis location. If a Best track match is found, store the storm ID.
 
-  * If no Best track match is found, apply the same logic to search the operational track points with lead time of 0 hours. If an operational match is found, store the storm ID.
+    * If no Best track match is found, apply the same logic to search the operational track points with lead time of 0 hours. If an operational match is found, store the storm ID.
 
-  * If a matching storm ID is found, match the forecast genesis event to the Best track genesis event for that storm ID.
+    * If a matching storm ID is found, match the forecast genesis event to the Best track genesis event for that storm ID.
 
-  * If no matching storm ID is found, store an unmatched pair for the genesis forecast.
+    * If no matching storm ID is found, store an unmatched pair for the genesis forecast.
 
-  * Loop through the genesis pairs and populate contingency tables using two methods, the development (dev) and operational (ops) methods. For each pair, if the forecast genesis event is unmatched, score it as a dev and ops FALSE ALARM. If the Best track genesis event is unmatched, score it as a dev and ops MISS. Score each matched genesis pair as follows:
+    * Loop through the genesis pairs and populate contingency tables using two methods, the development (dev) and operational (ops) methods. For each pair, if the forecast genesis event is unmatched, score it as a dev and ops FALSE ALARM. If the Best track genesis event is unmatched, score it as a dev and ops MISS. Score each matched genesis pair as follows:
 
-   * If the forecast initialization time is at or after the Best track genesis event, DISCARD this case and exclude it from the statistics.
+      * If the forecast initialization time is at or after the Best track genesis event, DISCARD this case and exclude it from the statistics.
 
-   * Compute the difference between the forecast and Best track genesis events in time and space. If they are both within the configurable tolerance, score it as a dev HIT. If not, score it as a dev FALSE ALARM.
+      * Compute the difference between the forecast and Best track genesis events in time and space. If they are both within the configurable tolerance, score it as a dev HIT. If not, score it as a dev FALSE ALARM.
 
-   * Compute the difference between the Best track genesis time and model initialization time. If it is within the configurable tolerance, score it as an ops HIT. If not, score it as an ops FALSE ALARM.
+      * Compute the difference between the Best track genesis time and model initialization time. If it is within the configurable tolerance, score it as an ops HIT. If not, score it as an ops FALSE ALARM.
 
-  * Do not count any CORRECT NEGATIVES.
+    * Do not count any CORRECT NEGATIVES.
 
- * Report the contingency table hits, misses, and false alarms separately for each forecast model and configuration file filter. The development (dev) scoring method is indicated in the output as *GENESIS_DEV* while the operational (ops) scoring method is indicated as *GENESIS_OPS*.
+  * Report the contingency table hits, misses, and false alarms separately for each forecast model and configuration file filter. The development (dev) scoring method is indicated in the output as *GENESIS_DEV* while the operational (ops) scoring method is indicated as *GENESIS_OPS*.
 
 * For **-edeck** inputs:
 
- * Parse the ATCF edeck files. Ignore any lines not containing "GN" and "genFcst", which indicate a genesis probability forecast. Also, ignore any lines which do not contain a predicted genesis location (latitude and longitude) or genesis time.
+  * Parse the ATCF edeck files. Ignore any lines not containing "GN" and "genFcst", which indicate a genesis probability forecast. Also, ignore any lines which do not contain a predicted genesis location (latitude and longitude) or genesis time.
 
- * Loop over the filters defined in the configuration file and apply the following logic for each.
+  * Loop over the filters defined in the configuration file and apply the following logic for each.
 
-  * Subset the genesis probability forecasts based on the current filter criteria. Typically, genesis probability forecasts are provided for multiple lead times. Create separate Nx2 probabilistic contingency tables for each unique combination of predicted lead time and model name.
+    * Subset the genesis probability forecasts based on the current filter criteria. Typically, genesis probability forecasts are provided for multiple lead times. Create separate Nx2 probabilistic contingency tables for each unique combination of predicted lead time and model name.
 
-  * For each genesis probability forecast, search for a matching Best track. A configurable boolean option controls whether all Best track points are considered for a match or only the single Best track genesis point. A match occurs if the Best track point valid time is within a configurable window around the forecast genesis time and the Best track point location is within a configurable radius of the forecast genesis location. If a Best track match is found, store the storm ID.
+    * For each genesis probability forecast, search for a matching Best track. A configurable boolean option controls whether all Best track points are considered for a match or only the single Best track genesis point. A match occurs if the Best track point valid time is within a configurable window around the forecast genesis time and the Best track point location is within a configurable radius of the forecast genesis location. If a Best track match is found, store the storm ID.
 
-  * If no Best track match is found, apply the same logic to search the operational track points with lead time of 0 hours. If an operational match is found, store the storm ID.
+    * If no Best track match is found, apply the same logic to search the operational track points with lead time of 0 hours. If an operational match is found, store the storm ID.
 
-  * If no matching storm ID is found, add the unmatched forecast to the observation-no column of the Nx2 probabilistic contingency table.
+    * If no matching storm ID is found, add the unmatched forecast to the observation-no column of the Nx2 probabilistic contingency table.
 
-  * If a matching storm ID is found, check whether that storm's genesis occurred within the predicted time window: between the forecast initialization time and the predicted lead time. If so, add the matched forecast to the observation-yes column. If not, add it to the observation-no column.
+    * If a matching storm ID is found, check whether that storm's genesis occurred within the predicted time window: between the forecast initialization time and the predicted lead time. If so, add the matched forecast to the observation-yes column. If not, add it to the observation-no column.
 
- * Report the Nx2 probabilistic contingency table counts and statistics for each forecast model, lead time, and configuration file filter. These counts and statistics are identified in the output files as *PROB_GENESIS*.
+  * Report the Nx2 probabilistic contingency table counts and statistics for each forecast model, lead time, and configuration file filter. These counts and statistics are identified in the output files as *PROB_GENESIS*.
 
 * For **-shape** inputs:
 
- * For each input shapefile, parse the timestamp from the "gtwo_areas_YYYYMMDDHHMM.shp" naming convention, and error out otherwise. Round the timestamp to the nearest synoptic time (e.g., 00, 06, 12, 18) and store that as the issuance time.
+  * For each input shapefile, parse the timestamp from the "gtwo_areas_YYYYMMDDHHMM.shp" naming convention, and error out otherwise. Round the timestamp to the nearest synoptic time (e.g., 00, 06, 12, 18) and store that as the issuance time.
 
- * Open the shapefile and corresponding database file. Process each record.
+  * Open the shapefile and corresponding database file. Process each record.
 
-  * For each record, extract the shape and metadata which defines the basin and 2, 5, and 7 day probabilities.
+    * For each record, extract the shape and metadata which defines the basin and 2, 5, and 7 day probabilities.
 
-  * Check if this shape is a duplicate that has already been processed. If it is an exact duplicate, with the same basin, file timestamp, issue time, and min/max lat/lon values, ignore it. If the file timestamp is older than the existing shape, also ignore it. If the file timestamp is newer than the existing shape, replace the existing shape with the new one.
+    * Check if this shape is a duplicate that has already been processed. If it is an exact duplicate, with the same basin, file timestamp, issue time, and min/max lat/lon values, ignore it. If the file timestamp is older than the existing shape, also ignore it. If the file timestamp is newer than the existing shape, replace the existing shape with the new one.
 
- * Loop over the filters defined in the configuration file and apply the following logic for each.
+  * Loop over the filters defined in the configuration file and apply the following logic for each.
 
-  * Subset the list of genesis shapes based on the current filter criteria.
+    * Subset the list of genesis shapes based on the current filter criteria.
 
-  * Search the Best track genesis events to see if any occurred inside the shape within 7 days of the issuance time. If multiple genesis events occurred, choose the one closest to the issuance time.
+    * Search the Best track genesis events to see if any occurred inside the shape within 7 days of the issuance time. If multiple genesis events occurred, choose the one closest to the issuance time.
 
-  * If not found, score each probability as a miss.
+    * If not found, score each probability as a miss.
 
-  * If found, further check the 2 and 5 day time windows to classify each probability as a hit or miss.
+    * If found, further check the 2 and 5 day time windows to classify each probability as a hit or miss.
 
-  * Add each probability pair to an Nx2 probabilistic contingency table, tracking results separately for each lead time.
+    * Add each probability pair to an Nx2 probabilistic contingency table, tracking results separately for each lead time.
 
-  * Report the Nx2 probabilistic contingency table counts and statistics for each lead time. These counts and statistics are identified in the output files as *GENESIS_SHAPE*.
+    * Report the Nx2 probabilistic contingency table counts and statistics for each lead time. These counts and statistics are identified in the output files as *GENESIS_SHAPE*.
 
 tc_gen Configuration File
 -------------------------

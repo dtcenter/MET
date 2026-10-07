@@ -986,7 +986,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool is described b
     - Double
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_ES_header_info_es_out_SSVAR:
 

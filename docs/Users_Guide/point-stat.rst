@@ -718,7 +718,7 @@ The first set of header columns are common to all of the output files generated 
     - Double
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_PS_format_info_CTS:
 
@@ -829,7 +829,7 @@ The first set of header columns are common to all of the output files generated 
 
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_PS_format_info_CNT:
 
@@ -992,7 +992,7 @@ The first set of header columns are common to all of the output files generated 
 
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_PS_format_info_MCTS:
 
@@ -1082,7 +1082,7 @@ The first set of header columns are common to all of the output files generated 
 
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_PS_format_info_PSTD:
 

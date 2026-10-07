@@ -528,7 +528,7 @@ The user may specify one or more analysis jobs to be performed on the STAT lines
 All possible tasks for **job_name** are listed in :numref:`Des_components_STAT_analysis_tool`.
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _Des_components_STAT_analysis_tool:
 

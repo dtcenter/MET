@@ -792,7 +792,7 @@ These object identifiers are described in :numref:`MODE_object_attribute`.
 
 
 .. role:: raw-html(raw)
-   :format: html
+  :format: html
 
 .. _MODE_object_attribute:
 
@@ -1083,7 +1083,7 @@ The dimensions and variables included in the mode NetCDF files are described in 
 .. _Variables_contained_in_MODE_NetCDF_output:
 
 .. role:: raw-html(raw)
-   :format: html
+  :format: html
 
 .. list-table:: Variables contained in MODE NetCDF output.
   :widths: auto

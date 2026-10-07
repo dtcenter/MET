@@ -626,7 +626,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool is the same as the
     - Double
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_GS_format_info_NBRCTS:
 
@@ -729,7 +729,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool is the same as the
 
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_GS_format_info_NBRCNT:
 
@@ -975,7 +975,7 @@ The output NetCDF file contains the dimensions and variables shown in :numref:`t
 
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_GS_var_NetCDF_matched_pair_out:
 

@@ -205,13 +205,13 @@ and *scripts/config*.
 When you pass a configuration file to a MET tool, the tool actually parses up
 to four different configuration files in the following order:
 
-   1. Reads *share/met/config/ConfigConstants* to define constants.
+  1. Reads *share/met/config/ConfigConstants* to define constants.
 
-   2. If the tool produces PostScript output, it reads *share/met/config/ConfigMapData* to define the map data to be plotted.
+  2. If the tool produces PostScript output, it reads *share/met/config/ConfigMapData* to define the map data to be plotted.
 
-   3. Reads the default configuration file for the tool from *share/met/config*.
+  3. Reads the default configuration file for the tool from *share/met/config*.
 
-   4. Reads the user-specified configuration file from the command line.
+  4. Reads the user-specified configuration file from the command line.
 
 Many of the entries from step (3) are overwritten by the user-specified entries
 from step (4). Therefore, the configuration file you pass in on the command
@@ -1680,9 +1680,9 @@ time_interp_method
 The "time_interp_method" entry specifies how the climatology data should
 be interpolated in time to the forecast valid time:
 
- * NEAREST for data closest in time
- * UW_MEAN for average of data before and after
- * DW_MEAN for linear interpolation in time of data before and after
+  * NEAREST for data closest in time
+  * UW_MEAN for average of data before and after
+  * DW_MEAN for linear interpolation in time of data before and after
 
 day_interval
 ^^^^^^^^^^^^
@@ -1909,13 +1909,13 @@ mask_missing_flag
 The "mask_missing_flag" entry specifies how missing data should be handled
 in the Wavelet-Stat and MODE tools:
 
- * NONE to perform no masking of missing data
+  * NONE to perform no masking of missing data
 
- * FCST to mask the forecast field with missing observation data
+  * FCST to mask the forecast field with missing observation data
 
- * OBS to mask the observation field with missing forecast data
+  * OBS to mask the observation field with missing forecast data
 
- * BOTH to mask both fields with missing data from the other
+  * BOTH to mask both fields with missing data from the other
 
 .. code-block:: none
 
@@ -3878,14 +3878,14 @@ fcst/obs.merge_flag
 """""""""""""""""""
 The "merge_flag" entry specifies the merging methods to be applied:
 
- * NONE for no merging
+  * NONE for no merging
 
- * THRESH for the double-threshold merging method. Merge objects
-   that would be part of the same object at the lower threshold.
+  * THRESH for the double-threshold merging method. Merge objects
+    that would be part of the same object at the lower threshold.
 
- * ENGINE for the fuzzy logic approach comparing the field to itself
+  * ENGINE for the fuzzy logic approach comparing the field to itself
 
- * BOTH for both the double-threshold and engine merging methods
+  * BOTH for both the double-threshold and engine merging methods
 
 .. code-block:: none
 

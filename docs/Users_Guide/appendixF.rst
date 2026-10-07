@@ -125,53 +125,53 @@ Attributes for 2D Gridded Dataplanes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table:: 2D Dataplane Attributes
-   :widths: 5 5 10 5
-   :header-rows: 1
+  :widths: 5 5 10 5
+  :header-rows: 1
 
-   * - key
-     - description
-     - data type/format
-     - required/optional
-   * - valid
-     - valid time
-     - string (YYYYMMDD_HHMMSS)
-     - required
-   * - init
-     - initialization time
-     - string (YYYYMMDD_HHMMSS)
-     - required
-   * - lead
-     - forecast lead
-     - string (HHMMSS)
-     - required
-   * - accum
-     - accumulation interval
-     - string (HHMMSS)
-     - required
-   * - name
-     - variable name
-     - string
-     - required
-   * - long_name
-     - variable long name
-     - string
-     - required
-   * - level
-     - variable level
-     - string
-     - required
-   * - units
-     - variable units
-     - string
-     - required
-   * - grid
-     - :ref:`grid information<pyembed-grid-attrs>`
-     - string or dict
-     - required
-   * - fill_value
-     - :ref:`missing data value<pyembed-fillvalue-attrs>`
-     - int or float
-     - optional
+  * - key
+    - description
+    - data type/format
+    - required/optional
+  * - valid
+    - valid time
+    - string (YYYYMMDD_HHMMSS)
+    - required
+  * - init
+    - initialization time
+    - string (YYYYMMDD_HHMMSS)
+    - required
+  * - lead
+    - forecast lead
+    - string (HHMMSS)
+    - required
+  * - accum
+    - accumulation interval
+    - string (HHMMSS)
+    - required
+  * - name
+    - variable name
+    - string
+    - required
+  * - long_name
+    - variable long name
+    - string
+    - required
+  * - level
+    - variable level
+    - string
+    - required
+  * - units
+    - variable units
+    - string
+    - required
+  * - grid
+    - :ref:`grid information<pyembed-grid-attrs>`
+    - string or dict
+    - required
+  * - fill_value
+    - :ref:`missing data value<pyembed-fillvalue-attrs>`
+    - int or float
+    - optional
 
 .. note::
 
@@ -458,45 +458,45 @@ Python Script Requirements for Point Observations
 To provide the data that MET expects for point observations, the user is encouraged when designing their Python script to consider how to map their observations into the MET 11-column format. Then, the user can populate their observations into a Pandas DataFrame with the following column names and dtypes:
 
 .. list-table:: Point Observation DataFrame Columns and Dtypes
-   :widths: 5 5 10
-   :header-rows: 1
+  :widths: 5 5 10
+  :header-rows: 1
 
-   * - column name
-     - data type (dtype)
-     - description
-   * - typ
-     - string
-     - Message Type
-   * - sid
-     - string
-     - Station ID
-   * - vld
-     - string
-     - Valid Time (YYYYMMDD_HHMMSS)
-   * - lat
-     - numeric
-     - Latitude (Degrees North)
-   * - lon
-     - numeric
-     - Longitude (Degrees East)
-   * - elv
-     - numeric
-     - Elevation (MSL)
-   * - var
-     - string
-     - Variable name (or GRIB code)
-   * - lvl
-     - numeric
-     - Level
-   * - hgt
-     - numeric
-     - Height (MSL or AGL)
-   * - qc
-     - string
-     - QC string
-   * - obs
-     - numeric
-     - Observation Value
+  * - column name
+    - data type (dtype)
+    - description
+  * - typ
+    - string
+    - Message Type
+  * - sid
+    - string
+    - Station ID
+  * - vld
+    - string
+    - Valid Time (YYYYMMDD_HHMMSS)
+  * - lat
+    - numeric
+    - Latitude (Degrees North)
+  * - lon
+    - numeric
+    - Longitude (Degrees East)
+  * - elv
+    - numeric
+    - Elevation (MSL)
+  * - var
+    - string
+    - Variable name (or GRIB code)
+  * - lvl
+    - numeric
+    - Level
+  * - hgt
+    - numeric
+    - Height (MSL or AGL)
+  * - qc
+    - string
+    - QC string
+  * - obs
+    - numeric
+    - Observation Value
 
 To create the variable for MET, use the **.values** property of the Pandas DataFrame and the **.tolist()** method of the NumPy N-D Array. For example:
 
