@@ -64,138 +64,138 @@ Overview of Steps for Performing Benchmarking
 
 1. .. dropdown:: Instrument the MET code of interest
 
-       .. note::
+     .. note::
 
-         The ctrack.hpp file is saved in the $HOME/MET/src/basic/vx_util directory and does not need to be modified
-         or added to any other location.  This version of ctrack.hpp has been modified to write the summary and detail
-         tables to text files. By default, CTRACK is disabled and is enabled at compilation time via the
-         :code:`--enable-profiler` flag.
+       The ctrack.hpp file is saved in the $HOME/MET/src/basic/vx_util directory and does not need to be modified
+       or added to any other location.  This version of ctrack.hpp has been modified to write the summary and detail
+       tables to text files. By default, CTRACK is disabled and is enabled at compilation time via the
+       :code:`--enable-profiler` flag.
 
-         $HOME refers to the path to where the MET source code is saved.
+       $HOME refers to the path to where the MET source code is saved.
 
-       The ctrack.hpp file must be included in the source code of interest:
+     The ctrack.hpp file must be included in the source code of interest:
 
-       .. code-block:: ini
+     .. code-block:: ini
 
-         #ifdef WITH_PROFILER
-         #include "ctrack.hpp"
-         #endif
+       #ifdef WITH_PROFILER
+       #include "ctrack.hpp"
+       #endif
 
 
-       The CTRACK directive is placed at the top of the function of interest.  Use the preprocessor directive for WITH_PROFILER:
+     The CTRACK directive is placed at the top of the function of interest.  Use the preprocessor directive for WITH_PROFILER:
 
-       e.g., ensemble_stat.cc:
+     e.g., ensemble_stat.cc:
 
-        .. code-block:: ini
+     .. code-block:: ini
 
-          void process_grid(const Grid &fcst_grid) {
-              #ifdef WITH_PROFILER
-              CTRACK;
-              #endif
-              Grid obs_grid;
-             ... more code
-
-      and the *ctrack::result_print* is placed within the corresponding MET tool's
-      **main()/met_main()** function
-
-       e.g., ensemble_stat.cc
-
-         .. code-block:: ini
-
-           int met_main(int argc, char *argv[]) {
-
-             // Process the command line arguments
-             process_command_line(argc, argv);
-
-             // Check for valid ensemble data
-             process_n_vld();
-
-            // Perform verification
-            process_vx();
-
-           // Save the CTRACK metrics
+       void process_grid(const Grid &fcst_grid) {
            #ifdef WITH_PROFILER
-           ctrack::result_print();
+           CTRACK;
            #endif
+           Grid obs_grid;
+          ... more code
+
+     and the *ctrack::result_print* is placed within the corresponding MET tool's
+     **main()/met_main()** function
+
+     e.g., ensemble_stat.cc
+
+     .. code-block:: ini
+
+       int met_main(int argc, char *argv[]) {
+
+         // Process the command line arguments
+         process_command_line(argc, argv);
+
+         // Check for valid ensemble data
+         process_n_vld();
+
+        // Perform verification
+        process_vx();
+
+       // Save the CTRACK metrics
+       #ifdef WITH_PROFILER
+       ctrack::result_print();
+       #endif
 
 
-       .. note ::
+     .. note ::
 
-         The summary_output.txt and detail_output.txt files will only be saved when the ctrack::result_print() function is
-         called within main() or met_main().
+       The summary_output.txt and detail_output.txt files will only be saved when the ctrack::result_print() function is
+       called within main() or met_main().
 
 2. .. dropdown::  Compile MET code
 
-    .. dropdown:: Configure
+     .. dropdown:: Configure
 
-      From the $HOME/MET directory:
+       From the $HOME/MET directory:
 
-        * source ./internal/scripts/environment/development.xyz
-        *  *xyz* is the name of the host
+       * source ./internal/scripts/environment/development.xyz
+       *  *xyz* is the name of the host
 
-      **By default, CTRACK is disabled**. Enable it with the --enable-profiler option.
+       **By default, CTRACK is disabled**. Enable it with the --enable-profiler option.
 
        Run one of the following configure commands (to enable all the components and the CTRACK macro):
 
-         .. code-block:: ini
+       .. code-block:: ini
 
-           ./configure --prefix=`pwd` --enable-grib2 --enable-modis --enable-lidar2nc --enable-python --enable-ugrid --enable-profiler
+         ./configure --prefix=`pwd` --enable-grib2 --enable-modis --enable-lidar2nc --enable-python --enable-ugrid --enable-profiler
 
-            or
+          or
 
-         .. code-block:: ini
+       .. code-block:: ini
 
-           ./configure --prefix=`pwd` --enable-all --enable-ugrid --enable-profiler
+         ./configure --prefix=`pwd` --enable-all --enable-ugrid --enable-profiler
 
-    .. dropdown:: Run make install and test
+     .. dropdown:: Run make install and test
 
-      Redirect the output to a log file named make.log:
+       Redirect the output to a log file named make.log:
 
-        .. code-block:: ini
+       .. code-block:: ini
 
-          make install test >& make.log &
-          tail -f make.log
+         make install test >& make.log &
+         tail -f make.log
 
 
 
-    .. dropdown:: Verify that the expected code is being measured
+     .. dropdown:: Verify that the expected code is being measured
 
-      The summary and detail tables are generated during the MET build (when running the test target).
-      These tables created by CTRACK can be viewed in the make.log before they are consolidated.
-      Use the *cat* (concatenation) tool to view the make.log file to view the CTRACK-generated metrics tables that
-      correspond to the MET tool that was instrumented.
+       The summary and detail tables are generated during the MET build (when running the test target).
+       These tables created by CTRACK can be viewed in the make.log before they are consolidated.
+       Use the *cat* (concatenation) tool to view the make.log file to view the CTRACK-generated metrics tables that
+       correspond to the MET tool that was instrumented.
 
-      .. note::
+       .. note::
 
-        The CTRACK output is formatted using *BeautifulTable*.
-        Therefore **concatenation** (vs viewing via a text editor like vim) facilitates viewing the human-readable
-        version of the tables. The human-readable form of the tables is also available while running the
-        *tail -f* command when viewing the make.log during compilation.
+         The CTRACK output is formatted using *BeautifulTable*.
+         Therefore **concatenation** (vs viewing via a text editor like vim) facilitates viewing the human-readable
+         version of the tables. The human-readable form of the tables is also available while running the
+         *tail -f* command when viewing the make.log during compilation.
 
-      From the command line:
+       From the command line:
 
-      .. code-block:: ini
+       .. code-block:: ini
 
-        cat make.log
+         cat make.log
 
-      CTRACK summary and detail tables will appear in the make.log file.  A
-      summary table will look like the following:
+       CTRACK summary and detail tables will appear in the make.log file.  A
+       summary table will look like the following:
 
-      .. code-block:: ini
+       .. code-block:: ini
 
-        Summary
-        +---------------------+---------------------+------------+---------------+-----------------+
-        |        Start        |         End         | time total | time ctracked | time ctracked % |
-        +---------------------+---------------------+------------+---------------+-----------------+
-        | 2025-04-22 22:43:22 | 2025-04-22 22:44:31 |    69.43 s |    353.42 mcs |           0.00% |
-        +---------------------+---------------------+------------+---------------+-----------------+
-        +----------+-----------------+------+-------+-----------+------------+----------------+---------------+
-        | filename |    function     | line | calls | ae[1-99]% | ae[0-100]% | time ae[0-100] | time a[0-100] |
-        +----------+-----------------+------+-------+-----------+------------+----------------+---------------+
-        |  main.cc |  do_pre_process |   97 |     1 |     0.00% |      0.00% |     322.08 mcs |    322.08 mcs |
-        +----------+-----------------+------+-------+-----------+------------+----------------+---------------+
-        |  main.cc | do_post_process |  119 |     1 |     0.00% |      0.00% |      31.34 mcs |     31.34 mcs |
-        +----------+-----------------+------+-------+-----------+------------+----------------+---------------+
+         Summary
+         +---------------------+---------------------+------------+---------------+-----------------+
+         |        Start        |         End         | time total | time ctracked | time ctracked % |
+         +---------------------+---------------------+------------+---------------+-----------------+
+         | 2025-04-22 22:43:22 | 2025-04-22 22:44:31 |    69.43 s |    353.42 mcs |           0.00% |
+         +---------------------+---------------------+------------+---------------+-----------------+
+         +----------+-----------------+------+-------+-----------+------------+----------------+---------------+
+         | filename |    function     | line | calls | ae[1-99]% | ae[0-100]% | time ae[0-100] | time a[0-100] |
+         +----------+-----------------+------+-------+-----------+------------+----------------+---------------+
+         |  main.cc |  do_pre_process |   97 |     1 |     0.00% |      0.00% |     322.08 mcs |    322.08 mcs |
+         +----------+-----------------+------+-------+-----------+------------+----------------+---------------+
+         |  main.cc | do_post_process |  119 |     1 |     0.00% |      0.00% |      31.34 mcs |     31.34 mcs |
+         +----------+-----------------+------+-------+-----------+------------+----------------+---------------+
 
 
 
@@ -339,8 +339,8 @@ Overview of Steps for Performing Benchmarking
          - **required**
          - location of the METplus source code, specified by one of the following methods:
 
-            - indicated as a full path e.g., /home/username/METplus
-            - setting the METPLUS_BASE environment variable and using the current environment syntax like the following:
+           - indicated as a full path e.g., /home/username/METplus
+           - setting the METPLUS_BASE environment variable and using the current environment syntax like the following:
 
              .. code-block:: ini
 
@@ -378,93 +378,93 @@ Overview of Steps for Performing Benchmarking
 
 4. .. dropdown::  Invoke the Python script *benchmark.py* to collect the benchmarking metrics
 
-    .. note::
+     .. note::
 
-      Use Python 3.12 or above for running the benchmark.py script
+       Use Python 3.12 or above for running the benchmark.py script
 
 
-    **Pre-conditions:**
+     **Pre-conditions:**
 
-    .. dropdown::  Running MET command
+     .. dropdown::  Running MET command
 
        Define any necessary environment variables for the corresponding MET tool (e.g., Ensemble-Stat tool environment
        variables specified in the $HOME/METplus/metplus/parm/met_config/EnsembleStatConfig_wrapped)
 
-      .. dropdown:: Example Ensemble-Stat config
+       .. dropdown:: Example Ensemble-Stat config
 
-        .. code-block:: ini
+         .. code-block:: ini
 
-          #!/usr/bin/bash
+           #!/usr/bin/bash
 
-          export METPLUS_CENSOR_THRESH="";
-          export METPLUS_CENSOR_VAL="";
-          export METPLUS_CI_ALPHA="ci_alpha = [0.05];";
-          export METPLUS_CLIMO_CDF_DICT="";
-          export METPLUS_CLIMO_MEAN_DICT=“”;
-          export METPLUS_CLIMO_STDEV_DICT="";
-          export METPLUS_CONTROL_ID="";
-          export METPLUS_DESC="desc = \"NA\";";
-          export METPLUS_DUPLICATE_FLAG="";
-          export METPLUS_ECLV_POINTS="";
-          export METPLUS_ENS_MEMBER_IDS="";
-          export METPLUS_ENS_PHIST_BIN_SIZE="";
-          export METPLUS_ENS_SSVAR_BIN_SIZE="";
-          export METPLUS_ENS_THRESH="ens_thresh = 1.0;";
-          export METPLUS_FCST_CLIMO_STDEV_DICT="";
-          export METPLUS_FCST_FIELD="field = [{ name=\"APCP\"; level=\"A01\"; }];";
-          export METPLUS_FCST_FILE_TYPE=""; export METPLUS_GRID_WEIGHT_FLAG="";
-          export METPLUS_INTERP_DICT="interp = {vld_thresh = 1.0;shape = SQUARE;type = {method = [NEAREST];width = [1];}}";
-          export METPLUS_MASK_GRID="";
-          export METPLUS_MASK_POLY="";
-          export METPLUS_MESSAGE_TYPE="";
-          export METPLUS_MET_CONFIG_OVERRIDES="";
-          export METPLUS_MODEL="model = \"RRFS\";";
-          export METPLUS_NC_ORANK_FLAG_DICT="nc_orank_flag = {latlon = TRUE;mean = TRUE;raw = TRUE;rank = TRUE;pit = TRUE;vld_count = TRUE;weight = FALSE;}";
-          export METPLUS_OBS_CLIMO_MEAN_DICT="";
-          export METPLUS_OBS_CLIMO_STDEV_DICT="";
-          export METPLUS_OBS_ERROR_FLAG="";
-          export METPLUS_OBS_FIELD="field = [{ name=\"APCP\"; level=\"A01\"; }];";
-          export METPLUS_OBS_FILE_TYPE=""; export METPLUS_OBS_QUALITY_EXC="";
-          export METPLUS_OBS_QUALITY_INC=""; export METPLUS_OBS_THRESH="";
-          export METPLUS_OBS_WINDOW_DICT="obs_window = {beg = -1800;end = 1800;}";
-          export METPLUS_OBTYPE="obtype = \"CCPA\";";
-          export METPLUS_OBTYPE_AS_GROUP_VAL_FLAG="";
-          export METPLUS_OUTPUT_FLAG_DICT="output_flag = {ecnt = NONE;rps = NONE;rhist = STAT;phist = STAT;orank = STAT;ssvar = STAT;relp = STAT;}";
-          export METPLUS_OUTPUT_PREFIX="";
-          export METPLUS_POINT_WEIGHT_FLAG="";
-          export METPLUS_PROB_CAT_THRESH="";
-          export METPLUS_PROB_PCT_THRESH="";
-          export METPLUS_REGRID_DICT="regrid = {to_grid = OBS;method = NEAREST;width = 1;vld_thresh = 0.5;shape = SQUARE;}";
-          export METPLUS_SKIP_CONST=""; exp
-
-
-    .. dropdown:: Running via METplus Usecase(s)
-
-      Define the necessary environment variables that are required for running any METplus use case.
+           export METPLUS_CENSOR_THRESH="";
+           export METPLUS_CENSOR_VAL="";
+           export METPLUS_CI_ALPHA="ci_alpha = [0.05];";
+           export METPLUS_CLIMO_CDF_DICT="";
+           export METPLUS_CLIMO_MEAN_DICT=“”;
+           export METPLUS_CLIMO_STDEV_DICT="";
+           export METPLUS_CONTROL_ID="";
+           export METPLUS_DESC="desc = \"NA\";";
+           export METPLUS_DUPLICATE_FLAG="";
+           export METPLUS_ECLV_POINTS="";
+           export METPLUS_ENS_MEMBER_IDS="";
+           export METPLUS_ENS_PHIST_BIN_SIZE="";
+           export METPLUS_ENS_SSVAR_BIN_SIZE="";
+           export METPLUS_ENS_THRESH="ens_thresh = 1.0;";
+           export METPLUS_FCST_CLIMO_STDEV_DICT="";
+           export METPLUS_FCST_FIELD="field = [{ name=\"APCP\"; level=\"A01\"; }];";
+           export METPLUS_FCST_FILE_TYPE=""; export METPLUS_GRID_WEIGHT_FLAG="";
+           export METPLUS_INTERP_DICT="interp = {vld_thresh = 1.0;shape = SQUARE;type = {method = [NEAREST];width = [1];}}";
+           export METPLUS_MASK_GRID="";
+           export METPLUS_MASK_POLY="";
+           export METPLUS_MESSAGE_TYPE="";
+           export METPLUS_MET_CONFIG_OVERRIDES="";
+           export METPLUS_MODEL="model = \"RRFS\";";
+           export METPLUS_NC_ORANK_FLAG_DICT="nc_orank_flag = {latlon = TRUE;mean = TRUE;raw = TRUE;rank = TRUE;pit = TRUE;vld_count = TRUE;weight = FALSE;}";
+           export METPLUS_OBS_CLIMO_MEAN_DICT="";
+           export METPLUS_OBS_CLIMO_STDEV_DICT="";
+           export METPLUS_OBS_ERROR_FLAG="";
+           export METPLUS_OBS_FIELD="field = [{ name=\"APCP\"; level=\"A01\"; }];";
+           export METPLUS_OBS_FILE_TYPE=""; export METPLUS_OBS_QUALITY_EXC="";
+           export METPLUS_OBS_QUALITY_INC=""; export METPLUS_OBS_THRESH="";
+           export METPLUS_OBS_WINDOW_DICT="obs_window = {beg = -1800;end = 1800;}";
+           export METPLUS_OBTYPE="obtype = \"CCPA\";";
+           export METPLUS_OBTYPE_AS_GROUP_VAL_FLAG="";
+           export METPLUS_OUTPUT_FLAG_DICT="output_flag = {ecnt = NONE;rps = NONE;rhist = STAT;phist = STAT;orank = STAT;ssvar = STAT;relp = STAT;}";
+           export METPLUS_OUTPUT_PREFIX="";
+           export METPLUS_POINT_WEIGHT_FLAG="";
+           export METPLUS_PROB_CAT_THRESH="";
+           export METPLUS_PROB_PCT_THRESH="";
+           export METPLUS_REGRID_DICT="regrid = {to_grid = OBS;method = NEAREST;width = 1;vld_thresh = 0.5;shape = SQUARE;}";
+           export METPLUS_SKIP_CONST=""; exp
 
 
-    **Running the Python script**
+     .. dropdown:: Running via METplus Usecase(s)
 
-    Run the following from the command line (from the location where the benchmark.py file is located):
+       Define the necessary environment variables that are required for running any METplus use case.
+
+
+     **Running the Python script**
+
+     Run the following from the command line (from the location where the benchmark.py file is located):
    
 
-    .. note::
-      An AssertionError message is printed to the terminal if the benchmark.py script is not run in the $BASE/MET/internal/scripts/benchmark
-      directory.
+     .. note::
+       An AssertionError message is printed to the terminal if the benchmark.py script is not run in the $BASE/MET/internal/scripts/benchmark
+       directory.
 
 
-    .. code-block:: ini
+     .. code-block:: ini
    
-      cd $BASE/MET/internal/scripts/benchmark
-      python benchmark.py
+       cd $BASE/MET/internal/scripts/benchmark
+       python benchmark.py
 
 
-    .. note::
+     .. note::
 
-      The intermediate summary_output.txt and detail_output.txt files generated by CTRACK are found in the
-      directory from which the benchmark.py script was invoked (in the $BASE/MET/internal/scripts/benchmark directory).
-      The final, consolidated report is saved as a .csv and a tabular .txt file as specified in the
-      **benchmark_output_path** setting.
+       The intermediate summary_output.txt and detail_output.txt files generated by CTRACK are found in the
+       directory from which the benchmark.py script was invoked (in the $BASE/MET/internal/scripts/benchmark directory).
+       The final, consolidated report is saved as a .csv and a tabular .txt file as specified in the
+       **benchmark_output_path** setting.
 
 
 5. .. dropdown:: View results
@@ -477,7 +477,7 @@ Overview of Steps for Performing Benchmarking
      View the consolidated metrics to identify potential performance enhancements.  Refer to the CTRACK documentation to
      learn about the metrics collected, under the **Metrics & Output** section:
 
-          https://github.com/Compaile/ctrack#metrics--output
+     https://github.com/Compaile/ctrack#metrics--output
 
 
      .. note::

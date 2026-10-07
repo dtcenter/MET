@@ -1219,27 +1219,27 @@ listed in the "data/config/ConfigConstants" file and are described below.
 This entry should be defined within the "fcst" and/or "obs" dictionaries.
 For example:
 
-  .. code-block:: none
+.. code-block:: none
 
-    fcst = {
-       file_type = GRIB1;         GRIB version 1
-       file_type = GRIB2;         GRIB version 2
-       file_type = NETCDF_MET;    NetCDF created by another MET tool
-       file_type = NETCDF_WRF;    NetCDF WRF output.
-       file_type = NETCDF_PINT;   NetCDF created by running the p_interp
-                                  or wrf_interp utility on WRF output.
-                                  May be used to read unstaggered raw WRF
-                                  NetCDF output at the surface or a
-                                  single model level.
-       file_type = NETCDF_NCCF;   NetCDF following the Climate Forecast
-                                  (CF) convention.
-       file_type = NETCDF_UGRID;  NetCDF containing data on an
-                                  unstructured grid.
-       file_type = PYTHON_NUMPY;  Run a Python script to load data into
-                                  a NumPy array.
-       file_type = PYTHON_XARRAY; Run a Python script to load data into
-                                  an xarray object.
-    }
+  fcst = {
+     file_type = GRIB1;         GRIB version 1
+     file_type = GRIB2;         GRIB version 2
+     file_type = NETCDF_MET;    NetCDF created by another MET tool
+     file_type = NETCDF_WRF;    NetCDF WRF output.
+     file_type = NETCDF_PINT;   NetCDF created by running the p_interp
+                                or wrf_interp utility on WRF output.
+                                May be used to read unstaggered raw WRF
+                                NetCDF output at the surface or a
+                                single model level.
+     file_type = NETCDF_NCCF;   NetCDF following the Climate Forecast
+                                (CF) convention.
+     file_type = NETCDF_UGRID;  NetCDF containing data on an
+                                unstructured grid.
+     file_type = PYTHON_NUMPY;  Run a Python script to load data into
+                                a NumPy array.
+     file_type = PYTHON_XARRAY; Run a Python script to load data into
+                                an xarray object.
+  }
 
 wind_thresh
 ^^^^^^^^^^^

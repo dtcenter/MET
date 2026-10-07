@@ -78,7 +78,7 @@ For each term, all matching SL1L2 (or CTC) input lines are aggregated separately
 
 Where :math:`s_{fcst}` and :math:`s_{ref}` are the aggregated forecast and reference statistics, respectively. Next, a weighted average is computed from the skill scores for each term:
 
- .. math:: ss_{avg} = \frac{1}{n} \sum_{i=1}^{n} w_i * ss_i
+.. math:: ss_{avg} = \frac{1}{n} \sum_{i=1}^{n} w_i * ss_i
 
 Where, :math:`w_i` and :math:`ss_i` are the weight and skill score for each term and :math:`n` is the number of terms. Finally, the skill score index is computed as:
 
