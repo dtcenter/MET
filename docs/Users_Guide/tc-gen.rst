@@ -69,7 +69,7 @@ Note: At least one of the **-genesis**, **-edeck**, or **-shape** command line o
 
 4. The **-track path** argument is one or more ATCF reference track files or an ASCII file list or top-level directory containing them, with files ending in ".dat". This tool processes either Best track data from bdeck files, or operational track data (e.g., CARQ) from adeck files, or both. Providing both bdeck and adeck files will result in a richer dataset to match with the **-genesis** files.  Both adeck and bdeck data should be provided using the **-track** option. The **-track** option must be used at least once.
 
-5. The **-config file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
+5. The **-config** file argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
 Optional Arguments for tc_gen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
