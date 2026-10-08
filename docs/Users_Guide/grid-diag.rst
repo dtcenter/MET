@@ -122,12 +122,12 @@ _____________________
 
 .. code-block:: none
 
-   output_flag = {
-      histogram_1d   = TRUE;
-      histogram_2d   = TRUE;
-      info_theory    = FALSE;
-      power_spectrum = FALSE;
-   }
+  output_flag = {
+     histogram_1d   = TRUE;
+     histogram_2d   = TRUE;
+     info_theory    = FALSE;
+     power_spectrum = FALSE;
+  }
 
 The **output_flag** dictionary controls the type of output that the Grid-Diag tool generates. Each flag should be set to **TRUE** or **FALSE** to enable the computation and writing of one or more variables to the output NetCDF file, as described below:
 

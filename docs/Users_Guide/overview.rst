@@ -42,7 +42,7 @@ The reformatting stage of MET consists of several tools which perform a variety 
 
 .. figure:: figure/overview-figure.png
 
-   Basic representation of current MET structure and modules. Gray areas represent input and output files. Dark green areas represent point preprocessing tools. Light green areas represent grid preprocessing tools. Pink areas represent regridding tools. Orange areas represent plotting tools. Blue areas represent statistical tools. Yellow areas represent aggregation and analysis tools.
+  Basic representation of current MET structure and modules. Gray areas represent input and output files. Dark green areas represent point preprocessing tools. Light green areas represent grid preprocessing tools. Pink areas represent regridding tools. Orange areas represent plotting tools. Blue areas represent statistical tools. Yellow areas represent aggregation and analysis tools.
 
 Several optional plotting utilities are provided to assist users in checking their output from the data preprocessing step. Plot-Point-Obs creates a postscript plot showing the locations of point observations. This can be quite useful for assessing whether the latitude and longitude of observation stations were specified correctly. Plot-Data-Plane produces a similar plot for gridded data. Finally, WWMCA-Plot produces a plot of the raw WWMCA data file.
 

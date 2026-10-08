@@ -205,13 +205,13 @@ and *scripts/config*.
 When you pass a configuration file to a MET tool, the tool actually parses up
 to four different configuration files in the following order:
 
-   1. Reads *share/met/config/ConfigConstants* to define constants.
+  1. Reads *share/met/config/ConfigConstants* to define constants.
 
-   2. If the tool produces PostScript output, it reads *share/met/config/ConfigMapData* to define the map data to be plotted.
+  2. If the tool produces PostScript output, it reads *share/met/config/ConfigMapData* to define the map data to be plotted.
 
-   3. Reads the default configuration file for the tool from *share/met/config*.
+  3. Reads the default configuration file for the tool from *share/met/config*.
 
-   4. Reads the user-specified configuration file from the command line.
+  4. Reads the user-specified configuration file from the command line.
 
 Many of the entries from step (3) are overwritten by the user-specified entries
 from step (4). Therefore, the configuration file you pass in on the command
@@ -1219,27 +1219,27 @@ listed in the "data/config/ConfigConstants" file and are described below.
 This entry should be defined within the "fcst" and/or "obs" dictionaries.
 For example:
 
-  .. code-block:: none
+.. code-block:: none
 
-    fcst = {
-       file_type = GRIB1;         GRIB version 1
-       file_type = GRIB2;         GRIB version 2
-       file_type = NETCDF_MET;    NetCDF created by another MET tool
-       file_type = NETCDF_WRF;    NetCDF WRF output.
-       file_type = NETCDF_PINT;   NetCDF created by running the p_interp
-                                  or wrf_interp utility on WRF output.
-                                  May be used to read unstaggered raw WRF
-                                  NetCDF output at the surface or a
-                                  single model level.
-       file_type = NETCDF_NCCF;   NetCDF following the Climate Forecast
-                                  (CF) convention.
-       file_type = NETCDF_UGRID;  NetCDF containing data on an
-                                  unstructured grid.
-       file_type = PYTHON_NUMPY;  Run a Python script to load data into
-                                  a NumPy array.
-       file_type = PYTHON_XARRAY; Run a Python script to load data into
-                                  an xarray object.
-    }
+  fcst = {
+     file_type = GRIB1;         GRIB version 1
+     file_type = GRIB2;         GRIB version 2
+     file_type = NETCDF_MET;    NetCDF created by another MET tool
+     file_type = NETCDF_WRF;    NetCDF WRF output.
+     file_type = NETCDF_PINT;   NetCDF created by running the p_interp
+                                or wrf_interp utility on WRF output.
+                                May be used to read unstaggered raw WRF
+                                NetCDF output at the surface or a
+                                single model level.
+     file_type = NETCDF_NCCF;   NetCDF following the Climate Forecast
+                                (CF) convention.
+     file_type = NETCDF_UGRID;  NetCDF containing data on an
+                                unstructured grid.
+     file_type = PYTHON_NUMPY;  Run a Python script to load data into
+                                a NumPy array.
+     file_type = PYTHON_XARRAY; Run a Python script to load data into
+                                an xarray object.
+  }
 
 wind_thresh
 ^^^^^^^^^^^
@@ -1329,7 +1329,7 @@ GRIB1 and GRIB2
   * The "GRIB_lvl_typ" entry is an integer specifying the level type.
 
   * The "GRIB_lvl_val1" and "GRIB_lvl_val2" entries are floats specifying
-      the first and second level values.
+    the first and second level values.
 
   * The "GRIB_ens" entry is a string specifying NCEP's usage of the
     extended PDS for ensembles. Set to "hi_res_ctl", "low_res_ctl",
@@ -1466,9 +1466,9 @@ Using PYTHON_NUMPY or PYTHON_XARRAY:
 
       .. code-block:: none
 
-         field = [
-           { name = "read_ascii_numpy.py data/python/fcst.txt FCST"; }
-         ];
+        field = [
+          { name = "read_ascii_numpy.py data/python/fcst.txt FCST"; }
+        ];
 
   Option 2:
 
@@ -1530,48 +1530,48 @@ length of the "fcst.field" array.  For example:
 
 .. code-block:: none
 
-        obs = fcst;
+  obs = fcst;
 
 or
 
 .. code-block:: none
 
-   fcst = {
-     censor_thresh = [];
-     censor_val    = [];
-     cnt_thresh    = [ NA ];
-     cnt_logic     = UNION;
-     wind_thresh   = [ NA ];
-     wind_logic    = UNION;
+  fcst = {
+    censor_thresh = [];
+    censor_val    = [];
+    cnt_thresh    = [ NA ];
+    cnt_logic     = UNION;
+    wind_thresh   = [ NA ];
+    wind_logic    = UNION;
 
-     field = [
-        {
-           name       = "PWAT";
-           level      = [ "L0" ];
-           cat_thresh = [ >2.5 ];
-        }
-      ];
-   }
+    field = [
+       {
+          name       = "PWAT";
+          level      = [ "L0" ];
+          cat_thresh = [ >2.5 ];
+       }
+     ];
+  }
 
 
-   obs = {
-     censor_thresh = [];
-     censor_val    = [];
-     mpr_column    = [];
-     mpr_thresh    = [];
-     cnt_thresh    = [ NA ];
-     cnt_logic     = UNION;
-     wind_thresh   = [ NA ];
-     wind_logic    = UNION;
+  obs = {
+    censor_thresh = [];
+    censor_val    = [];
+    mpr_column    = [];
+    mpr_thresh    = [];
+    cnt_thresh    = [ NA ];
+    cnt_logic     = UNION;
+    wind_thresh   = [ NA ];
+    wind_logic    = UNION;
 
-     field = [
-        {
-           name       = "IWV";
-           level      = [ "L0" ];
-           cat_thresh = [ >25.0 ];
-        }
-      ];
-   }
+    field = [
+       {
+          name       = "IWV";
+          level      = [ "L0" ];
+          cat_thresh = [ >25.0 ];
+       }
+     ];
+  }
 
 message_type
 ^^^^^^^^^^^^
@@ -1592,33 +1592,33 @@ than one "message_type" entry is desired within the config file. For example:
 
 .. code-block:: none
 
-   fcst = {
-       censor_thresh = [];
-       censor_val    = [];
-       cnt_thresh    = [ NA ];
-       cnt_logic     = UNION;
-       wind_thresh   = [ NA ];
-       wind_logic    = UNION;
+  fcst = {
+      censor_thresh = [];
+      censor_val    = [];
+      cnt_thresh    = [ NA ];
+      cnt_logic     = UNION;
+      wind_thresh   = [ NA ];
+      wind_logic    = UNION;
 
-       field = [
-          {
-            message_type = [ "ADPUPA" ];
-            sid_inc      = [];
-            sid_exc      = [];
-            name         = "TMP";
-            level        = [ "P250", "P500", "P700", "P850", "P1000" ];
-            cat_thresh   = [ <=273.0 ];
-          },
-          {
-            message_type = [ "ADPSFC" ];
-            sid_inc      = [];
-            sid_exc      = [ "KDEN", "KDET" ];
-            name         = "TMP";
-            level        = [ "Z2" ];
-            cat_thresh   = [ <=273.0 ];
-          }
-       ];
-     }
+      field = [
+         {
+           message_type = [ "ADPUPA" ];
+           sid_inc      = [];
+           sid_exc      = [];
+           name         = "TMP";
+           level        = [ "P250", "P500", "P700", "P850", "P1000" ];
+           cat_thresh   = [ <=273.0 ];
+         },
+         {
+           message_type = [ "ADPSFC" ];
+           sid_inc      = [];
+           sid_exc      = [ "KDEN", "KDET" ];
+           name         = "TMP";
+           level        = [ "Z2" ];
+           cat_thresh   = [ <=273.0 ];
+         }
+      ];
+    }
 
 sid_inc and sid_exc
 ^^^^^^^^^^^^^^^^^^^
@@ -1680,9 +1680,9 @@ time_interp_method
 The "time_interp_method" entry specifies how the climatology data should
 be interpolated in time to the forecast valid time:
 
- * NEAREST for data closest in time
- * UW_MEAN for average of data before and after
- * DW_MEAN for linear interpolation in time of data before and after
+  * NEAREST for data closest in time
+  * UW_MEAN for average of data before and after
+  * DW_MEAN for linear interpolation in time of data before and after
 
 day_interval
 ^^^^^^^^^^^^
@@ -1733,15 +1733,15 @@ configuration file context to use the same data for both. The "climo_mean" and
 assuming normality. These climatological distributions are used in two ways:
 
 (1)
-    To define climatological distribution percentile thresholds (FCDP and
-    OCDP) which can be used as categorical (cat_thresh), continuous (cnt_thresh),
-    or wind speed (wind_thresh) thresholds.
+  To define climatological distribution percentile thresholds (FCDP and
+  OCDP) which can be used as categorical (cat_thresh), continuous (cnt_thresh),
+  or wind speed (wind_thresh) thresholds.
 
 (2)
-    To subset matched pairs into climatological bins based on where the
-    observation value falls within the observation climatological distribution.
-    See the "climo_cdf" dictionary. Note that only the observation climatology
-    data is used for this purpose, not the forecast climatology data.
+  To subset matched pairs into climatological bins based on where the
+  observation value falls within the observation climatological distribution.
+  See the "climo_cdf" dictionary. Note that only the observation climatology
+  data is used for this purpose, not the forecast climatology data.
 
 This dictionary is identical to the "climo_mean" dictionary described above
 but points to files containing climatological standard deviation values
@@ -1787,14 +1787,14 @@ within the observation climatological distribution. It can be set inside the
 dictionary consists of the following entries:
 
 (1)
-    The "cdf_bins" entry defines the climatological bins either as an integer
-    or an array of floats between 0 and 1.
+  The "cdf_bins" entry defines the climatological bins either as an integer
+  or an array of floats between 0 and 1.
 
 (2)
-    The "center_bins" entry may be set to TRUE or FALSE.
+  The "center_bins" entry may be set to TRUE or FALSE.
 
 (3)
-    The "write_bins" entry may be set to TRUE or FALSE.
+  The "write_bins" entry may be set to TRUE or FALSE.
 
 (4) The "direct_prob" entry may be set to TRUE or FALSE.
 
@@ -1909,13 +1909,13 @@ mask_missing_flag
 The "mask_missing_flag" entry specifies how missing data should be handled
 in the Wavelet-Stat and MODE tools:
 
- * NONE to perform no masking of missing data
+  * NONE to perform no masking of missing data
 
- * FCST to mask the forecast field with missing observation data
+  * FCST to mask the forecast field with missing observation data
 
- * OBS to mask the observation field with missing forecast data
+  * OBS to mask the observation field with missing forecast data
 
- * BOTH to mask both fields with missing data from the other
+  * BOTH to mask both fields with missing data from the other
 
 .. code-block:: none
 
@@ -1951,10 +1951,10 @@ used in the computation of statistics.
 
 .. note::
 
-   Masking regions can be defined in a variety of ways, described below.
-   However, if no geographic masking regions are specified, the MET tools
-   automatically set "grid" equal to "FULL" to verify all data in the
-   entire input domain.
+  Masking regions can be defined in a variety of ways, described below.
+  However, if no geographic masking regions are specified, the MET tools
+  automatically set "grid" equal to "FULL" to verify all data in the
+  entire input domain.
 
 Masking regions may be specified in the following ways:
 
@@ -1994,13 +1994,13 @@ These three options are described below:
   Here is an example of a rectangle consisting of 4 points:
 
   .. code-block:: none
-     :caption: ASCII Rectangle Polygon Mask
+    :caption: ASCII Rectangle Polygon Mask
 
-     RECTANGLE
-     25  -120
-     55  -120
-     55   -70
-     25   -70
+    RECTANGLE
+    25  -120
+    55  -120
+    55   -70
+    25   -70
 
   Several masking polygons used by NCEP are predefined in the
   installed *share/met/poly* directory. Creating a new polygon is as
@@ -2015,7 +2015,7 @@ These three options are described below:
 
   .. code-block:: none
 
-     mask = { poly = [ "share/met/poly/CONUS.poly" ]; }
+    mask = { poly = [ "share/met/poly/CONUS.poly" ]; }
 
 * Option 2 - Gen-Vx-Mask output:
 
@@ -2024,7 +2024,7 @@ These three options are described below:
 
   .. code-block:: none
 
-     mask = { poly = [ "/path/to/gen_vx_mask_output.nc" ]; }
+    mask = { poly = [ "/path/to/gen_vx_mask_output.nc" ]; }
 
 * Option 3 - Any gridded data file:
 
@@ -2038,7 +2038,7 @@ These three options are described below:
 
   .. code-block:: none
 
-     mask = { poly = [ "/path/to/sample.grib {name = \"TMP\"; level = \"Z2\";} >273" ]; }
+    mask = { poly = [ "/path/to/sample.grib {name = \"TMP\"; level = \"Z2\";} >273" ]; }
 
   .. note::
 
@@ -3032,11 +3032,11 @@ For example:
 
 .. code-block:: none
 
-   beg = "00";
-   end = "235959";
-   step = 300;
-   width = 600;
-   width = { beg = -300; end = 300; }
+  beg = "00";
+  end = "235959";
+  step = 300;
+  width = 600;
+  width = { beg = -300; end = 300; }
 
 This example does a 10-minute time summary every 5 minutes throughout the
 day. The first interval will be from 23:55:00 the previous day through
@@ -3878,14 +3878,14 @@ fcst/obs.merge_flag
 """""""""""""""""""
 The "merge_flag" entry specifies the merging methods to be applied:
 
- * NONE for no merging
+  * NONE for no merging
 
- * THRESH for the double-threshold merging method. Merge objects
-   that would be part of the same object at the lower threshold.
+  * THRESH for the double-threshold merging method. Merge objects
+    that would be part of the same object at the lower threshold.
 
- * ENGINE for the fuzzy logic approach comparing the field to itself
+  * ENGINE for the fuzzy logic approach comparing the field to itself
 
- * BOTH for both the double-threshold and engine merging methods
+  * BOTH for both the double-threshold and engine merging methods
 
 .. code-block:: none
 
@@ -4385,11 +4385,11 @@ See `Code table for observation quality markers <http://www.emc.ncep.noaa.gov/mm
 
 .. note::
 
-   In earlier versions of MET, "quality_mark_thresh" was defined as an
-   integer. Observations with quality marks LESS THAN OR EQUAL TO the
-   value were included while those with quality marks GREATER THAN it
-   were excluded. For backward compatibility, setting this entry as
-   an integer "N" results in a "<=N" threshold being defined.
+  In earlier versions of MET, "quality_mark_thresh" was defined as an
+  integer. Observations with quality marks LESS THAN OR EQUAL TO the
+  value were included while those with quality marks GREATER THAN it
+  were excluded. For backward compatibility, setting this entry as
+  an integer "N" results in a "<=N" threshold being defined.
 
 event_stack_flag
 ^^^^^^^^^^^^^^^^
@@ -4920,14 +4920,14 @@ arithmetic mean method do not need to be listed.
 
 .. code-block:: none
 
-   wmo_sqrt_stats   = [ "CNT:FSTDEV",  "CNT:OSTDEV",  "CNT:ESTDEV",
-                        "CNT:RMSE",    "CNT:RMSFA",   "CNT:RMSOA",
-                        "VCNT:FS_RMS", "VCNT:OS_RMS", "VCNT:RMSVE",
-                        "VCNT:FSTDEV", "VCNT:OSTDEV" ];
+  wmo_sqrt_stats   = [ "CNT:FSTDEV",  "CNT:OSTDEV",  "CNT:ESTDEV",
+                       "CNT:RMSE",    "CNT:RMSFA",   "CNT:RMSOA",
+                       "VCNT:FS_RMS", "VCNT:OS_RMS", "VCNT:RMSVE",
+                       "VCNT:FSTDEV", "VCNT:OSTDEV" ];
 
-   wmo_fisher_stats = [ "CNT:PR_CORR", "CNT:SP_CORR",
-                        "CNT:KT_CORR", "CNT:ANOM_CORR",
-                        "CNT:ANOM_CORR_UNCNTR" ];
+  wmo_fisher_stats = [ "CNT:PR_CORR", "CNT:SP_CORR",
+                       "CNT:KT_CORR", "CNT:ANOM_CORR",
+                       "CNT:ANOM_CORR_UNCNTR" ];
 
 vif_flag
 ^^^^^^^^
@@ -5051,10 +5051,10 @@ Supply the NetCDF output information.  For example:
 
 .. code-block:: none
 
-   variable_name = "Cloud_Pct";
-   units         = "percent";
-   long_name     = "cloud cover percent";
-   level         = "SFC";
+  variable_name = "Cloud_Pct";
+  units         = "percent";
+  long_name     = "cloud cover percent";
+  level         = "SFC";
 
 .. code-block:: none
 

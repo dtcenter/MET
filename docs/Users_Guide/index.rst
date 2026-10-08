@@ -40,56 +40,56 @@ We thank the National Science Foundation (NSF) along with three organizations wi
 The National Center for Atmospheric Research (NCAR) is sponsored by NSF. The DTC is sponsored by the National Oceanic and Atmospheric Administration (NOAA), the United States Air Force, and the National Science Foundation (NSF). NCAR is sponsored by the National Science Foundation (NSF).
 
 .. toctree::
-   :titlesonly:
-   :numbered: 4
+  :titlesonly:
+  :numbered: 4
 
-   overview
-   release-notes
-   installation
-   data_io
-   config_options
-   config_options_tc
-   reformat_point
-   reformat_grid
-   gen-ens-prod
-   masking
-   point-stat
-   pair-stat
-   grid-stat
-   ensemble-stat
-   wavelet-stat
-   gsi-tools
-   stat-analysis
-   series-analysis
-   grid-diag
-   mode
-   mode-analysis
-   mode-td
-   met-tc_overview
-   tc-dland
-   tc-pairs
-   tc-diag
-   tc-stat
-   tc-gen
-   tc-rmw
-   rmw-analysis
-   plotting
-   refs
-   appendixA
-   appendixB
-   appendixC
-   appendixD
-   appendixE
-   appendixF
-   appendixG
-   appendixH
+  overview
+  release-notes
+  installation
+  data_io
+  config_options
+  config_options_tc
+  reformat_point
+  reformat_grid
+  gen-ens-prod
+  masking
+  point-stat
+  pair-stat
+  grid-stat
+  ensemble-stat
+  wavelet-stat
+  gsi-tools
+  stat-analysis
+  series-analysis
+  grid-diag
+  mode
+  mode-analysis
+  mode-td
+  met-tc_overview
+  tc-dland
+  tc-pairs
+  tc-diag
+  tc-stat
+  tc-gen
+  tc-rmw
+  rmw-analysis
+  plotting
+  refs
+  appendixA
+  appendixB
+  appendixC
+  appendixD
+  appendixE
+  appendixF
+  appendixG
+  appendixH
 
 .. only:: html
 
-   Indices and tables
-   ==================
+  Indices and tables
+  ==================
 
-   * :ref:`genindex`
-   * :ref:`search`
+  * :ref:`genindex`
+  * :ref:`search`
 
 

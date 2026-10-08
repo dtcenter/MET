@@ -26,7 +26,7 @@ This may also be set using basin, cyclone, and timing information below.
 
 .. code-block:: none
 
-   storm_id = [];
+  storm_id = [];
 
 basin
 -----
@@ -42,7 +42,7 @@ For example:
 
 .. code-block:: none
 
-   basin = [];
+  basin = [];
 
 
 cyclone

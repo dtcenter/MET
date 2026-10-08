@@ -383,11 +383,11 @@ Included in SEEPS output :numref:`table_PS_format_info_SEEPS` and SEEPS_MPR outp
 The SEEPS scoring matrix (equation 15 from :ref:`Rodwell et al, 2010 <Rodwell-2010>`) is:
 
 .. math:: \{S^{S}_{vf}\} = \frac{1}{2}
-          \begin{Bmatrix}
-             0 & \frac{1}{1-p_1} & \frac{1}{p_3} + \frac{1}{1-p_1}\\
-             \frac{1}{p_1} & 0 & \frac{1}{p_3}\\
-             \frac{1}{p_1} + \frac{1}{1-p_3} & \frac{1}{1-p_3} & 0
-          \end{Bmatrix}
+  \begin{Bmatrix}
+     0 & \frac{1}{1-p_1} & \frac{1}{p_3} + \frac{1}{1-p_1}\\
+     \frac{1}{p_1} & 0 & \frac{1}{p_3}\\
+     \frac{1}{p_1} + \frac{1}{1-p_3} & \frac{1}{1-p_3} & 0
+  \end{Bmatrix}
 
 In addition, Rodwell et al (2011) note that SEEPS can be written as the mean of two 2-category scores that individually assess the dry/light and light/heavy thresholds (:ref:`Rodwell et al., 2011 <Rodwell-2011>`). Each of these scores is like 1 – HK, but written as:
 
@@ -977,7 +977,7 @@ The ideal forecast (i.e., one with perfect reliability) has conditional observed
 
 .. figure:: figure/appendixC-rel_diag.jpg
 
-	    Example of Reliability Diagram
+  Example of Reliability Diagram
 
 Receiver Operating Characteristic
 ---------------------------------
@@ -992,7 +992,7 @@ A ROC curve shows how well the forecast discriminates between two outcomes, so i
 
 .. figure:: figure/appendixC-roc_example.jpg
 
-	    Example of ROC Curve
+  Example of ROC Curve
 
 Area Under the ROC Curve (AUC)
 ------------------------------
@@ -1330,9 +1330,9 @@ Unlike Baddeley's :math:`\Delta` metric, the MED is not a mathematical metric be
 
 .. math:: min \text{MED}(A,B) = min( \text{MED}(A,B),\text{MED}(B,A))
 
- max \text{MED}(A,B) = max( \text{MED}(A,B), \text{MED}(B,A))
+  max \text{MED}(A,B) = max( \text{MED}(A,B), \text{MED}(B,A))
 
- mean \text{MED}(A,B) = \frac{1}{2}(\text{MED}(A,B) + \text{MED}(B,A))
+  mean \text{MED}(A,B) = \frac{1}{2}(\text{MED}(A,B) + \text{MED}(B,A))
 
 From the distance map perspective, MED *(A,B)* is the average of the values in :numref:`grid-stat_fig4` (top right), and MED *(B,A)* is the average of the values in :numref:`grid-stat_fig4` (bottom left). Note that the average is only over the circular regions depicted in the figure.
 
@@ -1400,7 +1400,7 @@ Suppose now that we have a collection of *N* data points :math:`x_i \text{for } 
 
 .. math:: I = \lfloor (N - 1)t \rfloor
 
- \Delta = (N - 1)t - I
+  \Delta = (N - 1)t - I
 
 Then the value *p* of the percentile is
 
