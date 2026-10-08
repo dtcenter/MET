@@ -5,7 +5,7 @@ Use of Temporary Files
 
 The MET application and library code uses temporary files in several
 places. Each specific use of temporary files is described below. The
-directory in which temporary files are stored is configurable as,
+directory in which temporary files are stored is configurable, as
 described in :numref:`User's Guide Section %s <config_tmp_dir>`.
 
 Whenever a MET application is run, the operating system assigns it a
@@ -117,7 +117,7 @@ input data for each job.
 
 * :code:`tmp_stat_analysis_{PID}`: If warranted, Stat-Analysis reads
   all input data, applies common filtering logic, and writes the
-  result to this temporary file. All of analysis jobs read data from
+  result to this temporary file. All of the analysis jobs read data from
   this temporary file, apply any additional job-specific filtering
   criteria, and perform the requested operation.
 

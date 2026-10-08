@@ -48,9 +48,9 @@ Often, the goal of ensemble forecasting is to reproduce the distribution of obse
 
 The relative position (RELP) is a count of the number of times each ensemble member is closest to the observation. For stochastic or randomly derived ensembles, this statistic is meaningless. For specified ensemble members, however, it can assist users in determining if any ensemble member is performing consistently better or worse than the others.
 
-The ranked probability score (RPS) is included in the Ranked Probability Score (RPS) line type. It is the mean of the Brier scores computed from ensemble probabilities derived for each probability category threshold (prob_cat_thresh) specified in the configuration file. The continuous ranked probability score (CRPS) is the average the distance between the forecast (ensemble) cumulative distribution function and the observation cumulative distribution function. It is an analog of the Brier score, but for continuous forecast and observation fields. The CRPS statistic is computed using two methods: assuming a normal distribution defined by the ensemble mean and spread (:ref:`Gneiting et al., 2004 <Gneiting-2004>`) and using the empirical ensemble distribution (:ref:`Hersbach, 2000 <Hersbach-2000>`). The CRPS statistic using the empirical ensemble distribution can be adjusted (bias corrected) by subtracting 1/(2*m) times the mean absolute difference of the ensemble members, where m is the ensemble size. This is reported as a separate statistic called CRPS_EMP_FAIR. The empirical CRPS and its fair version are included in the Ensemble Continuous Statistics (ECNT) line type, along with other statistics quantifying the ensemble spread and ensemble mean skill.
+The ranked probability score (RPS) is included in the Ranked Probability Score (RPS) line type. It is the mean of the Brier scores computed from ensemble probabilities derived for each probability category threshold (prob_cat_thresh) specified in the configuration file. The continuous ranked probability score (CRPS) is the average distance between the forecast (ensemble) cumulative distribution function and the observation cumulative distribution function. It is an analog of the Brier score, but for continuous forecast and observation fields. The CRPS statistic is computed using two methods: assuming a normal distribution defined by the ensemble mean and spread (:ref:`Gneiting et al., 2004 <Gneiting-2004>`) and using the empirical ensemble distribution (:ref:`Hersbach, 2000 <Hersbach-2000>`). The CRPS statistic using the empirical ensemble distribution can be adjusted (bias corrected) by subtracting 1/(2*m) times the mean absolute difference of the ensemble members, where m is the ensemble size. This is reported as a separate statistic called CRPS_EMP_FAIR. The empirical CRPS and its fair version are included in the Ensemble Continuous Statistics (ECNT) line type, along with other statistics quantifying the ensemble spread and ensemble mean skill.
 
-The Ensemble-Stat tool can derive ensemble relative frequencies and verify them as probability forecasts all in the same run. Note however that these simple ensemble relative frequencies are not actually calibrated probability forecasts. If probabilistic line types are requested (output_flag), this logic is applied to each pair of fields listed in the forecast (fcst) and observation (obs) dictionaries of the configuration file. Each probability category threshold (prob_cat_thresh) listed for the forecast field is applied to the input ensemble members to derive a relative frequency forecast. The probability category threshold (prob_cat_thresh) parsed from the corresponding observation entry is applied to the (gridded or point) observations to determine whether or not the event actually occurred. The paired ensemble relative frequencies and observation events are used to populate an Nx2 probabilistic contingency table. The dimension of that table is determined by the probability PCT threshold (prob_pct_thresh) configuration file option parsed from the forecast dictionary. All probabilistic output types requested are derived from this Nx2 table and written to the ascii output files. Note that the FCST_VAR name header column is automatically reset as "PROB({FCST_VAR}{THRESH})" where {FCST_VAR} is the current field being evaluated and {THRESH} is the threshold that was applied.
+The Ensemble-Stat tool can derive ensemble relative frequencies and verify them as probability forecasts all in the same run. Note however that these simple ensemble relative frequencies are not actually calibrated probability forecasts. If probabilistic line types are requested (output_flag), this logic is applied to each pair of fields listed in the forecast (fcst) and observation (obs) dictionaries of the configuration file. Each probability category threshold (prob_cat_thresh) listed for the forecast field is applied to the input ensemble members to derive a relative frequency forecast. The probability category threshold (prob_cat_thresh) parsed from the corresponding observation entry is applied to the (gridded or point) observations to determine whether or not the event actually occurred. The paired ensemble relative frequencies and observation events are used to populate an Nx2 probabilistic contingency table. The dimension of that table is determined by the probability PCT threshold (prob_pct_thresh) configuration file option parsed from the forecast dictionary. All probabilistic output types requested are derived from this Nx2 table and written to the ASCII output files. Note that the FCST_VAR name header column is automatically reset as "PROB({FCST_VAR}{THRESH})" where {FCST_VAR} is the current field being evaluated and {THRESH} is the threshold that was applied.
 
 Note that if no probability category thresholds (prob_cat_thresh) are defined, but climatological mean and standard deviation data is provided along with climatological bins, climatological distribution percentile thresholds are automatically derived and used to compute probabilistic outputs.
 
@@ -59,20 +59,20 @@ Climatology Data
 
 The Ensemble-Stat output includes at least three statistics computed relative to external climatology data. The climatology is defined by mean and standard deviation fields, and typically both are required in the computation of ensemble skill score statistics. MET assumes that the climatology follows a normal distribution, defined by the mean and standard deviation at each point.
 
-When computing the CRPS skill score for (:ref:`Gneiting et al., 2004 <Gneiting-2004>`) the reference CRPS statistic is computed using the climatological mean and standard deviation directly. When computing the CRPS skill score for (:ref:`Hersbach, 2000 <Hersbach-2000>`) the reference CRPS statistic is computed by selecting equal-area-spaced values from the assumed normal climatological distribution. The number of points selected is determined by the *cdf_bins* setting in the *climo_cdf* dictionary. The reference CRPS is computed empirically from this ensemble of climatology values. If the number bins is set to 1, the climatological CRPS is computed using only the climatological mean value. In this way, the empirical CRPSS may be computed relative to a single model rather than a climatological distribution.
+When computing the CRPS skill score for (:ref:`Gneiting et al., 2004 <Gneiting-2004>`) the reference CRPS statistic is computed using the climatological mean and standard deviation directly. When computing the CRPS skill score for (:ref:`Hersbach, 2000 <Hersbach-2000>`) the reference CRPS statistic is computed by selecting equal-area-spaced values from the assumed normal climatological distribution. The number of points selected is determined by the *cdf_bins* setting in the *climo_cdf* dictionary. The reference CRPS is computed empirically from this ensemble of climatology values. If the number of bins is set to 1, the climatological CRPS is computed using only the climatological mean value. In this way, the empirical CRPSS may be computed relative to a single model rather than a climatological distribution.
 
-The climatological distribution is also used for the RPSS. The forecast RPS statistic is computed from a probabilistic contingency table in which the probabilities are derived from the ensemble member values. In a simliar fashion, the climatogical probability for each observed value is derived from the climatological distribution. The area of the distribution to the left of the observed value is interpreted as the climatological probability. These climatological probabilities are also evaluated using a probabilistic contingency table from which the reference RPS score is computed. The skill scores are derived by comparing the forecast statistic to the reference climatology statistic.
+The climatological distribution is also used for the RPSS. The forecast RPS statistic is computed from a probabilistic contingency table in which the probabilities are derived from the ensemble member values. In a similar fashion, the climatological probability for each observed value is derived from the climatological distribution. The area of the distribution to the left of the observed value is interpreted as the climatological probability. These climatological probabilities are also evaluated using a probabilistic contingency table from which the reference RPS score is computed. The skill scores are derived by comparing the forecast statistic to the reference climatology statistic.
 
-The Ensemble-Stat tool also allows the computation of RPS and RPSS utilizing an ensemble forecast in probabilistic space. This unique ability is for users with ensemble data that is formulated relative to climatology; it does not require the use of any climatological datasets, instead relying on the assumption that each ensemble member has a climatologically equal chance of occurring. Each ensemble member's field should contain values in the range [0, 1] or [0, 100]. However, when MET encounters a probability field with a range [0, 100], it will automatically rescale it to be [0, 1]. The sum of all ensemble member fields should equal 1 (if range is [0, 1]) or 100 (if range is [0, 100]). When calculating RPS, the ensemble member field values are cumulatively summed in the order that they are evaluated by Ensemble-Stat. Each of these sums is then used to calculate a squared probability error relative to observations and their appropriate thresolds. Note that it is expected each observation point or observation gridpoint will indicate exactly one climatological probability bin where the observation occurred. The cumulative sum and squared probability errors are also calculated for climatology using an even, constant probability bin width that is equal to 1 divided by the number of ensemble members (ex. three ensemble members are evaluated with three climatology probability bins of width 0.333). The accompanying skill score is derived by comparing the forecast RPS to the reference climatology RPS.
+The Ensemble-Stat tool also allows the computation of RPS and RPSS utilizing an ensemble forecast in probabilistic space. This unique ability is for users with ensemble data that is formulated relative to climatology; it does not require the use of any climatological datasets, instead relying on the assumption that each ensemble member has a climatologically equal chance of occurring. Each ensemble member's field should contain values in the range [0, 1] or [0, 100]. However, when MET encounters a probability field with a range [0, 100], it will automatically rescale it to be [0, 1]. The sum of all ensemble member fields should equal 1 (if range is [0, 1]) or 100 (if range is [0, 100]). When calculating RPS, the ensemble member field values are cumulatively summed in the order that they are evaluated by Ensemble-Stat. Each of these sums is then used to calculate a squared probability error relative to observations and their appropriate thresholds. Note that it is expected each observation point or observation gridpoint will indicate exactly one climatological probability bin where the observation occurred. The cumulative sum and squared probability errors are also calculated for climatology using an even, constant probability bin width that is equal to 1 divided by the number of ensemble members (ex. three ensemble members are evaluated with three climatology probability bins of width 0.333). The accompanying skill score is derived by comparing the forecast RPS to the reference climatology RPS.
 
 Ensemble Observation Error
 --------------------------
 
 In an attempt to ameliorate the effect of observation errors on the verification of forecasts, a random perturbation approach has been implemented. A great deal of user flexibility has been built in, but the methods detailed in :ref:`Candille and Talagrand (2008) <Candille-2008>` can be replicated using the appropriate options. Additional variations of the ignorance score that include observational uncertainty recommended by :ref:`Ferro, 2017 <Ferro-2017>` are also provided.
 
-Observation error information can be defined directly in the Ensemble-Stat configuration file or through a more flexible observation error lookup table. The user selects a distribution for the observation error, along with parameters for that distribution. Rescaling and bias correction can also be specified prior to the perturbation. Random draws from the distribution can then be added to either, or both of the forecast and observed fields, including ensemble members. Details about the effects of the choices on verification statistics should be considered, with many details provided in the literature (*e.g.* :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Saetra et al., 2004 <Saetra-2004>`; :ref:`Santos and Ghelli, 2012 <Santos-2012>`). Generally, perturbation makes verification statistics better when applied to ensemble members, and worse when applied to the observations themselves.
+Observation error information can be defined directly in the Ensemble-Stat configuration file or through a more flexible observation error lookup table. The user selects a distribution for the observation error, along with parameters for that distribution. Rescaling and bias correction can also be specified prior to the perturbation. Random draws from the distribution can then be added to either, or both of the forecast and observed fields, including ensemble members. Details about the effects of the choices on verification statistics should be considered, with many details provided in the literature (*e.g.*, :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Saetra et al., 2004 <Saetra-2004>`; :ref:`Santos and Ghelli, 2012 <Santos-2012>`). Generally, perturbation makes verification statistics better when applied to ensemble members, and worse when applied to the observations themselves.
 
-Normal and uniform are common choices for the observation error distribution. The uniform distribution provides the benefit of being bounded on both sides, thus preventing the perturbation from taking on extreme values. Normal is the most common choice for observation error. However, the user should realize that with the very large samples typical in NWP, some large outliers will almost certainly be introduced with the perturbation. For variables that are bounded below by 0, and that may have inconsistent observation errors (e.g. larger errors with larger measurements), a lognormal distribution may be selected. Wind speeds and precipitation measurements are the most common of this type of NWP variable. The lognormal error perturbation prevents measurements of 0 from being perturbed, and applies larger perturbations when measurements are larger. This is often the desired behavior in these cases, but this distribution can also lead to some outliers being introduced in the perturbation step.
+Normal and uniform are common choices for the observation error distribution. The uniform distribution provides the benefit of being bounded on both sides, thus preventing the perturbation from taking on extreme values. Normal is the most common choice for observation error. However, the user should realize that with the very large samples typical in NWP, some large outliers will almost certainly be introduced with the perturbation. For variables that are bounded below by 0, and that may have inconsistent observation errors (e.g., larger errors with larger measurements), a lognormal distribution may be selected. Wind speeds and precipitation measurements are the most common of this type of NWP variable. The lognormal error perturbation prevents measurements of 0 from being perturbed, and applies larger perturbations when measurements are larger. This is often the desired behavior in these cases, but this distribution can also lead to some outliers being introduced in the perturbation step.
 
 Observation errors differ according to instrument, temporal and spatial representation, and variable type. Unfortunately, many observation errors have not been examined or documented in the literature. Those that have usually lack information regarding their distributions and approximate parameters. Instead, a range or typical value of observation error is often reported and these are often used as an estimate of the standard deviation of some distribution. Where possible, it is recommended to use the appropriate type and size of perturbation for the observation to prevent spurious results.
 
@@ -84,7 +84,7 @@ This section contains information about configuring and running the Ensemble-Sta
 ensemble_stat Usage
 -------------------
 
-The usage statement for the Ensemble Stat tool is shown below:
+The usage statement for the Ensemble-Stat tool is shown below:
 
 .. code-block:: none
 
@@ -104,8 +104,8 @@ The usage statement for the Ensemble Stat tool is shown below:
 
 ensemble_stat has two required arguments and accepts several optional ones.
 
-Required Arguments ensemble_stat
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Required Arguments for ensemble_stat
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **n_ens file_1 ... file_n | file_list** specifies either the number of ensemble members followed by a list of ensemble member file names or an ASCII file list of the file names to be used, as described in :numref:`ascii_file_lists`.
 
@@ -145,14 +145,14 @@ An example of the ensemble_stat calling sequence is shown below:
      -point_obs out/ascii2nc/precip24_2010010112.nc \
      -outdir out/ensemble_stat -v 2
 
-In this example, the Ensemble-Stat tool will process six forecast files specified in the file list into an ensemble forecast. Observations in both point and grid format will be included, and be used to compute ensemble statistics separately. Ensemble Stat will create a NetCDF file containing requested ensemble fields and an output STAT file.
+In this example, the Ensemble-Stat tool will process six forecast files specified in the file list into an ensemble forecast. Observations in both point and grid format will be included, and be used to compute ensemble statistics separately. Ensemble-Stat will create a NetCDF file containing requested ensemble fields and an output STAT file.
 
 ensemble_stat Configuration File
 --------------------------------
 
 The default configuration file for the Ensemble-Stat tool named **EnsembleStatConfig_default** can be found in the installed *share/met/config* directory. Another version is located in *scripts/config*. We encourage users to make a copy of these files prior to modifying their contents. Each configuration file (both the default and sample) contains many comments describing its contents. The contents of the configuration file are also described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
+Note that environment variables may be used when editing configuration files, as described in :numref:`config_env_vars`.
 
 ____________________
 
@@ -211,7 +211,7 @@ When processing the **fcst** data, compute a ratio of the number of valid ensemb
 
 When processing the **fcst** data, for each grid point compute a ratio of the number of valid data values to the number of ensemble members. If that ratio is less than **vld_thresh**, write out bad data. This threshold must be between 0 and 1. Setting this threshold to 1 will require each grid point to contain valid data for all ensemble members.
 
-For each **field** listed in the forecast field, give the name and vertical or accumulation level, plus one or more categorical thresholds. The thresholds are specified using symbols, as shown above. It is the user's responsibility to know the units for each model variable and to choose appropriate threshold values. The thresholds are used to define ensemble relative frequencies, e.g. a threshold of >=5 can be used to compute the proportion of ensemble members predicting precipitation of at least 5mm at each grid point.
+For each **field** listed in the forecast field, give the name and vertical or accumulation level, plus one or more categorical thresholds. The thresholds are specified using symbols, as shown above. It is the user's responsibility to know the units for each model variable and to choose appropriate threshold values. The thresholds are used to define ensemble relative frequencies, e.g., a threshold of >=5 can be used to compute the proportion of ensemble members predicting precipitation of at least 5mm at each grid point.
 
 _______________________
 
@@ -302,7 +302,7 @@ ____________________
   skip_const = FALSE;
 
 
-Setting **skip_const** to true tells Ensemble-Stat to exclude pairs where all the ensemble members and the observation have a constant value. For example, exclude points with zero precipitation amounts from all output line types. This option may be set separately for each **obs.field** entry. When set to false, constant points are and the observation rank is chosen at random.
+Setting **skip_const** to true tells Ensemble-Stat to exclude pairs where all the ensemble members and the observation have a constant value. For example, exclude points with zero precipitation amounts from all output line types. This option may be set separately for each **obs.field** entry. When set to false, constant points are included and the observation rank is chosen at random.
 
 ____________________
 
@@ -326,7 +326,7 @@ ____________________
   prob_pct_thresh = [];
 
 
-The **prob_cat_thresh** entry is an array of thresholds. It is applied both to the computation of the RPS line type as well as the when generating probabilistic output line types. Since these thresholds can change for each variable, they can be specified separately for each **fcst.field** entry. If left empty but climatological mean and standard deviation data is provided, the **climo_cdf** thresholds will be used instead. If no climatology data is provided, and the RPS output line type is requested, then the **prob_cat_thresh** array must be defined. When probabilistic output line types are requested, for each **prob_cat_thresh** threshold listed, ensemble relative frequencies are derived and verified against the point and/or gridded observations.
+The **prob_cat_thresh** entry is an array of thresholds. It is applied both to the computation of the RPS line type as well as when generating probabilistic output line types. Since these thresholds can change for each variable, they can be specified separately for each **fcst.field** entry. If left empty but climatological mean and standard deviation data is provided, the **climo_cdf** thresholds will be used instead. If no climatology data is provided, and the RPS output line type is requested, then the **prob_cat_thresh** array must be defined. When probabilistic output line types are requested, for each **prob_cat_thresh** threshold listed, ensemble relative frequencies are derived and verified against the point and/or gridded observations.
 
 The **prob_pct_thresh** entry is an array of thresholds which define the Nx2 probabilistic contingency table used to evaluate probability forecasts. It can be specified separately for each **fcst.field** entry. Options for defining probability bins are discussed in Point-Stat section :numref:`PS_Probability`.
 
@@ -354,7 +354,7 @@ The **obs_error** dictionary controls how observation error information should b
 The **flag** entry toggles the observation error logic on (**TRUE**) and off (**FALSE**). When the **flag** is **TRUE**, random observation error perturbations are applied to the ensemble member values. No perturbation is applied to the observation values but the bias scale and offset values, if specified, are applied.
 
 
-The **dist_type** entry may be set to **NONE, NORMAL, LOGNORMAL, EXPONENTIAL,CHISQUARED, GAMMA, UNIFORM**, or **BETA**. The default value of **NONE** indicates that the observation error table file should be used rather than the configuration file settings.
+The **dist_type** entry may be set to **NONE, NORMAL, LOGNORMAL, EXPONENTIAL, CHISQUARED, GAMMA, UNIFORM**, or **BETA**. The default value of **NONE** indicates that the observation error table file should be used rather than the configuration file settings.
 
 
 The **dist_parm** entry is an array of length 1 or 2 specifying the parameters for the distribution selected in **dist_type**. The **GAMMA, UNIFORM**, and **BETA** distributions are defined by two parameters, specified as a comma-separated list (a,b), whereas all other distributions are defined by a single parameter.
@@ -449,7 +449,7 @@ __________________
     nc_var_str = "";
 
 
-The **nc_var_str** entry specifies a string for each ensemble field and verification task. This string is parsed from each **ens.field** and **obs.field** dictionary entry and is used to customize the variable names written to theNetCDF output file. The default is an empty string, meaning that no customization is applied to the output variable names. When the Ensemble-Stat config file contains two fields with the same name and level value, this entry is used to make the resulting variable names unique.
+The **nc_var_str** entry specifies a string for each ensemble field and verification task. This string is parsed from each **ens.field** and **obs.field** dictionary entry and is used to customize the variable names written to the NetCDF output file. The default is an empty string, meaning that no customization is applied to the output variable names. When the Ensemble-Stat config file contains two fields with the same name and level value, this entry is used to make the resulting variable names unique.
 
 ________________
 
@@ -485,7 +485,7 @@ ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV.stat where PREFIX indicates the user-defin
 The output ASCII files are named similarly:
 
 
-ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of elements of the **output_flag** configuration option to indicate the line type it contains.
+ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of the elements of the **output_flag** configuration option to indicate the line type it contains.
 
 
 When verification against gridded analyses is performed, Ensemble-Stat can produce output NetCDF files using the following naming convention:
@@ -514,7 +514,7 @@ Spread/Skill Variance
 Ensemble Matched Pair information
 
 
-The format of the STAT and ASCII output of the Ensemble-Stat tool are described below.
+The format of the STAT and ASCII output of the Ensemble-Stat tool is described below.
 
 .. _table_ES_header_info_es_out:
 
@@ -671,15 +671,15 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Double
   * - 33
     - ME_OERR
-    - The Mean Error of the PERTURBED ensemble mean (e.g. with Observation Error)
+    - The Mean Error of the PERTURBED ensemble mean (e.g., with Observation Error)
     - Double
   * - 34
     - RMSE_OERR
-    - The Root Mean Square Error of the PERTURBED ensemble mean (e.g. with Observation Error)
+    - The Root Mean Square Error of the PERTURBED ensemble mean (e.g., with Observation Error)
     - Double
   * - 35
     - SPREAD_OERR
-    - The square root of the mean of the variance of the PERTURBED ensemble member values (e.g. with Observation Error) at each observation location
+    - The square root of the mean of the variance of the PERTURBED ensemble member values (e.g., with Observation Error) at each observation location
     - Double
   * - 36
     - SPREAD_PLUS_OERR
@@ -715,7 +715,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Double
   * - 44
     - MAE_OERR
-    - The Mean Absolute Error of the PERTURBED ensemble mean (e.g. with Observation Error)
+    - The Mean Absolute Error of the PERTURBED ensemble mean (e.g., with Observation Error)
     - Double
   * - 45
     - BIAS_RATIO
@@ -735,15 +735,15 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Integer
   * - 49
     - ME_LT_OBS
-    - The Mean Error of the ensemble values less than or equal to their observations
+    - The Mean Error of the ensemble values less than their observations
     - Double
   * - 50
     - IGN_CONV_OERR
-    - Error-convolved logarithmic scoring rule (i.e. ignornance score) from Equation 5 of :ref:`Ferro, 2017 <Ferro-2017>`
+    - Error-convolved logarithmic scoring rule (i.e., ignorance score) from Equation 5 of :ref:`Ferro, 2017 <Ferro-2017>`
     - Double
   * - 51
     - IGN_CORR_OERR
-    - Error-corrected logarithmic scoring rule (i.e. ignornance score) from Equation 7 of :ref:`Ferro, 2017 <Ferro-2017>`
+    - Error-corrected logarithmic scoring rule (i.e., ignorance score) from Equation 7 of :ref:`Ferro, 2017 <Ferro-2017>`
     - Double
 
 .. _table_ES_header_info_es_out_RPS:
@@ -766,7 +766,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Integer
   * - 26
     - N_PROB
-    - Number of probability thresholds (i.e. number of ensemble members in Ensemble-Stat)
+    - Number of probability thresholds (i.e., number of ensemble members in Ensemble-Stat)
     - Integer
   * - 27
     - RPS_REL
@@ -961,12 +961,12 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - The spread (standard deviation) of the unperturbed ensemble member values
     - Double
   * - Last-5
-    - ENS_MEAN _OERR
-    - The PERTURBED ensemble mean (e.g. with Observation Error)
+    - ENS_MEAN_OERR
+    - The PERTURBED ensemble mean (e.g., with Observation Error)
     - Double
   * - Last-4
     - SPREAD_OERR
-    - The spread (standard deviation) of the PERTURBED ensemble member values (e.g. with Observation Error)
+    - The spread (standard deviation) of the PERTURBED ensemble member values (e.g., with Observation Error)
     - Double
   * - Last-3
     - SPREAD_PLUS_OERR
@@ -1056,7 +1056,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Double
   * - 39-41
     - FSTDEV, :raw-html:`<br />` FSTDEV_NCL, :raw-html:`<br />` FSTDEV_NCU
-    - Standard deviation of the error including normal upper and lower confidence limits
+    - Standard deviation of the forecasts including normal upper and lower confidence limits
     - Double
   * - 42-43
     - OBAR_NCL, :raw-html:`<br />` OBAR_NCU
@@ -1064,7 +1064,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Double
   * - 44-46
     - OSTDEV, :raw-html:`<br />` OSTDEV_NCL, :raw-html:`<br />` OSTDEV_NCU
-    - Standard deviation of the error including normal upper and lower confidence limits
+    - Standard deviation of the observations including normal upper and lower confidence limits
     - Double
   * - 47-49
     - PR_CORR, :raw-html:`<br />` PR_CORR_NCL, :raw-html:`<br />` PR_CORR_NCU

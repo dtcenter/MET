@@ -20,7 +20,7 @@ MODE Time Domain (MTD) is an extension of the MODE object-based approach to veri
 
 A plot of some MTD precipitation objects is shown over the United States in :numref:`mtd-3d_color`. The colors indicate longitude, with red in the east moving through the spectrum to blue in the west. Time increases vertically in this plot (and in most of the spacetime diagrams in this users' guide). A few things are worthy of note in this figure. First, the tendency of storm systems to move from west to east over time shows up clearly. Second, tracking of storm objects over time is easily done: if we want to know if a storm at one time is a later version of a storm at an earlier time, we need only see if they are part of the same 3D spacetime object. Lastly, storms splitting up or merging over time are handled easily by this method.
 
-The 2D (or traditional) MODE approach to object-base verification enabled users to analyze forecasts in terms of location errors, intensity errors and shape, size and orientation errors. MTD retains all of that capability, and adds new classes of forecast errors involving time information: speed and direction errors, buildup and decay errors, and timing and duration errors. This opens up new ways of analyzing forecast quality.
+The 2D (or traditional) MODE approach to object-based verification enabled users to analyze forecasts in terms of location errors, intensity errors and shape, size and orientation errors. MTD retains all of that capability, and adds new classes of forecast errors involving time information: speed and direction errors, buildup and decay errors, and timing and duration errors. This opens up new ways of analyzing forecast quality.
 
 In the past, many MET users have performed separate MODE runs at a series of forecast valid times and analyzed the resulting object attributes, matches and merges as functions of time in an effort to incorporate temporal information in assessments of forecast quality. MTD was developed as a way to address this need in a more systematic way. Most of the information obtained from such multiple coordinated MODE runs can be obtained more simply from MTD.
 
@@ -82,11 +82,11 @@ The spatial orientation of an object (what traditional MODE calls the **axis ang
 
    3D axis
 
-A simple integer count of the number of grid squares in an object for all of it's lifetime gives the **volume** of the object. Remember that while we're working in three dimensions, one of the dimensions is non-spatial, so one should not attempt to convert this to a volume in, e.g., :math:`\text{km}^3`.
+A simple integer count of the number of grid squares in an object for all of its lifetime gives the **volume** of the object. Remember that while we're working in three dimensions, one of the dimensions is non-spatial, so one should not attempt to convert this to a volume in, e.g., :math:`\text{km}^3`.
 
 The **start time** and **end time** of an object are attributes as well. These are integers reflecting at which time step an object starts and ends. These values are zero-based, so for example, if an object comes into existence at the :math:`\text{3}^{rd}` time step and lasts until the :math:`\text{9}^{th}` time step, then the start time and end time will be listed as 2 and 8, respectively. Note that this object has a lifetime of 7 time steps, not 6.
 
-**Centroid distance traveled** is the total great circle distance, in kilometers, traveled by the 2D spatial centroid over the lifetime of the object. In other words, at each time :math:`t` for which the 3D object exists, the set of points in the object also have that value of :math:`t` will together form a 2D spatial object. That 2D object will have a spatial centroid, which will move around as :math:`t` varies. This attribute represents this total 2D centroid movement over time.
+**Centroid distance traveled** is the total great circle distance, in kilometers, traveled by the 2D spatial centroid over the lifetime of the object. In other words, at each time :math:`t` for which the 3D object exists, the set of points in the object that also have that value of :math:`t` will together form a 2D spatial object. That 2D object will have a spatial centroid, which will move around as :math:`t` varies. This attribute represents this total 2D centroid movement over time.
 
 Finally, MTD calculates several **intensity percentiles** of the raw data values inside each object. Not all of the attributes are purely geometrical.
 
@@ -101,9 +101,9 @@ The **spatial centroid distance** is the purely spatial part of the centroid sep
 
 .. math:: \sqrt{(\bar{x_1} - \bar{x_2})^2 + (\bar{y_1} - \bar{y_2})^2 }
 
-The **time centroid delta** is the difference between the time coordinates of the centroid. Since this is a simple difference, it can be either positive or negative.
+The **time centroid delta** is the difference between the time coordinates of the centroid. Unlike the other deltas, it is computed as "observed minus forecast". Since this is a simple difference, it can be either positive or negative.
 
-The **axis difference** is smaller of the two angles that the two spatial axis planes make with each other. :numref:`mtd-axis_diff` shows the idea. In the figure, the axis angle would be reported as angle :math:`\alpha`, not angle :math:`\beta`.
+The **axis difference** is the smaller of the two angles that the two spatial axis planes make with each other. :numref:`mtd-axis_diff` shows the idea. In the figure, the axis angle would be reported as angle :math:`\alpha`, not angle :math:`\beta`.
 
 **Speed delta** and **direction difference** are obtained from the velocity vectors of the two objects. Speed delta is the difference in the lengths of the vectors, and direction difference is the angle that the two vectors make with each other.
 
@@ -242,7 +242,7 @@ In this example, the MODE-TD tool will read in a list of forecast GRIB files in 
 MTD Configuration File
 ----------------------
 
-The default configuration file for the MODE tool, **MODEConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We encourage users to make a copy of the configuration files prior to modifying their contents.Most of the entries in the MTD configuration file should be familiar from the corresponding file for MODE. This initial beta release of MTD does not offer all the tunable options that MODE has accumulated over the years, however. In this section, we will not bother to repeat explanations of config file details that are exactly the same as those in MODE; we will only explain those elements that are different from MODE, and those that are unique to MTD.
+The default configuration file for the MTD tool, **MTDConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We encourage users to make a copy of the configuration files prior to modifying their contents. Most of the entries in the MTD configuration file should be familiar from the corresponding file for MODE. This initial beta release of MTD does not offer all the tunable options that MODE has accumulated over the years, however. In this section, we will not bother to repeat explanations of config file details that are exactly the same as those in MODE; we will only explain those elements that are different from MODE, and those that are unique to MTD.
 
 ______________________
 
@@ -275,7 +275,7 @@ ______________________
   obs = fcst;
   total_interest_thresh = 0.7;
 
-The configuration options listed above are common to many MODE and are described in :numref:`MODE-configuration-file`.
+The configuration options listed above are common to MODE and are described in :numref:`MODE-configuration-file`.
 
 The **conv_time_window** entry is a dictionary defining how much smoothing in time should be done. The **beg** and **end** entries are integers defining how many time steps should be used before and after the current time. The default setting of **beg = -1; end = 1;** uses one time step before and after. Setting them both to 0 effectively disables smoothing in time.
 
@@ -293,7 +293,7 @@ ______________________
 
   min_volume = 2000;
 
-The **min_volume** entry tells MTD to throw away objects whose "volume" (as described elsewhere in this section) is smaller than the given value. Spacetime objects whose volume is less than this will not participate in the matching and merging process, and no attribute information will be written to the ASCII output files. The default value is 10,000. If this seems rather large, consider the following example: Suppose the user is running MTD on a :math:`600 \times 400` grid, using 24 time steps. Then the volume of the whole data field is 600 :math:`\times` 400 :math:`\times` 24 = 5,760,000 cells. An object of volume 10,000 represents only 10,000/5,760,000 = 1/576 of the total data field. Setting **min\_volume** too small will typically produce a very large number of small objects, slowing down the MTD run and increasing the size of the output files.The configuration options listed above are common to many MODE and are described in :numref:`MODE-configuration-file`.
+The **min_volume** entry tells MTD to throw away objects whose "volume" (as described elsewhere in this section) is smaller than the given value. Spacetime objects whose volume is less than this will not participate in the matching and merging process, and no attribute information will be written to the ASCII output files. The default value is 2,000. If this seems rather large, consider the following example: Suppose the user is running MTD on a :math:`600 \times 400` grid, using 24 time steps. Then the volume of the whole data field is 600 :math:`\times` 400 :math:`\times` 24 = 5,760,000 cells. An object of volume 2,000 represents only 2,000/5,760,000 = 1/2,880 of the total data field. Setting **min\_volume** too small will typically produce a very large number of small objects, slowing down the MTD run and increasing the size of the output files. The configuration options listed above are common to MODE and are described in :numref:`MODE-configuration-file`.
 
 ______________________
 
@@ -582,7 +582,7 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
     - Integer
   * - 36
     - CDIST_TRAVELLED
-    - Total great circle distance travelled by the 2D spatial centroid over the lifetime of the 3D object (in kilometers)
+    - Total great circle distance traveled by the 2D spatial centroid over the lifetime of the 3D object (in kilometers)
     - Double
   * - 37-41
     - INTENSITY_10,_25,_50,_75,_90
@@ -662,7 +662,7 @@ MTD writes a NetCDF file containing various types of information as specified in
 
 • **Latitude** and **longitude** of all the points in the 2D grid. Useful for geolocating points or regions given by grid coordinates.
 
-• **Raw data** from the input data files. This can be useful if the input data were grib format, since NetCDF is often easier to read.
+• **Raw data** from the input data files. This can be useful if the input data were GRIB format, since NetCDF is often easier to read.
 
 • **Object ID** numbers, giving for each grid point the number of the simple object (if any) that covers that point. These numbers are one-based. A value of zero means that this point is not part of any object.
 

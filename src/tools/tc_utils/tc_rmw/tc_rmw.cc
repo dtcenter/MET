@@ -119,7 +119,7 @@ __attribute__((noreturn)) static void usage(int exit_code) {
          << ") ***\n\n"
          << "Usage: " << program_name << "\n"
          << "\t-data file_1 ... file_n | file_list\n"
-         << "\t-deck file\n"
+         << "\t-deck path\n"
          << "\t-config file\n"
          << "\t-out file\n"
          << "\t[-log file]\n"
@@ -129,10 +129,10 @@ __attribute__((noreturn)) static void usage(int exit_code) {
          << "specifies the gridded data files or an ASCII file "
          << "containing a list of files to be used (required).\n"
 
-         << "\t\t\"-deck source\" is the ATCF format data source "
+         << "\t\t\"-deck path\" is the ATCF format data source "
          << "(required).\n"
 
-         << "\t\t\"config_file\" is a TCRMWConfig file to be used "
+         << "\t\t\"-config file\" is a TCRMWConfig file to be used "
          << "(required).\n"
 
          << "\t\t\"-out file\" is the NetCDF output file to be written "

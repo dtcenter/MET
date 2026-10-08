@@ -5,12 +5,12 @@ Testing
 make test
 =========
 
-After MET has been compiled, run ``make test`` from the top-level directory to execute the scripts found in the ``scripts/examples`` directory. These scripts run a subset of the MET tools reading input data from the top-level ``data`` directory and configuration files from the ``scripts/config`` directory and write output to top-level ``out`` directory. Successful completion of these tests provides reasonable assurance that MET has been compiled well and is running properly. However, these sample scripts are not comprehensive and do not exercise all possible configuration options. So it's possible for the ``make test`` scripts to run without error, but for users to later encounter issues when running MET with new inputs files and configuration options.
+After MET has been compiled, run ``make test`` from the top-level directory to execute the scripts found in the ``scripts/examples`` directory. These scripts run a subset of the MET tools reading input data from the top-level ``data`` directory and configuration files from the ``scripts/config`` directory and write output to the top-level ``out`` directory. Successful completion of these tests provides reasonable assurance that MET has been compiled well and is running properly. However, these sample scripts are not comprehensive and do not exercise all possible configuration options. So it's possible for the ``make test`` scripts to run without error, but for users to later encounter issues when running MET with new input files and configuration options.
 
 Unit Tests
 ==========
 
-The MET unit tests offer much more thorough testing coverage of the MET tools than running ``make test``, as described above. These units tests provide the basis for the regression testing performed for each pull request. Logic exists in GitHub automation to run these unit tests and check for differences in the output. However, these unit tests can also be run locally and instructions for doing so are provided in this section.
+The MET unit tests offer much more thorough testing coverage of the MET tools than running ``make test``, as described above. These unit tests provide the basis for the regression testing performed for each pull request. Logic exists in GitHub automation to run these unit tests and check for differences in the output. However, these unit tests can also be run locally and instructions for doing so are provided in this section.
 
 Running Unit Tests
 ------------------
@@ -75,7 +75,7 @@ Input Data
 ----------
 
 Input data used to run the MET unit tests in CI workflows are pulled from the DTC web server and stored on DockerHub.
-On the web server, data is stored for each supported version, e.g. *v12.0*, *v12.1*, etc.
+On the web server, data is stored for each supported version, e.g., *v12.0*, *v12.1*, etc.
 There is also a directory called *develop* that includes symbolic links to the latest version,
 which is the version that is currently in development.
 This is done so that the latest state of the input data is used for new development
@@ -93,7 +93,7 @@ The GitHub Actions custom action
 `metplus-action-data-update <https://github.com/dtcenter/metplus-action-data-update>`_
 expects a specific URL defined in *update_data_volumes.py* script in its repo.
 This directory should exist on the web server.
-This can be a link to another directory, but the name must match the repo name, e.g. MET.
+This can be a link to another directory, but the name must match the repo name, e.g., MET.
 If this path must differ on a new web server, then modifications will be needed to the custom action.
 
 The directory should also be linked from the *met_test* user's home directory with the name *MET_unit_test*.
@@ -138,7 +138,7 @@ release so that it can be updated while preserving the test data used for an off
 For example, if the *main_v12.1* branch was created when the *12.1.0-rc1* release was created,
 then a data directory to store data for *v13.0* (or similar) should be created.
 
-Pull changes from develop to ensure that the latest version of script is used.
+Pull changes from develop to ensure that the latest version of the script is used.
 ::
 
     runas met_test
@@ -162,14 +162,14 @@ Adding new test files
 
    These instructions require access to run commands as the *met_test* user on the DTC web server.
 
-Updates to the input data, e.g. adding new test files, are made on the DTC web server.
+Updates to the input data, e.g., adding new test files, are made on the DTC web server.
 The next time the MET CI unit tests are run,
 the web server will be checked and the input data will be updated automatically.
 Note that the unit tests are only run for develop/main branches or running via workflow dispatch.
 A push event to a branch will not run the full unit test suite and therefore will not update the input data.
 
 In the *MET_unit_test* directory, there is a directory called *unit_test*.
-These files are the full set of fields and fields used for the unit tests.
+These files are the full set of input files used for the unit tests.
 **These files are used by the MET regression tests that are run locally.**
 
 First, add any new files to the *unit_test* directory so they will be available to the MET regression tests.
@@ -189,7 +189,7 @@ If any of the files are very large, consider creating a subset of these files.
 For example, GRIB2 files can be subset with *wgrib2* and NetCDF files can be subset using NCO tools.
 After the updates have been made, run the script to update the test data tarfile.
 
-Pull changes from develop to ensure that the latest version of script is used.
+Pull changes from develop to ensure that the latest version of the script is used.
 ::
 
     runas met_test
@@ -202,7 +202,7 @@ If the script is linked from the home directory, run::
 
     ~/update_met_unit_test_data.sh v13.0
 
-This will save a copy the input data tarfile with the current date in YYYYMMDD format in case it needs to be recovered,
+This will save a copy of the input data tarfile with the current date in YYYYMMDD format in case it needs to be recovered,
 then create the tarfile using the contents of the *unit_test* directory.
 
 

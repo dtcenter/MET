@@ -45,7 +45,7 @@ recommended update frequency and method.
     :numref:`User's Guide Section %s <met_ndbc_stations>`, is read by
     ASCII2NC and contains buoy latitude and longitude locations that can
     change on a daily basis. To be used in real time, this file should be
-    regenerated daily and the :code:`MET_NDBC_STATION` environment variable
+    regenerated daily and the :code:`MET_NDBC_STATIONS` environment variable
     should define its location. Use the
     :code:`scripts/python/utility/build_ndbc_stations_from_web.py`
     utility to update its contents.

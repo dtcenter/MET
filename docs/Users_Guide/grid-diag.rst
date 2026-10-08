@@ -91,7 +91,7 @@ _____________________
 
 The **power_spectrum** dictionary defines options for computing power spectra and can be specified separately for each **data.field** entry below.
 
-The **missing_flag** and **missing_value** entries define how bad data values should be handled. For all other output types, bad data values are ignored but they are problematic for power spectra. Set **missing_flag** to **NONE** (default) to skip power spectrum when bad data is present, to **MEAN** to replace bad data with the mean of each input field, or to **VALUE** to replace bad data with the constant numeric value specified by **missing_value**. Set **vld_thresh** to a number beween 0 and 1 to define the required ratio of valid data to be present to compute power spectra output for that field.
+The **missing_flag** and **missing_value** entries define how bad data values should be handled. For all other output types, bad data values are ignored but they are problematic for power spectra. Set **missing_flag** to **NONE** (default) to skip power spectrum when bad data is present, to **MEAN** to replace bad data with the mean of each input field, or to **VALUE** to replace bad data with the constant numeric value specified by **missing_value**. Set **vld_thresh** to a number between 0 and 1 to define the required ratio of valid data to be present to compute power spectra output for that field.
 
 _____________________
 
@@ -131,9 +131,9 @@ _____________________
 
 The **output_flag** dictionary controls the type of output that the Grid-Diag tool generates. Each flag should be set to **TRUE** or **FALSE** to enable the computation and writing of one or more variables to the output NetCDF file, as described below:
 
-1. **histogram_1d** for 1-dimensional histograms for each **data.field** entry, including minimum, maxmimum, and midpoint values for each histogram bin.
+1. **histogram_1d** for 1-dimensional histograms for each **data.field** entry, including minimum, maximum, and midpoint values for each histogram bin.
 
-2. **histogram_2d** for 2-dimensional histograms for each pair of **data.field** entries, including minimum, maxmimum, and midpoint values for each histogram bin.
+2. **histogram_2d** for 2-dimensional histograms for each pair of **data.field** entries, including minimum, maximum, and midpoint values for each histogram bin.
 
 3. **info_theory** for information theory metrics, including entropy for each **data.field** entry and mutual information and joint entropy for each pair of entries.
 
@@ -144,13 +144,13 @@ grid_diag Output File
 
 The output NetCDF file contains variables for **grid_size** and **n_series** which specify the number of points in the grid and the number of files that were processed, respectively. The range of the initialization, valid, and lead times processed is written to the global attributes. These variables and global attributes are written for each run.
 
-If histogram or information theory output is requested, dimensions are created for the number of masking regions and one for each of the specified data variable and level combinations, e.g. APCP_L0 and PWAT_L0. The bin minimum and maximum values are indicated with an _min or _max appended to the variable/level. For each variable and level combination, a coordinate variable is written to indicate the midpoint value for each histogram bin.
+If histogram or information theory output is requested, dimensions are created for the number of masking regions and one for each of the specified data variable and level combinations, e.g., APCP_L0 and PWAT_L0. The bin minimum and maximum values are indicated with an _min or _max appended to the variable/level. For each variable and level combination, a coordinate variable is written to indicate the midpoint value for each histogram bin.
 
 The **mask_name** and **mask_size** variables have dimensions based on the number of masking regions and indicate the name of each masking region and the number of grid points it includes, respectively. Masking variables are written when histogram or information theory output is requested whereas power spectrum output is computed over the full input grid.
 
 If 1-dimensional histograms are requested, a corresponding **hist_** variable is written for each variable/level in the data dictionary. This variable has dimensions for the number of masking regions and for the number of bins specified in the data dictionary. For example, hist_APCP_L0 and hist_PWAT_L0 are the counts of all data values falling within each bin for a given spatial masking region. Data values below the minimum or above the maximum are included in the lowest and highest bins, respectively. A warning message is printed when the range of the data falls outside the range defined in the configuration file. In this case, users are advised to adjust the **range** setting and rerun.
 
-If 2-dimensional joint historgrams are requested, a corresponding **hist_** variable is written for each combination of variable/level entries in the data dictionary. This variable has dimensions for the number of masking regions and for the number of bins specified for the two data dictionary entries. For example, hist_APCP_L0_PWAT_L0 is the joint histogram for those two variables/levels for a given spatial masking region.
+If 2-dimensional joint histograms are requested, a corresponding **hist_** variable is written for each combination of variable/level entries in the data dictionary. This variable has dimensions for the number of masking regions and for the number of bins specified for the two data dictionary entries. For example, hist_APCP_L0_PWAT_L0 is the joint histogram for those two variables/levels for a given spatial masking region.
 
 If information theory output is requested, **entropy_**, **joint_entropy_**, and **mutual_information_** variables are written. Shannon entropy is derived from each 1-dimensional histogram, while joint entropy and mutual information are derived from each 2-dimensional joint histogram. These variables have one dimension for the number of masking regions and are computed using log base 2 rather than the natural logarithm. As such, their units are specified in the output as "bits" rather than "nats".
 
