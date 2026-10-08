@@ -42,24 +42,24 @@ latex_show_pagerefs = True
 latex_master_doc = 'Users_Guide/index'
 
 latex_elements = {
-   # The paper size ('letterpaper' or 'a4paper').
-   #
-   'papersize': 'letterpaper',
-   'releasename':"{version}",
-   'fncychap': '\\usepackage{fncychap}',
-   'fontpkg': '\\usepackage{amsmath,amsfonts,amssymb,amsthm,float}',
-   'inputenc': '\\usepackage[utf8]{inputenc}',
-   'fontenc': '\\usepackage[LGR,T1]{fontenc}',
+    # The paper size ('letterpaper' or 'a4paper').
+    #
+    'papersize': 'letterpaper',
+    'releasename':"{version}",
+    'fncychap': '\\usepackage{fncychap}',
+    'fontpkg': '\\usepackage{amsmath,amsfonts,amssymb,amsthm,float}',
+    'inputenc': '\\usepackage[utf8]{inputenc}',
+    'fontenc': '\\usepackage[LGR,T1]{fontenc}',
                                                      
-   'figure_align':'H',
-   'pointsize': '11pt',
+    'figure_align':'H',
+    'pointsize': '11pt',
                                         
-   'preamble': r'''
-       \usepackage{charter}
-       \usepackage[defaultsans]{lato}
-       \usepackage{inconsolata}
-       \setcounter{secnumdepth}{4}
-       \setcounter{tocdepth}{4}
+    'preamble': r'''
+        \usepackage{charter}
+        \usepackage[defaultsans]{lato}
+        \usepackage{inconsolata}
+        \setcounter{secnumdepth}{4}
+        \setcounter{tocdepth}{4}
     ''',
                                                                             
     'sphinxsetup': \
@@ -69,9 +69,9 @@ latex_elements = {
         HeaderFamily=\\rmfamily\\bfseries, \
         InnerLinkColor={rgb}{0,0,1}, \
         OuterLinkColor={rgb}{0,0,1}',
-        'maketitle': '\\sphinxmaketitle',  
-#        'tableofcontents': ' ',
-        'printindex': ' '
+    'maketitle': '\\sphinxmaketitle',  
+#   'tableofcontents': ' ',
+    'printindex': ' '
 }
 
 # Grouping the document tree into LaTeX files. List of tuples

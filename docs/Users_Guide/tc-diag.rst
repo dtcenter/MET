@@ -285,7 +285,7 @@ When the **nc_diag_flag** configuration entry is set to true, a NetCDF output fi
     - Vertical dimension for the number of pressure levels
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_TC-Diag_Variables_NetCDF_diagnostics:
 
@@ -370,7 +370,7 @@ The NetCDF range-azimuth file contains the dimensions and variables shown in :nu
     - Vertical dimension for the number of pressure levels
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_TC-Diag_Variables_NetCDF_range_azimuth:
 

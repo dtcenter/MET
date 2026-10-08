@@ -74,9 +74,9 @@ FBAR and OBAR are the average values of the forecast and observed wind speed.
 
 .. math::
 
-   \text{FBAR} = \frac{1}{N} \sum_i s_{fi}
+  \text{FBAR} = \frac{1}{N} \sum_i s_{fi}
 
-   \text{OBAR} = {1 \over N} \sum_i s_{oi}
+  \text{OBAR} = {1 \over N} \sum_i s_{oi}
 
 _________________________
 
@@ -84,19 +84,19 @@ FS_RMS and OS_RMS are the root-mean-square values of the forecast and observed w
 
 .. only:: latex
 
-   .. math::
+  .. math::
 
-      \text{FS\_RMS} = [ \frac{1}{N} \sum_i s_{fi}^2]^{1/2}
+    \text{FS\_RMS} = [ \frac{1}{N} \sum_i s_{fi}^2]^{1/2}
 
-      \text{OS\_RMS} = [\frac{1}{N} \sum_i s_{oi}^2]^{1/2}
+    \text{OS\_RMS} = [\frac{1}{N} \sum_i s_{oi}^2]^{1/2}
 
 .. only:: html
 
-   .. math::
+  .. math::
 
-      \text{FS_RMS} = [ \frac{1}{N} \sum_i s_{fi}^2]^{1/2}
+    \text{FS_RMS} = [ \frac{1}{N} \sum_i s_{fi}^2]^{1/2}
 
-      \text{OS_RMS} = [\frac{1}{N} \sum_i s_{oi}^2]^{1/2}
+    \text{OS_RMS} = [\frac{1}{N} \sum_i s_{oi}^2]^{1/2}
 
 ___________________________
 
@@ -104,9 +104,9 @@ MSVE and RMSVE are, respectively, the mean squared, and root mean squared, lengt
 
 .. math::
 
-   \text{MSVE} = \frac{1}{N} \sum_i | \mathbf{F}_i - \mathbf{O}_i|^2
+  \text{MSVE} = \frac{1}{N} \sum_i | \mathbf{F}_i - \mathbf{O}_i|^2
 
-   \text{RMSVE} = \sqrt{MSVE}
+  \text{RMSVE} = \sqrt{MSVE}
 
 ____________________________
 
@@ -114,7 +114,7 @@ FSTDEV and OSTDEV are the standard deviations of the forecast and observed wind 
 
 .. math:: \text{FSTDEV } = \frac{1}{N} \sum_i (s_{fi} - \text{FBAR})^2 = \frac{1}{N} \sum_i s_{fi}^2 - \text{FBAR}^2
 
- \text{OSTDEV } = \frac{1}{N} \sum_i (s_{oi} - \text{OBAR})^2 = \frac{1}{N} \sum_i s_{oi}^2 - \text{OBAR}^2
+  \text{OSTDEV } = \frac{1}{N} \sum_i (s_{oi} - \text{OBAR})^2 = \frac{1}{N} \sum_i s_{oi}^2 - \text{OBAR}^2
 
 ___________________________
 
@@ -122,7 +122,7 @@ FDIR and ODIR are the direction (angle) of :math:`\mathbf{F}_a \text{ and } \mat
 
 .. math:: \text{FDIR } = \text{ direction angle of } \mathbf{F}_a
 
-     \text{ODIR} = \text{ direction angle of } \mathbf{O}_a
+  \text{ODIR} = \text{ direction angle of } \mathbf{O}_a
 
 ________________________
 
@@ -130,19 +130,19 @@ FBAR_SPEED and OBAR_SPEED are the lengths of the average forecast and observed w
 
 .. only:: latex
 
-   .. math::
+  .. math::
 
-      \text{FBAR\_SPEED } = | \mathbf{F}_a |
+    \text{FBAR\_SPEED } = | \mathbf{F}_a |
 
-      \text{OBAR\_SPEED } = | \mathbf{O}_a |
+    \text{OBAR\_SPEED } = | \mathbf{O}_a |
 
 .. only:: html
 
-   .. math::
+  .. math::
 
-      \text{FBAR_SPEED } = | \mathbf{F}_a |
+    \text{FBAR_SPEED } = | \mathbf{F}_a |
 
-      \text{OBAR_SPEED } = | \mathbf{O}_a |
+    \text{OBAR_SPEED } = | \mathbf{O}_a |
 
 ________________________
 
@@ -150,19 +150,19 @@ VDIFF_SPEED is the length (*i.e., speed*) of the vector difference between the a
 
 .. only:: latex
 
-   .. math:: \text{VDIFF\_SPEED } = | \mathbf{F}_a - \mathbf{O}_a |
+  .. math:: \text{VDIFF\_SPEED } = | \mathbf{F}_a - \mathbf{O}_a |
 
 .. only:: html
 
-   .. math:: \text{VDIFF_SPEED } = | \mathbf{F}_a - \mathbf{O}_a |
+  .. math:: \text{VDIFF_SPEED } = | \mathbf{F}_a - \mathbf{O}_a |
 
 .. only:: latex
 
-   Note that this is *not* the same as the difference in lengths (speeds) of the average forecast and observed wind vectors. That quantity is called SPEED_ERR (see below). There is a relationship between these two statistics however: using some of the results obtained in the introduction to this appendix, we can say that :math:`| | \mathbf{F}_a | - | \mathbf{O}_a | | \leq | \mathbf{F}_a - \mathbf{O}_a |` or, equivalently, that :math:`\vert \text{SPEED\_ERR } \vert \leq \text{VDIFF\_SPEED. }`
+  Note that this is *not* the same as the difference in lengths (speeds) of the average forecast and observed wind vectors. That quantity is called SPEED_ERR (see below). There is a relationship between these two statistics however: using some of the results obtained in the introduction to this appendix, we can say that :math:`| | \mathbf{F}_a | - | \mathbf{O}_a | | \leq | \mathbf{F}_a - \mathbf{O}_a |` or, equivalently, that :math:`\vert \text{SPEED\_ERR } \vert \leq \text{VDIFF\_SPEED. }`
 
 .. only:: html
 
-   Note that this is *not* the same as the difference in lengths (speeds) of the average forecast and observed wind vectors. That quantity is called SPEED_ERR (see below). There is a relationship between these two statistics however: using some of the results obtained in the introduction to this appendix, we can say that :math:`| | \mathbf{F}_a | - | \mathbf{O}_a | | \leq | \mathbf{F}_a - \mathbf{O}_a |` or, equivalently, that   :math:`\vert \text{SPEED_ERR } \vert \leq \text{VDIFF_SPEED. }`
+  Note that this is *not* the same as the difference in lengths (speeds) of the average forecast and observed wind vectors. That quantity is called SPEED_ERR (see below). There is a relationship between these two statistics however: using some of the results obtained in the introduction to this appendix, we can say that :math:`| | \mathbf{F}_a | - | \mathbf{O}_a | | \leq | \mathbf{F}_a - \mathbf{O}_a |` or, equivalently, that   :math:`\vert \text{SPEED_ERR } \vert \leq \text{VDIFF_SPEED. }`
 
 _________________________
 
@@ -170,11 +170,11 @@ VDIFF_DIR is the direction of the vector difference of the average forecast and 
 
 .. only:: latex
 
-   .. math:: \text{VDIFF\_DIR } = \text{ direction of } (\mathbf{F}_a - \mathbf{O}_a)
+  .. math:: \text{VDIFF\_DIR } = \text{ direction of } (\mathbf{F}_a - \mathbf{O}_a)
 
 .. only:: html
 
-   .. math:: \text{VDIFF_DIR } = \text{ direction of } (\mathbf{F}_a - \mathbf{O}_a)
+  .. math:: \text{VDIFF_DIR } = \text{ direction of } (\mathbf{F}_a - \mathbf{O}_a)
 
 _________________________
 
@@ -182,11 +182,11 @@ SPEED_ERR is the difference in the lengths (speeds) of the average forecast and 
 
 .. only:: latex
 
-   .. math:: \text{SPEED\_ERR } = | \mathbf{F}_a | - | \mathbf{O}_a | = \text{ FBAR\_SPEED } - \text{ OBAR\_SPEED }
+  .. math:: \text{SPEED\_ERR } = | \mathbf{F}_a | - | \mathbf{O}_a | = \text{ FBAR\_SPEED } - \text{ OBAR\_SPEED }
 
 .. only:: html
 
-   .. math:: \text{SPEED_ERR } = | \mathbf{F}_a | - | \mathbf{O}_a | = \text{ FBAR_SPEED } - \text{ OBAR_SPEED }
+  .. math:: \text{SPEED_ERR } = | \mathbf{F}_a | - | \mathbf{O}_a | = \text{ FBAR_SPEED } - \text{ OBAR_SPEED }
 
 ___________________________
 
@@ -194,11 +194,11 @@ SPEED_ABSERR is the absolute value of SPEED_ERR. Note that we have SPEED_ABSERR 
 
 .. only:: latex
 
-   .. math:: \text{SPEED\_ABSERR } = \vert \text{SPEED\_ERR } \vert
+  .. math:: \text{SPEED\_ABSERR } = \vert \text{SPEED\_ERR } \vert
 
 .. only:: html
 
-   .. math:: \text{SPEED_ABSERR } = \vert \text{SPEED_ERR } \vert
+  .. math:: \text{SPEED_ABSERR } = \vert \text{SPEED_ERR } \vert
 
 __________________________
 
@@ -206,11 +206,11 @@ DIR_ERR is the signed angle between the directions of the average forecast and a
 
 .. only:: latex
 
-   .. math:: \text{DIR\_ERR } = \text{ direction between } N(\mathbf{F}_a) \text{ and } N(\mathbf{O}_a)
+  .. math:: \text{DIR\_ERR } = \text{ direction between } N(\mathbf{F}_a) \text{ and } N(\mathbf{O}_a)
 
 .. only:: html
 
-   .. math:: \text{DIR_ERR } = \text{ direction between } N(\mathbf{F}_a) \text{ and } N(\mathbf{O}_a)
+  .. math:: \text{DIR_ERR } = \text{ direction between } N(\mathbf{F}_a) \text{ and } N(\mathbf{O}_a)
 
 __________________________
 
@@ -218,11 +218,11 @@ DIR_ABSERR is the absolute value of DIR_ERR. In other words, it's an unsigned an
 
 .. only:: latex
 
-   .. math:: \text{DIR\_ABSERR } = \vert \text{DIR\_ERR } \vert
+  .. math:: \text{DIR\_ABSERR } = \vert \text{DIR\_ERR } \vert
 
 .. only:: html
 
-   .. math:: \text{DIR_ABSERR } = \vert \text{DIR_ERR } \vert
+  .. math:: \text{DIR_ABSERR } = \vert \text{DIR_ERR } \vert
 
 __________________________
 
@@ -232,7 +232,7 @@ For each point, the directed angle difference in degrees is computed between the
 
 .. math::
 
-   N(\mathbf{F}_i) - N(\mathbf{O}_i) \in (-180, 180]
+  N(\mathbf{F}_i) - N(\mathbf{O}_i) \in (-180, 180]
 
 Note however that the direction of the zero vector is undefined. Points for which the forecast or observed wind direction is undefined are excluded from the analysis and result in a warning message being printed. The "wind_thresh" and "wind_logic" configuration options, described in :numref:`config_options`, can be used to filter the wind vectors down to a subset that meet the specified wind speed threshold.
 
@@ -242,15 +242,15 @@ DIR_ME is the average of the signed difference between the forecast and observed
 
 .. only:: latex
 
-   .. math::
+  .. math::
 
-      \text{DIR\_ME} = \frac{1}{N} \sum_i (N(\mathbf{F}_i) - N(\mathbf{O}_i))
+    \text{DIR\_ME} = \frac{1}{N} \sum_i (N(\mathbf{F}_i) - N(\mathbf{O}_i))
 
 .. only:: html
 
-   .. math::
+  .. math::
 
-      \text{DIR_ME} = \frac{1}{N} \sum_i (N(\mathbf{F}_i) - N(\mathbf{O}_i))
+    \text{DIR_ME} = \frac{1}{N} \sum_i (N(\mathbf{F}_i) - N(\mathbf{O}_i))
 
 __________________________
 
@@ -258,15 +258,15 @@ DIR_MAE is the average of the absolute value of the difference between the forec
 
 .. only:: latex
 
-   .. math::
+  .. math::
 
-      \text{DIR\_MAE} = \frac{1}{N} \sum_i | N(\mathbf{F}_i) - N(\mathbf{O}_i) |
+    \text{DIR\_MAE} = \frac{1}{N} \sum_i | N(\mathbf{F}_i) - N(\mathbf{O}_i) |
 
 .. only:: html
 
-   .. math::
+  .. math::
 
-      \text{DIR_MAE} = \frac{1}{N} \sum_i | N(\mathbf{F}_i) - N(\mathbf{O}_i) |
+    \text{DIR_MAE} = \frac{1}{N} \sum_i | N(\mathbf{F}_i) - N(\mathbf{O}_i) |
 
 __________________________
 
@@ -274,15 +274,15 @@ DIR_MSE is the average of the squared difference between the forecast and observ
 
 .. only:: latex
 
-   .. math::
+  .. math::
 
-      \text{DIR\_MSE} = \frac{1}{N} \sum_i (N(\mathbf{F}_i) - N(\mathbf{O}_i))^2
+    \text{DIR\_MSE} = \frac{1}{N} \sum_i (N(\mathbf{F}_i) - N(\mathbf{O}_i))^2
 
 .. only:: html
 
-   .. math::
+  .. math::
 
-      \text{DIR_MSE} = \frac{1}{N} \sum_i (N(\mathbf{F}_i) - N(\mathbf{O}_i))^2
+    \text{DIR_MSE} = \frac{1}{N} \sum_i (N(\mathbf{F}_i) - N(\mathbf{O}_i))^2
 
 __________________________
 
@@ -290,12 +290,12 @@ DIR_RMSE is the square root of the average squared difference between the foreca
 
 .. only:: latex
 
-   .. math::
+  .. math::
 
-      \text{DIR\_RMSE} = \sqrt{DIR\_MSE}
+    \text{DIR\_RMSE} = \sqrt{DIR\_MSE}
 
 .. only:: html
 
-   .. math::
+  .. math::
 
-      \text{DIR_RMSE} = \sqrt{DIR\_MSE}
+    \text{DIR_RMSE} = \sqrt{DIR\_MSE}

@@ -286,10 +286,10 @@ ____________________
 
 .. code-block:: none
 
- watch_warn = {
-     file_name   = "MET_BASE/tc_data/wwpts_us.txt";
-     time_offset = -14400;
-  }
+  watch_warn = {
+      file_name   = "MET_BASE/tc_data/wwpts_us.txt";
+      time_offset = -14400;
+   }
 
 The **watch_warn** field specifies the file name and time applied offset to the **watch_warn** flag. The **file_name** string specifies the path of the watch/warning file to be used to determine when a watch or warning is in effect during the forecast initialization and verification times. The default file is named **wwpts_us.txt**, which is found in the installed *share/met/tc_data/* directory within the MET build. The **time_offset** string is the time window (in seconds) assigned to the watch/warning. Due to the non-uniform time watches and warnings are issued, a time window is assigned for which watch/warnings are included in the verification for each valid time. The default watch/warn file is static, and therefore may not include warned storms beyond the current MET code release date; therefore users may wish to create a post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_ in order to obtain the most recent watch/warning file if the static file does not contain storms of interest.
 
@@ -297,22 +297,22 @@ ____________________
 
 .. code-block:: none
 
- diag_info_map = [
-    {
-       diag_source    = "CIRA_DIAG_RT";
-       track_source   = "GFS";
-       field_source   = "GFS_0p50";
-       match_to_track = [];
-       diag_name      = [];
-    },
-    {
-       diag_source    = "SHIPS_DIAG_RT";
-       track_source   = "SHIPS_TRK";
-       field_source   = "GFS_0p50";
-       match_to_track = [ "OFCL" ];
-       diag_name      = [];
-    }
- ];
+  diag_info_map = [
+     {
+        diag_source    = "CIRA_DIAG_RT";
+        track_source   = "GFS";
+        field_source   = "GFS_0p50";
+        match_to_track = [];
+        diag_name      = [];
+     },
+     {
+        diag_source    = "SHIPS_DIAG_RT";
+        track_source   = "SHIPS_TRK";
+        field_source   = "GFS_0p50";
+        match_to_track = [ "OFCL" ];
+        diag_name      = [];
+     }
+  ];
 
 A TCMPR line is written to the output for each track point. If diagnostics data is also defined for that track point, a TCDIAG line is written immediately after the corresponding TCMPR line. The contents of that TCDIAG line are determined by the **diag_info_map** entry.
 
@@ -328,44 +328,44 @@ ____________________
 
 .. code-block:: none
 
- diag_convert_map = [
-    {
-       diag_source = "CIRA_DIAG";
-       key         = [ "(10C)", "(10KT)", "(10M/S)" ];
-       convert(x)  = x / 10;
-    },
-    {
-       diag_source = "SHIPS_DIAG";
-       key         = [ "LAT",  "LON",  "CSST", "RSST", "DSST", "DSTA", "XDST", "XNST", "NSST", "NSTA",
-                       "NTMX", "NTFR", "U200", "U20C", "V20C", "E000", "EPOS", "ENEG", "EPSS", "ENSS",
-                       "T000", "TLAT", "TLON", "TWAC", "TWXC", "G150", "G200", "G250", "V000", "V850",
-                       "V500", "V300", "SHDC", "SHGC", "T150", "T200", "T250", "SHRD", "SHRS", "SHRG",
-                       "HE07", "HE05", "PW01", "PW02", "PW03", "PW04", "PW05", "PW06", "PW07", "PW08",
-                       "PW09", "PW10", "PW11", "PW12", "PW13", "PW14", "PW15", "PW16", "PW17", "PW18",
-                       "PW20", "PW21" ];
-       convert(x)  = x / 10;
-    },
-    {
-       diag_source = "SHIPS_DIAG";
-       key         = [ "VVAV", "VMFX", "VVAC" ];
-       convert(x)  = x / 100;
-    },
-    {
+  diag_convert_map = [
+     {
+        diag_source = "CIRA_DIAG";
+        key         = [ "(10C)", "(10KT)", "(10M/S)" ];
+        convert(x)  = x / 10;
+     },
+     {
         diag_source = "SHIPS_DIAG";
-        key         = [ "TADV" ];
-        convert(x)  = x / 1000000;
-    },
-    {
-       diag_source = "SHIPS_DIAG";
-       key         = [ "Z850", "D200", "TGRD", "DIVC" ];
-       convert(x)  = x / 10000000;
-    },
-    {
-       diag_source = "SHIPS_DIAG";
-       key         = [ "PENC", "PENV" ];
-       convert(x)  = x / 10 + 1000;
-    }
- ];
+        key         = [ "LAT",  "LON",  "CSST", "RSST", "DSST", "DSTA", "XDST", "XNST", "NSST", "NSTA",
+                        "NTMX", "NTFR", "U200", "U20C", "V20C", "E000", "EPOS", "ENEG", "EPSS", "ENSS",
+                        "T000", "TLAT", "TLON", "TWAC", "TWXC", "G150", "G200", "G250", "V000", "V850",
+                        "V500", "V300", "SHDC", "SHGC", "T150", "T200", "T250", "SHRD", "SHRS", "SHRG",
+                        "HE07", "HE05", "PW01", "PW02", "PW03", "PW04", "PW05", "PW06", "PW07", "PW08",
+                        "PW09", "PW10", "PW11", "PW12", "PW13", "PW14", "PW15", "PW16", "PW17", "PW18",
+                        "PW20", "PW21" ];
+        convert(x)  = x / 10;
+     },
+     {
+        diag_source = "SHIPS_DIAG";
+        key         = [ "VVAV", "VMFX", "VVAC" ];
+        convert(x)  = x / 100;
+     },
+     {
+         diag_source = "SHIPS_DIAG";
+         key         = [ "TADV" ];
+         convert(x)  = x / 1000000;
+     },
+     {
+        diag_source = "SHIPS_DIAG";
+        key         = [ "Z850", "D200", "TGRD", "DIVC" ];
+        convert(x)  = x / 10000000;
+     },
+     {
+        diag_source = "SHIPS_DIAG";
+        key         = [ "PENC", "PENV" ];
+        convert(x)  = x / 10 + 1000;
+     }
+  ];
 
 The **diag_convert_map** entries define conversion functions to be applied to diagnostics data read with the **-diag** command line option. Each array element is a dictionary consisting of a **diag_source**, **key**, and **convert(x)** entry.
 

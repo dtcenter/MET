@@ -126,7 +126,7 @@ The GSID2MPR tool writes the same set of MPR output columns for the conventional
 
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. list-table:: Format information for GSI Diagnostic Radiance MPR (Matched Pair) output line type.
   :widths: auto

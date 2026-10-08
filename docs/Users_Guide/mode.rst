@@ -55,7 +55,7 @@ An example of the steps involved in resolving objects is shown in :numref:`mode-
 
 .. figure:: figure/mode-object_id.png
 
-   Example of an application of the MODE object identification process to a model precipitation field.
+  Example of an application of the MODE object identification process to a model precipitation field.
 
 .. _mode-attributes:
 
@@ -261,7 +261,7 @@ _____________________
 
 .. code-block:: none
 
-   multivar_logic = "#1 && #2 && #3";
+  multivar_logic = "#1 && #2 && #3";
 
 The **multivar_logic** entry appears only in the **MODEMultivarConfig_default** file. This option applies to running multi-variate MODE by setting **field** to an array of dictionaries to define multiple input fields. Objects are defined separately for each input field based on the configuration settings specified for each field array entry. The **multivar_logic** entry is a string which defines how objects for each field are combined into a final *super* object. The objects for each field are referred to as '#N' where N is the N-th field array entry. The '&&' and '||' strings define intersection and union logic, respectively. For example, "#1 && #2" is the intersection of the objects from the first and second fields. "(#1 && #2) || #3" is the union of that intersection with the objects from the third field.
 
@@ -271,8 +271,8 @@ _____________________
 
 .. code-block:: none
 
-   multivar_intensity_compare_fcst = [1,2];
-   multivar_intensity_compare_obs = [2,3];
+  multivar_intensity_compare_fcst = [1,2];
+  multivar_intensity_compare_obs = [2,3];
 
 The **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** entries appear only in the **MODEMultivarConfig_default** file. These entries define an index in the field arrays to be compared for forecast and observation intensities and must be the same length. For example, in the above example, forecast field 1 will be compared to observation field 2 for computing intensity attribute statistics. If the **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty, traditional mode output is created for the super objects, but with no intensity information.
 
@@ -280,7 +280,7 @@ _____________________
 
 .. code-block:: none
 
-   multivar_name = "Super";
+  multivar_name = "Super";
 
 The **multivar_name** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty. It can be thought of as an identifier for the multivariate super object.  It shows up in output file names and content.  It can be set separately for forecasts and observations or as a common value for both.
 
@@ -288,7 +288,7 @@ _____________________
 
 .. code-block:: none
 
-   multivar_level = "LO";
+  multivar_level = "LO";
 
 The **multivar_level** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty. It is the identifier for the multivariate super object as regards level.  It shows up in output file names and content.  If not set the default value is "NA".   It can be set separately for forecasts and observations, or as a common value for both.
 
@@ -455,7 +455,7 @@ _____________________
      corner             = 0.8;
      ratio_if           = ( ( 0.0, 0.0 )
                           ( corner, 1.0 )
-			  ( 1.0, 1.0 ) );
+                          ( 1.0, 1.0 ) );
      area_ratio         = ratio_if;
      int_area_ratio     = ( ... );
      curvature_ratio    = ratio_if;
@@ -792,7 +792,7 @@ These object identifiers are described in :numref:`MODE_object_attribute`.
 
 
 .. role:: raw-html(raw)
-   :format: html
+  :format: html
 
 .. _MODE_object_attribute:
 
@@ -1083,7 +1083,7 @@ The dimensions and variables included in the mode NetCDF files are described in 
 .. _Variables_contained_in_MODE_NetCDF_output:
 
 .. role:: raw-html(raw)
-   :format: html
+  :format: html
 
 .. list-table:: Variables contained in MODE NetCDF output.
   :widths: auto

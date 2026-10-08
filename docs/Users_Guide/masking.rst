@@ -65,7 +65,7 @@ Required Arguments for gen_vx_mask
 
 .. note::
 
-   While multiple **-type** mask types can be requested in a single run, all requested masking types must use the same **mask_file** setting.
+  While multiple **-type** mask types can be requested in a single run, all requested masking types must use the same **mask_file** setting.
 
 Optional Arguments for gen_vx_mask
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

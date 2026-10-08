@@ -39,10 +39,10 @@ Here is an example ASCII file list for three input files, each listed on a separ
 
 .. code-block::
 
- file_list
- /path/to/file1
- /path/to/file2
- /path/to/file3
+  file_list
+  /path/to/file1
+  /path/to/file2
+  /path/to/file3
 
 Requirements for CF Compliant NetCDF
 ------------------------------------
@@ -73,37 +73,37 @@ Here are examples for the grid mapping variable ("edr" is the data variable):
 
 .. code-block:: none
 
-    float edr(time, z, lat, lon) ;
-            edr:units = "m^(2/3) s^-1" ;
-            edr:long_name = "Median eddy dissipation rate" ;
-            edr:coordinates = "lat lon" ;
-            edr:_FillValue = -9999.f ;
-            edr:grid_mapping = "grid_mapping" ;
-    int grid_mapping ;
-            grid_mapping:grid_mapping_name = "latitude_longitude" ;
-            grid_mapping:semi_major_axis = 6371000. ;
-            grid_mapping:inverse_flattening = 0 ;
+  float edr(time, z, lat, lon) ;
+          edr:units = "m^(2/3) s^-1" ;
+          edr:long_name = "Median eddy dissipation rate" ;
+          edr:coordinates = "lat lon" ;
+          edr:_FillValue = -9999.f ;
+          edr:grid_mapping = "grid_mapping" ;
+  int grid_mapping ;
+          grid_mapping:grid_mapping_name = "latitude_longitude" ;
+          grid_mapping:semi_major_axis = 6371000. ;
+          grid_mapping:inverse_flattening = 0 ;
 
 
 **Example 2: grid mapping for lambert_conformal_conic projection**
 
 .. code-block:: none
 
-    float edr(time, z, y, x) ;
-            edr:units = "m^(2/3) s^-1" ;
-            edr:long_name = "Eddy dissipation rate" ;
-            edr:coordinates = "lat lon" ;
-            edr:_FillValue = -9999.f ;
-            edr:grid_mapping = "grid_mapping" ;
-    int grid_mapping ;
-            grid_mapping:grid_mapping_name = "lambert_conformal_conic" ;
-            grid_mapping:standard_parallel = 25. ;
-            grid_mapping:longitude_of_central_meridian = -95. ;
-            grid_mapping:latitude_of_projection_origin = 25. ;
-            grid_mapping:false_easting = 0 ;
-            grid_mapping:false_northing = 0 ;
-            grid_mapping:GRIB_earth_shape = "spherical" ;
-            grid_mapping:GRIB_earth_shape_code = 0 ;
+  float edr(time, z, y, x) ;
+          edr:units = "m^(2/3) s^-1" ;
+          edr:long_name = "Eddy dissipation rate" ;
+          edr:coordinates = "lat lon" ;
+          edr:_FillValue = -9999.f ;
+          edr:grid_mapping = "grid_mapping" ;
+  int grid_mapping ;
+          grid_mapping:grid_mapping_name = "lambert_conformal_conic" ;
+          grid_mapping:standard_parallel = 25. ;
+          grid_mapping:longitude_of_central_meridian = -95. ;
+          grid_mapping:latitude_of_projection_origin = 25. ;
+          grid_mapping:false_easting = 0 ;
+          grid_mapping:false_northing = 0 ;
+          grid_mapping:GRIB_earth_shape = "spherical" ;
+          grid_mapping:GRIB_earth_shape_code = 0 ;
 
 When the grid mapping variable is not available, MET can detect either a latitude_longitude or rotated_latitude_longitude projection.  It detects the latitude_longitude projection in the following order:
 
