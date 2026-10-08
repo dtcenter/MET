@@ -453,7 +453,7 @@ if ( maxval != 255 )  {
 
    mlog << Warning << "\nPcm::read() -> bad maxval: \"" << maxval << "\"\n\n";
 
-   Pcm::clear();
+   clear();
 
    return 0;
 
