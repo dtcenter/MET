@@ -127,7 +127,7 @@ void Pgm::clear()
 
 {
 
-clear_common();
+PxmBase::clear_common();
 
 return;
 
@@ -259,7 +259,7 @@ ifstream in;
    //  clear out old image, if any
    //
 
-clear();
+Pgm::clear();
 
    //
    //  open input file
@@ -292,7 +292,7 @@ if ( !in )  {
 
    mlog << Warning << "\nPgm::read() -> unable to read magic cookie in image file \"" << filename << "\"\n\n";
 
-   clear();
+   Pgm::clear();
 
    return 0;
 
@@ -302,7 +302,7 @@ if ( (c1 != 'P') || (c2 != '5') )  {
 
    mlog << Warning << "\nPgm::read() -> bad magic number in image file \"" << filename << "\"\n\n";
 
-   clear();
+   Pgm::clear();
 
    return 0;
 
@@ -322,7 +322,7 @@ while ( true )  {
 
    get_comment(in, junk);
 
-   add_comment(junk);
+   PxmBase::add_comment(junk);
 
 }
 
@@ -338,7 +338,7 @@ if ( maxval != 255 )  {
 
    mlog << Warning << "\nPgm::read() -> bad maxval: \"" << maxval << "\"\n\n";
 
-   clear();
+   Pgm::clear();
 
    return 0;
 
@@ -356,7 +356,7 @@ if ( !in.read((char *) data.data(), n) )  {
 
    mlog << Warning << "\nPgm::read() -> trouble reading image data\n\n";
 
-   clear();
+   Pgm::clear();
 
    return 0;
 

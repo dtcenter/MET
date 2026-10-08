@@ -125,7 +125,7 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
    PairDataPoint::clear();
 
    // Allocate memory for output pairs
-   extend(pd.n_obs);
+   PairDataPoint::extend(pd.n_obs);
 
    set_mask_name(pd.mask_name.c_str());
    set_mask_area_ptr(pd.mask_area_ptr);
@@ -285,7 +285,7 @@ bool PairDataPoint::add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
    }
 
    // Allocate enough memory
-   extend(o_in.n());
+   PairDataPoint::extend(o_in.n());
 
    f_na.add(f_in);
    o_na.add(o_in);
@@ -486,7 +486,7 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
 
    VxPairBase::assign(vx_pd);
 
-   set_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
+   VxPairDataPoint::set_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
 
    pd = vx_pd.pd;
 

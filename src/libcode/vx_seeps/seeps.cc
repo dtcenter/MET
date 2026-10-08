@@ -508,7 +508,7 @@ void SeepsClimo::read_seeps_climo_grid(const ConcatString &filename) {
       double matrix_00_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
       double matrix_12_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
       std::unique_ptr<netCDF::NcFile> nc_file = open_ncfile(filename.c_str());
-      clear();
+      SeepsClimo::clear();
 
       // dimensions: month = 12 ; nstn = 5293 ; nmatrix = 9 ;
       get_dim(nc_file.get(), dim_name_nstn, nstn, true);

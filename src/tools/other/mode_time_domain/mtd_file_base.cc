@@ -117,6 +117,27 @@ void MtdFileBase::base_assign(const MtdFileBase & f)
 
 clear();
 
+base_copy(f);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Copy the MtdFileBase members without clearing first.  The derived
+   //  class assign functions use this instead of base_assign(), since
+   //  they have already cleared everything, and calling the virtual
+   //  clear() from there would happen during construction.
+   //
+
+void MtdFileBase::base_copy(const MtdFileBase & f)
+
+{
+
 Nx         = f.Nx;
 Ny         = f.Ny;
 Nt         = f.Nt;

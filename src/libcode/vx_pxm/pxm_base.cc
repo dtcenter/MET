@@ -68,7 +68,7 @@ void PxmBase::init_from_scratch()
 Name.clear();
 
 
-clear_common();
+PxmBase::clear_common();
 
 
 return;
@@ -116,7 +116,7 @@ const char *method_name = "PxmBase::copy_common() ";
 
 if ( this == &p )  return;
 
-clear_common();
+PxmBase::clear_common();
 
 Nalloc = p.Nalloc;
 

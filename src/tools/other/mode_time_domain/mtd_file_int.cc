@@ -165,7 +165,7 @@ MtdIntFile::clear();
 
 int n;
 
-base_assign(f);
+base_copy(f);
 
 DataMin = f.DataMin;
 DataMax = f.DataMax;

@@ -1005,7 +1005,7 @@ if ( d.Nentries > 0 )  {
 
    for (j=0; j<(d.Nentries); ++j)  {
 
-      store( *(d.e[j]) );
+      Dictionary::store( *(d.e[j]) );
 
    }
 
@@ -1170,7 +1170,7 @@ void Dictionary::store(const Dictionary & d)
 
 for (int j=0; j<(d.n_entries()); ++j)  {
 
-   store( *(d[j]) );
+   Dictionary::store( *(d[j]) );
 
 }
 

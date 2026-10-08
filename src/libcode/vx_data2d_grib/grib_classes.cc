@@ -610,7 +610,7 @@ bool GribFile::open(const char *filename)
 int j;
 const char *method_name = "GribFile::open(char *) -> ";
 
-close();
+GribFile::close();
 
 rep = std::make_shared<GribFileRep>();
 
@@ -764,7 +764,7 @@ g.Sec0_offset_in_record = bytes_processed;
 
 bytes = sizeof(Section0_Header);
 
-if ( (n_read = read(rep->buf.data(), bytes)) == 0 ) return 0;
+if ( (n_read = GribFile::read(rep->buf.data(), bytes)) == 0 ) return 0;
 
 memcpy(g.is.get(), rep->buf.data(), 8);
 

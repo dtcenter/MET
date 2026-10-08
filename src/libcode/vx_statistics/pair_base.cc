@@ -1153,7 +1153,7 @@ void VxPairBase::assign(const VxPairBase &vx_pb) {
 
    sfc_info = vx_pb.sfc_info;
 
-   set_size(vx_pb.n_msg_typ, vx_pb.n_mask, vx_pb.n_interp);
+   VxPairBase::set_size(vx_pb.n_msg_typ, vx_pb.n_mask, vx_pb.n_interp);
 
    pb_ptr = vx_pb.pb_ptr;
 

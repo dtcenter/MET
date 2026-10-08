@@ -1047,7 +1047,7 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
    n_try_obs_error  = vx_pd.n_try_obs_error;
    n_fail_obs_error = vx_pd.n_fail_obs_error;
 
-   set_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
+   VxPairDataEnsemble::set_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
 
    pd = vx_pd.pd;
 

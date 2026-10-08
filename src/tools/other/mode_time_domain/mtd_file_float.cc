@@ -145,7 +145,7 @@ void MtdFloatFile::float_assign(const MtdFloatFile & f)
 
 MtdFloatFile::clear();
 
-base_assign(f);
+base_copy(f);
 
 DataMin = f.DataMin;
 DataMax = f.DataMax;

@@ -120,7 +120,7 @@ void Pcm::clear()
 
 {
 
-clear_common();
+PxmBase::clear_common();
 
 Colormap.clear();
 
@@ -371,7 +371,7 @@ unsigned char r, g, b;
    //  clear out old image, if any
    //
 
-clear();
+Pcm::clear();
 
    //
    //  open input file
@@ -404,7 +404,7 @@ if ( !in )  {
 
    mlog << Warning << "\nPcm::read() -> unable to read magic cookie in image file \"" << filename << "\"\n\n";
 
-   clear();
+   Pcm::clear();
 
    return 0;
 
@@ -414,7 +414,7 @@ if ( (c1 != 'P') || (c2 != '9') )  {
 
    mlog << Warning << "\nPcm::read() -> bad magic number in image file \"" << filename << "\"\n\n";
 
-   clear();
+   Pcm::clear();
 
    return 0;
 
@@ -434,7 +434,7 @@ while ( true )  {
 
    get_comment(in, junk);
 
-   add_comment(junk);
+   PxmBase::add_comment(junk);
 
 }
 
@@ -453,7 +453,7 @@ if ( maxval != 255 )  {
 
    mlog << Warning << "\nPcm::read() -> bad maxval: \"" << maxval << "\"\n\n";
 
-   clear();
+   Pcm::clear();
 
    return 0;
 
@@ -480,7 +480,7 @@ for (j=0; j<Ncolors; ++j)  {
 
       mlog << Warning << "\nPcm::read() -> trouble reading colormap data\n\n";
 
-      clear();
+      Pcm::clear();
 
       return 0;
 
@@ -502,7 +502,7 @@ if ( !in.read((char *) data.data(), n) )  {
 
    mlog << Warning << "\nPcm::read() -> trouble reading image data\n\n";
 
-   clear();
+   Pcm::clear();
 
    return 0;
 
