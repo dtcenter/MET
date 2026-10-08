@@ -159,7 +159,7 @@ class SeepsClimoBase {
       virtual void clear();
       virtual ConcatString get_env_climo_name() { return "not defined"; };
       virtual char *get_def_climo_name() { return nullptr; };
-      virtual void read_seeps_climo_grid(const ConcatString &filename) {};
+      virtual void read_seeps_climo_grid(const ConcatString &filename) = 0;
       void set_seeps_ready(bool _seeps_ready) { seeps_ready = _seeps_ready; };
 
    public:
