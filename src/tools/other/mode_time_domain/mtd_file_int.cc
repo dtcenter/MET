@@ -1139,7 +1139,7 @@ void MtdIntFile::split()
 {
 
 int j, k;
-int * d = 0;
+int * d = nullptr;
 MtdIntFile old;
 
 old = ::split(*this, Nobjects);

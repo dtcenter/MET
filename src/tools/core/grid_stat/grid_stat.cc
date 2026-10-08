@@ -448,7 +448,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    setup_table(stat_at);
 
    // Write the text header row
-   write_header_row((const char **) 0, 0, 1, stat_at, 0, 0);
+   write_header_row(nullptr, 0, 1, stat_at, 0, 0);
 
    // Initialize the row index to 1 to account for the header
    i_stat_row = 1;

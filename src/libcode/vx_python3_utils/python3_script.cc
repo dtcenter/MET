@@ -80,13 +80,13 @@ void Python3_Script::clear()
 
 {
 
-Module = 0;
+Module = nullptr;
 
-ModuleAscii = 0;
+ModuleAscii = nullptr;
 
-Dict = 0;
+Dict = nullptr;
 
-DictAscii = 0;
+DictAscii = nullptr;
 
 Script_Filename.clear();
 
@@ -162,7 +162,7 @@ PyObject * Python3_Script::lookup(const char * name) const
 
 {
 
-PyObject * var = 0;
+PyObject * var = nullptr;
 
 var = PyDict_GetItemString (Dict, name);
 
@@ -178,7 +178,7 @@ PyObject * Python3_Script::lookup_ascii(const char * name) const
 
 {
 
-PyObject * var = 0;
+PyObject * var = nullptr;
 
 var = PyDict_GetItemString (DictAscii, name);
 

@@ -92,9 +92,9 @@ rdiag_bytes = 0;
 
 date = 0;
 
-cdiag = 0;
+cdiag = nullptr;
 
-rdiag = 0;
+rdiag = nullptr;
 
 
 return;

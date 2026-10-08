@@ -575,7 +575,7 @@ ConcatString Mtd_Partition::specialized_dump_string(const int Nf, const int No) 
 int j, k, n;
 int id;
 static const char tab [] = "   ";
-const EquivalenceClass * c = 0;
+const EquivalenceClass * c = nullptr;
 ConcatString s;
 ConcatString out;
 StringArray a;

@@ -214,7 +214,7 @@ bool Observation::hasSameHeader(Observation &obs) const {
 bool Observation::hasSameHeader(Observation *obs) const {
   bool same_header = true;
   if ( this != obs ) {
-    if (obs == 0) {
+    if (obs == nullptr) {
       same_header = false;
     }
     else if (obs->getHeaderType() != getHeaderType()    ||

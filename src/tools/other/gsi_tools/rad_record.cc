@@ -188,11 +188,11 @@ void RadRecord::rad_clear()
 
 gsi_clear();
 
-diag = 0;
+diag = nullptr;
 
-diagchan = 0;
+diagchan = nullptr;
 
-extra = 0;
+extra = nullptr;
 
 Ndiag     = 0;
 Ndiagchan = 0;
@@ -721,7 +721,7 @@ r.Nextra    = iextra*jextra;
 
 r.diag     = (float *) (r.Buf.data());
 r.diagchan = (float *) (r.Buf.data() + 4*n_diag);
-r.extra    = 0;
+r.extra    = nullptr;
 
 if ( r.Nextra > 0 )  r.extra = (float *) (r.Buf.data() + 4*n_diag + 4*n12);
 

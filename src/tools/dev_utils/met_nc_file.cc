@@ -35,16 +35,16 @@ using namespace netCDF;
 
 MetNcFile::MetNcFile(const string &file_path) :
   _filePath(file_path),
-  _hdrArrDim(0),
-  _obsArrDim(0),
-  _nhdrDim(0),
-  _nobsDim(0),
-  _strlDim(0),
-  _hdrArrVar(0),
-  _hdrTypeVar(0),
-  _hdrSidVar(0),
-  _hdrVldVar(0),
-  _obsArrVar(0)
+  _hdrArrDim(nullptr),
+  _obsArrDim(nullptr),
+  _nhdrDim(nullptr),
+  _nobsDim(nullptr),
+  _strlDim(nullptr),
+  _hdrArrVar(nullptr),
+  _hdrTypeVar(nullptr),
+  _hdrSidVar(nullptr),
+  _hdrVldVar(nullptr),
+  _obsArrVar(nullptr)
 {
 }
 

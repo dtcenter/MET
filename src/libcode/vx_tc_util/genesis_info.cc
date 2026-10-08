@@ -313,7 +313,7 @@ int GenesisInfo::genesis_fhr() const {
 ////////////////////////////////////////////////////////////////////////
 
 const TrackPoint * GenesisInfo::genesis() const {
-   return(is_bad_data(GenesisIndex) ? 0 : &(Point[GenesisIndex]));
+   return(is_bad_data(GenesisIndex) ? nullptr : &(Point[GenesisIndex]));
 }
 
 ////////////////////////////////////////////////////////////////////////

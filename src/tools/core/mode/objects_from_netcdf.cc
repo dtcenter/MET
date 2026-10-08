@@ -55,8 +55,8 @@ void objects_from_netcdf(const char * netcdf_filename,
 
 {
 
-   const string * fcst_var_name = 0;
-   const string *  obs_var_name = 0;
+   const string * fcst_var_name = nullptr;
+   const string *  obs_var_name = nullptr;
 
    if ( do_clusters )  {
 

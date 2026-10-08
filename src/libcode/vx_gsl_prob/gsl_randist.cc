@@ -44,7 +44,7 @@ void rng_set(gsl_rng *&r, const char *rng_name, const char *rng_seed) {
    setenv("GSL_RNG_TYPE", rng_name, 1);
 
    // Set the GSL_RNG_SEED environment variable
-   if(rng_seed != (const char *) 0 && m_strlen(rng_seed) > 0) {
+   if(rng_seed != nullptr && m_strlen(rng_seed) > 0) {
       setenv("GSL_RNG_SEED", rng_seed, 1);
    }
    // If rng_seed is not set, set the seed using the current time
@@ -329,7 +329,7 @@ double dist_var(DistType t, double p1, double p2) {
 
 int get_seed() {
    int curr_time;
-   unsigned char *u = (unsigned char *) 0, t;
+   unsigned char *u = nullptr, t;
 
    // Get the current time
    curr_time = time(nullptr);

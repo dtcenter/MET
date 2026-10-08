@@ -108,7 +108,7 @@ index = -1;
 
 N = -1;
 
-main_list = 0;   //  don't delete
+main_list = nullptr;   //  don't delete
 
 UserScriptPath.clear();
 
@@ -237,7 +237,7 @@ ConcatString PyLineDataFile::make_data_line()
 int j;
 ConcatString line;
 ConcatString a;
-PyObject * sublist = 0;
+PyObject * sublist = nullptr;
 
 
    //
@@ -389,7 +389,7 @@ const int N = UserScriptArgs.n();
 ConcatString command;
 ConcatString path;
 ConcatString tmp_ascii_path;
-const char * tmp_dir = 0;
+const char * tmp_dir = nullptr;
 int status;
 
 mlog << Debug(3) << "Calling " << UserPathToPython
@@ -404,7 +404,7 @@ path << cs_erase
      << tmp_dir << '/'
      << tmp_base_name;
 
-tmp_ascii_path = make_temp_file_name(path.text(), 0);
+tmp_ascii_path = make_temp_file_name(path.text(), nullptr);
 tmp_ascii_path << ".txt";
 
 command << cs_erase

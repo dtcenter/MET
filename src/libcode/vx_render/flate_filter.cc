@@ -50,9 +50,9 @@ s = std::make_unique<z_stream>();
 
 memset(s.get(), 0, sizeof(*s));
 
-s->zalloc = NULL;
-s->zfree  = NULL;
-s->opaque = NULL;
+s->zalloc = nullptr;
+s->zfree  = nullptr;
+s->opaque = nullptr;
 
 if ( deflateInit(s.get(), Z_BEST_COMPRESSION) != Z_OK )  {
 

@@ -348,7 +348,7 @@ mlog << Debug(1) << method_name << "Writing MET File:\t" << output_filename << "
    //
    //  global attributes for netcdf output file
    //
-const unixtime now = time(0);
+const unixtime now = time(nullptr);
 int month, day, year, hour, minute, second;
 ConcatString s;
 char junk [1 + HEADER_STR_LEN];

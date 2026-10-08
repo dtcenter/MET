@@ -1050,7 +1050,7 @@ void process_diags(TrackInfoArray &tracks) {
       for(j=0,n=0; j<cur_files.n(); j++) {
 
          // Check for diagnostic info map entry
-         DiagInfo * info_ptr = 0;
+         DiagInfo * info_ptr = nullptr;
          if(conf_info.DiagInfoMap.count(diag_source[i]) < 1) {
             mlog << Error << "\nprocess_diags() -> "
                  << "no \"" << conf_key_diag_info_map
@@ -1061,7 +1061,7 @@ void process_diags(TrackInfoArray &tracks) {
          info_ptr = &conf_info.DiagInfoMap.at(diag_source[i]);
 
          // Check for diagnostic conversion map entry
-         map<ConcatString,UserFunc_1Arg> * convert_ptr = 0;
+         map<ConcatString,UserFunc_1Arg> * convert_ptr = nullptr;
          map< ConcatString,map<ConcatString,UserFunc_1Arg> >::iterator it;
          for(it = conf_info.DiagConvertMap.begin();
              it != conf_info.DiagConvertMap.end(); it++) {

@@ -38,8 +38,8 @@ bool dataplane_from_xarray(PyObject * data_array, DataPlane & dp_out, Grid & gri
 {
 
 DataPlane dp;
-PyObject * numpy_array = 0;
-PyObject * attrs_dict  = 0;
+PyObject * numpy_array = nullptr;
+PyObject * attrs_dict  = nullptr;
 
 
 numpy_array = PyObject_GetAttrString(data_array, data_attr_name);

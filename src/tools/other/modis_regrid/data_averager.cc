@@ -62,7 +62,7 @@ void DataAverager::init_from_scratch()
 
 {
 
-grid = 0;
+grid = nullptr;
 
 
 
@@ -81,7 +81,7 @@ void DataAverager::clear()
 
 {
 
-grid = 0;
+grid = nullptr;
 
 Sum.clear();
 

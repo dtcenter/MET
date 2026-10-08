@@ -28,7 +28,7 @@ void load_numpy (void * buf,
                  float * out)
 {
 
-bool need_swap = (shuf != 0) && (native_endian != data_endian);
+bool need_swap = (shuf != nullptr) && (native_endian != data_endian);
 
 int j;
 T * u = (T *) buf;
@@ -65,7 +65,7 @@ void load_numpy (void * buf,
 {
 
 const char *method_name = "load_numpy(int *) ";
-bool need_swap = (shuf != 0) && (native_endian != data_endian);
+bool need_swap = (shuf != nullptr) && (native_endian != data_endian);
 
 int j;
 T * u = (T *) buf;
@@ -102,7 +102,7 @@ void load_numpy_int (void * buf,
 {
 
 const char *method_name = "load_numpy_int(IntArray *) ";
-bool need_swap = (shuf != 0) && (native_endian != data_endian);
+bool need_swap = (shuf != nullptr) && (native_endian != data_endian);
 
 int j;
 T * u = (T *) buf;
@@ -142,7 +142,7 @@ void load_numpy_num (void * buf,
 {
 
 const char *method_name = "load_numpy_num(NumArray *) ";
-bool need_swap = (shuf != 0) && (native_endian != data_endian);
+bool need_swap = (shuf != nullptr) && (native_endian != data_endian);
 
 int j;
 T * u = (T *) buf;

@@ -846,7 +846,7 @@ bool NetcdfObsVars::read_obs_data(int buf_size, int offset,
          result = false;
       }
 
-      if (0 != obs_qty_buf) {
+      if (nullptr != obs_qty_buf) {
          lengths[1] = qty_len;
          if(!get_nc_data(&obs_qty_var, obs_qty_buf, lengths, offsets)) {
             mlog << Error << "\n" << method_name << "trouble getting obs_qty\n\n";

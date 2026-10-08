@@ -76,7 +76,7 @@ SHgrid = std::make_unique<const Grid>(wwmca_south_data);
 
 Config = (MetConfig *) nullptr;
 
-interp_func = 0;
+interp_func = nullptr;
 
 
 
@@ -114,7 +114,7 @@ Width = 0;
 
 Method = InterpMthd::None;
 
-interp_func = 0;
+interp_func = nullptr;
 
 Fraction = 0.0;   //  is this a good default value?
 
@@ -665,9 +665,9 @@ double lat, lon;
 double dx, dy;
 double v;
 int x, y, xx, yy, from_x, from_y;
-const AFCloudPctFile   * cloud = 0;
-const AFPixelTimeFile  * pixel = 0;
-const Grid             * From  = 0;
+const AFCloudPctFile   * cloud = nullptr;
+const AFPixelTimeFile  * pixel = nullptr;
+const Grid             * From  = nullptr;
 int pixel_age_minutes;
 const double max_minutes = Config->lookup_double(conf_key_max_minutes);
 
@@ -1044,7 +1044,7 @@ void WwmcaRegridder::get_grid()
 
 {
 
-Grid G = parse_vx_grid(parse_conf_regrid(Config), (Grid *) 0, (Grid *) 0);
+Grid G = parse_vx_grid(parse_conf_regrid(Config), nullptr, nullptr);
 
 ToGrid = std::make_unique<const Grid>(G);
 
