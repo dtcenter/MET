@@ -4,25 +4,25 @@
 #   intel-oneapi/2022.0.2
 # A recommended workaround to this issue is to either module unload cray-libsci or use another intel compiler.
 
-module unload cray-libsci/24.07.0
+#module unload cray-libsci/24.07.0
 #Upgrade compiler version and check cmake version
-module load intel/2023.2.0
-module load cmake/3.23.1
+module load intel/2025.2
+module load cmake/3.27.9
 
-export FC=ifort
-export F77=ifort
-export F90=ifort
-export CC=icc
-export CXX=icpc
+export FC=ifx
+export F77=ifx
+export F90=ifx
+export CC=icx
+export CXX=icpx
 
 export TEST_BASE=/usw/met/13.0.0
-export COMPILER=intel_2023.2.0
+export COMPILER=intel_2025.2
 export MET_SUBDIR=${TEST_BASE}
 export MET_TARBALL=v13.0.0.tar.gz
 export USE_MODULES=TRUE
-export MET_PYTHON=/gpfs/f5/esrl/proj-shared/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v6.1_py3.12/
-export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.12
-export MET_PYTHON_LD=-L${MET_PYTHON}/lib/python3.12/config-3.10-x86_64-linux-gnu\ -L${MET_PYTHON}/lib\ -lpython3.12\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lm
+export MET_PYTHON=/gpfs/f5/esrl/proj-shared/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v13.0_py3.14/
+export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.14
+export MET_PYTHON_LD=-L${MET_PYTHON}/lib/python3.14/config-3.14-x86_64-linux-gnu\ -L${MET_PYTHON}/lib\ -lpython3.14\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lm
 export EXTERNAL_LIBS=${TEST_BASE}/external_libs
 COMPILE_ATLAS=1
 COMPILE_ECKIT=1

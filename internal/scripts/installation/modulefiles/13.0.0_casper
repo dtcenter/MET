@@ -17,9 +17,9 @@ set base /glade/work/dtcrt/METplus/casper/components/MET/installations/13.0.0
 set ver  13.0.0
 set share $base/share/met
 
-prepend-path PATH $base/bin:/glade/work/dtcrt/METplus/casper/components/MET/installations/13.0.0/external_libs/bin:/glade/work/dtcrt/METplus/casper/miniconda/miniconda3/envs/metplus_v6.1_py3.12/bin
+prepend-path PATH $base/bin:/glade/work/dtcrt/METplus/casper/components/MET/installations/13.0.0/external_libs/bin:/glade/work/dtcrt/METplus/casper/miniconda/miniconda3/envs/metplus_v13.0_py3.14/bin
 
 setenv HDF5_USE_FILE_LOCKING FALSE
-setenv MET_PYTHON_EXE /glade/work/dtcrt/METplus/casper/miniconda/miniconda3/envs/metplus_v6.1_py3.12/bin/python3
+setenv MET_PYTHON_EXE /glade/work/dtcrt/METplus/casper/miniconda/miniconda3/envs/metplus_v13.0_py3.14/bin/python3
 
 setenv METversion V$ver
