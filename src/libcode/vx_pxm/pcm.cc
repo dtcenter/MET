@@ -448,18 +448,6 @@ maxval = parse_number(in);
 
 Ncolors = maxval + 1;
 
-/*
-if ( maxval != 255 )  {
-
-   mlog << Warning << "\nPcm::read() -> bad maxval: \"" << maxval << "\"\n\n";
-
-   clear();
-
-   return 0;
-
-}
-*/
-
    //
    //  get colormap
    //
