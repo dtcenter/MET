@@ -72,7 +72,7 @@ class MsgLevel
          // do stuff
          //
 
-      operator const int & () const;
+      explicit operator const int & () const;
 
 };
 
@@ -170,7 +170,7 @@ class LoggerDebug {
          // do stuff
          //
 
-      operator int () const;
+      explicit operator int () const;
 
 };
 

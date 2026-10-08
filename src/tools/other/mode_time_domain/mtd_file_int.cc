@@ -532,7 +532,7 @@ lengths.add(Nt);
 lengths.add(Ny);
 lengths.add(Nx);
 
-if ( ! put_nc_data(&data_var, Data.data(), lengths, offsets) )  {
+if ( ! put_nc_data(&data_var, Data.data(), static_cast<long *>(lengths), static_cast<long *>(offsets)) )  {
 
    mlog << Error << "\nMtdIntFile::write(const char *) -> "
         << "trouble getting data\n\n";

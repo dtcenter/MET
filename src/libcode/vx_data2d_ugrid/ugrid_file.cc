@@ -478,38 +478,6 @@ bool UGridFile::find_nc_vinfo_list(const char *var_name,
 ////////////////////////////////////////////////////////////////////////
 
 
-double UGridFile::getData(NcVar * var, const LongArray & a) const
-{
-  clock_t start_clock = clock();
-  static const string method_name
-      = "UGridFile::getData(NcVar *, const LongArray &) -> ";
-
-  bool status = false;
-  double d = bad_data_double;
-
-  double fill_value;
-  get_var_fill_value(var, fill_value);
-
-  status = get_nc_data(var, a);
-
-  if (!status)
-  {
-    mlog << Error << "\n" << method_name << "bad status for var->get()\n\n";
-    exit(1);
-  }
-
-  //  done
-
-  mlog << Debug(6) << method_name << "took "
-       << (clock()-start_clock)/CLOCKS_PER_SEC << " seconds\n";
-
-  return d;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 {
   clock_t start_clock = clock();

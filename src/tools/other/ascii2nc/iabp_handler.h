@@ -59,7 +59,7 @@ class IabpHandler : public FileHandler {
 
    public:
 
-      IabpHandler(const std::string &program_name);
+      explicit IabpHandler(const std::string &program_name);
       virtual ~IabpHandler();
 
       virtual bool isFileType(LineDataFile &ascii_file) const;

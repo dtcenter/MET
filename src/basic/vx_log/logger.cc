@@ -648,7 +648,7 @@ Logger & Logger::operator<<(const string s)
          // if the message level is -1, then this is an ERROR type message,
          // so write it to cerr
          //
-      if (message_level == ErrorMessageLevel)
+      if (message_level.value() == ErrorMessageLevel)
       {
          cerr << messages[i] << flush;
 
@@ -665,7 +665,7 @@ Logger & Logger::operator<<(const string s)
          // else if the message level is 0, then this is a WARNING type message,
          // so write it to cerr
          //
-      else if (message_level == WarningMessageLevel)
+      else if (message_level.value() == WarningMessageLevel)
       {
          cerr << messages[i] << flush;
 
@@ -685,7 +685,7 @@ Logger & Logger::operator<<(const string s)
          //
       else
       {
-         if (message_level <= VerbosityLevel)
+         if (message_level.value() <= VerbosityLevel)
          {
             cout << messages[i] << flush;
 
@@ -813,7 +813,7 @@ Logger & Logger::operator<<(const char * s)
          // if the message level is -1, then this is an ERROR type message,
          // so write it to cerr
          //
-      if (message_level == ErrorMessageLevel)
+      if (message_level.value() == ErrorMessageLevel)
       {
          cerr << messages[i] << flush;
 
@@ -830,7 +830,7 @@ Logger & Logger::operator<<(const char * s)
          // else if the message level is 0, then this is a WARNING type message,
          // so write it to cerr
          //
-      else if (message_level == WarningMessageLevel)
+      else if (message_level.value() == WarningMessageLevel)
       {
          cerr << messages[i] << flush;
 
@@ -850,7 +850,7 @@ Logger & Logger::operator<<(const char * s)
          //
       else
       {
-         if (message_level <= VerbosityLevel)
+         if (message_level.value() <= VerbosityLevel)
          {
             cout << messages[i] << flush;
 
@@ -888,7 +888,7 @@ Logger & Logger::operator<<(const int n)
       // if the message level is -1, then this is an ERROR type message,
       // so write it to cerr
       //
-   if (message_level == ErrorMessageLevel)
+   if (message_level.value() == ErrorMessageLevel)
    {
       cerr << n << flush;
 
@@ -905,7 +905,7 @@ Logger & Logger::operator<<(const int n)
       // else if the message level is 0, then this is a WARNING type message,
       // so write it to cerr
       //
-   else if (message_level == WarningMessageLevel)
+   else if (message_level.value() == WarningMessageLevel)
    {
       cerr << n << flush;
 
@@ -925,7 +925,7 @@ Logger & Logger::operator<<(const int n)
       //
    else
    {
-      if (message_level <= VerbosityLevel)
+      if (message_level.value() <= VerbosityLevel)
       {
          cout << n << flush;
 
@@ -954,7 +954,7 @@ Logger & Logger::operator<<(const unsigned int n)
       // if the message level is -1, then this is an ERROR type message,
       // so write it to cerr
       //
-   if (message_level == ErrorMessageLevel)
+   if (message_level.value() == ErrorMessageLevel)
    {
       cerr << n << flush;
 
@@ -971,7 +971,7 @@ Logger & Logger::operator<<(const unsigned int n)
       // else if the message level is 0, then this is a WARNING type message,
       // so write it to cerr
       //
-   else if (message_level == WarningMessageLevel)
+   else if (message_level.value() == WarningMessageLevel)
    {
       cerr << n << flush;
 
@@ -991,7 +991,7 @@ Logger & Logger::operator<<(const unsigned int n)
       //
    else
    {
-      if (message_level <= VerbosityLevel)
+      if (message_level.value() <= VerbosityLevel)
       {
          cout << n << flush;
 
@@ -1020,7 +1020,7 @@ Logger & Logger::operator<<(const long l)
       // if the message level is -1, then this is an ERROR type message,
       // so write it to cerr
       //
-   if (message_level == ErrorMessageLevel)
+   if (message_level.value() == ErrorMessageLevel)
    {
       cerr << l << flush;
 
@@ -1037,7 +1037,7 @@ Logger & Logger::operator<<(const long l)
       // else if the message level is 0, then this is a WARNING type message,
       // so write it to cerr
       //
-   else if (message_level == WarningMessageLevel)
+   else if (message_level.value() == WarningMessageLevel)
    {
       cerr << l << flush;
 
@@ -1057,7 +1057,7 @@ Logger & Logger::operator<<(const long l)
       //
    else
    {
-      if (message_level <= VerbosityLevel)
+      if (message_level.value() <= VerbosityLevel)
       {
          cout << l << flush;
 
@@ -1085,7 +1085,7 @@ Logger & Logger::operator<<(const unsigned long l)
       // if the message level is -1, then this is an ERROR type message,
       // so write it to cerr
       //
-   if (message_level == ErrorMessageLevel)
+   if (message_level.value() == ErrorMessageLevel)
    {
       cerr << l << flush;
 
@@ -1102,7 +1102,7 @@ Logger & Logger::operator<<(const unsigned long l)
       // else if the message level is 0, then this is a WARNING type message,
       // so write it to cerr
       //
-   else if (message_level == WarningMessageLevel)
+   else if (message_level.value() == WarningMessageLevel)
    {
       cerr << l << flush;
 
@@ -1122,7 +1122,7 @@ Logger & Logger::operator<<(const unsigned long l)
       //
    else
    {
-      if (message_level <= VerbosityLevel)
+      if (message_level.value() <= VerbosityLevel)
       {
          cout << l << flush;
 
@@ -1151,7 +1151,7 @@ Logger & Logger::operator<<(const long long l)
       // if the message level is -1, then this is an ERROR type message,
       // so write it to cerr
       //
-   if (message_level == ErrorMessageLevel)
+   if (message_level.value() == ErrorMessageLevel)
    {
       cerr << l << flush;
 
@@ -1168,7 +1168,7 @@ Logger & Logger::operator<<(const long long l)
       // else if the message level is 0, then this is a WARNING type message,
       // so write it to cerr
       //
-   else if (message_level == WarningMessageLevel)
+   else if (message_level.value() == WarningMessageLevel)
    {
       cerr << l << flush;
 
@@ -1188,7 +1188,7 @@ Logger & Logger::operator<<(const long long l)
       //
    else
    {
-      if (message_level <= VerbosityLevel)
+      if (message_level.value() <= VerbosityLevel)
       {
          cout << l << flush;
 
@@ -1217,7 +1217,7 @@ Logger & Logger::operator<<(const unsigned long long l)
       // if the message level is -1, then this is an ERROR type message,
       // so write it to cerr
       //
-   if (message_level == ErrorMessageLevel)
+   if (message_level.value() == ErrorMessageLevel)
    {
       cerr << l << flush;
 
@@ -1234,7 +1234,7 @@ Logger & Logger::operator<<(const unsigned long long l)
       // else if the message level is 0, then this is a WARNING type message,
       // so write it to cerr
       //
-   else if (message_level == WarningMessageLevel)
+   else if (message_level.value() == WarningMessageLevel)
    {
       cerr << l << flush;
 
@@ -1254,7 +1254,7 @@ Logger & Logger::operator<<(const unsigned long long l)
       //
    else
    {
-      if (message_level <= VerbosityLevel)
+      if (message_level.value() <= VerbosityLevel)
       {
          cout << l << flush;
 
@@ -1283,7 +1283,7 @@ Logger & Logger::operator<<(const double d)
       // if the message level is -1, then this is an ERROR type message,
       // so write it to cerr
       //
-   if (message_level == ErrorMessageLevel)
+   if (message_level.value() == ErrorMessageLevel)
    {
       cerr << d << flush;
 
@@ -1300,7 +1300,7 @@ Logger & Logger::operator<<(const double d)
       // else if the message level is 0, then this is a WARNING type message,
       // so write it to cerr
       //
-   else if (message_level == WarningMessageLevel)
+   else if (message_level.value() == WarningMessageLevel)
    {
       cerr << d << flush;
 
@@ -1320,7 +1320,7 @@ Logger & Logger::operator<<(const double d)
       //
    else
    {
-      if (message_level <= VerbosityLevel)
+      if (message_level.value() <= VerbosityLevel)
       {
          cout << d << flush;
 
@@ -1349,7 +1349,7 @@ Logger & Logger::operator<<(const char c)
       // if the message level is -1, then this is an ERROR type message,
       // so write it to cerr
       //
-   if (message_level == ErrorMessageLevel)
+   if (message_level.value() == ErrorMessageLevel)
    {
       cerr << c << flush;
 
@@ -1366,7 +1366,7 @@ Logger & Logger::operator<<(const char c)
       // else if the message level is 0, then this is a WARNING type message,
       // so write it to cerr
       //
-   else if (message_level == WarningMessageLevel)
+   else if (message_level.value() == WarningMessageLevel)
    {
       cerr << c << flush;
 
@@ -1386,7 +1386,7 @@ Logger & Logger::operator<<(const char c)
       //
    else
    {
-      if (message_level <= VerbosityLevel)
+      if (message_level.value() <= VerbosityLevel)
       {
          cout << c << flush;
 
@@ -1415,7 +1415,7 @@ Logger & Logger::operator<<(const bool b)
       // if the message level is -1, then this is an ERROR type message,
       // so write it to cerr
       //
-   if (message_level == ErrorMessageLevel)
+   if (message_level.value() == ErrorMessageLevel)
    {
       cerr << b << flush;
 
@@ -1432,7 +1432,7 @@ Logger & Logger::operator<<(const bool b)
       // else if the message level is 0, then this is a WARNING type message,
       // so write it to cerr
       //
-   else if (message_level == WarningMessageLevel)
+   else if (message_level.value() == WarningMessageLevel)
    {
       cerr << b << flush;
 
@@ -1452,7 +1452,7 @@ Logger & Logger::operator<<(const bool b)
       //
    else
    {
-      if (message_level <= VerbosityLevel)
+      if (message_level.value() <= VerbosityLevel)
       {
          cout << b << flush;
 
@@ -1505,7 +1505,7 @@ Logger & Logger::operator<<(const Indent & i)
       // if the message level is -1, then this is an ERROR type message,
       // so write it to cerr
       //
-   if (message_level == ErrorMessageLevel)
+   if (message_level.value() == ErrorMessageLevel)
    {
       cerr << tmp_str << flush;
 
@@ -1522,7 +1522,7 @@ Logger & Logger::operator<<(const Indent & i)
       // else if the message level is 0, then this is a WARNING type message,
       // so write it to cerr
       //
-   else if (message_level == WarningMessageLevel)
+   else if (message_level.value() == WarningMessageLevel)
    {
       cerr << tmp_str << flush;
 
@@ -1542,7 +1542,7 @@ Logger & Logger::operator<<(const Indent & i)
       //
    else
    {
-      if (message_level <= VerbosityLevel)
+      if (message_level.value() <= VerbosityLevel)
       {
          cout << tmp_str << flush;
 
@@ -1631,7 +1631,7 @@ void Logger::write_msg_type()
       // if the message level is -1, then this is an ERROR type message,
       // so write it to cerr
       //
-   if (message_level == ErrorMessageLevel)
+   if (message_level.value() == ErrorMessageLevel)
    {
       cerr << "ERROR  : " << flush;
 
@@ -1648,7 +1648,7 @@ void Logger::write_msg_type()
       // else if the message level is 0, then this is a WARNING type message,
       // so write it to cerr
       //
-   else if (message_level == WarningMessageLevel)
+   else if (message_level.value() == WarningMessageLevel)
    {
       cerr << "WARNING: " << flush;
 
@@ -1668,9 +1668,9 @@ void Logger::write_msg_type()
       //
    else
    {
-      if (message_level <= VerbosityLevel)
+      if (message_level.value() <= VerbosityLevel)
       {
-         cout << "DEBUG " << message_level << ": " << flush;
+         cout << "DEBUG " << message_level.value() << ": " << flush;
 
          fflush(stdout);
 
@@ -1678,7 +1678,7 @@ void Logger::write_msg_type()
          // if the file is open, then also write it to the log file
          //
       if (is_open())
-            (*out) << "DEBUG " << message_level << ": " << flush;
+            (*out) << "DEBUG " << message_level.value() << ": " << flush;
 
       }
    }

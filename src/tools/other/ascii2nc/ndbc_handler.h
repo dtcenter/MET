@@ -40,7 +40,7 @@ private:
   public:
     std::string name;  // name of the header as found in the file
     int ptr;      // column index for that data (0,1,..)
-    inline Column(const std::string &n) : name(n), ptr(-1) {}
+    inline explicit Column(const std::string &n) : name(n), ptr(-1) {}
     inline ~Column() = default;
     inline void clear(void) {ptr = -1;}
     inline bool nameEquals(const std::string &s) const {return name == s;}
@@ -51,7 +51,7 @@ private:
 
 public:
 
-  NdbcHandler(const std::string &program_name);
+  explicit NdbcHandler(const std::string &program_name);
   virtual ~NdbcHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;

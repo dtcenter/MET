@@ -2067,8 +2067,8 @@ void write_ctc_genmpr_row(StatHdrColumns &shc,
    shc.set_line_type(stat_genmpr_str);
 
    // Not Applicable
-   shc.set_fcst_thresh(na_str);
-   shc.set_obs_thresh(na_str);
+   shc.set_fcst_thresh(SingleThresh(na_str));
+   shc.set_obs_thresh(SingleThresh(na_str));
    shc.set_alpha(bad_data_double);
 
    // Write a line for each matched pair
@@ -2278,8 +2278,8 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
    shc.set_line_type(stat_genmpr_str);
 
    // Not Applicable
-   shc.set_fcst_thresh(na_str);
-   shc.set_obs_thresh(na_str);
+   shc.set_fcst_thresh(SingleThresh(na_str));
+   shc.set_obs_thresh(SingleThresh(na_str));
    shc.set_alpha(bad_data_double);
 
    // Write a line for each matched pair

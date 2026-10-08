@@ -53,7 +53,7 @@ Python3_Numpy np;
 
 np.set(numpy_array);
 
-bool status = dataplane_from_numpy_array(np, attrs_dict, dp_out, grid_out, vinfo);
+bool status = dataplane_from_numpy_array(np, Python3_Dict(attrs_dict), dp_out, grid_out, vinfo);
 
    //
    //  done

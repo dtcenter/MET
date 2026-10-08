@@ -32,7 +32,7 @@ class AirnowHandler : public FileHandler
 
 public:
 
-  AirnowHandler(const std::string &program_name);
+  explicit AirnowHandler(const std::string &program_name);
   virtual ~AirnowHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;

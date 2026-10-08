@@ -56,7 +56,7 @@ class Python3_Dict {
    public:
 
       Python3_Dict();
-      Python3_Dict(PyObject *);
+      explicit Python3_Dict(PyObject *);
      ~Python3_Dict();
 
       void dump(std::ostream &, int depth) const;

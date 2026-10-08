@@ -150,7 +150,7 @@ class ModePsFile : public PSfile {
  public:
 
    ModePsFile();
-   ModePsFile(const char *);
+   explicit ModePsFile(const char *);
    ~ModePsFile();
 
    //

@@ -395,7 +395,7 @@ Buf.extend(record.rh.content_length_bytes);
 // 
 // }
 
-if ( ! file.read(Buf, record.rh.content_length_bytes) )  {
+if ( ! file.read(static_cast<unsigned char *>(Buf), record.rh.content_length_bytes) )  {
 
    mlog << Error
         << "\n\n  operator>>(ShpFile &, ShpPolyRecord &) -> read error in shp file \""

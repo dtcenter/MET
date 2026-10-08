@@ -163,7 +163,7 @@ class SeepsClimoBase {
 
    public:
 
-      SeepsClimoBase(const ConcatString &seeps_climo_name);
+      explicit SeepsClimoBase(const ConcatString &seeps_climo_name);
       virtual ~SeepsClimoBase();
       void set_p1_thresh(const SingleThresh &p1_thresh);
       int get_filtered_count() const;
@@ -195,7 +195,7 @@ class SeepsClimo : public SeepsClimoBase {
 
    public:
 
-      SeepsClimo(const ConcatString &seeps_climo_name);
+      explicit SeepsClimo(const ConcatString &seeps_climo_name);
      ~SeepsClimo();
 
       std::unique_ptr<SeepsRecord> get_record(int sid, int month, int hour);
