@@ -90,7 +90,7 @@ class IsmnHandler : public FileHandler {
 
    public:
 
-      IsmnHandler(const std::string &program_name);
+      explicit IsmnHandler(const std::string &program_name);
       virtual ~IsmnHandler();
 
       virtual bool isFileType(LineDataFile &ascii_file) const;

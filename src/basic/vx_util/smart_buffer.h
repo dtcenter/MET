@@ -65,9 +65,9 @@ class SmartBuffer {
          //  do stuff
          //
 
-     operator unsigned char * () const;
+     explicit operator unsigned char * () const;
 
-     operator void * () const;
+     explicit operator void * () const;
 
      void extend (const int bytes);
 

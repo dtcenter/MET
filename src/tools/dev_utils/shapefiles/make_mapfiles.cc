@@ -325,9 +325,9 @@ ConcatString s;
 char junk[512];
 DbfHeader hd;
 DbfSubRecord rd;
-DbfSubRecord * country_name_rec = 0;
-DbfSubRecord *   admin_name_rec = 0;
-DbfSubRecord * r                = 0;
+DbfSubRecord * country_name_rec = nullptr;
+DbfSubRecord *   admin_name_rec = nullptr;
+DbfSubRecord * r                = nullptr;
 
    //
    //  get the country names (and admin names, if they're there) from the dbf file

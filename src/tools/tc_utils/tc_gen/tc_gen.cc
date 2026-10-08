@@ -867,7 +867,7 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
 
       // Pointer to the matching BEST track
       bgi = (is_bad_data(i_bga) ?
-             (const GenesisInfo *) 0 :
+             nullptr :
              &best_ga[i_bga]);
 
       // Loop over the individual probabilities
@@ -916,7 +916,7 @@ void do_genshape_pct(const TCGenVxOpt &vx_opt,
 
       // Pointer to the matching BEST track
       bgi = (is_bad_data(i_bga) ?
-             (const GenesisInfo *) 0 :
+             nullptr :
              &best_ga[i_bga]);
 
       // Score each probability
@@ -1873,7 +1873,7 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
       setup_table(stat_at);
 
       // Write the text header row
-      write_header_row((const char **) 0, 0, 1, stat_at, 0, 0);
+      write_header_row(nullptr, 0, 1, stat_at, 0, 0);
 
       // Initialize the row index to 1 to account for the header
       i_stat_row = 1;
@@ -2067,8 +2067,8 @@ void write_ctc_genmpr_row(StatHdrColumns &shc,
    shc.set_line_type(stat_genmpr_str);
 
    // Not Applicable
-   shc.set_fcst_thresh(na_str);
-   shc.set_obs_thresh(na_str);
+   shc.set_fcst_thresh(SingleThresh(na_str));
+   shc.set_obs_thresh(SingleThresh(na_str));
    shc.set_alpha(bad_data_double);
 
    // Write a line for each matched pair
@@ -2278,8 +2278,8 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
    shc.set_line_type(stat_genmpr_str);
 
    // Not Applicable
-   shc.set_fcst_thresh(na_str);
-   shc.set_obs_thresh(na_str);
+   shc.set_fcst_thresh(SingleThresh(na_str));
+   shc.set_obs_thresh(SingleThresh(na_str));
    shc.set_alpha(bad_data_double);
 
    // Write a line for each matched pair

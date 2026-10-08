@@ -52,12 +52,12 @@ void m_strncpy(char *to_str, const char *from_str, const int buf_len,
    if (!from_str){
       mlog << Warning << "\n" << method_name 
            << " Do not copy the string because a from_string is nullptr. " 
-           << (extra_msg == 0 ? "" : extra_msg) << "\n\n";
+           << (extra_msg == nullptr ? "" : extra_msg) << "\n\n";
    }
    else if (!to_str){
       mlog << Warning << "\n" << method_name 
            << " Do not copy the string because a to_string is nullptr. " 
-           << (extra_msg == 0 ? "" : extra_msg) << "\n\n";
+           << (extra_msg == nullptr ? "" : extra_msg) << "\n\n";
    }
    else {   // (from_str && to_str)
       int str_len = m_strlen(from_str);
@@ -78,7 +78,7 @@ void m_strncpy(char *to_str, const char *from_str, const int buf_len,
 
       if (!truncate && strcmp(from_str, to_str)) {
          mlog << Warning << "\n" << method_name
-              << " truncated a string " << (extra_msg == 0 ? " " : extra_msg)
+              << " truncated a string " << (extra_msg == nullptr ? " " : extra_msg)
               << " from \"" << from_str << "\" to \"" << to_str << "\"\n\n";
       }
    }

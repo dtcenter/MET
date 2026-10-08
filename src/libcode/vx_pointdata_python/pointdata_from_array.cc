@@ -54,8 +54,8 @@ const ConcatString dtype = np.dtype();
 
       //   1 byte integers
 
-     if ( dtype == "|i1"  )   load_numpy <int8_t>    (np.buffer(), n, little_endian,         0, data_out);
-else if ( dtype == "|u1"  )   load_numpy <uint8_t>   (np.buffer(), n, little_endian,         0, data_out);
+     if ( dtype == "|i1"  )   load_numpy <int8_t>    (np.buffer(), n, little_endian,         nullptr, data_out);
+else if ( dtype == "|u1"  )   load_numpy <uint8_t>   (np.buffer(), n, little_endian,         nullptr, data_out);
 
       //   2 byte integers
 
@@ -152,8 +152,8 @@ const ConcatString dtype = np.dtype();
 
       //   1 byte integers
 
-     if ( dtype == "|i1"  )   load_numpy <int8_t>    (np.buffer(), n, little_endian,         0, data_out);
-else if ( dtype == "|u1"  )   load_numpy <uint8_t>   (np.buffer(), n, little_endian,         0, data_out);
+     if ( dtype == "|i1"  )   load_numpy <int8_t>    (np.buffer(), n, little_endian,         nullptr, data_out);
+else if ( dtype == "|u1"  )   load_numpy <uint8_t>   (np.buffer(), n, little_endian,         nullptr, data_out);
 
       //   2 byte integers
 
@@ -251,8 +251,8 @@ const ConcatString dtype = np.dtype();
 
       //   1 byte integers
 
-     if ( dtype == "|i1"  ) load_numpy_int <int8_t>    (np.buffer(), n, little_endian,         0, data_out);
-else if ( dtype == "|u1"  ) load_numpy_int <uint8_t>   (np.buffer(), n, little_endian,         0, data_out);
+     if ( dtype == "|i1"  ) load_numpy_int <int8_t>    (np.buffer(), n, little_endian,         nullptr, data_out);
+else if ( dtype == "|u1"  ) load_numpy_int <uint8_t>   (np.buffer(), n, little_endian,         nullptr, data_out);
 
       //   2 byte integers
 
@@ -350,8 +350,8 @@ const ConcatString dtype = np.dtype();
 
       //   1 byte integers
 
-     if ( dtype == "|i1"  ) load_numpy_num <int8_t>    (np.buffer(), n, little_endian,         0, data_out);
-else if ( dtype == "|u1"  ) load_numpy_num <uint8_t>   (np.buffer(), n, little_endian,         0, data_out);
+     if ( dtype == "|i1"  ) load_numpy_num <int8_t>    (np.buffer(), n, little_endian,         nullptr, data_out);
+else if ( dtype == "|u1"  ) load_numpy_num <uint8_t>   (np.buffer(), n, little_endian,         nullptr, data_out);
 
       //   2 byte integers
 

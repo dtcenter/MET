@@ -54,7 +54,7 @@ MetNcCFDataFile::MetNcCFDataFile() {
 
 MetNcCFDataFile::~MetNcCFDataFile() {
 
-   close();
+   MetNcCFDataFile::close();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ void MetNcCFDataFile::nccf_init_from_scratch() {
    cur_time_index = -1;
    cur_z_index = -1;
 
-   close();
+   MetNcCFDataFile::close();
 
    return;
 }

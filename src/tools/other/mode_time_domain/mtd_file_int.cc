@@ -69,7 +69,7 @@ MtdIntFile::~MtdIntFile()
 
 {
 
-clear();
+MtdIntFile::clear();
 
 }
 
@@ -112,7 +112,7 @@ void MtdIntFile::int_init_from_scratch()
 {
 
 
-clear();
+MtdIntFile::clear();
 
 return;
 
@@ -161,11 +161,11 @@ void MtdIntFile::int_assign(const MtdIntFile & f)
 
 {
 
-clear();
+MtdIntFile::clear();
 
 int n;
 
-base_assign(f);
+base_copy(f);
 
 DataMin = f.DataMin;
 DataMax = f.DataMax;
@@ -532,7 +532,7 @@ lengths.add(Nt);
 lengths.add(Ny);
 lengths.add(Nx);
 
-if ( ! put_nc_data(&data_var, Data.data(), lengths, offsets) )  {
+if ( ! put_nc_data(&data_var, Data.data(), static_cast<long *>(lengths), static_cast<long *>(offsets)) )  {
 
    mlog << Error << "\nMtdIntFile::write(const char *) -> "
         << "trouble getting data\n\n";
@@ -1139,7 +1139,7 @@ void MtdIntFile::split()
 {
 
 int j, k;
-int * d = 0;
+int * d = nullptr;
 MtdIntFile old;
 
 old = ::split(*this, Nobjects);

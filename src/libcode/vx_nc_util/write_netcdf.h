@@ -27,9 +27,9 @@ static const float FILL_VALUE = -9999.f;
 ////////////////////////////////////////////////////////////////////////
 
 extern void write_netcdf_global     (netCDF::NcFile *, const char *, const char *,
-                                     const char *model_name = (const char *) 0,
-                                     const char *obtype     = (const char *) 0,
-                                     const char *desc       = (const char *) 0);
+                                     const char *model_name = nullptr,
+                                     const char *obtype     = nullptr,
+                                     const char *desc       = nullptr);
 extern void write_netcdf_proj       (netCDF::NcFile *, const Grid &, netCDF::NcDim &, netCDF::NcDim &);
 extern void write_netcdf_latlon     (netCDF::NcFile *, netCDF::NcDim *, netCDF::NcDim *, const Grid &);
 extern void write_netcdf_grid_weight(netCDF::NcFile *, netCDF::NcDim *, netCDF::NcDim *, const GridWeightType, const DataPlane &); 

@@ -59,7 +59,7 @@ MtdFloatFile::~MtdFloatFile()
 
 {
 
-clear();
+MtdFloatFile::clear();
 
 }
 
@@ -102,7 +102,7 @@ void MtdFloatFile::float_init_from_scratch()
 {
 
 
-clear();
+MtdFloatFile::clear();
 
 return;
 
@@ -143,9 +143,9 @@ void MtdFloatFile::float_assign(const MtdFloatFile & f)
 
 {
 
-clear();
+MtdFloatFile::clear();
 
-base_assign(f);
+base_copy(f);
 
 DataMin = f.DataMin;
 DataMax = f.DataMax;

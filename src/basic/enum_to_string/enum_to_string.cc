@@ -189,7 +189,7 @@ do {
 
         if ( strcmp(argv[j], "-prefix"          ) == 0 )  { set_prefix         ();       shift_down(argc, argv, j, 1); }
    else if ( strcmp(argv[j], "-hh"              ) == 0 )  { set_suffix         (".hh");  shift_down(argc, argv, j, 1); }
-   else if ( strcmp(argv[j], "-no_suffix"       ) == 0 )  { set_suffix         (0);      shift_down(argc, argv, j, 1); }
+   else if ( strcmp(argv[j], "-no_suffix"       ) == 0 )  { set_suffix         (nullptr);      shift_down(argc, argv, j, 1); }
    else if ( strcmp(argv[j], "-angle_brackets"  ) == 0 )  { set_angle_brackets ();       shift_down(argc, argv, j, 1); }
    else if ( strcmp(argv[j], "-array"           ) == 0 )  { set_array          ();       shift_down(argc, argv, j, 1); }
    else if ( strcmp(argv[j], "-reverse"         ) == 0 )  { set_reverse        ();       shift_down(argc, argv, j, 1); }

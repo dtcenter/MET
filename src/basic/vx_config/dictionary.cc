@@ -906,7 +906,7 @@ Dictionary::~Dictionary()
 
 {
 
-clear();
+Dictionary::clear();
 
 }
 
@@ -957,7 +957,7 @@ Nentries = 0;
 
 Nalloc = 0;
 
-clear();
+Dictionary::clear();
 
 return;
 
@@ -995,7 +995,7 @@ void Dictionary::assign(const Dictionary & d)
 
 {
 
-clear();
+Dictionary::clear();
 
 if ( d.Nentries > 0 )  {
 
@@ -1005,7 +1005,7 @@ if ( d.Nentries > 0 )  {
 
    for (j=0; j<(d.Nentries); ++j)  {
 
-      store( *(d.e[j]) );
+      Dictionary::store( *(d.e[j]) );
 
    }
 
@@ -1170,7 +1170,7 @@ void Dictionary::store(const Dictionary & d)
 
 for (int j=0; j<(d.n_entries()); ++j)  {
 
-   store( *(d[j]) );
+   Dictionary::store( *(d[j]) );
 
 }
 
@@ -2346,7 +2346,7 @@ DictionaryStack::~DictionaryStack()
 
 {
 
-clear();
+DictionaryStack::clear();
 
 }
 
@@ -2402,7 +2402,7 @@ for (j=0; j<max_dictionary_depth; ++j)  {
 
 }
 
-clear();
+DictionaryStack::clear();
 
 return;
 

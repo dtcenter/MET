@@ -43,7 +43,7 @@ public:
   {}
   
   
-  virtual ~SDObservation() {}
+  virtual ~SDObservation() = default;
     
   
   ////////////////////

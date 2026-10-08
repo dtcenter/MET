@@ -82,8 +82,9 @@ class CylindricalGridInterpolator(metaclass=abc.ABCMeta):
         self.x_km, self.y_km = convert_grid_to_tc_centric_km(
             src_lons, src_lats, tc_center_lon, tc_center_lat)
 
+    @abc.abstractmethod
     def __call__(self, data: np.ndarray):
-        pass
+        """Interpolate data to the cylindrical grid; implemented by subclasses."""
 
 
 class ScipyLinearNDInterpolator(CylindricalGridInterpolator):

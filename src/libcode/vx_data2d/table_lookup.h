@@ -174,7 +174,7 @@ class TableFlatFile {
    public:
 
       TableFlatFile();
-      TableFlatFile(int);   //  reads defaults
+      explicit TableFlatFile(int);   //  reads defaults
      ~TableFlatFile();
       TableFlatFile(const TableFlatFile &);
       TableFlatFile & operator=(const TableFlatFile &);

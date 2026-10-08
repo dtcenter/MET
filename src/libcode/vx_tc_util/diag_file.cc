@@ -244,7 +244,7 @@ void DiagFile::read_cira_rt(const ConcatString &path,
    int i;
    double v_in, v_out;
    NumArray data;
-   const UserFunc_1Arg *fx_ptr = 0;
+   const UserFunc_1Arg *fx_ptr = nullptr;
 
    // Initialize
    clear();
@@ -394,7 +394,7 @@ void DiagFile::read_ships_rt(const ConcatString &path,
    int i, v_int;
    double v_dbl;
    NumArray data;
-   const UserFunc_1Arg *fx_ptr = 0;
+   const UserFunc_1Arg *fx_ptr = nullptr;
 
    // Initialize
    clear();

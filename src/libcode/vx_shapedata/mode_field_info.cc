@@ -118,9 +118,9 @@ void Mode_Field_Info::init_from_scratch()
 
 {
 
-dict = 0;
+dict = nullptr;
 
-conf = 0;
+conf = nullptr;
 
 var_info.reset();
 
@@ -141,9 +141,9 @@ void Mode_Field_Info::clear()
 
 index = -1;
 
-dict = 0;   //  not allocated, so don't delete
+dict = nullptr;   //  not allocated, so don't delete
 
-conf = 0;   //  not allocated, so don't delete
+conf = nullptr;   //  not allocated, so don't delete
 
 gft = FileType_None;
 

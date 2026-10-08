@@ -36,7 +36,7 @@ class Ppm : public PxmBase {
    public:
 
       Ppm();
-      Ppm(const char *);
+      explicit Ppm(const char *);
       virtual ~Ppm();
       Ppm(const Ppm &);
       Ppm & operator=(const Ppm &);

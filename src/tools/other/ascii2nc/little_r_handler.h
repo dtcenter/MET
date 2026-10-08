@@ -32,7 +32,7 @@ class LittleRHandler : public FileHandler
 
 public:
 
-  LittleRHandler(const std::string &program_name);
+  explicit LittleRHandler(const std::string &program_name);
   virtual ~LittleRHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;

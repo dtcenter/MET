@@ -1150,7 +1150,7 @@ int32 r, nt;
 
 clear_buf();
 
-if ( SWinqdatafields(SwathId, (char *) buf, 0, 0) < 0 )  {
+if ( SWinqdatafields(SwathId, (char *) buf, nullptr, nullptr) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_data_fields() -> error (1)\n\n";
@@ -1355,7 +1355,7 @@ int32 r, nt;
 
 clear_buf();
 
-if ( SWinqgeofields(SwathId, (char *) buf, 0, 0) < 0 )  {
+if ( SWinqgeofields(SwathId, (char *) buf, nullptr, nullptr) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_geo_fields() -> error (1)\n\n";
@@ -1465,7 +1465,7 @@ StringArray a;
 
 clear_buf();
 
-if ( SWinqdims(SwathId, (char *) buf, 0) < 0 )  {
+if ( SWinqdims(SwathId, (char *) buf, nullptr) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_dimensions() -> error (1)\n\n";
@@ -1522,7 +1522,7 @@ for (j=0; j<Ndatafields; ++j)  {
 }
 
 
-return ( (SwathDataField *) 0 );
+return ( nullptr );
 
 }
 
@@ -1565,7 +1565,7 @@ for (j=0; j<Ngeofields; ++j)  {
 }
 
 
-return ( (SwathDataField *) 0 );
+return ( nullptr );
 
 }
 
@@ -1608,7 +1608,7 @@ for (j=0; j<Ndatafields; ++j)  {
 }
 
 
-return ( (SwathDataField *) 0 );
+return ( nullptr );
 
 }
 
@@ -1736,7 +1736,7 @@ if ( (k < 0) || (k >= n) )  {
 
 start = (int32) k;
 
-if ( SWreadfield(SwathId, (char *) "Latitude", &start, 0, &edge, buf) < 0 )  {
+if ( SWreadfield(SwathId, (char *) "Latitude", &start, nullptr, &edge, buf) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::lat(int) const -> bad SWreadfield status\n\n";
@@ -1780,7 +1780,7 @@ if ( (k < 0) || (k >= n) )  {
 
 start = (int32) k;
 
-if ( SWreadfield(SwathId, (char *) "Longitude", &start, 0, &edge, buf) < 0 )  {
+if ( SWreadfield(SwathId, (char *) "Longitude", &start, nullptr, &edge, buf) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::lon(int) const -> bad SWreadfield status\n\n";
@@ -1830,7 +1830,7 @@ start[1] = (int32) bin;
 
 edge[0] = edge[1] = 1;
 
-if ( SWreadfield(SwathId, (char *) "Height", start, 0, edge, buf) < 0 )  {
+if ( SWreadfield(SwathId, (char *) "Height", start, nullptr, edge, buf) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::height_m(int) const -> bad SWreadfield status\n\n";
@@ -1879,7 +1879,7 @@ start[1] = (int32) bin;
 
 edge[0] = edge[1] = 1;
 
-if ( SWreadfield(SwathId, (char *) "Radar_Reflectivity", start, 0, edge, buf) < 0 )  {
+if ( SWreadfield(SwathId, (char *) "Radar_Reflectivity", start, nullptr, edge, buf) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::reflectivity(int, int) const -> bad SWreadfield status\n\n";

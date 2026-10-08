@@ -31,7 +31,7 @@ class PSOutputFilter : public PSFilter {
       PSOutputFilter();
      ~PSOutputFilter();
 
-      PSOutputFilter(std::ofstream &);
+      explicit PSOutputFilter(std::ofstream &);
 
       std::ofstream *file;
 

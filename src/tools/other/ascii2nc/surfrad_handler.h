@@ -31,7 +31,7 @@ class SurfradHandler : public FileHandler
 
 public:
 
-  SurfradHandler(const std::string &program_name);
+  explicit SurfradHandler(const std::string &program_name);
   virtual ~SurfradHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;

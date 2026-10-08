@@ -50,7 +50,7 @@ class Python3_Script {
 
    public:
 
-      Python3_Script(const char * _script_filename);
+      explicit Python3_Script(const char * _script_filename);
      ~Python3_Script();
 
          //

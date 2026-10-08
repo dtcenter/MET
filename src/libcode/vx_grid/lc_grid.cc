@@ -184,7 +184,7 @@ theta_pin = H*Cone*(rescale_deg(Lon_orient - data.lon_pin, -180.0, 180.0));
 Bx = data.x_pin - Alpha*r_pin*H*sind(theta_pin);
 By = data.y_pin + Alpha*r_pin*H*cosd(theta_pin);
 
-xy_to_latlon(0.0, 0.0, Lat_LL, Lon_LL);
+LambertGrid::xy_to_latlon(0.0, 0.0, Lat_LL, Lon_LL);
 
 reduce(Lon_LL);
 

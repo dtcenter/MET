@@ -48,7 +48,7 @@ class FileHandler
 
 public:
 
-  FileHandler(const std::string &program_name);
+  explicit FileHandler(const std::string &program_name);
   virtual ~FileHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const = 0;

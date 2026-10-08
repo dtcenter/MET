@@ -157,7 +157,7 @@ void AsciiHeaderLine::set_col_names(const char *s) {
       }
 
       // Check for a variable length column
-     else if(strstr(ColNames[i].c_str(), var_col_name_str) != 0) {
+     else if(strstr(ColNames[i].c_str(), var_col_name_str) != nullptr) {
 
          // Check that the variable index column has already been set
          if(VarIndexName.empty()) {

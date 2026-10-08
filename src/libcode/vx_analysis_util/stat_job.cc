@@ -2076,7 +2076,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          // Write only header columns for unspecified line type
          //
          case STATLineType::none:
-                                    write_header_row       ((const char **) 0, 0, 1,                 stat_at, 0, 0); break;
+                                    write_header_row       (nullptr, 0, 1,                 stat_at, 0, 0); break;
 
          default:
             mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
@@ -2271,7 +2271,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line,
             case STATLineType::relp:
             case STATLineType::orank:
             case STATLineType::genmpr:
-               write_header_row((const char **) 0, 0, 1, dump_at, 0, 0);
+               write_header_row(nullptr, 0, 1, dump_at, 0, 0);
                break;
 
             default:
@@ -2284,7 +2284,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line,
       // Otherwise, just write a STAT header line
       //
       else {
-         write_header_row((const char **) 0, 0, 1, dump_at, 0, 0);
+         write_header_row(nullptr, 0, 1, dump_at, 0, 0);
       }
 
       n_dump++;

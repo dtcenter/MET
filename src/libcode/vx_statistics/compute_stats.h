@@ -41,7 +41,7 @@ extern void   compute_i_mctsinfo(const PairDataPoint &, int,
                                  bool, MCTSInfo &);
 
 extern void   compute_pctinfo(const PairDataPoint &, bool, PCTInfo &,
-                              const NumArray *cprob_in = 0);
+                              const NumArray *cprob_in = nullptr);
 
 extern void   compute_nbrcntinfo(const PairDataPoint &,
                                  const PairDataPoint &,

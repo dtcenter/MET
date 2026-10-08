@@ -153,17 +153,18 @@ class SeepsClimoBase {
       bool is_seeps_ready() { return seeps_ready; };
       void increase_filtered_count() { filtered_count++; };
       bool check_seeps_p1_thresh(double p1) { return seeps_p1_thresh.check(p1); };
-      ConcatString get_climo_filename();
+      ConcatString get_climo_filename(const ConcatString &env_climo_name,
+                                      const char *def_climo_name);
 
       virtual void clear();
       virtual ConcatString get_env_climo_name() { return "not defined"; };
       virtual char *get_def_climo_name() { return nullptr; };
-      virtual void read_seeps_climo_grid(const ConcatString &filename) {};
+      virtual void read_seeps_climo_grid(const ConcatString &filename) = 0;
       void set_seeps_ready(bool _seeps_ready) { seeps_ready = _seeps_ready; };
 
    public:
 
-      SeepsClimoBase(const ConcatString &seeps_climo_name);
+      explicit SeepsClimoBase(const ConcatString &seeps_climo_name);
       virtual ~SeepsClimoBase();
       void set_p1_thresh(const SingleThresh &p1_thresh);
       int get_filtered_count() const;
@@ -195,7 +196,7 @@ class SeepsClimo : public SeepsClimoBase {
 
    public:
 
-      SeepsClimo(const ConcatString &seeps_climo_name);
+      explicit SeepsClimo(const ConcatString &seeps_climo_name);
      ~SeepsClimo();
 
       std::unique_ptr<SeepsRecord> get_record(int sid, int month, int hour);

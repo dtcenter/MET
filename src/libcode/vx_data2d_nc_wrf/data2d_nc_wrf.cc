@@ -37,7 +37,7 @@ MetNcWrfDataFile::MetNcWrfDataFile() {
 
 MetNcWrfDataFile::~MetNcWrfDataFile() {
 
-   close();
+   MetNcWrfDataFile::close();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ void MetNcWrfDataFile::nc_wrf_init_from_scratch() {
 
    WrfNc.reset();
 
-   close();
+   MetNcWrfDataFile::close();
 
    return;
 }

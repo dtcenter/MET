@@ -92,11 +92,11 @@ for (j=1; j<argc; ++j)  {   //  j starts at one, here
    //  test
    //
 
-const DictionaryEntry * e = (const DictionaryEntry *) 0;
-const DictionaryEntry * m = (const DictionaryEntry *) 0;
-const DictionaryEntry * h = (const DictionaryEntry *) 0;
-Dictionary * ed = (Dictionary *) 0;
-Dictionary * md = (Dictionary *) 0;
+const DictionaryEntry * e = nullptr;
+const DictionaryEntry * m = nullptr;
+const DictionaryEntry * h = nullptr;
+Dictionary * ed = nullptr;
+Dictionary * md = nullptr;
 
 
 cout << "\n\n";

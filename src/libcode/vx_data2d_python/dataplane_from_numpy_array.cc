@@ -83,8 +83,8 @@ const ConcatString dtype = np.dtype();
 
       //   1 byte integers
 
-     if ( dtype == "|i1"  )   load_numpy <int8_t>    (np.buffer(), Nx, Ny, little_endian,         0, dp_out);
-else if ( dtype == "|u1"  )   load_numpy <uint8_t>   (np.buffer(), Nx, Ny, little_endian,         0, dp_out);
+     if ( dtype == "|i1"  )   load_numpy <int8_t>    (np.buffer(), Nx, Ny, little_endian,         nullptr, dp_out);
+else if ( dtype == "|u1"  )   load_numpy <uint8_t>   (np.buffer(), Nx, Ny, little_endian,         nullptr, dp_out);
 
       //   2 byte integers
 

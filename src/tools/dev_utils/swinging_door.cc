@@ -234,7 +234,7 @@ bool write_observations(const vector< SDObservation > &observations,
 
   FILE *output_file;
 
-  if ((output_file = fopen(file_path.c_str(), "w")) == 0)
+  if ((output_file = fopen(file_path.c_str(), "w")) == nullptr)
   {
     mlog << Error << "\n" + method_name + " -> "
          << "Error opening output file: " << file_path << ".\n\n";
@@ -274,7 +274,7 @@ bool write_ramps(const vector< SDObservation > &observations,
 
   FILE *output_file;
 
-  if ((output_file = fopen(file_path.c_str(), "w")) == 0)
+  if ((output_file = fopen(file_path.c_str(), "w")) == nullptr)
   {
     mlog << Error << "\n" + method_name + " -> "
          << "Error opening output file: " << file_path << ".\n\n";
