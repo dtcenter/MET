@@ -46,7 +46,7 @@ Pcm::Pcm()
 
 {
 
-init_from_scratch();
+Pcm::init_from_scratch();
 
 }
 
@@ -58,9 +58,9 @@ Pcm::Pcm(const char * filename)
 
 {
 
-init_from_scratch();
+Pcm::init_from_scratch();
 
-if ( !read(filename) )  {
+if ( !Pcm::read(filename) )  {
 
    mlog << Error << "\nPcm::Pcm(const char *filename) -> failed to read file \"" << filename << "\"\n\n";
 
@@ -78,7 +78,7 @@ Pcm::~Pcm()
 
 {
 
-clear();
+Pcm::clear();
 
 }
 
@@ -90,7 +90,7 @@ Pcm::Pcm(const Pcm & p)
 
 {
 
-init_from_scratch();
+Pcm::init_from_scratch();
 
 assign(p);
 
@@ -165,9 +165,9 @@ void Pcm::assign(const Pcm & p)
 int trouble;
 
 
-clear();
+Pcm::clear();
 
-copy_common(p);
+PxmBase::copy_common(p);
 
 
 int j;
@@ -178,7 +178,7 @@ Colormap = p.Colormap;
 
 if ( trouble )  {
 
-   clear();
+   Pcm::clear();
 
    mlog << Error << "\nPcm::assign() -> memory allocation error\n\n";
 

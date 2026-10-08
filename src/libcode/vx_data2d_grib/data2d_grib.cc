@@ -61,7 +61,7 @@ MetGrib1DataFile::~MetGrib1DataFile()
 
 {
 
-close();
+MetGrib1DataFile::close();
 
 }
 
@@ -107,7 +107,7 @@ GF.reset();
 
 Plane.clear();
 
-close();
+MetGrib1DataFile::close();
 
 return;
 

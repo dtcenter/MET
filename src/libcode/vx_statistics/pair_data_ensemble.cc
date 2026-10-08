@@ -44,7 +44,7 @@ PairDataEnsemble::PairDataEnsemble() {
 ////////////////////////////////////////////////////////////////////////
 
 PairDataEnsemble::~PairDataEnsemble() {
-   clear();
+   PairDataEnsemble::clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ void PairDataEnsemble::init_from_scratch() {
 
    n_ens      = 0;
 
-   clear();
+   PairDataEnsemble::clear();
 
    return;
 }
@@ -198,7 +198,7 @@ void PairDataEnsemble::extend(int n) {
 
 void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
-   clear();
+   PairDataEnsemble::clear();
 
    set_mask_name(pd.mask_name.c_str());
    set_mask_area_ptr(pd.mask_area_ptr);
@@ -979,7 +979,7 @@ VxPairDataEnsemble::VxPairDataEnsemble() {
 ////////////////////////////////////////////////////////////////////////
 
 VxPairDataEnsemble::~VxPairDataEnsemble() {
-   clear();
+   VxPairDataEnsemble::clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1008,7 +1008,7 @@ void VxPairDataEnsemble::init_from_scratch() {
 
    VxPairBase::init_from_scratch();
 
-   clear();
+   VxPairDataEnsemble::clear();
 
    return;
 }
@@ -1035,7 +1035,7 @@ void VxPairDataEnsemble::clear() {
 
 void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
 
-   clear();
+   VxPairDataEnsemble::clear();
 
    VxPairBase::assign(vx_pd);
 

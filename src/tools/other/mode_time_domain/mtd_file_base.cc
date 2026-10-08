@@ -59,7 +59,7 @@ MtdFileBase::~MtdFileBase()
 
 {
 
-clear();
+MtdFileBase::clear();
 
 }
 
@@ -71,7 +71,7 @@ void MtdFileBase::base_init_from_scratch()
 
 {
 
-clear();
+MtdFileBase::clear();
 
 return;
 

@@ -69,7 +69,7 @@ MtdIntFile::~MtdIntFile()
 
 {
 
-clear();
+MtdIntFile::clear();
 
 }
 
@@ -112,7 +112,7 @@ void MtdIntFile::int_init_from_scratch()
 {
 
 
-clear();
+MtdIntFile::clear();
 
 return;
 
@@ -161,7 +161,7 @@ void MtdIntFile::int_assign(const MtdIntFile & f)
 
 {
 
-clear();
+MtdIntFile::clear();
 
 int n;
 

@@ -43,7 +43,7 @@ Pbm::Pbm()
 
 {
 
-init_from_scratch();
+Pbm::init_from_scratch();
 
 }
 
@@ -55,9 +55,9 @@ Pbm::Pbm(const char * filename)
 
 {
 
-init_from_scratch();
+Pbm::init_from_scratch();
 
-if ( !read(filename) )  {
+if ( !Pbm::read(filename) )  {
 
    mlog << Error << "\nPbm::Pbm(const char *filename) -> failed to read file \"" << filename << "\"\n\n";
 
@@ -75,7 +75,7 @@ Pbm::~Pbm()
 
 {
 
-clear();
+Pbm::clear();
 
 }
 
@@ -87,7 +87,7 @@ Pbm::Pbm(const Pbm & p)
 
 {
 
-init_from_scratch();
+Pbm::init_from_scratch();
 
 assign(p);
 
@@ -145,7 +145,7 @@ void Pbm::assign(const Pbm & p)
 
 {
 
-copy_common(p);
+PxmBase::copy_common(p);
 
 return;
 

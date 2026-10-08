@@ -53,7 +53,7 @@ BasicModeAnalysisJob::BasicModeAnalysisJob()
 
 {
 
-init_from_scratch();
+BasicModeAnalysisJob::init_from_scratch();
 
 }
 
@@ -65,7 +65,7 @@ BasicModeAnalysisJob::~BasicModeAnalysisJob()
 
 {
 
-clear();
+BasicModeAnalysisJob::clear();
 
 }
 
@@ -77,9 +77,9 @@ BasicModeAnalysisJob::BasicModeAnalysisJob(const BasicModeAnalysisJob & aj)
 
 {
 
-init_from_scratch();
+BasicModeAnalysisJob::init_from_scratch();
 
-assign_basic_job(aj);
+BasicModeAnalysisJob::assign_basic_job(aj);
 
 }
 
@@ -373,7 +373,7 @@ SummaryJob::SummaryJob()
 
 {
 
-init_from_scratch();
+SummaryJob::init_from_scratch();
 
 }
 
@@ -385,7 +385,7 @@ SummaryJob::~SummaryJob()
 
 {
 
-clear();
+SummaryJob::clear();
 
 }
 
@@ -397,7 +397,7 @@ SummaryJob::SummaryJob(const SummaryJob & job)
 
 {
 
-init_from_scratch();
+SummaryJob::init_from_scratch();
 
 assign(job);
 
@@ -455,7 +455,7 @@ void SummaryJob::assign(const SummaryJob & job)
 
 {
 
-clear();
+SummaryJob::clear();
 
 BasicModeAnalysisJob::assign_basic_job(job);
 
@@ -701,7 +701,7 @@ ByCaseJob::ByCaseJob()
 
 {
 
-init_from_scratch();
+ByCaseJob::init_from_scratch();
 
 }
 
@@ -713,7 +713,7 @@ ByCaseJob::~ByCaseJob()
 
 {
 
-clear();
+ByCaseJob::clear();
 
 }
 
@@ -725,7 +725,7 @@ ByCaseJob::ByCaseJob(const ByCaseJob & job)
 
 {
 
-init_from_scratch();
+ByCaseJob::init_from_scratch();
 
 assign(job);
 
@@ -787,7 +787,7 @@ void ByCaseJob::assign(const ByCaseJob & job)
 
 {
 
-clear();
+ByCaseJob::clear();
 
 BasicModeAnalysisJob::assign_basic_job(job);
 

@@ -46,7 +46,7 @@ Ppm::Ppm()
 
 {
 
-init_from_scratch();
+Ppm::init_from_scratch();
 
 }
 
@@ -58,9 +58,9 @@ Ppm::Ppm(const char * filename)
 
 {
 
-init_from_scratch();
+Ppm::init_from_scratch();
 
-if ( !read(filename) )  {
+if ( !Ppm::read(filename) )  {
 
    mlog << Error << "\nPpm::Ppm(const char *) -> failed to read file \"" << filename << "\"\n\n";
 
@@ -78,7 +78,7 @@ Ppm::~Ppm()
 
 {
 
-clear();
+Ppm::clear();
 
 }
 
@@ -90,7 +90,7 @@ Ppm::Ppm(const Ppm &p)
 
 {
 
-init_from_scratch();
+Ppm::init_from_scratch();
 
 assign(p);
 
@@ -150,7 +150,7 @@ void Ppm::assign(const Ppm & p)
 
 {
 
-copy_common(p);
+PxmBase::copy_common(p);
 
 return;
 

@@ -595,7 +595,7 @@ GribFile::GribFile(const char *filename)
 
 rep.reset();
 
-open(filename);
+GribFile::open(filename);
 
 }
 
@@ -692,7 +692,7 @@ GribFile::~GribFile()
 
 {
 
-close();
+GribFile::close();
 
 }
 

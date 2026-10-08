@@ -42,7 +42,7 @@ PairDataPoint::PairDataPoint() {
 ////////////////////////////////////////////////////////////////////////
 
 PairDataPoint::~PairDataPoint() {
-   clear();
+   PairDataPoint::clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ void PairDataPoint::init_from_scratch() {
 
    seeps_climo = nullptr;
 
-   clear();
+   PairDataPoint::clear();
 
    return;
 }
@@ -122,7 +122,7 @@ void PairDataPoint::extend(int n) {
 
 void PairDataPoint::assign(const PairDataPoint &pd) {
 
-   clear();
+   PairDataPoint::clear();
 
    // Allocate memory for output pairs
    extend(pd.n_obs);
@@ -416,7 +416,7 @@ VxPairDataPoint::VxPairDataPoint() {
 ////////////////////////////////////////////////////////////////////////
 
 VxPairDataPoint::~VxPairDataPoint() {
-   clear();
+   VxPairDataPoint::clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -462,7 +462,7 @@ void VxPairDataPoint::init_from_scratch() {
 
    VxPairBase::init_from_scratch();
 
-   clear();
+   VxPairDataPoint::clear();
 
    return;
 }
@@ -482,7 +482,7 @@ void VxPairDataPoint::clear() {
 
 void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
 
-   clear();
+   VxPairDataPoint::clear();
 
    VxPairBase::assign(vx_pd);
 

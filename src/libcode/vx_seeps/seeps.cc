@@ -166,7 +166,7 @@ SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
 
 SeepsClimoBase::SeepsClimoBase(const ConcatString &seeps_climo_name) : climo_file_name{seeps_climo_name} {
 
-   clear();
+   SeepsClimoBase::clear();
    seeps_ready = false;
 
 }
@@ -174,7 +174,7 @@ SeepsClimoBase::SeepsClimoBase(const ConcatString &seeps_climo_name) : climo_fil
 ////////////////////////////////////////////////////////////////////////
 
 SeepsClimoBase::~SeepsClimoBase() {
-   clear();
+   SeepsClimoBase::clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -186,16 +186,16 @@ void SeepsClimoBase::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString SeepsClimoBase::get_climo_filename() {
+ConcatString SeepsClimoBase::get_climo_filename(const ConcatString &env_climo_name,
+                                                const char *def_climo_name) {
    ConcatString log_seeps_filename;
    ConcatString seeps_filename;
    const char *method_name = "SeepsClimoBase::get_climo_filename() -> ";
 
    // Use the environment variable, if set.
-   ConcatString env_climo_name = get_env_climo_name();
    bool use_env = get_env(env_climo_name.c_str(), seeps_filename);
    if(!use_env) {
-      seeps_filename = climo_file_name.nonempty() ? climo_file_name : get_def_climo_name();
+      seeps_filename = climo_file_name.nonempty() ? climo_file_name : def_climo_name;
    }
    seeps_filename = replace_path(seeps_filename);
 
@@ -241,16 +241,17 @@ void SeepsClimoBase::set_p1_thresh(const SingleThresh &p1_thresh) {
 
 SeepsClimo::SeepsClimo(const ConcatString &seeps_climo_name) : SeepsClimoBase{seeps_climo_name} {
 
-   clear();
-   ConcatString seeps_name = get_climo_filename();
-   if (file_exists(seeps_name.c_str())) read_seeps_climo_grid(seeps_name);
+   SeepsClimo::clear();
+   ConcatString seeps_name = get_climo_filename(SeepsClimo::get_env_climo_name(),
+                                                SeepsClimo::get_def_climo_name());
+   if (file_exists(seeps_name.c_str())) SeepsClimo::read_seeps_climo_grid(seeps_name);
 
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 SeepsClimo::~SeepsClimo() {
-   clear();
+   SeepsClimo::clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -674,16 +675,17 @@ void SeepsClimo::read_seeps_climo_grid(const ConcatString &filename) {
 SeepsClimoGrid::SeepsClimoGrid(int month, int hour, const ConcatString &seeps_climo_name)
    : month{month}, hour{hour}, SeepsClimoBase{seeps_climo_name}
 {
-   clear();
+   SeepsClimoGrid::clear();
 
-   ConcatString seeps_name = get_climo_filename();
-   if (file_exists(seeps_name.c_str())) read_seeps_climo_grid(seeps_name);
+   ConcatString seeps_name = get_climo_filename(SeepsClimoGrid::get_env_climo_name(),
+                                                SeepsClimoGrid::get_def_climo_name());
+   if (file_exists(seeps_name.c_str())) SeepsClimoGrid::read_seeps_climo_grid(seeps_name);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 SeepsClimoGrid::~SeepsClimoGrid() {
-   clear();
+   SeepsClimoGrid::clear();
 }
 
 ////////////////////////////////////////////////////////////////////////

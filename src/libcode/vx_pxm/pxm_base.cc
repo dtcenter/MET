@@ -40,7 +40,7 @@ PxmBase::PxmBase()
 
 {
 
-init_from_scratch();
+PxmBase::init_from_scratch();
 
 }
 
@@ -52,7 +52,7 @@ PxmBase::~PxmBase()
 
 {
 
-clear_common();
+PxmBase::clear_common();
 
 }
 

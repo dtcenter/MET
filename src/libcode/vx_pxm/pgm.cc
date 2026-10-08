@@ -53,7 +53,7 @@ Pgm::Pgm()
 
 {
 
-init_from_scratch();
+Pgm::init_from_scratch();
 
 }
 
@@ -65,9 +65,9 @@ Pgm::Pgm(const char * filename)
 
 {
 
-init_from_scratch();
+Pgm::init_from_scratch();
 
-if ( !read(filename) )  {
+if ( !Pgm::read(filename) )  {
 
    mlog << Error << "\nPgm::Pgm(const char *filename) -> failed to read file \"" << filename << "\"\n\n";
 
@@ -85,7 +85,7 @@ Pgm::~Pgm()
 
 {
 
-clear();
+Pgm::clear();
 
 }
 
@@ -97,7 +97,7 @@ Pgm::Pgm(const Pgm & p)
 
 {
 
-init_from_scratch();
+Pgm::init_from_scratch();
 
 assign(p);
 
@@ -157,7 +157,7 @@ void Pgm::assign(const Pgm & p)
 
 {
 
-copy_common(p);
+PxmBase::copy_common(p);
 
 return;
 

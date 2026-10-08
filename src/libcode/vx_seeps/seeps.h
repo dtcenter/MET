@@ -153,7 +153,8 @@ class SeepsClimoBase {
       bool is_seeps_ready() { return seeps_ready; };
       void increase_filtered_count() { filtered_count++; };
       bool check_seeps_p1_thresh(double p1) { return seeps_p1_thresh.check(p1); };
-      ConcatString get_climo_filename();
+      ConcatString get_climo_filename(const ConcatString &env_climo_name,
+                                      const char *def_climo_name);
 
       virtual void clear();
       virtual ConcatString get_env_climo_name() { return "not defined"; };

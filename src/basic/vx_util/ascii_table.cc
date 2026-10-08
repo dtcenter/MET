@@ -161,13 +161,13 @@ PadChar = default_table_pad_char;
 
 Nrows = Ncols = 0;
 
-set_precision(ascii_table_default_precision);
+AsciiTable::set_precision(ascii_table_default_precision);
 
-set_bad_data_value(ascii_table_default_bad_data_value);
+AsciiTable::set_bad_data_value(ascii_table_default_bad_data_value);
 
 snprintf(tmp_str, sizeof(tmp_str), "%.0f", ascii_table_default_bad_data_value);
 
-set_bad_data_str(tmp_str);
+AsciiTable::set_bad_data_str(tmp_str);
 
 DoCommaString = false;
 
@@ -247,7 +247,7 @@ clear();
 
 if ( a.e.empty() )  return;
 
-set_size(a.nrows(), a.ncols());
+AsciiTable::set_size(a.nrows(), a.ncols());
 
 
 int r, c;
