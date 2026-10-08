@@ -156,7 +156,7 @@ References
 
 .. _Ebert-Uphoff-2024:
 
-| Ebert-Uphoff, I.,, 2024: An Investigation of Metrics to Evaluate the Sharpness
+| Ebert-Uphoff, I., 2024: An Investigation of Metrics to Evaluate the Sharpness
 |   in AI-Generated Meteorological Imagery. *Draft version - Jan 26, 2024*
 |
 
@@ -169,8 +169,8 @@ References
 
 .. _Efron-2007:
 
-| Efron, B. 2007: Correlation and large-scale significance testing. *Journal*
-|   of the American Statistical Association*, 102(477), 93-103.
+| Efron, B. 2007: Correlation and large-scale significance testing. *Journal of*
+|   *the American Statistical Association*, 102(477), 93-103.
 |
 
 .. _Epstein-1969:
@@ -185,6 +185,14 @@ References
 | Ferro C. A. T., 2017: Measuring forecast performance in the presence of observation error.
 |   *Q. J. R. Meteorol. Soc.*, 143 (708), 2665-2676.
 |   doi: https://doi.org/10.1002/qj.3115
+|
+
+.. _Ferro-2011:
+
+| Ferro, C. A. T., and D. B. Stephenson, 2011: Extremal Dependence Indices: Improved
+|   Verification Measures for Deterministic Forecasts of Rare Binary Events.
+|   *Weather and Forecasting*, 26 (5), 699-713.
+|   doi: https://doi.org/10.1175/WAF-D-10-05030.1
 |
 
 .. _Gilleland-2010:
@@ -263,8 +271,8 @@ References
 .. _Knaff-2003:
 
 | Knaff, J.A., M. DeMaria, C.R. Sampson, and J.M. Gross, 2003: Statistical,
-|   Five-Day Tropical Cyclone Intensity Forecasts Derived from Climatology
-|   and Persistence. *Weather and Forecasting*, Vol. 18 Issue 2, p. 80-92.
+|   5-Day Tropical Cyclone Intensity Forecasts Derived from Climatology
+|   and Persistence. *Weather and Forecasting*, Vol. 18 Issue 1, p. 80-92.
 |
 
 .. _Mason-2004:
@@ -332,7 +340,7 @@ References
 
 | Rodwell, M.J., D.S. Richardson, T.D. Hewson and T. Haiden, 2010: A new equitable
 |   score suitable for verifying precipitation in numerical weather prediction.
-|   *Quarterly Journal of the Royal Meteorological Society*, 136: 1344-1463.
+|   *Quarterly Journal of the Royal Meteorological Society*, 136: 1344-1363.
 |   https://doi.org/10.1002/qj.656
 |
 

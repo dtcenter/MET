@@ -149,7 +149,7 @@ __attribute__((noreturn)) static void usage(int exit_code) {
         << ") ***\n\n"
         << "Usage: " << program_name << "\n"
         << "\t-data domain tech_id_list [ file_1 ... file_n | file_list ]\n"
-        << "\t-deck file\n"
+        << "\t-deck path\n"
         << "\t-config file\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
@@ -162,7 +162,7 @@ __attribute__((noreturn)) static void usage(int exit_code) {
         << "\t\t\ta list of files to be used.\n"
         << "\t\t\tSpecify \"-data\" once for each data source (required).\n"
 
-        << "\t\t\"-deck source\" is the ATCF format data source "
+        << "\t\t\"-deck path\" is the ATCF format data source "
         << "(required).\n"
 
         << "\t\t\"-config file\" is a TCDiagConfig file to be used "

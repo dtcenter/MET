@@ -65,7 +65,7 @@ ______________________
 
   version = "VN.N";
 
-The :code:`data` dictionary specifies the name of the 2D and 3D gridded variables to be processed from the TC-RMW NetCDF output files. Its formatting is the same as the :code:`fcst` and :code:`obs` dictionaries, used in the MET statistics tools. However, while the :code:`level` string must be specified, it is not actually used and can remain as its default setting of an empty string. TC-RMW reads data for all variables requested and summarizes it through time for all tracks that meet the filtering criteria described below.
+The :code:`data` dictionary specifies the name of the 2D and 3D gridded variables to be processed from the TC-RMW NetCDF output files. Its formatting is the same as the :code:`fcst` and :code:`obs` dictionaries, used in the MET statistics tools. However, while the :code:`level` string must be specified, it is not actually used and can remain as its default setting of an empty string. RMW-Analysis reads data for all variables requested and summarizes it through time for all tracks that meet the filtering criteria described below.
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
@@ -106,7 +106,7 @@ ____________________
 
 The NetCDF output from TC-RMW contains ATCF-formatted storm track information in the :code:`TrackLines` variable. The RMW-Analysis tool parses that track information and applies the filtering criteria listed above. Filtering is only applied for configuration entries that are non-empty lists or strings. The corresponding gridded data is only used for track points that meet all specified filtering criteria.
 
-The :code:`column_thresh_name` and :code:`init_thresh_name` arrays specify the names of ATCF columns whose values should be checked. The former applies to each individual track point while the latter applies to the initial track point (i.e. lead time equals 0). If the filtering criteria is not satisfied for the initial time, the entire track is discarded. Only values from select ATCF columns (LAT, LON, VMAX, MSLP, POUTER, ROUTER, RMW, GUSTS, EYE, DIR, and SPEED) can be thresholded numerically with these options to filter the input data processed. 
+The :code:`column_thresh_name` and :code:`init_thresh_name` arrays specify the names of ATCF columns whose values should be checked. The former applies to each individual track point while the latter applies to the initial track point (i.e., lead time equals 0). If the filtering criteria is not satisfied for the initial time, the entire track is discarded. Only values from select ATCF columns (LAT, LON, VMAX, MSLP, POUTER, ROUTER, RMW, GUSTS, EYE, DIR, and SPEED) can be thresholded numerically with these options to filter the input data processed. 
 
 These configuration options are described in :numref:`config_options_tc`.
 
