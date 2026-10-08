@@ -9,11 +9,11 @@
 module load intel/2025.2
 module load cmake/3.27.9
 
-export FC=ifort
-export F77=ifort
-export F90=ifort
-export CC=icc
-export CXX=icpc
+export FC=ifx
+export F77=ifx
+export F90=ifx
+export CC=icx
+export CXX=icpx
 
 export TEST_BASE=/usw/met/13.0.0
 export COMPILER=intel_2025.2
