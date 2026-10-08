@@ -176,30 +176,19 @@ LoggerError::LoggerError()
 //////////////////////////////////////////////////////////////////
 
 
-LoggerError::~LoggerError()
-{
-}
+LoggerError::~LoggerError() = default;
 
 
 //////////////////////////////////////////////////////////////////
 
 
-LoggerError::LoggerError(const LoggerError & le)
-{
-   err = le.err;
-}
+LoggerError::LoggerError(const LoggerError & le) = default;
 
 
 //////////////////////////////////////////////////////////////////
 
 
-LoggerError & LoggerError::operator=(const LoggerError & le)
-{
-   err = le.err;
-
-   return *this;
-
-}
+LoggerError & LoggerError::operator=(const LoggerError & le) = default;
 
 
 //////////////////////////////////////////////////////////////////
@@ -244,34 +233,13 @@ LoggerWarning::~LoggerWarning()
 //////////////////////////////////////////////////////////////////
 
 
-LoggerWarning::LoggerWarning(const LoggerWarning & lw)
-{
-   warn = lw.warn;
-
-   PrintWarning = lw.PrintWarning;
-
-   ExitOnWarning = lw.ExitOnWarning;
-
-   NeedToExit = lw.NeedToExit;
-}
+LoggerWarning::LoggerWarning(const LoggerWarning & lw) = default;
 
 
 //////////////////////////////////////////////////////////////////
 
 
-LoggerWarning & LoggerWarning::operator=(const LoggerWarning & lw)
-{
-   warn = lw.warn;
-
-   PrintWarning = lw.PrintWarning;
-
-   ExitOnWarning = lw.ExitOnWarning;
-
-   NeedToExit = lw.NeedToExit;
-
-   return *this;
-
-}
+LoggerWarning & LoggerWarning::operator=(const LoggerWarning & lw) = default;
 
 
 //////////////////////////////////////////////////////////////////

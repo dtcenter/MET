@@ -123,13 +123,7 @@ Sec4_offset_in_file = -1;
 ////////////////////////////////////////////////////////////////////////
 
 
-GribRecord::~GribRecord()
-
-{
-
-//if ( data ) { delete data; data = (vector<unsigned char> *) nullptr; }
-//if ( bitmap ) { delete bitmap; bitmap = (vector<unsigned char> *) nullptr; }
-}
+GribRecord::~GribRecord() = default;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -669,14 +663,7 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-GribFile::GribFile(const GribFile &g)
-
-{
-
-rep = g.rep;
-
-
-}
+GribFile::GribFile(const GribFile &g) = default;
 
 
 ////////////////////////////////////////////////////////////////////////

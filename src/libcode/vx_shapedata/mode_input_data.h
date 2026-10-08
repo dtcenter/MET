@@ -28,7 +28,7 @@ class ModeInputData {
    ModeInputData(const std::string &name, const DataPlane &dp, const Grid &g) :
       _name(name), _dataPlane(dp), _grid(g) {}
       
-   ~ModeInputData() {}
+   ~ModeInputData() = default;
 
    std::string _name;
    DataPlane _dataPlane;

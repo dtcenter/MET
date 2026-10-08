@@ -734,11 +734,7 @@ StringArray parse_sid_mask_as_list(const ConcatString &mask_sid_str) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-MaskLatLon::MaskLatLon(const MaskLatLon &a) {
-   name = a.name;
-   lat_thresh = a.lat_thresh;
-   lon_thresh = a.lon_thresh;
-}
+MaskLatLon::MaskLatLon(const MaskLatLon &a) = default;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1446,9 +1442,7 @@ void TimeSummaryInfo::clear() {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-BootInfo::BootInfo(const BootInfo &a)
-   : interval(a.interval), rep_prop(a.rep_prop), n_rep(a.n_rep),
-     rng(a.rng), seed(a.seed) { }
+BootInfo::BootInfo(const BootInfo &a) = default;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1989,13 +1983,7 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-ClimoCDFInfo::ClimoCDFInfo(const ClimoCDFInfo &a) {
-   flag = a.flag;
-   n_bin = a.n_bin;
-   cdf_ta = a.cdf_ta;
-   write_bins = a.write_bins;
-   direct_prob = a.direct_prob;
-}
+ClimoCDFInfo::ClimoCDFInfo(const ClimoCDFInfo &a) = default;
 
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -41,7 +41,7 @@ private:
     std::string name;  // name of the header as found in the file
     int ptr;      // column index for that data (0,1,..)
     inline Column(const std::string &n) : name(n), ptr(-1) {}
-    inline ~Column() {}
+    inline ~Column() = default;
     inline void clear(void) {ptr = -1;}
     inline bool nameEquals(const std::string &s) const {return name == s;}
     inline void setPtr(int ipt) {ptr = ipt;}
