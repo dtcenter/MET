@@ -1390,7 +1390,7 @@ static void process_grid_vx() {
                     << obs_info->name()
                     << ") and MESSAGE_TYPE(" << conf_info.obtype
                     << ").\nSpecify a custom obs error table using the "
-                    << "MET_OBS_ERROR_TABLE environment variable.\n\n";
+                    << "MET_OBS_ERR_TABLE environment variable.\n\n";
                conf_info.vx_opt[i].obs_error.flag = false;
             }
             else {

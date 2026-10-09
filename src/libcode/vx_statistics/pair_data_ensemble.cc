@@ -1256,7 +1256,7 @@ void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
                  << "obs error table contains no entry for OBS_VAR("
                  << obs_info->name() << ") and MESSAGE_TYPE("
                  << hdr_typ_str << ").\nSpecify a custom obs error "
-                 << "table using the MET_OBS_ERROR_TABLE environment "
+                 << "table using the MET_OBS_ERR_TABLE environment "
                  << "variable.\n\n";
             obs_error_info->flag = false;
          }

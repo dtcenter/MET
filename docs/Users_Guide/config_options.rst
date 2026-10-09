@@ -341,16 +341,25 @@ files when specifying paths and the appropriate path will be substituted in.
 If MET_BASE is defined as an environment variable, its value will be used
 instead of the one defined at compilation time.
 
-.. _met_obs_error_table:
+.. _met_obs_err_table:
 
-MET_OBS_ERROR_TABLE
--------------------
+MET_OBS_ERR_TABLE
+-----------------
 
-The MET_OBS_ERROR_TABLE environment variable can be set to specify the location
+The MET_OBS_ERR_TABLE environment variable can be set to specify the location
 of an ASCII file defining observation error information. The default table can
-be found in the installed *share/met/table_files/obs_error_table.txt*. This
+be found in the installed *share/met/table_files/obs_err_table.txt*. This
 observation error logic is applied in Ensemble-Stat to perturb ensemble member
-values and/or define observation bias corrections.
+values and/or define observation bias corrections. If MET_OBS_ERR_TABLE is set
+to a directory, all files in it whose names begin with "obs_err" and end with
+".txt" are read.
+
+.. note:: The "MET_OBS_ERR_TABLE" environment variable was named
+          "MET_OBS_ERROR_TABLE" and the default "obs_err_table.txt" file was
+          named "obs_error_table.txt" prior to MET version 13.0.0. The
+          deprecated environment variable name is still supported for
+          backward compatibility but should be replaced. User-defined table
+          files whose names begin with "obs_error" are still read.
 
 When processing point and gridded observations, Ensemble-Stat searches the table
 to find the entry defining the observation error information. The table
@@ -3419,8 +3428,8 @@ May be set separately in each "obs.field" entry.
 The obs_err dictionary controls how observation error information should be
 handled. Observation error information can either be specified directly in
 the configuration file or by parsing information from an external table file.
-By default, the *MET_BASE/data/table_files/obs_error_table.txt* file is read
-but this may be overridden by setting the $MET_OBS_ERROR_TABLE environment
+By default, the *MET_BASE/data/table_files/obs_err_table.txt* file is read
+but this may be overridden by setting the $MET_OBS_ERR_TABLE environment
 variable at runtime.
 
 The "dist_type" entry may be set to NONE, NORMAL, EXPONENTIAL, CHISQUARED,

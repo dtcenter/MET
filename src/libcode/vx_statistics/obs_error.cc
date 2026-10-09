@@ -28,9 +28,15 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 // Default observation error table file name
-static const char default_obs_error_dir[] = "MET_BASE/table_files";
+static const char default_obs_err_table[] =
+   "MET_BASE/table_files/obs_err_table.txt";
 
-// Name of user-specified observation errror environment variable
+// Name of user-specified observation error table environment variable
+static const char met_obs_err_table[] =
+   "MET_OBS_ERR_TABLE";
+
+// MET #3455 deprecated environment variable name, still supported
+// for backward compatibility
 static const char met_obs_error_table[] =
    "MET_OBS_ERROR_TABLE";
 
@@ -480,21 +486,32 @@ void ObsErrorTable::initialize() {
    StringArray file_names;
 
    //
-   // Use MET_OBS_ERROR_TABLE, if set
+   // Use MET_OBS_ERR_TABLE, if set
    //
-   if(get_env(met_obs_error_table, path)) {
+   if(get_env(met_obs_err_table, path)) {
+      desc << "user-defined " << met_obs_err_table;
+   }
+   //
+   // MET #3455 Otherwise, use the deprecated MET_OBS_ERROR_TABLE, if set
+   //
+   else if(get_env(met_obs_error_table, path)) {
+      mlog << Warning << "\nObsErrorTable::initialize() -> "
+           << "the \"" << met_obs_error_table
+           << "\" environment variable is deprecated. "
+           << "Replace it with \"" << met_obs_err_table << "\"!\n\n";
       desc << "user-defined " << met_obs_error_table;
    }
    //
    // Otherwise, read the default table file
    //
    else {
-      path = replace_path(default_obs_error_dir);
-      desc = "default observation error table";
+      path = replace_path(default_obs_err_table);
+      desc = "default obs_err table";
    }
 
-   // Search for file input file names
-   file_names = get_filenames(path, "^obs_error", ".txt$", true);
+   // Search for input file names, where the "^obs_err" prefix also
+   // matches user-defined files named with the older "obs_error" prefix
+   file_names = get_filenames(path, "^obs_err", ".txt$", true);
 
    for(int i=0; i<file_names.n(); i++) {
 

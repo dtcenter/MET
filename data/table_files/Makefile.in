@@ -332,7 +332,7 @@ tablefiles_DATA = \
 	airnow_monitoring_site_locations_v2.txt \
 	ndbc_stations.xml \
 	stat_column_description.txt \
-	obs_error_table.txt \
+	obs_err_table.txt \
 	grib1_af_131_57.txt \
 	grib1_af_133_57.txt \
 	grib1_cptec_254_64.txt \

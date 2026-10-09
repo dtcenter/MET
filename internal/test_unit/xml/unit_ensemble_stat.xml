@@ -249,13 +249,13 @@
   <!--  MET #3429 use a truncated observation error table to cause bad lookups.  -->
 
   <test name="ensemble_stat_OBSERR_BAD_LOOKUP">
-    <exec>grep -E "OBS_VAR|APCP" &MET_BASE;/table_files/obs_error_table.txt | head -2 \
-          > &OUTPUT_DIR;/ensemble_stat/obs_error_table_truncated.txt; \
+    <exec>grep -E "OBS_VAR|APCP" &MET_BASE;/table_files/obs_err_table.txt | head -2 \
+          > &OUTPUT_DIR;/ensemble_stat/obs_err_table_truncated.txt; \
           &MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>DESC</name>                <value>OBSERR</value></pair>
       <pair><name>OBS_ERROR_FLAG</name>      <value>TRUE</value></pair>
-      <pair><name>MET_OBS_ERROR_TABLE</name> <value>&OUTPUT_DIR;/ensemble_stat/obs_error_table_truncated.txt</value></pair>
+      <pair><name>MET_OBS_ERR_TABLE</name> <value>&OUTPUT_DIR;/ensemble_stat/obs_err_table_truncated.txt</value></pair>
       <pair><name>SKIP_CONST</name>          <value>TRUE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>       <value>OBSERR_BAD_LOOKUP</value></pair>
       <pair><name>OMP_NUM_THREADS</name>     <value>1</value></pair>
