@@ -82,7 +82,7 @@ fcst = {
          level      = "A24";
          obs_thresh = [ NA, >0, >=2.54 ];
          obs_err    = {
-            flag      = ${OBS_ERROR_FLAG};
+            flag      = ${OBS_ERR_FLAG};
             dist_type = NONE;
          }
       }

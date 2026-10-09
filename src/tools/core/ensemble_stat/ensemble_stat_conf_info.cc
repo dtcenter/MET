@@ -725,7 +725,7 @@ void EnsembleStatVxOpt::clear() {
    obs_summary = ObsSummary::None;
    obs_perc = bad_data_int;
    skip_const = false;
-   obs_error.clear();
+   obs_err.clear();
 
    for(int i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
@@ -925,17 +925,17 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // Conf: skip_const
    skip_const = odict.lookup_bool(conf_key_skip_const);
 
-   // Conf: obs_error
-   obs_error = parse_conf_obs_error(&odict, rng_ptr);
-   vx_pd.obs_error_info = &obs_error;
+   // Conf: obs_err
+   obs_err = parse_conf_obs_err(&odict, rng_ptr);
+   vx_pd.obs_err_info = &obs_err;
 
-   // Initialize the global instance of obs_error_table
-   if(obs_error.flag && !obs_error_table.is_set()) {
-      obs_error_table.initialize();
+   // Initialize the global instance of obs_err_table
+   if(obs_err.flag && !obs_err_table.is_set()) {
+      obs_err_table.initialize();
    }
 
    // Print debug information
-   if(obs_error.entry.dist_type != DistType::None) {
+   if(obs_err.entry.dist_type != DistType::None) {
       mlog << Debug(3)
            << "Observation error for point verification is "
            << "defined in the configuration file.\n";

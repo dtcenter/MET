@@ -19,7 +19,7 @@
 
 #include "pair_data_ensemble.h"
 #include "ens_stats.h"
-#include "obs_error.h"
+#include "obs_err.h"
 
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
@@ -84,8 +84,8 @@ void PairDataEnsemble::clear() {
 
    PairBase::clear();
 
-   obs_error_entry.clear();
-   obs_error_flag = false;
+   obs_err_entry.clear();
+   obs_err_flag = false;
 
    e_na.clear();
 
@@ -161,7 +161,7 @@ void PairDataEnsemble::extend(int n) {
 
    PairBase::extend(n);
 
-   obs_error_entry.extend(n);
+   obs_err_entry.extend(n);
 
    for(int i=0; i<n_ens; i++) e_na[i].extend(n);
 
@@ -295,16 +295,16 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
    for(int i=0; i<n_ens; i++) e_na[i] = pd.e_na[i];
 
-   obs_error_entry = pd.obs_error_entry;
-   obs_error_flag  = pd.obs_error_flag;
+   obs_err_entry = pd.obs_err_entry;
+   obs_err_flag  = pd.obs_err_flag;
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairDataEnsemble::has_obs_error() const {
-   return obs_error_flag;
+bool PairDataEnsemble::has_obs_err() const {
+   return obs_err_flag;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -350,11 +350,11 @@ void PairDataEnsemble::set_ens_size(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataEnsemble::add_obs_error_entry(const ObsErrorEntry *e) {
+void PairDataEnsemble::add_obs_err_entry(const ObsErrEntry *e) {
 
-   obs_error_entry.add(e);
+   obs_err_entry.add(e);
 
-   if(e) obs_error_flag = true;
+   if(e) obs_err_flag = true;
 
    return;
 }
@@ -476,7 +476,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          var_na.add(var_unperturbed);
 
          // Process the observation error information
-         const ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
+         const ObsErrEntry * e = (has_obs_err() ? obs_err_entry[i] : 0);
          if(e) {
 
             // Get observation error variance
@@ -485,7 +485,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             // Compute the observation error log scores
             double v_conv;
             double v_corr;
-            compute_obs_error_log_scores(
+            compute_obs_err_log_scores(
                compute_mean(esum_na[i], nint(esumn_na[i])),
                compute_stdev(esum_na[i], esumsq_na[i], nint(esumn_na[i])),
                o_na[i], oerr_var,
@@ -877,8 +877,8 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
    pd.extend(n_obs);
    pd.phist_bin_size  = phist_bin_size;
    pd.ssvar_bin_size  = ssvar_bin_size;
-   pd.obs_error_entry = obs_error_entry;
-   pd.obs_error_flag  = obs_error_flag;
+   pd.obs_err_entry = obs_err_entry;
+   pd.obs_err_flag  = obs_err_flag;
    pd.cdf_info_ptr    = cdf_info_ptr;
 
    bool fcmn_flag = set_climo_flag(o_na, fcmn_na);
@@ -1021,10 +1021,10 @@ void VxPairDataEnsemble::clear() {
 
    ens_info.reset();
 
-   obs_error_info = (ObsErrorInfo *) nullptr;
+   obs_err_info = (ObsErrInfo *) nullptr;
 
-   n_try_obs_error  = 0;
-   n_fail_obs_error = 0;
+   n_try_obs_err  = 0;
+   n_fail_obs_err = 0;
 
    pd.clear();
 
@@ -1042,10 +1042,10 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
    set_ens_info(vx_pd.ens_info.get());
    set_obs_info(vx_pd.obs_info.get());
 
-   obs_error_info = vx_pd.obs_error_info;
+   obs_err_info = vx_pd.obs_err_info;
 
-   n_try_obs_error  = vx_pd.n_try_obs_error;
-   n_fail_obs_error = vx_pd.n_fail_obs_error;
+   n_try_obs_err  = vx_pd.n_try_obs_err;
+   n_fail_obs_err = vx_pd.n_fail_obs_err;
 
    set_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
 
@@ -1238,19 +1238,19 @@ void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
       obs_lvl = bad_data_double;
    }
 
-   // Store pointer to ObsErrorEntry
-   const ObsErrorEntry *oerr_ptr = nullptr;
-   if(obs_error_info->flag) {
+   // Store pointer to ObsErrEntry
+   const ObsErrEntry *oerr_ptr = nullptr;
+   if(obs_err_info->flag) {
 
       // Use config file setting, if specified
-      if(obs_error_info->entry.dist_type != DistType::None) {
-         oerr_ptr = &(obs_error_info->entry);
+      if(obs_err_info->entry.dist_type != DistType::None) {
+         oerr_ptr = &(obs_err_info->entry);
       }
       // Otherwise, do a table lookup
       else {
 
          // Check for table entries for this variable and message type
-         if(!obs_error_table.has(obs_info->name().c_str(), hdr_typ_str)) {
+         if(!obs_err_table.has(obs_info->name().c_str(), hdr_typ_str)) {
             mlog << Warning << "\nVxPairDataEnsemble::add_point_obs() -> "
                  << "Disabling observation error logic since the "
                  << "obs error table contains no entry for OBS_VAR("
@@ -1258,25 +1258,25 @@ void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
                  << hdr_typ_str << ").\nSpecify a custom obs error "
                  << "table using the MET_OBS_ERR_TABLE environment "
                  << "variable.\n\n";
-            obs_error_info->flag = false;
+            obs_err_info->flag = false;
          }
          else {
-            n_try_obs_error++;
-            oerr_ptr = obs_error_table.lookup(
+            n_try_obs_err++;
+            oerr_ptr = obs_err_table.lookup(
                obs_info->name().c_str(), hdr_typ_str, hdr_sid_str,
                hdr_typ_arr[0], hdr_typ_arr[1], hdr_typ_arr[2],
                obs_lvl, obs_hgt, obs_v);
 
             // MET #3429: Skip observation if the table lookup fails
-            if(!oerr_ptr) { n_fail_obs_error++; return; }
+            if(!oerr_ptr) { n_fail_obs_err++; return; }
          }
       }
    }
 
    // Apply observation error additive and multiplicative
    // bias correction, if requested
-   if(obs_error_info->flag) {
-      obs_v = add_obs_error_bc(
+   if(obs_err_info->flag) {
+      obs_v = add_obs_err_bc(
                                FieldType::Obs, oerr_ptr, obs_v);
    }
 
@@ -1326,7 +1326,7 @@ void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
             }
 
             // Store the observation error pointer
-            pd[n].add_obs_error_entry(oerr_ptr);
+            pd[n].add_obs_err_entry(oerr_ptr);
 
          } // end for k
       } // end for j
@@ -1337,17 +1337,17 @@ void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::log_obs_error_lookup_summary() {
+void VxPairDataEnsemble::log_obs_err_lookup_summary() {
 
-   if(n_fail_obs_error > 0) {
+   if(n_fail_obs_err > 0) {
       mlog << Debug(2)
-           << "Skipping " << n_fail_obs_error << " of " << n_try_obs_error
+           << "Skipping " << n_fail_obs_err << " of " << n_try_obs_err
            << " observations with no matching observation error "
            << "table entry.\n";
    }
 
-   n_try_obs_error  = 0;
-   n_fail_obs_error = 0;
+   n_try_obs_err  = 0;
+   n_fail_obs_err = 0;
 
    return;
 }
@@ -1505,10 +1505,10 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, const Grid &gr) {
 
                // Apply observation error perturbation, if requested
                double fcst_v;
-               if(obs_error_info->flag) {
-                  fcst_v = add_obs_error_inc(
-                              obs_error_info->rng_ptr, FieldType::Fcst,
-                              it->obs_error_entry[i_obs],
+               if(obs_err_info->flag) {
+                  fcst_v = add_obs_err_inc(
+                              obs_err_info->rng_ptr, FieldType::Fcst,
+                              it->obs_err_entry[i_obs],
                               it->o_na[i_obs], fcst_na[i_fcst]);
                }
                else {
@@ -1692,11 +1692,11 @@ double compute_bias_ratio(double me_ge_obs, double me_lt_obs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_obs_error_log_scores(double emn, double esd,
+void compute_obs_err_log_scores(double emn, double esd,
                                   double obs, double oerr_var,
                                   double &v_conv, double &v_corr) {
 
-   const char *method_name = "compute_obs_error_log_scores() -> ";
+   const char *method_name = "compute_obs_err_log_scores() -> ";
 
    // Check for bad input data
    if(is_bad_data(emn) ||

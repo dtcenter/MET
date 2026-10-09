@@ -2609,7 +2609,7 @@ void aggr_orank_lines(LineDataFiles &f, STATAnalysisJob &job,
 
             aggr.clear();
 
-            aggr.ens_pd.obs_error_flag = !is_bad_data(cur.ens_mean_oerr);
+            aggr.ens_pd.obs_err_flag = !is_bad_data(cur.ens_mean_oerr);
             aggr.ens_pd.set_ens_size(cur.n_ens);
             aggr.ens_pd.extend(cur.total);
             for(int i=0; i<cur.n_ens+1; i++) aggr.ens_pd.rhist_na.add(0);
@@ -2715,7 +2715,7 @@ void aggr_orank_lines(LineDataFiles &f, STATAnalysisJob &job,
          // Compute observation error log scores
          double v_conv;
          double v_corr;
-         compute_obs_error_log_scores(
+         compute_obs_err_log_scores(
             cur.ens_mean, cur.spread, cur.obs, oerr_var,
             v_conv, v_corr);
          m[key].ens_pd.ign_conv_oerr_na.add(v_conv);
