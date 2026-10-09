@@ -156,11 +156,11 @@ class ObsErrTable {
 
       // for point observations
       const ObsErrEntry * lookup(const char *, const char *, const char *,
-                                   int, int, int, double, double, double);
+                                 int, int, int, double, double, double);
 
       // for gridded analyses
       const ObsErrEntry * lookup(const char *, const char *,
-                                   double cur_val = bad_data_double);
+                                 double cur_val = bad_data_double);
 
       bool has(const char *, const char *);
 };
@@ -202,43 +202,43 @@ struct ObsErrInfo {
 // External utility functions
 //
 
-extern ObsErrInfo parse_conf_obs_err(Dictionary *dict, gsl_rng *);
+extern ObsErrInfo   parse_conf_obs_err(Dictionary *dict, gsl_rng *);
 
 extern double       add_obs_err_inc(const gsl_rng *, FieldType,
-                                      const ObsErrEntry *, const double,
-                                      double, bool log_detail = true);
+                                    const ObsErrEntry *, const double,
+                                    double, bool log_detail = true);
 extern DataPlane    add_obs_err_inc(const gsl_rng *, FieldType,
-                                      const ObsErrEntry *,
-                                      const DataPlane &in_dp,
-                                      const DataPlane &obs_dp,
-                                      const char *, const char *);
+                                    const ObsErrEntry *,
+                                    const DataPlane &in_dp,
+                                    const DataPlane &obs_dp,
+                                    const char *, const char *);
 
 extern double       add_obs_err_bc(FieldType,
-                                     const ObsErrEntry *, double,
-                                     bool log_detail = true);
+                                   const ObsErrEntry *, double,
+                                   bool log_detail = true);
 extern DataPlane    add_obs_err_bc(FieldType,
-                                     const ObsErrEntry *,
-                                     const DataPlane &in_dp,
-                                     const DataPlane &obs_dp,
-                                     const char *, const char *);
+                                   const ObsErrEntry *,
+                                   const DataPlane &in_dp,
+                                   const DataPlane &obs_dp,
+                                   const char *, const char *);
 
 // Build a per-gridpoint cache of resolved ObsErrEntry pointers by
 // doing one table lookup per point to avoid repeating the table
 // lookup for each ensemble member.
 extern std::vector<const ObsErrEntry *> build_obs_err_entry_grid(
-                                      const DataPlane &val_dp,
-                                      const char *var_name,
-                                      const char *obtype);
+                                    const DataPlane &val_dp,
+                                    const char *var_name,
+                                    const char *obtype);
 
 // Variants that consume a precomputed per-gridpoint entry cache
 // instead of a single entry or a var_name/obtype table lookup
 extern DataPlane    add_obs_err_inc(const gsl_rng *, FieldType,
-                                      const std::vector<const ObsErrEntry *> &entry_grid,
-                                      const DataPlane &in_dp,
-                                      const DataPlane &obs_dp);
+                                    const std::vector<const ObsErrEntry *> &entry_grid,
+                                    const DataPlane &in_dp,
+                                    const DataPlane &obs_dp);
 extern DataPlane    add_obs_err_bc(FieldType,
-                                     const std::vector<const ObsErrEntry *> &entry_grid,
-                                     const DataPlane &in_dp);
+                                   const std::vector<const ObsErrEntry *> &entry_grid,
+                                   const DataPlane &in_dp);
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -302,15 +302,15 @@ bool ObsErrEntry::is_header(const DataLine &dl) {
 ////////////////////////////////////////////////////////////////////////
 
 bool ObsErrEntry::is_match(const char *cur_var_name,
-                             const char *cur_msg_type,
-                             const char *cur_sid,
-                             int cur_pb_rpt,
-                             int cur_in_rpt,
-                             int cur_inst,
-                             double cur_hgt,
-                             double cur_prs,
-                             double cur_val,
-                             bool skip_var_name) {
+                           const char *cur_msg_type,
+                           const char *cur_sid,
+                           int cur_pb_rpt,
+                           int cur_in_rpt,
+                           int cur_inst,
+                           double cur_hgt,
+                           double cur_prs,
+                           double cur_val,
+                           bool skip_var_name) {
 
    // Check array filters
    // The var_name regex check is the most expensive (recompiles a
@@ -689,7 +689,7 @@ const ObsErrEntry *ObsErrTable::lookup(
 ////////////////////////////////////////////////////////////////////////
 
 bool ObsErrTable::has(const char *cur_var_name,
-                        const char *cur_msg_type) {
+                      const char *cur_msg_type) {
 
    for(int i=0; i<n(); i++) {
       if( (e[i].var_name.n() == 0 || e[i].var_name.reg_exp_match(cur_var_name)) &&
@@ -802,8 +802,8 @@ ObsErrInfo parse_conf_obs_err(Dictionary *dict, gsl_rng *rng_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 double add_obs_err_inc(const gsl_rng *r, FieldType t,
-                         const ObsErrEntry *e, const double obs,
-                         double v, bool log_detail) {
+                       const ObsErrEntry *e, const double obs,
+                       double v, bool log_detail) {
    double v_new = v;
 
    // Check for null pointer or bad input value
@@ -846,10 +846,10 @@ double add_obs_err_inc(const gsl_rng *r, FieldType t,
 ////////////////////////////////////////////////////////////////////////
 
 DataPlane add_obs_err_inc(const gsl_rng *r, FieldType t,
-                            const ObsErrEntry *in_e,
-                            const DataPlane &in_dp,
-                            const DataPlane &obs_dp,
-                            const char *var_name, const char *obtype) {
+                          const ObsErrEntry *in_e,
+                          const DataPlane &in_dp,
+                          const DataPlane &obs_dp,
+                          const char *var_name, const char *obtype) {
    DataPlane out_dp(in_dp);
    int nx = in_dp.nx();
    int ny = in_dp.ny();
@@ -892,7 +892,7 @@ DataPlane add_obs_err_inc(const gsl_rng *r, FieldType t,
             for(int y=0; y<ny; y++) {
                int j = y*nx + x;
                out_buf[j] = add_obs_err_inc(r, t, in_e, obs_buf[j],
-                                              in_buf[j], false);
+                                            in_buf[j], false);
             }
          }
       }
@@ -915,7 +915,7 @@ DataPlane add_obs_err_inc(const gsl_rng *r, FieldType t,
                for(int y=0; y<ny; y++) {
                   int j = y*nx + x;
                   out_buf[j] = add_obs_err_inc(my_r, t, in_e, obs_buf[j],
-                                                 in_buf[j], false);
+                                               in_buf[j], false);
                }
             }
          }
@@ -944,8 +944,8 @@ DataPlane add_obs_err_inc(const gsl_rng *r, FieldType t,
 ////////////////////////////////////////////////////////////////////////
 
 double add_obs_err_bc(FieldType t,
-                        const ObsErrEntry *e, double v,
-                        bool log_detail) {
+                      const ObsErrEntry *e, double v,
+                      bool log_detail) {
    double v_new = v;
 
    // Check for null pointer or bad input value
@@ -985,10 +985,10 @@ double add_obs_err_bc(FieldType t,
 ////////////////////////////////////////////////////////////////////////
 
 DataPlane add_obs_err_bc(FieldType t,
-                           const ObsErrEntry *in_e,
-                           const DataPlane &in_dp,
-                           const DataPlane &obs_dp,
-                           const char *var_name, const char *obtype) {
+                         const ObsErrEntry *in_e,
+                         const DataPlane &in_dp,
+                         const DataPlane &obs_dp,
+                         const char *var_name, const char *obtype) {
    DataPlane out_dp(in_dp);
    int nxy = in_dp.nxy();
 
@@ -1050,7 +1050,7 @@ vector<const ObsErrEntry *> build_obs_err_entry_grid(
    for(int j=0; j<nxy; j++) {
       if(!is_bad_data(val_buf[j])) {
          entry_grid[j] = obs_err_table.lookup(var_name, obtype,
-                                                val_buf[j]);
+                                              val_buf[j]);
       }
    }
 
@@ -1060,9 +1060,9 @@ vector<const ObsErrEntry *> build_obs_err_entry_grid(
 ////////////////////////////////////////////////////////////////////////
 
 DataPlane add_obs_err_inc(const gsl_rng *r, FieldType t,
-                            const vector<const ObsErrEntry *> &entry_grid,
-                            const DataPlane &in_dp,
-                            const DataPlane &obs_dp) {
+                          const vector<const ObsErrEntry *> &entry_grid,
+                          const DataPlane &in_dp,
+                          const DataPlane &obs_dp) {
    DataPlane out_dp(in_dp);
    int nx  = in_dp.nx();
    int ny  = in_dp.ny();
@@ -1099,7 +1099,7 @@ DataPlane add_obs_err_inc(const gsl_rng *r, FieldType t,
          for(int y=0; y<ny; y++) {
             int j = y*nx + x;
             out_buf[j] = add_obs_err_inc(r, t, entry_buf[j], obs_buf[j],
-                                           in_buf[j], false);
+                                         in_buf[j], false);
          }
       }
    }
@@ -1122,7 +1122,7 @@ DataPlane add_obs_err_inc(const gsl_rng *r, FieldType t,
             for(int y=0; y<ny; y++) {
                int j = y*nx + x;
                out_buf[j] = add_obs_err_inc(my_r, t, entry_buf[j], obs_buf[j],
-                                              in_buf[j], false);
+                                            in_buf[j], false);
             }
          }
       }
@@ -1136,8 +1136,8 @@ DataPlane add_obs_err_inc(const gsl_rng *r, FieldType t,
 ////////////////////////////////////////////////////////////////////////
 
 DataPlane add_obs_err_bc(FieldType t,
-                           const vector<const ObsErrEntry *> &entry_grid,
-                           const DataPlane &in_dp) {
+                         const vector<const ObsErrEntry *> &entry_grid,
+                         const DataPlane &in_dp) {
    DataPlane out_dp(in_dp);
    int nxy = in_dp.nxy();
 

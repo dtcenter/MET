@@ -1277,7 +1277,7 @@ void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
    // bias correction, if requested
    if(obs_err_info->flag) {
       obs_v = add_obs_err_bc(
-                               FieldType::Obs, oerr_ptr, obs_v);
+                             FieldType::Obs, oerr_ptr, obs_v);
    }
 
    // Loop through the message types
@@ -1693,8 +1693,8 @@ double compute_bias_ratio(double me_ge_obs, double me_lt_obs) {
 ////////////////////////////////////////////////////////////////////////
 
 void compute_obs_err_log_scores(double emn, double esd,
-                                  double obs, double oerr_var,
-                                  double &v_conv, double &v_corr) {
+                                double obs, double oerr_var,
+                                double &v_conv, double &v_corr) {
 
    const char *method_name = "compute_obs_err_log_scores() -> ";
 
