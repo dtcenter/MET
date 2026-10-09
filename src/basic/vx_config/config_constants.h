@@ -665,9 +665,9 @@ static const char conf_key_output_precision[]    = "output_precision";
 // backward compatibility
 //
 
-static const char conf_key_exit_on_warning[]     = "exit_on_warning";
-static const char conf_key_time_offset_warning[] = "time_offset_warning";
-static const char conf_key_obs_error[]           = "obs_error";
+static const char conf_key_exit_on_warn_deprecated[]     = "exit_on_warning";
+static const char conf_key_time_offset_warn_deprecated[] = "time_offset_warning";
+static const char conf_key_obs_err_deprecated[]          = "obs_error";
 
 static const char conf_key_version[]           = "version";
 static const char conf_key_model[]             = "model";
