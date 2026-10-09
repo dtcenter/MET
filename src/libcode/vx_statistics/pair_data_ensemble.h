@@ -75,7 +75,7 @@ class PairDataEnsemble : public PairBase {
 
       // Observation error entries [n_obs]
       ObsErrEntryPtrArray obs_err_entry;
-      bool                  obs_err_flag;
+      bool                obs_err_flag;
 
       // Ensemble, valid count, and rank values
       std::vector<NumArray> e_na;  // Ensemble values [n_ens][n_obs]
