@@ -366,7 +366,7 @@ BEG,END where BEG and END specify the range of values to be used. The
 INST_BIAS_SCALE and INST_BIAS_OFFSET columns define instrument bias adjustments
 which are applied to the observation values. The DIST_TYPE and DIST_PARM
 columns define the distribution from which random perturbations should be drawn
-and applied to the ensemble member values. See the obs_error description below
+and applied to the ensemble member values. See the obs_err description below
 for details on the supported error distributions. The last two columns, MIN and
 MAX, define the bounds for the valid range of the bias-corrected observation
 values and randomly perturbed ensemble member values. Values less than MIN are
@@ -589,21 +589,25 @@ If the environment variable is set to any value, the subgrid values will be read
 Settings Common to Multiple Tools
 =================================
 
-exit_on_warning
----------------
+exit_on_warn
+------------
 
-The "exit_on_warning" entry in ConfigConstants may be set to true or false.
+The "exit_on_warn" entry in ConfigConstants may be set to true or false.
 If set to true and a MET tool encounters a warning, it will immediately exit
 with bad status after writing the warning message.
 
+.. note:: The "exit_on_warn" entry was named "exit_on_warning" prior to
+          MET version 13.0.0. The deprecated name is still supported for
+          backward compatibility but should be replaced.
+
 .. code-block:: none
 
-  exit_on_warning = FALSE;
+  exit_on_warn = FALSE;
 
-time_offset_warning
--------------------
+time_offset_warn
+----------------
 
-The "time_offset_warning" entry in ConfigConstants defines an allowable
+The "time_offset_warn" entry in ConfigConstants defines an allowable
 offset in seconds to silence time differences warning messages. Several
 MET tools check the timestamps of the datasets being compared and print a
 warning message if they differ. Increasing this option from its default
@@ -612,9 +616,13 @@ without triggering a warning. If the absolute value of a non-zero time
 difference is less than or equal to this setting, a debug log message is
 written instead of a warning.
 
+.. note:: The "time_offset_warn" entry was named "time_offset_warning" prior
+          to MET version 13.0.0. The deprecated name is still supported for
+          backward compatibility but should be replaced.
+
 .. code-block:: none
 
-  time_offset_warning = 0;
+  time_offset_warn = 0;
 
 nc_compression
 --------------
@@ -3388,23 +3396,27 @@ random.
 
   skip_const = FALSE;
 
-obs_error
-^^^^^^^^^
+obs_err
+^^^^^^^
 
 Observation error options:
 
-obs_error.flag
-""""""""""""""
+.. note:: The "obs_err" dictionary was named "obs_error" prior to MET
+          version 13.0.0. The deprecated name is still supported for
+          backward compatibility but should be replaced.
+
+obs_err.flag
+""""""""""""
 The "flag" entry toggles the observation error logic on (TRUE) and off (FALSE).
 When flag is TRUE, random observation error perturbations are applied to the
 ensemble member values. No perturbation is applied to the observation values
 but the bias scale and offset values, if specified, are applied.
 
-obs_error.dist_type
-"""""""""""""""""""
+obs_err.dist_type
+"""""""""""""""""
 Set "dist_type" to NONE to use the observation error table instead.
 May be set separately in each "obs.field" entry.
-The obs_error dictionary controls how observation error information should be
+The obs_err dictionary controls how observation error information should be
 handled. Observation error information can either be specified directly in
 the configuration file or by parsing information from an external table file.
 By default, the *MET_BASE/data/table_files/obs_error_table.txt* file is read
@@ -3416,8 +3428,8 @@ GAMMA, UNIFORM, or BETA. The default value of NONE indicates that the
 observation error table file should be used rather than the configuration
 file settings.
 
-obs_error.dist_parm
-"""""""""""""""""""
+obs_err.dist_parm
+"""""""""""""""""
 The "dist_parm" entry is an array of length 1 or 2 specifying the parameters
 for the distribution selected in dist_type. The NORMAL, EXPONENTIAL, and
 CHISQUARED distributions are defined by a single parameter. The GAMMA,
@@ -3425,8 +3437,8 @@ UNIFORM, and BETA distributions are defined by two parameters. See the
 `GNU Scientific Library Reference Manual <https://www.gnu.org/software/gsl/manual>`_
 for more information on these distributions.
 
-obs_error.inst_bias_scale and obs_error.inst_bias_offset
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+obs_err.inst_bias_scale and obs_err.inst_bias_offset
+""""""""""""""""""""""""""""""""""""""""""""""""""""
 The "inst_bias_scale" and "inst_bias_offset" entries specify bias scale and
 offset values that should be applied to observation values prior to
 perturbing them. These entries enable bias-correction on the fly.
@@ -3443,7 +3455,7 @@ levels, and range of values.
 
 .. code-block:: none
 
-  obs_error = {
+  obs_err = {
      flag             = FALSE;   TRUE or FALSE
      dist_type        = NONE;    Distribution type
      dist_parm        = [];      Distribution parameters

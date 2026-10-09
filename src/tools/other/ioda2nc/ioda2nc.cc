@@ -473,7 +473,7 @@ static void process_ioda_file(int i_pb) {
          obs_data[idx2] = bad_data_double;
       }
       mlog << Debug(7) << method_name
-           << "processing \"" << raw_var_names[idx] << "\" variable!\n";
+           << "processing \"" << raw_var_names[idx] << "\" variable\n";
       obs_var = get_var(f_in, raw_var_names[idx].c_str(), obs_group_name);
       if (IS_INVALID_NC(obs_var)) obs_var = get_var(f_in, raw_var_names[idx].c_str(), derived_obs_group_name);
       v_qc_data.emplace_back(qc_data);
@@ -1045,7 +1045,7 @@ static bool get_obs_data_double(NcFile *f_in, const ConcatString &var_name,
                           << "trouble getting " << var_name << "\n";
       }
       else mlog << Debug(4) << method_name
-                << "\"" << var_name << "\" does not exist!\n";
+                << "\"" << var_name << "\" does not exist\n";
    }
    if(status) {
       for(int idx=0; idx<nlocs; idx++)

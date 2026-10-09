@@ -899,7 +899,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          }
          if (empty_input) {
             mlog << Debug(2) << method_name
-                 << error_msg << "\tBut ignored because of empty input\n";
+                 << error_msg << "\tBut ignored since the input contains no data\n";
          }
          else {
             mlog << Error << "\n" << method_name
@@ -2029,7 +2029,7 @@ static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
    int obs_count = obs_index_array.n();
    if (0 == obs_count) {
       mlog << Debug(2) << method_name
-           << "no valid point observation data!\n";
+           << "no valid point observation data\n";
       return status;
    }
 
@@ -2842,7 +2842,7 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
 
    if (to_cell_count == 0) {
       mlog << Debug(2) << method_name
-           << "No valid data!\n";
+           << "No valid data\n";
    }
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "

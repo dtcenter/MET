@@ -234,7 +234,7 @@ LoggerWarning::~LoggerWarning()
    if(Warning.NeedToExit)
    {
       mlog << Error
-           << "\nExiting since exit_on_warning = TRUE;\n\n";
+           << "\nExiting since exit_on_warn = TRUE;\n\n";
       exit(1);
    }
 

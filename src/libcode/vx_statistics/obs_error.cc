@@ -742,8 +742,9 @@ ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *rng_ptr) {
    // Initialize
    info.clear();
 
-   // Conf: obs_error
-   err_dict = dict->lookup_dictionary(conf_key_obs_error);
+   // Conf: obs_err, MET #3455 support the deprecated obs_error name
+   err_dict = dict->lookup_dictionary(
+                 dict->resolve_name(conf_key_obs_err, conf_key_obs_error));
 
    // Conf: flag
    info.flag = err_dict->lookup_bool(conf_key_flag);

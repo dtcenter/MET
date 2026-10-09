@@ -3103,7 +3103,7 @@ static int combine_tqz_and_uv(map<double, double*> &pqtzuv_map_tq,
       bool no_overlap = (tq_pres_max < uv_pres_min) || (tq_pres_min > uv_pres_max);
       mlog << Debug(6) << method_name << "TQZ pressures: " << tq_pres_max
            << " to " << tq_pres_min << "  UV pressures: " << uv_pres_max
-           << " to " << uv_pres_min << (no_overlap ? "  no overlap!" : "  overlapping") << "\n";
+           << " to " << uv_pres_min << (no_overlap ? "  no overlap" : "  overlapping") << "\n";
       if( no_overlap ) {
          mlog << Debug(4) << "\n" << method_name
               << "Can not combine TQ and UV records because of no overlapping."
@@ -3219,7 +3219,7 @@ static double compute_pbl(map<double, double*> pqtzuv_map_tq,
 
       if (pbl_level <= 0) {
          mlog << Debug(4) << method_name
-              << "Skip CALPBL because of an empty list after combining TQZ and UV\n";
+              << "Skip CALPBL because no data remains after combining TQZ and UV\n";
       }
       else if (pbl_level == 1) {
          mlog << Debug(4) << method_name

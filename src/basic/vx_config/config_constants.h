@@ -655,10 +655,19 @@ static const char config_map_data_filename[] = "MET_BASE/config/ConfigMapData";
 // Parameter key names common to multiple tools
 //
 
-static const char conf_key_exit_on_warning[]     = "exit_on_warning";
-static const char conf_key_time_offset_warning[] = "time_offset_warning";
+static const char conf_key_exit_on_warn[]        = "exit_on_warn";
+static const char conf_key_time_offset_warn[]    = "time_offset_warn";
 static const char conf_key_nc_compression[]      = "nc_compression";
 static const char conf_key_output_precision[]    = "output_precision";
+
+//
+// Deprecated parameter key names (MET #3455), still parsed for
+// backward compatibility
+//
+
+static const char conf_key_exit_on_warning[]     = "exit_on_warning";
+static const char conf_key_time_offset_warning[] = "time_offset_warning";
+static const char conf_key_obs_error[]           = "obs_error";
 
 static const char conf_key_version[]           = "version";
 static const char conf_key_model[]             = "model";
@@ -974,7 +983,7 @@ static const char conf_key_ssvar_bin[]        = "ens_ssvar_bin_size";
 static const char conf_key_phist_bin[]        = "ens_phist_bin_size";
 static const char conf_key_prob_cat_thresh[]  = "prob_cat_thresh";
 static const char conf_key_prob_pct_thresh[]  = "prob_pct_thresh";
-static const char conf_key_obs_error[]        = "obs_error";
+static const char conf_key_obs_err[]          = "obs_err";
 static const char conf_key_dist_type[]        = "dist_type";
 static const char conf_key_dist_parm[]        = "dist_parm";
 static const char conf_key_inst_bias_scale[]  = "inst_bias_scale";

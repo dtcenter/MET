@@ -767,7 +767,7 @@ void print_met_data(const MetPointObsData *obs_data,
               << "  message_type[" << idx << "] = " << header_data->typ_array[idx] << "\n";
    }
    else mlog << Debug(debug_level)
-              << "     typ_array is empty!!!\n";
+              << "     typ_array has no entries.\n";
    if (header_data->sid_array.n() > 0) {
       mlog << Debug(debug_level) << "\n";
       count = header_data->sid_array.n();
@@ -786,7 +786,7 @@ void print_met_data(const MetPointObsData *obs_data,
       }
    }
    else mlog << Debug(debug_level)
-              << "     s_array is empty!!!\n";
+              << "     s_array has no entries.\n";
    if (header_data->vld_array.n() > 0) {
       mlog << Debug(debug_level) << "\n";
       count = header_data->vld_array.n();
@@ -805,7 +805,7 @@ void print_met_data(const MetPointObsData *obs_data,
       }
    }
    else mlog << Debug(debug_level)
-              << "     typ_array is empty!!!\n";
+              << "     typ_array has no entries.\n";
    if (header_data->prpt_typ_array.n() > 0) {
       mlog << Debug(debug_level) << "\n";
       for (int idx=0; idx<header_data->prpt_typ_array.n(); idx++)
@@ -862,7 +862,7 @@ void print_met_data(const MetPointObsData *obs_data,
               << "     var_names[" << idx << "] = " << obs_data->var_names[idx] << "\n";
    }
    else mlog << Debug(debug_level)
-              << "     var_names is empty!!!\n";
+              << "     var_names has no entries.\n";
    if (obs_data->qty_names.n() > 0) {
       mlog << Debug(debug_level) << "\n";
       for (int idx=0; idx<obs_data->qty_names.n(); idx++)
@@ -870,7 +870,7 @@ void print_met_data(const MetPointObsData *obs_data,
               << "     qty_names[" << idx << "] = " << obs_data->qty_names[idx] << "\n";
    }
    else mlog << Debug(debug_level)
-              << "     qty_names is empty!!!\n";
+              << "     qty_names has no entries.\n";
 
    mlog << Debug(debug_level) << "Done " << method_name << "by " << caller << "\n\n";
 

@@ -201,6 +201,8 @@ class Dictionary {
       virtual const DictionaryEntry * lookup_simple(const std::string name,
                                                     bool search_parent = true);   //  no scope
 
+      bool has_entry(const char * name) const;   //  this scope only, no parents
+
 
       int Nentries;
 
@@ -258,6 +260,14 @@ class Dictionary {
       virtual void store(const Dictionary &);
 
       virtual const DictionaryEntry * lookup(const std::string name, bool search_parent = true);
+
+         //
+         //  MET #3455 for renamed configuration options, return
+         //  either the current or deprecated name, whichever is
+         //  defined in the scope closest to this dictionary
+         //
+
+      const char * resolve_name(const char * name, const char * deprecated_name);
 
          //
          //  convenience functions
