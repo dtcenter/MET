@@ -38,6 +38,11 @@ on:
         default: develop 
         type: string
 
+# Group by workflow name and branch/PR reference
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: SonarQube Scan 
