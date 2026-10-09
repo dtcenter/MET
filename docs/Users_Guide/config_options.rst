@@ -3405,6 +3405,8 @@ random.
 
   skip_const = FALSE;
 
+.. _config_options-obs_err:
+
 obs_err
 ^^^^^^^
 

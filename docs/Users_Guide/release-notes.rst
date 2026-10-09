@@ -185,6 +185,14 @@ MET Version 13.0.0 Upgrade Instructions
      * The "ensemble_flag.eas" and "ensemble_flag.eas_width" entries are added to enable the
        writing of EAS output fields.
 
+   * Ensemble-Stat configuration file
+
+     * The "obs_error" dictionary is renamed to "obs_err", as described in
+       :numref:`config_options-obs_err`, to avoid false positives when log files are scanned
+       for words like "error". The old name is still supported but prints a warning and should
+       be replaced. This applies both to the top-level entry and to entries set separately
+       in each "obs.field" entry.
+
    * ConfigConstanst configuration file
 
      * The "u_wind_field_name", "v_wind_field_name", "wind_speed_field_name", and "wind_direction_field_name"
@@ -225,8 +233,12 @@ MET Version 13.0.0 Upgrade Instructions
      `#3396 <https://github.com/dtcenter/MET/issues/3396>`_, improvements to the RPS computation
      algorithm result in minor changes to the statistics.
 
-.. dropdown:: Additional upgrade instructions - NONE
+.. dropdown:: Additional upgrade instructions
 
    Recommendations when upgrading to MET version 13.0.0:
 
-   * None
+   * The "MET_OBS_ERROR_TABLE" environment variable is renamed to "MET_OBS_ERR_TABLE", and the
+     default *share/met/table_files/obs_error_table.txt* file is renamed to *obs_err_table.txt*,
+     as described in :numref:`met_obs_err_table`. The old environment variable name is still
+     supported but prints a warning and should be replaced. User-defined observation error
+     table files whose names begin with "obs_error" are still read.
