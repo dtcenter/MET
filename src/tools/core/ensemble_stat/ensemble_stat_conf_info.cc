@@ -937,12 +937,12 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // Print debug information
    if(obs_err.entry.dist_type != DistType::None) {
       mlog << Debug(3)
-           << "Observation error for point verification is "
+           << "The obs_err settings for point verification are "
            << "defined in the configuration file.\n";
    }
    else {
       mlog << Debug(3)
-           << "Observation error for point verification is "
+           << "The obs_err settings for point verification are "
            << "defined by a table lookup for each observation.\n";
    }
    

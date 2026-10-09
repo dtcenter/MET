@@ -1373,7 +1373,7 @@ static void process_grid_vx() {
          // Use config file setting, if specified
          if(conf_info.vx_opt[i].obs_err.entry.dist_type != DistType::None) {
             mlog << Debug(3)
-                 << "Observation error for gridded verification is "
+                 << "The obs_err settings for gridded verification are "
                  << "defined in the configuration file.\n";
             oerr_ptr = &(conf_info.vx_opt[i].obs_err.entry);
          }
@@ -1405,12 +1405,12 @@ static void process_grid_vx() {
                if(oerr_ptr) {
                   if(oerr_ptr->val_range.n() == 0) {
                      mlog << Debug(3)
-                          << "Observation error for gridded verification is "
+                          << "The obs_err settings for gridded verification are "
                           << "defined by a single table entry.\n";
                   }
                   else {
                      mlog << Debug(3)
-                          << "Observation error for gridded verification is "
+                          << "The obs_err settings for gridded verification are "
                           << "defined by a table lookup for each point.\n";
                      oerr_ptr = nullptr;
                   }
@@ -1628,7 +1628,7 @@ static void process_grid_vx() {
          // Apply observation error bias correction, if requested
          if(conf_info.vx_opt[i].obs_err.flag) {
             mlog << Debug(3)
-                 << "Applying observation error bias correction to "
+                 << "Applying obs_err bias correction to "
                  << "gridded observation data.\n";
             obs_dp = oerr_ptr ?
                add_obs_err_bc(
@@ -1654,7 +1654,7 @@ static void process_grid_vx() {
             if(conf_info.vx_opt[i].obs_err.flag &&
                !fraw_dp[k].is_empty()) {
                mlog << Debug(3)
-                    << "Applying observation error perturbation to "
+                    << "Applying obs_err perturbation to "
                     << "ensemble member " << k+1 << ".\n";
                fcst_dp[k] = oerr_ptr ?
                   add_obs_err_inc(conf_info.rng_ptr,
@@ -1808,7 +1808,7 @@ static void process_grid_scores(int i_vx,
    if(n_fail_obs_err > 0) {
       mlog << Debug(2)
            << "Skipping " << n_fail_obs_err << " of " << n_try_obs_err
-           << " grid points with no matching observation error "
+           << " grid points with no matching obs_err "
            << "table entry.\n";
    }
 

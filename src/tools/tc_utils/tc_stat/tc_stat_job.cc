@@ -2627,8 +2627,8 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
       if(strstr(s.c_str(), "-") == nullptr && strstr(s.c_str(), "ERR") == nullptr) {
          mlog << Debug(4)
               << "Skipping frequency of superior performance for "
-              << "column \"" << Column[i] << "\" since it is not an "
-              << "error or difference.\n";
+              << "column \"" << Column[i] << "\" since it is neither "
+              << "an ERR column nor a difference.\n";
          continue;
       }
 

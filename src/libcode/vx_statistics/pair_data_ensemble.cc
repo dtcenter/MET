@@ -1342,7 +1342,7 @@ void VxPairDataEnsemble::log_obs_err_lookup_summary() {
    if(n_fail_obs_err > 0) {
       mlog << Debug(2)
            << "Skipping " << n_fail_obs_err << " of " << n_try_obs_err
-           << " observations with no matching observation error "
+           << " observations with no matching obs_err "
            << "table entry.\n";
    }
 

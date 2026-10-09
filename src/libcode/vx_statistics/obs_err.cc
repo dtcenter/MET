@@ -632,7 +632,7 @@ const ObsErrEntry *ObsErrTable::lookup(
            << "var_name = \"" << cur_var_name
            << "\", msg_type = \"" << cur_msg_type
            << "\", sid = \"" << cur_sid
-           << ", pb_rpt_typ = " << cur_pb_rpt
+           << "\", pb_rpt_typ = " << cur_pb_rpt
            << ", in_rpt_typ = " << cur_in_rpt
            << ", inst_typ = " << cur_inst
            << ", hgt = " << cur_hgt
@@ -677,7 +677,7 @@ const ObsErrEntry *ObsErrTable::lookup(
    // Check for no match
    if(e_match == nullptr && mlog.verbosity_level() >= 4) {
       mlog << Debug(4) << "\nObsErrTable::lookup() -> "
-           << "no observation error table match found for "
+           << "no obs_err table match found for "
            << "var_name = \"" << cur_var_name
            << "\", msg_type = \"" << cur_msg_type
            << "\", val = " << cur_val << "\n\n";
@@ -825,14 +825,14 @@ double add_obs_err_inc(const gsl_rng *r, FieldType t,
       // Check for no updates
       if(e->dist_type == DistType::None) {
          mlog << Debug(4)
-              << "Applying no observation error update for "
+              << "Applying no obs_err update for "
               << fieldtype_to_string(t) << " value " <<  v
               << " and OBS value " << obs << ".\n";
       }
       // Print detailed update information
       else {
          mlog << Debug(4)
-              << "Applying observation error update from "
+              << "Applying obs_err update from "
               << fieldtype_to_string(t) << " value " << v << " to "
               << v_new << " for OBS value " << obs << " using the "
               << dist_to_string(e->dist_type, e->dist_parm)
@@ -966,13 +966,13 @@ double add_obs_err_bc(FieldType t,
       if(is_bad_data(e->bias_scale) &&
          is_bad_data(e->bias_offset)) {
          mlog << Debug(4)
-              << "Applying no observation error bias correction to "
+              << "Applying no obs_err bias correction to "
               << fieldtype_to_string(t) << " value " <<  v << ".\n";
       }
       // Print detailed update information
       else {
          mlog << Debug(4)
-              << "Applying observation error bias correction from "
+              << "Applying obs_err bias correction from "
               << fieldtype_to_string(t) << " value " << v << " to "
               << v_new << " for bias scale (" << e->bias_scale
               << ") and offset (" <<  e->bias_offset << ").\n";
