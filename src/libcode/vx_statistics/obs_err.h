@@ -186,7 +186,7 @@ extern ObsErrTable obs_err_table;
 
 struct ObsErrInfo {
    bool          flag;  // TRUE or FALSE
-   ObsErrEntry entry; // Defines perturbation
+   ObsErrEntry   entry; // Defines perturbation
 
    gsl_rng * rng_ptr;   // not allocated
 

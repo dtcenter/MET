@@ -877,8 +877,8 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
    pd.extend(n_obs);
    pd.phist_bin_size  = phist_bin_size;
    pd.ssvar_bin_size  = ssvar_bin_size;
-   pd.obs_err_entry = obs_err_entry;
-   pd.obs_err_flag  = obs_err_flag;
+   pd.obs_err_entry   = obs_err_entry;
+   pd.obs_err_flag    = obs_err_flag;
    pd.cdf_info_ptr    = cdf_info_ptr;
 
    bool fcmn_flag = set_climo_flag(o_na, fcmn_na);

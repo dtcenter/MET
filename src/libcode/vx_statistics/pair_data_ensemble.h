@@ -46,7 +46,7 @@ struct ens_ssvar_pt {
 typedef std::deque<ens_ssvar_pt>             ssvar_pt_list;
 typedef std::map<std::string,ssvar_pt_list>  ssvar_bin_map;  // Indexed by bin min
 typedef CRC_Array<bool>                      BoolArray;
-typedef CRC_Array<const ObsErrEntry *>     ObsErrEntryPtrArray;
+typedef CRC_Array<const ObsErrEntry *>       ObsErrEntryPtrArray;
 
 // Number of SSVAR bins to produce a warning
 static const int n_warn_ssvar_bins = 1000;
@@ -194,7 +194,7 @@ class VxPairDataEnsemble : public VxPairBase {
 
       //////////////////////////////////////////////////////////////////
 
-      ObsErrInfo *obs_err_info; // Pointer for observation error
+      ObsErrInfo *obs_err_info;     // Pointer for observation error
                                     // Not allocated
 
       // Counts of observation error table lookups attempted and failed,

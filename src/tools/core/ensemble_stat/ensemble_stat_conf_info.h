@@ -132,7 +132,7 @@ class EnsembleStatVxOpt {
       ObsSummary     obs_summary;        // Summarize observations
       int            obs_perc;           // Summary percentile value
       bool           skip_const;         // Skip points with constant data values
-      ObsErrInfo   obs_err;          // Observation error handling
+      ObsErrInfo     obs_err;            // Observation error handling
 
       // Output file options
       STATOutputType output_flag[n_txt]; // Flag for each output line type

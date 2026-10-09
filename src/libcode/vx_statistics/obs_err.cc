@@ -40,7 +40,7 @@ static const char met_obs_err_table[] =
 static const char met_obs_err_table_deprecated[] =
    "MET_OBS_ERROR_TABLE";
 
-static const int  n_obs_err_columns = 15;
+static const int  n_obs_err_columns   = 15;
 static const char wildcard_str []     = "ALL";
 
 ////////////////////////////////////////////////////////////////////////
