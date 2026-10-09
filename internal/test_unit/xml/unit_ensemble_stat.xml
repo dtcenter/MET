@@ -29,7 +29,7 @@
     <exec>&MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>DESC</name>           <value>NA</value></pair>
-      <pair><name>OBS_ERR_FLAG</name> <value>FALSE</value></pair>
+      <pair><name>OBS_ERR_FLAG</name>   <value>FALSE</value></pair>
       <pair><name>SKIP_CONST</name>     <value>FALSE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>CMD_LINE</value></pair>
     </env>
@@ -70,7 +70,7 @@
           &MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>DESC</name>           <value>NA</value></pair>
-      <pair><name>OBS_ERR_FLAG</name> <value>FALSE</value></pair>
+      <pair><name>OBS_ERR_FLAG</name>   <value>FALSE</value></pair>
       <pair><name>SKIP_CONST</name>     <value>FALSE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>FILE_LIST</value></pair>
     </env>
@@ -188,7 +188,7 @@
           &MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>DESC</name>           <value>SKIP_CONST</value></pair>
-      <pair><name>OBS_ERR_FLAG</name> <value>FALSE</value></pair>
+      <pair><name>OBS_ERR_FLAG</name>   <value>FALSE</value></pair>
       <pair><name>SKIP_CONST</name>     <value>TRUE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>SKIP_CONST</value></pair>
     </env>
@@ -223,7 +223,7 @@
           &MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>DESC</name>            <value>OBSERR</value></pair>
-      <pair><name>OBS_ERR_FLAG</name>  <value>TRUE</value></pair>
+      <pair><name>OBS_ERR_FLAG</name>    <value>TRUE</value></pair>
       <pair><name>SKIP_CONST</name>      <value>TRUE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>   <value>OBSERR</value></pair>
       <pair><name>OMP_NUM_THREADS</name> <value>1</value></pair>
@@ -254,8 +254,8 @@
           &MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>DESC</name>                <value>OBSERR</value></pair>
-      <pair><name>OBS_ERR_FLAG</name>      <value>TRUE</value></pair>
-      <pair><name>MET_OBS_ERR_TABLE</name> <value>&OUTPUT_DIR;/ensemble_stat/obs_err_table_truncated.txt</value></pair>
+      <pair><name>OBS_ERR_FLAG</name>        <value>TRUE</value></pair>
+      <pair><name>MET_OBS_ERR_TABLE</name>   <value>&OUTPUT_DIR;/ensemble_stat/obs_err_table_truncated.txt</value></pair>
       <pair><name>SKIP_CONST</name>          <value>TRUE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>       <value>OBSERR_BAD_LOOKUP</value></pair>
       <pair><name>OMP_NUM_THREADS</name>     <value>1</value></pair>

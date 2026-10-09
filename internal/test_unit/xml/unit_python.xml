@@ -608,7 +608,7 @@
     <env>
       <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
       <pair><name>DESC</name>           <value>NA</value></pair>
-      <pair><name>OBS_ERR_FLAG</name> <value>FALSE</value></pair>
+      <pair><name>OBS_ERR_FLAG</name>   <value>FALSE</value></pair>
       <pair><name>SKIP_CONST</name>     <value>FALSE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>FILE_LIST</value></pair>
     </env>
