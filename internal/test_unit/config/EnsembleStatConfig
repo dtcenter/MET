@@ -81,8 +81,8 @@ fcst = {
          name       = "APCP";
          level      = "A24";
          obs_thresh = [ NA, >0, >=2.54 ];
-         obs_error  = {
-            flag      = ${OBS_ERROR_FLAG};
+         obs_err    = {
+            flag      = ${OBS_ERR_FLAG};
             dist_type = NONE;
          }
       }
@@ -112,7 +112,7 @@ skip_const      = ${SKIP_CONST};
 // Set dist_type to NONE to use the observation error table instead
 // May be set separately in each "obs.field" entry
 //
-obs_error = {
+obs_err = {
    flag             = FALSE;
    dist_type        = NONE;
    dist_parm        = [];

@@ -352,7 +352,7 @@ void IODAReader::read_header() {
    }
    else {
       mlog << Debug(1) << method_name
-           << "The metadata variable for message type does not exist!\n";
+           << "The metadata variable for message type does not exist\n";
    }
 
    station_ids.resize(nlocs, "");
@@ -364,7 +364,7 @@ void IODAReader::read_header() {
    }
    else {
       mlog << Debug(1) << method_name
-           << "The metadata variable for station ID does not exist!\n";
+           << "The metadata variable for station ID does not exist\n";
    }
 
 }
@@ -417,7 +417,7 @@ bool IODAReader::read_time() {
          NcDim datetime_dim = get_nc_dim(&in_hdr_vld_var, 1);
          ndatetime = IS_VALID_NC(datetime_dim) ? get_dim_size(&datetime_dim) : nstring;
          mlog << Debug(3) << "\n" << method_name
-              << "ndatetime dimension does not exist!\n";
+              << "ndatetime dimension does not exist\n";
       }
       mlog << Debug(5) << method_name << "dimensions: nvars=" << nvars << ", nlocs=" << nlocs
            << ", nrecs=" << nrecs << ", nstring=" << nstring << ", ndatetime=" << ndatetime << "\n";

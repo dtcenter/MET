@@ -323,7 +323,7 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
       rmse = sqrt(ffbar + oobar - 2.0*fobar);
 
       // If observation error was specified, compute ME_OERR, MAE_OERR, and RMSE_OERR
-      if(pd.has_obs_error()) {
+      if(pd.has_obs_err()) {
 
          fbar = obar = ffbar = oobar = fobar = abserr = 0.0;
          for(int i=0; i<pd.n_obs; i++) {

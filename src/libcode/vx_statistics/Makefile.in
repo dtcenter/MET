@@ -121,7 +121,7 @@ am_libvx_statistics_a_OBJECTS =  \
 	libvx_statistics_a-pair_data_point.$(OBJEXT) \
 	libvx_statistics_a-pair_data_ensemble.$(OBJEXT) \
 	libvx_statistics_a-read_climo.$(OBJEXT) \
-	libvx_statistics_a-obs_error.$(OBJEXT)
+	libvx_statistics_a-obs_err.$(OBJEXT)
 libvx_statistics_a_OBJECTS = $(am_libvx_statistics_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -147,7 +147,7 @@ am__depfiles_remade = ./$(DEPDIR)/libvx_statistics_a-apply_mask.Po \
 	./$(DEPDIR)/libvx_statistics_a-ens_stats.Po \
 	./$(DEPDIR)/libvx_statistics_a-grid_closed_poly.Po \
 	./$(DEPDIR)/libvx_statistics_a-met_stats.Po \
-	./$(DEPDIR)/libvx_statistics_a-obs_error.Po \
+	./$(DEPDIR)/libvx_statistics_a-obs_err.Po \
 	./$(DEPDIR)/libvx_statistics_a-pair_base.Po \
 	./$(DEPDIR)/libvx_statistics_a-pair_data_ensemble.Po \
 	./$(DEPDIR)/libvx_statistics_a-pair_data_point.Po \
@@ -379,7 +379,7 @@ libvx_statistics_a_SOURCES = \
                pair_data_point.cc pair_data_point.h \
                pair_data_ensemble.cc pair_data_ensemble.h \
                read_climo.cc read_climo.h \
-               obs_error.cc obs_error.h \
+               obs_err.cc obs_err.h \
                vx_statistics.h
 
 libvx_statistics_a_CPPFLAGS = ${MET_CPPFLAGS}
@@ -440,7 +440,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_statistics_a-ens_stats.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_statistics_a-grid_closed_poly.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_statistics_a-met_stats.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_statistics_a-obs_error.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_statistics_a-obs_err.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_statistics_a-pair_base.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_statistics_a-pair_data_ensemble.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_statistics_a-pair_data_point.Po@am__quote@ # am--include-marker
@@ -648,19 +648,19 @@ libvx_statistics_a-read_climo.obj: read_climo.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_statistics_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_statistics_a-read_climo.obj `if test -f 'read_climo.cc'; then $(CYGPATH_W) 'read_climo.cc'; else $(CYGPATH_W) '$(srcdir)/read_climo.cc'; fi`
 
-libvx_statistics_a-obs_error.o: obs_error.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_statistics_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_statistics_a-obs_error.o -MD -MP -MF $(DEPDIR)/libvx_statistics_a-obs_error.Tpo -c -o libvx_statistics_a-obs_error.o `test -f 'obs_error.cc' || echo '$(srcdir)/'`obs_error.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_statistics_a-obs_error.Tpo $(DEPDIR)/libvx_statistics_a-obs_error.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='obs_error.cc' object='libvx_statistics_a-obs_error.o' libtool=no @AMDEPBACKSLASH@
+libvx_statistics_a-obs_err.o: obs_err.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_statistics_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_statistics_a-obs_err.o -MD -MP -MF $(DEPDIR)/libvx_statistics_a-obs_err.Tpo -c -o libvx_statistics_a-obs_err.o `test -f 'obs_err.cc' || echo '$(srcdir)/'`obs_err.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_statistics_a-obs_err.Tpo $(DEPDIR)/libvx_statistics_a-obs_err.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='obs_err.cc' object='libvx_statistics_a-obs_err.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_statistics_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_statistics_a-obs_error.o `test -f 'obs_error.cc' || echo '$(srcdir)/'`obs_error.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_statistics_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_statistics_a-obs_err.o `test -f 'obs_err.cc' || echo '$(srcdir)/'`obs_err.cc
 
-libvx_statistics_a-obs_error.obj: obs_error.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_statistics_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_statistics_a-obs_error.obj -MD -MP -MF $(DEPDIR)/libvx_statistics_a-obs_error.Tpo -c -o libvx_statistics_a-obs_error.obj `if test -f 'obs_error.cc'; then $(CYGPATH_W) 'obs_error.cc'; else $(CYGPATH_W) '$(srcdir)/obs_error.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_statistics_a-obs_error.Tpo $(DEPDIR)/libvx_statistics_a-obs_error.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='obs_error.cc' object='libvx_statistics_a-obs_error.obj' libtool=no @AMDEPBACKSLASH@
+libvx_statistics_a-obs_err.obj: obs_err.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_statistics_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_statistics_a-obs_err.obj -MD -MP -MF $(DEPDIR)/libvx_statistics_a-obs_err.Tpo -c -o libvx_statistics_a-obs_err.obj `if test -f 'obs_err.cc'; then $(CYGPATH_W) 'obs_err.cc'; else $(CYGPATH_W) '$(srcdir)/obs_err.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_statistics_a-obs_err.Tpo $(DEPDIR)/libvx_statistics_a-obs_err.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='obs_err.cc' object='libvx_statistics_a-obs_err.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_statistics_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_statistics_a-obs_error.obj `if test -f 'obs_error.cc'; then $(CYGPATH_W) 'obs_error.cc'; else $(CYGPATH_W) '$(srcdir)/obs_error.cc'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_statistics_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_statistics_a-obs_err.obj `if test -f 'obs_err.cc'; then $(CYGPATH_W) 'obs_err.cc'; else $(CYGPATH_W) '$(srcdir)/obs_err.cc'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -795,7 +795,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libvx_statistics_a-ens_stats.Po
 	-rm -f ./$(DEPDIR)/libvx_statistics_a-grid_closed_poly.Po
 	-rm -f ./$(DEPDIR)/libvx_statistics_a-met_stats.Po
-	-rm -f ./$(DEPDIR)/libvx_statistics_a-obs_error.Po
+	-rm -f ./$(DEPDIR)/libvx_statistics_a-obs_err.Po
 	-rm -f ./$(DEPDIR)/libvx_statistics_a-pair_base.Po
 	-rm -f ./$(DEPDIR)/libvx_statistics_a-pair_data_ensemble.Po
 	-rm -f ./$(DEPDIR)/libvx_statistics_a-pair_data_point.Po
@@ -854,7 +854,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libvx_statistics_a-ens_stats.Po
 	-rm -f ./$(DEPDIR)/libvx_statistics_a-grid_closed_poly.Po
 	-rm -f ./$(DEPDIR)/libvx_statistics_a-met_stats.Po
-	-rm -f ./$(DEPDIR)/libvx_statistics_a-obs_error.Po
+	-rm -f ./$(DEPDIR)/libvx_statistics_a-obs_err.Po
 	-rm -f ./$(DEPDIR)/libvx_statistics_a-pair_base.Po
 	-rm -f ./$(DEPDIR)/libvx_statistics_a-pair_data_ensemble.Po
 	-rm -f ./$(DEPDIR)/libvx_statistics_a-pair_data_point.Po

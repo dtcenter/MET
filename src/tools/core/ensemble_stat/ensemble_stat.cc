@@ -145,8 +145,8 @@ static void process_grid_scores   (int,
                const DataPlane &, const DataPlane &,
                const DataPlane &, const DataPlane &,
                const DataPlane &, const MaskPlane &,
-               const ObsErrorEntry *,
-               const std::vector<const ObsErrorEntry *> &,
+               const ObsErrEntry *,
+               const std::vector<const ObsErrEntry *> &,
                PairDataEnsemble &);
 
 static void do_ecnt              (const EnsembleStatVxOpt &,
@@ -1220,7 +1220,7 @@ static void process_point_scores() {
       VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info.get();
 
       // Log a summary of any observation error table lookup failures
-      conf_info.vx_opt[i].vx_pd.log_obs_error_lookup_summary();
+      conf_info.vx_opt[i].vx_pd.log_obs_err_lookup_summary();
 
       // Set the description
       shc.set_desc(conf_info.vx_opt[i].vx_pd.desc.c_str());
@@ -1324,7 +1324,7 @@ static void process_grid_vx() {
    DataPlane ocsd_dp;
    PairDataEnsemble pd;
    PairDataEnsemble pd_all;
-   const ObsErrorEntry * oerr_ptr = nullptr;
+   const ObsErrEntry * oerr_ptr = nullptr;
    VarInfo * var_info;
    ConcatString fcst_file;
 
@@ -1367,21 +1367,21 @@ static void process_grid_vx() {
       // Set the forecast level name
       shc.set_fcst_lev(fcst_info->level_attr().c_str());
 
-      // Set the ObsErrorEntry pointer
-      if(conf_info.vx_opt[i].obs_error.flag) {
+      // Set the ObsErrEntry pointer
+      if(conf_info.vx_opt[i].obs_err.flag) {
 
          // Use config file setting, if specified
-         if(conf_info.vx_opt[i].obs_error.entry.dist_type != DistType::None) {
+         if(conf_info.vx_opt[i].obs_err.entry.dist_type != DistType::None) {
             mlog << Debug(3)
-                 << "Observation error for gridded verification is "
+                 << "The obs_err settings for gridded verification are "
                  << "defined in the configuration file.\n";
-            oerr_ptr = &(conf_info.vx_opt[i].obs_error.entry);
+            oerr_ptr = &(conf_info.vx_opt[i].obs_err.entry);
          }
          // Otherwise, do a table lookup
          else {
 
             // Check for table entries for this variable and message type
-            if(!obs_error_table.has(
+            if(!obs_err_table.has(
                   obs_info->name().c_str(),
                   conf_info.obtype.c_str())) {
                mlog << Warning << "\nprocess_grid_vx() -> "
@@ -1390,13 +1390,13 @@ static void process_grid_vx() {
                     << obs_info->name()
                     << ") and MESSAGE_TYPE(" << conf_info.obtype
                     << ").\nSpecify a custom obs error table using the "
-                    << "MET_OBS_ERROR_TABLE environment variable.\n\n";
-               conf_info.vx_opt[i].obs_error.flag = false;
+                    << "MET_OBS_ERR_TABLE environment variable.\n\n";
+               conf_info.vx_opt[i].obs_err.flag = false;
             }
             else {
 
                // Do a lookup for this variable and message type
-               oerr_ptr = obs_error_table.lookup(
+               oerr_ptr = obs_err_table.lookup(
                   obs_info->name().c_str(),
                   conf_info.obtype.c_str());
 
@@ -1405,12 +1405,12 @@ static void process_grid_vx() {
                if(oerr_ptr) {
                   if(oerr_ptr->val_range.n() == 0) {
                      mlog << Debug(3)
-                          << "Observation error for gridded verification is "
+                          << "The obs_err settings for gridded verification are "
                           << "defined by a single table entry.\n";
                   }
                   else {
                      mlog << Debug(3)
-                          << "Observation error for gridded verification is "
+                          << "The obs_err settings for gridded verification are "
                           << "defined by a table lookup for each point.\n";
                      oerr_ptr = nullptr;
                   }
@@ -1618,23 +1618,23 @@ static void process_grid_vx() {
          // rather than repeating the table lookup for the bias
          // correction call, for every ensemble member below, and
          // again in process_grid_scores()
-         vector<const ObsErrorEntry *> oerr_grid;
-         if(conf_info.vx_opt[i].obs_error.flag && !oerr_ptr) {
-            oerr_grid = build_obs_error_entry_grid(
+         vector<const ObsErrEntry *> oerr_grid;
+         if(conf_info.vx_opt[i].obs_err.flag && !oerr_ptr) {
+            oerr_grid = build_obs_err_entry_grid(
                            oraw_dp, obs_info->name().c_str(),
                            conf_info.obtype.c_str());
          }
 
          // Apply observation error bias correction, if requested
-         if(conf_info.vx_opt[i].obs_error.flag) {
+         if(conf_info.vx_opt[i].obs_err.flag) {
             mlog << Debug(3)
-                 << "Applying observation error bias correction to "
+                 << "Applying obs_err bias correction to "
                  << "gridded observation data.\n";
             obs_dp = oerr_ptr ?
-               add_obs_error_bc(
+               add_obs_err_bc(
                   FieldType::Obs, oerr_ptr, oraw_dp, oraw_dp,
                   obs_info->name().c_str(), conf_info.obtype.c_str()) :
-               add_obs_error_bc(FieldType::Obs, oerr_grid, oraw_dp);
+               add_obs_err_bc(FieldType::Obs, oerr_grid, oraw_dp);
          }
 
          // Loop through the ensemble members
@@ -1651,16 +1651,16 @@ static void process_grid_vx() {
 
             // Apply observation error perturbation, if requested
             // and data is present for this ensemble member
-            if(conf_info.vx_opt[i].obs_error.flag &&
+            if(conf_info.vx_opt[i].obs_err.flag &&
                !fraw_dp[k].is_empty()) {
                mlog << Debug(3)
-                    << "Applying observation error perturbation to "
+                    << "Applying obs_err perturbation to "
                     << "ensemble member " << k+1 << ".\n";
                fcst_dp[k] = oerr_ptr ?
-                  add_obs_error_inc(conf_info.rng_ptr,
+                  add_obs_err_inc(conf_info.rng_ptr,
                      FieldType::Fcst, oerr_ptr, fraw_dp[k], oraw_dp,
                      obs_info->name().c_str(), conf_info.obtype.c_str()) :
-                  add_obs_error_inc(conf_info.rng_ptr,
+                  add_obs_err_inc(conf_info.rng_ptr,
                      FieldType::Fcst, oerr_grid, fraw_dp[k], oraw_dp);
             }
          } // end for k
@@ -1735,13 +1735,13 @@ static void process_grid_scores(int i_vx,
         const DataPlane &fcmn_dp, const DataPlane &fcsd_dp,
         const DataPlane &ocmn_dp, const DataPlane &ocsd_dp,
         const MaskPlane &mask_mp,
-        const ObsErrorEntry *oerr_ptr,
-        const vector<const ObsErrorEntry *> &oerr_grid,
+        const ObsErrEntry *oerr_ptr,
+        const vector<const ObsErrEntry *> &oerr_grid,
         PairDataEnsemble &pd) {
    int n_miss;
-   const ObsErrorEntry * e = nullptr;
-   int n_try_obs_error  = 0;
-   int n_fail_obs_error = 0;
+   const ObsErrEntry * e = nullptr;
+   int n_try_obs_err  = 0;
+   int n_fail_obs_err = 0;
 
    // Allocate memory in one big chunk based on grid size
    pd.extend(nxy);
@@ -1771,15 +1771,15 @@ static void process_grid_scores(int i_vx,
          if(oerr_ptr) {
             e = oerr_ptr;
          }
-         else if(conf_info.vx_opt[i_vx].obs_error.flag) {
-            n_try_obs_error++;
+         else if(conf_info.vx_opt[i_vx].obs_err.flag) {
+            n_try_obs_err++;
 
             // Use the entry cache built once in process_grid_vx()
             // instead of repeating the table lookup for each point
             e = oerr_grid[y * obs_dp.nx() + x];
 
             // MET #3429: Skip observation if the table lookup fails
-            if(!e) { n_fail_obs_error++; continue; }
+            if(!e) { n_fail_obs_err++; continue; }
          }
          else {
             e = nullptr;
@@ -1796,7 +1796,7 @@ static void process_grid_scores(int i_vx,
          pd.add_grid_obs(x, y, oraw_dp(x, y), cpi, wgt_dp(x, y));
 
          // Store the observation error entry pointer
-         pd.add_obs_error_entry(e);
+         pd.add_obs_err_entry(e);
 
          // Add the ensemble mean value for this point
          pd.mn_na.add(emn_flag ? emn_dp(x, y) : bad_data_double);
@@ -1805,10 +1805,10 @@ static void process_grid_scores(int i_vx,
    } // end for x
 
    // Log a summary of any observation error table lookup failures
-   if(n_fail_obs_error > 0) {
+   if(n_fail_obs_err > 0) {
       mlog << Debug(2)
-           << "Skipping " << n_fail_obs_error << " of " << n_try_obs_error
-           << " grid points with no matching observation error "
+           << "Skipping " << n_fail_obs_err << " of " << n_try_obs_err
+           << " grid points with no matching obs_err "
            << "table entry.\n";
    }
 

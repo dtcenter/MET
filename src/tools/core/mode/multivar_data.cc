@@ -90,7 +90,7 @@ void MultiVarData1::print(const string &name) const
    if(!_obj_data.empty()) {
       _print_summary(n, _obj_data, *_obj_sd);
    } else {
-      mlog << Debug(2) << n << " is empty\n";
+      mlog << Debug(2) << n << " has no object data\n";
    }
 }           
 

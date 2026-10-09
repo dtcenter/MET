@@ -8,8 +8,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef  __OBS_ERROR_H__
-#define  __OBS_ERROR_H__
+#ifndef  __OBS_ERR_H__
+#define  __OBS_ERR_H__
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -23,20 +23,20 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-class ObsErrorEntry {
+class ObsErrEntry {
 
    private:
 
       void init_from_scratch();
 
-      void assign(const ObsErrorEntry &);
+      void assign(const ObsErrEntry &);
 
    public:
 
-      ObsErrorEntry();
-     ~ObsErrorEntry();
-      ObsErrorEntry(const ObsErrorEntry &);
-      ObsErrorEntry & operator=(const ObsErrorEntry &);
+      ObsErrEntry();
+     ~ObsErrEntry();
+      ObsErrEntry(const ObsErrEntry &);
+      ObsErrEntry & operator=(const ObsErrEntry &);
 
       void clear();
 
@@ -98,15 +98,15 @@ class ObsErrorEntry {
 
 ////////////////////////////////////////////////////////////////////////
 
-class ObsErrorTable {
+class ObsErrTable {
 
    private:
 
-      void assign(const ObsErrorTable &);
+      void assign(const ObsErrTable &);
 
       void extend(int);
 
-      std::vector<ObsErrorEntry> e;   //  elements
+      std::vector<ObsErrEntry> e;   //  elements
 
       bool IsSet = false;
 
@@ -123,12 +123,12 @@ class ObsErrorTable {
 
    public:
 
-      ObsErrorTable() = default;
-     ~ObsErrorTable();
-      ObsErrorTable(const ObsErrorTable &);
-      ObsErrorTable(ObsErrorTable &&) noexcept;
-      ObsErrorTable & operator=(const ObsErrorTable &);
-      ObsErrorTable & operator=(ObsErrorTable &&) noexcept;
+      ObsErrTable() = default;
+     ~ObsErrTable();
+      ObsErrTable(const ObsErrTable &);
+      ObsErrTable(ObsErrTable &&) noexcept;
+      ObsErrTable & operator=(const ObsErrTable &);
+      ObsErrTable & operator=(ObsErrTable &&) noexcept;
 
       void clear();
 
@@ -155,28 +155,28 @@ class ObsErrorTable {
       bool read(const char * filename);
 
       // for point observations
-      const ObsErrorEntry * lookup(const char *, const char *, const char *,
-                                   int, int, int, double, double, double);
+      const ObsErrEntry * lookup(const char *, const char *, const char *,
+                                 int, int, int, double, double, double);
 
       // for gridded analyses
-      const ObsErrorEntry * lookup(const char *, const char *,
-                                   double cur_val = bad_data_double);
+      const ObsErrEntry * lookup(const char *, const char *,
+                                 double cur_val = bad_data_double);
 
       bool has(const char *, const char *);
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int  ObsErrorTable::n()      const { return (int) e.size(); }
-inline bool ObsErrorTable::is_set() const { return IsSet;      }
+inline int  ObsErrTable::n()      const { return (int) e.size(); }
+inline bool ObsErrTable::is_set() const { return IsSet;      }
 
 ////////////////////////////////////////////////////////////////////////
 
 //
-//  Global instance of ObsErrorTable
+//  Global instance of ObsErrTable
 //
 
-extern ObsErrorTable obs_error_table;
+extern ObsErrTable obs_err_table;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -184,16 +184,16 @@ extern ObsErrorTable obs_error_table;
 // Struct to store observation error information from config files
 //
 
-struct ObsErrorInfo {
+struct ObsErrInfo {
    bool          flag;  // TRUE or FALSE
-   ObsErrorEntry entry; // Defines perturbation
+   ObsErrEntry   entry; // Defines perturbation
 
    gsl_rng * rng_ptr;   // not allocated
 
    void clear();
    void validate();
 
-   ObsErrorInfo &operator=(const ObsErrorInfo &a) noexcept;
+   ObsErrInfo &operator=(const ObsErrInfo &a) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -202,46 +202,46 @@ struct ObsErrorInfo {
 // External utility functions
 //
 
-extern ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *);
+extern ObsErrInfo   parse_conf_obs_err(Dictionary *dict, gsl_rng *);
 
-extern double       add_obs_error_inc(const gsl_rng *, FieldType,
-                                      const ObsErrorEntry *, const double,
-                                      double, bool log_detail = true);
-extern DataPlane    add_obs_error_inc(const gsl_rng *, FieldType,
-                                      const ObsErrorEntry *,
-                                      const DataPlane &in_dp,
-                                      const DataPlane &obs_dp,
-                                      const char *, const char *);
+extern double       add_obs_err_inc(const gsl_rng *, FieldType,
+                                    const ObsErrEntry *, const double,
+                                    double, bool log_detail = true);
+extern DataPlane    add_obs_err_inc(const gsl_rng *, FieldType,
+                                    const ObsErrEntry *,
+                                    const DataPlane &in_dp,
+                                    const DataPlane &obs_dp,
+                                    const char *, const char *);
 
-extern double       add_obs_error_bc(FieldType,
-                                     const ObsErrorEntry *, double,
-                                     bool log_detail = true);
-extern DataPlane    add_obs_error_bc(FieldType,
-                                     const ObsErrorEntry *,
-                                     const DataPlane &in_dp,
-                                     const DataPlane &obs_dp,
-                                     const char *, const char *);
+extern double       add_obs_err_bc(FieldType,
+                                   const ObsErrEntry *, double,
+                                   bool log_detail = true);
+extern DataPlane    add_obs_err_bc(FieldType,
+                                   const ObsErrEntry *,
+                                   const DataPlane &in_dp,
+                                   const DataPlane &obs_dp,
+                                   const char *, const char *);
 
-// Build a per-gridpoint cache of resolved ObsErrorEntry pointers by
+// Build a per-gridpoint cache of resolved ObsErrEntry pointers by
 // doing one table lookup per point to avoid repeating the table
 // lookup for each ensemble member.
-extern std::vector<const ObsErrorEntry *> build_obs_error_entry_grid(
-                                      const DataPlane &val_dp,
-                                      const char *var_name,
-                                      const char *obtype);
+extern std::vector<const ObsErrEntry *> build_obs_err_entry_grid(
+                                    const DataPlane &val_dp,
+                                    const char *var_name,
+                                    const char *obtype);
 
 // Variants that consume a precomputed per-gridpoint entry cache
 // instead of a single entry or a var_name/obtype table lookup
-extern DataPlane    add_obs_error_inc(const gsl_rng *, FieldType,
-                                      const std::vector<const ObsErrorEntry *> &entry_grid,
-                                      const DataPlane &in_dp,
-                                      const DataPlane &obs_dp);
-extern DataPlane    add_obs_error_bc(FieldType,
-                                     const std::vector<const ObsErrorEntry *> &entry_grid,
-                                     const DataPlane &in_dp);
+extern DataPlane    add_obs_err_inc(const gsl_rng *, FieldType,
+                                    const std::vector<const ObsErrEntry *> &entry_grid,
+                                    const DataPlane &in_dp,
+                                    const DataPlane &obs_dp);
+extern DataPlane    add_obs_err_bc(FieldType,
+                                   const std::vector<const ObsErrEntry *> &entry_grid,
+                                   const DataPlane &in_dp);
 
 ////////////////////////////////////////////////////////////////////////
 
-#endif   // __OBS_ERROR_H__
+#endif   // __OBS_ERR_H__
 
 ////////////////////////////////////////////////////////////////////////
