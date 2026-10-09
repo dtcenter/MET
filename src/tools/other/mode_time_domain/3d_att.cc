@@ -16,6 +16,7 @@
 #include <string.h>
 #include <cstdio>
 #include <cmath>
+#include <vector>
 
 #include "vx_util.h"
 #include "vx_math.h"
@@ -522,7 +523,6 @@ void SingleAtt3D::write_txt(AsciiTable & table, const int row) const
 ConcatString cs;
 int c = n_header_3d_cols;
 int k;
-const char * format = 0;
 ConcatString s;
 
 
@@ -564,17 +564,15 @@ table.set_entry(row, c, s.text()); c++;
    //  centroid x, y, t
    //
 
-format = format_2_decimals;
-
-cs.format(format, Xbar);
+cs.format(format_2_decimals, Xbar);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ybar);
+cs.format(format_2_decimals, Ybar);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Tbar);
+cs.format(format_2_decimals, Tbar);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -582,13 +580,11 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  space centroid lat, lon
    //
 
-format = format_2_decimals;
-
-cs.format(format, Centroid_Lat);
+cs.format(format_2_decimals, Centroid_Lat);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, -Centroid_Lon);
+cs.format(format_2_decimals, -Centroid_Lon);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -596,13 +592,11 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  velocity xdot, ydot
    //
 
-format = format_2_decimals;
-
-cs.format(format, Xvelocity);
+cs.format(format_2_decimals, Xvelocity);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Yvelocity);
+cs.format(format_2_decimals, Yvelocity);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -610,9 +604,7 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  spatial axis angle
    //
 
-format = format_2_decimals;
-
-cs.format(format, SpatialAxisAngle);
+cs.format(format_2_decimals, SpatialAxisAngle);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -628,13 +620,11 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  start time, end time
    //
 
-format = format_int;
-
-cs.format(format, Tmin);
+cs.format(format_int, Tmin);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Tmax);
+cs.format(format_int, Tmax);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -642,9 +632,7 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  centroid distance travelled
    //
 
-format = format_3_decimals;
-
-cs.format(format, CdistTravelled);
+cs.format(format_3_decimals, CdistTravelled);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -652,25 +640,23 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  intensities 10, 25, 50, 75, 90
    //
 
-format = format_2_decimals;
-
-cs.format(format, Ptile_10);
+cs.format(format_2_decimals, Ptile_10);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_25);
+cs.format(format_2_decimals, Ptile_25);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_50);
+cs.format(format_2_decimals, Ptile_50);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_75);
+cs.format(format_2_decimals, Ptile_75);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
-cs.format(format, Ptile_90);
+cs.format(format_2_decimals, Ptile_90);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -678,7 +664,7 @@ table.set_entry(row, c, cs.c_str()); c++;
    //  custom intensity value
    //
 
-cs.format(format, Ptile_User);
+cs.format(format_2_decimals, Ptile_User);
 
 table.set_entry(row, c, cs.c_str()); c++;
 
@@ -1229,7 +1215,6 @@ double lat, lon;
 double xbar_2d, ybar_2d, x_old, y_old;
 double dist;
 ConcatString raw_filename;
-float * values = (float *) nullptr;
 const int   * i = 0;
 const float * r = 0;
 Mtd_3D_Moments moments;
@@ -1330,16 +1315,7 @@ a.set_cdist_travelled(dist);
 
 Vol = a.Volume;
 
-values = new float [Vol];
-
-if ( !values )  {
-
-   mlog << Error << "\ncalc_3d_single_atts() -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
+vector<float> values(Vol);
 
 n = 0;
 
@@ -1359,24 +1335,23 @@ for (j=0; j<n3; ++j)  {
 }
 
 
-sort_f(values, n);
+sort_f(values.data(), n);
 
-a.Ptile_10 = percentile_f(values, n, 0.10);
-a.Ptile_25 = percentile_f(values, n, 0.25);
-a.Ptile_50 = percentile_f(values, n, 0.50);
-a.Ptile_75 = percentile_f(values, n, 0.75);
-a.Ptile_90 = percentile_f(values, n, 0.90);
+a.Ptile_10 = percentile_f(values.data(), n, 0.10);
+a.Ptile_25 = percentile_f(values.data(), n, 0.25);
+a.Ptile_50 = percentile_f(values.data(), n, 0.50);
+a.Ptile_75 = percentile_f(values.data(), n, 0.75);
+a.Ptile_90 = percentile_f(values.data(), n, 0.90);
 
 a.Ptile_Value = ptile_value;
 
-a.Ptile_User = percentile_f(values, n, (double) (a.Ptile_Value/100.0));
+a.Ptile_User = percentile_f(values.data(), n, (double) (a.Ptile_Value/100.0));
 
 
    //
    //   done
    //
 
-if ( values )  { delete [] values;  values = 0; }
 
 return a;
 

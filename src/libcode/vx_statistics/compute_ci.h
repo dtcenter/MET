@@ -46,7 +46,7 @@ extern void compute_hk_ci(double hk, double alpha, double vif,
    double &hk_cl, double &hk_cu);
 
 extern void compute_cts_stats_ci_bca(const gsl_rng *,
-   const PairDataPoint &, int, CTSInfo *&, int, bool, bool,
+   const PairDataPoint &, int, CTSInfo *, int, bool, bool,
    const char *);
 
 extern void compute_mcts_stats_ci_bca(const gsl_rng *,
@@ -58,7 +58,7 @@ extern void compute_cnt_stats_ci_bca(const gsl_rng *,
    const char *);
 
 extern void compute_cts_stats_ci_perc(const gsl_rng *,
-   const PairDataPoint &, int, double, CTSInfo *&, int, bool, bool,
+   const PairDataPoint &, int, double, CTSInfo *, int, bool, bool,
    const char *);
 
 extern void compute_mcts_stats_ci_perc(const gsl_rng *,
@@ -70,7 +70,7 @@ extern void compute_cnt_stats_ci_perc(const gsl_rng *,
    const char *);
 
 extern void compute_nbrcts_stats_ci_bca(const gsl_rng *,
-   const PairDataPoint &, int, NBRCTSInfo *&, int, bool,
+   const PairDataPoint &, int, NBRCTSInfo *, int, bool,
    const char *);
 
 extern void compute_nbrcnt_stats_ci_bca(const gsl_rng *,
@@ -78,7 +78,7 @@ extern void compute_nbrcnt_stats_ci_bca(const gsl_rng *,
    int, NBRCNTInfo &, bool, const char *);
 
 extern void compute_nbrcts_stats_ci_perc(const gsl_rng *,
-   const PairDataPoint &, int, double, NBRCTSInfo *&, int, bool,
+   const PairDataPoint &, int, double, NBRCTSInfo *, int, bool,
    const char *);
 
 extern void compute_nbrcnt_stats_ci_perc(const gsl_rng *,

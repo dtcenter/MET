@@ -78,9 +78,9 @@ void BoolCalc::clear()
 
 {
 
-if ( s )  { delete s;  s = nullptr; }
+s.reset();
 
-if ( program )  { delete program;  program = nullptr; }
+program.reset();
 
 Max_depth = Max_local = 0;
 
@@ -96,11 +96,11 @@ void BoolCalc::set(const char * algebraic)
 
 {
 
-program = new Program;
+program = std::make_unique<Program>();
 
 make_program(algebraic, *program);
 
-s = new stack<bool>;
+s = std::make_unique<std::stack<bool>>();
 
 Max_depth = max_depth(*program);
 

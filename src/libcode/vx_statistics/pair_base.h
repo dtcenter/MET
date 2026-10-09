@@ -11,6 +11,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <map>
 #include <utility>
 
@@ -232,7 +233,7 @@ class VxPairBase {
 
       void init_from_scratch();
       void assign(const VxPairBase &);
-      void copy_var_info(const VarInfo *info, VarInfo *&copy);
+      void copy_var_info(const VarInfo *info, std::unique_ptr<VarInfo> &copy);
 
    public:
 
@@ -249,11 +250,11 @@ class VxPairBase {
       //
       //////////////////////////////////////////////////////////////////
 
-      VarInfo *fcst_info;        // Forecast field, allocated by VarInfoFactory
-      VarInfo *obs_info;         // Observation field, allocated by VarInfoFactory
+      std::unique_ptr<VarInfo> fcst_info;   // Forecast field
+      std::unique_ptr<VarInfo> obs_info;    // Observation field
 
-      VarInfo *fclm_info;        // Forecast climatology field, allocated by VarInfoFactory
-      VarInfo *oclm_info;        // Observation climatology field, allocated by VarInfoFactory
+      std::unique_ptr<VarInfo> fclm_info;   // Forecast climatology field
+      std::unique_ptr<VarInfo> oclm_info;   // Observation climatology field
 
       ConcatString desc;         // User description from config file
 

@@ -17,8 +17,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <algorithm>
+#include <cstdlib>
 #include <iostream>
+#include <memory>
 #include <string.h>
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -30,49 +34,31 @@ typedef int (ncrr_cmp_func)(const void *, const void *);
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int ncrr_default_alloc_inc = 20;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 template <typename T>
 
 class NCRR_Array {
 
    protected:
 
-      void init_from_scratch();
-
       void assign(const NCRR_Array &);
 
+         //
+         //  Each element is held by pointer so that operator[] can hand back a
+         //  reference that stays valid as the array grows.
+         //
 
-
-      int Nelements;
-
-      int Nalloc;
-
-      int AllocInc;
-
-      T ** e;
+      std::vector<std::unique_ptr<T>> e;
 
 
    public:
 
-      NCRR_Array()  { init_from_scratch(); }
+      NCRR_Array() = default;
 
-     ~NCRR_Array()  { clear(); }
+     ~NCRR_Array() = default;
 
-      NCRR_Array(const NCRR_Array & _a)  { init_from_scratch();  assign(_a); }
+      NCRR_Array(const NCRR_Array & _a)  { assign(_a); }
 
-      NCRR_Array(NCRR_Array && _a) noexcept
-         : Nelements(_a.Nelements), Nalloc(_a.Nalloc), AllocInc(_a.AllocInc), e(_a.e) {
-
-         _a.e = (T **) nullptr;
-         _a.Nelements = 0;
-         _a.Nalloc = 0;
-
-      }
+      NCRR_Array(NCRR_Array &&) noexcept = default;
 
       NCRR_Array & operator=(const NCRR_Array & _a)  {
 
@@ -84,42 +70,19 @@ class NCRR_Array {
 
       }
 
-      NCRR_Array & operator=(NCRR_Array && _a) noexcept  {
-
-         if ( this == &_a )  return *this;
-
-         clear();
-
-         Nelements = _a.Nelements;
-         Nalloc    = _a.Nalloc;
-         AllocInc  = _a.AllocInc;
-         e         = _a.e;
-
-         _a.e = (T **) nullptr;
-         _a.Nelements = 0;
-         _a.Nalloc = 0;
-
-         return *this;
-
-      }
+      NCRR_Array & operator=(NCRR_Array &&) noexcept = default;
 
       void clear();
 
       void dump(std::ostream &, int = 0) const;
 
          //
-         //  set stuff
-         //
-
-      void set_alloc_inc(int = 0);   //  0 means default value
-
-         //
          //  get stuff
          //
 
-      int n_elements() const  { return Nelements;}
+      int n_elements() const  { return (int) e.size(); }
 
-      int n         () const  { return Nelements;}
+      int n         () const  { return (int) e.size(); }
 
       T & operator[](int) const;
 
@@ -135,8 +98,6 @@ class NCRR_Array {
 
       void qsort_increasing(ncrr_cmp_func);
       void qsort_decreasing(ncrr_cmp_func);
-
-      void extend(int, bool exact = true);
 
       void reverse();   //  reverse the order of the elements
 
@@ -156,51 +117,11 @@ class NCRR_Array {
 
 template <typename T>
 
-void NCRR_Array<T>::init_from_scratch()
-
-{
-
-e = (T **) nullptr;
-
-AllocInc = ncrr_default_alloc_inc;
-
-clear();
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-template <typename T>
-
 void NCRR_Array<T>::clear()
 
 {
 
-if ( e )  {
-
-   int j;
-
-   for (j=0; j<Nalloc; ++j)  {
-
-      if ( e[j] )  { delete e[j];  e[j] = (T *) nullptr; }
-
-   }
-
-   delete [] e;  e = (T **) nullptr;
-
-}   //  if e
-
-
-Nelements = 0;
-
-Nalloc = 0;
-
-// AllocInc = ncrr_default_alloc_inc;   //  don't reset AllocInc
-
+e.clear();
 
 return;
 
@@ -232,69 +153,17 @@ return;
 
 template <typename T>
 
-void NCRR_Array<T>::extend(int N, bool exact)
-
-{
-
-if ( N <= Nalloc )  return;
-
-if ( ! exact )  {
-
-   N = AllocInc*( (N + AllocInc - 1)/AllocInc );
-
-}
-
-int j;
-T ** u = new T * [N];
-
-if ( !u )  {
-
-   mlog << Error << "\nNCRR_Array<T>::extend(int, bool) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-memset(u, 0, N*sizeof(T *));
-
-for(j=0; j<Nelements; ++j)  {
-
-   u[j] = e[j];
-
-}
-
-if ( e )  { delete [] e;  e = (T **) nullptr; }
-
-e = u;
-
-u = (T **) nullptr;
-
-Nalloc = N;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-template <typename T>
-
 void NCRR_Array<T>::dump(std::ostream & out, int depth) const
 
 {
 
 Indent prefix(depth);
 
-out << prefix << "Nelements = " << Nelements << "\n";
-out << prefix << "Nalloc    = " << Nalloc    << "\n";
-out << prefix << "AllocInc  = " << AllocInc  << "\n";
+out << prefix << "Nelements = " << n_elements() << "\n";
 
 int j;
 
-for(j=0; j<Nelements; ++j)  {
+for(j=0; j<n_elements(); ++j)  {
 
    out << prefix << "Element # " << j << " ... \n";
 
@@ -314,50 +183,13 @@ return;
 
 template <typename T>
 
-void NCRR_Array<T>::set_alloc_inc(int N)
-
-{
-
-if ( N < 0 )  {
-
-   mlog << Error << "\nNCRR_Array<T>::set_alloc_int(int) -> "
-        << "bad value ... " << N << "\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( N == 0 )  AllocInc = ncrr_default_alloc_inc;
-else           AllocInc = N;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-template <typename T>
-
 void NCRR_Array<T>::add(const T & a)
 
 {
 
-extend(Nelements + 1, false);
+e.push_back(std::make_unique<T>());
 
-e[Nelements] = new T;
-
-if ( !(e[Nelements]) )  {
-
-   mlog << Error << "\nNCRR_Array<T>::add(const T &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-*(e[Nelements++]) = a;
+*(e.back()) = a;
 
 return;
 
@@ -375,7 +207,7 @@ void NCRR_Array<T>::add(const NCRR_Array & a)
 
 int j;
 
-extend(Nelements + a.n_elements());
+e.reserve(e.size() + a.n_elements());
 
 for (j=0; j<(a.n_elements()); ++j)  {
 
@@ -397,7 +229,7 @@ T & NCRR_Array<T>::operator[](int N) const
 
 {
 
-if ( (N < 0) || (N >= Nelements) )  {
+if ( (N < 0) || (N >= n_elements()) )  {
 
    mlog << Error << "\nNCRR_Array<T>::operator[](int) -> "
         << "range check error ... " << N << "\n\n";
@@ -419,26 +251,7 @@ void NCRR_Array<T>::reverse()
 
 {
 
-if ( Nelements < 2 )  return;
-
-int j, k;
-int jmax;
-T * temp = nullptr;
-
-jmax = Nelements/2;   //  works whether Nelements is even or odd
-
-k = Nelements - 1;
-
-for (j=0; j<jmax; ++j, --k)  {
-
-   temp = e[j];
-
-   e[j] = e[k];
-
-   e[k] = temp;
-
-}
-
+std::reverse(e.begin(), e.end());
 
 return;
 
@@ -448,36 +261,25 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  ncrr_cmp_func is a C-style comparator: it is handed the addresses of two
+   //  elements, which in the old raw T ** array meant T **.  The wrapper below
+   //  keeps that contract.
+   //
+
+
 template <typename T>
 
 void NCRR_Array<T>::bubble_sort_decreasing(ncrr_cmp_func _cmp)
 
 {
 
-if ( Nelements < 2 )  return;
-
-int j, k;
-T * temp = nullptr;
-
-
-for (j=0; j<(Nelements - 1); ++j) {
-
-   for (k=(j + 1); k<Nelements; ++k) {
-
-      if ( _cmp(e[j], e[k]) < 0 )  {
-
-         temp = e[j];
-
-         e[j] = e[k];
-
-         e[k] = temp;
-
-      }
-
-   }
-
-}
-
+std::stable_sort(e.begin(), e.end(),
+   [_cmp](const std::unique_ptr<T> & a, const std::unique_ptr<T> & b) {
+      const T * pa = a.get();
+      const T * pb = b.get();
+      return ( _cmp(&pa, &pb) > 0 );
+   });
 
 return;
 
@@ -493,12 +295,9 @@ void NCRR_Array<T>::bubble_sort_increasing(ncrr_cmp_func _cmp)
 
 {
 
-if ( Nelements < 2 )  return;
-
 bubble_sort_decreasing(_cmp);
 
 reverse();
-
 
 return;
 
@@ -514,9 +313,12 @@ void NCRR_Array<T>::qsort_increasing(ncrr_cmp_func _cmp)
 
 {
 
-if ( Nelements < 2 )  return;
-
-qsort(e, Nelements, sizeof(*e), _cmp);   //  sort in increasing order
+std::stable_sort(e.begin(), e.end(),
+   [_cmp](const std::unique_ptr<T> & a, const std::unique_ptr<T> & b) {
+      const T * pa = a.get();
+      const T * pb = b.get();
+      return ( _cmp(&pa, &pb) < 0 );
+   });
 
 return;
 
@@ -532,9 +334,7 @@ void NCRR_Array<T>::qsort_decreasing(ncrr_cmp_func _cmp)
 
 {
 
-if ( Nelements < 2 )  return;
-
-qsort(e, Nelements, sizeof(*e), _cmp);   //  sort in increasing order
+qsort_increasing(_cmp);
 
 reverse();
 

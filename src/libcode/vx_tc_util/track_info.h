@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <vector>
 
 #include "vx_cal.h"
 #include "vx_math.h"
@@ -43,7 +44,6 @@ class TrackInfo {
 
       void init_from_scratch();
       void assign(const TrackInfo &);
-      void extend(int, bool exact = true);
 
       bool         IsSet;
       bool         IsBestTrack;
@@ -77,9 +77,7 @@ class TrackInfo {
       StringArray  DiagName;
 
       // TrackPoints
-      TrackPoint  *Point;
-      int          NPoints;
-      int          NAlloc;
+      std::vector<TrackPoint> Point;
 
    public:
 
@@ -210,7 +208,7 @@ inline unixtime             TrackInfo::valid_min()        const { return MinVali
 inline unixtime             TrackInfo::valid_max()        const { return MaxValidTime;                 }
 inline unixtime             TrackInfo::warm_core_min()    const { return MinWarmCore;                  }
 inline unixtime             TrackInfo::warm_core_max()    const { return MaxWarmCore;                  }
-inline int                  TrackInfo::n_points()         const { return NPoints;                      }
+inline int                  TrackInfo::n_points()         const { return (int) Point.size(); }
 
 inline DiagType             TrackInfo::diag_source()      const { return DiagSource;   }
 inline const ConcatString & TrackInfo::track_source()     const { return TrackSource;  }

@@ -28,11 +28,23 @@ class StereographicGrid : public GridRep {
 
       friend class Grid;
 
+         //
+         //  Key is private, so only Grid and StereographicGrid itself can create
+         //  one.  It lets the constructors below be public - which is
+         //  what std::make_unique needs - without opening grid
+         //  construction up to the rest of the code.
+         //
+
+      struct Key { explicit Key() = default; };
+
+   public:
+
+     ~StereographicGrid();
+      StereographicGrid(const StereographicData &, Key);
+
    private:
 
       StereographicGrid();
-     ~StereographicGrid();
-      StereographicGrid(const StereographicData &);
 
          //
          //
@@ -44,8 +56,6 @@ class StereographicGrid : public GridRep {
       void uv_to_xy(double u, double v, double &x, double &y) const;
 
       double uv_closedpolyline_area(const double * u, const double * v, int n) const;
-
-      double xy_closedpolyline_area(const double * x, const double * y, int n) const;
 
       double f(double) const;
 
@@ -99,7 +109,7 @@ class StereographicGrid : public GridRep {
 
       void shift_right(int);
 
-      GridRep * copy() const;
+      std::unique_ptr<GridRep> copy() const;
 
 };
 

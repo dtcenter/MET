@@ -92,8 +92,6 @@ void FO_Node_Array::init_from_scratch()
 
 {
 
-e = (FO_Node *) nullptr;
-
 AllocInc = 30;   //  default value
 
 clear();
@@ -110,13 +108,7 @@ void FO_Node_Array::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (FO_Node *) nullptr; }
-
-
-
-Nelements = 0;
-
-Nalloc = 0;
+e.clear();
 
 return;
 
@@ -144,61 +136,19 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void FO_Node_Array::extend(int N)
-
-{
-
-if ( N <= Nalloc )  return;
-
-N = AllocInc*( (N + AllocInc - 1)/AllocInc );
-
-int j;
-FO_Node * u = new FO_Node [N];
-
-if ( !u )  {
-
-   mlog << Error << "\nFO_Node_Array::extend(int) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for(j=0; j<Nelements; ++j)  {
-
-   u[j] = e[j];
-
-}
-
-if ( e )  { delete [] e;  e = (FO_Node *) nullptr; }
-
-e = u;
-
-u = (FO_Node *) nullptr;
-
-Nalloc = N;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void FO_Node_Array::dump(ostream & out, int depth) const
 
 {
 
 Indent prefix(depth);
 
-out << prefix << "Nelements = " << Nelements << "\n";
-out << prefix << "Nalloc    = " << Nalloc    << "\n";
+out << prefix << "Nelements = " << e.size() << "\n";
+out << prefix << "Nalloc    = " << e.capacity() << "\n";
 out << prefix << "AllocInc  = " << AllocInc  << "\n";
 
 int j;
 
-for(j=0; j<Nelements; ++j)  {
+for(j=0; j<(int) e.size(); ++j)  {
 
    out << prefix << "Element # " << j << " ... \n";
 
@@ -244,9 +194,7 @@ void FO_Node_Array::add(const FO_Node & a)
 
 {
 
-extend(Nelements + 1);
-
-e[Nelements++] = a;
+e.push_back(a);
 
 return;
 
@@ -262,7 +210,7 @@ void FO_Node_Array::add(const FO_Node_Array & a)
 
 int j;
 
-extend(Nelements + a.n_elements());
+e.reserve(e.size() + a.n_elements());
 
 for (j=0; j<(a.n_elements()); ++j)  {
 
@@ -282,7 +230,7 @@ FO_Node & FO_Node_Array::operator[](int N) const
 
 {
 
-if ( (N < 0) || (N >= Nelements) )  {
+if ( (N < 0) || (N >= (int) e.size()) )  {
 
    mlog << Error << "\nFO_Node_Array::operator[](int) -> "
         << "range check error ... " << N << "\n\n";
@@ -290,7 +238,7 @@ if ( (N < 0) || (N >= Nelements) )  {
    exit ( 1 );
 }
 
-return e[N];
+return const_cast<FO_Node &>(e[N]);
 
 }
 

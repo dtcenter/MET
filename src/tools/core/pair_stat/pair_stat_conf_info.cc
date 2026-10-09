@@ -710,8 +710,8 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    clear();
 
    // Allocate new VarInfo objects
-   vx_pd.set_fcst_info(VarInfoFactory::new_var_info(FileType_Pairs));
-   vx_pd.set_obs_info(VarInfoFactory::new_var_info(FileType_Pairs));
+   vx_pd.set_fcst_info(VarInfoFactory::new_var_info(FileType_Pairs).get());
+   vx_pd.set_obs_info(VarInfoFactory::new_var_info(FileType_Pairs).get());
 
    // Set the VarInfo objects
    vx_pd.fcst_info->set_dict(fdict);
@@ -1572,10 +1572,10 @@ void PairStatVxOpt::apply_convert_censor(STATLine &l) const {
 
    // Apply logic to the forecast and observation values
    double fval = atof(l.get_item("FCST"));
-   apply_convert_censor(vx_pd.fcst_info, fval);
+   apply_convert_censor(vx_pd.fcst_info.get(), fval);
 
    double oval = atof(l.get_item("OBS"));
-   apply_convert_censor(vx_pd.obs_info, oval);
+   apply_convert_censor(vx_pd.obs_info.get(), oval);
 
    // Store the result
    l.set_item(l.get_offset("FCST"), to_string(fval));
@@ -1589,8 +1589,8 @@ void PairStatVxOpt::apply_convert_censor(STATLine &l) const {
 void PairStatVxOpt::apply_convert_censor(point_pair_t &p) const {
 
    // Apply logic to the forecast and observation values
-   apply_convert_censor(vx_pd.fcst_info, p.fval);
-   apply_convert_censor(vx_pd.obs_info,  p.oval);
+   apply_convert_censor(vx_pd.fcst_info.get(), p.fval);
+   apply_convert_censor(vx_pd.obs_info.get(),  p.oval);
 
    return;
 }

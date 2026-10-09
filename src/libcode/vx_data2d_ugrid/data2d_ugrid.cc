@@ -90,7 +90,7 @@ bool MetUGridDataFile::fail_with_error(const char *method_name, const std::strin
 
 void MetUGridDataFile::ugrid_init_from_scratch() {
 
-   _file = (UGridFile *) nullptr;
+   _file.reset();
    _cur_time_index = -1;
    _cur_vert_index = -1;
 
@@ -103,7 +103,7 @@ void MetUGridDataFile::ugrid_init_from_scratch() {
 
 void MetUGridDataFile::close() {
 
-   if(_file) { delete _file; _file = (UGridFile *) nullptr; }
+   _file.reset();
 
    return;
 }
@@ -115,7 +115,7 @@ bool MetUGridDataFile::open(const char * _filename) {
 
    close();
 
-   _file = new UGridFile;
+   _file = std::make_unique<UGridFile>();
 
    if(!_file->open(_filename)) {
       return fail_with_error(method_name, std::string("unable to open NetCDF file \"") + _filename + "\"");
@@ -141,11 +141,11 @@ bool MetUGridDataFile::open_metadata(const char * _filename) {
 
    meta_filename = _filename;
 
-   Raw_Grid = new Grid;
+   Raw_Grid = std::make_unique<Grid>();
 
    (*Raw_Grid) = _file->grid;
 
-   Dest_Grid = new Grid;
+   Dest_Grid = std::make_unique<Grid>();
 
    (*Dest_Grid) = (*Raw_Grid);
 
@@ -374,7 +374,7 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
          int tmp_lower = lvl_lower;
          int tmp_upper = lvl_upper;
          if (data_vinfo->z_slot >= 0) {
-            int zdim_size = get_dim_size(data_vinfo->var, data_vinfo->z_slot);
+            int zdim_size = get_dim_size(data_vinfo->var.get(), data_vinfo->z_slot);
             if (tmp_lower >= zdim_size) tmp_lower = zdim_size - 1;
             if (tmp_upper >= zdim_size) tmp_upper = zdim_size - 1;
          }
@@ -667,7 +667,7 @@ long MetUGridDataFile::convert_value_to_offset(double z_value, string z_dim_name
    if (!found && 0 < z_dim_name.length()) {
       NcVarInfo *var_info = find_var_info_by_dim_name(_file->Var, z_dim_name, _file->Nvars);
       if (var_info) {
-         long new_offset = get_index_at_nc_data(var_info->var, z_value, z_dim_name);
+         long new_offset = get_index_at_nc_data(var_info->var.get(), z_value, z_dim_name);
          if (new_offset != bad_data_int) z_offset = new_offset;
       }
    }
@@ -680,21 +680,15 @@ long MetUGridDataFile::convert_value_to_offset(double z_value, string z_dim_name
 
 int MetUGridDataFile::extract_vlevels(const ConcatString &var_name_base, const char *var_name) {
    int num_mat = 0;
-   char** mat = nullptr;
+   StringArray mat;
    int vlevel = bad_data_int;
    ConcatString name_pattern;
 
    name_pattern.erase();
    name_pattern << "(" << var_name_base << "[ _])([0-9]+)(.*)";
    num_mat = regex_apply(name_pattern.c_str(), 4, var_name, mat);
-   if (2 < num_mat) vlevel = atoi(mat[2]);
+   if (2 < num_mat) vlevel = atoi(mat[2].c_str());
 
-   if (mat) {
-      for (int i = 0; i < num_mat; ++i) {
-         delete[] mat[i];   // free each row
-      }
-      delete[] mat;         // free the array of pointers
-   }
    return vlevel;
 }
 

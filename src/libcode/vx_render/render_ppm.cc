@@ -11,6 +11,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -34,8 +35,8 @@ plot.gsave();
 
 int j, r, c;
 double w, h;
-PSFilter *out = (PSFilter *) nullptr;
-PSFilter **v = &out;
+std::unique_ptr<PSFilter> out;
+std::unique_ptr<PSFilter> *v = &out;
 Color color;
 
    //
@@ -55,22 +56,22 @@ for (j=0; j<(info.n_filters()); ++j)  {
    switch ( info.filter(j) )  {
 
       case ASCII85Encode:
-         *v = new ASCII85EncodeFilter();
+         *v = std::make_unique<ASCII85EncodeFilter>();
          v = &((*v)->next);
          break;
 
       case HexEncode:
-         *v = new HexEncodeFilter();
+         *v = std::make_unique<HexEncodeFilter>();
          v = &((*v)->next);
          break;
 
       case RunLengthEncode:
-         *v = new RunLengthEncodeFilter();
+         *v = std::make_unique<RunLengthEncodeFilter>();
          v = &((*v)->next);
          break;
 
       case FlateEncode:
-         *v = new FlateEncodeFilter();
+         *v = std::make_unique<FlateEncodeFilter>();
          v = &((*v)->next);
          break;
 
@@ -86,13 +87,13 @@ for (j=0; j<(info.n_filters()); ++j)  {
    //  put an output filter on the back end
    //
 
-PSOutputFilter * psout = new PSOutputFilter(plot.psout);
+auto psout = std::make_unique<PSOutputFilter>(plot.psout);
 
 psout->ignore_columns = false;
 
-*v = psout;
+*v = std::move(psout);
 
-v = (PSFilter **) nullptr;
+v = nullptr;
 
 
 
@@ -164,7 +165,7 @@ for (r=0; r<(image.nrows()); ++r)  {
 
 out->eod();
 
-delete out;   out = (PSFilter *) nullptr;
+out.reset();
 
 plot.file() << "\n\n";
 

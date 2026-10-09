@@ -18,6 +18,7 @@
 
 
 #include <iostream>
+#include <string>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -27,7 +28,7 @@ class ScopeStackElement {
 
    private:
 
-      const char * Name;   //  if any
+      std::string Name;   //  if any
 
       int Level;   //  bracket depth
 
@@ -59,7 +60,12 @@ class ScopeStackElement {
 
 inline int ScopeStackElement::level() const { return Level; }
 
-inline const char * ScopeStackElement::name() const { return Name; }
+   //
+   //  An unnamed scope must keep reporting a null pointer: the parser tests
+   //  the result and skips the element when it is null.
+   //
+
+inline const char * ScopeStackElement::name() const { return ( Name.empty() ? nullptr : Name.c_str() ); }
 
 
 ////////////////////////////////////////////////////////////////////////

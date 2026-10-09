@@ -26,6 +26,18 @@ libvx_afm_a_CPPFLAGS = ${MET_CPPFLAGS}
 # in a distribution because the enum_to_string utility isn't available.
 
 if ENABLE_DEVELOPMENT
+
+# BUILT_SOURCES so these are generated before anything that
+# includes them is compiled.  Without it, a development build
+# whose .deps are empty - as after the make clean that removes
+# these very files - compiles sources in _SOURCES order and can
+# reach a consumer before its header has been generated.
+
+BUILT_SOURCES = afmkeyword_to_string.cc \
+                afmkeyword_to_string.h \
+                afmtokentype_to_string.cc \
+                afmtokentype_to_string.h
+
 afmkeyword_to_string.h afmkeyword_to_string.cc: afm_keywords.h
 	${ENUM_TO_STRING} -concat_string afm_keywords.h
 

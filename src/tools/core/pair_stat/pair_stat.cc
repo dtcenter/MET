@@ -27,6 +27,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -278,7 +279,7 @@ static void setup_txt_files() {
    max_col += n_header_columns + 1;
 
    // Initialize file stream
-   stat_out = (ofstream *) nullptr;
+   stat_out.reset();
 
    // Build the file name
    stat_file << base_name << stat_file_ext;
@@ -309,7 +310,7 @@ static void setup_txt_files() {
       if(conf_info.output_flag[i] == STATOutputType::Both) {
 
          // Initialize file stream
-         txt_out[i] = (ofstream *) nullptr;
+         txt_out[i].reset();
 
          // Build the file name
          txt_file[i] << base_name << "_" << txt_file_abbr[i]
@@ -555,7 +556,7 @@ static void process_python_pairs(const ConcatString &python_command) {
       user_script_args.shift_down(0, 1);
    }
 
-   auto *pldf = new PyLineDataFile;
+   auto pldf = std::make_unique<PyLineDataFile>();
 
    if(!pldf->open(user_script_path.c_str(), user_script_args)) {
       mlog << Error << "\n" << method_name
@@ -574,7 +575,7 @@ static void process_python_pairs(const ConcatString &python_command) {
    // Process the STAT lines
    //
    STATLine line;
-   LineDataFile *f = pldf;
+   LineDataFile *f = pldf.get();
    while((*f) >> line) {
 
       // Skip header and non-MPR lines
@@ -596,7 +597,6 @@ static void process_python_pairs(const ConcatString &python_command) {
 	<< "\".\n";
 
    f->close();
-   if(pldf) { delete pldf; pldf = (PyLineDataFile *) nullptr; } 
 
 #endif
 
@@ -613,29 +613,26 @@ static void process_ioda_pairs(const ConcatString &file_name) {
    ioda_reader.set_data_config(default_config_filename,
                                config_file.c_str());
 
-   NcFile *f_in = open_ncfile(file_name.c_str());
-
+   std::unique_ptr<netCDF::NcFile> f_in = open_ncfile(file_name.c_str());
    // Check for a valid file
-   if(IS_INVALID_NC_P(f_in)) {
+   if(IS_INVALID_NC_P(f_in.get())) {
       mlog << Error << "\n" << method_name
            << "can't open input NetCDF file \"" << file_name
            << "\" for reading.\n\n";
-      delete f_in;
-      f_in = (NcFile *) nullptr;
+      f_in.reset();
       clean_up();
       exit(1);
    }
 
    // Read the IODA file
-   ioda_reader.read_ioda(f_in);
+   ioda_reader.read_ioda(f_in.get());
 
    // Error out for missing metadata
    if(!ioda_reader.validate_metadata()) {
       mlog << Error << "\n" << method_name
            << "Required dimensions and/or metadata variables "
            << "missing from IODA file \"" << file_name << "\".\n\n"; 
-      delete f_in;
-      f_in = (NcFile *) nullptr;
+      f_in.reset();
       clean_up();
       exit(1);
    }
@@ -1494,7 +1491,7 @@ static void clean_up() {
    finish_txt_files();
 
    // Deallocate memory for data files
-   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) nullptr; }
+   fcst_mtddf.reset();
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);

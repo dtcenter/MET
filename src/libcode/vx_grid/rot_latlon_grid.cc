@@ -79,7 +79,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-RotatedLatLonGrid::RotatedLatLonGrid(const RotatedLatLonData & rdata)
+RotatedLatLonGrid::RotatedLatLonGrid(const RotatedLatLonData & rdata, Key)
 
 {
 
@@ -389,11 +389,11 @@ exit ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * RotatedLatLonGrid::copy() const
+std::unique_ptr<GridRep> RotatedLatLonGrid::copy() const
 
 {
 
-auto * p = new RotatedLatLonGrid (RData);
+auto p = std::make_unique<RotatedLatLonGrid>(RData, Key{});
 
 p->Name = Name;
 
@@ -433,7 +433,7 @@ void Grid::set(const RotatedLatLonData & rdata)
 
 clear();
 
-rep = new RotatedLatLonGrid ( rdata );
+rep = std::make_unique<RotatedLatLonGrid>(rdata, RotatedLatLonGrid::Key{});
 
 if ( !rep )  {
 

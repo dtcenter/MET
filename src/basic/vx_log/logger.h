@@ -17,6 +17,7 @@
 //////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 #include <fstream>
 #include <string.h>
@@ -219,7 +220,7 @@ class Logger
          //
       ConcatString LogFilename;
 
-      std::ofstream * out;  // allocated
+      std::unique_ptr<std::ofstream> out;
 
          //
          // do stuff

@@ -64,7 +64,7 @@ void load_tc_dland(const ConcatString &dland_file, Grid &grid,
    dim.add(vx_data2d_star);
 
    // Read the data
-   if(!MetNc.data(MetNc.Var[i].var, dim, dp)) {
+   if(!MetNc.data(MetNc.Var[i].var.get(), dim, dp)) {
       mlog << Error << "\nload_tc_dland() -> "
            << "can't read data from file \""
            << file_name << "\"\n\n";
@@ -121,7 +121,7 @@ void load_tc_basin(const ConcatString &basin_file, Grid &grid,
    }
 
    // Read the basin abbrevations
-   if(!get_nc_data_to_array(MetNc.Nc, nc_var_basin_abbr, &abbr)) {
+   if(!get_nc_data_to_array(MetNc.Nc.get(), nc_var_basin_abbr, &abbr)) {
       mlog << Error << "\nload_tc_basin() -> "
            << "can't read \"" << nc_var_basin_abbr
            << "\" abbreviations from file \""

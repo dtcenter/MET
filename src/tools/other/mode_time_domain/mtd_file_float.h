@@ -28,6 +28,7 @@
 
 #include "mtd_file_base.h"
 #include "data_plane.h"
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -51,7 +52,7 @@ class MtdFloatFile : public MtdFileBase {
       virtual void write (netCDF::NcFile &) const;
 
 
-      float * Data;   //  allocated
+      std::vector<float> Data;
 
       float DataMin;
       float DataMax;
@@ -145,7 +146,7 @@ inline int MtdFloatFile::time_end() const { return TimeEnd; }
 inline float MtdFloatFile::data_min() const { return DataMin; }
 inline float MtdFloatFile::data_max() const { return DataMax; }
 
-inline const float * MtdFloatFile::data() const { return Data; }
+inline const float * MtdFloatFile::data() const { return Data.data(); }
 
 inline float MtdFloatFile::operator()(int _x, int _y, int _t) const
 

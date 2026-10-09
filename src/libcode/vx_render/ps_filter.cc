@@ -48,9 +48,35 @@ PSFilter::PSFilter()
 
 {
 
-next = (PSFilter *) nullptr;
-
 set_decimal_places(default_decimal_places);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+PSFilter::PSFilter(const PSFilter & f)
+
+{
+
+DecimalPlaces = f.DecimalPlaces;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+PSFilter & PSFilter::operator=(const PSFilter & f)
+
+{
+
+if ( this == &f )  return *this;
+
+DecimalPlaces = f.DecimalPlaces;
+
+return *this;
 
 }
 
@@ -62,7 +88,7 @@ PSFilter::~PSFilter()
 
 {
 
-if ( next )  { delete next;  next = (PSFilter *) nullptr; }
+next.reset();
 
 }
 
@@ -126,10 +152,6 @@ if ( (k < 0) || (k > max_decimal_places) )  {
 }
 
 DecimalPlaces = k;
-
-int buf_size = sizeof(double_format);
-if (buf_size > filter_buf_size) buf_size = filter_buf_size;
-snprintf(double_format, buf_size, "%%.%df", DecimalPlaces);   // example:  "%.5f"
 
 
 return;
@@ -208,7 +230,7 @@ PSFilter & PSFilter::operator<<(const double x)
 
   ConcatString junk;
 
-  junk.format(double_format, x);
+  junk.format("%.*f", DecimalPlaces, x);
 
   operator<<(junk);
 

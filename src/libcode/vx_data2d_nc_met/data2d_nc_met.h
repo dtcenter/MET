@@ -1,3 +1,4 @@
+#include <memory>
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -45,7 +46,7 @@ class MetNcMetDataFile : public Met2dDataFile {
          //  NetCDF file
          //
       
-      MetNcFile * MetNc;    //  allocated
+      std::unique_ptr<MetNcFile> MetNc;
 
          //
          //  set stuff

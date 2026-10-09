@@ -125,8 +125,8 @@ class ModeConfInfo {
    /////////////////////////////////////////////////////////////////////
 
 
-      Mode_Field_Info * fcst_array;   //  allocated
-      Mode_Field_Info *  obs_array;   //  allocated
+      std::vector<Mode_Field_Info> fcst_array;
+      std::vector<Mode_Field_Info>  obs_array;
 
       Mode_Field_Info * Fcst;         //  points to current field, not allocated
       Mode_Field_Info *  Obs;         //  points to current field, not allocated
@@ -160,10 +160,10 @@ class ModeConfInfo {
       PercThreshType perctype(const Mode_Field_Info &f) const;
 
       // deal with zeroth field 
-      void read_fields_0 (Mode_Field_Info * &, Dictionary * dict, GrdFileType, char _fo);
+      void read_fields_0 (std::vector<Mode_Field_Info> &, Dictionary * dict, GrdFileType, char _fo);
 
       // deal with non-zeroth field 
-      void read_fields_1 (Mode_Field_Info * &, Dictionary * dict, GrdFileType, char _fo, int field_index);
+      void read_fields_1 (std::vector<Mode_Field_Info> &, Dictionary * dict, GrdFileType, char _fo, int field_index);
 
       PiecewiseLinear * parse_interest_function(Dictionary * dict, const char * conf_key_if);
 

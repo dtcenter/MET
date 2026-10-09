@@ -57,15 +57,10 @@ void GenEnsProdConfInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void GenEnsProdConfInfo::clear() {
-   vector<GenEnsProdVarInfo*>::const_iterator var_it = ens_input.begin();
 
    // Clear, erase, and initialize members
    model.clear();
    desc.clear();
-
-   for(; var_it != ens_input.end(); var_it++) {
-     if(*var_it) { delete *var_it; }
-   }
 
    ens_input.clear();
    cdf_info.clear();
@@ -106,7 +101,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
    Dictionary *edict = nullptr;
    Dictionary i_edict;
    InterpMthd mthd;
-   VarInfo *next_var;
+   std::unique_ptr<VarInfo> next_var;
 
    int n_ens_files = ens_files->n();
 
@@ -183,7 +178,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
    max_n_cat = 0;
    for(int i=0; i<n_var; i++) {
       
-      auto ens_info = new GenEnsProdVarInfo();
+      auto ens_info = std::make_unique<GenEnsProdVarInfo>();
 
       // Get the current dictionary
       i_edict = parse_conf_i_vx_dict(edict, i);
@@ -212,11 +207,11 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
          }
 
          InputInfo input_info;
-         input_info.var_info = next_var;
+         input_info.var_info = std::move(next_var);
          input_info.file_index = 0;
          input_info.file_list = ens_files;
          input_info.ens_member_id = ens_member_ids[j];
-         ens_info->add_input(input_info);
+         ens_info->add_input(std::move(input_info));
 
          // Add InputInfo to ens info list for each ensemble file provided
          // set var_info to nullptr to note first VarInfo should be used
@@ -225,7 +220,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
             input_info.file_index = k;
             input_info.file_list = ens_files;
             input_info.ens_member_id = ens_member_ids[j];
-            ens_info->add_input(input_info);
+            ens_info->add_input(std::move(input_info));
          } // end for k
 
       } // end for j
@@ -242,7 +237,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
          // Set the current dictionary
          next_var->set_dict(i_edict);
 
-         ens_info->set_ctrl(next_var);
+         ens_info->set_ctrl(std::move(next_var));
       }
 
       // Conf: nc_var_str
@@ -267,7 +262,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
       // Conf: ensemble_flag
       ens_info->nc_info = parse_nc_info(&i_edict);
 
-      ens_input.emplace_back(ens_info);
+      ens_input.emplace_back(std::move(ens_info));
    } // end for i
 
    // Conf: ens.ens_thresh

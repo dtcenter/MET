@@ -41,7 +41,7 @@ static int n_liginfos = 0;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void set_string(char * & s, const char * text);
+static void set_string(ConcatString & s, const char * text);
 
 static void clear_liginfos();
 
@@ -253,9 +253,9 @@ void LigatureInfo::init_from_scratch()
 
 {
 
-successor_name = (char *) nullptr;
+successor_name .clear();
 
-ligature_name = (char *) nullptr;
+ligature_name .clear();
 
 clear();
 
@@ -273,9 +273,9 @@ void LigatureInfo::clear()
 
 {
 
-if ( successor_name )  { delete [] successor_name;  successor_name = (char *) nullptr; }
+successor_name.clear();
 
-if ( ligature_name )  { delete [] ligature_name;  ligature_name = (char *) nullptr; }
+ligature_name.clear();
 
 successor_index = ligature_index = -1;
 
@@ -297,8 +297,8 @@ clear();
 successor_index = i.successor_index;
 ligature_index = i.ligature_index;
 
-set_string(successor_name, i.successor_name);
-set_string(ligature_name, i.ligature_name);
+set_string(successor_name, i.successor_name.c_str());
+set_string(ligature_name, i.ligature_name.c_str());
 
 
 return;
@@ -315,7 +315,7 @@ void LigatureInfo::dump(ostream & out, int depth) const
 
 Indent prefix(depth);
 
-if ( successor_name )  {
+if ( !successor_name.empty() )  {
 
    out << prefix << "successor_name       = \"" << successor_name << "\"\n";
 
@@ -331,7 +331,7 @@ out << prefix << "successor_index      = " << successor_index << "\n";
 
 
 
-if ( ligature_name )  {
+if ( !ligature_name.empty() )  {
 
    out << prefix << "ligature_name       = \"" << ligature_name << "\"\n";
 
@@ -424,9 +424,9 @@ void AfmCharMetrics::init_from_scratch()
 
 {
 
-name = (char *) nullptr;
+name .clear();
 
-linfo = (LigatureInfo *) nullptr;
+linfo.clear();
 
 clear();
 
@@ -443,9 +443,9 @@ void AfmCharMetrics::clear()
 
 {
 
-if ( name )  { delete [] name;  name = (char *) nullptr; }
+name.clear();
 
-if ( linfo )  { delete [] linfo;  linfo = (LigatureInfo *) nullptr; }
+linfo.clear();
 
 
 ascii_code = -1;
@@ -481,11 +481,11 @@ bbox = m.bbox;
 
 n_ligatures = m.n_ligatures;
 
-set_string(name, m.name);
+set_string(name, m.name.c_str());
 
-if ( m.linfo )  {
+if ( !m.linfo.empty() )  {
 
-   linfo = new LigatureInfo [m.n_ligatures];
+   linfo.resize(m.n_ligatures);
 
    int j;
 
@@ -517,7 +517,7 @@ out << prefix << "ascii_code  = " << ascii_code  << "\n";
 out << prefix << "width       = " << width       << "\n";
 out << prefix << "n_ligatures = " << n_ligatures << "\n";
 
-if ( name )  {
+if ( !name.empty() )  {
 
    out << prefix << "name        = \"" << name << "\"\n";
 
@@ -622,7 +622,7 @@ void PCC::init_from_scratch()
 
 {
 
-name = (char *) nullptr;
+name .clear();
 
 clear();
 
@@ -638,7 +638,7 @@ void PCC::clear()
 
 {
 
-if ( name )  { delete [] name;  name = (char *) nullptr; }
+name.clear();
 
 delta_x = 0;
 
@@ -658,7 +658,7 @@ void PCC::assign(const PCC & p)
 
 clear();
 
-set_string(name, p.name);
+set_string(name, p.name.c_str());
 
 delta_x = p.delta_x;
 
@@ -762,9 +762,9 @@ void AfmCompositeInfo::init_from_scratch()
 
 {
 
-name = (char *) nullptr;
+name .clear();
 
-pcc = (PCC *) nullptr;
+pcc.clear();
 
 clear();
 
@@ -780,9 +780,9 @@ void AfmCompositeInfo::clear()
 
 {
 
-if ( name )  { delete [] name;  name = (char *) nullptr; }
+name.clear();
 
-if ( pcc )   { delete [] pcc;   pcc  = (PCC *) nullptr;  }
+pcc.clear();
 
 n_parts = 0;
 
@@ -802,11 +802,11 @@ int j;
 
 clear();
 
-set_string(name, i.name);
+set_string(name, i.name.c_str());
 
 n_parts = i.n_parts;
 
-pcc = new PCC [n_parts];
+pcc.resize(n_parts);
 
 for (j=0; j<n_parts; ++j)  {
 
@@ -926,9 +926,9 @@ void KPX::init_from_scratch()
 
 {
 
-name1 = (char *) nullptr;
+name1 .clear();
 
-name2 = (char *) nullptr;
+name2 .clear();
 
 
 clear();
@@ -946,8 +946,8 @@ void KPX::clear()
 
 {
 
-if ( name1 )  { delete [] name1;  name1 = (char *) nullptr; }
-if ( name2 )  { delete [] name2;  name2 = (char *) nullptr; }
+name1.clear();
+name2.clear();
 
 dx = 0.0;
 
@@ -965,9 +965,9 @@ void KPX::assign(const KPX & p)
 
 clear();
 
-set_string(name1, p.name1);
+set_string(name1, p.name1.c_str());
 
-set_string(name2, p.name2);
+set_string(name2, p.name2.c_str());
 
 dx = p.dx;
 
@@ -1069,22 +1069,22 @@ void Afm::init_from_scratch()
 
 {
 
-in = (ifstream *) nullptr;
+in.reset();
 
-cm = (AfmCharMetrics *) nullptr;
-
-
-FontName       = (char *) nullptr;
-FullName       = (char *) nullptr;
-FamilyName     = (char *) nullptr;
-Weight         = (char *) nullptr;
-Version        = (char *) nullptr;
-EncodingScheme = (char *) nullptr;
+cm.clear();
 
 
-compinfo = (AfmCompositeInfo *) nullptr;
+FontName       .clear();
+FullName       .clear();
+FamilyName     .clear();
+Weight         .clear();
+Version        .clear();
+EncodingScheme .clear();
 
-kpx = (KPX *) nullptr;
+
+compinfo.clear();
+
+kpx.clear();
 
 
 
@@ -1104,28 +1104,28 @@ void Afm::clear()
 
 {
 
-if ( in )  { delete in;  in = (ifstream *) nullptr; }
+in.reset();
 
 line_number = 0;
 
 
-if ( FontName       )  { delete [] FontName;        FontName       = (char *) nullptr; }
-if ( FullName       )  { delete [] FullName;        FullName       = (char *) nullptr; }
-if ( FamilyName     )  { delete [] FamilyName;      FamilyName     = (char *) nullptr; }
-if ( Weight         )  { delete [] Weight;          Weight         = (char *) nullptr; }
-if ( Version        )  { delete [] Version;         Version        = (char *) nullptr; }
-if ( EncodingScheme )  { delete [] EncodingScheme;  EncodingScheme = (char *) nullptr; }
+FontName.clear();
+FullName.clear();
+FamilyName.clear();
+Weight.clear();
+Version.clear();
+EncodingScheme.clear();
 
 
-if ( cm )  { delete [] cm;  cm = (AfmCharMetrics *) nullptr; }
+cm.clear();
 
 n_cms = 0;
 
-if ( compinfo )  { delete [] compinfo;  compinfo = (AfmCompositeInfo *) nullptr; }
+compinfo.clear();
 
 n_composites = 0;
 
-if ( kpx )  { delete [] kpx;  kpx = (KPX *) nullptr; }
+kpx.clear();
 
 n_kern_pairs = 0;
 
@@ -1161,12 +1161,12 @@ int j;
 
 clear();
 
-set_string(FontName,       a.FontName      );
-set_string(FullName,       a.FullName      );
-set_string(FamilyName,     a.FamilyName    );
-set_string(Weight,         a.Weight        );
-set_string(Version,        a.Version       );
-set_string(EncodingScheme, a.EncodingScheme);
+set_string(FontName,       a.FontName.c_str()      );
+set_string(FullName,       a.FullName.c_str()      );
+set_string(FamilyName,     a.FamilyName.c_str()    );
+set_string(Weight,         a.Weight.c_str()        );
+set_string(Version,        a.Version.c_str()       );
+set_string(EncodingScheme, a.EncodingScheme.c_str());
 
 ItalicAngle = a.ItalicAngle;
 
@@ -1192,7 +1192,7 @@ n_cms = a.n_cms;
 
 if ( n_cms > 0 )  {
 
-   cm = new AfmCharMetrics [n_cms];
+   cm.resize(n_cms);
 
    for (j=0; j<n_cms; ++j)  {
 
@@ -1208,7 +1208,7 @@ n_composites = a.n_composites;
 
 if ( n_composites > 0 )  {
 
-   compinfo = new AfmCompositeInfo [n_composites];
+   compinfo.resize(n_composites);
 
    for (j=0; j<n_composites; ++j)  {
 
@@ -1224,7 +1224,7 @@ n_kern_pairs = a.n_kern_pairs;
 
 if ( n_kern_pairs > 0 )  {
 
-   kpx = new KPX [n_kern_pairs];
+   kpx.resize(n_kern_pairs);
 
    for (j=0; j<n_kern_pairs; ++j)  {
 
@@ -1253,22 +1253,22 @@ Indent prefix(depth);
 Indent prefix2(depth + 1);
 
 
-if ( FontName       )  out << prefix << "FontName           = \"" << FontName       << "\"\n";
+if ( !FontName.empty()       )  out << prefix << "FontName           = \"" << FontName       << "\"\n";
 else                   out << prefix << "FontName           = (nul)\n";
 
-if ( FullName       )  out << prefix << "FullName           = \"" << FullName       << "\"\n";
+if ( !FullName.empty()       )  out << prefix << "FullName           = \"" << FullName       << "\"\n";
 else                   out << prefix << "FullName           = (nul)\n";
 
-if ( FamilyName     )  out << prefix << "FamilyName         = \"" << FamilyName     << "\"\n";
+if ( !FamilyName.empty()     )  out << prefix << "FamilyName         = \"" << FamilyName     << "\"\n";
 else                   out << prefix << "FamilyName         = (nul)\n";
 
-if ( Weight         )  out << prefix << "Weight             = \"" << Weight         << "\"\n";
+if ( !Weight.empty()         )  out << prefix << "Weight             = \"" << Weight         << "\"\n";
 else                   out << prefix << "Weight             = (nul)\n";
 
-if ( Version        )  out << prefix << "Version            = \"" << Version        << "\"\n";
+if ( !Version.empty()        )  out << prefix << "Version            = \"" << Version        << "\"\n";
 else                   out << prefix << "Version            = (nul)\n";
 
-if ( EncodingScheme )  out << prefix << "EncodingScheme     = \"" << EncodingScheme << "\"\n";
+if ( !EncodingScheme.empty() )  out << prefix << "EncodingScheme     = \"" << EncodingScheme << "\"\n";
 else                   out << prefix << "EncodingScheme     = (nul)\n";
 
 out << prefix << "ItalicAngle        = " << ItalicAngle        << "\n";
@@ -1360,7 +1360,7 @@ clear_liginfos();
 
 
 
-in = new ifstream;
+in = std::make_unique<ifstream>();
 
 met_open(*in, filename.c_str());
 //in->open(filename.c_str());
@@ -1443,7 +1443,7 @@ for (j=0; j<n_cms; ++j)  {
 
 in->close();
 
-delete in;  in = (ifstream *) nullptr;
+in.reset();
 
 line_number = 0;
 
@@ -1518,14 +1518,14 @@ while ( (*in) >> line )  {
       case afm_keyword_StartCharMetrics:
          tok = line.nexttoken();
          n_cms = tok.i;
-         cm = new AfmCharMetrics [n_cms];
+         cm.resize(n_cms);
          do_startcharmetrics();
          break;
 
       case afm_keyword_StartComposites:
          tok = line.nexttoken();
          n_composites = tok.i;
-         compinfo = new AfmCompositeInfo [n_composites];
+         compinfo.resize(n_composites);
          do_startcomposites();
          break;
 
@@ -1721,7 +1721,7 @@ while ( (*in) >> line )  {
       case afm_keyword_StartKernPairs:
          tok = line.nexttoken();
          n_kern_pairs = tok.i;
-         kpx = new KPX [n_kern_pairs];
+         kpx.resize(n_kern_pairs);
          do_startkernpairs();
          break;
 
@@ -1975,7 +1975,7 @@ if ( n_liginfos > 0 )  {
 
    c.n_ligatures = n_liginfos;
 
-   c.linfo = new LigatureInfo [n_liginfos];
+   c.linfo.resize(n_liginfos);
 
    for (j=0; j<n_liginfos; ++j)  {
 
@@ -2020,7 +2020,7 @@ tok = line.nexttoken();
 
 c.n_parts = tok.i;
 
-c.pcc = new PCC [c.n_parts];
+c.pcc.resize(c.n_parts);
 
 n_pcc = 0;
 
@@ -2089,7 +2089,7 @@ int ligature_found = 0;
 for (j=0; j<n_cms; ++j)  {
 
 
-   if ( !successor_found && strcmp(i.successor_name, cm[j].name) == 0 )  {
+   if ( !successor_found && strcmp(i.successor_name.c_str(), cm[j].name.c_str()) == 0 )  {
 
       successor_found = 1;
 
@@ -2098,7 +2098,7 @@ for (j=0; j<n_cms; ++j)  {
    }
 
 
-   if ( !ligature_found && strcmp(i.ligature_name, cm[j].name) == 0 )  {
+   if ( !ligature_found && strcmp(i.ligature_name.c_str(), cm[j].name.c_str()) == 0 )  {
 
       ligature_found = 1;
 
@@ -2156,7 +2156,7 @@ int j;
 
 for (j=0; j<n_cms; ++j)  {
 
-   if ( strcmp(cm[j].name, name) == 0 )  return j;
+   if ( strcmp(cm[j].name.c_str(), name) == 0 )  return j;
 
 }
 
@@ -2185,7 +2185,7 @@ cm_index = lookup_cm(ascii_code_1);
 
 if ( cm_index < 0 )  return 0;
 
-AfmCharMetrics & m = cm[cm_index];
+const AfmCharMetrics & m = cm[cm_index];
 
 if ( m.n_ligatures == 0 )  return 0;
 
@@ -2239,13 +2239,13 @@ cm_index_2 = lookup_cm(ascii_code_2);
 
 if ( (cm_index_1 < 0) || (cm_index_2 < 0) )  return 0;
 
-n1 = cm[cm_index_1].name;
-n2 = cm[cm_index_2].name;
+n1 = cm[cm_index_1].name.c_str();
+n2 = cm[cm_index_2].name.c_str();
 
 
 for (j=0; j<n_kern_pairs; ++j)  {
 
-   if ( (strcmp(kpx[j].name1, n1) == 0) && (strcmp(kpx[j].name2, n2) == 0) )  {
+   if ( (strcmp(kpx[j].name1.c_str(), n1) == 0) && (strcmp(kpx[j].name2.c_str(), n2) == 0) )  {
 
       kp = kpx[j];
 
@@ -2275,18 +2275,13 @@ return 0;
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_string(char * & s, const char * text)
+void set_string(ConcatString & s, const char * text)
 
 {
 
-if ( s )  { delete [] s;  s = (char *) nullptr; }
+s.clear();
 
-if ( !text )  return;
-
-const char *method_name = "afm set_string()";
-
-s = m_strcpy2(text, method_name);
-
+if ( text )  s = text;
 
 return;
 

@@ -13,7 +13,9 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <iostream>
+#include <vector>
 
 #include "vx_config.h"
 #include "vx_data2d.h"
@@ -138,11 +140,13 @@ class GridStatVxOpt {
 
       GridStatVxOpt();
      ~GridStatVxOpt();
+      GridStatVxOpt(GridStatVxOpt &&) noexcept = default;
+      GridStatVxOpt & operator=(GridStatVxOpt &&) noexcept = default;
 
       //////////////////////////////////////////////////////////////////
 
-      VarInfo *        fcst_info;        // fcst VarInfo pointer (allocated)
-      VarInfo *        obs_info;         // obs VarInfo pointer (allocated)
+      std::unique_ptr<VarInfo> fcst_info;
+      std::unique_ptr<VarInfo> obs_info;
 
       ConcatString     desc;             // Description string
       ConcatString     var_name;         // nc_pairs_var_name string
@@ -274,7 +278,7 @@ class GridStatConfInfo {
       ConcatString model;                   // Model name
       ConcatString obtype;                  // Observation type
 
-      GridStatVxOpt * vx_opt;               // Array of vx task options [n_vx] (allocated)
+      std::vector<GridStatVxOpt> vx_opt;               // Array of vx task options [n_vx] (allocated)
 
       std::map<ConcatString,MaskPlane> mask_map; // Mapping of mask names to MaskPlanes
 

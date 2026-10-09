@@ -16,6 +16,7 @@
 #include <cstdio>
 #include <cmath>
 #include <ctype.h>
+#include <vector>
 
 #include "main.h"
 #include "vx_log.h"
@@ -243,7 +244,6 @@ AFCloudPctFile f_cp;
 AFPixelTimeFile f_pt;
 ConcatString short_name;
 ConcatString output_filename;
-char * pt_filename = (char *) nullptr;
 Pgm image;
 RenderInfo info;
 PSfile plot;
@@ -267,20 +267,19 @@ short_name = get_short_name(filename);
 
 // allocate space for the pixel time filename (make it slightly
 // larger than the input filename to ensure that it is large enough)
-pt_filename = new char [m_strlen(filename) + 10];
+vector<char> pt_filename(m_strlen(filename) + 10);
 
 // create pixel time filename and read it in
-set_pixel_time_filename(filename, pt_filename);
+set_pixel_time_filename(filename, pt_filename.data());
 
-if ( !(f_pt.read(pt_filename, bad_data_char)) )  {
+if ( !(f_pt.read(pt_filename.data(), bad_data_char)) )  {
 
-   mlog << Error << "\n" << program_name << ": unable to open pixel time file \"" << pt_filename << "\"\n\n";
+   mlog << Error << "\n" << program_name << ": unable to open pixel time file \"" << pt_filename.data() << "\"\n\n";
 
    exit ( 1 );
 
 }
 
-if (pt_filename)  { delete [] pt_filename; pt_filename = (char *) nullptr; }
 
 if ( output_directory.length() > 0 )  output_filename << output_directory << '/';
 

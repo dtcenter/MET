@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <cmath>
+#include <iterator>
 
 #include "builtin.h"
 
@@ -132,7 +133,7 @@ const BuiltinInfo binfo[] = {
 };
 
 
-const int n_binfos = sizeof(binfo)/sizeof(binfo[0]);
+const int n_binfos = std::size(binfo);
 
 
 ////////////////////////////////////////////////////////////////////////

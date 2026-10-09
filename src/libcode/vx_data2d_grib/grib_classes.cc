@@ -62,24 +62,16 @@ GribRecord::GribRecord()
 
 {
 
-is  = new Section0_Header;
-pds = (unsigned char *) nullptr;
-gds = new Section2_Header;
-bms = new Section3_Header;
-bds = new Section4_Header;
+is  = std::make_unique<Section0_Header>();
+pds.clear();
+gds = std::make_unique<Section2_Header>();
+bms = std::make_unique<Section3_Header>();
+bds = std::make_unique<Section4_Header>();
 
-if ( !is || !gds || !bms || !bds )  {
-
-   mlog << Error << "\nGribRecord::GribRecord() -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-memset(is,  0, sizeof(Section0_Header));
-memset(gds, 0, sizeof(Section2_Header));
-memset(bms, 0, sizeof(Section3_Header));
-memset(bds, 0, sizeof(Section4_Header));
+memset(is.get(),   0, sizeof(Section0_Header));
+memset(gds.get(),  0, sizeof(Section2_Header));
+memset(bms.get(),  0, sizeof(Section3_Header));
+memset(bds.get(),  0, sizeof(Section4_Header));
 
 rec_num = pds_len = gds_flag = bms_flag = 0;
 
@@ -135,11 +127,6 @@ GribRecord::~GribRecord()
 
 {
 
-if (  is )  { delete  is;    is = (Section0_Header *) nullptr; }
-if ( pds )  { delete [] pds;   pds = (unsigned char *)   nullptr; }
-if ( gds )  { delete gds;   gds = (Section2_Header *) nullptr; }
-if ( bms )  { delete bms;   bms = (Section3_Header *) nullptr; }
-if ( bds )  { delete bds;   bds = (Section4_Header *) nullptr; }
 //if ( data ) { delete data; data = (vector<unsigned char> *) nullptr; }
 //if ( bitmap ) { delete bitmap; bitmap = (vector<unsigned char> *) nullptr; }
 }
@@ -152,25 +139,17 @@ GribRecord::GribRecord(const GribRecord &g)
 
 {
 
-is  = new Section0_Header;
-pds = new unsigned char [g.pds_len];
-gds = new Section2_Header;
-bms = new Section3_Header;
-bds = new Section4_Header;
+is  = std::make_unique<Section0_Header>();
+pds.resize(g.pds_len);
+gds = std::make_unique<Section2_Header>();
+bms = std::make_unique<Section3_Header>();
+bds = std::make_unique<Section4_Header>();
 
-if ( !is || !pds || !gds || !bms || !bds )  {
-
-   mlog << Error << "\nGribRecord::GribRecord(const GribRecord &) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-memcpy(is,  g.is,  sizeof(Section0_Header));
-memcpy(pds, g.pds, sizeof(unsigned char)*g.pds_len);
-memcpy(gds, g.gds, sizeof(Section2_Header));
-memcpy(bms, g.bms, sizeof(Section3_Header));
-memcpy(bds, g.bds, sizeof(Section4_Header));
+memcpy(is.get(),   g.is.get(),  sizeof(Section0_Header));
+memcpy(pds.data(), g.pds.data(), sizeof(unsigned char)*g.pds_len);
+memcpy(gds.get(),  g.gds.get(), sizeof(Section2_Header));
+memcpy(bms.get(),  g.bms.get(), sizeof(Section3_Header));
+memcpy(bds.get(),  g.bds.get(), sizeof(Section4_Header));
 
 rec_num             = g.rec_num;
 pds_len             = g.pds_len;
@@ -225,13 +204,13 @@ GribRecord & GribRecord::operator=(const GribRecord &g)
 
 if ( this == &g )  return *this;   //  check for a = a
 
-pds = new unsigned char [g.pds_len];
+pds.resize(g.pds_len);
 
-memcpy(is,  g.is,  sizeof(Section0_Header));
-memcpy(pds, g.pds, sizeof(unsigned char)*g.pds_len);
-memcpy(gds, g.gds, sizeof(Section2_Header));
-memcpy(bms, g.bms, sizeof(Section3_Header));
-memcpy(bds, g.bds, sizeof(Section4_Header));
+memcpy(is.get(),   g.is.get(),  sizeof(Section0_Header));
+memcpy(pds.data(), g.pds.data(), sizeof(unsigned char)*g.pds_len);
+memcpy(gds.get(),  g.gds.get(), sizeof(Section2_Header));
+memcpy(bms.get(),  g.bms.get(), sizeof(Section3_Header));
+memcpy(bds.get(),  g.bds.get(), sizeof(Section4_Header));
 
 rec_num             = g.rec_num;
 pds_len             = g.pds_len;
@@ -385,11 +364,11 @@ void GribRecord::reset()
 
 {
 
-if ( is )   memset(is,  0, sizeof(Section0_Header));
-if ( pds )  memset(pds, 0, sizeof(unsigned char)*pds_len);
-if ( gds )  memset(gds, 0, sizeof(Section2_Header));
-if ( bms )  memset(bms, 0, sizeof(Section3_Header));
-if ( bds )  memset(bds, 0, sizeof(Section4_Header));
+if ( is )   memset(is.get(),   0, sizeof(Section0_Header));
+if ( !pds.empty() )  memset(pds.data(), 0, sizeof(unsigned char)*pds_len);
+if ( gds )  memset(gds.get(),  0, sizeof(Section2_Header));
+if ( bms )  memset(bms.get(),  0, sizeof(Section3_Header));
+if ( bds )  memset(bds.get(),  0, sizeof(Section4_Header));
 
 if ( data.size() ) data.clear();
 
@@ -465,7 +444,7 @@ int GribRecord::gribcode() const
 {
 
 int j;
-Section1_Header *pds_ptr = (Section1_Header *) pds;
+Section1_Header *pds_ptr = (Section1_Header *) pds.data();
 
 j = (int) (pds_ptr->grib_code);
 
@@ -522,17 +501,17 @@ fd = -1;
 
 file_start = (long) -1;
 
-name = (char *) nullptr;
+name.clear();
 
-referenceCount = n_alloc = issue = lead = 0;
+n_alloc = issue = lead = 0;
 
 buf_size = (size_t) 0;
 
 n_records = (unsigned int) 0;
 
-buf = (unsigned char *) nullptr;
+buf.clear();
 
-record_info = (RecordInfo *) nullptr;
+record_info.clear();
 
 }
 
@@ -546,11 +525,11 @@ GribFileRep::~GribFileRep()
 
 if ( fd >= 0 )  { ::close(fd);  fd = -1; }
 
-if ( buf )  { delete [] buf;  buf = (unsigned char *) nullptr; }
+buf.clear();
 
-if ( name )  { delete [] name;  name = (char *) nullptr; }
+name.clear();
 
-if ( n_alloc ) { delete [] record_info;  record_info = (RecordInfo *) nullptr; }
+record_info.clear();
 
 
 }
@@ -564,45 +543,13 @@ void GribFileRep::record_extend(int n)
 
 if ( n_alloc > n )  return;
 
-int j;
-RecordInfo *r  = (RecordInfo *) nullptr;
-
-
 ++n;
 
 n_alloc = (n + 99)/100;
 
 n_alloc *= 100;
 
-r = new RecordInfo [n_alloc];
-
-if ( !r )  {
-
-   mlog << Error << "\nvoid GribFileRep::record_extend(int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for (j=0; j<n_records; ++j)  {
-
-   r[j].lseek_offset = record_info[j].lseek_offset;
-
-   r[j].gribcode = record_info[j].gribcode;
-
-}
-
-for (j=n_records; j<n_alloc; ++j)  {
-
-   r[j].lseek_offset = -1;
-
-   r[j].gribcode = -1;
-
-}
-
-delete [] record_info;  record_info = (RecordInfo *) nullptr;
-
-record_info = r;  r = (RecordInfo *) nullptr;
+record_info.resize(n_alloc);
 
 return;
 
@@ -616,17 +563,7 @@ void GribFileRep::realloc_buf(size_t n_bytes)
 
 {
 
-if ( buf )  { delete [] buf;  buf = nullptr;  buf_size = 0; }
-
-buf = new unsigned char [n_bytes];
-
-if ( !buf )  {
-
-   mlog << Error << "\n\n  GribFileRep::realloc_buf(long long) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
+buf.assign(n_bytes, 0);
 
 buf_size = n_bytes;
 
@@ -650,7 +587,7 @@ GribFile::GribFile()
 
 {
 
-rep = (GribFileRep *) nullptr;
+rep.reset();
 
 }
 
@@ -662,7 +599,7 @@ GribFile::GribFile(const char *filename)
 
 {
 
-rep = (GribFileRep *) nullptr;
+rep.reset();
 
 open(filename);
 
@@ -681,7 +618,9 @@ const char *method_name = "GribFile::open(char *) -> ";
 
 close();
 
-if ( !(rep = new GribFileRep) )  {
+rep = std::make_shared<GribFileRep>();
+
+if ( !rep )  {
 
    mlog << Error << "\n" << method_name << "memory allocation error\n\n";
 
@@ -689,7 +628,6 @@ if ( !(rep = new GribFileRep) )  {
 
 }
 
-rep->referenceCount = 1;
 
    //
    //  Strip off leading path component
@@ -701,7 +639,7 @@ while ( (j >= 0) && (filename[j] != '/') )   --j;
 
 ++j;
 
-rep->name = m_strcpy2(filename + j,  method_name, "rep->name");
+rep->name = (filename + j);
 
 rep->issue = rep->lead = 0;
 
@@ -713,13 +651,7 @@ if ( (rep->fd = met_open(filename, O_RDONLY)) < 0 )  {
 
 }
 
-if ( !(rep->buf = new unsigned char [default_gribfile_buf_size]) )  {
-
-   mlog << Error << "\nGribFile::open(const char *) -> memory allocation error 2\n\n";
-
-   exit ( 1 );
-
-}
+rep->buf.assign(default_gribfile_buf_size, 0);
 
 rep->buf_size = default_gribfile_buf_size;
 
@@ -743,7 +675,6 @@ GribFile::GribFile(const GribFile &g)
 
 rep = g.rep;
 
-if ( rep )  ++rep->referenceCount;
 
 }
 
@@ -761,7 +692,6 @@ close();
 
 rep = g.rep;
 
-if ( rep )  ++rep->referenceCount;
 
 return *this;
 
@@ -847,11 +777,11 @@ g.Sec0_offset_in_record = bytes_processed;
 
 bytes = sizeof(Section0_Header);
 
-if ( (n_read = read(rep->buf, bytes)) == 0 ) return 0;
+if ( (n_read = read(rep->buf.data(), bytes)) == 0 ) return 0;
 
-memcpy(g.is, rep->buf, 8);
+memcpy(g.is.get(), rep->buf.data(), 8);
 
-if ( (n_read < 0) || (n_read != bytes) )  {
+if ( n_read != bytes )  {
 
    mlog << Error << "\nGribFile::read_record() -> error reading section 0 header ... nread = " << n_read << "\n\n";
 
@@ -879,7 +809,7 @@ if ( s > (rep->buf_size) )  rep->realloc_buf(s);
 
 if ( read(8, s - 8) == 0 )  return 0;
 
-if ( strncmp((char *) (rep->buf + (s - 4)), "7777", 4) != 0 )  {
+if ( strncmp((char *) (rep->buf.data() + (s - 4)), "7777", 4) != 0 )  {
 
    mlog << Error << "\nGribFile::read_record(GribRecord &) -> trailing \"7777\" not found in grib record\n\n";
 
@@ -898,16 +828,16 @@ g.Sec1_offset_in_record = bytes_processed;
    //
    //  Extract the PDS length
    //
-c3[0] = *(rep->buf + bytes_processed);
-c3[1] = *(rep->buf + bytes_processed + 1);
-c3[2] = *(rep->buf + bytes_processed + 2);
+c3[0] = *(rep->buf.data() + bytes_processed);
+c3[1] = *(rep->buf.data() + bytes_processed + 1);
+c3[2] = *(rep->buf.data() + bytes_processed + 2);
 len = char3_to_int(c3);
 
-g.pds = new unsigned char [len];
+g.pds.resize(len);
 
-memcpy(g.pds, rep->buf + bytes_processed, sizeof(unsigned char)*len);
+memcpy(g.pds.data(), rep->buf.data() + bytes_processed, sizeof(unsigned char)*len);
 
-Section1_Header *pds_ptr = (Section1_Header *) g.pds;
+Section1_Header *pds_ptr = (Section1_Header *) g.pds.data();
 
 c = (unsigned char *) (&D);
 D = 0;
@@ -950,7 +880,7 @@ if ( (pds_ptr->flag) & 128 )  {
 //
 //  ????? Need to change this?????
 //
-   memcpy(g.gds, rep->buf + bytes_processed, sizeof(Section2_Header));
+   memcpy(g.gds.get(), rep->buf.data() + bytes_processed, sizeof(Section2_Header));
 
    g.nx = char2_to_int(g.gds->nx);
    g.ny = char2_to_int(g.gds->ny);
@@ -976,14 +906,14 @@ if ( pds_ptr->flag & 64 )  {
 
    g.bms_flag = 1;
 
-   memcpy(g.bms, rep->buf + bytes_processed, sizeof(Section3_Header));
+   memcpy(g.bms.get(), rep->buf.data() + bytes_processed, sizeof(Section3_Header));
 
    s = char3_to_int(g.bms->length) - 6;
 
    g.extend_bitmap(s);
 
    g.bitmap.clear();
-   unsigned char *begin = rep->buf + bytes_processed + 6;
+   unsigned char *begin = rep->buf.data() + bytes_processed + 6;
    g.bitmap.assign(begin, begin+s);
 
    // mlog << Debug(1) << "\n\n  reading " << s << " bytes into bitmap at file location " << (bytes_processed + 6) << "\n\n";
@@ -1003,7 +933,7 @@ if ( pds_ptr->flag & 64 )  {
 g.Sec4_offset_in_file   = file_pos + bytes_processed;
 g.Sec4_offset_in_record = bytes_processed;
 
-memcpy(g.bds, rep->buf + bytes_processed, sizeof(Section4_Header));
+memcpy(g.bds.get(), rep->buf.data() + bytes_processed, sizeof(Section4_Header));
 
 c = (unsigned char *) (&E);
 E = 0;
@@ -1077,7 +1007,7 @@ bytes = char3_to_int(g.bds->length) - 11;
 g.extend_data(bytes);
 g.data.clear();
 
-unsigned char *begin = rep->buf + bytes_processed + 11;
+unsigned char *begin = rep->buf.data() + bytes_processed + 11;
 g.data.assign(begin, begin+bytes);
 
 g.mask = 0L;
@@ -1100,7 +1030,7 @@ int GribFile::skip_header()
 
 {
 
-size_t j, n_read;
+ssize_t j, n_read;
 off_t pos;
 
 bool found = false;
@@ -1115,7 +1045,7 @@ if ( pos < 0 )  pos = 0L;
 
 lseek(rep->fd, pos, SEEK_SET);
 
-n_read = ::read(rep->fd, (char *) (rep->buf), rep->buf_size);
+n_read = ::read(rep->fd, (char *) (rep->buf.data()), rep->buf_size);
 
 if ( n_read == 0 )  {
 
@@ -1132,9 +1062,9 @@ if ( n_read < 0 )  {
 
 }
 
-for (j=0; j<=min(grib_search_bytes, (n_read - 4)); ++j)  {
+for (j=0; j<=min<ssize_t>(grib_search_bytes, (n_read - 4)); ++j)  {
 
-   if ( strncmp((char *) (rep->buf + j), "GRIB", 4) == 0 )  {
+   if ( strncmp((char *) (rep->buf.data() + j), "GRIB", 4) == 0 )  {
       found = true;
       break;
    }
@@ -1165,7 +1095,7 @@ void GribFile::index_records()
 
 {
 
-GribRecord *g = new GribRecord();
+auto g = std::make_unique<GribRecord>();
 Section1_Header *pds_ptr = (Section1_Header *) nullptr;
 
 rep->record_extend(1);
@@ -1176,7 +1106,7 @@ while ( read_record(*g) )  {
 
    rep->record_info[rep->n_records].lseek_offset = g->record_lseek_offset;
 
-   pds_ptr = (Section1_Header *) g->pds;
+   pds_ptr = (Section1_Header *) g->pds.data();
 
    rep->record_info[rep->n_records].gribcode = pds_ptr->grib_code;
 
@@ -1186,7 +1116,6 @@ while ( read_record(*g) )  {
 
 }
 
-delete g;
 
 }
 
@@ -1198,9 +1127,9 @@ size_t GribFile::read()
 
 {
 
-size_t n_read;
+ssize_t n_read;
 
-if ( (n_read = ::read(rep->fd, (char *) rep->buf, rep->buf_size)) < 0 )  {
+if ( (n_read = ::read(rep->fd, (char *) rep->buf.data(), rep->buf_size)) < 0 )  {
 
    mlog << Error << "\nGribFile::read() -> file read error\n\n";
 
@@ -1208,7 +1137,7 @@ if ( (n_read = ::read(rep->fd, (char *) rep->buf, rep->buf_size)) < 0 )  {
 
 }
 
-return n_read;
+return static_cast<size_t>(n_read);
 
 }
 
@@ -1220,7 +1149,7 @@ size_t GribFile::read(size_t bytes)
 
 {
 
-size_t n_read;
+ssize_t n_read;
 
 if ( bytes > rep->buf_size )  {
 
@@ -1231,7 +1160,7 @@ if ( bytes > rep->buf_size )  {
 
 }
 
-if ( (n_read = ::read(rep->fd, (char *) rep->buf, bytes)) < 0 )  {
+if ( (n_read = ::read(rep->fd, (char *) rep->buf.data(), bytes)) < 0 )  {
 
    mlog << Error << "\nGribFile::read() -> file read error\n\n";
 
@@ -1239,7 +1168,7 @@ if ( (n_read = ::read(rep->fd, (char *) rep->buf, bytes)) < 0 )  {
 
 }
 
-return n_read;
+return static_cast<size_t>(n_read);
 
 }
 
@@ -1264,7 +1193,7 @@ if ( (buffer_offset + bytes) > (rep->buf_size) )  {
 
 B = min<int>(bytes, rep->buf_size - buffer_offset);   //  to please fortify
 
-n_read = ::read(rep->fd, (rep->buf + buffer_offset), B);
+n_read = ::read(rep->fd, (rep->buf.data() + buffer_offset), B);
 
 if ( n_read != B )  {
 
@@ -1308,13 +1237,7 @@ void GribFile::close()
 
 {
 
-if ( rep ) {
-
-   if (--rep->referenceCount == 0) delete rep;
-
-   rep = (GribFileRep *) nullptr;
-
-}
+rep.reset();
 
 return;
 
@@ -1406,7 +1329,7 @@ const char * GribFile::name()
 
 if ( !rep ) return ( (char *) 0 );
 
-return ( rep->name );
+return ( rep->name.c_str() );
 
 }
 
@@ -1568,7 +1491,7 @@ file.setf(ios::fixed);
 file << separator << "\n\n";
 file << *(g.is);
 file << separator << "\n\n";
-file << *(g.pds);
+if ( !g.pds.empty() )  file << *((const Section1_Header *) g.pds.data());
 file << separator << "\n\n";
 
 if ( g.gds_flag )   { file << *(g.gds);  file << separator << "\n\n"; }
@@ -1944,7 +1867,7 @@ long find_magic_cookie(int fd)
 {
 
 int j;
-size_t n_read;
+ssize_t n_read;
 long pos = 0;
 char buf[100];
 

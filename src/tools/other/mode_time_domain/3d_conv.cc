@@ -17,6 +17,8 @@
 #include <time.h>
 #include <cstdio>
 #include <cmath>
+#include <memory>
+#include <vector>
 
 #include <netcdf>
 
@@ -40,8 +42,8 @@ static const bool do_ppms = false;
 
 static int spatial_conv_radius = -1;
 
-static double *     sum_plane_buf = nullptr;
-static bool   *  ok_sum_plane_buf = nullptr;
+static std::vector<double>       sum_plane_buf;
+static std::unique_ptr<bool[]> ok_sum_plane_buf;   //  vector<bool> has no .data()
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -79,16 +81,16 @@ struct DataHandle {
       ///////////////
 
 
-   double ** data_plane;
-   double ** sum_plane;
+   std::vector<std::vector<double>> data_plane;
+   std::vector<std::vector<double>> sum_plane;
 
-   bool **   ok_plane;
-   bool **   ok_sum_plane;
+   std::vector<std::unique_ptr<bool[]>> ok_plane;
+   std::vector<std::unique_ptr<bool[]>> ok_sum_plane;
 
 
-   bool * plane_loaded;
+   std::vector<bool> plane_loaded;
 
-   int  * plane_time;
+   std::vector<int>  plane_time;
 
 
    void set_size(int _nx, int _ny, int _time_radius);
@@ -101,18 +103,6 @@ struct DataHandle {
 
       t = -1;
 
-          data_plane = nullptr;
-
-           sum_plane = nullptr;
-
-            ok_plane = nullptr;
-
-        ok_sum_plane = nullptr;
-
-        plane_loaded = nullptr;
-
-        plane_time   = nullptr;
-
    }
 
   ~DataHandle() { clear(); }
@@ -121,29 +111,18 @@ struct DataHandle {
 
       nx = ny = 0;
 
-      if ( ! data_plane )  return;
+      if ( data_plane.empty() )  return;
 
          //////////////////
 
-      int j;
+      data_plane.clear();
+      sum_plane.clear();
+      ok_plane.clear();
+      ok_sum_plane.clear();
 
-      for (j=0; j<time_radius; ++j)  {
+      plane_loaded.clear();
 
-         if (   data_plane[j] )  { delete []   data_plane[j];    data_plane[j] = nullptr; }
-         if (    sum_plane[j] )  { delete []    sum_plane[j];     sum_plane[j] = nullptr; }
-         if (     ok_plane[j] )  { delete []     ok_plane[j];      ok_plane[j] = nullptr; }
-         if ( ok_sum_plane[j] )  { delete [] ok_sum_plane[j];  ok_sum_plane[j] = nullptr; }
-
-      }
-
-      delete []   data_plane;    data_plane = nullptr;
-      delete []    sum_plane;     sum_plane = nullptr;
-      delete []     ok_plane;      ok_plane = nullptr;
-      delete [] ok_sum_plane;  ok_sum_plane = nullptr;
-
-      delete [] plane_loaded;  plane_loaded = nullptr;
-
-      delete [] plane_time;    plane_time   = nullptr;
+      plane_time.clear();
 
       return;
 
@@ -246,8 +225,8 @@ spatial_conv_radius = spatial_R;
 const int Nxy = Nx*Ny;
 const int Nxyz = Nx*Ny*Nt;
 
-   sum_plane_buf = new double [Nxy];
-ok_sum_plane_buf = new bool   [Nxy];
+   sum_plane_buf.assign(Nxy, 0.0);
+ok_sum_plane_buf = std::make_unique<bool[]>(Nxy);
 
 handle.set_size(Nx, Ny, time_radius);
 
@@ -272,9 +251,9 @@ for (int t=0; t<Nt; ++t)  {
 
    for (int k=0; k<time_radius; ++k)  {
 
-      ss[k] = handle.sum_plane[k];
+      ss[k] = handle.sum_plane[k].data();
 
-      ok[k] = handle.ok_sum_plane[k];
+      ok[k] = handle.ok_sum_plane[k].get();
 
    }
 
@@ -397,8 +376,8 @@ for (int x=0; x<Nx; ++x)  {
    //  done
    //
 
-if (    sum_plane_buf )  { delete []    sum_plane_buf;     sum_plane_buf = nullptr; }
-if ( ok_sum_plane_buf )  { delete [] ok_sum_plane_buf;  ok_sum_plane_buf = nullptr; }
+   sum_plane_buf.clear();
+ok_sum_plane_buf.reset();
 
 return out;
 
@@ -433,54 +412,22 @@ t = -1;
 int j;
 const int nxy = nx*ny;
 
-  data_plane = new double * [time_radius];
-   sum_plane = new double * [time_radius];
+data_plane.assign(time_radius, std::vector<double>(nxy, 0.0));
+ sum_plane.assign(time_radius, std::vector<double>(nxy, 0.0));
 
-    ok_plane = new bool   * [time_radius];
-ok_sum_plane = new bool   * [time_radius];
+    ok_plane.resize(time_radius);
+ok_sum_plane.resize(time_radius);
 
 for (j=0; j<time_radius; ++j)  {
 
-     data_plane[j] = new double [nxy];
-      sum_plane[j] = new double [nxy];
-
-       ok_plane[j] = new bool   [nxy];
-   ok_sum_plane[j] = new bool   [nxy];
+       ok_plane[j] = std::make_unique<bool[]>(nxy);   //  value-initialised to false
+   ok_sum_plane[j] = std::make_unique<bool[]>(nxy);
 
 }   //  for j
 
-plane_loaded = new bool [time_radius];
+plane_loaded.assign(time_radius, false);
 
-for (j=0; j<time_radius; ++j)  plane_loaded[j] = false;
-
-plane_time = new int [time_radius];
-
-for (j=0; j<time_radius; ++j)  plane_time[j] = -1;
-
-   //
-   //  initialize planes
-   //
-
-double * dd = data_plane[0];
-bool   * bb = ok_plane[0];
-
-for (j=0; j<nxy; ++j)  {
-
-   dd[j] = 0.0;
-
-   bb[j] = false;
-
-}
-
-for (j=1; j<time_radius; ++j)  {   //  j starts at one here, not zero
-
-   memcpy(  data_plane[j], dd, nxy*sizeof(double));
-   memcpy(   sum_plane[j], dd, nxy*sizeof(double));
-
-   memcpy(    ok_plane[j], bb, nxy*sizeof(bool));
-   memcpy(ok_sum_plane[j], bb, nxy*sizeof(bool));
-
-}
+plane_time.assign(time_radius, -1);
 
 
 return;
@@ -581,9 +528,9 @@ const double * data_in_p      = nullptr;
    //  zero out the sum plane buffer
    //
 
-memset(sum_plane_buf, 0, nxy*sizeof(double));
+memset(sum_plane_buf.data(), 0, nxy*sizeof(double));
 
-b = ok_sum_plane_buf;
+b = ok_sum_plane_buf.get();
 
 for (j=0; j<nxy; ++j)  *b++ = true;
 
@@ -594,8 +541,8 @@ for (j=0; j<nxy; ++j)  *b++ = true;
 data_in_p  = data_plane;
   ok_in_p  = ok_plane;
 
-data_out_p =    sum_plane_buf;
-  ok_out_p = ok_sum_plane_buf;
+data_out_p =    sum_plane_buf.data();
+  ok_out_p = ok_sum_plane_buf.get();
 
 
 for (y=0; y<ny; ++y)  {
@@ -680,8 +627,8 @@ if ( do_ppms )  {
    //  calculate sums in y-direction for each x
    //
 
-data_in_p =    sum_plane_buf;
-  ok_in_p = ok_sum_plane_buf;
+data_in_p =    sum_plane_buf.data();
+  ok_in_p = ok_sum_plane_buf.get();
 
 data_out_p =    sum_plane;
   ok_out_p = ok_sum_plane;
@@ -814,11 +761,11 @@ for (index=0; index<time_radius; ++index)  {
 
    if ( ((index + 1) < time_radius) && (handle.plane_loaded[index + 1]) )  {
 
-      memcpy(handle.data_plane   [index], handle.data_plane   [index + 1], data_bytes);
-      memcpy(handle.sum_plane    [index], handle.sum_plane    [index + 1], data_bytes);
+      memcpy(handle.data_plane   [index].data(), handle.data_plane   [index + 1].data(), data_bytes);
+      memcpy(handle.sum_plane    [index].data(), handle.sum_plane    [index + 1].data(), data_bytes);
 
-      memcpy(handle.ok_plane     [index], handle.ok_plane     [index + 1], tf_bytes);
-      memcpy(handle.ok_sum_plane [index], handle.ok_sum_plane [index + 1], tf_bytes);
+      memcpy(handle.ok_plane     [index].get(),  handle.ok_plane     [index + 1].get(),  tf_bytes);
+      memcpy(handle.ok_sum_plane [index].get(),  handle.ok_sum_plane [index + 1].get(),  tf_bytes);
 
       continue;
 
@@ -826,9 +773,9 @@ for (index=0; index<time_radius; ++index)  {
 
       //   nope
 
-   get_data_plane(in, t_real, handle.data_plane[index],  handle.ok_plane[index]);
+   get_data_plane(in, t_real, handle.data_plane[index].data(),  handle.ok_plane[index].get());
 
-   calc_sum_plane(in.nx(), in.ny(), handle.data_plane[index], handle.ok_plane[index], handle.sum_plane[index], handle.ok_sum_plane[index]);
+   calc_sum_plane(in.nx(), in.ny(), handle.data_plane[index].data(), handle.ok_plane[index].get(), handle.sum_plane[index].data(), handle.ok_sum_plane[index].get());
 
 
 }   //  for index
@@ -838,8 +785,8 @@ for (index=0; index<time_radius; ++index)  {
 
    if ( ! new_loaded[index] )  {
 
-      set_false_plane(handle.ok_plane     [index], nxy);
-      set_false_plane(handle.ok_sum_plane [index], nxy);
+      set_false_plane(handle.ok_plane     [index].get(), nxy);
+      set_false_plane(handle.ok_sum_plane [index].get(), nxy);
 
    }
 

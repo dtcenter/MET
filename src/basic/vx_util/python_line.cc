@@ -76,7 +76,7 @@ PyLineDataFile::PyLineDataFile()
 
 {
 
-script = 0;
+script.reset();
 
 close();
 
@@ -116,7 +116,7 @@ UserScriptArgs.clear();
 
 UserPathToPython.clear();
 
-if ( script ) { delete script;  script = 0; }
+script.reset();
 
 
 return;
@@ -572,7 +572,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-Python3_Script *get_python3_script()
+std::unique_ptr<Python3_Script> get_python3_script()
 
 {
 
@@ -596,7 +596,7 @@ setenv(env_PYTHONPATH, python_path.c_str(),1);
    //  start up the python interpreter
    //
 
-return new Python3_Script (path.text());
+return std::make_unique<Python3_Script>(path.text());
 
 }
 

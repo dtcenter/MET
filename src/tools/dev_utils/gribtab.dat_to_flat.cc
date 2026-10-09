@@ -99,6 +99,7 @@ const char s_delim [] = ",\"";
 const char * c = (const char *) nullptr;
 char line2[512];
 char * s = line2;
+char * saveptr = (char *) nullptr;
 const char *method_name = "parse_line() -> ";
 
 m_strncpy(line2, line, sizeof(line2), method_name);
@@ -109,7 +110,7 @@ m_strncpy(line2, line, sizeof(line2), method_name);
 
 for (j=0; j<6; ++j)  {
 
-   c = strtok(s, i_delim);
+   c = strtok_r(s, i_delim, &saveptr);
 
    i[j] = atoi(c);
 
@@ -129,8 +130,8 @@ cout << i[0] << ' ' << i[4] << ' ' << i[5] << ' ';
 
 for (j=0; j<3; ++j)  {
 
-   c = strtok(s, s_delim);
-   c = strtok(s, s_delim);
+   c = strtok_r(s, s_delim, &saveptr);
+   c = strtok_r(s, s_delim, &saveptr);
 
    cout << ' ' << '\"' << c << '\"';
 
