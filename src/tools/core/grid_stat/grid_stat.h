@@ -49,6 +49,7 @@
 #include "vx_util.h"
 #include "vx_stat_out.h"
 #include "vx_gsl_prob.h"
+#include <memory>
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -127,7 +128,7 @@ static ConcatString out_dir;
 
 // Output Netcdf file
 static ConcatString         out_nc_file;
-static netCDF::NcFile      *nc_out = (netCDF::NcFile *) nullptr;
+static std::unique_ptr<netCDF::NcFile> nc_out;
 static netCDF::NcDim        lat_dim;
 static netCDF::NcDim        lon_dim;
 
@@ -136,13 +137,13 @@ static StringArray nc_var_sa;
 
 // Output STAT file
 static ConcatString     stat_file;
-static std::ofstream    *stat_out = (std::ofstream *) nullptr;
+static std::unique_ptr<std::ofstream> stat_out;
 static AsciiTable       stat_at;
 static int              i_stat_row;
 
 // Optional ASCII output files
 static ConcatString     txt_file[n_txt];
-static std::ofstream    *txt_out[n_txt];
+static std::unique_ptr<std::ofstream> txt_out[n_txt];
 static AsciiTable       txt_at[n_txt];
 static int              i_txt_row[n_txt];
 
@@ -162,8 +163,8 @@ static bool is_first_pass = true;
 static DataPlane wgt_dp;
 
 // Data file factory and input files
-static Met2dDataFile *fcst_mtddf = nullptr;
-static Met2dDataFile *obs_mtddf  = nullptr;
+static std::unique_ptr<Met2dDataFile> fcst_mtddf;
+static std::unique_ptr<Met2dDataFile> obs_mtddf;
 
 // Pointer to the random number generator to be used
 static gsl_rng *rng_ptr = nullptr;

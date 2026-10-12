@@ -75,7 +75,7 @@ VarInfoPairs & VarInfoPairs::operator=(const VarInfoPairs &f) {
 ///////////////////////////////////////////////////////////////////////////////
 
 unique_ptr<VarInfo> VarInfoPairs::clone() const {
-   return unique_ptr<VarInfo>(new VarInfoPairs(*this));
+   return std::make_unique<VarInfoPairs>(*this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

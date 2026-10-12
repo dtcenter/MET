@@ -14,6 +14,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <iterator>
+
 #include "var_info_nc.h"
 
 #include "data_file_type.h"
@@ -63,8 +65,7 @@ static const char *pinterp_precipitation_names[] = {
 //
 
 static const int n_pinterp_precipitation_names =
-                     sizeof(pinterp_precipitation_names)/
-                    sizeof(*pinterp_precipitation_names);
+                     std::size(pinterp_precipitation_names);
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -87,8 +88,7 @@ static const char *pinterp_specific_humidity_names[] = {
 //
 
 static const int n_pinterp_specific_humidity_names =
-                     sizeof(pinterp_specific_humidity_names)/
-                    sizeof(*pinterp_specific_humidity_names);
+                     std::size(pinterp_specific_humidity_names);
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -110,8 +110,7 @@ static const char *pinterp_u_wind_names[] = {
 //
 
 static const int n_pinterp_u_wind_names =
-                     sizeof(pinterp_u_wind_names)/
-                    sizeof(*pinterp_u_wind_names);
+                     std::size(pinterp_u_wind_names);
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -133,8 +132,7 @@ static const char *pinterp_v_wind_names[] = {
 //
 
 static const int n_pinterp_v_wind_names =
-                     sizeof(pinterp_v_wind_names)/
-                    sizeof(*pinterp_v_wind_names);
+                     std::size(pinterp_v_wind_names);
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -152,8 +150,7 @@ static const char *pinterp_wind_speed_names[] = {
 //
 
 static const int n_pinterp_wind_speed_names =
-                     sizeof(pinterp_wind_speed_names)/
-                    sizeof(*pinterp_wind_speed_names);
+                     std::size(pinterp_wind_speed_names);
 
 ///////////////////////////////////////////////////////////////////////////////
 

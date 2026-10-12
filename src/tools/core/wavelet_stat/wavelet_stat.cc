@@ -67,6 +67,7 @@
 #include "vx_regrid.h"
 #include "vx_log.h"
 #include "vx_plot_util.h"
+#include <memory>
 
 using namespace std;
 using namespace netCDF;
@@ -97,9 +98,10 @@ static void get_tile(const DataPlane &, const DataPlane &, int, int,
 static int  get_tile_tot_count();
 
 static void do_intensity_scale(const NumArray &, const NumArray &,
-                               ISCInfo *&, int, int);
+                               std::vector<ISCInfo> &, int, int);
 
-static void aggregate_isc_info(ISCInfo **, int, int, ISCInfo &);
+static void aggregate_isc_info(const std::vector<std::vector<ISCInfo>> &,
+                               int, int, ISCInfo &);
 
 static void compute_cts(const double *, const double *, int, ISCInfo &);
 static void compute_mse(const double *, const double *, int, double &);
@@ -210,14 +212,16 @@ static void process_command_line(int argc, char **argv) {
    otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
    // Read forecast file
-   if(!(fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype))) {
+   fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype);
+   if(!fcst_mtddf) {
       mlog << Error << "\nTrouble reading forecast file \""
            << fcst_file << "\"\n\n";
       exit(1);
    }
 
    // Read observation file
-   if(!(obs_mtddf = Met2dDataFileFactory::new_met_2d_data_file(obs_file.c_str(), otype))) {
+   obs_mtddf = Met2dDataFileFactory::new_met_2d_data_file(obs_file.c_str(), otype);
+   if(!obs_mtddf) {
       mlog << Error << "\nTrouble reading observation file \""
            << obs_file << "\"\n\n";
       exit(1);
@@ -231,8 +235,8 @@ static void process_command_line(int argc, char **argv) {
    conf_info.process_config(ftype, otype);
 
    // Update the input grid, if needed
-   update_mtddf_grid(fcst_mtddf, conf_info.fcst_info[0]);
-   update_mtddf_grid(obs_mtddf, conf_info.obs_info[0]);
+   update_mtddf_grid(fcst_mtddf.get(), conf_info.fcst_info[0].get());
+   update_mtddf_grid(obs_mtddf.get(), conf_info.obs_info[0].get());
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.fcst_info[0]->regrid(),
@@ -262,7 +266,8 @@ static void process_scores() {
    DataPlane fcst_dp_fill, obs_dp_fill;
 
    NumArray f_na, o_na;
-   ISCInfo **isc_info = (ISCInfo **) 0, isc_aggr;
+   std::vector<std::vector<ISCInfo>> isc_info;
+   ISCInfo isc_aggr;
    Grid fcst_grid, obs_grid;
 
    // Loop through each of the fields to be verified
@@ -422,11 +427,9 @@ static void process_scores() {
          plot_ps_raw(fcst_dp, obs_dp, fcst_dp_fill, obs_dp_fill, i);
       }
 
-      // Allocate memory for ISCInfo objects sized as [n_tile][n_thresh]
-      isc_info = new ISCInfo * [conf_info.get_n_tile()];
-      for(int j=0; j<conf_info.get_n_tile(); j++) {
-         isc_info[j] = new ISCInfo [conf_info.fcat_ta[i].n()];
-      }
+      // ISCInfo objects sized as [n_tile][n_thresh]
+      isc_info.assign(conf_info.get_n_tile(),
+                      std::vector<ISCInfo>(conf_info.fcat_ta[i].n()));
 
       // Process percentile thresholds
       conf_info.set_perc_thresh(fcst_dp, obs_dp);
@@ -488,17 +491,8 @@ static void process_scores() {
          }
       }
 
-      // Deallocate memory for ISCInfo objects
-      for(int j=0; j<conf_info.get_n_tile(); j++) {
-         if(isc_info[j]) {
-            delete [] isc_info[j];
-            isc_info[j] = (ISCInfo *) nullptr;
-         }
-      }
-      if(isc_info) {
-         delete [] isc_info;
-         isc_info = (ISCInfo **) nullptr;
-      }
+      // Release the ISCInfo objects
+      isc_info.clear();
 
    } // end for i
 
@@ -558,7 +552,7 @@ static void setup_txt_files(unixtime valid_ut, int lead_sec) {
    /////////////////////////////////////////////////////////////////////
 
    // Initialize file stream
-   stat_out = (ofstream *) nullptr;
+   stat_out.reset();
 
    // Build the file name
    stat_file << tmp_str << stat_file_ext;
@@ -587,7 +581,7 @@ static void setup_txt_files(unixtime valid_ut, int lead_sec) {
 
 
       // Initialize file stream
-      isc_out   = (ofstream *) nullptr;
+      isc_out.reset();
 
       // Build the file name
       isc_file << tmp_str << "_" << isc_file_abbr << txt_file_ext;
@@ -645,7 +639,7 @@ static void setup_nc_file(const WaveletStatNcOutInfo & nc_info,
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_nc_file.c_str(), true);
 
-   if(!nc_out || IS_INVALID_NC_P(nc_out)) {
+   if(!nc_out.get() || IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_nc_file << "\n\n";
@@ -653,18 +647,18 @@ static void setup_nc_file(const WaveletStatNcOutInfo & nc_info,
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_nc_file.c_str(), program_name,
+   write_netcdf_global(nc_out.get(), out_nc_file.c_str(), program_name,
                        conf_info.model.c_str(), conf_info.obtype.c_str());
-   if ( nc_info.do_diff )  add_att(nc_out, "Difference", "Forecast Value - Observation Value");
+   if ( nc_info.do_diff )  add_att(nc_out.get(), "Difference", "Forecast Value - Observation Value");
 
    // Set the NetCDF dimensions
-   x_dim = add_dim(nc_out, "x", conf_info.get_tile_dim());
+   x_dim = add_dim(nc_out.get(), "x", conf_info.get_tile_dim());
 
-   y_dim = add_dim(nc_out, "y", conf_info.get_tile_dim());
+   y_dim = add_dim(nc_out.get(), "y", conf_info.get_tile_dim());
 
-   scale_dim = add_dim(nc_out, "scale", conf_info.get_n_scale()+2);
+   scale_dim = add_dim(nc_out.get(), "scale", conf_info.get_n_scale()+2);
 
-   tile_dim  = add_dim(nc_out, "tile", conf_info.get_n_tile());
+   tile_dim  = add_dim(nc_out.get(), "tile", conf_info.get_n_tile());
 
    // Add the x_ll and y_ll variables
    NcVar x_ll_var ;
@@ -673,8 +667,8 @@ static void setup_nc_file(const WaveletStatNcOutInfo & nc_info,
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
-   x_ll_var = add_var(nc_out, "x_ll", ncInt, tile_dim, deflate_level);
-   y_ll_var = add_var(nc_out, "y_ll", ncInt, tile_dim, deflate_level);
+   x_ll_var = add_var(nc_out.get(), "x_ll", ncInt, tile_dim, deflate_level);
+   y_ll_var = add_var(nc_out.get(), "y_ll", ncInt, tile_dim, deflate_level);
 
    for(int i=0; i<conf_info.get_n_tile(); i++) {
 
@@ -711,7 +705,7 @@ static void setup_ps_file(unixtime valid_ut, int lead_sec) {
    build_outfile_name(valid_ut, lead_sec, ".ps", out_ps_file);
 
    // Create a new PostScript file and open it
-   ps_out = new PSfile;
+   ps_out = std::make_unique<PSfile>();
    ps_out->open(out_ps_file.c_str());
    n_page = 1;
 
@@ -910,7 +904,7 @@ static int get_tile_tot_count() {
 
 static void do_intensity_scale(const NumArray &f_na,
                                const NumArray &o_na,
-                               ISCInfo *&isc_info, int i_vx,
+                               std::vector<ISCInfo> &isc_info, int i_vx,
                                int i_tile) {
 
    // Check the NumArray lengths
@@ -1161,13 +1155,13 @@ static void do_intensity_scale(const NumArray &f_na,
       }
 
       msg << "MSE_SUM[" << thresh_str << "]\t= "
-          << sum_array(isc_info[i].mse_scale, isc_info[i].n_scale+1) << "\n"
+          << sum_array(isc_info[i].mse_scale.data(), isc_info[i].n_scale+1) << "\n"
           << "ISC_MEAN[" << thresh_str << "]\t= "
-          << mean_array(isc_info[i].isc_scale, isc_info[i].n_scale+1) << "\n"
+          << mean_array(isc_info[i].isc_scale.data(), isc_info[i].n_scale+1) << "\n"
           << "FEN_SUM[" << thresh_str << "]\t= "
-          << sum_array(isc_info[i].fen_scale, isc_info[i].n_scale+1) << "\n"
+          << sum_array(isc_info[i].fen_scale.data(), isc_info[i].n_scale+1) << "\n"
           << "OEN_SUM[" << thresh_str << "]\t= "
-          << sum_array(isc_info[i].oen_scale, isc_info[i].n_scale+1) << "\n";
+          << sum_array(isc_info[i].oen_scale.data(), isc_info[i].n_scale+1) << "\n";
 
       mlog << Debug(3) << msg;
 
@@ -1178,7 +1172,7 @@ static void do_intensity_scale(const NumArray &f_na,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void aggregate_isc_info(ISCInfo **isc_info, int i_vx,
+static void aggregate_isc_info(const std::vector<std::vector<ISCInfo>> &isc_info, int i_vx,
                                int i_thresh, ISCInfo &isc_aggr) {
 
    // Set up the aggregated ISCInfo object
@@ -1270,13 +1264,13 @@ static void aggregate_isc_info(ISCInfo **isc_info, int i_vx,
    }
 
    msg << "MSE_SUM[" << fcst_thresh_str << ", " << obs_thresh_str << "]\t= "
-        << sum_array(isc_aggr.mse_scale, isc_aggr.n_scale+1) << "\n"
+        << sum_array(isc_aggr.mse_scale.data(), isc_aggr.n_scale+1) << "\n"
         << "ISC_MEAN[" << fcst_thresh_str << ", " << obs_thresh_str << "]\t= "
-        << mean_array(isc_aggr.isc_scale, isc_aggr.n_scale+1) << "\n"
+        << mean_array(isc_aggr.isc_scale.data(), isc_aggr.n_scale+1) << "\n"
         << "FEN_SUM[" << fcst_thresh_str << ", " << obs_thresh_str << "]\t= "
-        << sum_array(isc_aggr.fen_scale, isc_aggr.n_scale+1) << "\n"
+        << sum_array(isc_aggr.fen_scale.data(), isc_aggr.n_scale+1) << "\n"
         << "OEN_SUM[" << fcst_thresh_str << ", " << obs_thresh_str << "]\t= "
-        << sum_array(isc_aggr.oen_scale, isc_aggr.n_scale+1) << "\n";
+        << sum_array(isc_aggr.oen_scale.data(), isc_aggr.n_scale+1) << "\n";
 
    mlog << Debug(2) << msg;
 
@@ -1436,13 +1430,13 @@ static void write_nc_raw(const WaveletStatNcOutInfo &nc_info,
       if(deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
       if(nc_info.do_raw) {
-         fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
+         fcst_var = add_var(nc_out.get(), (string)fcst_var_name, ncFloat,
                             tile_dim, x_dim, y_dim, deflate_level);
-         obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
+         obs_var  = add_var(nc_out.get(), (string)obs_var_name,  ncFloat,
                             tile_dim, x_dim, y_dim, deflate_level);
       }
       if(nc_info.do_diff) {
-         diff_var = add_var(nc_out, (string)diff_var_name, ncFloat,
+         diff_var = add_var(nc_out.get(), (string)diff_var_name, ncFloat,
                             tile_dim, x_dim, y_dim, deflate_level);
       }
 
@@ -1510,11 +1504,11 @@ static void write_nc_raw(const WaveletStatNcOutInfo &nc_info,
    // Otherwise, retrieve the previously defined variables
    else {
       if(nc_info.do_raw) {
-         fcst_var = get_var(nc_out, fcst_var_name.c_str());
-         obs_var  = get_var(nc_out, obs_var_name.c_str());
+         fcst_var = get_var(nc_out.get(), fcst_var_name.c_str());
+         obs_var  = get_var(nc_out.get(), obs_var_name.c_str());
       }
       if(nc_info.do_diff) {
-         diff_var = get_var(nc_out, diff_var_name.c_str());
+         diff_var = get_var(nc_out.get(), diff_var_name.c_str());
       }
    }
 
@@ -1662,14 +1656,14 @@ static void write_nc_wav(const WaveletStatNcOutInfo &nc_info,
 
       // Define the forecast and difference variables
       if(nc_info.do_raw) {
-         fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
+         fcst_var = add_var(nc_out.get(), (string)fcst_var_name, ncFloat,
                             tile_dim, scale_dim, x_dim, y_dim, deflate_level);
-         obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
+         obs_var  = add_var(nc_out.get(), (string)obs_var_name,  ncFloat,
                             tile_dim, scale_dim, x_dim, y_dim, deflate_level);
       }
 
       if(nc_info.do_diff) {
-         diff_var = add_var(nc_out, (string)diff_var_name, ncFloat,
+         diff_var = add_var(nc_out.get(), (string)diff_var_name, ncFloat,
                             tile_dim, scale_dim, x_dim, y_dim, deflate_level);
       } 
 
@@ -1751,11 +1745,11 @@ static void write_nc_wav(const WaveletStatNcOutInfo &nc_info,
    else {
 
       if(nc_info.do_raw) {
-         fcst_var = get_var(nc_out, fcst_var_name.c_str());
-         obs_var  = get_var(nc_out, obs_var_name.c_str());
+         fcst_var = get_var(nc_out.get(), fcst_var_name.c_str());
+         obs_var  = get_var(nc_out.get(), obs_var_name.c_str());
       }
       if(nc_info.do_diff) {
-         diff_var = get_var(nc_out, diff_var_name.c_str());
+         diff_var = get_var(nc_out.get(), diff_var_name.c_str());
       } 
    }
 
@@ -1883,13 +1877,12 @@ static void close_out_files() {
    }
 
    // Close the output NetCDF file as long as it was opened
-   if ( nc_out && !(conf_info.nc_info.all_false()) )  {
+   if ( nc_out.get() && !(conf_info.nc_info.all_false()) )  {
 
       // List the NetCDF file after it is finished
       mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
-      //nc_out->close();
-      delete nc_out;
-      nc_out = (NcFile *) nullptr;
+      //nc_out.get()->close();
+      nc_out.reset();
    }
 
    // Close the output PSfile as long as it was opened
@@ -1898,8 +1891,7 @@ static void close_out_files() {
       // List the PostScript file after it is finished
       mlog << Debug(1) << "Output file: " << out_ps_file << "\n";
       ps_out->close();
-      delete ps_out;
-      ps_out = (PSfile *) nullptr;
+      ps_out.reset();
    }
 
    return;
@@ -2090,9 +2082,9 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
 
    Box dim;
    set_dim(dim, v_tab_1, v_tab_1 + sm_plot_height, h_tab_1);
-   render_image(ps_out, fcst_dp, dim, 1);
-   draw_map(ps_out, dim);
-   draw_border(ps_out, dim);
+   render_image(ps_out.get(), fcst_dp, dim, 1);
+   draw_map(ps_out.get(), dim);
+   draw_border(ps_out.get(), dim);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -2100,7 +2092,7 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
    //
    ////////////////////////////////////////////////////////////////////////////
 
-   draw_colorbar(ps_out, dim, 1, 1);
+   draw_colorbar(ps_out.get(), dim, 1, 1);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -2109,9 +2101,9 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
    ////////////////////////////////////////////////////////////////////////////
 
    set_dim(dim, v_tab_1, v_tab_1 + sm_plot_height, h_tab_3);
-   render_image(ps_out, obs_dp, dim, 0);
-   draw_map(ps_out, dim);
-   draw_border(ps_out, dim);
+   render_image(ps_out.get(), obs_dp, dim, 0);
+   draw_map(ps_out.get(), dim);
+   draw_border(ps_out.get(), dim);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -2120,10 +2112,10 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
    ////////////////////////////////////////////////////////////////////////////
 
    set_dim(dim, v_tab_2, v_tab_2 + sm_plot_height, h_tab_1);
-   render_image(ps_out, fcst_dp_fill, dim, 1);
-   draw_map(ps_out, dim);
-   draw_border(ps_out, dim);
-   draw_tiles(ps_out, dim, 0, conf_info.get_n_tile()-1, 1);
+   render_image(ps_out.get(), fcst_dp_fill, dim, 1);
+   draw_map(ps_out.get(), dim);
+   draw_border(ps_out.get(), dim);
+   draw_tiles(ps_out.get(), dim, 0, conf_info.get_n_tile()-1, 1);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -2131,7 +2123,7 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
    //
    ////////////////////////////////////////////////////////////////////////////
 
-   draw_colorbar(ps_out, dim, 0, 1);
+   draw_colorbar(ps_out.get(), dim, 0, 1);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -2140,10 +2132,10 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
    ////////////////////////////////////////////////////////////////////////////
 
    set_dim(dim, v_tab_2, v_tab_2 + sm_plot_height, h_tab_3);
-   render_image(ps_out, obs_dp_fill, dim, 0);
-   draw_map(ps_out, dim);
-   draw_border(ps_out, dim);
-   draw_tiles(ps_out, dim, 0, conf_info.get_n_tile()-1, 1);
+   render_image(ps_out.get(), obs_dp_fill, dim, 0);
+   draw_map(ps_out.get(), dim);
+   draw_border(ps_out.get(), dim);
+   draw_tiles(ps_out.get(), dim, 0, conf_info.get_n_tile()-1, 1);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -2387,11 +2379,11 @@ static void plot_ps_wvlt(const double *diff, double mad,
    ////////////////////////////////////////////////////////////////////////////
 
    set_dim(dim, v_tab-lg_plot_height, v_tab, h_tab_cen);
-   render_tile(ps_out, diff, n, i_tile, dim);
-   draw_map(ps_out, dim);
-   draw_border(ps_out, dim);
-   draw_tiles(ps_out, dim, i_tile, i_tile, 0);
-   draw_colorbar(ps_out, dim, 0, 0);
+   render_tile(ps_out.get(), diff, n, i_tile, dim);
+   draw_map(ps_out.get(), dim);
+   draw_border(ps_out.get(), dim);
+   draw_tiles(ps_out.get(), dim, i_tile, i_tile, 0);
+   draw_colorbar(ps_out.get(), dim, 0, 0);
 
    ////////////////////////////////////////////////////////////////////////////
    //

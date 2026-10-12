@@ -62,7 +62,6 @@ TrackInfo & TrackInfo::operator=(const TrackInfo & t) {
 
 void TrackInfo::init_from_scratch() {
 
-   Point = (TrackPoint *) nullptr;
 
    clear();
 
@@ -105,8 +104,7 @@ void TrackInfo::clear() {
 
 void TrackInfo::clear_points() {
 
-   if(Point) { delete [] Point; Point = (TrackPoint *) nullptr; }
-   NPoints = NAlloc = 0;
+   Point.clear();
 
    return;
 }
@@ -136,10 +134,10 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "TrackSource     = " << TrackSource.contents() << "\n";
    out << prefix << "FieldSource     = " << FieldSource.contents() << "\n";
    out << prefix << "NDiag           = " << DiagName.n() << "\n";
-   out << prefix << "NPoints         = " << NPoints << "\n";
-   out << prefix << "NAlloc          = " << NAlloc << "\n";
+   out << prefix << "NPoints         = " << Point.size() << "\n";
+   out << prefix << "NAlloc          = " << Point.capacity() << "\n";
 
-   for(int i=0; i<NPoints; i++) {
+   for(int i=0; i<(int) Point.size(); i++) {
       out << prefix << "TrackPoint[" << i+1 << "]:" << "\n";
       Point[i].dump(out, indent_depth+1);
    }
@@ -176,8 +174,8 @@ ConcatString TrackInfo::serialize() const {
      << ", TrackSource = " << TrackSource.contents()
      << ", FieldSource = " << FieldSource.contents()
      << ", NDiag = " << DiagName.n()
-     << ", NPoints = " << NPoints
-     << ", NAlloc = " << NAlloc;
+     << ", NPoints = " << (int) Point.size()
+     << ", NAlloc = " << (int) Point.capacity();
 
    return s;
 
@@ -191,7 +189,7 @@ ConcatString TrackInfo::serialize_r(int n, int indent_depth) const {
 
    s << prefix << "[" << n << "] " << serialize() << ", Points:\n";
 
-   for(int i=0; i<NPoints; i++)
+   for(int i=0; i<(int) Point.size(); i++)
       s << Point[i].serialize_r(i+1, indent_depth+1);
 
    return s;
@@ -227,53 +225,7 @@ void TrackInfo::assign(const TrackInfo &t) {
    FieldSource     = t.FieldSource;
    DiagName        = t.DiagName;
 
-   if(t.NPoints == 0) return;
-
-   extend(t.NPoints);
-
-   for(int i=0; i<t.NPoints; i++) Point[i] = t.Point[i];
-
-   NPoints = t.NPoints;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TrackInfo::extend(int n, bool exact) {
-   auto new_line = (TrackPoint *) nullptr;
-
-   // Check if enough memory is already allocated
-   if(NAlloc >= n) return;
-
-   // Compute the allocation size 
-   if(!exact) {
-      int k = n/TrackInfoAllocInc;
-      if(n%TrackInfoAllocInc) k++;
-      n = k*TrackInfoAllocInc;
-   }
-
-   // Allocate a new TrackPoint array of the required length
-   new_line = new TrackPoint [n];
-
-   if(!new_line) {
-      mlog << Error << "\nvoid TrackInfo::extend(int, bool) -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
-
-   // Copy the array contents and delete the old one
-   if(Point) {
-      for(int j=0; j<NPoints; j++) new_line[j] = Point[j];
-      delete [] Point;  Point = (TrackPoint *) nullptr;
-   }
-
-   // Point to the new array
-   Point    = new_line;
-   new_line = (TrackPoint *) nullptr;
-
-   // Store the allocated length
-   NAlloc = n;
+   Point = t.Point;
 
    return;
 }
@@ -315,7 +267,7 @@ void TrackInfo::initialize(const ATCFTrackLine &l, bool check_anly) {
 void TrackInfo::set_point(int n, const TrackPoint &p) {
 
    // Check range
-   if((n < 0) || (n >= NPoints)) {
+   if((n < 0) || (n >= (int) Point.size())) {
       mlog << Error << "\nTrackInfo::set_point(int, const TrackPoint &) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
@@ -332,11 +284,11 @@ int TrackInfo::lead_index(int l) const {
    int i;
 
    // Loop through the TrackPoints looking for a matching lead time
-   for(i=0; i<NPoints; i++) {
+   for(i=0; i<(int) Point.size(); i++) {
       if(Point[i].lead() == l) break;
    }
 
-   if(i == NPoints) i = -1;
+   if(i == (int) Point.size()) i = -1;
 
    return i;
 }
@@ -347,11 +299,11 @@ int TrackInfo::valid_index(unixtime u) const {
    int i;
 
    // Loop through the TrackPoints looking for a matching valid time
-   for(i=0; i<NPoints; i++) {
+   for(i=0; i<(int) Point.size(); i++) {
       if(Point[i].valid() == u) break;
    }
 
-   if(i == NPoints) i = -1;
+   if(i == (int) Point.size()) i = -1;
 
    return i;
 }
@@ -361,7 +313,7 @@ int TrackInfo::valid_index(unixtime u) const {
 const TrackPoint & TrackInfo::operator[](int n) const {
 
    // Check range
-   if((n < 0) || (n >= NPoints)) {
+   if((n < 0) || (n >= (int) Point.size())) {
       mlog << Error << "\nTrackInfo::operator[](int) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
@@ -400,7 +352,7 @@ int TrackInfo::valid_inc() const {
    NumArray ut_inc;
 
    // Compute list of time spacing between TrackPoints
-   for(int i=1; i<NPoints; i++)
+   for(int i=1; i<(int) Point.size(); i++)
       ut_inc.add((int) (Point[i].valid() - Point[i-1].valid()));
 
    // Return the most common spacing
@@ -417,7 +369,7 @@ string TrackInfo::diag_name(int i) const {
 
 StringArray TrackInfo::track_lines() const {
    StringArray sa;
-   for(int i=0; i<NPoints; i++) sa.add(Point[i].track_lines());
+   for(int i=0; i<(int) Point.size(); i++) sa.add(Point[i].track_lines());
    return sa;
 }
 
@@ -425,16 +377,7 @@ StringArray TrackInfo::track_lines() const {
 
 void TrackInfo::add(const TrackPoint &p) {
 
-   extend(NPoints + 1, false);
-
-   if(NPoints < 0 || NPoints >= NAlloc) {
-      mlog << Error << "\nTrackInfo::add(const TrackPoint &) -> "
-           << "index out of range (" << NPoints << ")!\n\n";
-      exit(1);
-   }
-
-   Point[NPoints] = p;
-   NPoints++;
+   Point.push_back(p);
 
    // Check the valid time range
    if(MinValidTime == (unixtime) 0 || p.valid() < MinValidTime)
@@ -477,18 +420,18 @@ bool TrackInfo::add(const ATCFTrackLine &l, bool check_dup, bool check_anly) {
    }
 
    // Check that the TrackPoint valid time is increasing
-   if(NPoints > 0 && l.valid() < Point[NPoints-1].valid()) {
+   if((int) Point.size() > 0 && l.valid() < Point[(int) Point.size()-1].valid()) {
       mlog << Warning
            << "\nTrackInfo::add(const ATCFTrackLine &) -> "
            << "skipping ATCFTrackLine since the valid time is not increasing ("
            << unix_to_yyyymmdd_hhmmss(l.valid()) << " < "
-           << unix_to_yyyymmdd_hhmmss(Point[NPoints-1].valid())
+           << unix_to_yyyymmdd_hhmmss(Point[(int) Point.size()-1].valid())
            << "):\n" << l.get_line() << "\n\n";
       return false;
    }
 
    // Add ATCFTrackLine to an existing TrackPoint if possible
-   for(int i=NPoints-1; i>=0; i--) {
+   for(int i=(int) Point.size()-1; i>=0; i--) {
       if(Point[i].is_match(l)) {
          found = true;
          status = Point[i].set(l, check_dup);
@@ -498,8 +441,8 @@ bool TrackInfo::add(const ATCFTrackLine &l, bool check_dup, bool check_anly) {
 
    // Otherwise, create a new point
    if(!found) {
-      extend(NPoints + 1, false);
-      status = Point[NPoints++].set(l, check_dup);
+      Point.emplace_back();
+      status = Point.back().set(l, check_dup);
    }
 
    // Check the valid time range
@@ -528,7 +471,7 @@ void TrackInfo::add_watch_warn(const ConcatString &ww_sid,
    if(storm_id() != ww_sid) return;
 
    // Loop over the TrackPoints
-   for(int i=0; i<NPoints; i++) Point[i].set_watch_warn(ww_type, ww_ut);
+   for(int i=0; i<(int) Point.size(); i++) Point[i].set_watch_warn(ww_type, ww_ut);
 
    return;
 }
@@ -603,7 +546,7 @@ bool TrackInfo::add_diag_data(const DiagFile &diag_file,
 void TrackInfo::add_diag_value(int i_pnt, double val) {
 
    // Range check
-   if(i_pnt < 0 || i_pnt >= NPoints) {
+   if(i_pnt < 0 || i_pnt >= (int) Point.size()) {
       mlog << Error << "\nTrackInfo::add_diag_value() -> "
            << "range check error for point " << i_pnt << "\n\n";
       exit(1);
@@ -630,7 +573,7 @@ bool TrackInfo::has(const ATCFTrackLine &l) const {
    bool found = false;
 
    // Check if the TrackInfo data matches
-   for(int i=NPoints-1; i>=0; i--) {
+   for(int i=(int) Point.size()-1; i>=0; i--) {
       if(Point[i].has(l)) {
          found = true;
          break;
@@ -656,11 +599,11 @@ bool TrackInfo::is_match(const ATCFTrackLine &l) {
 
    // Check for an analysis track where the technique number matches,
    // the lead time remains zero, and the valid time changes.
-   if(CheckAnly && !IsBestTrack && !IsAnlyTrack && NPoints > 0 &&
+   if(CheckAnly && !IsBestTrack && !IsAnlyTrack && (int) Point.size() > 0 &&
       TechniqueNumber          == l.technique_number() &&
-      Point[NPoints-1].lead()  == 0 &&
+      Point[(int) Point.size()-1].lead()  == 0 &&
       l.lead()                 == 0 &&
-      Point[NPoints-1].valid() != l.valid()) {
+      Point[(int) Point.size()-1].valid() != l.valid()) {
 
       // Set analysis track flag and reset InitTime to 0.
       IsAnlyTrack = true;
@@ -671,8 +614,8 @@ bool TrackInfo::is_match(const ATCFTrackLine &l) {
    if(IsBestTrack || IsAnlyTrack) {
 
       // Subsequent track point times cannot differ by too much
-      if(NPoints > 0) {
-         diff = (int) (l.warning_time() - Point[NPoints-1].valid());
+      if((int) Point.size() > 0) {
+         diff = (int) (l.warning_time() - Point[(int) Point.size()-1].valid());
          if(abs(diff) > MaxBestTrackTimeInc) match = false;
       }
 

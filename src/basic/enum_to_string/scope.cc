@@ -38,8 +38,6 @@ ScopeStackElement::ScopeStackElement()
 
 {
 
-Name = (const char *) nullptr;
-
 clear();
 
 }
@@ -99,7 +97,7 @@ clear();
 
 Level = e.Level;
 
-set_name(e.Name);
+set_name(e.Name.c_str());
 
 
 return;
@@ -116,7 +114,7 @@ void ScopeStackElement::clear()
 
 Level = 0;
 
-if ( Name )  { delete [] Name;  Name = (const char *) nullptr; }
+Name.clear();
 
 
 return;
@@ -130,31 +128,11 @@ return;
 void ScopeStackElement::set_name(const char * text)
 
 {
-const char *method_name = "void ScopeStackElement::set_name(const char *) -> ";
-if ( Name )  { delete [] Name;  Name = (const char *) nullptr; }
+Name.clear();
 
 if ( !text )  return;
 
-int k;
-char * c = (char *) nullptr;
-
-k = m_strlen(text);
-
-c = new char [1 + k];
-
-if ( !c )  {
-
-   cerr << "\n\n  " << method_name << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-m_strncpy(c, text, k, method_name);
-
-c[k] = (char) 0;   //  just to make sure
-
-Name = (const char *) c;   c = (char *) nullptr;
+Name = text;
 
 return;
 

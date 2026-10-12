@@ -10,6 +10,7 @@
 ///////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -38,7 +39,7 @@ using namespace std;
 
 extern const char * const program_name;
 
-static ModeExecutive *mode_exec = 0;
+static std::unique_ptr<ModeExecutive> mode_exec;
 
 // used only for traditional mode, multivar sets it into config previous
 // to the frontend creation
@@ -61,7 +62,7 @@ ModeFrontEnd::ModeFrontEnd() :
 ModeFrontEnd::~ModeFrontEnd()
 {
    if ( mode_exec ) {
-      delete mode_exec;  mode_exec = 0;
+      mode_exec.reset();
    }
 }
 
@@ -184,9 +185,9 @@ void ModeFrontEnd::init()
 {
    mlog << Debug(1) << "Running traditional mode front end\n";
 
-   if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
+   mode_exec.reset();
 
-   mode_exec = new ModeExecutive();//ModeExecutive::TRADITIONAL);
+   mode_exec = std::make_unique<ModeExecutive>();//ModeExecutive::TRADITIONAL);
    compress_level = -1;
 }
 

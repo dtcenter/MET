@@ -56,7 +56,6 @@ TCPairsConfInfo::~TCPairsConfInfo() {
 void TCPairsConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   Consensus = (ConsensusInfo *) nullptr;
 
    clear();
 
@@ -68,7 +67,7 @@ void TCPairsConfInfo::init_from_scratch() {
 void TCPairsConfInfo::clear() {
 
    // Deallocate memory
-   if(Consensus) { delete [] Consensus; Consensus = (ConsensusInfo *) nullptr; }
+   Consensus.clear();
 
    Desc.clear();
    Model.clear();
@@ -218,7 +217,7 @@ void TCPairsConfInfo::process_config() {
 
    // Set the consensus count
    NConsensus = dict->n_entries();
-   Consensus  = new ConsensusInfo [NConsensus];
+   Consensus.resize(NConsensus);
 
    // Loop over the consensus entries
    for(int i=0; i<NConsensus; i++) {

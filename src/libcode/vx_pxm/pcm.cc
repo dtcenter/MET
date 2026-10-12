@@ -122,7 +122,7 @@ void Pcm::clear()
 
 clear_common();
 
-if ( Colormap )  { delete [] Colormap;   Colormap = (Color *) nullptr; }
+Colormap.clear();
 
 Ncolors = 0;
 
@@ -142,9 +142,7 @@ void Pcm::init_from_scratch()
 // PxmBase::init_from_scratch();
 
 
-Colormap = (Color *) nullptr;
-
-Name = (char *) nullptr;
+Name.clear();
 
 Ncolors = 0;
 
@@ -176,13 +174,7 @@ int j;
 trouble = 0;
 
 
-if ( p.Colormap )  {
-
-   Colormap = new Color [p.Ncolors];
-
-   if ( !Colormap )  trouble = 1;
-
-}
+Colormap = p.Colormap;
 
 if ( trouble )  {
 
@@ -194,7 +186,7 @@ if ( trouble )  {
 
 }
 
-if ( p.Colormap )  {
+if ( !(p.Colormap.empty()) )  {
 
    for (j=0; j<Ncolors; ++j)  Colormap[j] = p.Colormap[j];
 
@@ -399,19 +391,7 @@ if ( !in )  {
    //  copy filename
    //
 
-Name = new char [1 + m_strlen(filename)];
-
-if ( !Name )  {
-
-   mlog << Warning << "\nPcm::read() -> can't allocate memory for file name\n\n";
-
-   clear();
-
-   return 0;
-
-}
-
-memcpy(Name, filename, 1 + m_strlen(filename));
+Name = filename;
 
    //
    //  read magic cookie
@@ -484,17 +464,7 @@ if ( maxval != 255 )  {
    //  get colormap
    //
 
-Colormap = new Color [Ncolors];
-
-if ( !Colormap )  {
-
-   mlog << Warning << "\nPcm::read() -> can't allocate memory for colormap!\n\n";
-
-   clear();
-
-   return 0;
-
-}
+Colormap.assign(Ncolors, Color());
 
 for (j=0; j<Ncolors; ++j)  {
 
@@ -526,17 +496,9 @@ for (j=0; j<Ncolors; ++j)  {
 
 n = Nrows*Ncols;
 
-if ( !(data = new unsigned char [n]) )  {
+data.assign(n, 0);
 
-   mlog << Warning << "\nPcm::read() -> memory allocation error\n\n";
-
-   clear();
-
-   return 0;
-
-}
-
-if ( !in.read((char *) data, n) )  {
+if ( !in.read((char *) data.data(), n) )  {
 
    mlog << Warning << "\nPcm::read() -> trouble reading image data\n\n";
 
@@ -661,15 +623,7 @@ void Pcm::set_size_rc(int NR, int NC)
 
 clear();
 
-data = new unsigned char [NR*NC];
-
-if ( !data )  {
-
-   mlog << Error << "\nPcm::set_size(int, int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
+data.assign(NR*NC, 0);
 
 Nrows = NR;
 Ncols = NC;
@@ -708,7 +662,7 @@ void Pcm::reverse_video()
 
 {
 
-if ( !data )  {
+if ( data.empty() )  {
 
    mlog << Error << "\nvoid Pcm::reverse_video() -> bad image\n\n";
 
@@ -753,7 +707,6 @@ int row, col;
 int Nrows_new, Ncols_new, bytes;
 int row_new = 0, col_new = 0;
 int n_new, n_old;
-unsigned char *u = (unsigned char *) nullptr;
 
 
 if ( a == 2 )  {
@@ -770,13 +723,7 @@ if ( a == 2 )  {
 
 bytes = (Nrows)*(Ncols);
 
-if ( !(u = new unsigned char [bytes]) )  {
-
-   mlog << Error << "\nPcm::rotate(int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
+std::vector<unsigned char> u(bytes);
 
 for (row=0; row<Nrows; ++row)  {
 
@@ -815,7 +762,7 @@ for (row=0; row<Nrows; ++row)  {
 Ncols = Ncols_new;
 Nrows = Nrows_new;
 
-delete [] data;  data = u;
+data = std::move(u);
 
 return;
 
@@ -870,17 +817,8 @@ void Pcm::set_colormap(const Color * c, int n)
 
 {
 
-if ( Colormap )  { delete [] Colormap;  Colormap = (Color *) nullptr; }
+Colormap.assign(n, Color());
 
-Colormap = new Color [n];
-
-if ( !Colormap )  {
-
-   mlog << Error << "\nPcm::set_colormap() -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 Ncolors = n;
 

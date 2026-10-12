@@ -21,6 +21,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
+#include <memory>
 #include <ostream>
 
 #include <netcdf>
@@ -65,7 +67,7 @@ class WrfFile {
       void dump(std::ostream &, int = 0) const;
 
 
-      netCDF::NcFile * Nc;      //  allocated
+      std::unique_ptr<netCDF::NcFile> Nc;
 
          //
          //  time
@@ -73,7 +75,7 @@ class WrfFile {
 
       int Ntimes;
 
-      unixtime * Time;  //  allocated
+      std::vector<unixtime> Time;
 
       unixtime InitTime;
 
@@ -86,7 +88,7 @@ class WrfFile {
 
       int Ndims;
 
-      netCDF::NcDim ** Dim;   //  allocated
+      std::vector<netCDF::NcDim *> Dim;   //  the array is owned; the NcDims are not
 
       StringArray DimNames;
 
@@ -98,7 +100,7 @@ class WrfFile {
 
       int Nvars;
 
-      NcVarInfo * Var;     //  allocated
+      std::vector<NcVarInfo> Var;
 
          //
          //  Grid

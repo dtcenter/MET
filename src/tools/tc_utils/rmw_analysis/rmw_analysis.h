@@ -24,6 +24,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -78,8 +79,8 @@ static ConcatString out_dir;
 ConcatString out_file;
 
 // NetCDF file information
-static netCDF::NcFile* nc_in = (netCDF::NcFile*) nullptr;
-static netCDF::NcFile* nc_out = (netCDF::NcFile*) nullptr;
+static std::unique_ptr<netCDF::NcFile> nc_in;
+static std::unique_ptr<netCDF::NcFile> nc_out;
 
 // Grid dimension information
 static netCDF::NcDim range_dim;

@@ -11,6 +11,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 #include "token.h"
 
@@ -26,16 +27,9 @@ class TokenStack {
 
       void assign(const TokenStack &);
 
-      void extend(int);
-
-
-      int Nelements;
-
-      int Nalloc;
-
       int AllocInc;
 
-      Token * e;
+      std::vector<Token> e;
 
 
    public:
@@ -74,11 +68,11 @@ class TokenStack {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int TokenStack::depth() const { return Nelements; }
+inline int TokenStack::depth() const { return (int) e.size(); }
 
-inline bool TokenStack::empty() const { return ( Nelements == 0 ); }
+inline bool TokenStack::empty() const { return e.empty(); }
 
-inline bool TokenStack::nonempty() const { return ( Nelements > 0 ); }
+inline bool TokenStack::nonempty() const { return !e.empty(); }
 
 
 ////////////////////////////////////////////////////////////////////////

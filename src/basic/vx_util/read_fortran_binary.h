@@ -39,12 +39,6 @@ extern long long read_fortran_binary(const int fd, void * buf, const int buf_siz
    //           not stack or text segment memory
    //
 
-extern long long read_fortran_binary_realloc(const int fd, 
-                                             void * & buf, int & buf_size, 
-                                             const int rec_pad_length, 
-                                             const bool swap_endian);
-
-
 ////////////////////////////////////////////////////////////////////////
 
 

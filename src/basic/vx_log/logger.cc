@@ -435,7 +435,7 @@ Logger & Logger::operator=(const Logger & l)
 
 void Logger::init_from_scratch()
 {
-   out = (ofstream *) nullptr;
+   out.reset();
 
    clear();
 
@@ -453,9 +453,7 @@ void Logger::clear()
 
       out->close();
 
-      delete out;
-
-      out = (ofstream *) nullptr;
+      out.reset();
 
    }
 
@@ -568,7 +566,7 @@ void Logger::open_log_file(const ConcatString s)
       //
       // allocate the out pointer
       //
-   out = new ofstream;
+   out = std::make_unique<std::ofstream>();
 
       //
       // open file and check for error

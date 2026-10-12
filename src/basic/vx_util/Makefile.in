@@ -131,13 +131,12 @@ am__libvx_util_a_SOURCES_DIST = ascii_table.cc ascii_table.h \
 	bool_to_string.h empty_string.h polyline.h polyline.cc \
 	mask_poly.h mask_poly.cc mask_sid.h mask_sid.cc point_weight.h \
 	point_weight.cc read_fortran_binary.h read_fortran_binary.cc \
-	met_buffer.h met_buffer.cc smart_buffer.h smart_buffer.cc \
-	vx_util.h CircularTemplate.h CircularTemplate.cc \
-	GridTemplate.h GridTemplate.cc GridPoint.h GridPoint.cc \
-	GridOffset.h GridOffset.cc observation.h observation.cc \
-	stat_column_defs.h handle_openmp.h handle_openmp.cc \
-	RectangularTemplate.h RectangularTemplate.cc python_line.h \
-	python_line.cc
+	smart_buffer.h smart_buffer.cc vx_util.h CircularTemplate.h \
+	CircularTemplate.cc GridTemplate.h GridTemplate.cc GridPoint.h \
+	GridPoint.cc GridOffset.h GridOffset.cc observation.h \
+	observation.cc stat_column_defs.h handle_openmp.h \
+	handle_openmp.cc RectangularTemplate.h RectangularTemplate.cc \
+	python_line.h python_line.cc
 @ENABLE_PYTHON_TRUE@am__objects_1 =  \
 @ENABLE_PYTHON_TRUE@	libvx_util_a-python_line.$(OBJEXT)
 am__objects_2 = $(am__objects_1)
@@ -177,7 +176,6 @@ am_libvx_util_a_OBJECTS = libvx_util_a-ascii_table.$(OBJEXT) \
 	libvx_util_a-mask_sid.$(OBJEXT) \
 	libvx_util_a-point_weight.$(OBJEXT) \
 	libvx_util_a-read_fortran_binary.$(OBJEXT) \
-	libvx_util_a-met_buffer.$(OBJEXT) \
 	libvx_util_a-smart_buffer.$(OBJEXT) \
 	libvx_util_a-CircularTemplate.$(OBJEXT) \
 	libvx_util_a-GridTemplate.$(OBJEXT) \
@@ -236,7 +234,6 @@ am__depfiles_remade = ./$(DEPDIR)/libvx_util_a-CircularTemplate.Po \
 	./$(DEPDIR)/libvx_util_a-mask_poly.Po \
 	./$(DEPDIR)/libvx_util_a-mask_sid.Po \
 	./$(DEPDIR)/libvx_util_a-memory.Po \
-	./$(DEPDIR)/libvx_util_a-met_buffer.Po \
 	./$(DEPDIR)/libvx_util_a-normalize.Po \
 	./$(DEPDIR)/libvx_util_a-num_array.Po \
 	./$(DEPDIR)/libvx_util_a-observation.Po \
@@ -511,7 +508,6 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                mask_sid.h mask_sid.cc \
                point_weight.h point_weight.cc \
                read_fortran_binary.h read_fortran_binary.cc \
-               met_buffer.h met_buffer.cc \
                smart_buffer.h smart_buffer.cc  \
                vx_util.h \
                CircularTemplate.h CircularTemplate.cc \
@@ -525,7 +521,21 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                RectangularTemplate.h RectangularTemplate.cc $(OPT_PYTHON_SOURCES)
 
 libvx_util_a_CPPFLAGS = ${MET_CPPFLAGS}
-all: all-am
+
+# If we are in development mode, generate the "to_string" files and
+# clean them up in a "make clean".  We don't want to do either of these
+# in a distribution because the enum_to_string utility isn't available.
+
+# BUILT_SOURCES so these are generated before anything that
+# includes them is compiled.  Without it, a development build
+# whose .deps are empty - as after the make clean that removes
+# these very files - compiles sources in _SOURCES order and can
+# reach a consumer before its header has been generated.
+@ENABLE_DEVELOPMENT_TRUE@BUILT_SOURCES = asciitablejust_to_string.cc \
+@ENABLE_DEVELOPMENT_TRUE@                asciitablejust_to_string.h
+
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .cc .o .obj
@@ -606,7 +616,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-mask_poly.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-mask_sid.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-memory.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-met_buffer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-normalize.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-num_array.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-observation.Po@am__quote@ # am--include-marker
@@ -1174,20 +1183,6 @@ libvx_util_a-read_fortran_binary.obj: read_fortran_binary.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_util_a-read_fortran_binary.obj `if test -f 'read_fortran_binary.cc'; then $(CYGPATH_W) 'read_fortran_binary.cc'; else $(CYGPATH_W) '$(srcdir)/read_fortran_binary.cc'; fi`
 
-libvx_util_a-met_buffer.o: met_buffer.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_util_a-met_buffer.o -MD -MP -MF $(DEPDIR)/libvx_util_a-met_buffer.Tpo -c -o libvx_util_a-met_buffer.o `test -f 'met_buffer.cc' || echo '$(srcdir)/'`met_buffer.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_util_a-met_buffer.Tpo $(DEPDIR)/libvx_util_a-met_buffer.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='met_buffer.cc' object='libvx_util_a-met_buffer.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_util_a-met_buffer.o `test -f 'met_buffer.cc' || echo '$(srcdir)/'`met_buffer.cc
-
-libvx_util_a-met_buffer.obj: met_buffer.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_util_a-met_buffer.obj -MD -MP -MF $(DEPDIR)/libvx_util_a-met_buffer.Tpo -c -o libvx_util_a-met_buffer.obj `if test -f 'met_buffer.cc'; then $(CYGPATH_W) 'met_buffer.cc'; else $(CYGPATH_W) '$(srcdir)/met_buffer.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_util_a-met_buffer.Tpo $(DEPDIR)/libvx_util_a-met_buffer.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='met_buffer.cc' object='libvx_util_a-met_buffer.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_util_a-met_buffer.obj `if test -f 'met_buffer.cc'; then $(CYGPATH_W) 'met_buffer.cc'; else $(CYGPATH_W) '$(srcdir)/met_buffer.cc'; fi`
-
 libvx_util_a-smart_buffer.o: smart_buffer.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_util_a-smart_buffer.o -MD -MP -MF $(DEPDIR)/libvx_util_a-smart_buffer.Tpo -c -o libvx_util_a-smart_buffer.o `test -f 'smart_buffer.cc' || echo '$(srcdir)/'`smart_buffer.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_util_a-smart_buffer.Tpo $(DEPDIR)/libvx_util_a-smart_buffer.Po
@@ -1402,11 +1397,14 @@ distdir-am: $(DISTFILES)
 	  top_distdir="$(top_distdir)" distdir="$(distdir)" \
 	  dist-hook
 check-am: all-am
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(LIBRARIES)
 installdirs:
-install: install-am
-install-exec: install-exec-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
+install-exec: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
 
@@ -1435,6 +1433,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 @ENABLE_DEVELOPMENT_FALSE@clean-local:
 clean: clean-am
@@ -1476,7 +1475,6 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libvx_util_a-mask_poly.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-mask_sid.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-memory.Po
-	-rm -f ./$(DEPDIR)/libvx_util_a-met_buffer.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-normalize.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-num_array.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-observation.Po
@@ -1569,7 +1567,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libvx_util_a-mask_poly.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-mask_sid.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-memory.Po
-	-rm -f ./$(DEPDIR)/libvx_util_a-met_buffer.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-normalize.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-num_array.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-observation.Po
@@ -1601,7 +1598,7 @@ ps-am:
 
 uninstall-am:
 
-.MAKE: install-am install-strip
+.MAKE: all check install install-am install-exec install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-am clean \
 	clean-generic clean-local clean-noinstLIBRARIES cscopelist-am \
@@ -1623,10 +1620,6 @@ uninstall-am:
 # Include the project definitions
 
 include ${top_srcdir}/Make-include
-
-# If we are in development mode, generate the "to_string" files and
-# clean them up in a "make clean".  We don't want to do either of these
-# in a distribution because the enum_to_string utility isn't available.
 
 @ENABLE_DEVELOPMENT_TRUE@asciitablejust_to_string.cc asciitablejust_to_string.h: ascii_table.h
 @ENABLE_DEVELOPMENT_TRUE@	${ENUM_TO_STRING} -concat_string ascii_table.h

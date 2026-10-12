@@ -19,6 +19,8 @@
 
 #include <iostream>
 
+#include <vector>
+
 #include "vx_cal.h"
 #include "vx_util.h"
 #include "vx_grid.h"
@@ -37,7 +39,7 @@ class AFPixelTimeFile : public AFDataFile {
 
       void assign(const AFPixelTimeFile &);
 
-      unsigned char * Buf;
+      std::vector<unsigned char> Buf;
 
       bool SwapEndian;
 

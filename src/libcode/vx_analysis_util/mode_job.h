@@ -26,6 +26,7 @@
 
 #include "vx_cal.h"
 #include "vx_util.h"
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -75,7 +76,7 @@ class BasicModeAnalysisJob {
       virtual void do_job(const StringArray & mode_files) = 0;
 
 
-      NumArray * accums;
+      std::vector<NumArray> accums;
 
       ModeAttributes atts;
 
@@ -162,7 +163,7 @@ class ByCaseJob : public BasicModeAnalysisJob {
 
       void process_mode_file(const char * filename);
 
-      ByCaseInfo * info;
+      std::vector<ByCaseInfo> info;
 
       IntArray valid_times;
 

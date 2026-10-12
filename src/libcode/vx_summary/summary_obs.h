@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <iostream>
 
 #include "config_constants.h"
@@ -86,7 +87,7 @@ protected:
   // Use the configuration information to generate the list of summary
   // calculators needed.
 
-  std::vector< SummaryCalc* > getSummaryCalculators(const TimeSummaryInfo &info) const;
+  std::vector<std::unique_ptr<SummaryCalc>> getSummaryCalculators(const TimeSummaryInfo &info) const;
 
   // Use the configuration file time summary information to figure out the
   // time intervals for our summaries

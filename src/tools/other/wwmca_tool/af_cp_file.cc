@@ -109,8 +109,6 @@ void AFCloudPctFile::init_from_scratch()
 
 {
 
-Buf = (unsigned char *) nullptr;
-
 clear();
 
 return;
@@ -125,7 +123,7 @@ void AFCloudPctFile::clear()
 
 {
 
-if ( Buf )  { delete [] Buf;  Buf = (unsigned char *) nullptr; }
+Buf.clear();
 
 AFDataFile::clear();
 
@@ -143,11 +141,9 @@ void AFCloudPctFile::assign(const AFCloudPctFile & a)
 
 clear();
 
-if ( !(a.Buf) )  return;
+if ( a.Buf.empty() )  return;
 
-Buf = new unsigned char [af_nx*af_ny*cloud_pct_record_size];
-
-memset(Buf, 0, af_nx*af_ny*cloud_pct_record_size);
+Buf.assign(af_nx*af_ny*cloud_pct_record_size, 0);
 
 AFDataFile::assign(a);
 
@@ -183,9 +179,9 @@ if ( (fd = met_open(filename, O_RDONLY)) < 0 )  {
 
 bytes = af_nx*af_ny*cloud_pct_record_size;
 
-Buf = new unsigned char [bytes];
+Buf.assign(bytes, 0);
 
-if ( ::read(fd, Buf, bytes) != bytes )  {
+if ( ::read(fd, Buf.data(), bytes) != bytes )  {
 
    mlog << Error << "\nAFCloudPctFile::read(const char *) -> "
         << "read error on file \"" << filename << "\"\n\n";
