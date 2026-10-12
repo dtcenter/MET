@@ -233,6 +233,13 @@ MET Version 13.0.0 Upgrade Instructions
      follows the same convention as the other grid types. See the additional upgrade
      instructions below for details.
 
+   * Output regridded to lat/lon, rotated lat/lon, and Mercator grids using the AW_MEAN
+     interpolation method changes along the western edge of regional grids, the eastern edge
+     of Mercator grids, and the first column of global grids. As described in MET
+     `#3178 <https://github.com/dtcenter/MET/issues/3178>`_, input grid points within half an
+     output grid box of those edges were previously discarded rather than assigned to the
+     nearest output grid box.
+
 .. dropdown:: Additional upgrade instructions
 
    Recommendations when upgrading to MET version 13.0.0:
@@ -251,5 +258,5 @@ MET Version 13.0.0 Upgrade Instructions
      exactly. AW_MEAN_CNTR is the recommended method for area-weighted regridding regardless of
      grid type.
 
-   * Users of all other grid types are unaffected, since their grid box areas were already
-     computed from the lower-left corner.
+   * Users of all other grid types are unaffected by the LAEA change, since their grid box areas
+     were already computed from the lower-left corner.

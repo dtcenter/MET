@@ -895,7 +895,10 @@ The "method" entry defines the regridding method to be used.
       point. Input points lying exactly on the boundary between output
       grid boxes are all assigned to the same side, which can shift
       the result by a fraction of a grid box when the input and output
-      grids are aligned (e.g. 0.25 to 1.0 degree lat/lon).
+      grids are aligned (e.g. 0.25 to 1.0 degree lat/lon). Prior to
+      version 13.0.0, input points within half a grid box of the western
+      edge of regional lat/lon grids, or of the first column of global
+      ones, were discarded.
 
     * AW_MEAN_CNTR for an area-weighted mean when regridding from
       high to low resolution grids (width = 1), weighting each input

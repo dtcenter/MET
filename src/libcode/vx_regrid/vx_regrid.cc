@@ -404,6 +404,12 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
             double y_to;
             to_grid.latlon_to_xy(lat, lon, x_to, y_to);
 
+            // Place x_to within half a period of the grid center, so
+            // that a point just west of a regional grid, or just west
+            // of the seam of a global grid, maps to a small negative x
+            // rather than to one near x_period
+            x_to = unwrap_x(x_to, x_center, x_period);
+
             bool centered = (info.method == InterpMthd::AW_Mean_Cntr);
             double weight = from_grid.calc_area(xf, yf, centered);
 
@@ -411,12 +417,6 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
             int n_yt = 0;
 
             if(centered) {
-
-               // Place x_to within half a period of the grid center, so
-               // that a point just west of a regional grid, or just west
-               // of the seam of a global grid, maps to a small negative x
-               // rather than to one near x_period
-               x_to = unwrap_x(x_to, x_center, x_period);
 
                // Map the from_grid box corners and edge midpoints to the
                // to_grid. The corners are needed because a rotated or
@@ -454,9 +454,9 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
 
             for(int i=0; i<n_xt; i++) {
 
-               // Wrap longitudes for AW_MEAN_CNTR
+               // Wrap longitudes for global grids
                int x = xt[i];
-               if(centered && to_grid.wrap_lon()) {
+               if(to_grid.wrap_lon()) {
                   x = ((x % to_grid.nx()) + to_grid.nx()) % to_grid.nx();
                }
                if(x < 0 || x >= to_grid.nx()) continue;
