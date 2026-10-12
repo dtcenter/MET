@@ -262,7 +262,7 @@ static void setup_txt_files() {
    // using the forecast name and level to make the file names unique
    vector<string> vx_names;
    for(int i=0; i<conf_info.get_n_vx(); i++) {
-      const VarInfo *info = conf_info.vx_opt[i].vx_pd.fcst_info;
+      const VarInfo *info = conf_info.vx_opt[i].vx_pd.fcst_info.get();
       vx_names.push_back(info ? info->name_attr().string() + "_" +
                                 info->level_attr().string() : "");
    }
