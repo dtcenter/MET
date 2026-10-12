@@ -2032,7 +2032,7 @@ These three options are described below:
 
   .. code-block:: none
 
-     mask = { poly = [ "share/met/poly/CONUS.poly" ]; }
+     mask = { poly = [ "MET_BASE/poly/CONUS.poly" ]; }
 
 * Option 2 - Gen-Vx-Mask output:
 
@@ -2115,7 +2115,7 @@ is included in the mask.
   mask = {
      grid    = [ "FULL" ];
      poly    = [ "MET_BASE/poly/LMV.poly",
-                 "MET_BASE/out/gen_vx_mask/CONUS_poly.nc",
+                 "/path/to/gen_vx_mask/CONUS_poly.nc",
                  "MET_BASE/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
                  {name = \"TMP\"; level = \"Z2\";} >273"
                ];
