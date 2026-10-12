@@ -92,7 +92,7 @@ for (j=0; j<(filenames.n()); ++j)  {
 
    raw.put(plane, j);
 
-   delete data_2d_file;  data_2d_file = 0;
+   data_2d_file.reset();
 
 }   //  for j
 

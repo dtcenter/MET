@@ -20,6 +20,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -55,7 +56,7 @@ static ConcatString program_name;
 
 static Grid grid;
 static ConcatString out_file;
-static NcFile       *nc_out = (NcFile *) nullptr;
+static std::unique_ptr<netCDF::NcFile> nc_out;
 static NcDim        lat_dim, lon_dim, cdf_dim;
 static NcVar        cdf_x_var, cdf_y_var;
 
@@ -128,8 +129,7 @@ int met_main(int argc, char *argv[]) {
    // List the NetCDF file after it is finished
    mlog << Debug(1)
         << "Finished writing output file: " << out_file << "\n";
-   delete nc_out;
-   nc_out = (NcFile *) nullptr;
+   nc_out.reset();
 
    return 0;
 }
@@ -246,7 +246,7 @@ void setup_nc_file() {
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_file.c_str(), true);
 
-   if(!nc_out || IS_INVALID_NC_P(nc_out)) {
+   if(!nc_out.get() || IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_file << "\n\n";
@@ -254,21 +254,21 @@ void setup_nc_file() {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_file.text(), program_name.c_str(), "Climatology", "NA");
+   write_netcdf_global(nc_out.get(), out_file.text(), program_name.c_str(), "Climatology", "NA");
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(nc_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
-   write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+   write_netcdf_latlon(nc_out.get(), &lat_dim, &lon_dim, grid);
 
    // The number of CDF values is one less than the number of bins
-   cdf_dim = add_dim(nc_out, "cdf", (long) n_bin-1);
+   cdf_dim = add_dim(nc_out.get(), "cdf", (long) n_bin-1);
 
    // Add CDF variables
-   cdf_y_var = add_var(nc_out, "CDF_Value", ncFloat,
+   cdf_y_var = add_var(nc_out.get(), "CDF_Value", ncFloat,
                        cdf_dim, deflate_level);
-   cdf_x_var = add_var(nc_out, (string) var_name, ncFloat,
+   cdf_x_var = add_var(nc_out.get(), (string) var_name, ncFloat,
                        cdf_dim, lat_dim, lon_dim, deflate_level);
 
    return;
@@ -412,8 +412,7 @@ void get_field(const char *file, const char *config_str, DataPlane &dp) {
    }
 
    // Clean up
-   if(mtddf_ptr) { delete mtddf_ptr; mtddf_ptr = (Met2dDataFile * ) nullptr; }
-   if(vi_ptr)    { delete vi_ptr;    vi_ptr    =        (VarInfo *) nullptr; }
+   mtddf_ptr.reset();
 
    return;
 }

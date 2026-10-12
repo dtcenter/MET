@@ -125,7 +125,7 @@ void ModisFile::init_from_scratch()
 
 FileId = -1;
 
-Swath  = 0;
+Swath.reset();
 
 Latitude = 0;
 
@@ -290,7 +290,7 @@ if ( n_swaths > 1 )  {
 
 }
 
-Swath = new CloudsatSwath;
+Swath = std::make_unique<CloudsatSwath>();
 
 Swath->set_name(a[0].c_str());
 
@@ -557,7 +557,7 @@ FileId = -1;
 
 Filename.clear();
 
-if ( Swath )  { delete Swath;  Swath = (CloudsatSwath *) nullptr; }
+Swath.reset();
 
 Latitude = 0;
 
@@ -948,7 +948,7 @@ CloudsatSwath * ModisFile::swath() const
 
 {
 
-return Swath;
+return Swath.get();
 
 }
 

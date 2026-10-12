@@ -30,7 +30,6 @@
    //
 
 
-extern StringArray parse_line(const char * line);
 
 
    //

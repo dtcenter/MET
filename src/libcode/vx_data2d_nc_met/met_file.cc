@@ -95,11 +95,11 @@ void MetNcFile::init_from_scratch()
 
 {
 
-Nc = (NcFile *) nullptr;
+Nc.reset();
 
-Dim = (NcDim **) nullptr;
+Dim.clear();
 
-Var = (NcVarInfo *) nullptr;
+Var.clear();
 
 close();
 
@@ -115,9 +115,9 @@ void MetNcFile::close()
 
 {
 
-if ( Nc )  { delete Nc;  Nc = (NcFile *) nullptr; }
+Nc.reset();
 
-if ( Dim )  { delete [] Dim;  Dim = (NcDim **) nullptr; }
+Dim.clear();
 
 Ndims = 0;
 
@@ -130,7 +130,7 @@ Zdim = nullptr;
 
 Nvars = 0;
 
-if ( Var )  { delete [] Var;  Var = (NcVarInfo *) nullptr; }
+Var.clear();
 
    //
    //  done
@@ -152,20 +152,20 @@ bool MetNcFile::open(const char * filename)
 
    Nc = open_ncfile(filename);
 
-   if ( IS_INVALID_NC_P(Nc) )  { close();  return false; }
+   if ( IS_INVALID_NC_P(Nc.get()) )  { close();  return false; }
 
    //
    //  grid
    //
 
-   read_netcdf_grid(Nc, grid);
+   read_netcdf_grid(Nc.get(), grid);
 
    //
    //  dimensions
    //
 
    StringArray gDimNames;
-   get_dim_names(Nc, &gDimNames);
+   get_dim_names(Nc.get(), &gDimNames);
 
    Ndims = gDimNames.n();
 
@@ -227,7 +227,7 @@ bool MetNcFile::open(const char * filename)
 
    for (int j=0; j<Ndims; ++j)  {
       string c = to_lower(gDimNames[j]);
-      NcDim dim = get_nc_dim(Nc, gDimNames[j]);
+      NcDim dim = get_nc_dim(Nc.get(), gDimNames[j]);
 
       if ( c.compare(x_dim_name) == 0 ) {
          Xdim = &dim;
@@ -249,30 +249,30 @@ bool MetNcFile::open(const char * filename)
    //
 
    StringArray varNames;
-   Nvars = get_var_names(Nc, &varNames);
+   Nvars = get_var_names(Nc.get(), &varNames);
 
-   Var = new NcVarInfo [Nvars];
+   Var.resize(Nvars);
 
    for (int j=0; j<Nvars; ++j)  {
 
-      NcVar v = get_var(Nc, varNames[j].c_str());
+      NcVar v = get_var(Nc.get(), varNames[j].c_str());
 
-      Var[j].var = new NcVar(v);
+      Var[j].var = std::make_unique<NcVar>(v);
 
       Var[j].name = GET_NC_NAME(v).c_str();
 
       int dim_count = GET_NC_DIM_COUNT(v);
       Var[j].Ndims = dim_count;
 
-      Var[j].Dims = new NcDim * [Var[j].Ndims];
+      Var[j].Dims.resize(Var[j].Ndims);
 
       //
       //  parse the variable attributes
       //
       get_att_name      ( Var[j],     Var[j].name_att      );
-      get_var_long_name ( Var[j].var, Var[j].long_name_att );
+      get_var_long_name ( Var[j].var.get(), Var[j].long_name_att );
       get_att_level     ( Var[j],     Var[j].level_att     );
-      get_var_units     ( Var[j].var, Var[j].units_att     );
+      get_var_units     ( Var[j].var.get(), Var[j].units_att     );
       get_att_accum_time( Var[j],     Var[j].AccumTime     );
 
       long long ill;
@@ -519,7 +519,7 @@ const int cell_count = Nx * Ny;
 bool found = false;
 
 for (int j=0; j<Nvars; ++j)  {
-   if ( Var[j].var == v )  { found = true;  var = Var + j;  break; }
+   if ( Var[j].var.get() == v )  { found = true;  var = const_cast<NcVarInfo *>(&Var[j]);  break; }
 }
 
 if ( !found )  {
@@ -644,7 +644,7 @@ bool found = ( nullptr != info );
 
 if ( !found )  return false;
 
-found = data(info->var, a, plane);
+found = data(info->var.get(), a, plane);
 
    //
    //  store the times
@@ -667,7 +667,7 @@ return found;
 
 NcVarInfo* MetNcFile::find_var_name(const char * var_name) const {
 
-   for(int i=0; i < Nvars; i++) if( Var[i].name == var_name ) return &Var[i];
+   for(int i=0; i < Nvars; i++) if( Var[i].name == var_name ) return const_cast<NcVarInfo *>(&Var[i]);
 
    return nullptr;
 }

@@ -14,10 +14,8 @@
 #define  __ENUM_INFO_H__
 
 
-////////////////////////////////////////////////////////////////////////
-
-
-static const int enuminfo_alloc_increment = 100;
+#include <string>
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -29,27 +27,22 @@ class EnumInfo {
 
    private:
 
-      char ** s;
+      std::vector<std::string> s;
 
-      char * Name;
+      std::string Name;
 
-      char * LowerCaseName;
+      std::string LowerCaseName;
 
-      char * Scope;
+      std::string Scope;
 
-      char * U_Scope;
+      std::string U_Scope;
 
-      char * Header;
-
-      int Nids;
-
-      int Nalloc;
+      std::string Header;
 
       void assign(const EnumInfo &);
 
       void init_from_scratch();
 
-      void extend(int);
 
    public:
 
@@ -90,17 +83,25 @@ class EnumInfo {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int EnumInfo::n_ids() const { return Nids; }
+inline int EnumInfo::n_ids() const { return (int) s.size(); }
 
-inline const char * EnumInfo::name() const { return Name; }
+   //
+   //  These return nullptr rather than "" when unset, because that is the
+   //  contract the generator relies on: code.cc tests "if ( e.scope() )" to
+   //  decide whether to emit a "Scope::" qualifier at all. Returning c_str()
+   //  unconditionally would make that test always true and prefix every
+   //  generated type with a bare "::".
+   //
 
-inline const char * EnumInfo::lowercase_name() const { return LowerCaseName; }
+inline const char * EnumInfo::name() const { return Name.empty() ? nullptr : Name.c_str(); }
 
-inline const char * EnumInfo::scope() const { return Scope; }
+inline const char * EnumInfo::lowercase_name() const { return LowerCaseName.empty() ? nullptr : LowerCaseName.c_str(); }
 
-inline const char * EnumInfo::u_scope() const { return U_Scope; }
+inline const char * EnumInfo::scope() const { return Scope.empty() ? nullptr : Scope.c_str(); }
 
-inline const char * EnumInfo::header() const { return Header; }
+inline const char * EnumInfo::u_scope() const { return U_Scope.empty() ? nullptr : U_Scope.c_str(); }
+
+inline const char * EnumInfo::header() const { return Header.empty() ? nullptr : Header.c_str(); }
 
 
 ////////////////////////////////////////////////////////////////////////

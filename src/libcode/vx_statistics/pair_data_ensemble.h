@@ -13,6 +13,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <vector>
+#include <memory>
 #include <string>
 #include <deque>
 #include <map>
@@ -76,7 +78,7 @@ class PairDataEnsemble : public PairBase {
       bool                  obs_error_flag;
 
       // Ensemble, valid count, and rank values
-      NumArray  *e_na;             // Ensemble values [n_ens][n_obs]
+      std::vector<NumArray> e_na;  // Ensemble values [n_ens][n_obs]
       NumArray   v_na;             // Number of valid ensemble values [n_obs]
       NumArray   r_na;             // Observation ranks [n_obs]
 
@@ -124,7 +126,7 @@ class PairDataEnsemble : public PairBase {
       NumArray   mn_oerr_na;       // Mean of perturbed members [n_obs]
 
       double     ssvar_bin_size;   // Variance bin size for spread/skill
-      SSVARInfo *ssvar_bins;       // Ensemble spread/skill bin information [n_ssvar_bin]
+      std::vector<SSVARInfo> ssvar_bins; // Ensemble spread/skill bin information [n_ssvar_bin]
 
       double     crpss_emp;        // Empirical CRPS skill score
       double     crpss_gaus;       // Guassian CRPS skill score
@@ -188,7 +190,7 @@ class VxPairDataEnsemble : public VxPairBase {
       //
       //////////////////////////////////////////////////////////////////
 
-      EnsVarInfo *ens_info;         // Ensemble data, allocated by EnsVarInfo
+      std::unique_ptr<EnsVarInfo> ens_info;   // Ensemble data
 
       //////////////////////////////////////////////////////////////////
 

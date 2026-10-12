@@ -46,8 +46,6 @@ SeriesAnalysisConfInfo::~SeriesAnalysisConfInfo() {
 void SeriesAnalysisConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   fcst_info = (VarInfo **) nullptr;
-   obs_info  = (VarInfo **) nullptr;
 
    clear();
 
@@ -91,19 +89,8 @@ void SeriesAnalysisConfInfo::clear() {
 
    output_stats.clear();
 
-   // Clear fcst_info
-   if(fcst_info) {
-      for(i=0; i<n_fcst; i++)
-         if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) nullptr; }
-      delete fcst_info; fcst_info = (VarInfo **) nullptr;
-   }
-
-   // Clear obs_info
-   if(obs_info) {
-      for(i=0; i<n_obs; i++)
-         if(obs_info[i]) { delete obs_info[i]; obs_info[i] = (VarInfo *) nullptr; }
-      delete obs_info; obs_info = (VarInfo **) nullptr;
-   }
+   fcst_info.clear();
+   obs_info.clear();
 
    // Reset counts
    n_fcst = 0;
@@ -221,13 +208,11 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    check_climo_n_vx(odict, n_obs);
 
    // Allocate space based on the number of verification tasks
-   fcst_info = new VarInfo * [n_fcst];
-   obs_info  = new VarInfo * [n_obs];
+   fcst_info.resize(n_fcst);
+   obs_info.resize(n_obs);
 
    // Initialize pointers
-   for(i=0; i<n_fcst; i++) fcst_info[i] = (VarInfo *) nullptr;
-   for(i=0; i<n_obs;  i++) obs_info[i]  = (VarInfo *) nullptr;
-
+   
    // Conf: fcst.cat_thresh and obs.cat_thresh
    fcat_ta = fdict->lookup_thresh_array(conf_key_cat_thresh);
    ocat_ta = odict->lookup_thresh_array(conf_key_cat_thresh);

@@ -49,7 +49,7 @@ EnsembleStatConfInfo::~EnsembleStatConfInfo() {
 void EnsembleStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   vx_opt   = (EnsembleStatVxOpt *) nullptr;
+   vx_opt.clear();
    rng_ptr  = (gsl_rng *)           nullptr;
 
    clear();
@@ -88,7 +88,7 @@ void EnsembleStatConfInfo::clear() {
    nc_info.clear();
 
    // Deallocate memory
-   if(vx_opt) { delete [] vx_opt; vx_opt = (EnsembleStatVxOpt *) nullptr; }
+   vx_opt.clear();
 
    // Reset counts
    n_vx          = 0;
@@ -257,7 +257,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Allocate memory for the verification task options
    n_vx   = n_fvx;
-   vx_opt = new EnsembleStatVxOpt [n_vx];
+   vx_opt.resize(n_vx);
 
    // Check for consistent number of climatology fields
    check_climo_n_vx(fdict, n_vx);
@@ -286,7 +286,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       for(int j=0; j<vx_opt[i].interp_info.n_interp; j++) {
          if(string_to_interpmthd(vx_opt[i].interp_info.method[j].c_str()) == InterpMthd::HiRA) {
             GridTemplateFactory gtf;
-            GridTemplate* gt = gtf.buildGT(vx_opt[i].interp_info.shape,
+            auto gt = gtf.buildGT(vx_opt[i].interp_info.shape,
                                            vx_opt[i].interp_info.width[j],
                                            false);
             max_hira_size = max(max_hira_size, gt->size());
@@ -745,14 +745,14 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *dict;
-   VarInfo * next_var;
+   std::unique_ptr<VarInfo> next_var;
    InputInfo input_info;
 
    // Initialize
    clear();
 
    // Allocate new EnsVarInfo object for fcst
-   vx_pd.ens_info = new EnsVarInfo();
+   vx_pd.ens_info = std::make_unique<EnsVarInfo>();
 
    // Loop over ensemble member IDs to substitute
    for(int i=0; i<ens_member_ids.n(); i++) {
@@ -766,13 +766,17 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       // Set the current dictionary
       next_var->set_dict(fdict);
 
-      input_info.var_info = next_var;
+      // Borrowed below: add_input() moves ownership into ens_info, but the
+      // object itself stays put, so this observer remains valid.
+      VarInfo *next_var_ptr = next_var.get();
+
+      input_info.var_info = std::move(next_var);
       input_info.file_index = 0;
       input_info.file_list = ens_files;
-      vx_pd.ens_info->add_input(input_info);
+      vx_pd.ens_info->add_input(std::move(input_info));
 
       // Set the fcst_info, if needed
-      if(!vx_pd.fcst_info) vx_pd.set_fcst_info(next_var); 
+      if(!vx_pd.fcst_info) vx_pd.set_fcst_info(next_var_ptr);
 
       // Add InputInfo to fcst info list for each ensemble file provided
       // set var_info to nullptr to note first VarInfo should be used
@@ -781,7 +785,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
          input_info.var_info = nullptr;
          input_info.file_index = j;
          input_info.file_list = ens_files;
-         vx_pd.ens_info->add_input(input_info);
+         vx_pd.ens_info->add_input(std::move(input_info));
       } // end for j
    } // end for i
 
@@ -797,10 +801,10 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       // Set the current dictionary
       next_var->set_dict(fdict);
 
-      input_info.var_info = next_var;
+      input_info.var_info = std::move(next_var);
       input_info.file_index = ens_files->n() - 1;
       input_info.file_list = ens_files;
-      vx_pd.ens_info->add_input(input_info);
+      vx_pd.ens_info->add_input(std::move(input_info));
    }
 
    // Allocate new VarInfo object for obs

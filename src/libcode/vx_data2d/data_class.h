@@ -18,6 +18,7 @@
 
 
 #include <iostream>
+#include <memory>
 
 #include "vx_cal.h"
 #include "vx_grid.h"
@@ -94,8 +95,8 @@ class Met2dDataFile : public Met2dData {
 
    protected:
 
-      Grid * Raw_Grid;       //  Grid for raw data ... allocated
-      Grid * Dest_Grid;      //  Grid for destination data ... allocated
+      std::unique_ptr<Grid> Raw_Grid;    //  Grid for raw data
+      std::unique_ptr<Grid> Dest_Grid;   //  Grid for destination data
 
       void copy_raw_grid_to_dest();
 
@@ -160,7 +161,7 @@ class Met2dDataFile : public Met2dData {
 
          //  retrieve a vector of all requested data planes
 
-      int data_planes(std::vector<VarInfo*>&,
+      int data_planes(const std::vector<std::unique_ptr<VarInfo>>&,
                       std::vector<DataPlane>&);
 
          //  derive and rotate wind fields

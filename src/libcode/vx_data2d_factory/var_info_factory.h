@@ -17,15 +17,16 @@
 #include "var_info.h"
 #include "concat_string.h"
 #include "grdfiletype_to_string.h"
+#include <memory>
 
 ///////////////////////////////////////////////////////////////////////////////
 
 class VarInfoFactory
 {
    public:
-      static VarInfo *new_var_info(GrdFileType t);
-      static VarInfo *new_var_info(ConcatString s);
-      static VarInfo *new_copy(const VarInfo *);
+      static std::unique_ptr<VarInfo> new_var_info(GrdFileType t);
+      static std::unique_ptr<VarInfo> new_var_info(ConcatString s);
+      static std::unique_ptr<VarInfo> new_copy(const VarInfo *);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

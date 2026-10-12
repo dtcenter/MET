@@ -18,6 +18,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 
 #include <netcdf>
@@ -80,7 +81,7 @@ class MtdFileBase {
       virtual void write (netCDF::NcFile &) const;
 
 
-      Grid * G;        //  allocated
+      std::unique_ptr<Grid> G;
 
       int Nx, Ny, Nt;
 

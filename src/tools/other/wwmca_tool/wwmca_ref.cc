@@ -21,10 +21,6 @@
 
 #include "wwmca_ref.h"
 #include "interp_base.h"
-#include "ave_interp.h"
-#include "max_interp.h"
-#include "min_interp.h"
-#include "nearest_interp.h"
 #include "gridhemisphere_to_string.h"
 
 #include "grid_output.h"
@@ -62,8 +58,8 @@ WwmcaRegridder::~WwmcaRegridder()
 
 clear();
 
-if ( NHgrid )  { delete NHgrid;  NHgrid = (const Grid *) nullptr; }
-if ( SHgrid )  { delete SHgrid;  SHgrid = (const Grid *) nullptr; }
+NHgrid.reset();
+SHgrid.reset();
 
 }
 
@@ -75,16 +71,8 @@ void WwmcaRegridder::init_from_scratch()
 
 {
 
-NHgrid = new Grid (wwmca_north_data);
-SHgrid = new Grid (wwmca_south_data);
-
-cp_nh = (const AFCloudPctFile *) nullptr;
-cp_sh = (const AFCloudPctFile *) nullptr;
-
-pt_nh = (const AFPixelTimeFile *) nullptr;
-pt_sh = (const AFPixelTimeFile *) nullptr;
-
-ToGrid = (const Grid *) nullptr;
+NHgrid = std::make_unique<const Grid>(wwmca_north_data);
+SHgrid = std::make_unique<const Grid>(wwmca_south_data);
 
 Config = (MetConfig *) nullptr;
 
@@ -106,13 +94,13 @@ void WwmcaRegridder::clear()
 
 {
 
-if ( cp_nh )  { delete cp_nh;  cp_nh = (const AFCloudPctFile *) nullptr; }
-if ( cp_sh )  { delete cp_sh;  cp_sh = (const AFCloudPctFile *) nullptr; }
+cp_nh.reset();
+cp_sh.reset();
 
-if ( pt_nh )  { delete pt_nh;  pt_nh = (const AFPixelTimeFile *) nullptr; }
-if ( pt_sh )  { delete pt_sh;  pt_sh = (const AFPixelTimeFile *) nullptr; }
+pt_nh.reset();
+pt_sh.reset();
 
-if ( ToGrid )  { delete ToGrid;  ToGrid = (const Grid *) nullptr; }
+ToGrid.reset();
 
 Hemi = no_hemisphere;
 
@@ -216,7 +204,7 @@ void WwmcaRegridder::set_cp_nh_file(const char * filename)
 
 {
 
-AFCloudPctFile * f = new AFCloudPctFile;
+auto f = std::make_unique<AFCloudPctFile>();
 
 if ( !(f->read(filename, 'N')) )  {
 
@@ -227,7 +215,7 @@ if ( !(f->read(filename, 'N')) )  {
 
 }
 
-cp_nh = (const AFCloudPctFile *) f;  f = (AFCloudPctFile *) nullptr;
+cp_nh = std::move(f);
 
 return;
 
@@ -241,7 +229,7 @@ void WwmcaRegridder::set_cp_sh_file(const char * filename)
 
 {
 
-AFCloudPctFile * f = new AFCloudPctFile;
+auto f = std::make_unique<AFCloudPctFile>();
 
 if ( !(f->read(filename, 'S')) )  {
 
@@ -252,7 +240,7 @@ if ( !(f->read(filename, 'S')) )  {
 
 }
 
-cp_sh = (const AFCloudPctFile *) f;  f = (AFCloudPctFile *) nullptr;
+cp_sh = std::move(f);
 
 return;
 
@@ -266,7 +254,7 @@ void WwmcaRegridder::set_pt_nh_file(const char * filename, bool swap)
 
 {
 
-AFPixelTimeFile * f = new AFPixelTimeFile;
+auto f = std::make_unique<AFPixelTimeFile>();
 
 if ( !(f->read(filename, 'N')) )  {
 
@@ -279,7 +267,7 @@ if ( !(f->read(filename, 'N')) )  {
 
 f->set_swap_endian(swap);
 
-pt_nh = (const AFPixelTimeFile *) f;  f = (AFPixelTimeFile *) nullptr;
+pt_nh = std::move(f);
 
 return;
 
@@ -293,7 +281,7 @@ void WwmcaRegridder::set_pt_sh_file(const char * filename, bool swap)
 
 {
 
-AFPixelTimeFile * f = new AFPixelTimeFile;
+auto f = std::make_unique<AFPixelTimeFile>();
 
 if ( !(f->read(filename, 'S')) )  {
 
@@ -306,7 +294,7 @@ if ( !(f->read(filename, 'S')) )  {
 
 f->set_swap_endian(swap);
 
-pt_sh = (const AFPixelTimeFile *) f;  f = (AFPixelTimeFile *) nullptr;
+pt_sh = std::move(f);
 
 return;
 
@@ -347,7 +335,7 @@ if ( WritePixelAge )  {
    mlog << Debug(2)
         << "Writing pixel age times instead of cloud data.\n";
 
-   if( pt_nh == 0 && pt_sh == 0 )  {
+   if( !pt_nh && !pt_sh )  {
 
       mlog << Error << "\nWwmcaRegridder::set_config() -> "
            << "when the \"" << conf_key_write_pixel_age << "\" configuration option is enabled, "
@@ -457,11 +445,11 @@ InterpolationValue value;
 switch ( Hemi )  {
 
    case north_hemisphere:
-      do_single_hemi(dp, NHgrid, cp_nh, pt_nh);
+      do_single_hemi(dp, NHgrid.get(), cp_nh.get(), pt_nh.get());
       break;
 
    case south_hemisphere:
-      do_single_hemi(dp, SHgrid, cp_sh, pt_sh);
+      do_single_hemi(dp, SHgrid.get(), cp_sh.get(), pt_sh.get());
       break;
 
    case both_hemispheres:
@@ -736,15 +724,15 @@ if ( Width == 1 )  {
 
          if ( lat >= 0.0 )  {
 
-            cloud  = cp_nh;
-            pixel  = pt_nh;
-            From   = NHgrid;
+            cloud  = cp_nh.get();
+            pixel  = pt_nh.get();
+            From   = NHgrid.get();
 
          } else {
 
-            cloud  = cp_sh;
-            pixel  = pt_sh;
-            From   = SHgrid;
+            cloud  = cp_sh.get();
+            pixel  = pt_sh.get();
+            From   = SHgrid.get();
 
          }
 
@@ -808,15 +796,15 @@ for (x=0; x<(dp.nx()); ++x)  {
 
             if ( lat >= 0.0 )  {
 
-               cloud  = cp_nh;
-               pixel  = pt_nh;
-               From   = NHgrid;
+               cloud  = cp_nh.get();
+               pixel  = pt_nh.get();
+               From   = NHgrid.get();
 
             } else {
 
-               cloud  = cp_sh;
-               pixel  = pt_sh;
-               From   = SHgrid;
+               cloud  = cp_sh.get();
+               pixel  = pt_sh.get();
+               From   = SHgrid.get();
 
             }
 
@@ -1058,7 +1046,7 @@ void WwmcaRegridder::get_grid()
 
 Grid G = parse_vx_grid(parse_conf_regrid(Config), (Grid *) 0, (Grid *) 0);
 
-ToGrid = new Grid(G);
+ToGrid = std::make_unique<const Grid>(G);
 
    //
    //  done

@@ -85,7 +85,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-LatLonGrid::LatLonGrid(const LatLonData & data)
+LatLonGrid::LatLonGrid(const LatLonData & data, Key)
 
 {
 
@@ -409,11 +409,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * LatLonGrid::copy() const
+std::unique_ptr<GridRep> LatLonGrid::copy() const
 
 {
 
-auto * p = new LatLonGrid (Data);
+auto p = std::make_unique<LatLonGrid>(Data, Key{});
 
 p->Name = Name;
 
@@ -453,15 +453,8 @@ void Grid::set(const LatLonData & data)
 
 clear();
 
-rep = new LatLonGrid ( data );
+rep = std::make_unique<LatLonGrid>(data, LatLonGrid::Key{});
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const LatLonData &) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 

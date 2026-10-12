@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <iostream>
 #include <map>
 
@@ -251,13 +252,13 @@ class STATAnalysisJob {
       //
       // Variables used to the store the analysis job specification
       //
-      char        *dump_row; // dump rows used to a file
-      std::ofstream    *dr_out;   // output file stream for dump row
+      ConcatString dump_row; // dump rows used to a file
+      std::unique_ptr<std::ofstream> dr_out;   // output file stream for dump row
       int         n_dump;    // number of lines written to dump row
       AsciiTable  dump_at;   // AsciiTable for buffering dump row data
 
-      char        *stat_file; // dump output statistics to a STAT file
-      std::ofstream    *stat_out;  // output file stream for -out_stat
+      ConcatString stat_file; // dump output statistics to a STAT file
+      std::unique_ptr<std::ofstream> stat_out;  // output file stream for -out_stat
       AsciiTable  stat_at;    // AsciiTable for buffering output STAT data
       int         stat_row;   // Counter for the current stat row
 
@@ -329,8 +330,13 @@ class STATAnalysisJob {
       // Name and seed value for the bootstrap random number generator.
       // (Default = "mnt19937" and "")
       //
-      char *boot_rng;
-      char *boot_seed;
+      ConcatString boot_rng;
+      ConcatString boot_seed;
+      // boot_seed was a char * whose null-ness was meaningful: unset omitted
+      // "-boot_seed" from the jobstring, while an explicitly empty value
+      // emitted "-boot_seed ''". ConcatString cannot tell those apart, so the
+      // distinction is carried here.
+      bool boot_seed_set;
 
       //
       // Name of the skill score index being computed

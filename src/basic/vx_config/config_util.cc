@@ -1448,6 +1448,12 @@ void TimeSummaryInfo::clear() {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+BootInfo::BootInfo(const BootInfo &a)
+   : interval(a.interval), rep_prop(a.rep_prop), n_rep(a.n_rep),
+     rng(a.rng), seed(a.seed) { }
+
+///////////////////////////////////////////////////////////////////////////////
+
 BootInfo::BootInfo(BootInfo &&a) noexcept
    : interval(a.interval), rep_prop(a.rep_prop), n_rep(a.n_rep),
      rng(a.rng), seed(a.seed) { }

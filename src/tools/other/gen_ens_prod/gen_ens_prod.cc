@@ -289,7 +289,7 @@ static void process_ensemble() {
    unixtime max_init_ut = bad_data_ll;
 
    // Loop through each of the ensemble fields to be processed
-   vector<GenEnsProdVarInfo*>::const_iterator var_it = conf_info.ens_input.begin();
+   auto var_it = conf_info.ens_input.begin();
    for(int i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
 
       // Need to reinitialize counts and sums for each ensemble field
@@ -350,14 +350,14 @@ static void process_ensemble() {
             clear_counts();
 
             // Read climatology data for this field
-            get_climo_mean_stdev((*var_it), i_var,
+            get_climo_mean_stdev(var_it->get(), i_var,
                                  set_climo_ens_mem_id,
                                  i_ens, cmn_dp, csd_dp);
 
             // Compute the ensemble summary data, if needed
             if((*var_it)->normalize == NormalizeType::FcstAnom ||
                (*var_it)->normalize == NormalizeType::FcstStdAnom) {
-               get_ens_mean_stdev((*var_it), emn_dp, esd_dp);
+               get_ens_mean_stdev(var_it->get(), emn_dp, esd_dp);
             }
             else {
                emn_dp.erase();
@@ -384,7 +384,7 @@ static void process_ensemble() {
 
                // Read climo data with MET_ENS_MEMBER_ID set
                if(set_climo_ens_mem_id) {
-                  get_climo_mean_stdev((*var_it), i_var,
+                  get_climo_mean_stdev(var_it->get(), i_var,
                                        set_climo_ens_mem_id, i_ens,
                                        cmn_dp, csd_dp);
                }
@@ -396,7 +396,7 @@ static void process_ensemble() {
                }
 
                // Apply current data to the running sums and counts
-               track_counts(*var_it, ctrl_dp, true, cmn_dp, csd_dp);
+               track_counts(var_it->get(), ctrl_dp, true, cmn_dp, csd_dp);
 
             } // end if ctrl_file
 
@@ -411,7 +411,7 @@ static void process_ensemble() {
 
          // Read climo data with MET_ENS_MEMBER_ID set
          if(set_climo_ens_mem_id) {
-             get_climo_mean_stdev((*var_it), i_var,
+             get_climo_mean_stdev(var_it->get(), i_var,
                                   set_climo_ens_mem_id, i_ens,
                                   cmn_dp, csd_dp);
          }
@@ -423,7 +423,7 @@ static void process_ensemble() {
          }
 
          // Apply current data to the running sums and counts
-         track_counts(*var_it, ens_dp, false, cmn_dp, csd_dp);
+         track_counts(var_it->get(), ens_dp, false, cmn_dp, csd_dp);
 
          // Keep track of the maximum initialization time
          if(is_bad_data(max_init_ut) || ens_dp.init() > max_init_ut) {
@@ -446,7 +446,7 @@ static void process_ensemble() {
 
       // Write out the ensemble information to a NetCDF file
       ens_dp.set_init(max_init_ut);
-      write_ens_nc(*var_it, n_ens_vld, ens_dp, cmn_dp, csd_dp);
+      write_ens_nc(var_it->get(), n_ens_vld, ens_dp, cmn_dp, csd_dp);
 
    } // end for var_it
 
@@ -676,7 +676,7 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
       if(nxy == 0) process_grid(mtddf->grid());
 
       // Create the output file, if necessary
-      if(nc_out == nullptr) setup_nc_file();
+      if(nc_out.get() == nullptr) setup_nc_file();
 
       // Regrid, if requested and necessary
       if(!(mtddf->grid() == grid)) {
@@ -703,7 +703,7 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
    } // end if found
 
    // Cleanup
-   if(mtddf) { delete mtddf; mtddf = nullptr; }
+   mtddf.reset();
 
    return found;
 }
@@ -827,7 +827,7 @@ static void setup_nc_file() {
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_file.c_str(), true);
 
-   if(IS_INVALID_NC_P(nc_out)) {
+   if(IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_file << "\n\n";
@@ -835,15 +835,15 @@ static void setup_nc_file() {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_file.text(), program_name,
+   write_netcdf_global(nc_out.get(), out_file.text(), program_name,
                        conf_info.model.c_str());
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(nc_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    if(conf_info.ens_input[0]->nc_info.do_latlon) {
-      write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+      write_netcdf_latlon(nc_out.get(), &lat_dim, &lon_dim, grid);
    }
 
    return;
@@ -1196,7 +1196,7 @@ static void write_ens_var_float(GenEnsProdVarInfo *ens_info,
    // Otherwise, add to the list of previously defined variables
    nc_ens_var_sa.add(ens_var_name);
 
-   auto ens_var = add_var(nc_out, (string) ens_var_name,
+   auto ens_var = add_var(nc_out.get(), (string) ens_var_name,
                           ncFloat, lat_dim, lon_dim);
 
    //
@@ -1256,7 +1256,7 @@ static void write_ens_var_int(GenEnsProdVarInfo *ens_info,
    nc_ens_var_sa.add(ens_var_name);
 
    int deflate_level = conf_info.get_compression_level();
-   auto ens_var = add_var(nc_out, (string) ens_var_name,
+   auto ens_var = add_var(nc_out.get(), (string) ens_var_name,
                           ncInt, lat_dim, lon_dim, deflate_level);
 
    // Construct the variable name attribute
@@ -1340,7 +1340,7 @@ static void clean_up() {
    mlog << Debug(1) << "Output file: " << out_file << "\n";
 
    // Close the output NetCDF file
-   if(nc_out) { delete nc_out; nc_out = (NcFile *) nullptr; }
+   nc_out.reset();
 
    // Clear the threshold count arrays
    thresh_cnt_na.clear();

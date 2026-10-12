@@ -21,6 +21,7 @@
 #include "3d_att.h"
 
 #include "pwl.h"
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -45,15 +46,14 @@ class InterestCalculator {
       void extend(int);
 
 
-      double * W;     //  allocated
+      std::vector<double> W;
 
-      PWL * F;        //  array is allocated, elements are not
+      std::vector<PWL> F;        //  elements are not owned
 
-      Argument * A;   //  array is allocated, elements are not
+      std::vector<Argument> A;   //  elements are not owned
 
       double Scale;
 
-      int Nalloc;
 
       int Nelements;
 

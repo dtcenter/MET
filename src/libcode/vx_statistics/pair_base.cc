@@ -712,7 +712,7 @@ void PairBase::calc_obs_summary(){
       station_values_t * svt = &map_val[map_key[i]];
 
       //  parse the single key string
-      char** mat = nullptr;
+      StringArray mat;
       if( 5 != regex_apply("^([^:]+):([^:]+):([^:]+):([^:]+)$", 5,
                            map_key[i].c_str(), mat) ){
          mlog << Error << "\nPairBase::calc_obs_summary() -> "
@@ -722,12 +722,10 @@ void PairBase::calc_obs_summary(){
       }
 
       string msg_key = str_format("%s:%s:%s:%s",
-                                  mat[1], mat[2],
-                                  mat[3], mat[4]).text();
+                                  mat[1].c_str(), mat[2].c_str(),
+                                  mat[3].c_str(), mat[4].c_str()).text();
 
       ob_val_t ob;
-
-      regex_clean(mat);
 
       switch(obs_summary) {
          case ObsSummary::Nearest:
@@ -923,10 +921,10 @@ VxPairBase::VxPairBase(const VxPairBase &v) {
 ////////////////////////////////////////////////////////////////////////
 
 VxPairBase::VxPairBase(VxPairBase &&v) noexcept
-   : fcst_info(v.fcst_info),
-     obs_info(v.obs_info),
-     fclm_info(v.fclm_info),
-     oclm_info(v.oclm_info),
+   : fcst_info(move(v.fcst_info)),
+     obs_info(move(v.obs_info)),
+     fclm_info(move(v.fclm_info)),
+     oclm_info(move(v.oclm_info)),
      desc(move(v.desc)),
      interp_thresh(v.interp_thresh),
      fcst_dpa(move(v.fcst_dpa)),
@@ -964,10 +962,6 @@ VxPairBase::VxPairBase(VxPairBase &&v) noexcept
      rej_csd(move(v.rej_csd)), rej_mpr(move(v.rej_mpr)),
      rej_dup(move(v.rej_dup))
 {
-   v.fcst_info = nullptr;
-   v.obs_info  = nullptr;
-   v.fclm_info = nullptr;
-   v.oclm_info = nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -985,13 +979,10 @@ VxPairBase & VxPairBase::operator=(const VxPairBase &v) {
 
 VxPairBase & VxPairBase::operator=(VxPairBase &&v) noexcept {
    if (this != &v) {
-      delete fcst_info;  delete obs_info;
-      delete fclm_info;  delete oclm_info;
-
-      fcst_info = v.fcst_info;   v.fcst_info = nullptr;
-      obs_info  = v.obs_info;    v.obs_info  = nullptr;
-      fclm_info = v.fclm_info;   v.fclm_info = nullptr;
-      oclm_info = v.oclm_info;   v.oclm_info = nullptr;
+      fcst_info = move(v.fcst_info);
+      obs_info  = move(v.obs_info);
+      fclm_info = move(v.fclm_info);
+      oclm_info = move(v.oclm_info);
 
       desc = move(v.desc);
       interp_thresh = v.interp_thresh;
@@ -1045,12 +1036,6 @@ VxPairBase & VxPairBase::operator=(VxPairBase &&v) noexcept {
 
 void VxPairBase::init_from_scratch() {
 
-   fcst_info = (VarInfo *) nullptr;
-   obs_info  = (VarInfo *) nullptr;
-
-   fclm_info = (VarInfo *) nullptr;
-   oclm_info = (VarInfo *) nullptr;
-
    clear();
 
    return;
@@ -1060,11 +1045,11 @@ void VxPairBase::init_from_scratch() {
 
 void VxPairBase::clear() {
 
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) nullptr; }
-   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) nullptr; }
+   fcst_info.reset();
+   obs_info.reset();
 
-   if(fclm_info) { delete fclm_info; fclm_info = (VarInfo *) nullptr; }
-   if(oclm_info) { delete oclm_info; oclm_info = (VarInfo *) nullptr; }
+   fclm_info.reset();
+   oclm_info.reset();
 
    desc.clear();
 
@@ -1131,11 +1116,11 @@ void VxPairBase::assign(const VxPairBase &vx_pb) {
 
    clear();
 
-   set_fcst_info(vx_pb.fcst_info);
-   set_obs_info(vx_pb.obs_info);
+   set_fcst_info(vx_pb.fcst_info.get());
+   set_obs_info(vx_pb.obs_info.get());
 
-   set_fcst_climo_info(vx_pb.fclm_info);
-   set_obs_climo_info(vx_pb.oclm_info);
+   set_fcst_climo_info(vx_pb.fclm_info.get());
+   set_obs_climo_info(vx_pb.oclm_info.get());
 
    desc = vx_pb.desc;
 
@@ -1193,10 +1178,7 @@ void VxPairBase::assign(const VxPairBase &vx_pb) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::copy_var_info(const VarInfo *info, VarInfo *&copy) {
-
-   // Deallocate, if necessary
-   if(copy) { delete copy; copy = (VarInfo *) nullptr; }
+void VxPairBase::copy_var_info(const VarInfo *info, std::unique_ptr<VarInfo> &copy) {
 
    // Perform a deep copy
    copy = VarInfoFactory::new_var_info(info->file_type());
@@ -1729,7 +1711,7 @@ bool VxPairBase::is_keeper_var(
         const char *pnt_obs_str, const char *var_name, int grib_code) {
    bool keep = true;
 
-   const auto obs_info_grib = (VarInfoGrib *) obs_info;
+   const auto obs_info_grib = (VarInfoGrib *) obs_info.get();
 
    // Check for matching variable name or GRIB code
    if((var_name != nullptr) && (m_strlen(var_name) > 0)) {
@@ -1821,7 +1803,7 @@ bool VxPairBase::is_keeper_obs(
    bool keep = true;
 
    // Apply observation processing logic
-   obs_v = pb_ptr[0]->process_obs(obs_info, obs_v);
+   obs_v = pb_ptr[0]->process_obs(obs_info.get(), obs_v);
 
    // Check whether the observation value contains valid data
    if(is_bad_data(obs_v)) {
@@ -2685,7 +2667,7 @@ void get_interp_points(const DataPlaneArray &dpa,
    int i, n_vld;
    NumArray pts_blw, pts_abv;
    GridTemplateFactory gtf;
-   const GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
+   const auto gt = gtf.buildGT(shape, width, wrap_lon);
 
    // Get interpolation points below the observation
    pts_blw = interp_points(dpa[i_blw], *gt, obs_x, obs_y);
@@ -2740,7 +2722,6 @@ void get_interp_points(const DataPlaneArray &dpa,
       interp_pnts.erase();
    }
 
-   if ( gt )  { delete gt;  gt = (const GridTemplate *) nullptr; }
 
    return;
 }

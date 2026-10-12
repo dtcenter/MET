@@ -279,8 +279,6 @@ static bool parse_lambert_grid(const StringArray &grid_strings, Grid & g)
 
 {
 
-Grid * ToGrid = nullptr;
-
 LambertData ldata;
 
 const int N = grid_strings.n_elements();
@@ -378,11 +376,7 @@ if ( !west_longitude_positive )  {
 
 }
 
-ToGrid = new Grid ( ldata );
-
-g = *ToGrid;
-
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
+g.set(ldata);
 
    //
    //  done
@@ -400,8 +394,6 @@ return true;
 static bool parse_stereographic_grid(const StringArray &grid_strings, Grid & g)
 
 {
-
-Grid * ToGrid = nullptr;
 
 StereographicData sdata;
 
@@ -502,11 +494,7 @@ sdata.false_north = 0.;
 sdata.scale_factor = 1.0;
 sdata.dy_km = sdata.d_km;
 
-ToGrid = new Grid ( sdata );
-
-g = *ToGrid;
-
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
+g.set(sdata);
 
    //
    //  done
@@ -524,8 +512,6 @@ return true;
 static bool parse_latlon_grid(const StringArray &grid_strings, Grid & g)
 
 {
-
-Grid * ToGrid = nullptr;
 
 LatLonData ldata;
 
@@ -581,11 +567,7 @@ if ( !west_longitude_positive )  {
 
 }
 
-ToGrid = new Grid ( ldata );
-
-g = *ToGrid;
-
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
+g.set(ldata);
 
 
    //
@@ -604,8 +586,6 @@ return true;
 static bool parse_rotlatlon_grid(const StringArray &grid_strings, Grid & g)
 
 {
-
-Grid * ToGrid = nullptr;
 
 RotatedLatLonData rdata;
 
@@ -672,11 +652,7 @@ if ( !west_longitude_positive )  {
 
 }
 
-ToGrid = new Grid ( rdata );
-
-g = *ToGrid;
-
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
+g.set(rdata);
 
 
    //
@@ -695,8 +671,6 @@ return true;
 static bool parse_mercator_grid(const StringArray &grid_strings, Grid & g)
 
 {
-
-Grid * ToGrid = nullptr;
 
 MercatorData mdata;
 
@@ -754,11 +728,7 @@ if ( !west_longitude_positive )  {
 
 }
 
-ToGrid = new Grid ( mdata );
-
-g = *ToGrid;
-
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
+g.set(mdata);
 
    //
    //  done
@@ -776,8 +746,6 @@ return true;
 static bool parse_gaussian_grid(const StringArray &grid_strings, Grid & g)
 
 {
-
-Grid * ToGrid = nullptr;
 
 GaussianData gdata;
 
@@ -823,11 +791,7 @@ if ( !west_longitude_positive )  {
 
 }
 
-ToGrid = new Grid ( gdata );
-
-g = *ToGrid;
-
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
+g.set(gdata);
 
    //
    //  done
@@ -845,8 +809,6 @@ return true;
 static bool parse_laea_grid(const StringArray &grid_strings, Grid & g)
 
 {
-
-Grid * ToGrid = nullptr;
 
 LaeaData ldata;
 
@@ -903,11 +865,7 @@ if ( !west_longitude_positive )  {
 
 }
 
-ToGrid = new Grid ( ldata );
-
-g = *ToGrid;
-
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
+g.set(ldata);
 
    //
    // done
@@ -924,8 +882,6 @@ return true;
 static bool parse_rngazi_grid(const StringArray &grid_strings, Grid & g)
 
 {
-
-Grid * ToGrid = nullptr;
 
 RngAziData radata;
 
@@ -962,11 +918,7 @@ if ( !west_longitude_positive )  {
 
 }
 
-ToGrid = new Grid ( radata );
-
-g = *ToGrid;
-
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
+g.set(radata);
 
    //
    //  done

@@ -64,7 +64,6 @@ void Tokenizer::init_from_scratch()
 
 {
 
-source = nullptr;
 
 clear();
 
@@ -80,7 +79,7 @@ void Tokenizer::clear()
 
 {
 
-if ( source )  { delete [] source;  source = nullptr; }
+source.clear();
 
 pos = -1;
 
@@ -105,15 +104,7 @@ if ( empty(input) )  {
 
 }
 
-const int N = strlen(input);
-
-char * c = new char [N + 1];
-
-memcpy(c, input, N);
-
-c[N] = (char) 0;
-
-source = c;
+source = input;
 
 pos = 0;
 

@@ -38,7 +38,9 @@ LongArray::LongArray()
 
 {
 
-init_from_scratch();
+AllocInc = 10;   //  default value
+
+clear();
 
 }
 
@@ -62,7 +64,7 @@ LongArray::LongArray(const LongArray & a)
 
 {
 
-init_from_scratch();
+AllocInc = 10;   //  default value
 
 assign(a);
 
@@ -88,35 +90,11 @@ return *this;
 ////////////////////////////////////////////////////////////////////////
 
 
-void LongArray::init_from_scratch()
-
-{
-
-e = (long *) nullptr;
-
-AllocInc = 10;   //  default value
-
-clear();
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void LongArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (long *) nullptr; }
-
-
-
-Nelements = 0;
-
-Nalloc = 0;
+e.clear();
 
 // AllocInc = 10;   //  don't reset AllocInc
 
@@ -147,69 +125,19 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void LongArray::extend(int n, bool exact)
-
-{
-
-if ( n <= Nalloc )  return;
-
-if ( ! exact )  {
-
-   n = AllocInc*( (n + AllocInc - 1)/AllocInc );
-
-}
-
-int j;
-long * u = (long *) nullptr;
-
-u = new long [n];
-
-if ( !u )  {
-
-   mlog << Error << "\nLongArray::extend(int, bool) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-memset(u, 0, n*sizeof(long));
-
-for(j=0; j<Nelements; ++j)  {
-
-   u[j] = e[j];
-
-}
-
-if ( e )  { delete [] e;  e = (long *) nullptr; }
-
-e = u;
-
-u = (long *) nullptr;
-
-Nalloc = n;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void LongArray::dump(ostream & out, int depth) const
 
 {
 
 Indent prefix(depth);
 
-out << prefix << "Nelements = " << Nelements << "\n";
-out << prefix << "Nalloc    = " << Nalloc    << "\n";
-out << prefix << "AllocInc  = " << AllocInc  << "\n";
+out << prefix << "Nelements = " << e.size()     << "\n";
+out << prefix << "Nalloc    = " << e.capacity() << "\n";
+out << prefix << "AllocInc  = " << AllocInc     << "\n";
 
 int j;
 
-for(j=0; j<Nelements; ++j)  {
+for(j=0; j<(int) e.size(); ++j)  {
 
    out << prefix << "Element # " << j << " = " << e[j] << "\n";
 
@@ -254,9 +182,7 @@ void LongArray::add(const long & a)
 
 {
 
-extend(Nelements + 1, false);
-
-e[Nelements++] = a;
+e.push_back(a);
 
 return;
 
@@ -272,7 +198,7 @@ void LongArray::add(const LongArray & a)
 
 int j;
 
-extend(Nelements + a.n_elements());
+e.reserve(e.size() + a.n_elements());
 
 for (j=0; j<(a.n_elements()); ++j)  {
 
@@ -294,7 +220,7 @@ int LongArray::has(const long l) const
 
 int j;
 
-for (j=0; j<Nelements; ++j)  {
+for (j=0; j<(int) e.size(); ++j)  {
 
    if ( e[j] == l )  return 1;
 
@@ -312,7 +238,7 @@ long & LongArray::operator[](int n) const
 
 {
 
-if ( (n < 0) || (n >= Nelements) )  {
+if ( (n < 0) || (n >= (int) e.size()) )  {
 
    mlog << Error << "\nLongArray::operator[](int) -> "
         << "range check error ... " << n << "\n\n";
@@ -320,7 +246,7 @@ if ( (n < 0) || (n >= Nelements) )  {
    exit ( 1 );
 }
 
-return e[n];
+return const_cast<long &>(e[n]);
 
 }
 

@@ -69,7 +69,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-LaeaGrid::LaeaGrid(const LaeaData & data)
+LaeaGrid::LaeaGrid(const LaeaData & data, Key)
 
 {
 
@@ -119,7 +119,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-LaeaGrid::LaeaGrid(const LaeaNetcdfData & nc)
+LaeaGrid::LaeaGrid(const LaeaNetcdfData & nc, Key)
 
 {
 
@@ -452,47 +452,6 @@ return sum;
 ////////////////////////////////////////////////////////////////////////
 
 
-double LaeaGrid::xy_closedpolyline_area(const double *x, const double *y, int n) const
-
-{
-
-double sum;
-double *u = (double *) nullptr;
-double *v = (double *) nullptr;
-
-u = new double [n];
-v = new double [n];
-
-if ( !u || !v )  {
-
-   mlog << Error << "\nLaeaGrid::xy_closedpolyline_area() -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for (int j=0; j<n; ++j)  {
-
-   xy_to_uv(x[j], y[j], u[j], v[j]);
-
-}
-
-sum = uv_closedpolyline_area(u, v, n);
-
-sum *= earth_radius_km*earth_radius_km;
-
-delete [] u;  u = (double *) nullptr;
-delete [] v;  v = (double *) nullptr;
-
-return sum;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void LaeaGrid::uv_to_xy(double u, double v, double &x, double &y) const
 
 {
@@ -638,11 +597,11 @@ return 0.0;
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * LaeaGrid::copy() const
+std::unique_ptr<GridRep> LaeaGrid::copy() const
 
 {
 
-auto * p = new LaeaGrid (Data);
+auto p = std::make_unique<LaeaGrid>(Data, Key{});
 
 return p;
 
@@ -815,16 +774,8 @@ void Grid::set(const LaeaData & data)
 
 clear();
 
-rep = new LaeaGrid (data);
+rep = std::make_unique<LaeaGrid>(data, LaeaGrid::Key{});
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const LaeaData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 
@@ -854,16 +805,8 @@ void Grid::set(const LaeaNetcdfData & data)
 
 clear();
 
-rep = new LaeaGrid (data);
+rep = std::make_unique<LaeaGrid>(data, LaeaGrid::Key{});
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const LaeaNetcdfData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 

@@ -114,9 +114,9 @@ d = 0.0;
 
 type = no_cell_type;
 
-name = (char *) nullptr;
+name.clear();
 
-text = (char *) nullptr;
+text.clear();
 
 e = 0;
 
@@ -137,9 +137,9 @@ i = 0;
 
 d = 0.0;
 
-if ( name )  { delete [] name;   name = (char *) nullptr; }
+name.clear();
 
-if ( text )  { delete [] text;   text = (char *) nullptr; }
+text.clear();
 
 e = 0;
 
@@ -160,8 +160,6 @@ void IcodeCell::assign(const IcodeCell & icc)
 
 {
 
-const char *method_name = "IcodeCell::assign() -> ";
-
 i = icc.i;
 
 d = icc.d;
@@ -170,13 +168,13 @@ type = icc.type;
 
 if ( type == identifier )  {
 
-   name = m_strcpy2(icc.name, method_name, "name");
+   name = icc.name;
 
 }
 
 if ( type == character_string )  {
 
-   text = m_strcpy2(icc.text, method_name, "text");
+   text = icc.text;
 
 }
 
@@ -408,13 +406,11 @@ void IcodeCell::set_identifier(const char * Text)
 
 {
 
-const char *method_name = "IcodeCell::set_identifier() -> ";
-
 clear();
 
 type = identifier;
 
-name = m_strcpy2(Text, method_name);
+name = (Text ? Text : "");
 
 
 return;
@@ -429,13 +425,11 @@ void IcodeCell::set_string(const char * Text)
 
 {
 
-const char *method_name = "IcodeCell::set_string() -> ";
-
 clear();
 
 type = character_string;
 
-text = m_strcpy2(Text, method_name);
+text = (Text ? Text : "");
 
 
 return;
@@ -1088,8 +1082,6 @@ ICVStack::ICVStack()
 
 {
 
-for (int j=0; j<icv_stack_size; ++j)  v[j] = (IcodeVector *) nullptr;
-
 clear();
 
 }
@@ -1113,8 +1105,6 @@ clear();
 ICVStack::ICVStack(const ICVStack & s)
 
 {
-
-for (int j=0; j<icv_stack_size; ++j)  v[j] = (IcodeVector *) nullptr;
 
 Depth = 0;
 
@@ -1148,7 +1138,7 @@ void ICVStack::clear()
 
 for (int j=0; j<icv_stack_size; ++j)  {
 
-   if ( v[j] )  { delete v[j];  v[j] = (IcodeVector *) nullptr; }
+   v[j].reset();
 
 }
 
@@ -1178,7 +1168,7 @@ Depth = s.Depth;
 
 for (j=0; j<Depth; ++j)  {
 
-   v[j] = new IcodeVector;
+   v[j] = std::make_unique<IcodeVector>();
 
    if ( !(v[j]) )  {
 
@@ -1215,7 +1205,7 @@ if ( Depth >= icv_stack_size )  {
 
 }
 
-v[Depth] = new IcodeVector;
+v[Depth] = std::make_unique<IcodeVector>();
 
 if ( !(v[Depth]) )  {
 
@@ -1253,7 +1243,7 @@ IcodeVector V;
 
 V = *(v[Depth - 1]);
 
-delete v[Depth - 1];   v[Depth - 1] = (IcodeVector *) nullptr;
+v[Depth - 1].reset();
 
 --Depth;
 
@@ -1297,7 +1287,7 @@ if ( Depth <= 0 )  {
 }
 
 
-return v[Depth - 1];
+return v[Depth - 1].get();
 
 }
 
@@ -1441,7 +1431,7 @@ void ICVQueue::clear()
 
 for (int j=0; j<icv_stack_size; ++j)  {
 
-   if ( v[j] )  { delete v[j];  v[j] = (IcodeVector *) nullptr; }
+   v[j].reset();
 
 }
 
@@ -1492,7 +1482,7 @@ if ( Nelements >= icv_stack_size )  {
 
 }
 
-v[Nelements] = new IcodeVector;
+v[Nelements] = std::make_unique<IcodeVector>();
 
 *(v[Nelements]) = icv;
 
@@ -1524,11 +1514,11 @@ icv = *(v[0]);
 
 for (int j=1; j<Nelements; ++j)  {
 
-   v[j - 1] = v[j];
+   v[j - 1] = std::move(v[j]);
 
 }
 
-v[Nelements - 1] = (IcodeVector *) nullptr;
+v[Nelements - 1].reset();
 
 --Nelements;
 

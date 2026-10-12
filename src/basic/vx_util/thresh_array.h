@@ -57,7 +57,6 @@ class ThreshArray {
 
       void set(const SingleThresh &);
 
-      void parse_thresh_str(const char *);
 
       int n_elements() const;
       int n() const;
