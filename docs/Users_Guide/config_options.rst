@@ -908,6 +908,11 @@ The "method" entry defines the regridding method to be used.
         is determined by the extent of each input grid box and is not
         subject to a fixed limit.
 
+      * Input grid boxes which straddle the edge of a regional output grid,
+        or the longitude seam of a global one, are divided by their overlap
+        like any other, for lat/lon, rotated lat/lon, and Mercator output
+        grids.
+
       * Prior to version 13.0.0, the AW_MEAN option computed centered grid
         box areas for Lambert Azimuthal Equal Area grids, unlike all other
         grid projections. Use AW_MEAN_CNTR to most closely reproduce that

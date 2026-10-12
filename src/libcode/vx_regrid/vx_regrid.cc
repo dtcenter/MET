@@ -214,6 +214,80 @@ static int aw_mean_overlap(double lo, double hi, int max_boxes,
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Store the nearest to_grid box along one axis, for points whose overlap
+// cannot be computed. Returns 1, or 0 for a coordinate outside the
+// to_grid, which is checked before rounding so that the huge coordinates
+// returned outside the valid domain of a projection cannot overflow.
+// Coordinates within half a box of the edge are kept, so that the
+// caller can wrap them for global grids or discard them otherwise.
+//
+////////////////////////////////////////////////////////////////////////
+
+static int aw_mean_nearest(double v, int max_boxes,
+                           vector<int> &i, vector<double> &w) {
+
+   if(!std::isfinite(v) || v < -1.0 || v > (double) max_boxes) return 0;
+
+   i[0] = nint(v); w[0] = 1.0;
+
+   return 1;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// The latlon_to_xy() functions for lat/lon, rotated lat/lon, and
+// Mercator grids reduce longitude modulo 360 degrees, so a point just
+// west of a regional grid maps to x near the 360 degree period rather
+// than to a small negative value. Return that period in x index units,
+// or 0 for grids with no periodic x coordinate.
+//
+// Global grids use nx, which matches the period except when the last
+// column repeats the first.
+//
+////////////////////////////////////////////////////////////////////////
+
+static double x_lon_period(const Grid &grid) {
+
+   if(grid.wrap_lon()) return (double) grid.nx();
+
+   GridInfo gi = grid.info();
+   double dlon = 0.0;
+
+   if(gi.ll) {
+      dlon = gi.ll->delta_lon;
+   }
+   else if(gi.rll) {
+      dlon = gi.rll->delta_rot_lon;
+   }
+   else if(gi.m) {
+      // Mercator columns are evenly spaced in longitude
+      double lat0, lon0, lat1, lon1;
+      grid.xy_to_latlon(0.0, 0.0, lat0, lon0);
+      grid.xy_to_latlon(1.0, 0.0, lat1, lon1);
+      dlon = lon1 - lon0;
+      dlon -= 360.0*floor((dlon + 180.0)/360.0);
+   }
+
+   return (is_eq(dlon, 0.0) ? 0.0 : 360.0/fabs(dlon));
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Shift x by whole periods to within half a period of x_ref
+//
+////////////////////////////////////////////////////////////////////////
+
+static double unwrap_x(double x, double x_ref, double period) {
+
+   if(period > 0.0 && std::isfinite(x)) {
+      x -= period*floor((x - x_ref)/period + 0.5);
+   }
+
+   return x;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // For AW_MEAN_CNTR between grids whose rows follow lines of constant
 // latitude, recompute the y overlap fractions in proportion to true
 // area, which varies with sin(lat), rather than with grid index. This
@@ -279,6 +353,10 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
    // Split y overlaps by true area when rows follow constant latitude
    bool lat_rows = is_lat_row_grid(from_grid) && is_lat_row_grid(to_grid);
 
+   // Longitude period of the to_grid x coordinate, if any
+   double x_period = x_lon_period(to_grid);
+   double x_center = 0.5*(to_grid.nx() - 1);
+
    //
    // MET #3206 Reduction of vectors needed to prevent data races
    //           when updating to_data values 
@@ -292,7 +370,7 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
 
 #pragma omp parallel default(none) \
    shared(from_data, from_grid, to_grid, info, to_data) \
-   shared(to_data_sum, wt_data_sum, lat_rows)
+   shared(to_data_sum, wt_data_sum, lat_rows, x_period, x_center)
    { 
 
 #pragma omp single
@@ -334,6 +412,12 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
 
             if(centered) {
 
+               // Place x_to within half a period of the grid center, so
+               // that a point just west of a regional grid, or just west
+               // of the seam of a global grid, maps to a small negative x
+               // rather than to one near x_period
+               x_to = unwrap_x(x_to, x_center, x_period);
+
                // Map the from_grid box corners and edge midpoints to the
                // to_grid. The corners are needed because a rotated or
                // skewed mapping carries them beyond the edge midpoints,
@@ -348,10 +432,7 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
                   to_grid.latlon_to_xy(lat_e, lon_e, x_e, y_e);
 
                   // Unwrap relative to the box center
-                  if(to_grid.wrap_lon()) {
-                     while(x_e - x_to >  0.5*to_grid.nx()) x_e -= to_grid.nx();
-                     while(x_e - x_to < -0.5*to_grid.nx()) x_e += to_grid.nx();
-                  }
+                  x_e = unwrap_x(x_e, x_to, x_period);
 
                   x_min = min(x_min, x_e); x_max = max(x_max, x_e);
                   y_min = min(y_min, y_e); y_max = max(y_max, y_e);
@@ -365,12 +446,11 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
                }
             }
 
-            // Otherwise, assign to the nearest to_grid box
-            if(n_xt == 0 || n_yt == 0) {
-               n_xt = n_yt = 1;
-               xt[0] = nint(x_to); xw[0] = 1.0;
-               yt[0] = nint(y_to); yw[0] = 1.0;
-            }
+            // Otherwise, assign to the nearest to_grid box, replacing
+            // only the axis whose overlap could not be computed
+            if(n_xt == 0) n_xt = aw_mean_nearest(x_to, to_grid.nx(), xt, xw);
+            if(n_yt == 0) n_yt = aw_mean_nearest(y_to, to_grid.ny(), yt, yw);
+            if(n_xt == 0 || n_yt == 0) continue;
 
             for(int i=0; i<n_xt; i++) {
 
