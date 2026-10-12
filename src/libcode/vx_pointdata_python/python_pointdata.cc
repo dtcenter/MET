@@ -786,7 +786,7 @@ void print_met_data(const MetPointObsData *obs_data,
       }
    }
    else mlog << Debug(debug_level)
-              << "     s_array has no entries.\n";
+              << "     sid_array has no entries.\n";
    if (header_data->vld_array.n() > 0) {
       mlog << Debug(debug_level) << "\n";
       count = header_data->vld_array.n();

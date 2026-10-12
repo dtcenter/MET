@@ -3430,7 +3430,7 @@ May be set separately in each "obs.field" entry.
 The obs_err dictionary controls how observation error information should be
 handled. Observation error information can either be specified directly in
 the configuration file or by parsing information from an external table file.
-By default, the *MET_BASE/data/table_files/obs_err_table.txt* file is read
+By default, the *MET_BASE/table_files/obs_err_table.txt* file is read
 but this may be overridden by setting the $MET_OBS_ERR_TABLE environment
 variable at runtime.
 
