@@ -193,12 +193,12 @@ switch ( Type )  {   //  assumes Type is already set
 
 Filename = file_name;
 
-Raw_Grid = new Grid;
+Raw_Grid = std::make_unique<Grid>();
 
 bool status = python_dataplane(file_name.c_str(), sa,
                                use_xarray, Plane, *Raw_Grid, VInfo);
 
-Dest_Grid = new Grid;
+Dest_Grid = std::make_unique<Grid>();
 
 (*Dest_Grid) = (*Raw_Grid);
 

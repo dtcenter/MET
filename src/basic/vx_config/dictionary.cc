@@ -110,15 +110,15 @@ void DictionaryEntry::init_from_scratch()
 
 {
 
-Text = (ConcatString *) nullptr;
+Text.reset();
 
-Dict = (Dictionary *) nullptr;
+Dict.reset();
 
-Thresh = (SingleThresh *) nullptr;
+Thresh.reset();
 
-PWL = (PiecewiseLinear *) nullptr;
+PWL.reset();
 
-v = (IcodeVector *) nullptr;
+v.reset();
 
 Nargs = 0;
 
@@ -142,15 +142,15 @@ Ival = 0;
 Dval = 0.0;
 Bval = false;
 
-if ( Text )  { delete Text;  Text = (ConcatString *) nullptr; }
+Text.reset();
 
-if ( Dict )  { delete Dict;  Dict = (Dictionary *) nullptr; }
+Dict.reset();
 
-if ( Thresh )  { delete Thresh;  Thresh = (SingleThresh *) nullptr; }
+Thresh.reset();
 
-if ( PWL )  { delete PWL;  PWL = (PiecewiseLinear *) nullptr; }
+PWL.reset();
 
-if ( v )  { delete v;  v = (IcodeVector *) nullptr; }
+v.reset();
 
 Nargs = 0;
 
@@ -445,9 +445,9 @@ void DictionaryEntry::set_icodevector (const IcodeVector & _icv)
 
 {
 
-if ( v )  { delete v;  v = nullptr; }
+v.reset();
 
-v = new IcodeVector;
+v = std::make_unique<IcodeVector>();
 
 (*v) = _icv;
 
@@ -547,7 +547,7 @@ Type = StringType;
 
 if ( _name != "" )  set_name(_name);
 
-Text = new ConcatString;
+Text = std::make_unique<ConcatString>();
 
 if ( _text != "" )  *Text = _text;
 
@@ -590,7 +590,7 @@ else                 Type = DictionaryType;
 
 if ( _name != "" )  set_name(_name);
 
-Dict = new Dictionary;
+Dict = std::make_unique<Dictionary>();
 
 *Dict = d;
 
@@ -612,7 +612,7 @@ Type = PwlFunctionType;
 
 if ( _name != "" )  set_name(_name);
 
-PWL = new PiecewiseLinear;
+PWL = std::make_unique<PiecewiseLinear>();
 
 PWL->set_name(_name);
 
@@ -636,7 +636,7 @@ Type = ThresholdType;
 
 if ( _name != "" )  set_name(_name);
 
-Thresh = new SingleThresh;
+Thresh = std::make_unique<SingleThresh>();
 
 *Thresh = t;
 
@@ -659,7 +659,7 @@ Type = ArrayType;
 
 set_name(_name);
 
-Dict = new Dictionary;
+Dict = std::make_unique<Dictionary>();
 
 *Dict = d;
 
@@ -808,7 +808,7 @@ if ( Type != DictionaryType )  {
 }
 
 
-return Dict;
+return Dict.get();
 
 }
 
@@ -830,7 +830,7 @@ if ( Type != ArrayType )  {
 }
 
 
-return Dict;
+return Dict.get();
 
 }
 
@@ -852,7 +852,7 @@ if ( Type != ThresholdType )  {
 }
 
 
-return Thresh;
+return Thresh.get();
 
 }
 
@@ -874,7 +874,7 @@ if ( Type != PwlFunctionType )  {
 }
 
 
-return PWL;
+return PWL.get();
 
 }
 
@@ -948,7 +948,7 @@ void Dictionary::init_from_scratch()
 
 {
 
-e = (DictionaryEntry **) nullptr;
+e.clear();
 
 Parent = (Dictionary *) nullptr;
 
@@ -971,17 +971,7 @@ void Dictionary::clear()
 
 {
 
-if ( e )  {
-
-   for (int j=0; j<Nalloc; ++j)  {
-
-      if ( e[j] )  { delete e[j];  e[j] = (DictionaryEntry *) nullptr; }
-
-   }
-
-   delete [] e;  e = (DictionaryEntry **) nullptr;
-
-}
+e.clear();
 
 Nentries = 0;
 
@@ -1009,7 +999,7 @@ clear();
 
 if ( d.Nentries > 0 )  {
 
-   extend(d.Nentries);
+   e.resize(d.Nentries);
 
    int j;
 
@@ -1102,41 +1092,6 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Dictionary::extend(int n)
-
-{
-
-if ( Nalloc >= n )  return;
-
-n = dictionary_alloc_inc*((n + dictionary_alloc_inc - 1)/dictionary_alloc_inc);
-
-int j;
-DictionaryEntry ** u = (DictionaryEntry **) nullptr;
-
-u = new DictionaryEntry * [n];
-
-for (j=0; j<n; ++j)  u[j] = (DictionaryEntry *) nullptr;
-
-if ( e )  {
-
-   for (j=0; j<Nentries; ++j)  u[j] = e[j];
-
-   delete [] e;  e = (DictionaryEntry **) nullptr;
-
-}
-
-e = u;   u = (DictionaryEntry **) nullptr;
-
-Nalloc = n;
-
-
-   //
-   //  done
-   //
-
-return;
-
-}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1189,9 +1144,9 @@ if ( found )  {
    //  nope, new entry
    //
 
-extend(Nentries + 1);
+if ( (int) e.size() < Nentries + 1 )  e.resize(Nentries + 1);
 
-e[Nentries] = new DictionaryEntry;
+e[Nentries] = std::make_unique<DictionaryEntry>();
 
 *(e[Nentries]) = entry;
 
@@ -1246,7 +1201,7 @@ if ( (n < 0) || (n >= Nentries) )  {
 
 }
 
-return e[n];
+return e[n].get();
 
 }
 
@@ -1365,7 +1320,7 @@ for (int j=0; j<Nentries; ++j)  {
 
       LastLookupStatus = (e[j] != nullptr);
 
-      return e[j];
+      return e[j].get();
    }
 
 }
@@ -2465,7 +2420,7 @@ int j;
 
 for (j=1; j<max_dictionary_depth; ++j)  {   //  j starts at one, here
 
-   if ( D[j] )  { delete D[j];  D[j] = (Dictionary *) nullptr; }
+   DStore[j].reset();  D[j] = (Dictionary *) nullptr;
 
 }
 
@@ -2491,7 +2446,9 @@ int j;
 
 for (j=0; j<(s.Nelements); ++j)  {
 
-   D[j] = new Dictionary;
+   DStore[j] = std::make_unique<Dictionary>();
+
+   D[j] = DStore[j].get();
 
    *(D[j]) = *(s.D[j]);
 
@@ -2650,7 +2607,7 @@ if ( Nelements <= 1 )  {
 
 }
 
-delete D[Nelements - 1];   D[Nelements - 1] = (Dictionary *) nullptr;
+DStore[Nelements - 1].reset();   D[Nelements - 1] = (Dictionary *) nullptr;
 
 --Nelements;
 
@@ -2675,7 +2632,11 @@ if ( Nelements >= max_dictionary_depth )  {
 
 }
 
-D[Nelements++] = new Dictionary;
+DStore[Nelements] = std::make_unique<Dictionary>();
+
+D[Nelements] = DStore[Nelements].get();
+
+++Nelements;
 
 return;
 
@@ -2720,7 +2681,7 @@ entry.set_dict (name, *(D[Nelements - 1]));
 
 D[Nelements - 2]->store(entry);
 
-delete D[Nelements - 1];  D[Nelements - 1] = (Dictionary *) nullptr;
+DStore[Nelements - 1].reset();  D[Nelements - 1] = (Dictionary *) nullptr;
 
 --Nelements;
 
@@ -2760,7 +2721,7 @@ E.set_name(name);
 
 D[Nelements - 2]->store(E);
 
-delete D[Nelements - 1];  D[Nelements - 1] = (Dictionary *) nullptr;
+DStore[Nelements - 1].reset();  D[Nelements - 1] = (Dictionary *) nullptr;
 
 --Nelements;
 

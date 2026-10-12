@@ -311,8 +311,8 @@ void ModePsFile::set_xy_box()
    // Compute the x/y bounding box for valid data in each field
    //
 
-   Box fcst_xy_bb = valid_xy_bb(Engine->fcst_raw, *grid);
-   Box obs_xy_bb = valid_xy_bb(Engine->obs_raw,  *grid);
+   Box fcst_xy_bb = valid_xy_bb(Engine->fcst_raw.get(), *grid);
+   Box obs_xy_bb = valid_xy_bb(Engine->obs_raw.get(),  *grid);
 
    //
    // MET #3286: Update the bounding box logic to handle all

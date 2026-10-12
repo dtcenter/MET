@@ -74,12 +74,6 @@ void ModeConfInfo::init_from_scratch()
    Field_Index_f = 0;
    Field_Index_o = 0;
 
-   fcst_array = nullptr;
-    obs_array = nullptr;
-
-   fcst_array = nullptr;
-    obs_array = nullptr;
-
    clear();
 
    return;
@@ -115,25 +109,23 @@ void ModeConfInfo::assign( const ModeConfInfo &m)
    complexity_ratio_wt = m.complexity_ratio_wt;
    inten_perc_ratio_wt = m.inten_perc_ratio_wt;
 
-   fcst_array = nullptr;
    Fcst = nullptr;
    if (N_fields_f > 0) {
-      fcst_array = new Mode_Field_Info[N_fields_f];
+      fcst_array.resize(N_fields_f);
       for (int i=0; i<N_fields_f; ++i)
       {
          fcst_array[i].clone(m.fcst_array[i]);
       }
-      Fcst = fcst_array + Field_Index_f;
+      Fcst = fcst_array.data() + Field_Index_f;
    }
-   obs_array = nullptr;
    Obs = nullptr;
    if (N_fields_o > 0) {
-      obs_array = new Mode_Field_Info[N_fields_o];
+      obs_array.resize(N_fields_o);
       for (int i=0; i<N_fields_o; ++i)
       {
          obs_array[i].clone(m.obs_array[i]);
       }
-      Obs = obs_array + Field_Index_o;
+      Obs = obs_array.data() + Field_Index_o;
    }
 
    // need to be recomputed, maybe, so do so just in case
@@ -259,8 +251,8 @@ void ModeConfInfo::clear()
    quilt = false;
 
    // Deallocate memory
-   if ( fcst_array )  { delete [] fcst_array;  fcst_array = nullptr; }
-   if (  obs_array )  { delete []  obs_array;   obs_array = nullptr; }
+   fcst_array.clear();
+   obs_array.clear();
 
    Fcst = nullptr;
     Obs = nullptr;
@@ -548,16 +540,16 @@ void ModeConfInfo::process_config_both(GrdFileType ftype, GrdFileType otype,
       read_fields_1 (fcst_array, fcst_dict, ftype, 'F', 0);
       read_fields_0 (obs_array, obs_dict, otype, 'O');
       read_fields_1 (obs_array, obs_dict, otype, 'O', 0);
-      fcst_array->raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_fcst_raw_plot));
-      obs_array->raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_obs_raw_plot));
+      fcst_array[0].raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_fcst_raw_plot));
+      obs_array[0].raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_obs_raw_plot));
 
    } else {
       read_fields_1 (fcst_array, fcst_dict, ftype, 'F', field_index);
       read_fields_1 (obs_array, obs_dict, otype, 'O', field_index);
    }      
 
-   Fcst = fcst_array + field_index;
-   Obs =  obs_array + field_index;
+   Fcst = fcst_array.data() + field_index;
+   Obs =  obs_array.data() + field_index;
 
       // Dump the contents of the VarInfo objects
 
@@ -607,12 +599,12 @@ void ModeConfInfo::process_config_fcst(GrdFileType ftype, int field_index)
    if (field_index == 0) {
       read_fields_0 (fcst_array, fcst_dict, ftype, 'F');
       read_fields_1 (fcst_array, fcst_dict, ftype, 'F', 0);
-      fcst_array->raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_fcst_raw_plot));
+      fcst_array[0].raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_fcst_raw_plot));
    } else {
       read_fields_1 (fcst_array, fcst_dict, ftype, 'F', field_index);
    }
    
-   Fcst = fcst_array + field_index;
+   Fcst = fcst_array.data() + field_index;
 
 
       // Dump the contents of the VarInfo object
@@ -641,12 +633,12 @@ void ModeConfInfo::process_config_obs(GrdFileType otype, int field_index)
    if (field_index == 0) {
       read_fields_0 (obs_array, obs_dict, otype, 'O');
       read_fields_1 (obs_array, obs_dict, otype, 'O', 0);
-      obs_array->raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_obs_raw_plot));
+      obs_array[0].raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_obs_raw_plot));
    } else {
       read_fields_1 (obs_array, obs_dict, otype, 'O', field_index);
    }
 
-   Obs =  obs_array + field_index;
+   Obs =  obs_array.data() + field_index;
 
       // Dump the contents of the VarInfo object
 
@@ -902,7 +894,7 @@ void ModeConfInfo::evaluate_obs_settings(int j)
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModeConfInfo::read_fields_0 (Mode_Field_Info * & info_array, Dictionary * dict, GrdFileType, char _fo)
+void ModeConfInfo::read_fields_0 (std::vector<Mode_Field_Info> & info_array, Dictionary * dict, GrdFileType, char _fo)
 
 {
 
@@ -921,7 +913,7 @@ const Dictionary * field = ee->dict();
 
 const int N = ( (field->is_array()) ? (field->n_entries()) : 1 );
 
-info_array = new Mode_Field_Info [N];
+info_array.resize(N);
 
 if ( field->is_array() ) {
 
@@ -982,7 +974,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModeConfInfo::read_fields_1 (Mode_Field_Info * & info_array, Dictionary * dict, GrdFileType type, char _fo,
+void ModeConfInfo::read_fields_1 (std::vector<Mode_Field_Info> & info_array, Dictionary * dict, GrdFileType type, char _fo,
                                   int field_index)
 
 {
@@ -1092,7 +1084,7 @@ void ModeConfInfo::set_field_index(int k)
       }
       Field_Index_o = k;
       Field_Index_f = -1;
-      Obs =  obs_array + k;
+      Obs =  obs_array.data() + k;
    }
    else if (data_type == ModeDataType::MvMode_Fcst) {
       if ( (k < 0) || (k >= N_fields_f) ) {
@@ -1102,7 +1094,7 @@ void ModeConfInfo::set_field_index(int k)
       }
       Field_Index_f = k;
       Field_Index_o = -1;
-      Fcst =  fcst_array + k;
+      Fcst =  fcst_array.data() + k;
    } else {
       // set obs and fcst index values the same
       set_field_index(k, k);
@@ -1131,10 +1123,10 @@ Field_Index_f = f_index;
 Field_Index_o = o_index;
 
 if (data_type != ModeDataType::MvMode_Fcst) {
-   Obs =  obs_array + o_index;
+   Obs =  obs_array.data() + o_index;
 }
 if (data_type != ModeDataType::MvMode_Obs) {
-   Fcst = fcst_array + f_index;
+   Fcst = fcst_array.data() + f_index;
 }
 return;
 

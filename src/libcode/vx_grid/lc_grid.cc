@@ -118,7 +118,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-LambertGrid::LambertGrid(const LambertData & data)
+LambertGrid::LambertGrid(const LambertData & data, Key)
 
 {
 
@@ -421,48 +421,6 @@ return sum;
 ////////////////////////////////////////////////////////////////////////
 
 
-double LambertGrid::xy_closedpolyline_area(const double * x, const double *y , int n) const
-
-{
-
-int j;
-double sum;
-double *u = (double *) nullptr;
-double *v = (double *) nullptr;
-
-u = new double [n];
-v = new double [n];
-
-if ( !u || !v )  {
-
-   mlog << Error << "\nLambertGrid::xy_closedpolyline_area() -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for (j=0; j<n; ++j)  {
-
-   xy_to_uv(x[j], y[j], u[j], v[j]);
-
-}
-
-sum = uv_closedpolyline_area(u, v, n);
-
-sum *= earth_radius_km*earth_radius_km;
-
-delete [] u;  u = (double *) nullptr;
-delete [] v;  v = (double *) nullptr;
-
-return sum;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void LambertGrid::uv_to_xy(double u, double v, double & x, double & y) const
 
 {
@@ -663,11 +621,11 @@ exit ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * LambertGrid::copy() const
+std::unique_ptr<GridRep> LambertGrid::copy() const
 
 {
 
-auto * p = new LambertGrid (Data);
+auto p = std::make_unique<LambertGrid>(Data, Key{});
 
 p->Name = Name;
 
@@ -904,16 +862,8 @@ void Grid::set(const LambertData & data)
 
 clear();
 
-rep = new LambertGrid (data);
+rep = std::make_unique<LambertGrid>(data, LambertGrid::Key{});
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const LambertData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 }
 

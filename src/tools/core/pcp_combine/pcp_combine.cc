@@ -108,6 +108,7 @@
 #include "vx_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"
+#include <memory>
 
 using namespace std;
 using namespace netCDF;
@@ -138,7 +139,7 @@ static StringArray  req_out_var_name;
 static int          i_out_var = 0;
 static int          n_out_var;
 static MetConfig    config;
-static VarInfo *    var_info = (VarInfo *) nullptr;
+static std::unique_ptr<VarInfo> var_info;
 static double       input_thresh = 1.0;
 static double       vld_thresh = 1.0;
 static int          compress_level = -1;
@@ -158,7 +159,7 @@ static StringArray  field_list;
 static StringArray  derive_list;
 
 // Output NetCDF file
-NcFile *nc_out = (NcFile *) nullptr;
+std::unique_ptr<netCDF::NcFile> nc_out;
 NcDim   lat_dim;
 NcDim   lon_dim;
 
@@ -225,7 +226,7 @@ int met_main(int argc, char *argv[]) {
       // Reinitialize for the current loop.
       //
       field_string = req_field_list[i];
-      if(var_info) { delete var_info; var_info = (VarInfo *) nullptr; }
+      var_info.reset();
 
       //
       // Reset when reading multiple fields from the same input files.
@@ -565,7 +566,7 @@ static void do_sum_command() {
    //
    // Write output.
    //
-   if(!nc_out) open_nc(grid);
+   if(!nc_out.get()) open_nc(grid);
    write_nc_data(init_time, valid_time, out_accum, plane, "sum", "");
 
    return;
@@ -802,7 +803,7 @@ static int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          auto cur_var = VarInfoFactory::new_var_info(mtddf->file_type());
          if(!cur_var) {
-            delete mtddf;  mtddf = nullptr;
+            mtddf.reset();
             mlog << Warning << "search_pcp_dir() -> "
                  << "unable to determine filetype of \"" << cur_file
                  << "\"\n";
@@ -831,8 +832,7 @@ static int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          // Cleanup.
          //
-         if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) nullptr; }
-         if(cur_var) { delete cur_var; cur_var = (VarInfo *)       nullptr; }
+         mtddf.reset();
 
          // Check for a valid match
          if(i_rec != -1) {
@@ -969,7 +969,7 @@ static void do_sub_command() {
    //
    // Write output.
    //
-   if(!nc_out) open_nc(grid1);
+   if(!nc_out.get()) open_nc(grid1);
    write_nc_data(nc_init_time, nc_valid_time, nc_accum, diff,
                  "diff", "");
 
@@ -1178,7 +1178,7 @@ static void do_derive_command() {
    //
    // Open the output file, if needed.
    //
-   if(!nc_out) open_nc(grid);
+   if(!nc_out.get()) open_nc(grid);
 
    //
    // Loop through the derived fields.
@@ -1292,9 +1292,9 @@ static bool get_field(const char *filename,
                       Grid & grid,
                       DataPlane & plane,
                       bool error_out) {
-   Met2dDataFile *mtddf = nullptr;
+   std::unique_ptr<Met2dDataFile> mtddf;
    GrdFileType ftype;
-   VarInfo *cur_var = nullptr;
+   std::unique_ptr<VarInfo> cur_var;
    const char *method_name = "get_field() -> ";
 
    //
@@ -1404,8 +1404,7 @@ static bool get_field(const char *filename,
    //
    // Cleanup.
    //
-   if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) nullptr; }
-   if(cur_var) { delete cur_var; cur_var = (VarInfo *)       nullptr; }
+   mtddf.reset();
 
    //
    // Error out and exit, if requested.
@@ -1433,17 +1432,16 @@ static void open_nc(const Grid &grid) {
    // Create a new NetCDF file and open it.
    nc_out = open_ncfile(out_filename.c_str(), true);
 
-   if(IS_INVALID_NC_P(nc_out)) {
+   if(IS_INVALID_NC_P(nc_out.get())) {
       mlog << Error << "\nopen_nc() -> "
            << "trouble opening output file " << out_filename
            << "\n\n";
-      delete nc_out;
-      nc_out = (NcFile *) nullptr;
+      nc_out.reset();
       exit(1);
    }
 
    // Add global attributes.
-   write_netcdf_global(nc_out, out_filename.c_str(), program_name.c_str());
+   write_netcdf_global(nc_out.get(), out_filename.c_str(), program_name.c_str());
 
    if(run_command == RunCommand::sum) {
       command_str << cs_erase
@@ -1465,13 +1463,13 @@ static void open_nc(const Grid &grid) {
                   << n_files << " files.";
    }
 
-   add_att(nc_out, "RunCommand", command_str.c_str());
+   add_att(nc_out.get(), "RunCommand", command_str.c_str());
 
    // Add the projection information.
-   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(nc_out.get(), grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables.
-   write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+   write_netcdf_latlon(nc_out.get(), &lat_dim, &lon_dim, grid);
 
    return;
 }
@@ -1557,7 +1555,7 @@ static void write_nc_data(unixtime nc_init,
    if(deflate_level < 0) deflate_level = config.nc_compression();
 
    // Define variable.
-   nc_var = add_var(nc_out, var_str.c_str(), ncFloat,
+   nc_var = add_var(nc_out.get(), var_str.c_str(), ncFloat,
                     lat_dim, lon_dim, deflate_level);
 
    // Add variable attributes.
@@ -1623,8 +1621,8 @@ static void close_nc() {
    //
    // Clean up.
    //
-   if(nc_out)    { delete nc_out;   nc_out   = (NcFile *)  nullptr; }
-   if(var_info ) { delete var_info; var_info = (VarInfo *) nullptr; }
+   nc_out.reset();
+   var_info.reset();
 
    return;
 }

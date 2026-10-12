@@ -20,6 +20,7 @@
 #include "vx_color.h"
 #include "table_helper.h"
 #include "vx_log.h"
+#include <vector>
 
 using namespace std;
 
@@ -100,10 +101,6 @@ void TableHelper::init_from_scratch()
 
 {
 
-ColWidth = (double *) nullptr;
-
-RowHeight = (double *) nullptr;
-
 clear();
 
 return;
@@ -120,9 +117,9 @@ void TableHelper::clear()
 
 Plot = (PSfile *) nullptr;   //  not allocated, so don't delete
 
-if ( ColWidth )  { delete [] ColWidth;  ColWidth = (double *) nullptr; }
+ColWidth.clear();
 
-if ( RowHeight )  { delete [] RowHeight;  RowHeight = (double *) nullptr; }
+RowHeight.clear();
 
 Xpin = Ypin = Upin = Vpin = 0.0;
 
@@ -159,8 +156,8 @@ if ( (Nrows <= 0) || (Ncols <= 0) )  {
 int j;
 
 
-ColWidth  = new double [Ncols];
-RowHeight = new double [Nrows];
+ColWidth.resize(Ncols);
+RowHeight.resize(Nrows);
 
 for (j=0; j<Ncols; ++j)  ColWidth[j]  = default_col_width;
 for (j=0; j<Nrows; ++j)  RowHeight[j] = default_row_height;

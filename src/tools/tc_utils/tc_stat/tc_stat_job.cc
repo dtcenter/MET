@@ -50,8 +50,8 @@ static ConcatString build_map_key      (const char *, const TCStatLine &, const 
 //
 ////////////////////////////////////////////////////////////////////////
 
-TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
-   TCStatJob *job = (TCStatJob *) nullptr;
+std::unique_ptr<TCStatJob> TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
+   std::unique_ptr<TCStatJob> job;
    TCStatJobType type = TCStatJobType::None;
 
    // Determine the TCStatJobType
@@ -62,19 +62,19 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
    switch(type) {
 
       case TCStatJobType::Filter:
-         job = new TCStatJobFilter;
+         job = std::make_unique<TCStatJobFilter>();
          break;
 
       case TCStatJobType::Summary:
-         job = new TCStatJobSummary;
+         job = std::make_unique<TCStatJobSummary>();
          break;
 
       case TCStatJobType::RIRW:
-         job = new TCStatJobRIRW;
+         job = std::make_unique<TCStatJobRIRW>();
          break;
 
       case TCStatJobType::ProbRIRW:
-         job = new TCStatJobProbRIRW;
+         job = std::make_unique<TCStatJobProbRIRW>();
          break;
 
       case TCStatJobType::None:
@@ -89,8 +89,8 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TCStatJob *TCStatJobFactory::new_tc_stat_job(const char *jobstring) {
-   TCStatJob *job = (TCStatJob *) nullptr;
+std::unique_ptr<TCStatJob> TCStatJobFactory::new_tc_stat_job(const char *jobstring) {
+   std::unique_ptr<TCStatJob> job;
    StringArray a;
    ConcatString type_str = na_string;
    ConcatString err_str;
@@ -167,9 +167,9 @@ TCStatJob & TCStatJob::operator=(const TCStatJob &j) {
 
 void TCStatJob::init_from_scratch() {
 
-   DumpOut = (ofstream *) nullptr;
+   DumpOut.reset();
    JobOut  = (ofstream *) nullptr;
-   StatOut = (ofstream *) nullptr;
+   StatOut.reset();
 
    // Ignore case when performing comparisons
    AModel.set_ignore_case(1);
@@ -240,7 +240,7 @@ void TCStatJob::clear() {
 
    StatFile.clear();
    close_stat_file();
-   StatOut = (ofstream *) nullptr;
+   StatOut.reset();
    stat_row = 0;
 
    // Set to default values
@@ -1155,7 +1155,7 @@ void TCStatJob::open_dump_file() {
 
    if(DumpFile.empty()) return;
 
-   DumpOut = new ofstream;
+   DumpOut = std::make_unique<ofstream>();
    met_open(*DumpOut, DumpFile.c_str());
 
    if(!DumpOut) {
@@ -1178,8 +1178,7 @@ void TCStatJob::close_dump_file() {
            << "Creating output dump file: " << DumpFile << "\n";
 
       DumpOut->close();
-      delete DumpOut;
-      DumpOut = (ofstream *) nullptr;
+      DumpOut.reset();
    }
 
    return;
@@ -1195,7 +1194,7 @@ void TCStatJob::open_stat_file() {
 
    if(StatFile.empty()) return;
 
-   StatOut = new ofstream;
+   StatOut = std::make_unique<ofstream>();
    met_open(*StatOut, StatFile.c_str());
 
    if(!StatOut) {
@@ -1218,8 +1217,7 @@ void TCStatJob::close_stat_file() {
            << "Creating output statistics file: " << StatFile << "\n";
 
       StatOut->close();
-      delete StatOut;
-      StatOut = (ofstream *) nullptr;
+      StatOut.reset();
    }
 
    return;
@@ -1890,7 +1888,7 @@ void TCStatJobFilter::filter_tracks(TCPointCounts &n) {
             mlog << Debug(4)
                  << "Processing track pair: " << pair.case_info() << "\n";
 
-            if(DumpOut) dump_pair(pair, DumpOut, true);
+            if(DumpOut) dump_pair(pair, DumpOut.get(), true);
          }
       } // end while
    } // end else
@@ -1927,7 +1925,7 @@ void TCStatJobFilter::filter_lines(TCPointCounts &n) {
          // Check if this line should be kept
          if(!is_keeper_line(line, n)) continue;
 
-         if(DumpOut) dump_line(line, DumpOut, true);
+         if(DumpOut) dump_line(line, DumpOut.get(), true);
 
       } // end while
    } // end else
@@ -2231,7 +2229,7 @@ void TCStatJobSummary::summarize_tracks(TCPointCounts &n) {
             // Process the track pair info for the summary job
             process_pair(pair);
 
-            if(DumpOut) dump_pair(pair, DumpOut);
+            if(DumpOut) dump_pair(pair, DumpOut.get());
          }
       } // end while
    } // end else
@@ -2271,7 +2269,7 @@ void TCStatJobSummary::summarize_lines(TCPointCounts &n) {
          // Process the line for the summary job
          process_line(line);
 
-         if(DumpOut) dump_line(line, DumpOut);
+         if(DumpOut) dump_line(line, DumpOut.get());
 
       } // end while
    } // end else
@@ -2969,7 +2967,7 @@ TCStatJobRIRW & TCStatJobRIRW::operator=(const TCStatJobRIRW &j) {
 void TCStatJobRIRW::init_from_scratch() {
    int i;
 
-   for(i=0; i<4; i++) DumpOutCTC[i] = (ofstream *) nullptr;
+   for(i=0; i<4; i++) DumpOutCTC[i].reset();
 
    TCStatJob::init_from_scratch();
 
@@ -3067,7 +3065,7 @@ void TCStatJobRIRW::open_dump_file() {
    for(i=0; i<4; i++) {
 
       DumpFileCTC[i] << cs_erase << DumpFile << "_"  << category[i] << ".tcst";
-      DumpOutCTC[i] = new ofstream;
+      DumpOutCTC[i] = std::make_unique<ofstream>();
       DumpOutCTC[i]->open(DumpFileCTC[i].c_str());
 
       if(!DumpOutCTC[i]) {
@@ -3092,8 +3090,7 @@ void TCStatJobRIRW::close_dump_file() {
               << "Creating output dump file: " << DumpFileCTC[i] << "\n";
 
          DumpOutCTC[i]->close();
-         delete DumpOutCTC[i];
-         DumpOutCTC[i] = (ofstream *) nullptr;
+         DumpOutCTC[i].reset();
       }
    }
 
@@ -3311,10 +3308,10 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
             pair_pt.clear();
             pair_pt.add(*pair.tcmpr_line(i));
 
-                 if(a == 1 && b == 1) dump_pair(pair_pt, DumpOutCTC[0]);
-            else if(a == 1 && b == 0) dump_pair(pair_pt, DumpOutCTC[1]);
-            else if(a == 0 && b == 1) dump_pair(pair_pt, DumpOutCTC[2]);
-            else if(a == 0 && b == 0) dump_pair(pair_pt, DumpOutCTC[3]);
+                 if(a == 1 && b == 1) dump_pair(pair_pt, DumpOutCTC[0].get());
+            else if(a == 1 && b == 0) dump_pair(pair_pt, DumpOutCTC[1].get());
+            else if(a == 0 && b == 1) dump_pair(pair_pt, DumpOutCTC[2].get());
+            else if(a == 0 && b == 0) dump_pair(pair_pt, DumpOutCTC[3].get());
          }
       }
 
@@ -3998,7 +3995,7 @@ TCStatJobProbRIRW & TCStatJobProbRIRW::operator=(const TCStatJobProbRIRW &j) {
 
 void TCStatJobProbRIRW::init_from_scratch() {
 
-   StatOut = (ofstream *) nullptr;
+   StatOut.reset();
 
    TCStatJob::init_from_scratch();
 
@@ -4095,8 +4092,7 @@ void TCStatJobProbRIRW::close_dump_file() {
    // Close the current output dump file stream
    if(DumpOut) {
       DumpOut->close();
-      delete DumpOut;
-      DumpOut = (ofstream *) nullptr;
+      DumpOut.reset();
    }
 
    // Prepare nicely formatted AsciiTable object
@@ -4238,7 +4234,7 @@ void TCStatJobProbRIRW::do_job(const StringArray &file_list,
          process_pair(pair);
 
          if(DumpOut) {
-            dump_line(pair.line(), DumpOut);
+            dump_line(pair.line(), DumpOut.get());
             NDumpLines++;
          }
 

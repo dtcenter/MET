@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <iostream>
 
 #include "vx_config.h"
@@ -84,7 +85,7 @@ class GenEnsProdConfInfo {
       ConcatString         desc;            // Description
       ConcatString         control_id;      // Control ID
 
-      std::vector<GenEnsProdVarInfo *> ens_input;        // Vector of GenEnsProdVarInfo pointers (allocated)
+      std::vector<std::unique_ptr<GenEnsProdVarInfo>> ens_input;
       std::vector<ClimoCDFInfo>        cdf_info;         // Array of climo CDF info objects
       StringArray                      ens_member_ids;   // Array of ensemble member ID strings
 

@@ -108,7 +108,6 @@ am__v_AR_1 =
 libvx_shapedata_a_AR = $(AR) $(ARFLAGS)
 libvx_shapedata_a_LIBADD =
 am_libvx_shapedata_a_OBJECTS = libvx_shapedata_a-moments.$(OBJEXT) \
-	libvx_shapedata_a-node.$(OBJEXT) \
 	libvx_shapedata_a-shapedata.$(OBJEXT) \
 	libvx_shapedata_a-set.$(OBJEXT) \
 	libvx_shapedata_a-interest.$(OBJEXT) \
@@ -138,7 +137,6 @@ am__depfiles_remade = ./$(DEPDIR)/libvx_shapedata_a-engine.Po \
 	./$(DEPDIR)/libvx_shapedata_a-mode_conf_info.Po \
 	./$(DEPDIR)/libvx_shapedata_a-mode_field_info.Po \
 	./$(DEPDIR)/libvx_shapedata_a-moments.Po \
-	./$(DEPDIR)/libvx_shapedata_a-node.Po \
 	./$(DEPDIR)/libvx_shapedata_a-set.Po \
 	./$(DEPDIR)/libvx_shapedata_a-shapedata.Po
 am__mv = mv -f
@@ -356,7 +354,6 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LIBRARIES = libvx_shapedata.a
 libvx_shapedata_a_SOURCES = \
               moments.cc moments.h \
-              node.cc node.h \
               shape.h \
               shapedata.cc shapedata.h \
               set.cc set.h \
@@ -424,7 +421,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_shapedata_a-mode_conf_info.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_shapedata_a-mode_field_info.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_shapedata_a-moments.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_shapedata_a-node.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_shapedata_a-set.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_shapedata_a-shapedata.Po@am__quote@ # am--include-marker
 
@@ -461,20 +457,6 @@ libvx_shapedata_a-moments.obj: moments.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='moments.cc' object='libvx_shapedata_a-moments.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_shapedata_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_shapedata_a-moments.obj `if test -f 'moments.cc'; then $(CYGPATH_W) 'moments.cc'; else $(CYGPATH_W) '$(srcdir)/moments.cc'; fi`
-
-libvx_shapedata_a-node.o: node.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_shapedata_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_shapedata_a-node.o -MD -MP -MF $(DEPDIR)/libvx_shapedata_a-node.Tpo -c -o libvx_shapedata_a-node.o `test -f 'node.cc' || echo '$(srcdir)/'`node.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_shapedata_a-node.Tpo $(DEPDIR)/libvx_shapedata_a-node.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='node.cc' object='libvx_shapedata_a-node.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_shapedata_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_shapedata_a-node.o `test -f 'node.cc' || echo '$(srcdir)/'`node.cc
-
-libvx_shapedata_a-node.obj: node.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_shapedata_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_shapedata_a-node.obj -MD -MP -MF $(DEPDIR)/libvx_shapedata_a-node.Tpo -c -o libvx_shapedata_a-node.obj `if test -f 'node.cc'; then $(CYGPATH_W) 'node.cc'; else $(CYGPATH_W) '$(srcdir)/node.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_shapedata_a-node.Tpo $(DEPDIR)/libvx_shapedata_a-node.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='node.cc' object='libvx_shapedata_a-node.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_shapedata_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_shapedata_a-node.obj `if test -f 'node.cc'; then $(CYGPATH_W) 'node.cc'; else $(CYGPATH_W) '$(srcdir)/node.cc'; fi`
 
 libvx_shapedata_a-shapedata.o: shapedata.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_shapedata_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_shapedata_a-shapedata.o -MD -MP -MF $(DEPDIR)/libvx_shapedata_a-shapedata.Tpo -c -o libvx_shapedata_a-shapedata.o `test -f 'shapedata.cc' || echo '$(srcdir)/'`shapedata.cc
@@ -704,7 +686,6 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libvx_shapedata_a-mode_conf_info.Po
 	-rm -f ./$(DEPDIR)/libvx_shapedata_a-mode_field_info.Po
 	-rm -f ./$(DEPDIR)/libvx_shapedata_a-moments.Po
-	-rm -f ./$(DEPDIR)/libvx_shapedata_a-node.Po
 	-rm -f ./$(DEPDIR)/libvx_shapedata_a-set.Po
 	-rm -f ./$(DEPDIR)/libvx_shapedata_a-shapedata.Po
 	-rm -f Makefile
@@ -758,7 +739,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libvx_shapedata_a-mode_conf_info.Po
 	-rm -f ./$(DEPDIR)/libvx_shapedata_a-mode_field_info.Po
 	-rm -f ./$(DEPDIR)/libvx_shapedata_a-moments.Po
-	-rm -f ./$(DEPDIR)/libvx_shapedata_a-node.Po
 	-rm -f ./$(DEPDIR)/libvx_shapedata_a-set.Po
 	-rm -f ./$(DEPDIR)/libvx_shapedata_a-shapedata.Po
 	-rm -f Makefile

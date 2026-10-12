@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <iostream>
 #include <map>
 
@@ -180,8 +181,8 @@ class TCStatJob;
 
 class TCStatJobFactory {
    public:
-      static TCStatJob *new_tc_stat_job_type(const char *type_str);
-      static TCStatJob *new_tc_stat_job(const char *jobstring);
+      static std::unique_ptr<TCStatJob> new_tc_stat_job_type(const char *type_str);
+      static std::unique_ptr<TCStatJob> new_tc_stat_job(const char *jobstring);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -329,12 +330,12 @@ class TCStatJob {
 
       // Variables to the store the analysis job specification
       ConcatString DumpFile;             // Dump TrackPairInfo used to a file
-      std::ofstream    *DumpOut;         // Dump output file stream
+      std::unique_ptr<std::ofstream> DumpOut;   // Dump output file stream
       std::ofstream    *JobOut;          // Job output file stream (not allocated)
 
       // Derived output statistics
       ConcatString StatFile;             // File name for output statistics
-      std::ofstream    *StatOut;         // Output statistics file stream
+      std::unique_ptr<std::ofstream> StatOut;   // Output statistics file stream
       AsciiTable  stat_at;               // AsciiTable for buffering output STAT data
       int         stat_row;              // Counter for the current stat row
 
@@ -479,7 +480,7 @@ class TCStatJobRIRW : public TCStatJob {
       void assign(const TCStatJobRIRW &);
 
       ConcatString DumpFileCTC[4];
-      std::ofstream    *DumpOutCTC[4];
+      std::unique_ptr<std::ofstream> DumpOutCTC[4];
 
    public:
 

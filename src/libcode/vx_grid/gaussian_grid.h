@@ -17,6 +17,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
+
 #include "grid_base.h"
 
 #include "gaussian_grid_defs.h"
@@ -29,11 +31,23 @@ class GaussianGrid : public GridRep {
 
       friend class Grid;
 
+         //
+         //  Key is private, so only Grid and GaussianGrid itself can create
+         //  one.  It lets the constructors below be public - which is
+         //  what std::make_unique needs - without opening grid
+         //  construction up to the rest of the code.
+         //
+
+      struct Key { explicit Key() = default; };
+
+   public:
+
+     ~GaussianGrid();
+      GaussianGrid(const GaussianData &, Key);
+
    private:
 
       GaussianGrid();
-     ~GaussianGrid();
-      GaussianGrid(const GaussianData &);
 
       int Nx;
       int Ny;
@@ -42,7 +56,7 @@ class GaussianGrid : public GridRep {
 
       double Delta_Lon;
 
-      double * Latitudes;   //  allocated, increasing order (ie, south to north)
+      std::vector<double> Latitudes;   //  increasing order (ie, south to north)
 
       ConcatString Name;
 
@@ -81,7 +95,7 @@ class GaussianGrid : public GridRep {
 
       void shift_right(int);
 
-      GridRep * copy() const;
+      std::unique_ptr<GridRep> copy() const;
 
 };
 

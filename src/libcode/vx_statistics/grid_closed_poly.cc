@@ -156,14 +156,14 @@ int GridClosedPoly::is_inside(double u_test, double v_test) const {
 
 bool GridClosedPolyArray::is_inside(double u_test, double v_test) const {
 
-   if(Nelements == 0) return false;
+   if(n_elements() == 0) return false;
 
    int j, status;
 
    //
    // return true if the test point is inside **ANY** of the polylines
    //
-   for(j=0; j<Nelements; j++) {
+   for(j=0; j<n_elements(); j++) {
 
       status = e[j]->is_inside(u_test, v_test);
 

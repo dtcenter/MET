@@ -69,7 +69,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-StereographicGrid::StereographicGrid(const StereographicData & data)
+StereographicGrid::StereographicGrid(const StereographicData & data, Key)
 
 {
 
@@ -204,14 +204,13 @@ if(is_eq(Data.eccentricity, 0.0)) {
    y = By - Alpha*r*H*cosd(theta);
 }
 else {
-   double delta_sign;
    st_latlon_to_xy_func(lat, -lon, x, y, Data.scale_factor, (Data.lon_orient*-1.0),
                         (Data.r_km*m_per_km), Data.false_east, Data.false_north,
                         Data.eccentricity, IsNorthHemisphere);
-   delta_sign = ((Data.d_km > 0) ? 1.0 : -1.0 );
-   x = delta_sign * ((x / (fabs(Data.d_km)*m_per_km)) - Data.x_pin);    // meters to index
-   delta_sign = ((Data.dy_km > 0) ? 1.0 : -1.0 );
-   y = delta_sign * ((y / (fabs(Data.dy_km)*m_per_km)) - Data.y_pin);   // meters to index
+   // Use fabs() since x_pin/y_pin are defined relative to the internal
+   // (possibly swapped) index direction, not the raw coordinate sign.
+   x = (x / (fabs(Data.d_km)*m_per_km)) - Data.x_pin;    // meters to index
+   y = (y / (fabs(Data.dy_km)*m_per_km)) - Data.y_pin;   // meters to index
 }
 
 }
@@ -244,8 +243,10 @@ if(is_eq(Data.eccentricity, 0.0)) {
    lon = Lon_orient - theta;
 }
 else {
-   double x1 = (Data.x_pin + x) * (Data.d_km*m_per_km);     // index to meters
-   double y1 = (Data.y_pin + y) * (Data.dy_km*m_per_km);    // index to meters
+   // Use fabs() since x_pin/y_pin are defined relative to the internal
+   // (possibly swapped) index direction, not the raw coordinate sign.
+   double x1 = (Data.x_pin + x) * (fabs(Data.d_km)*m_per_km);     // index to meters
+   double y1 = (Data.y_pin + y) * (fabs(Data.dy_km)*m_per_km);    // index to meters
    st_xy_to_latlon_func(x1, y1, lat, lon, Data.scale_factor, (Data.r_km*m_per_km),
                         (-1.0*Data.lon_orient), Data.false_east, Data.false_north,
                         Data.eccentricity, IsNorthHemisphere);
@@ -332,48 +333,6 @@ for (j=0; j<n; ++j)  {
 }   //  for j
 
 sum = fabs(sum);
-
-return sum;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double StereographicGrid::xy_closedpolyline_area(const double *x, const double *y, int n) const
-
-{
-
-int j;
-double sum;
-double *u = (double *) nullptr;
-double *v = (double *) nullptr;
-
-u = new double [n];
-v = new double [n];
-
-if ( !u || !v )  {
-
-   mlog << Error << "\nStereographicGrid::xy_closedpolyline_area() -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for (j=0; j<n; ++j)  {
-
-   xy_to_uv(x[j], y[j], u[j], v[j]);
-
-}
-
-sum = uv_closedpolyline_area(u, v, n);
-
-sum *= earth_radius_km*earth_radius_km;
-
-delete [] u;  u = (double *) nullptr;
-delete [] v;  v = (double *) nullptr;
 
 return sum;
 
@@ -584,11 +543,11 @@ exit ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * StereographicGrid::copy() const
+std::unique_ptr<GridRep> StereographicGrid::copy() const
 
 {
 
-auto * p = new StereographicGrid (Data);
+auto p = std::make_unique<StereographicGrid>(Data, Key{});
 
 p->Name = Name;
 
@@ -871,16 +830,8 @@ void Grid::set(const StereographicData & data)
 
 clear();
 
-rep = new StereographicGrid (data);
+rep = std::make_unique<StereographicGrid>(data, StereographicGrid::Key{});
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const StereographicData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 

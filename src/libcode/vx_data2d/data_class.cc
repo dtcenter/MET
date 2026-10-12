@@ -115,9 +115,6 @@ void Met2dDataFile::mtddf_init_from_scratch()
 
 {
 
-Raw_Grid  = (Grid *) nullptr;
-Dest_Grid = (Grid *) nullptr;
-
 ShiftRight = 0;
 GridShifted = false;
 
@@ -133,8 +130,8 @@ void Met2dDataFile::mtddf_clear()
 
 {
 
-if ( Raw_Grid  )  { delete Raw_Grid;   Raw_Grid  = (Grid *) nullptr; }
-if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = (Grid *) nullptr; }
+Raw_Grid.reset();
+Dest_Grid.reset();
 
 Filename.clear();
 
@@ -279,9 +276,7 @@ mlog << Debug(3) << "Resetting grid definition from \""
 
   }
 
-if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = nullptr; }
-
-Dest_Grid = new Grid;
+Dest_Grid = std::make_unique<Grid>();
 
 (*Dest_Grid) = grid;
 
@@ -306,9 +301,7 @@ if ( ! Raw_Grid )  {
 
 }
 
-if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = nullptr; }
-
-Dest_Grid = new Grid;
+Dest_Grid = std::make_unique<Grid>();
 
 (*Dest_Grid) = (*Raw_Grid);
 
@@ -320,7 +313,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-int Met2dDataFile::data_planes(vector<VarInfo*> &vi_list,
+int Met2dDataFile::data_planes(const vector<std::unique_ptr<VarInfo>> &vi_list,
                                vector<DataPlane> &dp_list)
 
 {

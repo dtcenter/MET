@@ -84,7 +84,7 @@ class MetGrib2DataFile : public Met2dDataFile {
 
       FILE *FileGrib2;
 
-      std::vector<Grib2Record*> RecList;
+      std::vector<std::unique_ptr<Grib2Record>> RecList;
 
       int ScanMode;
 

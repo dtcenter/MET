@@ -17,6 +17,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <cmath>
+#include <iterator>
 
 #include "vx_util.h"
 #include "vx_log.h"
@@ -32,7 +33,7 @@ static const int ships_wdth[] = {
    5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
    5, 5, 5, 5
 };
-static int n_ships_wdth = sizeof(ships_wdth)/sizeof(*ships_wdth);
+static int n_ships_wdth = std::size(ships_wdth);
 
 static const int cira_fill_value  = 9999;
 static const int ships_fill_value = 9999;

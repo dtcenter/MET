@@ -29,10 +29,10 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-void open_tc_txt_file(ofstream *&out, const char *file_name) {
+void open_tc_txt_file(std::unique_ptr<std::ofstream> &out, const char *file_name) {
 
    // Create and open the output file stream
-   out = new ofstream;
+   out = std::make_unique<std::ofstream>();
    out->open(file_name);
 
    if(!(*out)) {
@@ -49,7 +49,7 @@ void open_tc_txt_file(ofstream *&out, const char *file_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void close_tc_txt_file(ofstream *&out, const char *file_name) {
+void close_tc_txt_file(std::unique_ptr<std::ofstream> &out, const char *file_name) {
 
    // List the file being closed
    mlog << Debug(1)
@@ -57,8 +57,7 @@ void close_tc_txt_file(ofstream *&out, const char *file_name) {
 
    // Close the output file
    out->close();
-   delete out;
-   out = (ofstream *) nullptr;
+   out.reset();
 
    return;
 }

@@ -170,7 +170,7 @@ void process_search_dirs() {
 
 void process_jobs() {
    TCStatJobFactory factory;
-   TCStatJob *cur_job = (TCStatJob *) nullptr;
+   std::unique_ptr<TCStatJob> cur_job;
    ConcatString jobstring;
    int i, n_jobs;
    TCPointCounts n;
@@ -205,7 +205,7 @@ void process_jobs() {
       cur_job = factory.new_tc_stat_job(jobstring.c_str());
       if (cur_job) {
          // Set the job output file stream
-         cur_job->JobOut = tc_stat_out;
+         cur_job->JobOut = tc_stat_out.get();
 
          // Set the output precision
          cur_job->set_precision(conf_info.Conf.output_precision());
@@ -263,7 +263,6 @@ void process_jobs() {
            << "Rejected for out valid mask      = " << n.RejOutValidMask   << "\n";
 
       // Deallocate current job
-      if(cur_job) { delete cur_job; cur_job = (TCStatJob *) nullptr; }
 
    } // end for i
 
@@ -280,7 +279,7 @@ void open_out_file() {
    if(out_file.empty()) return;
 
    // Create an output file and point to it
-   tc_stat_out = new ofstream;
+   tc_stat_out = std::make_unique<std::ofstream>();
    tc_stat_out->open(out_file.c_str());
 
    if(!(*tc_stat_out)) {
@@ -298,7 +297,7 @@ void open_out_file() {
 void close_out_file() {
 
    // Close the output file
-   if(tc_stat_out != (ofstream *) nullptr) {
+   if(tc_stat_out) {
 
       // List the file being closed
       mlog << Debug(1)
@@ -306,8 +305,7 @@ void close_out_file() {
 
       // Close the output file
       tc_stat_out->close();
-      delete tc_stat_out;
-      tc_stat_out = (ofstream *) nullptr;
+      tc_stat_out.reset();
    }
 
    return;

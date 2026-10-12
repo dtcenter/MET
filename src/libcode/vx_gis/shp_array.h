@@ -32,6 +32,7 @@
 
 #include "vx_util.h"
 #include "vx_log.h"
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -49,13 +50,9 @@ class Shp_Array {
 
 
 
-      int Nelements;
-
-      int Nalloc;
-
       int AllocInc;
 
-      T * E;
+      std::vector<T> E;
 
    public:
 
@@ -66,11 +63,9 @@ class Shp_Array {
       Shp_Array(const Shp_Array <T> & _a) { init_from_scratch();  assign(_a); }
 
       Shp_Array(Shp_Array <T> && _a) noexcept
-         : Nelements(_a.Nelements), Nalloc(_a.Nalloc), AllocInc(_a.AllocInc), E(_a.E) {
+         : AllocInc(_a.AllocInc), E(std::move(_a.E)) {
 
-         _a.E = (T *) nullptr;
-         _a.Nelements = 0;
-         _a.Nalloc = 0;
+         _a.E.clear();
 
       }
 
@@ -90,14 +85,10 @@ class Shp_Array {
 
          clear();
 
-         Nelements = _a.Nelements;
-         Nalloc    = _a.Nalloc;
          AllocInc  = _a.AllocInc;
-         E         = _a.E;
+         E         = std::move(_a.E);
 
-         _a.E = (T *) nullptr;
-         _a.Nelements = 0;
-         _a.Nalloc = 0;
+         _a.E.clear();
 
          return *this;
 
@@ -123,9 +114,9 @@ class Shp_Array {
          //  get stuff
          //
 
-      int n() const { return Nelements; }
+      int n() const { return (int) E.size(); }
 
-      int n_elements() const { return Nelements; }
+      int n_elements() const { return (int) E.size(); }
 
          //
          //  do stuff
@@ -151,8 +142,6 @@ void Shp_Array<T>::init_from_scratch()
 
 {
 
-E = (T *) nullptr;
-
 AllocInc = 25;   //  default value
 
 clear();
@@ -171,13 +160,7 @@ void Shp_Array<T>::clear()
 
 {
 
-if ( E )  { delete [] E;  E = (T *) nullptr; }
-
-
-
-Nelements = 0;
-
-Nalloc = 0;
+E.clear();
 
 // AllocInc = 25;   //  don't reset AllocInc
 
@@ -216,39 +199,13 @@ void Shp_Array<T>::extend(int N, bool exact)
 
 {
 
-if ( N <= Nalloc )  return;
-
 if ( ! exact )  {
 
    N = AllocInc*( (N + AllocInc - 1)/AllocInc );
 
 }
 
-int j;
-T * u = new T [N];
-
-if ( !u )  {
-
-   mlog << Error << "Shp_Array::extend(int, bool) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for(j=0; j<Nelements; ++j)  {
-
-   u[j] = E[j];
-
-}
-
-if ( E )  { delete [] E;  E = (T *) nullptr; }
-
-E = u;
-
-u = (T *) nullptr;
-
-Nalloc = N;
+E.reserve(N);
 
 return;
 
@@ -266,14 +223,14 @@ void Shp_Array<T>::dump(std::ostream & out, int depth) const
 
 Indent prefix(depth);
 
-out << prefix << "Nelements = " << Nelements << "\n";
-out << prefix << "Nalloc    = " << Nalloc    << "\n";
+out << prefix << "(int) E.size() = " << E.size() << "\n";
+out << prefix << "Nalloc    = " << E.capacity() << "\n";
 out << prefix << "AllocInc  = " << AllocInc  << "\n";
 
 
 int j;
 
-for(j=0; j<Nelements; ++j)  {
+for(j=0; j<(int) E.size(); ++j)  {
 
    out << prefix << "Element # " << j << " ... \n";
 
@@ -333,7 +290,7 @@ if ( N < 0 )  {
 
 }
 
-Nelements = N;
+E.resize(N);
 
 return;
 
@@ -349,9 +306,7 @@ void Shp_Array<T>::add(const T & a)
 
 {
 
-extend(Nelements + 1, false);
-
-E[Nelements++] = a;
+E.push_back(a);
 
 return;
 
@@ -369,7 +324,7 @@ void Shp_Array<T>::add(const Shp_Array<T> & a)
 
 int j;
 
-extend(Nelements + a.n_elements());
+extend((int) E.size() + a.n_elements());
 
 for (j=0; j<(a.n_elements()); ++j)  {
 
@@ -391,7 +346,7 @@ const T Shp_Array<T>::operator[](int N) const
 
 {
 
-if ( (N < 0) || (N >= Nelements) )  {
+if ( (N < 0) || (N >= (int) E.size()) )  {
 
    mlog << Error << "\n\n  Shp_Array::operator[](int) -> "
         << "range check error ... " << N << "\n\n";
@@ -413,7 +368,7 @@ T * Shp_Array<T>::buf() const
 
 {
 
-return E;
+return const_cast<T *>(E.data());
 
 }
 

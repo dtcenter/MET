@@ -122,7 +122,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 
       // build the grid template
       GridTemplateFactory gtf;
-      GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
+      auto gt = gtf.buildGT(shape, width, wrap_lon);
 
 #pragma omp single
    {
@@ -184,7 +184,6 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
       } // end for x
 
       // Cleanup
-      delete gt;
 
    } // End omp parallel
 
@@ -294,7 +293,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 
      // Build the grid template
      GridTemplateFactory gtf;
-     GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
+     auto gt = gtf.buildGT(shape, width, wrap_lon);
 
 #pragma omp single
      {
@@ -387,7 +386,6 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 
      } // end for x
 
-     delete gt;
 
    } // End of omp parallel
 

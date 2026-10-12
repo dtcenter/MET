@@ -726,7 +726,7 @@ void LineDataFile::init_from_scratch()
 
 {
 
-in = (ifstream *) nullptr;
+in.reset();
 
 Last_Line_Number = 0;
 
@@ -749,7 +749,7 @@ int LineDataFile::open(const char * path)
 
 close();
 
-in = new ifstream;
+in = std::make_unique<std::ifstream>();
 
 if ( !in )  {
 
@@ -799,7 +799,7 @@ if ( in )  {
 
    in->close();
 
-   delete in;  in = (ifstream *) nullptr;
+   in.reset();
 
 }
 

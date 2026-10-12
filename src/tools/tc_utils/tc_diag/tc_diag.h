@@ -23,6 +23,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -111,6 +112,25 @@ class TmpFileInfo {
       TmpFileInfo();
       ~TmpFileInfo();
 
+         //
+         //  process_track_points() does tmp_file_map[key] = std::move(info),
+         //  so the move assignment is needed; map::operator[] default
+         //  constructs in place, so a move constructor is not.  A defaulted one
+         //  would in any case be deleted, because the ra_grid member is a
+         //  RngAziGrid whose copy constructor is deleted by GridRep's being
+         //  inaccessible.
+         //
+         //  noexcept is declared rather than deduced.  The deduced
+         //  specification is potentially throwing, because assigning ra_grid
+         //  falls back to RngAziGrid's copy assignment and grid_out is a Grid,
+         //  which deep copies its GridRep; both allocate.  The only exception
+         //  that can produce is std::bad_alloc, which no MET tool can ever
+         //  observe: met_main() calls set_handlers(), whose
+         //  set_new_handler(oom) exits the process before operator new throws.
+         //
+
+      TmpFileInfo & operator=(TmpFileInfo &&) noexcept = default;
+
       //////////////////////////////////////////////////////////////////
 
       // Track information
@@ -148,7 +168,7 @@ class TmpFileInfo {
 
       // NetCDF Cylindrical Coordinates output
       ConcatString    tmp_file;
-      netCDF::NcFile *tmp_out;
+      std::unique_ptr<netCDF::NcFile> tmp_out;
 
       // NetCDF Dimensions
       netCDF::NcDim trk_dim;
@@ -228,7 +248,7 @@ class OutFileInfo {
 
       // NetCDF Diagnostics output
       ConcatString    nc_diag_file;
-      netCDF::NcFile *nc_diag_out;
+      std::unique_ptr<netCDF::NcFile> nc_diag_out;
 
       // NetCDF Dimensions
       netCDF::NcDim vld_dim;
@@ -236,11 +256,11 @@ class OutFileInfo {
 
       // CIRA Diagnostics output
       ConcatString   cira_diag_file;
-      std::ofstream *cira_diag_out;
+      std::unique_ptr<std::ofstream> cira_diag_out;
 
       void clear();
 
-      netCDF::NcFile *setup_nc_file(const std::string &);
+      std::unique_ptr<netCDF::NcFile> setup_nc_file(const std::string &);
       void add_tmp_file_info(const TmpFileInfo &, const StringArray &, int);
       void write_nc_diag();
       void write_nc_domain_info(const DomainInfo &);

@@ -92,8 +92,6 @@ void SingleAtt3DArray::init_from_scratch()
 
 {
 
-e = (SingleAtt3D *) nullptr;
-
 AllocInc = 100;   //  default value
 
 clear();
@@ -110,11 +108,7 @@ void SingleAtt3DArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (SingleAtt3D *) nullptr; }
-
-Nelements = 0;
-
-Nalloc = 0;
+e.clear();
 
 
 return;
@@ -143,61 +137,19 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void SingleAtt3DArray::extend(int N)
-
-{
-
-if ( N <= Nalloc )  return;
-
-N = AllocInc*( (N + AllocInc - 1)/AllocInc );
-
-int j;
-SingleAtt3D * u = new SingleAtt3D [N];
-
-if ( !u )  {
-
-   mlog << Error << "\nSingleAtt3DArray::extend(int) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for(j=0; j<Nelements; ++j)  {
-
-   u[j] = e[j];
-
-}
-
-if ( e )  { delete [] e;  e = (SingleAtt3D *) nullptr; }
-
-e = u;
-
-u = (SingleAtt3D *) nullptr;
-
-Nalloc = N;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void SingleAtt3DArray::dump(ostream & out, int depth) const
 
 {
 
 Indent prefix(depth);
 
-out << prefix << "Nelements = " << Nelements << "\n";
-out << prefix << "Nalloc    = " << Nalloc    << "\n";
+out << prefix << "Nelements = " << e.size() << "\n";
+out << prefix << "Nalloc    = " << e.capacity() << "\n";
 out << prefix << "AllocInc  = " << AllocInc  << "\n";
 
 int j;
 
-for(j=0; j<Nelements; ++j)  {
+for(j=0; j<(int) e.size(); ++j)  {
 
    out << prefix << "Element # " << j << " ... \n";
 
@@ -243,9 +195,7 @@ void SingleAtt3DArray::add(const SingleAtt3D & a)
 
 {
 
-extend(Nelements + 1);
-
-e[Nelements++] = a;
+e.push_back(a);
 
 return;
 
@@ -261,7 +211,7 @@ void SingleAtt3DArray::add(const SingleAtt3DArray & a)
 
 int j;
 
-extend(Nelements + a.n_elements());
+e.reserve(e.size() + a.n_elements());
 
 for (j=0; j<(a.n_elements()); ++j)  {
 
@@ -281,7 +231,7 @@ SingleAtt3D & SingleAtt3DArray::operator[](int N) const
 
 {
 
-if ( (N < 0) || (N >= Nelements) )  {
+if ( (N < 0) || (N >= (int) e.size()) )  {
 
    mlog << Error << "\nSingleAtt3DArray::operator[](int) -> "
         << "range check error ... " << N << "\n\n";
@@ -289,7 +239,7 @@ if ( (N < 0) || (N >= Nelements) )  {
    exit ( 1 );
 }
 
-return ( e[N] );
+return const_cast<SingleAtt3D &>( e[N] );
 
 }
 
@@ -303,7 +253,7 @@ void SingleAtt3DArray::patch_cluster_numbers(const MM_Engine & engine)
 
 int j, s_id, c_id;
 
-for (j=0; j<Nelements; ++j)  {
+for (j=0; j<(int) e.size(); ++j)  {
 
    s_id = e[j].object_number();   //  1-based
 

@@ -34,6 +34,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <fstream>
 #include <dirent.h>
 #include <sys/types.h>
@@ -59,7 +60,7 @@ static const char * default_config_filename = "MET_BASE/config/MODEAnalysisConfi
 
 static ConcatString config_filename;
 
-static BasicModeAnalysisJob * job = (BasicModeAnalysisJob *) nullptr;
+static std::unique_ptr<BasicModeAnalysisJob> job;
 
 static ModeAttributes config_atts;
 
@@ -71,9 +72,9 @@ static StringArray mode_files;
 
 static StringArray lookin_dirs;
 
-static ofstream * dumpfile = (ofstream *) nullptr;
+static std::unique_ptr<ofstream> dumpfile;
 
-static ofstream * outfile  = (ofstream *) nullptr;
+static std::unique_ptr<ofstream> outfile;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -167,8 +168,8 @@ if ( config_filename.length() > 0 )  {
 
 }
 
-if ( dumpfile )  job->dumpfile = dumpfile;
-if ( outfile  )  job->outfile  = outfile;
+if ( dumpfile )  job->dumpfile = dumpfile.get();
+if ( outfile  )  job->outfile  = outfile.get();
 
 job->do_job(mode_files);
 
@@ -182,8 +183,8 @@ job->clear();
    //  done
    //
 
-if ( dumpfile )  { delete dumpfile;  dumpfile = (ofstream *) nullptr; }
-if ( outfile  )  { delete  outfile;   outfile = (ofstream *) nullptr; }
+dumpfile.reset();
+outfile.reset();
 
 return 0;
 
@@ -410,7 +411,7 @@ if ( job )  {
 
 }
 
-job = new SummaryJob;
+job = std::make_unique<SummaryJob>();
 
 
 return;
@@ -433,7 +434,7 @@ if ( job )  {
 
 }
 
-job = new ByCaseJob;
+job = std::make_unique<ByCaseJob>();
 
 
 return;
@@ -502,7 +503,7 @@ if ( dumpfile )  {
 
 }
 
-dumpfile = new ofstream;
+dumpfile = std::make_unique<ofstream>();
 
 dumpfile->open(path);
 
@@ -535,7 +536,7 @@ if ( outfile )  {
 
 }
 
-outfile = new ofstream;
+outfile = std::make_unique<ofstream>();
 
 outfile->open(path);
 

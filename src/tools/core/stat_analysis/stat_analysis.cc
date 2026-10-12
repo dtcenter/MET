@@ -435,7 +435,7 @@ static void set_out_file(const char *path) {
    //
    // Create an output file and set the sa_out ofstream to it.
    //
-   sa_out = new ofstream;
+   sa_out = std::make_unique<std::ofstream>();
    sa_out->open(out_file.c_str());
 
    if(!(*sa_out)) {
@@ -557,7 +557,7 @@ static void process_stat_file(const char *filename, const STATAnalysisJob &job,
 
 static StringArray process_python(const STATAnalysisJob & job) {
 
-   auto *pldf = new PyLineDataFile;
+   auto pldf = std::make_unique<PyLineDataFile>();
 
    if(!pldf->open(user_script_path.c_str(), user_script_args)) {
       mlog << Error << "\nprocess_python() -> "
@@ -566,7 +566,7 @@ static StringArray process_python(const STATAnalysisJob & job) {
       throw 1;
    }
 
-   LineDataFile *f = pldf;
+   LineDataFile *f = pldf.get();
 
    open_temp_file();
 
@@ -587,7 +587,6 @@ static StringArray process_python(const STATAnalysisJob & job) {
 
    f->close();
 
-   if(pldf) { delete pldf; pldf = (PyLineDataFile *) nullptr; }
 
    StringArray sa;
    sa.add(tmp_path);
@@ -674,7 +673,7 @@ static void process_job(const char * jobstring, int n_job,
    //
    // Do the job
    //
-   do_job(full_jobstring, job_input_files, job, n_job, tmp_dir, sa_out);
+   do_job(full_jobstring, job_input_files, job, n_job, tmp_dir, sa_out.get());
 
    return;
 }

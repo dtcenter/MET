@@ -19,6 +19,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 #include "fo_node.h"
 
@@ -34,16 +35,9 @@ class FO_Node_Array {
 
       void assign(const FO_Node_Array &);
 
-      void extend(int);
-
-
-      int Nelements;
-
-      int Nalloc;
-
       int AllocInc;
 
-      FO_Node * e;
+      std::vector<FO_Node> e;
 
 
    public:
@@ -74,8 +68,8 @@ class FO_Node_Array {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int FO_Node_Array::n_elements() const { return Nelements; }
-inline int FO_Node_Array::n         () const { return Nelements; }
+inline int FO_Node_Array::n_elements() const { return (int) e.size(); }
+inline int FO_Node_Array::n         () const { return (int) e.size(); }
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -1522,7 +1522,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
 
    for(int i=0; i<pd->n_obs; i++) {
       if (i >= pd->seeps_mpr.size()) break;
-      seeps_mpr = pd->seeps_mpr[i];
+      seeps_mpr = pd->seeps_mpr[i].get();
       if (!seeps_mpr || is_eq(seeps_mpr->score, bad_data_double)) continue;
 
       count++;
@@ -1729,7 +1729,7 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
               << obs_value << " " << fcst_value << "\n";
 
          if (!is_bad_data(fcst_value) && !is_bad_data(obs_value)) {
-            SeepsScore *seeps_mpr = seeps_climo->get_record(ix, iy, fcst_value, obs_value);
+            auto seeps_mpr = seeps_climo->get_record(ix, iy, fcst_value, obs_value);
             if (seeps_mpr != nullptr) {
                fcst_cat = seeps_mpr->fcst_cat;
                obs_cat = seeps_mpr->obs_cat;
@@ -1775,7 +1775,6 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
                        << seeps_score_partial_sum << " " << seeps_mpr->s_idx << "\n";
                }
 
-               if(seeps_mpr) { delete seeps_mpr; seeps_mpr = nullptr; }
             }
          }
          seeps_dp.set(seeps_score, ix, iy);
@@ -1876,7 +1875,7 @@ void compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps,
    seeps_idx = 0;
    for(int i=0; i<pd->n_obs; i++) {
       if (i >= pd->seeps_mpr.size()) break;
-      seeps_mpr = pd->seeps_mpr[i];
+      seeps_mpr = pd->seeps_mpr[i].get();
       mlog << Debug(9) << method_name
            << "seeps_idx, seeps_mpr => "
            << seeps_idx << " " << seeps_mpr << "\n";

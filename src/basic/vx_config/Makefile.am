@@ -51,6 +51,23 @@ libvx_config_a_CPPFLAGS = ${MET_CPPFLAGS}
 # in a distribution because the enum_to_string utility isn't available.
 
 if ENABLE_DEVELOPMENT
+
+# BUILT_SOURCES so these are generated before anything that
+# includes them is compiled.  Without it, a development build
+# whose .deps are empty - as after the make clean that removes
+# these very files - compiles sources in _SOURCES order and can
+# reach a consumer before its header has been generated.
+# config.tab.cc is named rather than config.tab.h because only
+# the .cc has a rule; automake emits the header as a side effect.
+
+BUILT_SOURCES = config.tab.cc \
+                celltype_to_string.cc \
+                celltype_to_string.h \
+                configobjecttype_to_string.cc \
+                configobjecttype_to_string.h \
+                grdfiletype_to_string.cc \
+                grdfiletype_to_string.h
+
 configobjecttype_to_string.cc configobjecttype_to_string.h: object_types.h
 	${ENUM_TO_STRING} -concat_string object_types.h
 

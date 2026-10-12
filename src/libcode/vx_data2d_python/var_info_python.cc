@@ -76,7 +76,7 @@ VarInfoPython & VarInfoPython::operator=(const VarInfoPython &f) {
 ///////////////////////////////////////////////////////////////////////////////
 
 unique_ptr<VarInfo> VarInfoPython::clone() const {
-   return unique_ptr<VarInfo>(new VarInfoPython(*this));
+   return std::make_unique<VarInfoPython>(*this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

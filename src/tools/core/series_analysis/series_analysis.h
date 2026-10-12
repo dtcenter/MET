@@ -24,6 +24,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -96,7 +97,7 @@ static SeriesAnalysisConfInfo conf_info;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static netCDF::NcFile *nc_out = nullptr;
+static std::unique_ptr<netCDF::NcFile> nc_out;
 static netCDF::NcDim   lat_dim;
 static netCDF::NcDim   lon_dim ;
 

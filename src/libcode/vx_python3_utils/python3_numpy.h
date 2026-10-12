@@ -21,6 +21,7 @@ extern "C" {
 
 
 #include <iostream>
+#include <vector>
 
 
 #include "concat_string.h"
@@ -52,7 +53,7 @@ class Python3_Numpy {
 
       int N_Dims;
 
-      int * Dim;                //  allocated
+      std::vector<int> Dim;                //  allocated
 
       long Item_Size;
 

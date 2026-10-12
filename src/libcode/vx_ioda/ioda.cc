@@ -659,8 +659,15 @@ bool IODAReader::read_string_data(const char *var_name, vector<string> &hdr_data
    if (IS_INVALID_NC(hdr_var)) return status;
    hdr_data.resize(nlocs, "");
    if (NC_STRING == GET_NC_TYPE_ID(hdr_var)) {
+      //
+      //  get_nc_data() reaches nc_get_vara_string(), which allocates the
+      //  strings itself, so these pointers are outputs.  The loop that used
+      //  to new[] a buffer for each one appended past the nlocs elements
+      //  constructed above, so it filled indices nlocs..2*nlocs-1, left
+      //  0..nlocs-1 null, and leaked every allocation.
+      //
+
       vector<char *> hdr_data2(nlocs, nullptr);
-      for (int i=0; i<nlocs; i++ ) hdr_data2.emplace_back(new char[str_length+1]);
       if ((status = get_nc_data(&hdr_var, hdr_data2.data()))) {
          for (int i=0; i<nlocs; i++ ) {
             m_strncpy(hdr_val, hdr_data2[i], str_length, method_name_s, "ioda_header");

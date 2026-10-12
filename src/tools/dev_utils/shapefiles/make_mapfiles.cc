@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -74,7 +75,7 @@ struct RecordInfo {
 };
 
 
-static RecordInfo * records = 0;
+static std::vector<RecordInfo> records;
 
 static int n_records = 0;
 
@@ -385,7 +386,7 @@ if ( ! country_name_rec )  {
 
 n_records = hd.n_records;
 
-records = new RecordInfo [n_records];
+records.assign(n_records, RecordInfo());
 
    //
    //  dbf records

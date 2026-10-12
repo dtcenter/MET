@@ -106,8 +106,6 @@ void NumberStack::init_from_scratch()
 
 {
 
-e = nullptr;
-
 AllocInc = default_ns_alloc_inc;
 
 clear();
@@ -124,17 +122,12 @@ void NumberStack::clear(bool initialize)
 
 {
 
-if ( e )  { delete [] e;  e = nullptr; }
-
-
-Nelements = 0;
-
-Nalloc = 0;
+e.clear();
 
 if (initialize) {
    AllocInc = default_ns_alloc_inc;
 
-   extend(default_ns_alloc_inc);
+   e.reserve(default_ns_alloc_inc);
 }
 
 return;
@@ -153,62 +146,9 @@ clear();
 
 if ( s.depth() == 0 )  return;
 
-extend(s.depth());
-
-int j;
-
-for (j=0; j<(s.depth()); ++j)  {
-
-   e[j] = s.e[j];
-
-}
-
-Nelements = s.Nelements;
+e = s.e;
 
 AllocInc = s.AllocInc;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void NumberStack::extend(int n)
-
-{
-
-if ( n <= Nalloc )  return;
-
-if ( AllocInc <= 0 )  AllocInc = default_ns_alloc_inc;
-
-n = AllocInc*( (n + AllocInc - 1)/AllocInc );
-
-int j;
-Number * u = new Number [n];
-
-if ( !u )  {
-
-   cerr << "NumberStack::extend(int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for(j=0; j<Nelements; ++j)  {
-
-   u[j] = e[j];
-
-}
-
-if ( e )  { delete [] e;  e = nullptr; }
-
-e = u;
-
-u = 0;
-
-Nalloc = n;
 
 return;
 
@@ -224,13 +164,13 @@ void NumberStack::dump(ostream & out, int _depth_) const
 
 Indent prefix(_depth_);
 
-out << prefix << "Nelements = " << Nelements << "\n";
-out << prefix << "Nalloc    = " << Nalloc    << "\n";
-out << prefix << "AllocInc  = " << AllocInc  << "\n";
+out << prefix << "Nelements = " << e.size()     << "\n";
+out << prefix << "Nalloc    = " << e.capacity() << "\n";
+out << prefix << "AllocInc  = " << AllocInc     << "\n";
 
 int j;
 
-for(j=0; j<Nelements; ++j)  {
+for(j=0; j<(int) e.size(); ++j)  {
 
    out << prefix << "Element # " << j << "\n";
 
@@ -275,9 +215,7 @@ void NumberStack::push(const Number & a)
 
 {
 
-extend(Nelements + 1);
-
-e[Nelements++] = a;
+e.push_back(a);
 
 return;
 
@@ -291,9 +229,9 @@ void NumberStack::push_int(const int k)
 
 {
 
-extend(Nelements + 1);
+e.emplace_back();
 
-set_int(e[Nelements++], k);
+set_int(e.back(), k);
 
 return;
 
@@ -307,9 +245,9 @@ void NumberStack::push_double (const double x)
 
 {
 
-extend(Nelements + 1);
+e.emplace_back();
 
-set_double(e[Nelements++], x);
+set_double(e.back(), x);
 
 return;
 
@@ -323,7 +261,7 @@ Number NumberStack::pop()
 
 {
 
-if ( Nelements <= 0 )  {
+if ( e.empty() )  {
 
    cerr << "NumberStack::pop() -> stack empty!\n\n";
 
@@ -331,7 +269,11 @@ if ( Nelements <= 0 )  {
 
 }
 
-return e[--Nelements];
+Number a = e.back();
+
+e.pop_back();
+
+return a;
 
 }
 
@@ -343,7 +285,7 @@ void NumberStack::pop2(Number & a, Number & b)
 
 {
 
-if ( Nelements < 2 )  {
+if ( e.size() < 2 )  {
 
    cerr << "NumberStack::pop2() -> stack empty!\n\n";
 
@@ -351,12 +293,13 @@ if ( Nelements < 2 )  {
 
 }
 
-int k = Nelements - 1;
+size_t k = e.size() - 1;
 
 b = e[k--];
-a = e[k--];
+a = e[k];
 
-Nelements -= 2;
+e.pop_back();
+e.pop_back();
 
 return;
 
@@ -370,7 +313,7 @@ Number NumberStack::peek() const
 
 {
 
-if ( Nelements <= 0 )  {
+if ( e.empty() )  {
 
    cerr << "NumberStack::pop() -> stack empty!\n\n";
 
@@ -378,7 +321,7 @@ if ( Nelements <= 0 )  {
 
 }
 
-return e[Nelements - 1];
+return e.back();
 
 }
 

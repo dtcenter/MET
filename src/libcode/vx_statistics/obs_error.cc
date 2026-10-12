@@ -886,7 +886,11 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
 #pragma omp parallel default(none) \
          shared(in_buf, obs_buf, out_buf, nx, ny, in_e, t, thread_rngs)
          {
-            gsl_rng *my_r = thread_rngs[omp_get_thread_num()];
+            int my_thread = 0;
+#ifdef _OPENMP
+            my_thread = omp_get_thread_num();
+#endif
+            gsl_rng *my_r = thread_rngs[my_thread];
 
 #pragma omp for collapse(2) schedule(static)
             for(int x=0; x<nx; x++) {
@@ -1089,7 +1093,11 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
 #pragma omp parallel default(none) \
       shared(in_buf, obs_buf, out_buf, entry_buf, nx, ny, t, thread_rngs)
       {
-         gsl_rng *my_r = thread_rngs[omp_get_thread_num()];
+         int my_thread = 0;
+#ifdef _OPENMP
+         my_thread = omp_get_thread_num();
+#endif
+         gsl_rng *my_r = thread_rngs[my_thread];
 
 #pragma omp for collapse(2) schedule(static)
          for(int x=0; x<nx; x++) {
