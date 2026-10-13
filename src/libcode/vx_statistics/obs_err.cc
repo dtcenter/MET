@@ -21,20 +21,26 @@
   #include "omp.h"
 #endif
 
-#include "obs_error.h"
+#include "obs_err.h"
 
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
 // Default observation error table file name
-static const char default_obs_error_dir[] = "MET_BASE/table_files";
+static const char default_obs_err_table[] =
+   "MET_BASE/table_files/obs_err_table.txt";
 
-// Name of user-specified observation errror environment variable
-static const char met_obs_error_table[] =
+// Name of user-specified observation error table environment variable
+static const char met_obs_err_table[] =
+   "MET_OBS_ERR_TABLE";
+
+// MET #3455 deprecated environment variable name, still supported
+// for backward compatibility
+static const char met_obs_err_table_deprecated[] =
    "MET_OBS_ERROR_TABLE";
 
-static const int  n_obs_error_columns = 15;
+static const int  n_obs_err_columns   = 15;
 static const char wildcard_str []     = "ALL";
 
 ////////////////////////////////////////////////////////////////////////
@@ -43,29 +49,29 @@ static const char wildcard_str []     = "ALL";
 // Gloabal instance needs external linkage
 //
 
-ObsErrorTable obs_error_table;
+ObsErrTable obs_err_table;
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Code for class ObsErrorEntry
+// Code for class ObsErrEntry
 //
 ////////////////////////////////////////////////////////////////////////
 
-ObsErrorEntry::ObsErrorEntry() {
+ObsErrEntry::ObsErrEntry() {
 
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ObsErrorEntry::~ObsErrorEntry() {
+ObsErrEntry::~ObsErrEntry() {
 
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ObsErrorEntry::ObsErrorEntry(const ObsErrorEntry & e) {
+ObsErrEntry::ObsErrEntry(const ObsErrEntry & e) {
 
    init_from_scratch();
 
@@ -74,7 +80,7 @@ ObsErrorEntry::ObsErrorEntry(const ObsErrorEntry & e) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ObsErrorEntry & ObsErrorEntry::operator=(const ObsErrorEntry & e) {
+ObsErrEntry & ObsErrEntry::operator=(const ObsErrEntry & e) {
 
    if(this == &e) return *this;
 
@@ -85,7 +91,7 @@ ObsErrorEntry & ObsErrorEntry::operator=(const ObsErrorEntry & e) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ObsErrorEntry::init_from_scratch() {
+void ObsErrEntry::init_from_scratch() {
 
    clear();
 
@@ -94,7 +100,7 @@ void ObsErrorEntry::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ObsErrorEntry::clear() {
+void ObsErrEntry::clear() {
 
    line_number = bad_data_int;
 
@@ -123,7 +129,7 @@ void ObsErrorEntry::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ObsErrorEntry::assign(const ObsErrorEntry & e) {
+void ObsErrEntry::assign(const ObsErrEntry & e) {
 
    clear();
 
@@ -152,11 +158,11 @@ void ObsErrorEntry::assign(const ObsErrorEntry & e) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ObsErrorEntry::dump(ostream & out, int depth) const {
+void ObsErrEntry::dump(ostream & out, int depth) const {
 
    Indent prefix(depth);
 
-   out << prefix << "ObsErrorEntry ... ";
+   out << prefix << "ObsErrEntry ... ";
    out << prefix << "line_number = " << line_number << "\n";
    out << prefix << "var_name: ";
    var_name.dump(out, depth+1);
@@ -189,25 +195,25 @@ void ObsErrorEntry::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-double ObsErrorEntry::variance() const {
+double ObsErrEntry::variance() const {
    return dist_var(dist_type, dist_parm[0], dist_parm[1]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ObsErrorEntry::need_bias_correction() const {
+bool ObsErrEntry::need_bias_correction() const {
    return !is_bad_data(bias_scale) || !is_bad_data(bias_offset);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ObsErrorEntry::need_perturbation() const {
+bool ObsErrEntry::need_perturbation() const {
    return dist_type != DistType::None;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ObsErrorEntry::parse_line(const DataLine &dl) {
+bool ObsErrEntry::parse_line(const DataLine &dl) {
 
    // Initialize
    clear();
@@ -216,10 +222,10 @@ bool ObsErrorEntry::parse_line(const DataLine &dl) {
    if(dl.n_items() == 0 || is_header(dl)) return false;
 
    // Check for expected number of elements
-   if(dl.n_items() != n_obs_error_columns) {
-      mlog << Error << "\nObsErrorEntry::parse_line() -> "
+   if(dl.n_items() != n_obs_err_columns) {
+      mlog << Error << "\nObsErrEntry::parse_line() -> "
            << "unexpected number of columns (" << dl.n_items()
-           << " != " << n_obs_error_columns << " on line number "
+           << " != " << n_obs_err_columns << " on line number "
            << dl.line_number() << " of file:\n"
            << dl.get_file()->filename() << "\n\n";
       exit(1);
@@ -262,7 +268,7 @@ bool ObsErrorEntry::parse_line(const DataLine &dl) {
    if((hgt_range.n() != 0 && hgt_range.n() != 2) ||
       (prs_range.n() != 0 && prs_range.n() != 2) ||
       (val_range.n() != 0 && val_range.n() != 2)) {
-      mlog << Error << "\nObsErrorEntry::validate() -> "
+      mlog << Error << "\nObsErrEntry::validate() -> "
            << "the HGT_RANGE, PRS_RANGE, and VAL_RANGE columns must be "
            << "set to \"" << wildcard_str << "\" or \"BEG,END\" to "
            << "specify the range of values on line number "
@@ -284,7 +290,7 @@ bool ObsErrorEntry::parse_line(const DataLine &dl) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ObsErrorEntry::is_header(const DataLine &dl) {
+bool ObsErrEntry::is_header(const DataLine &dl) {
 
    if(dl.n_items() > 0) {
       if(strcasecmp(dl[0], "OBS_VAR") == 0) return true;
@@ -295,16 +301,16 @@ bool ObsErrorEntry::is_header(const DataLine &dl) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ObsErrorEntry::is_match(const char *cur_var_name,
-                             const char *cur_msg_type,
-                             const char *cur_sid,
-                             int cur_pb_rpt,
-                             int cur_in_rpt,
-                             int cur_inst,
-                             double cur_hgt,
-                             double cur_prs,
-                             double cur_val,
-                             bool skip_var_name) {
+bool ObsErrEntry::is_match(const char *cur_var_name,
+                           const char *cur_msg_type,
+                           const char *cur_sid,
+                           int cur_pb_rpt,
+                           int cur_in_rpt,
+                           int cur_inst,
+                           double cur_hgt,
+                           double cur_prs,
+                           double cur_val,
+                           bool skip_var_name) {
 
    // Check array filters
    // The var_name regex check is the most expensive (recompiles a
@@ -337,7 +343,7 @@ bool ObsErrorEntry::is_match(const char *cur_var_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void ObsErrorEntry::validate() {
+void ObsErrEntry::validate() {
    int n_req;
 
    // Number of distribution parameters
@@ -349,7 +355,7 @@ void ObsErrorEntry::validate() {
    // Make sure we have the expected number of parameters
    if(dist_type != DistType::None &&
       dist_parm.n() != n_req) {
-      mlog << Error << "\nObsErrorEntry::validate() -> "
+      mlog << Error << "\nObsErrEntry::validate() -> "
            << "expected " << n_req << " parameter(s) but got "
            << dist_parm.n() << " for the "
            << disttype_to_string(dist_type) << " distribution.\n\n";
@@ -364,25 +370,25 @@ void ObsErrorEntry::validate() {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Code for class ObsErrorTable
+// Code for class ObsErrTable
 //
 ////////////////////////////////////////////////////////////////////////
 
-ObsErrorTable::~ObsErrorTable() {
+ObsErrTable::~ObsErrTable() {
 
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ObsErrorTable::ObsErrorTable(const ObsErrorTable &f) {
+ObsErrTable::ObsErrTable(const ObsErrTable &f) {
 
    assign(f);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ObsErrorTable::ObsErrorTable(ObsErrorTable &&f) noexcept :
+ObsErrTable::ObsErrTable(ObsErrTable &&f) noexcept :
    e(std::move(f.e)), IsSet(f.IsSet),
    VarSubsetCache(std::move(f.VarSubsetCache)),
    LastMatchIndex(f.LastMatchIndex) {
@@ -393,7 +399,7 @@ ObsErrorTable::ObsErrorTable(ObsErrorTable &&f) noexcept :
 
 ////////////////////////////////////////////////////////////////////////
 
-void ObsErrorTable::clear() {
+void ObsErrTable::clear() {
 
    e.clear();
 
@@ -407,13 +413,13 @@ void ObsErrorTable::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ObsErrorTable::dump(ostream & out, int depth) const {
+void ObsErrTable::dump(ostream & out, int depth) const {
    Indent prefix(depth);
 
    out << prefix << "N_elements = " << n() << "\n";
 
    for(int i=0; i<n(); i++) {
-      out << prefix << "ObsErrorTable Entry # " << i+1 << " ...\n";
+      out << prefix << "ObsErrTable Entry # " << i+1 << " ...\n";
       e[i].dump(out, depth + 1);
    }
 
@@ -422,7 +428,7 @@ void ObsErrorTable::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ObsErrorTable::assign(const ObsErrorTable & f) {
+void ObsErrTable::assign(const ObsErrTable & f) {
 
    clear();
 
@@ -436,7 +442,7 @@ void ObsErrorTable::assign(const ObsErrorTable & f) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ObsErrorTable & ObsErrorTable::operator=(const ObsErrorTable &f) {
+ObsErrTable & ObsErrTable::operator=(const ObsErrTable &f) {
 
    if(this == &f) return *this;
 
@@ -447,7 +453,7 @@ ObsErrorTable & ObsErrorTable::operator=(const ObsErrorTable &f) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ObsErrorTable & ObsErrorTable::operator=(ObsErrorTable &&f) noexcept {
+ObsErrTable & ObsErrTable::operator=(ObsErrTable &&f) noexcept {
 
    if(this == &f) return *this;
 
@@ -464,7 +470,7 @@ ObsErrorTable & ObsErrorTable::operator=(ObsErrorTable &&f) noexcept {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ObsErrorTable::extend(int len) {
+void ObsErrTable::extend(int len) {
 
    e.reserve(len);
 
@@ -474,27 +480,38 @@ void ObsErrorTable::extend(int len) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ObsErrorTable::initialize() {
+void ObsErrTable::initialize() {
    ConcatString path;
    ConcatString desc;
    StringArray file_names;
 
    //
-   // Use MET_OBS_ERROR_TABLE, if set
+   // Use MET_OBS_ERR_TABLE, if set
    //
-   if(get_env(met_obs_error_table, path)) {
-      desc << "user-defined " << met_obs_error_table;
+   if(get_env(met_obs_err_table, path)) {
+      desc << "user-defined " << met_obs_err_table;
+   }
+   //
+   // MET #3455 Otherwise, use the deprecated MET_OBS_ERROR_TABLE, if set
+   //
+   else if(get_env(met_obs_err_table_deprecated, path)) {
+      mlog << Warning << "\nObsErrTable::initialize() -> "
+           << "the \"" << met_obs_err_table_deprecated
+           << "\" environment variable is deprecated. "
+           << "Replace it with \"" << met_obs_err_table << "\"!\n\n";
+      desc << "user-defined " << met_obs_err_table_deprecated;
    }
    //
    // Otherwise, read the default table file
    //
    else {
-      path = replace_path(default_obs_error_dir);
-      desc = "default observation error table";
+      path = replace_path(default_obs_err_table);
+      desc = "default obs_err table";
    }
 
-   // Search for file input file names
-   file_names = get_filenames(path, "^obs_error", ".txt$", true);
+   // Search for input file names, where the "^obs_err" prefix also
+   // matches user-defined files named with the older "obs_error" prefix
+   file_names = get_filenames(path, "^obs_err", ".txt$", true);
 
    for(int i=0; i<file_names.n(); i++) {
 
@@ -502,7 +519,7 @@ void ObsErrorTable::initialize() {
            << "Reading " << desc << " file: " << file_names[i] << "\n";
 
       if(!read(file_names[i].c_str())) {
-         mlog << Error << "\nObsErrorTable::initialize() -> "
+         mlog << Error << "\nObsErrTable::initialize() -> "
               << "unable to read " << desc << " file \""
               << file_names[i] << "\"\n\n";
          exit(1);
@@ -516,13 +533,13 @@ void ObsErrorTable::initialize() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ObsErrorTable::read(const char * file_name) {
+bool ObsErrTable::read(const char * file_name) {
    LineDataFile f;
    DataLine dl;
-   ObsErrorEntry cur;
+   ObsErrEntry cur;
 
    if(!f.open(file_name)) {
-      mlog << Warning << "ObsErrorTable::read() -> "
+      mlog << Warning << "ObsErrTable::read() -> "
            << "unable to open input file \"" << file_name << "\"\n\n";
       return false;
    }
@@ -555,7 +572,7 @@ bool ObsErrorTable::read(const char * file_name) {
 // rescanning (and re-running regex matches over) the full table on
 // every lookup() call.
 //
-const vector<int> & ObsErrorTable::var_subset(const char *cur_var_name) {
+const vector<int> & ObsErrTable::var_subset(const char *cur_var_name) {
 
    // Transparent comparator lets find() compare directly against
    // cur_var_name, without constructing a temporary std::string key
@@ -578,11 +595,11 @@ const vector<int> & ObsErrorTable::var_subset(const char *cur_var_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const ObsErrorEntry *ObsErrorTable::lookup(
+const ObsErrEntry *ObsErrTable::lookup(
    const char *cur_var_name, const char *cur_msg_type, const char *cur_sid,
    int cur_pb_rpt,           int cur_in_rpt,           int cur_inst,
    double cur_hgt,           double cur_prs,           double cur_val) {
-   const ObsErrorEntry * e_match = nullptr;
+   const ObsErrEntry * e_match = nullptr;
 
    // Check the most recently matched entry first since consecutive
    // lookups often resolve to the same table row
@@ -610,12 +627,12 @@ const ObsErrorEntry *ObsErrorTable::lookup(
 
    // Check for no match
    if(e_match == nullptr && mlog.verbosity_level() >= 4) {
-      mlog << Debug(4) << "\nObsErrorTable::lookup() -> "
+      mlog << Debug(4) << "\nObsErrTable::lookup() -> "
            << "skipping observation since no match found for "
            << "var_name = \"" << cur_var_name
            << "\", msg_type = \"" << cur_msg_type
            << "\", sid = \"" << cur_sid
-           << ", pb_rpt_typ = " << cur_pb_rpt
+           << "\", pb_rpt_typ = " << cur_pb_rpt
            << ", in_rpt_typ = " << cur_in_rpt
            << ", inst_typ = " << cur_inst
            << ", hgt = " << cur_hgt
@@ -628,9 +645,9 @@ const ObsErrorEntry *ObsErrorTable::lookup(
 
 ////////////////////////////////////////////////////////////////////////
 
-const ObsErrorEntry *ObsErrorTable::lookup(
+const ObsErrEntry *ObsErrTable::lookup(
    const char *cur_var_name, const char *cur_msg_type, double cur_val) {
-   const ObsErrorEntry * e_match = nullptr;
+   const ObsErrEntry * e_match = nullptr;
 
    // Check the most recently matched entry first since consecutive
    // lookups (e.g. adjacent grid points) often resolve to the same
@@ -659,8 +676,8 @@ const ObsErrorEntry *ObsErrorTable::lookup(
 
    // Check for no match
    if(e_match == nullptr && mlog.verbosity_level() >= 4) {
-      mlog << Debug(4) << "\nObsErrorTable::lookup() -> "
-           << "no observation error table match found for "
+      mlog << Debug(4) << "\nObsErrTable::lookup() -> "
+           << "no obs_err table match found for "
            << "var_name = \"" << cur_var_name
            << "\", msg_type = \"" << cur_msg_type
            << "\", val = " << cur_val << "\n\n";
@@ -671,8 +688,8 @@ const ObsErrorEntry *ObsErrorTable::lookup(
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ObsErrorTable::has(const char *cur_var_name,
-                        const char *cur_msg_type) {
+bool ObsErrTable::has(const char *cur_var_name,
+                      const char *cur_msg_type) {
 
    for(int i=0; i<n(); i++) {
       if( (e[i].var_name.n() == 0 || e[i].var_name.reg_exp_match(cur_var_name)) &&
@@ -684,12 +701,12 @@ bool ObsErrorTable::has(const char *cur_var_name,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Code for struct ObsErrorInfo struct
+// Code for struct ObsErrInfo struct
 //
 ////////////////////////////////////////////////////////////////////////
 
 
-void ObsErrorInfo::clear() {
+void ObsErrInfo::clear() {
    flag = false;
    entry.clear();
    rng_ptr = (gsl_rng *) nullptr;
@@ -697,17 +714,17 @@ void ObsErrorInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ObsErrorInfo::validate() {
+void ObsErrInfo::validate() {
 
    // Check for no work to do
    if(!flag) return;
 
-   // Validate the ObsErrorEntry object
+   // Validate the ObsErrEntry object
    entry.validate();
 
    // Make sure the rng_ptr is set
    if(rng_ptr == (gsl_rng *) 0) {
-      mlog << Error << "\nObsErrorInfo::validate() -> "
+      mlog << Error << "\nObsErrInfo::validate() -> "
            << "random number generator pointer is not set!\n\n";
       exit(1);
    }
@@ -717,7 +734,7 @@ void ObsErrorInfo::validate() {
 
 ////////////////////////////////////////////////////////////////////////
 
-ObsErrorInfo &ObsErrorInfo::operator=(const ObsErrorInfo &a) noexcept {
+ObsErrInfo &ObsErrInfo::operator=(const ObsErrInfo &a) noexcept {
    if ( this != &a ) {
       flag = a.flag;
       entry = a.entry;
@@ -728,13 +745,13 @@ ObsErrorInfo &ObsErrorInfo::operator=(const ObsErrorInfo &a) noexcept {
 
 ////////////////////////////////////////////////////////////////////////
 
-ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *rng_ptr) {
+ObsErrInfo parse_conf_obs_err(Dictionary *dict, gsl_rng *rng_ptr) {
    Dictionary *err_dict = (Dictionary *) nullptr;
-   ObsErrorInfo info;
+   ObsErrInfo info;
    int i;
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_obs_error() -> "
+      mlog << Error << "\nparse_conf_obs_err() -> "
            << "empty dictionary!\n\n";
       exit(1);
    }
@@ -742,8 +759,9 @@ ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *rng_ptr) {
    // Initialize
    info.clear();
 
-   // Conf: obs_error
-   err_dict = dict->lookup_dictionary(conf_key_obs_error);
+   // Conf: obs_err, MET #3455 support the deprecated obs_error name
+   err_dict = dict->lookup_dictionary(
+                 dict->resolve_name(conf_key_obs_err, conf_key_obs_err_deprecated));
 
    // Conf: flag
    info.flag = err_dict->lookup_bool(conf_key_flag);
@@ -783,9 +801,9 @@ ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *rng_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-double add_obs_error_inc(const gsl_rng *r, FieldType t,
-                         const ObsErrorEntry *e, const double obs,
-                         double v, bool log_detail) {
+double add_obs_err_inc(const gsl_rng *r, FieldType t,
+                       const ObsErrEntry *e, const double obs,
+                       double v, bool log_detail) {
    double v_new = v;
 
    // Check for null pointer or bad input value
@@ -807,14 +825,14 @@ double add_obs_error_inc(const gsl_rng *r, FieldType t,
       // Check for no updates
       if(e->dist_type == DistType::None) {
          mlog << Debug(4)
-              << "Applying no observation error update for "
+              << "Applying no obs_err update for "
               << fieldtype_to_string(t) << " value " <<  v
               << " and OBS value " << obs << ".\n";
       }
       // Print detailed update information
       else {
          mlog << Debug(4)
-              << "Applying observation error update from "
+              << "Applying obs_err update from "
               << fieldtype_to_string(t) << " value " << v << " to "
               << v_new << " for OBS value " << obs << " using the "
               << dist_to_string(e->dist_type, e->dist_parm)
@@ -827,18 +845,18 @@ double add_obs_error_inc(const gsl_rng *r, FieldType t,
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
-                            const ObsErrorEntry *in_e,
-                            const DataPlane &in_dp,
-                            const DataPlane &obs_dp,
-                            const char *var_name, const char *obtype) {
+DataPlane add_obs_err_inc(const gsl_rng *r, FieldType t,
+                          const ObsErrEntry *in_e,
+                          const DataPlane &in_dp,
+                          const DataPlane &obs_dp,
+                          const char *var_name, const char *obtype) {
    DataPlane out_dp(in_dp);
    int nx = in_dp.nx();
    int ny = in_dp.ny();
 
    // Check for matching dimensions
    if(nx != obs_dp.nx() || ny != obs_dp.ny()) {
-      mlog << Error << "\nadd_obs_error_inc() -> "
+      mlog << Error << "\nadd_obs_err_inc() -> "
            << "the data dimensions must match (" << nx
            << ", " << ny << ") != (" << obs_dp.nx()
            << ", " << obs_dp.ny() << ")!\n\n";
@@ -873,8 +891,8 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
          for(int x=0; x<nx; x++) {
             for(int y=0; y<ny; y++) {
                int j = y*nx + x;
-               out_buf[j] = add_obs_error_inc(r, t, in_e, obs_buf[j],
-                                              in_buf[j], false);
+               out_buf[j] = add_obs_err_inc(r, t, in_e, obs_buf[j],
+                                            in_buf[j], false);
             }
          }
       }
@@ -896,8 +914,8 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
             for(int x=0; x<nx; x++) {
                for(int y=0; y<ny; y++) {
                   int j = y*nx + x;
-                  out_buf[j] = add_obs_error_inc(my_r, t, in_e, obs_buf[j],
-                                                 in_buf[j], false);
+                  out_buf[j] = add_obs_err_inc(my_r, t, in_e, obs_buf[j],
+                                               in_buf[j], false);
                }
             }
          }
@@ -907,15 +925,15 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
    }
    else {
 
-      // Do a table lookup for each point. ObsErrorTable::lookup()
+      // Do a table lookup for each point. ObsErrTable::lookup()
       // mutates shared cache state, so this loop must stay serial,
       // in the same x-outer, y-inner order used historically.
       for(int x=0; x<nx; x++) {
          for(int y=0; y<ny; y++) {
             int j = y*nx + x;
-            const ObsErrorEntry *e = obs_error_table.lookup(
+            const ObsErrEntry *e = obs_err_table.lookup(
                                          var_name, obtype, obs_buf[j]);
-            out_buf[j] = add_obs_error_inc(r, t, e, obs_buf[j], in_buf[j]);
+            out_buf[j] = add_obs_err_inc(r, t, e, obs_buf[j], in_buf[j]);
          }
       }
    }
@@ -925,9 +943,9 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
 
 ////////////////////////////////////////////////////////////////////////
 
-double add_obs_error_bc(FieldType t,
-                        const ObsErrorEntry *e, double v,
-                        bool log_detail) {
+double add_obs_err_bc(FieldType t,
+                      const ObsErrEntry *e, double v,
+                      bool log_detail) {
    double v_new = v;
 
    // Check for null pointer or bad input value
@@ -948,13 +966,13 @@ double add_obs_error_bc(FieldType t,
       if(is_bad_data(e->bias_scale) &&
          is_bad_data(e->bias_offset)) {
          mlog << Debug(4)
-              << "Applying no observation error bias correction to "
+              << "Applying no obs_err bias correction to "
               << fieldtype_to_string(t) << " value " <<  v << ".\n";
       }
       // Print detailed update information
       else {
          mlog << Debug(4)
-              << "Applying observation error bias correction from "
+              << "Applying obs_err bias correction from "
               << fieldtype_to_string(t) << " value " << v << " to "
               << v_new << " for bias scale (" << e->bias_scale
               << ") and offset (" <<  e->bias_offset << ").\n";
@@ -966,17 +984,17 @@ double add_obs_error_bc(FieldType t,
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlane add_obs_error_bc(FieldType t,
-                           const ObsErrorEntry *in_e,
-                           const DataPlane &in_dp,
-                           const DataPlane &obs_dp,
-                           const char *var_name, const char *obtype) {
+DataPlane add_obs_err_bc(FieldType t,
+                         const ObsErrEntry *in_e,
+                         const DataPlane &in_dp,
+                         const DataPlane &obs_dp,
+                         const char *var_name, const char *obtype) {
    DataPlane out_dp(in_dp);
    int nxy = in_dp.nxy();
 
    // Check for matching dimensions
    if(in_dp.nx() != obs_dp.nx() || in_dp.ny() != obs_dp.ny()) {
-      mlog << Error << "\nadd_obs_error_bc() -> "
+      mlog << Error << "\nadd_obs_err_bc() -> "
            << "the data dimensions must match (" << in_dp.nx()
            << ", " << in_dp.ny() << ") != (" << obs_dp.nx()
            << ", " << obs_dp.ny() << ")!\n\n";
@@ -1002,17 +1020,17 @@ DataPlane add_obs_error_bc(FieldType t,
 #pragma omp parallel for default(none) \
       shared(in_buf, out_buf, nxy, in_e, t) schedule(static)
       for(int j=0; j<nxy; j++) {
-         out_buf[j] = add_obs_error_bc(t, in_e, in_buf[j], false);
+         out_buf[j] = add_obs_err_bc(t, in_e, in_buf[j], false);
       }
    }
    else {
 
-      // Do a table lookup for each point. ObsErrorTable::lookup()
+      // Do a table lookup for each point. ObsErrTable::lookup()
       // mutates shared cache state, so this loop must stay serial.
       for(int j=0; j<nxy; j++) {
-         const ObsErrorEntry *e = obs_error_table.lookup(
+         const ObsErrEntry *e = obs_err_table.lookup(
                                       var_name, obtype, obs_buf[j]);
-         out_buf[j] = add_obs_error_bc(t, e, in_buf[j]);
+         out_buf[j] = add_obs_err_bc(t, e, in_buf[j]);
       }
    }
 
@@ -1021,18 +1039,18 @@ DataPlane add_obs_error_bc(FieldType t,
 
 ////////////////////////////////////////////////////////////////////////
 
-vector<const ObsErrorEntry *> build_obs_error_entry_grid(
+vector<const ObsErrEntry *> build_obs_err_entry_grid(
       const DataPlane &val_dp, const char *var_name, const char *obtype) {
 
    int nxy = val_dp.nxy();
-   vector entry_grid(nxy, (const ObsErrorEntry *) nullptr);
+   vector entry_grid(nxy, (const ObsErrEntry *) nullptr);
    const double *val_buf = val_dp.data();
 
-   // Serial: ObsErrorTable::lookup() mutates internal cache state
+   // Serial: ObsErrTable::lookup() mutates internal cache state
    for(int j=0; j<nxy; j++) {
       if(!is_bad_data(val_buf[j])) {
-         entry_grid[j] = obs_error_table.lookup(var_name, obtype,
-                                                val_buf[j]);
+         entry_grid[j] = obs_err_table.lookup(var_name, obtype,
+                                              val_buf[j]);
       }
    }
 
@@ -1041,10 +1059,10 @@ vector<const ObsErrorEntry *> build_obs_error_entry_grid(
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
-                            const vector<const ObsErrorEntry *> &entry_grid,
-                            const DataPlane &in_dp,
-                            const DataPlane &obs_dp) {
+DataPlane add_obs_err_inc(const gsl_rng *r, FieldType t,
+                          const vector<const ObsErrEntry *> &entry_grid,
+                          const DataPlane &in_dp,
+                          const DataPlane &obs_dp) {
    DataPlane out_dp(in_dp);
    int nx  = in_dp.nx();
    int ny  = in_dp.ny();
@@ -1053,7 +1071,7 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
    // Check for matching dimensions
    if(nx != obs_dp.nx() || ny != obs_dp.ny() ||
       (int) entry_grid.size() != nxy) {
-      mlog << Error << "\nadd_obs_error_inc() -> "
+      mlog << Error << "\nadd_obs_err_inc() -> "
            << "the data dimensions must match (" << nx
            << ", " << ny << ") != (" << obs_dp.nx()
            << ", " << obs_dp.ny() << ") or the entry_grid size ("
@@ -1065,7 +1083,7 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
    const double *in_buf   = in_dp.data();
    const double *obs_buf  = obs_dp.data();
    vector<double> &out_buf = out_dp.buf();
-   const ObsErrorEntry * const *entry_buf = entry_grid.data();
+   const ObsErrEntry * const *entry_buf = entry_grid.data();
 
    // Entries are precomputed and read-only here, so it's safe to
    // parallelize. Preserve the same x-outer, y-inner traversal order
@@ -1080,8 +1098,8 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
       for(int x=0; x<nx; x++) {
          for(int y=0; y<ny; y++) {
             int j = y*nx + x;
-            out_buf[j] = add_obs_error_inc(r, t, entry_buf[j], obs_buf[j],
-                                           in_buf[j], false);
+            out_buf[j] = add_obs_err_inc(r, t, entry_buf[j], obs_buf[j],
+                                         in_buf[j], false);
          }
       }
    }
@@ -1103,8 +1121,8 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
          for(int x=0; x<nx; x++) {
             for(int y=0; y<ny; y++) {
                int j = y*nx + x;
-               out_buf[j] = add_obs_error_inc(my_r, t, entry_buf[j], obs_buf[j],
-                                              in_buf[j], false);
+               out_buf[j] = add_obs_err_inc(my_r, t, entry_buf[j], obs_buf[j],
+                                            in_buf[j], false);
             }
          }
       }
@@ -1117,15 +1135,15 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlane add_obs_error_bc(FieldType t,
-                           const vector<const ObsErrorEntry *> &entry_grid,
-                           const DataPlane &in_dp) {
+DataPlane add_obs_err_bc(FieldType t,
+                         const vector<const ObsErrEntry *> &entry_grid,
+                         const DataPlane &in_dp) {
    DataPlane out_dp(in_dp);
    int nxy = in_dp.nxy();
 
    // Check for matching size
    if((int) entry_grid.size() != nxy) {
-      mlog << Error << "\nadd_obs_error_bc() -> "
+      mlog << Error << "\nadd_obs_err_bc() -> "
            << "the entry_grid size (" << entry_grid.size()
            << ") does not match the data size (" << nxy << ")!\n\n";
       exit(1);
@@ -1133,14 +1151,14 @@ DataPlane add_obs_error_bc(FieldType t,
 
    const double *in_buf   = in_dp.data();
    vector<double> &out_buf = out_dp.buf();
-   const ObsErrorEntry * const *entry_buf = entry_grid.data();
+   const ObsErrEntry * const *entry_buf = entry_grid.data();
 
    // Entries are precomputed and read-only here, so it's safe to
    // parallelize with no RNG involved
 #pragma omp parallel for default(none) \
    shared(in_buf, out_buf, entry_buf, nxy, t) schedule(static)
    for(int j=0; j<nxy; j++) {
-      out_buf[j] = add_obs_error_bc(t, entry_buf[j], in_buf[j], false);
+      out_buf[j] = add_obs_err_bc(t, entry_buf[j], in_buf[j], false);
    }
 
    return out_dp;

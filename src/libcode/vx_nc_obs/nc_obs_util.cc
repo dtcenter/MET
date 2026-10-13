@@ -810,9 +810,9 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
       int last_prpt_typ = hdr_data.prpt_typ_array.n_elements() - 1;
       int last_irpt_typ = hdr_data.irpt_typ_array.n_elements() - 1;
       int last_inst_typ = hdr_data.inst_typ_array.n_elements() - 1;
-      if (0 > last_prpt_typ) mlog << Debug(7) << "    prpt_typ is empty\n";
-      else if (0 > last_irpt_typ) mlog << Debug(7) << "    irpt_typ is empty\n";
-      else if (0 > last_inst_typ) mlog << Debug(7) << "    inst_typ is empty\n";
+      if (0 > last_prpt_typ) mlog << Debug(7) << "    prpt_typ has no entries\n";
+      else if (0 > last_irpt_typ) mlog << Debug(7) << "    irpt_typ has no entries\n";
+      else if (0 > last_inst_typ) mlog << Debug(7) << "    inst_typ has no entries\n";
       else {
          mlog << Debug(10)
               << "    prpt_typ[0,-1] " << hdr_data.prpt_typ_array[0]

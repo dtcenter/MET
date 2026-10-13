@@ -465,7 +465,7 @@ static void process_ioda_file(int i_pb) {
       std::vector<int>    qc_data(nlocs, bad_data_int);
       std::vector<double> obs_data(nlocs, bad_data_double);
       mlog << Debug(7) << method_name
-           << "processing \"" << raw_var_names[idx] << "\" variable!\n";
+           << "processing \"" << raw_var_names[idx] << "\" variable\n";
       obs_var = get_var(f_in.get(), raw_var_names[idx].c_str(), obs_group_name);
       if (IS_INVALID_NC(obs_var)) obs_var = get_var(f_in.get(), raw_var_names[idx].c_str(), derived_obs_group_name);
       unit_attr.clear();
@@ -1034,7 +1034,7 @@ static bool get_obs_data_double(NcFile *f_in, const ConcatString &var_name,
                           << "trouble getting " << var_name << "\n";
       }
       else mlog << Debug(4) << method_name
-                << "\"" << var_name << "\" does not exist!\n";
+                << "\"" << var_name << "\" does not exist\n";
    }
    if(status) {
       for(int idx=0; idx<nlocs; idx++)
