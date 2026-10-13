@@ -254,6 +254,12 @@ void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                                 "NA", wgt_dp);
          break;
 
+      case GridWeightType::Area_Cntr:
+         write_netcdf_grid_data(f_out, lat_dim, lon_dim, "grid_weight",
+                                "weight", "normalized true area centered grid weight",
+                                "NA", wgt_dp);
+         break;
+
       default:
          write_netcdf_grid_data(f_out, lat_dim, lon_dim, "grid_weight",
                                 "weight", "default grid weight",
@@ -262,9 +268,13 @@ void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    }
 
    // Write the true grid box areas, if provided
-   if(t == GridWeightType::Area && area_dp && area_dp->nxy() > 0) {
+   if((t == GridWeightType::Area || t == GridWeightType::Area_Cntr) &&
+      area_dp && area_dp->nxy() > 0) {
       write_netcdf_grid_data(f_out, lat_dim, lon_dim, "grid_area",
-                             "cell_area", "true grid box area",
+                             "cell_area",
+                             (t == GridWeightType::Area_Cntr ?
+                              "true centered grid box area" :
+                              "true grid box area"),
                              "km^2", *area_dp);
    }
 

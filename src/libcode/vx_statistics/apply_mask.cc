@@ -141,7 +141,10 @@ void parse_grid_weight(const Grid &grid, const GridWeightType t,
                w = cosd(lat);
             }
             else if(t == GridWeightType::Area) {
-               w = grid.calc_area(x, y);
+               w = grid.calc_area(x, y, false);
+            }
+            else if(t == GridWeightType::Area_Cntr) {
+               w = grid.calc_area(x, y, true);
             }
             else {
                w = default_weight;
@@ -154,8 +157,11 @@ void parse_grid_weight(const Grid &grid, const GridWeightType t,
       } // end for x
    } // End omp parallel
 
-   // Normalize the AREA weights to the range (0, 1]
-   if(t == GridWeightType::Area) {
+   // Normalize the AREA and AREA_CNTR weights to the range (0, 1]
+   if(t == GridWeightType::Area || t == GridWeightType::Area_Cntr) {
+
+      const char *area_str = (t == GridWeightType::Area_Cntr ?
+                              conf_val_area_cntr : conf_val_area);
 
       // Store the true grid box areas, if requested
       if(area_dp) *area_dp = wgt_dp;
@@ -167,7 +173,7 @@ void parse_grid_weight(const Grid &grid, const GridWeightType t,
       // Check for grids that do not define the grid box area
       if(is_bad_data(area_max) || area_max <= 0.0) {
          mlog << Error << "\nparse_grid_weight() -> "
-              << "\"" << conf_key_grid_weight_flag << " = " << conf_val_area
+              << "\"" << conf_key_grid_weight_flag << " = " << area_str
               << "\" is not supported since the grid box area is not "
               << "defined for this grid type.\n\n";
          exit(1);
@@ -176,7 +182,7 @@ void parse_grid_weight(const Grid &grid, const GridWeightType t,
       // Divide by the maximum grid box area
       wgt_dp /= area_max;
 
-      mlog << Debug(3) << "Normalized the " << conf_val_area
+      mlog << Debug(3) << "Normalized the " << area_str
            << " grid weights by the maximum grid box area of "
            << area_max << " km^2.\n";
    }

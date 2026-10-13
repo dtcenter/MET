@@ -878,27 +878,57 @@ The "method" entry defines the regridding method to be used.
 
   * Valid regridding methods:
 
-    * MIN         for the minimum value
+    * MIN          for the minimum value
 
-    * MAX         for the maximum value
+    * MAX          for the maximum value
 
-    * MEDIAN      for the median value
+    * MEDIAN       for the median value
 
-    * UW_MEAN     for the unweighted average value
+    * UW_MEAN      for the unweighted average value
 
-    * DW_MEAN     for the distance-weighted average value (weight =
+    * DW_MEAN      for the distance-weighted average value (weight =
       distance^-2)
 
-    * AW_MEAN     for an area-weighted mean when regridding from
-      high to low resolution grids (width = 1)
+    * AW_MEAN      for an area-weighted mean when regridding from
+      high to low resolution grids (width = 1), weighting each input
+      point by the area of the grid box whose lower-left corner is that
+      point. Input points lying exactly on the boundary between output
+      grid boxes are all assigned to the same side, which can shift
+      the result by a fraction of a grid box when the input and output
+      grids are aligned (e.g. 0.25 to 1.0 degree lat/lon). Prior to
+      version 13.0.0, input points within half a grid box of the western
+      edge of regional lat/lon grids, or of the first column of global
+      ones, were discarded.
 
-    * LS_FIT      for a least-squares fit
+    * AW_MEAN_CNTR for an area-weighted mean when regridding from
+      high to low resolution grids (width = 1), weighting each input
+      point by the area of the grid box centered on that point. When an
+      input grid box overlaps multiple output grid boxes, its weight is
+      divided among them in proportion to the overlap. This option is
+      recommended over AW_MEAN.
 
-    * BILIN       for bilinear interpolation (width = 2)
+      * The number of output grid boxes over which the weight is divided
+        is determined by the extent of each input grid box and is not
+        subject to a fixed limit.
 
-    * NEAREST     for the nearest grid point (width = 1)
+      * Input grid boxes which straddle the edge of a regional output grid,
+        or the longitude seam of a global one, are divided by their overlap
+        like any other, for lat/lon, rotated lat/lon, and Mercator output
+        grids.
 
-    * BUDGET      for the mass-conserving budget interpolation
+      * Prior to version 13.0.0, the AW_MEAN option computed centered grid
+        box areas for Lambert Azimuthal Equal Area grids, unlike all other
+        grid projections. Use AW_MEAN_CNTR to most closely reproduce that
+        behavior, noting that it also divides each input grid box weight by
+        the overlap and so will not match exactly.
+
+    * LS_FIT       for a least-squares fit
+
+    * BILIN        for bilinear interpolation (width = 2)
+
+    * NEAREST      for the nearest grid point (width = 1)
+
+    * BUDGET       for the mass-conserving budget interpolation
 
       * The budget interpolation method is often used for precipitation
         in order to roughly conserve global averages. However it is
@@ -911,18 +941,18 @@ The "method" entry defines the regridding method to be used.
         values, assuming enough valid data is present to meet the
         "vld_thresh" threshold.
 
-    * FORCE       to compare gridded data directly with no interpolation
+    * FORCE        to compare gridded data directly with no interpolation
       as long as the grid x and y dimensions match.
 
-    * UPPER_LEFT  for the upper left grid point (width = 1)
+    * UPPER_LEFT   for the upper left grid point (width = 1)
 
-    * UPPER_RIGHT for the upper right grid point (width = 1)
+    * UPPER_RIGHT  for the upper right grid point (width = 1)
 
-    * LOWER_RIGHT for the lower right grid point (width = 1)
+    * LOWER_RIGHT  for the lower right grid point (width = 1)
 
-    * LOWER_LEFT  for the lower left grid point (width = 1)
+    * LOWER_LEFT   for the lower left grid point (width = 1)
 
-    * MAXGAUSS    to compute the maximum value in the neighborhood
+    * MAXGAUSS     to compute the maximum value in the neighborhood
       and apply a Gaussian smoother to the result
 
     The BEST, GEOG_MATCH, and HIRA options are not valid for regridding.
@@ -2758,23 +2788,35 @@ verification, which is controlled by the "point_weight_flag" option.
 It can only be defined once at the highest level of config file context
 and applies to all verification tasks for that run.
 
-Three grid weighting options are currently supported:
+Four grid weighting options are currently supported:
 
 * NONE to disable grid weighting using a constant weight of 1.0 (default).
 
 * COS_LAT to define the weight as the cosine of the grid point latitude.
   This an approximation for grid box area used by NCEP and WMO.
 
-* AREA to define the weight as the true area of the grid box (km^2) divided
-  by the maximum grid box area in the verification grid. The resulting weights
-  are in the range (0, 1], consistent with the other weighting options. For a
-  regular lat/lon grid, they are approximately equal to the COS_LAT weights.
-  Since the grid box area is not defined for unstructured, semi-lat/lon, or
-  GOES grids, AREA weighting is not supported for them.
+* AREA to define the weight as the true area of the grid box (km^2)
+  defined by the lower-left corner of each grid box, divided by the maximum
+  grid box area in the verification grid.
+
+* AREA_CNTR to define the weight as the true area of the grid box (km^2)
+  defined by the center point of each grid box, divided by the maximum
+  grid box area in the verification grid.
+
+For both AREA and AREA_CNTR, the resulting weights are in the range (0, 1],
+consistent with the other weighting options. For a regular lat/lon grid, they
+are approximately equal to the COS_LAT weights. Since the grid box area is not
+defined for unstructured, semi-lat/lon, or GOES grids, AREA and AREA_CNTR
+weighting are not supported for them.
+
+.. note::
+   Prior to version 13.0.0, the AREA option computed centered grid box
+   areas for Lambert Azimuthal Equal Area grids, unlike all other grid
+   projections. Use AREA_CNTR to reproduce that behavior.
 
 If requested in the config file, the grid weights applied can be written to
-the NetCDF output from Grid-Stat and Ensemble-Stat. For AREA weighting, the
-true grid box areas (km^2) are also written to the NetCDF output.
+the NetCDF output from Grid-Stat and Ensemble-Stat. For AREA and AREA_CNTR
+weighting, the true grid box areas (km^2) are also written to the NetCDF output.
 
 When computing partial sums and continuous statistics, the weights are
 first normalized by dividing by the sum of the weights for the current
