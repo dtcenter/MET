@@ -1307,8 +1307,8 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
       //   The wgrib2 utility does NOT when populating gfld->igdtmpl.
       //   However, the wgrib2 -get_byte and -get_int options do work,
       //   as shown below:
-      //      wgrib2 ukv_agl_temperature_1.5_12.grib2 \
-      //        -get_byte 3 43 4 -get_int 3 43 1 \
+      //      wgrib2 ukv_agl_temperature_1.5_12.grib2
+      //        -get_byte 3 43 4 -get_int 3 43 1
       //        -get_byte 3 51 4 -get_int 3 51 1
       //
       //   The longitudes are correctly parsed as -17.117129 and -2.5, respectively.

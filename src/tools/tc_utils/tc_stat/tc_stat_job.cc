@@ -3810,7 +3810,6 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    TimeArray Valid;
    unixtime valid_beg, valid_end;
    int lead_time;
-   int r;
 
    // Setup -out_stat file
    setup_stat_file(1 + (int) RIRWMap.size());
@@ -3839,7 +3838,7 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    //
    // Loop through the map
    //
-   for(it = RIRWMap.begin(), r=1; it != RIRWMap.end(); it++) {
+   for(it = RIRWMap.begin(); it != RIRWMap.end(); it++) {
 
       // Set the output MODEL column
       shc.set_model(write_css(it->second.AModel).c_str());

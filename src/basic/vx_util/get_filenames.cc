@@ -168,7 +168,7 @@ StringArray get_filenames_from_dir(const char * directory_path,
 DIR * directory = (DIR *) nullptr;
 struct dirent * entry = (struct dirent *) nullptr;
 StringArray a, b;
-char entry_path[PATH_MAX];
+ConcatString entry_path;
 ConcatString regex;
 struct stat sbuf;
 
@@ -189,9 +189,9 @@ while ( (entry = readdir(directory)) != nullptr )  {
    if ( strcmp(entry->d_name, "." ) == 0 )  continue;
    if ( strcmp(entry->d_name, "..") == 0 )  continue;
 
-   snprintf(entry_path, sizeof(entry_path), "%s/%s", directory_path, entry->d_name);
+   entry_path << cs_erase << directory_path << '/' << entry->d_name;
 
-   if ( stat(entry_path, &sbuf) < 0 )  {
+   if ( stat(entry_path.c_str(), &sbuf) < 0 )  {
 
       mlog << Error << "\nget_filenames_from_dir() -> "
            << "can't stat \"" << entry_path << "\"\n\n";
@@ -207,7 +207,7 @@ while ( (entry = readdir(directory)) != nullptr )  {
 
    if ( S_ISDIR(sbuf.st_mode) )  {
 
-      b = get_filenames_from_dir(entry_path, regex1, regex2);
+      b = get_filenames_from_dir(entry_path.c_str(), regex1, regex2);
 
       b.sort();
 

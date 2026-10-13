@@ -1407,7 +1407,7 @@ void ICVQueue::init_from_scratch()
 
 {
 
-memset(v, 0, sizeof(v));
+for (auto & p : v)  p.reset();
 
 Nelements = 0;
 

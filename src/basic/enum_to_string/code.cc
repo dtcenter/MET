@@ -75,10 +75,10 @@ if ( e.n_ids() == 0 )  return;
 
 int j;
 ofstream f;
-char filename[256];
+char filename[512];
 char lower[256];
 char upper[256];
-char pound_define[256];
+char pound_define[512];
 ConcatString cs;
 int len, scope_len, max_len;
 std::vector<char> len_name_buf;
@@ -259,10 +259,10 @@ void write_cs_header(const EnumInfo & e)
 if ( e.n_ids() == 0 )  return;
 
 ofstream f;
-char filename[256];
+char filename[512];
 char lower[256];
 char upper[256];
-char pound_define[256];
+char pound_define[512];
 ConcatString cs;
 int len, scope_len, max_len;
 std::vector<char> len_name_buf;
@@ -425,7 +425,7 @@ void write_source(const EnumInfo & e)
 ofstream out;
 char L = '\"';
 char R = '\"';
-char filename[256];
+char filename[512];
 char lower[256];
 ConcatString cs;
 
@@ -539,7 +539,7 @@ void write_cs_source(const EnumInfo & e)
 ofstream out;
 char L = '\"';
 char R = '\"';
-char filename[256];
+char filename[512];
 char lower[256];
 ConcatString cs;
 

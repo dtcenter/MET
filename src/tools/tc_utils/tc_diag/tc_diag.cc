@@ -58,6 +58,13 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
+// Defined here rather than in tc_diag.h, which python_tc_diag.cc also
+// includes, so that file does not get its own unused copies
+static GrdFileType file_type = FileType_None;
+static unixtime    init_ut   = (unixtime) 0;
+
+////////////////////////////////////////////////////////////////////////
+
 static void usage(int exit_code=1);
 static void process_command_line(int, char**);
 static void get_file_type();
