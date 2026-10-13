@@ -260,7 +260,12 @@ void MetConfig::set_exit_on_warning()
 
 {
 
-bool b = lookup_bool(conf_key_exit_on_warning, false);
+   //
+   //  MET #3455 support the deprecated name
+   //
+
+bool b = lookup_bool(resolve_name(conf_key_exit_on_warn,
+                                  conf_key_exit_on_warn_deprecated), false);
 
 if ( LastLookupStatus )  mlog.set_exit_on_warning(b);
 
@@ -330,7 +335,12 @@ bool MetConfig::time_offset_warning(int offset)
 
 {
 
-int allowable_offset = lookup_int(conf_key_time_offset_warning, false);
+   //
+   //  MET #3455 support the deprecated name
+   //
+
+int allowable_offset = lookup_int(resolve_name(conf_key_time_offset_warn,
+                                               conf_key_time_offset_warn_deprecated), false);
 
 if (!LastLookupStatus )  allowable_offset = 0;
 
