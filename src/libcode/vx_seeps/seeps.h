@@ -220,7 +220,6 @@ class SeepsClimoGrid : public SeepsClimoBase {
    private:
 
       int   month;
-      int   hour; // not implemented
       int   nx;
       int   ny;
       std::vector<double> p1_buf;

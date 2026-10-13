@@ -1379,7 +1379,6 @@ bool get_nc_data(NcVar *var, float *data) {
          }
       }
       else {
-         int unpacked_count = 0;
          float add_offset = get_var_add_offset(var);
          float scale_factor = get_var_scale_factor(var);
          bool do_scale_factor = has_scale_factor_attr(var) || has_add_offset_attr(var);
@@ -1556,7 +1555,6 @@ bool get_nc_data(NcVar *var, double *data) {
       // Retrieve the double value from the NetCDF variable.
       // Note: missing data was checked here
       //
-      int unpacked_count = 0;
       int type_id = GET_NC_TYPE_ID_P(var);
       const int cell_count = get_data_size(var);
 

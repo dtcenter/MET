@@ -67,9 +67,6 @@ static double  my_dmod      (double, double);
 static int     my_istep     (int);
 static double  my_dstep     (double);
 
-static double  my_F_to_C    (double);
-static double  my_C_to_F    (double);
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -134,12 +131,6 @@ const BuiltinInfo binfo[] = {
 
 
 const int n_binfos = std::size(binfo);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static const double five_ninths = 5.0/9.0;    //  used in conversion between farenheight and celcius
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -438,35 +429,6 @@ double my_dstep(double x)
 if ( x >= 0.0 )  return 1.0;
 
 return 0.0;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  F = (9/5)*C + 32
-   //
-
-
-double my_F_to_C(double F)
-
-{
-
-return ( five_ninths*(F - 32.0) );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double my_C_to_F(double C)
-
-{
-
-return ( 1.8*C + 32.0 );
 
 }
 

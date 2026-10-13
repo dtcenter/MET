@@ -85,7 +85,7 @@ int met_main(int argc, char *argv[]) {
    static DataPlane dp_mask;
 
    // Process each -type setting
-   for(int i=0; i<mask_type_opts.size(); i++) {
+   for(int i=0; i<(int) mask_type_opts.size(); i++) {
 
       // Re-initialize the mask grid for each iteration
       grid_mask.clear();
@@ -1622,7 +1622,7 @@ static void write_netcdf(const DataPlane &dp) {
          mask_name = poly_mask.name();
       }
       else {
-         for(int i=0; i<mask_type_opts.size(); i++) {
+         for(int i=0; i<(int) mask_type_opts.size(); i++) {
             if(i>0) mask_name << "_";
             mask_name << masktype_to_string(mask_type_opts[i]);
          }

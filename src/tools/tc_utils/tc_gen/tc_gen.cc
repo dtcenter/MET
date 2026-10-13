@@ -2283,7 +2283,7 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
    shc.set_alpha(bad_data_double);
 
    // Write a line for each matched pair
-   for(i=0; i<pgi.ProbGenMap[lead_hr].size(); i++) {
+   for(i=0; i<(int) pgi.ProbGenMap[lead_hr].size(); i++) {
 
       // Pointers for current case
       const ProbGenInfo *fgi = pgi.ProbGenMap[lead_hr][i];

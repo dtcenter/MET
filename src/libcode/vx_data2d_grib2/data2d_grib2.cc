@@ -374,8 +374,6 @@ void MetGrib2DataFile::find_record_matches(const VarInfoGrib2* vinfo,
                                            vector<Grib2Record*> &listMatchExact,
                                            vector<Grib2Record*> &listMatchRange) {
 
-   const char *method_name = "MetGrib2DataFile::find_record_matches() -> ";
-
    //  clear the contents of the result vectors
    listMatchExact.clear();
    listMatchRange.clear();

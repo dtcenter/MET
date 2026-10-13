@@ -434,8 +434,6 @@ std::unique_ptr<SeepsScore> SeepsClimo::get_seeps_score(int sid, double p_fcst, 
 ////////////////////////////////////////////////////////////////////////
 
 void SeepsClimo::print_all() {
-   const char *method_name = "SeepsClimo::print_all() -> ";
-
    cout << "\n";
    cout << "===============  00Z  ===============\n";
    cout << "  sid\tlat\tlon\telv\n";
@@ -672,7 +670,7 @@ void SeepsClimo::read_seeps_climo_grid(const ConcatString &filename) {
 ////////////////////////////////////////////////////////////////////////
 
 SeepsClimoGrid::SeepsClimoGrid(int month, int hour, const ConcatString &seeps_climo_name)
-   : month{month}, hour{hour}, SeepsClimoBase{seeps_climo_name}
+   : SeepsClimoBase{seeps_climo_name}, month{month}
 {
    clear();
 

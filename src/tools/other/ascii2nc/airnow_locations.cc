@@ -84,7 +84,6 @@ bool AirnowLocations::initialize(const string &fileName)
   }
 
   // this is inefficient, but will work
-  int bad_line_count = 0;
   while (locFile >> data_line) {
     string aqsid = data_line[aqsidPtr];
     string fullaqsid = data_line[fullaqsidPtr];

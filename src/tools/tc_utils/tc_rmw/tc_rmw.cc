@@ -81,8 +81,6 @@ static void set_config(const StringArray&);
 static void set_out(const StringArray&);
 static void setup_grid();
 static void setup_nc_file();
-static void build_outfile_name(const ConcatString&,
-                const char*, ConcatString&);
 static void compute_lat_lon(vector<double> &, vector<double> &);
 static void process_fields(const TrackInfoArray&);
 
@@ -337,10 +335,6 @@ static void process_track_files(const StringArray& files,
     // Initialize
     tracks.clear();
 
-    // Initialize counts
-    int tot_read = 0;
-    int tot_add = 0;
-
     // Set metadata pointer
     line.set_best_technique(&conf_info.BestTechnique);
 
@@ -365,7 +359,6 @@ static void process_track_files(const StringArray& files,
 
             // Increment line counts
             cur_read++;
-            tot_read++;
 
             // Add model suffix, if specified
             if(model_suffix[i].length() > 0) {
@@ -380,7 +373,6 @@ static void process_track_files(const StringArray& files,
             // MET #3370 check for analysis tracks
             if(tracks.add(line, true, true)) {
                 cur_add++;
-                tot_add++;
             }
         }
 

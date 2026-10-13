@@ -325,7 +325,7 @@ DataPlane cur_dp;
    // Loop over requested VarInfo objects
    //
 
-for(int i=0; i<vi_list.size(); i++) {
+for(size_t i=0; i<vi_list.size(); i++) {
 
    //
    // Initialize

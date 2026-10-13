@@ -402,7 +402,7 @@ void GenesisInfoArray::dump(ostream &out, int indent_depth) const {
 
    out << prefix << "NGenesis = " << (int) Genesis.size() << "\n";
 
-   for(i=0; i<Genesis.size(); i++) {
+   for(i=0; i<(int) Genesis.size(); i++) {
       out << prefix << "GenesisInfo[" << i+1 << "]:" << "\n";
       Genesis[i].dump(out, indent_depth+1);
    }
@@ -434,7 +434,7 @@ ConcatString GenesisInfoArray::serialize_r(int indent_depth) const {
 
    s << prefix << serialize() << ", Genesis:\n";
 
-   for(i=0; i<Genesis.size(); i++) {
+   for(i=0; i<(int) Genesis.size(); i++) {
       s << Genesis[i].serialize_r(i+1, indent_depth+1) << "\n";
    }
 
@@ -451,7 +451,7 @@ void GenesisInfoArray::assign(const GenesisInfoArray &ga) {
 
    if(ga.Genesis.size() == 0) return;
 
-   for(i=0; i<ga.Genesis.size(); i++) add(ga[i]);
+   for(i=0; i<(int) ga.Genesis.size(); i++) add(ga[i]);
 
    return;
 }
@@ -461,7 +461,7 @@ void GenesisInfoArray::assign(const GenesisInfoArray &ga) {
 const GenesisInfo & GenesisInfoArray::operator[](int n) const {
 
    // Check range
-   if((n < 0) || (n >= Genesis.size())) {
+   if((n < 0) || (n >= (int) Genesis.size())) {
       mlog << Error
            << "\nGenesisInfoArray::operator[](int) -> "
            << "range check error for index value " << n << "\n\n";
@@ -493,7 +493,7 @@ bool GenesisInfoArray::add(const GenesisInfo &gi) {
 
 bool GenesisInfoArray::has(const GenesisInfo &g) const {
 
-   for(int i=0; i<Genesis.size(); i++) {
+   for(int i=0; i<(int) Genesis.size(); i++) {
       if(g == Genesis[i]) return true;
    }
 
@@ -504,7 +504,7 @@ bool GenesisInfoArray::has(const GenesisInfo &g) const {
 
 bool GenesisInfoArray::has_storm(const GenesisInfo &g, int &i) const {
 
-   for(i=0; i<Genesis.size(); i++) {
+   for(i=0; i<(int) Genesis.size(); i++) {
       if(g.is_storm(Genesis[i])) return true;
    }
 
@@ -516,7 +516,7 @@ bool GenesisInfoArray::has_storm(const GenesisInfo &g, int &i) const {
 
 bool GenesisInfoArray::has_storm_id(const ConcatString &s, int &i) const {
 
-   for(i=0; i<Genesis.size(); i++) {
+   for(i=0; i<(int) Genesis.size(); i++) {
       if(Genesis[i].storm_id() == s) return true;
    }
 
@@ -542,7 +542,7 @@ bool GenesisInfoArray::erase_storm_id(const ConcatString &s) {
 int GenesisInfoArray::n_technique() const {
    StringArray sa;
 
-   for(int i=0; i<Genesis.size(); i++) {
+   for(int i=0; i<(int) Genesis.size(); i++) {
       if(!sa.has(Genesis[i].technique())) {
          sa.add(Genesis[i].technique());
       }

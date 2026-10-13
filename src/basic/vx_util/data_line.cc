@@ -891,13 +891,11 @@ int LineDataFile::peek_line(DataLine & a)
 
 {
 
-int status = 0;
-
 if ( ok() ) {
 
    int cur_pos = in->tellg();
 
-   status = a.read_line(this);
+   a.read_line(this);
 
    in->seekg(cur_pos);
 
@@ -1207,7 +1205,7 @@ if ( !status && !CurLDF.ok() )  {
    CurFileNumber++;
 
    // Check for the last file
-   if ( CurFileNumber == Filenames.size() )  return 0;
+   if ( CurFileNumber == static_cast<int>(Filenames.size()) )  return 0;
 
    // Open the next file
    CurLDF.close();
@@ -1251,7 +1249,7 @@ ostream & operator<<(ostream & out, const DataLine & L)
 
 if ( L.n_items() == 0 )  return out;
 
-int j;
+size_t j;
 
 for (j = 0; j < L.Items.size(); j++) {
     out << L.Items[j];
@@ -1278,7 +1276,7 @@ Logger & operator<<(Logger & lgr, const DataLine & L)
 
 if ( L.n_items() == 0 )  return lgr;
 
-for (int j = 0; j < L.Items.size(); j++) {
+for (size_t j = 0; j < L.Items.size(); j++) {
     lgr << L.Items[j];
     if (j < (L.Items.size() - 1))
         lgr << ' ';

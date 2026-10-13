@@ -664,8 +664,6 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
    // Check InitDiagThreshMap
    if(keep == true) {
 
-      int i_diag;
-
       // Loop through the numeric diagnostic thresholds
       for(thr_it=InitDiagThreshMap.begin(); thr_it!= InitDiagThreshMap.end(); thr_it++) {
 
@@ -3812,7 +3810,7 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    TimeArray Valid;
    unixtime valid_beg, valid_end;
    int lead_time;
-   int i, j, r, c;
+   int r;
 
    // Setup -out_stat file
    setup_stat_file(1 + (int) RIRWMap.size());
@@ -3896,11 +3894,6 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
       // Write the output STAT header columns
       //
       
-      //
-      // Initialize
-      //
-      c = 0;
-
       // Split the current map key, eliminating the job name in the first entry
       StringArray ByValue = it->first.split(":");
       ByValue.shift_down(0, 1);

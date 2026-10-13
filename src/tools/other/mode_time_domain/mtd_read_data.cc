@@ -44,7 +44,7 @@ if ( filenames.n() < 2 )  {
 
 }
 
-int j, k;
+int j;
 DataPlane plane;
 vector<unixtime> valid_times;
    //

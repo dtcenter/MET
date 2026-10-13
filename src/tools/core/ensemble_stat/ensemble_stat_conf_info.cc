@@ -742,7 +742,6 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
                                        StringArray &ens_member_ids,
                                        StringArray * ens_files,
                                        bool use_ctrl, ConcatString &control_id) {
-   VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *dict;
    std::unique_ptr<VarInfo> next_var;

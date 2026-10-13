@@ -207,7 +207,6 @@ bool NdbcHandler::_readObservations(LineDataFile &ascii_file)
   //
   // Process the observation lines
   //
-  int bad_line_count = 0;
   data_line.set_delimiter(" ");
 
   // skip the next line which is also a header
@@ -215,9 +214,7 @@ bool NdbcHandler::_readObservations(LineDataFile &ascii_file)
   ascii_file >> data_line;
 
   while (ascii_file >> data_line) {
-    if (!_parseObservationLineStandard(data_line, ascii_file.filename())) {
-      bad_line_count++;
-    }
+    _parseObservationLineStandard(data_line, ascii_file.filename());
   }
   return true;
 }

@@ -511,7 +511,6 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
    DictionaryEntry entry;
    StringArray lvl;
    int n_lvl;
-   int total;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_i_vx_dict() -> "
@@ -1265,7 +1264,6 @@ map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 map<ConcatString,ConcatString> parse_conf_obs_name_map(Dictionary *dict) {
-   const char *method_name = "parse_conf_obs_name_map() -> ";
    return parse_conf_key_value_map(dict, conf_key_obs_name_map);
 }
 
@@ -2094,7 +2092,7 @@ ClimoCDFInfo &ClimoCDFInfo::operator=(ClimoCDFInfo &&a) noexcept {
       a.flag = false;
       n_bin = a.n_bin;
       a.n_bin = 0;
-      cdf_ta = move(a.cdf_ta);
+      cdf_ta = std::move(a.cdf_ta);
       write_bins = a.write_bins;
       a.write_bins = false;
       direct_prob = a.direct_prob;
@@ -2897,7 +2895,6 @@ SurfaceInfo parse_conf_surface_info(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void parse_conf_topo_mask_interp(Dictionary *dict, SurfaceInfo &sfc_info) {
-   const char *method_name = "parse_conf_topo_mask_interp() -> ";
 
    // Conf: topo_mask.interp
    Dictionary *interp_dict = dict->lookup_dictionary(conf_key_topo_mask_interp);

@@ -163,7 +163,6 @@ void MtdIntFile::int_assign(const MtdIntFile & f)
 
 clear();
 
-int n;
 
 base_assign(f);
 
@@ -182,15 +181,11 @@ Nobjects = f.Nobjects;
 
 FileType = f.FileType;
 
-n = Nx*Ny*Nt;
-
 if ( ! f.Data.empty() )  {
 
    Data = f.Data;
 
 }
-
-n = Nobjects;
 
 ObjVolume = f.ObjVolume;
 
@@ -1303,9 +1298,6 @@ if ( n_new > 0 )  {
 
 }
 
-int replace_count = 0;
-int zero_count = 0;
-
 d = Data.data();
 
 if ( n_new > 0 )  {
@@ -1318,8 +1310,8 @@ if ( n_new > 0 )  {
 
       k = old_to_new[k - 1];
 
-      if ( k < 0 )    { *d = 0;      ++zero_count; }
-      else            { *d = 1 + k;  ++replace_count; }
+      if ( k < 0 )    *d = 0;
+      else            *d = 1 + k;
 
    }
 

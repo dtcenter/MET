@@ -231,7 +231,6 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
    int n_vld = 0;
    int n_thr = 0;
    double v;
-   double bad = bad_data_double;
    bool use_climo = false;
 
    // Check that width is set to 1 or greater

@@ -3198,7 +3198,6 @@ void process_madis_acarsProfiles(NcFile *f_in) {
    int nlvl;
    int nlvl1;
    int maxLevels;
-   long i_cnt;
    int hdr_sid_len;
    int buf_size;
    double tmp_dbl;
@@ -3329,7 +3328,6 @@ void process_madis_acarsProfiles(NcFile *f_in) {
    //
    // Initialize
    //
-   i_cnt = -1;
    int hdr_idx = 0;
 
    //
@@ -3424,7 +3422,6 @@ void process_madis_acarsProfiles(NcFile *f_in) {
          for(int i_lvl=0; i_lvl<nlvl; i_lvl++) {
 
             count = 0;
-            i_cnt++;
             mlog << Debug(3) << "  Mandatory Level: " << i_lvl << "\n";
 
             int i_buf = (i_idx * maxLevels) + i_lvl;

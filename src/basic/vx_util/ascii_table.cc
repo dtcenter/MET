@@ -325,7 +325,7 @@ const int NRC = NR*NC;
 
 e.resize(NRC);
 
-if ( e.size() != NRC )  {
+if ( static_cast<int>(e.size()) != NRC )  {
 
    mlog << Error << "\nAsciiTable::set_size_rc() -> memory allocation error 1\n\n";
 

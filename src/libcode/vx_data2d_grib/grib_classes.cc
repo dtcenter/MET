@@ -263,7 +263,7 @@ return *this;
 
 void GribRecord::extend_data(int n)
 {
-    if (data.capacity() >= n)
+    if ((int) data.capacity() >= n)
         return;
 
     data.reserve(n);
@@ -275,7 +275,7 @@ void GribRecord::extend_data(int n)
 
 void GribRecord::extend_bitmap(int n)
 {
-    if (bitmap.capacity() >= n)
+    if ((int) bitmap.capacity() >= n)
         return;
 
     bitmap.reserve(n);
@@ -759,7 +759,7 @@ bytes_processed = 0;
    //  Infer the record number by the current file position
    //
 
-for (g.rec_num=0,j=0; j<(rep->n_records); ++j)  {
+for (g.rec_num=0,j=0; j<((int) rep->n_records); ++j)  {
 
    if ( file_pos == rep->record_info[j].lseek_offset )  {
       g.rec_num = j+1;
@@ -1112,7 +1112,7 @@ while ( read_record(*g) )  {
 
    ++rep->n_records;
 
-   if ( rep->n_records >= rep->n_alloc )  rep->record_extend(rep->n_alloc + 1);
+   if ( (int) rep->n_records >= rep->n_alloc )  rep->record_extend(rep->n_alloc + 1);
 
 }
 
@@ -1195,7 +1195,7 @@ B = min<int>(bytes, rep->buf_size - buffer_offset);   //  to please fortify
 
 n_read = ::read(rep->fd, (rep->buf.data() + buffer_offset), B);
 
-if ( n_read != B )  {
+if ( n_read != static_cast<size_t>(B) )  {
 
    mlog << Error << "\nGribFile::read() -> file read error ... requested " << B << " bytes, got " << n_read << "\n\n";
 
@@ -1263,7 +1263,7 @@ off_t GribFile::record_offset(int n)
 
 {
 
-if ( (n < 0) || (n >= (rep->n_records)) )  {
+if ( (n < 0) || (n >= ((int) rep->n_records)) )  {
 
    mlog << Error << "\nGribFile::record_offset(int) -> range check error\n\n";
 
@@ -1283,7 +1283,7 @@ int GribFile::gribcode(int n)
 
 {
 
-if ( (n < 0) || (n >= (rep->n_records)) )  {
+if ( (n < 0) || (n >= ((int) rep->n_records)) )  {
 
    mlog << Error << "\nGribFile::gribcode(int) -> range check error\n\n";
 
@@ -1341,7 +1341,7 @@ void GribFile::seek_record(int n)
 
 {
 
-if ( (n < 0) || (n >= (rep->n_records)) )  {
+if ( (n < 0) || (n >= ((int) rep->n_records)) )  {
 
    mlog << Error << "\nGribFile::seek_record(int) -> range check error\n\n";
 

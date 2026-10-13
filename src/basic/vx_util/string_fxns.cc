@@ -92,7 +92,8 @@ void check_met_version(const char * check_version) {
 ConcatString parse_version(const char * version, const int ndots) {
    ConcatString cs;
    string s = version;
-   int i, n;
+   size_t i;
+   int n;
 
    //
    // Parse the version string to the requested depth.

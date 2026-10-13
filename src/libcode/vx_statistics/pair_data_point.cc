@@ -154,7 +154,7 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
                pd.lvl_na[i], pd.hgt_na[i],
                pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
                cpi, pd.wgt_na[i]) &&
-            i < pd.seeps_mpr.size()) {
+            i < static_cast<int>(pd.seeps_mpr.size())) {
             set_seeps_score(seeps_mpr[i].get(), i);
          }
       }
@@ -431,7 +431,7 @@ VxPairDataPoint::VxPairDataPoint(const VxPairDataPoint &vx_pd) {
 ////////////////////////////////////////////////////////////////////////
 
 VxPairDataPoint::VxPairDataPoint(VxPairDataPoint &&vx_pd) noexcept
-   : VxPairBase(move(vx_pd)), pd(move(vx_pd.pd)) { }
+   : VxPairBase(std::move(vx_pd)), pd(std::move(vx_pd.pd)) { }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -450,8 +450,8 @@ VxPairDataPoint & VxPairDataPoint::operator=(VxPairDataPoint &&vx_pd) noexcept {
 
    if(this == &vx_pd) return *this;
 
-   VxPairBase::operator=(move(vx_pd));
-   pd = move(vx_pd.pd);
+   VxPairBase::operator=(std::move(vx_pd));
+   pd = std::move(vx_pd.pd);
 
    return *this;
 }

@@ -1610,7 +1610,6 @@ void write_seeps_row(StatHdrColumns &shc, const SeepsAggScore *seeps,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row,
                      bool update_thresh) {
-   const char *method_name = "write_seeps_row() -> ";
 
    // SEEPS line type
    shc.set_line_type(stat_seeps_str);
@@ -1676,7 +1675,7 @@ void write_seeps_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
    // Write a line for each matched pair
    for(int i=0; i<pd_ptr->n_obs; i++) {
 
-      if(i >= pd_ptr->seeps_mpr.size()) break;
+      if(i >= static_cast<int>(pd_ptr->seeps_mpr.size())) break;
       if(!pd_ptr->seeps_mpr[i] ||
          is_bad_data(pd_ptr->seeps_mpr[i]->score)) continue;
 

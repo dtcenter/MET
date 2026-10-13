@@ -156,8 +156,6 @@ TimeBeg = f.TimeBeg;
 
 TimeEnd = f.TimeEnd;
 
-const int n = Nx*Ny*Nt;
-
 if ( ! f.Data.empty() )  {
 
    Data = f.Data;
@@ -338,18 +336,13 @@ if ( (t < 0) || (t >= Nt) )  {
    //
 
 int x, y, n;
-int count;
 double value;
-
-count = 0;
 
 for (x=0; x<Nx; ++x)  {
 
    for (y=0; y<Ny; ++y)  {
 
       value = plane(x, y);
-
-      if ( value == bad_data_double )  ++count;
 
       n = mtd_three_to_one(Nx, Ny, Nt, x, y, t);
 

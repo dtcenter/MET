@@ -64,8 +64,8 @@ void update_pdf(double min, double delta, vector<long long>& pdf,
             if(mp.s_is_on(x, y) && !is_bad_data(value)) {
 
                auto bin = (int) floor((value - min) / delta);
-                    if(bin < 0)           bin = 0;
-               else if(bin >= pdf.size()) bin = (int) pdf.size() - 1;
+                    if(bin < 0)                 bin = 0;
+               else if(bin >= (int) pdf.size()) bin = (int) pdf.size() - 1;
 
                pdf[bin]++;
             }
@@ -131,7 +131,7 @@ void update_joint_pdf(int n_A, int n_B, double min_A, double min_B,
 void print_pdf(double min, double delta,
                const vector<long long>& pdf) {
 
-   for(int k=0; k<pdf.size(); k++) {
+   for(size_t k=0; k<pdf.size(); k++) {
       double bin_min = min + k * delta;
       double bin_max = min + (k + 1) * delta;
       cout << "[" << bin_min << ", " << bin_max << "] "
@@ -149,7 +149,7 @@ void write_nc_pdf(const NcFile* nc_out, const VarInfo& info,
    vector<double> bin_max;
    vector<double> bin_mid;
 
-   for(int k=0; k<pdf.size(); k++) {
+   for(size_t k=0; k<pdf.size(); k++) {
       bin_min.emplace_back(min + delta * k);
       bin_max.emplace_back(min + delta * (k + 1));
       bin_mid.emplace_back(min + delta * (k + 0.5));

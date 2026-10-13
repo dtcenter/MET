@@ -475,9 +475,9 @@ for (const auto &e : Entry) {
    //  must be in-between
    //
 
-for (int j=0; j<(Entry.size() - 1); ++j)  {
+for (size_t j=0; j<(Entry.size() - 1); ++j)  {
 
-   int k = j + 1;
+   size_t k = j + 1;
 
    double vlo = Entry[j].value_high();
    double vhi = Entry[k].value_low();
@@ -582,7 +582,6 @@ int ColorTable::write(const char * filename)
 
 {
 
-int j;
 ofstream out;
 
 out.open(filename);
@@ -717,7 +716,7 @@ out << prefix << "Colortable dump ... \n";
 out << prefix << "Gamma     = " << Gamma    << "\n";
 out << prefix << "# entries = " << Entry.size() << "\n";
 
-for (int j=0; j<Entry.size(); ++j)  {
+for (size_t j=0; j<Entry.size(); ++j)  {
 
    out << prefix << "Entry # " << j << " ...\n";
 
@@ -737,7 +736,7 @@ void ColorTable::extend(int n)
 
 {
 
-if ( Entry.capacity() >= n )  return;
+if ( (int) Entry.capacity() >= n )  return;
 
 int j = n/ctable_alloc_inc;
 
@@ -783,9 +782,9 @@ if ( Entry.size() <= 1 )  return;
    //     don't usually have very many entries
    //
 
-for (int j=0; j<(Entry.size() - 1); ++j)  {
+for (size_t j=0; j<(Entry.size() - 1); ++j)  {
 
-   for (int k=(j + 1); k<Entry.size(); ++k)  {
+   for (size_t k=(j + 1); k<Entry.size(); ++k)  {
 
       if ( Entry[j].value_low() > Entry[k].value_low() )  {
 
@@ -813,7 +812,7 @@ CtableEntry ColorTable::operator[](int n) const
 
 {
 
-if ( (n < 0) || (n >= Entry.size()) )  {
+if ( (n < 0) || (n >= (int) Entry.size()) )  {
 
    mlog << Error << "\nCtableEntry ColorTable::operator[](int) const -> "
         << "range check error\n\n";
