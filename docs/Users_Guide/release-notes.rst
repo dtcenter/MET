@@ -233,6 +233,21 @@ MET Version 13.0.0 Upgrade Instructions
      `#3396 <https://github.com/dtcenter/MET/issues/3396>`_, improvements to the RPS computation
      algorithm result in minor changes to the statistics.
 
+   * Output regridded from Lambert Azimuthal Equal Area (LAEA) grids using the AW_MEAN
+     interpolation method, or masked using the "AREA" grid weight option, changes slightly.
+     As described in MET `#3178 <https://github.com/dtcenter/MET/issues/3178>`_, LAEA grid box
+     areas were previously computed from a grid box centered on each grid point, unlike all
+     other grid types, which used the grid box whose lower-left corner is that point. LAEA now
+     follows the same convention as the other grid types. See the additional upgrade
+     instructions below for details.
+
+   * Output regridded to lat/lon, rotated lat/lon, and Mercator grids using the AW_MEAN
+     interpolation method changes along the western edge of regional grids, the eastern edge
+     of Mercator grids, and the first column of global grids. As described in MET
+     `#3178 <https://github.com/dtcenter/MET/issues/3178>`_, input grid points within half an
+     output grid box of those edges were previously discarded rather than assigned to the
+     nearest output grid box.
+
 .. dropdown:: Additional upgrade instructions
 
    Recommendations when upgrading to MET version 13.0.0:
@@ -242,3 +257,20 @@ MET Version 13.0.0 Upgrade Instructions
      as described in :numref:`met_obs_err_table`. The old environment variable name is still
      supported but prints a warning and should be replaced. User-defined observation error
      table files whose names begin with "obs_error" are still read.
+
+   * MET version 13.0.0 adds the AW_MEAN_CNTR interpolation method and the AREA_CNTR grid weight
+     option, which compute the area of the grid box **centered** on each grid point. The existing
+     AW_MEAN and AREA options compute the area of the grid box whose **lower-left corner** is that
+     point. Previously, Lambert Azimuthal Equal Area (LAEA) grids were the one exception to that
+     convention, computing centered areas even for AW_MEAN and AREA. That inconsistency has been
+     resolved, so AW_MEAN and AREA now behave the same way for LAEA grids as for all others.
+
+   * Users regridding from or weighting LAEA grids who wish to reproduce output from MET version
+     12.2.0 and earlier should switch from AW_MEAN to AW_MEAN_CNTR, and from AREA to AREA_CNTR.
+     Note that AW_MEAN_CNTR is not simply the old behavior renamed. It also divides the weight of
+     each input grid box among the output grid boxes it overlaps, so results will not match
+     exactly. AW_MEAN_CNTR is the recommended method for area-weighted regridding regardless of
+     grid type.
+
+   * Users of all other grid types are unaffected by the LAEA change, since their grid box areas
+     were already computed from the lower-left corner.
