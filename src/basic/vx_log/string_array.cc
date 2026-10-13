@@ -848,6 +848,11 @@ regex_t *preg = &buffer;
 // Check for null pointers
 if( !reg_exp_str || !test_str ) return false;
 
+// An empty pattern matches everything. Check for it explicitly since
+// POSIX leaves it undefined: glibc accepts it but macOS regcomp()
+// returns REG_EMPTY.
+if( *reg_exp_str == '\0' ) return true;
+
 if( regcomp(preg, reg_exp_str, REG_EXTENDED*REG_NOSUB) != 0 ) {
    mlog << Error << "\ncheck_reg_exp(char *, char *) -> "
         << "regcomp error for \""
