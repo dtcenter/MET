@@ -62,7 +62,7 @@ ScopeStackElement::ScopeStackElement(const ScopeStackElement & e)
 
 {
 
-Name = (const char *) nullptr;
+Name.clear();
 
 assign(e);
 
