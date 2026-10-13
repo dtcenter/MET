@@ -112,21 +112,6 @@ static Color dcolor_to_color(const Dcolor &);
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  Bison emits an "if (0) goto yyerrorlab;" in yyparse() that clang
-   //  flags with -Wunreachable-code. Suppress it for the generated parser
-   //  only; the matching pop is at the start of the epilogue.
-   //
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunreachable-code"
-#endif
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 %}
 
 
@@ -196,11 +181,6 @@ number : INTEGER   { $$ = int_to_num($1); }
 
 
 %%
-
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 ////////////////////////////////////////////////////////////////////////
