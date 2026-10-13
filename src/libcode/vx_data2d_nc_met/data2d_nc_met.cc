@@ -186,19 +186,29 @@ void MetNcMetDataFile::set_range_azimuth_times(int i_track_point, DataPlane &pla
 
    if(!MetNc->is_range_azimuth() || i_track_point < 0) return;
 
-   string ymd_hms_str("19700101_000000");
    vector<size_t> start(1, i_track_point);
    vector<size_t> count(1, 1);
+
+   //
+   //  init_time and valid_time are NC_STRING variables.  Read them through
+   //  char *, which the netCDF library allocates and nc_free_string()
+   //  releases.  These used to be read into a std::string, which matched
+   //  NcVar::getVar(void *) and wrote the raw char * over the string object.
+   //
+   char *ymd_hms_str = nullptr;
 
    // Initialization time
    NcVar var_init = get_nc_var(MetNc->Nc.get(), "init_time");
    var_init.getVar(&ymd_hms_str);
-   plane.set_init(timestring_to_unix(ymd_hms_str.c_str()));
+   plane.set_init(timestring_to_unix(ymd_hms_str));
+   nc_free_string(1, &ymd_hms_str);
 
    // Valid time
+   ymd_hms_str = nullptr;
    NcVar var_valid = get_nc_var(MetNc->Nc.get(), "valid_time");
    var_valid.getVar(start, count, &ymd_hms_str);
-   plane.set_valid(timestring_to_unix(ymd_hms_str.c_str()));
+   plane.set_valid(timestring_to_unix(ymd_hms_str));
+   nc_free_string(1, &ymd_hms_str);
 
    // Lead time
    int lead_sec;
