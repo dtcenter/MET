@@ -178,6 +178,21 @@ static void do_user_function_def();
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  Bison emits an "if (0) goto yyerrorlab;" in yyparse() that clang
+   //  flags with -Wunreachable-code. Suppress it for the generated parser
+   //  only; the matching pop is at the start of the epilogue.
+   //
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunreachable-code"
+#endif
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 %}
 
 
@@ -388,6 +403,11 @@ point : '(' expression ',' expression ')'   { add_point(); }
 
 
 %%
+
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////
