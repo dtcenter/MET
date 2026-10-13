@@ -650,7 +650,9 @@ bool IODAReader::read_point_data(const ConcatString &data_name,
 
 bool IODAReader::read_string_data(const char *var_name, vector<string> &hdr_data, int str_length) {
    bool status = false;
-   char hdr_val[512];
+   // Room for str_length characters plus the terminator that m_strncpy()
+   // and m_rstrip() write at index str_length
+   vector<char> hdr_val(str_length+1, 0);
    static const char *method_name = "IODAReader::read_string_data -> ";
    static const char *method_name_s = "IODAReader::read_string_data() ";
 
@@ -670,11 +672,11 @@ bool IODAReader::read_string_data(const char *var_name, vector<string> &hdr_data
       vector<char *> hdr_data2(nlocs, nullptr);
       if ((status = get_nc_data(&hdr_var, hdr_data2.data()))) {
          for (int i=0; i<nlocs; i++ ) {
-            m_strncpy(hdr_val, hdr_data2[i], str_length, method_name_s, "ioda_header");
-            m_rstrip(hdr_val, str_length);
-            hdr_data[i] = hdr_val;
+            m_strncpy(hdr_val.data(), hdr_data2[i], str_length, method_name_s, "ioda_header");
+            m_rstrip(hdr_val.data(), str_length);
+            hdr_data[i] = hdr_val.data();
             mlog << Debug(9) << method_name
-                 << var_name << "[" << i<< "]: " << hdr_data[i] << " from " << hdr_val << "\n";
+                 << var_name << "[" << i<< "]: " << hdr_data[i] << " from " << hdr_val.data() << "\n";
          }
          hdr_data2.clear();
       }
@@ -683,11 +685,11 @@ bool IODAReader::read_string_data(const char *var_name, vector<string> &hdr_data
       vector<char> hdr_data2(nlocs*(str_length+1),0);
       if ((status = get_meta_data_chars(hdr_var, hdr_data2.data()))) {
          for (int i=0; i<nlocs; i++ ) {
-            m_strncpy(hdr_val, hdr_data2.data()+(i*str_length), str_length, method_name_s, "ioda_header");
-            m_rstrip(hdr_val, str_length);
-            hdr_data[i] = hdr_val;
+            m_strncpy(hdr_val.data(), hdr_data2.data()+(i*str_length), str_length, method_name_s, "ioda_header");
+            m_rstrip(hdr_val.data(), str_length);
+            hdr_data[i] = hdr_val.data();
             mlog << Debug(9) << method_name
-                 << var_name << "[" << i<< "]: " << hdr_data[i] << " from " << hdr_val << "\n";
+                 << var_name << "[" << i<< "]: " << hdr_data[i] << " from " << hdr_val.data() << "\n";
          }
       }
    }
