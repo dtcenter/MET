@@ -1435,7 +1435,6 @@ static void apply_lat_lon_mask(DataPlane &dp) {
 
 static void apply_shape_mask(DataPlane & dp) {
    int n_in = 0;
-   bool status = false;
 
    // Load the shapes
    GridClosedPolyArray poly;
@@ -1447,8 +1446,7 @@ static void apply_shape_mask(DataPlane & dp) {
 
    // Check grid points
 #pragma omp parallel default(none) \
-   shared(grid, poly_list, complement, dp, n_in) \
-   private(status)
+   shared(grid, poly_list, complement, dp, n_in)
    {
 
 #pragma omp for schedule(static) \
@@ -1457,6 +1455,8 @@ static void apply_shape_mask(DataPlane & dp) {
      
       for(int x=0; x<(grid.nx()); x++) {
          for(int y=0; y<(grid.ny()); y++) {
+
+            bool status = false;
 
             for(const auto& cur_poly: poly_list) {
 
