@@ -1,3 +1,4 @@
+#include <memory>
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -46,7 +47,7 @@ class MetUGridDataFile : public Met2dDataFile {
       //  NetCDF file
       //
       
-      UGridFile * _file;    //  allocated
+      std::unique_ptr<UGridFile> _file;
       long _cur_time_index; // current time index to get the data plane (for array of data_plane)
       long _cur_vert_index; // current vertical index to get the data plane (for array of data_plane)
 

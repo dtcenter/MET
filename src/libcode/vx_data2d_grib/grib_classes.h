@@ -18,6 +18,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 #include <fstream>
 #include <string.h>
@@ -368,11 +369,11 @@ class GribRecord  {
 
       std::vector<unsigned char>      bitmap;   //  allocated
 
-      Section0_Header *      is;   //  allocated
-      unsigned char   *     pds;   //  allocated
-      Section2_Header *     gds;   //  allocated
-      Section3_Header *     bms;   //  allocated
-      Section4_Header *     bds;   //  allocated
+      std::unique_ptr<Section0_Header>  is;
+      std::vector<unsigned char>       pds;
+      std::unique_ptr<Section2_Header> gds;
+      std::unique_ptr<Section3_Header> bms;
+      std::unique_ptr<Section4_Header> bds;
 
       off_t Sec0_offset_in_record;
       off_t Sec1_offset_in_record;
@@ -478,30 +479,33 @@ class GribFileRep {
 
       friend class GribFile;
 
-   protected:
+   public:
 
-      int referenceCount;
-
-      int fd;
-      long file_start;
-
-      char * name;
-
-      int issue;
-      int lead;
-
-      unsigned char * buf;
-      size_t buf_size;
-
-      unsigned int n_records;
-      int n_alloc;
-
-      RecordInfo * record_info;
+         //  public so std::make_shared can construct and destroy one;
+         //  the data members below stay protected for GribFile's use
 
       GribFileRep();
      ~GribFileRep();
       GribFileRep(const GribFileRep &);
       GribFileRep &operator=(const GribFileRep &);
+
+   protected:
+
+      int fd;
+      long file_start;
+
+      ConcatString name;
+
+      int issue;
+      int lead;
+
+      std::vector<unsigned char> buf;
+      size_t buf_size;
+
+      unsigned int n_records;
+      int n_alloc;
+
+      std::vector<RecordInfo> record_info;
 
       void record_extend(int);
 
@@ -517,7 +521,7 @@ class GribFile {
 
    protected:
 
-      GribFileRep * rep;
+      std::shared_ptr<GribFileRep> rep;
 
    public:
 

@@ -19,7 +19,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-GlobalPython GP;   //  this needs external linkage
+GlobalPython GP;   // this needs external linkage
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -28,44 +28,45 @@ ostream & operator<<(ostream & out, PyObject * obj)
 
 {
 
-char * buf = 0;
-size_t len = 0;
-FILE * f   = 0;
+   //
+   // PyObject_Print() with Py_PRINT_RAW writes str(obj),
+   // so write that string directly
+   //
 
+if ( ! obj )  { out << "<nil>";   return out; }
 
-if ( (f = open_memstream(&buf, &len)) == nullptr )  {
+PyObject * str_obj = PyObject_Str(obj);
+
+if ( ! str_obj )  {
 
    mlog << Error << "\noperator<<(ostream &, PyObject *) -> "
-        << "unable to open memory stream\n\n";
+        << "PyObject_Str error\n\n";
 
    exit ( 1 );
 
 }
 
+const char * buf = PyUnicode_AsUTF8(str_obj);
 
-if ( PyObject_Print(obj, f, Py_PRINT_RAW) < 0 )  {
+if ( ! buf )  {
 
    mlog << Error << "\noperator<<(ostream &, PyObject *) -> "
-        << "PyObject_Print error\n\n";
+        << "PyUnicode_AsUTF8 error\n\n";
 
    exit ( 1 );
 
 }
 
-fflush(f);   //  important
-
-if ( buf )  out << buf;
+out << buf;
 
    //
-   //  cleanup
+   // cleanup
    //
 
-fclose(f);   f = 0;
-
-if ( buf )  { free(buf);   buf = 0; }
+Py_DECREF(str_obj);   str_obj = 0;
 
    //
-   //  done
+   // done
    //
 
 return out;
@@ -99,15 +100,15 @@ int pyobject_as_int (PyObject * obj)
 int k = bad_data_int;
 
 
-if ( PyLong_Check(obj) )  {   //  long?
+if ( PyLong_Check(obj) )  {   // long?
 
    k = (int) PyLong_AsLong(obj);
 
-} else if ( PyFloat_Check(obj) )  {   //  double?
+} else if ( PyFloat_Check(obj) )  {   // double?
 
    k = nint(PyFloat_AsDouble(obj));
 
-} else if ( PyUnicode_Check(obj) )  {   //  string?
+} else if ( PyUnicode_Check(obj) )  {   // string?
 
    k = atoi(PyUnicode_AsUTF8(obj));
 
@@ -147,15 +148,15 @@ double pyobject_as_double (PyObject * obj)
 double x = bad_data_double;
 
 
-if ( PyLong_Check(obj) )  {   //  long?
+if ( PyLong_Check(obj) )  {   // long?
 
    x = (double) PyLong_AsLong(obj);
 
-} else if ( PyFloat_Check(obj) )  {   //  double?
+} else if ( PyFloat_Check(obj) )  {   // double?
 
    x = PyFloat_AsDouble(obj);
 
-} else if ( PyUnicode_Check(obj) )  {   //  string?
+} else if ( PyUnicode_Check(obj) )  {   // string?
 
    x = atof(PyUnicode_AsUTF8(obj));
 
@@ -182,7 +183,7 @@ std::string pyobject_as_string (PyObject * obj)
 
 std::string s;
 
-if ( PyUnicode_Check(obj) )  {   //  string?
+if ( PyUnicode_Check(obj) )  {   // string?
 
    s = PyUnicode_AsUTF8(obj);
 
@@ -209,7 +210,7 @@ ConcatString pyobject_as_concat_string (PyObject * obj)
 
 ConcatString s;
 
-if ( PyUnicode_Check(obj) )  {   //  string?
+if ( PyUnicode_Check(obj) )  {   // string?
 
    s = PyUnicode_AsUTF8(obj);
 

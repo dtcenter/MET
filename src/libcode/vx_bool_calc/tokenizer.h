@@ -11,6 +11,7 @@
 
 
 #include "token.h"
+#include <string>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -24,7 +25,7 @@ class Tokenizer {
 
       int get_number();
 
-      const char * source;   //  allocated, nul-terminated
+      std::string source;
 
       int pos;               //  next unread character
 

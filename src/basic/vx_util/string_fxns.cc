@@ -202,40 +202,6 @@ void strip_char(char *str, const char c)
 ////////////////////////////////////////////////////////////////////////
 
 
-int num_tokens(const char *test_str, const char *separator)
-
-{
-   int n = 0;
-   char *temp_str = (char *) nullptr;
-   char *temp_ptr = (char *) nullptr;
-   char *c = (char *) nullptr;
-   const char *method_name = "num_tokens() -> ";
-
-   //
-   // Check for an empty string
-   //
-   if(!test_str) return 0;
-   
-   int buf_len = m_strlen(test_str);
-   if(buf_len <= 0) return 0;
-
-   //
-   // Initialize the temp string for use in tokenizing
-   //
-   temp_str = m_strcpy2(test_str, method_name);
-   if (temp_str) {
-
-      //
-      // Compute the number of tokens in the string
-      //
-      while((c = strtok_r(temp_str, separator, &temp_ptr)) != nullptr) n++;
-
-   }
-
-   if(temp_str) { delete [] temp_str; temp_str = (char *) nullptr; }
-
-   return n;
-}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -266,24 +232,26 @@ bool has_prefix(const char **prefix_list, int n_prefix,
 
 ////////////////////////////////////////////////////////////////////////
 
-int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
+int regex_apply(const char* pat, int num_mat, const char* str, StringArray &mat)
 {
    const char *method_name = "regex_apply() ";
    //  compile the regex pattern
    int rc = 0;
    int num_act = 0;
    int num_pmat = ( 0 == num_mat ? 1 : num_mat );
-   regex_t *re = new regex_t;
+   regex_t re;
    vector<regmatch_t> pmatch(num_pmat);
-   if(0 != (rc = regcomp(re, pat, REG_EXTENDED))){
-      regfree(re);
-      if( re ) { delete re; re = 0; }
+
+   mat.clear();
+
+   if(0 != (rc = regcomp(&re, pat, REG_EXTENDED))){
+      regfree(&re);
       mlog << Error << "\n" << method_name << "- regcomp() error: " << rc << "\n\n";
       exit(1);
    }
 
    //  apply the pattern to the input string
-   rc = regexec(re, str, num_pmat, pmatch.data(), 0);
+   rc = regexec(&re, str, num_pmat, pmatch.data(), 0);
 
    //  if the match succeeded, build the data for return
    if( 0 == rc ){
@@ -299,35 +267,18 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
          //  count the actual number of matches
          for(int i=0; i < num_mat; i++){ if( -1 != pmatch[i].rm_so ) num_act++; }
 
-         //  store the matched strings in a null-terminated list
+         //  store the matched strings
          string str_dat = str;
-         mat = new char*[num_act + 1];
          for(int i=0; i < num_act; i++){
             int mat_len = pmatch[i].rm_eo - pmatch[i].rm_so;
-            mat[i] = new char[mat_len + 1];
-            m_strncpy(mat[i], str_dat.substr(pmatch[i].rm_so, mat_len).data(),
-                      mat_len, method_name, "mat[i]");
+            mat.add(str_dat.substr(pmatch[i].rm_so, mat_len));
          }
-         mat[num_act] = nullptr;
 
       }
-   } else {
-      mat = nullptr;
    }
 
-   regfree(re);
-   if( re ) { delete re; re = nullptr; }
+   regfree(&re);
    return num_act;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void regex_clean(char** &mat)
-{
-   if( !mat ) return;
-   for(int i=0; mat[i] != nullptr; i++) delete [] mat[i];
-   delete [] mat;
-   mat = nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -19,6 +19,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 #include "color_parser.h"
 #include "concat_string.h"
@@ -85,13 +86,7 @@ class ColorList {
 
       void assign(const ColorList &);
 
-      void extend(int);
-
-      int Nelements;
-
-      int Nalloc;
-
-      ClistEntry * e;
+      std::vector<ClistEntry> e;
 
    public:
 
@@ -118,7 +113,7 @@ class ColorList {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int ColorList::n_elements() const { return Nelements; }
+inline int ColorList::n_elements() const { return (int) e.size(); }
 
 
 ////////////////////////////////////////////////////////////////////////

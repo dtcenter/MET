@@ -92,13 +92,12 @@ bool get_nc_att_value_(const netCDF::NcVar *var, const ConcatString &att_name,
    //
    // Retrieve the NetCDF variable attribute.
    //
-   netCDF::NcVarAtt *att = get_nc_att(var, att_name);
-   bool status = get_att_value((netCDF::NcAtt *)att, att_val);
+   auto att = get_nc_att(var, att_name);
+   bool status = get_att_value((netCDF::NcAtt *)att.get(), att_val);
    if (!status) {
       mlog << Error << "\n" << caller_name
-           << get_log_msg_for_att(att, GET_SAFE_NC_NAME_P(var), att_name);
+           << get_log_msg_for_att(att.get(), GET_SAFE_NC_NAME_P(var), att_name);
    }
-   if (att) delete att;
    if (!status && exit_on_error) exit(1);
 
    return status;
@@ -115,14 +114,13 @@ bool get_nc_att_values_(const netCDF::NcVar *var, const ConcatString &att_name,
    //
    // Retrieve the NetCDF variable attribute.
    //
-   netCDF::NcVarAtt *att = get_nc_att(var, att_name);
-   bool status = IS_VALID_NC_P(att);
+   auto att = get_nc_att(var, att_name);
+   bool status = IS_VALID_NC_P(att.get());
    if (status) att->getValues(att_vals);
    else {
       mlog << Error << "\n" << caller_name
-           << get_log_msg_for_att(att, GET_SAFE_NC_NAME_P(var), att_name);
+           << get_log_msg_for_att(att.get(), GET_SAFE_NC_NAME_P(var), att_name);
    }
-   if (att) delete att;
    if (!status && exit_on_error) exit(1);
 
    return status;
@@ -159,10 +157,10 @@ bool get_global_att_value_(const netCDF::NcFile *nc, const ConcatString& att_nam
    // Initialize
    att_val = bad_data;
 
-   netCDF::NcGroupAtt *nc_att = get_nc_att(nc, att_name);
-   if (IS_VALID_NC_P(nc_att)) {
-      status = get_att_value((netCDF::NcAtt *)nc_att, att_val);
-      std::string data_type = GET_NC_TYPE_NAME_P(nc_att);
+   auto nc_att = get_nc_att(nc, att_name);
+   if (IS_VALID_NC_P(nc_att.get())) {
+      status = get_att_value((netCDF::NcAtt *)nc_att.get(), att_val);
+      std::string data_type = GET_NC_TYPE_NAME_P(nc_att.get());
       if (error_out && !status) {
          mlog << Error << caller_name
               << "The data type \"" << data_type
@@ -174,7 +172,6 @@ bool get_global_att_value_(const netCDF::NcFile *nc, const ConcatString& att_nam
            << "can't find global NetCDF attribute \"" << att_name
            << "\".\n\n";
    }
-   if (nc_att) delete nc_att;
    // Check error_out status
    if (error_out && !status) exit(1);
 
@@ -191,13 +188,12 @@ bool get_var_att_num_(const netCDF::NcVar *var, const ConcatString &att_name,
    // Initialize
    att_val = bad_data;
 
-   netCDF::NcVarAtt *att = get_nc_att(var, att_name);
+   auto att = get_nc_att(var, att_name);
    // Look for a match
-   if (IS_VALID_NC_P(att)) {
+   if (IS_VALID_NC_P(att.get())) {
       att->getValues(&att_val);
       status = true;
    }
-   if (att) delete att;
 
    return status;
 }
@@ -208,18 +204,16 @@ template <typename T>
 bool get_var_fill_value(const netCDF::NcVar *var, T &att_val) {
    bool found = false;
 
-   netCDF::NcVarAtt *att = get_nc_att(var, fill_value_att_name);
-   if (IS_INVALID_NC_P(att)) {
-      if (att) delete att;
+   auto att = get_nc_att(var, fill_value_att_name);
+   if (IS_INVALID_NC_P(att.get())) {
       att = get_nc_att(var, missing_value_att_name);
    }
-   if (IS_VALID_NC_P(att)) {
+   if (IS_VALID_NC_P(att.get())) {
       att->getValues(&att_val);
       found = true;
    }
    else set_def_fill_value(&att_val);
 
-   if (att) delete att;
 
    return found;
 }

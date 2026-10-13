@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <map>
+#include <vector>
 
 #include "mask_poly.h"
 
@@ -98,7 +99,7 @@ class TCPairsConfInfo {
 
       // Consensus model definition
       int NConsensus;           // Number of consensus models
-      ConsensusInfo *Consensus; // Consensus model definition
+      std::vector<ConsensusInfo> Consensus; // Consensus model definition
 
       // Time-lagged track definition
       IntArray LagTime;

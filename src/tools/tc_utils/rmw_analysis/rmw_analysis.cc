@@ -177,7 +177,7 @@ static void setup() {
    mlog << Debug(1) << "Reading dimensions: "
         << data_files[0] << "\n";
    nc_in = open_ncfile(data_files[0].c_str());
-   if(!nc_in) {
+   if(!nc_in.get()) {
       mlog << Error << "\n" << method_name
           << "unable to open data file \""
           << data_files[0] << "\"\n\n";
@@ -185,19 +185,19 @@ static void setup() {
    }
 
    // Get dimension sizes
-   get_dim(nc_in, "range", n_range, true);
-   range_dim = get_nc_dim(nc_in, "range");
+   get_dim(nc_in.get(), "range", n_range, true);
+   range_dim = get_nc_dim(nc_in.get(), "range");
 
-   get_dim(nc_in, "azimuth", n_azimuth, true);
-   azimuth_dim = get_nc_dim(nc_in, "azimuth");
+   get_dim(nc_in.get(), "azimuth", n_azimuth, true);
+   azimuth_dim = get_nc_dim(nc_in.get(), "azimuth");
 
-   if(get_dim(nc_in, "height", n_level)) {
+   if(get_dim(nc_in.get(), "height", n_level)) {
       mlog << Debug(3) << "Found height vertical dimension.\n";
-      level_dim = get_nc_dim(nc_in, "height");
+      level_dim = get_nc_dim(nc_in.get(), "height");
       level_name = "height";
-   } else if(get_dim(nc_in, "pressure", n_level)) {
+   } else if(get_dim(nc_in.get(), "pressure", n_level)) {
       mlog << Debug(3) << "Found pressure vertical dimension.\n";
-      level_dim = get_nc_dim(nc_in, "pressure");
+      level_dim = get_nc_dim(nc_in.get(), "pressure");
       level_name = "pressure";
    } else {
       mlog << Warning << "No vertical dimension found.\n";
@@ -214,13 +214,13 @@ static void setup() {
 
    ConcatString s;
 
-   NcVar range_var = get_nc_var(nc_in, "range");
+   NcVar range_var = get_nc_var(nc_in.get(), "range");
    count.clear();
    count.emplace_back(n_range);
    range_coord.resize(n_range);
    range_var.getVar(start, count, range_coord.data());
 
-   NcVar azimuth_var = get_nc_var(nc_in, "azimuth");
+   NcVar azimuth_var = get_nc_var(nc_in.get(), "azimuth");
    count.clear();
    count.emplace_back(n_azimuth);
    azimuth_coord.resize(n_azimuth);
@@ -228,7 +228,7 @@ static void setup() {
    get_att_value_string(&azimuth_var, "units", s);
    azimuth_units = s.string();
 
-   NcVar level_var = get_nc_var(nc_in, level_name.c_str());
+   NcVar level_var = get_nc_var(nc_in.get(), level_name.c_str());
    count.clear();
    count.emplace_back(n_level);
    level_coord.resize(n_level);
@@ -240,7 +240,7 @@ static void setup() {
    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
       data_names.emplace_back(conf_info.data_info[i_var]->name().string());
       NcVar var = get_nc_var(
-         nc_in, conf_info.data_info[i_var]->name().c_str());
+         nc_in.get(), conf_info.data_info[i_var]->name().c_str());
       int n_dim = get_dim_count(&var) - 1;
       data_n_dims.emplace_back(n_dim);
       ConcatString s;
@@ -332,12 +332,17 @@ static void process_data_files() {
    count_3d.emplace_back(n_range);
    count_3d.emplace_back(n_azimuth);
 
+   // Close the handle used to read the dimensions above.  The loop below
+   // re-opens the same file as its first iteration, and holding two open
+   // handles to one file and then closing the first one crashes in HDF5.
+   nc_in.reset();
+
    // Loop over the input files
    for(int i_file = 0; i_file < data_files.n(); i_file++) {
 
       // Open current data file
       nc_in = open_ncfile(data_files[i_file].c_str());
-      if(!nc_in) {
+      if(!nc_in.get()) {
          mlog << Error << "\n" << method_name
               << "unable to open data file \""
               << data_files[i_file] << "\"\n\n";
@@ -345,7 +350,7 @@ static void process_data_files() {
       }
 
       // Get the track point dimension
-      get_dim(nc_in, "track_point", n_track_point, true);
+      get_dim(nc_in.get(), "track_point", n_track_point, true);
 
       // Read track information
       TrackInfo cur_track(read_nc_track());
@@ -389,7 +394,7 @@ static void process_data_files() {
 
       // Loop over variables to be processed 
       for(int i_var = 0; i_var < data_names.size(); i_var++) {
-         NcVar var = get_nc_var(nc_in, data_names[i_var].c_str());
+         NcVar var = get_nc_var(nc_in.get(), data_names[i_var].c_str());
 
          mlog << Debug(3) << "Processing field: "
               << data_names[i_var] << "\n";
@@ -433,6 +438,10 @@ static void process_data_files() {
          } // end for i_point
       } // end for i_var
    } // end for i_file
+
+   // Release the last input file while the netCDF library is still alive,
+   // rather than leaving it to static destruction after main() returns.
+   nc_in.reset();
 
    return;
 }
@@ -479,12 +488,12 @@ static void write_stats() {
    mlog << Debug(1) << "Writing output file: " << out_file << "\n";
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_file.c_str(), program_name);
+   write_netcdf_global(nc_out.get(), out_file.c_str(), program_name);
 
    // Define dimensions
-   range_dim = add_dim(nc_out, "range", n_range);
-   azimuth_dim = add_dim(nc_out, "azimuth", n_azimuth);
-   level_dim = add_dim(nc_out, level_name, n_level);
+   range_dim = add_dim(nc_out.get(), "range", n_range);
+   azimuth_dim = add_dim(nc_out.get(), "azimuth", n_azimuth);
+   level_dim = add_dim(nc_out.get(), level_name, n_level);
 
    vector<NcDim> dims_2d;
    dims_2d.emplace_back(range_dim);
@@ -496,9 +505,9 @@ static void write_stats() {
    dims_3d.emplace_back(azimuth_dim);
 
    // Define variables
-   NcVar level_var = nc_out->addVar(level_name, ncDouble, level_dim);
-   NcVar range_var = nc_out->addVar("range", ncDouble, range_dim);
-   NcVar azimuth_var = nc_out->addVar("azimuth", ncDouble, azimuth_dim);
+   NcVar level_var = nc_out.get()->addVar(level_name, ncDouble, level_dim);
+   NcVar range_var = nc_out.get()->addVar("range", ncDouble, range_dim);
+   NcVar azimuth_var = nc_out.get()->addVar("azimuth", ncDouble, azimuth_dim);
 
    vector<size_t> offset;
    vector<size_t> count_range;
@@ -539,7 +548,7 @@ static void write_stats() {
 
    for(int i_var = 0; i_var < data_names.size(); i_var++) {
       if(data_n_dims[i_var] == 2) {
-         NcVar var_mean = nc_out->addVar(
+         NcVar var_mean = nc_out.get()->addVar(
             data_names[i_var] + "_mean",
             ncDouble, dims_2d);
          add_att(&var_mean, "long_name",
@@ -549,7 +558,7 @@ static void write_stats() {
          var_mean.putVar(offset_2d, count_2d,
             data_means[i_var].data());
 
-         NcVar var_stdev = nc_out->addVar(
+         NcVar var_stdev = nc_out.get()->addVar(
             data_names[i_var] + "_stdev",
             ncDouble, dims_2d);
          add_att(&var_stdev, "long_name",
@@ -559,7 +568,7 @@ static void write_stats() {
          var_stdev.putVar(offset_2d, count_2d,
             data_stdevs[i_var].data());
 
-         NcVar var_min = nc_out->addVar(
+         NcVar var_min = nc_out.get()->addVar(
             data_names[i_var] + "_min",
             ncDouble, dims_2d);
          add_att(&var_min, "long_name",
@@ -569,7 +578,7 @@ static void write_stats() {
          var_min.putVar(offset_2d, count_2d,
             data_mins[i_var].data());
 
-         NcVar var_max = nc_out->addVar(
+         NcVar var_max = nc_out.get()->addVar(
             data_names[i_var] + "_max",
             ncDouble, dims_2d);
          add_att(&var_max, "long_name",
@@ -581,7 +590,7 @@ static void write_stats() {
       }
 
       else if(data_n_dims[i_var] == 3) {
-         NcVar var_mean = nc_out->addVar(
+         NcVar var_mean = nc_out.get()->addVar(
             data_names[i_var] + "_mean",
             ncDouble, dims_3d);
          add_att(&var_mean, "long_name",
@@ -591,7 +600,7 @@ static void write_stats() {
          var_mean.putVar(offset_3d, count_3d,
             data_means[i_var].data());
 
-         NcVar var_stdev = nc_out->addVar(
+         NcVar var_stdev = nc_out.get()->addVar(
             data_names[i_var] + "_stdev",
             ncDouble, dims_3d);
          add_att(&var_stdev, "long_name",
@@ -601,7 +610,7 @@ static void write_stats() {
          var_stdev.putVar(offset_3d, count_3d,
             data_stdevs[i_var].data());
 
-         NcVar var_min = nc_out->addVar(
+         NcVar var_min = nc_out.get()->addVar(
             data_names[i_var] + "_min",
             ncDouble, dims_3d);
          add_att(&var_min, "long_name",
@@ -611,7 +620,7 @@ static void write_stats() {
          var_min.putVar(offset_3d, count_3d,
             data_mins[i_var].data());
 
-         NcVar var_max = nc_out->addVar(
+         NcVar var_max = nc_out.get()->addVar(
             data_names[i_var] + "_max",
             ncDouble, dims_3d);
          add_att(&var_max, "long_name",
@@ -624,13 +633,13 @@ static void write_stats() {
    } // end for i_var
 
    // Add the number of track points
-   NcVar npoints_var = nc_out->addVar("TrackPoint_count", ncInt);
+   NcVar npoints_var = nc_out.get()->addVar("TrackPoint_count", ncInt);
    add_att(&npoints_var, "long_name", "Number of Track Points");
    int n_points = track_lat.n();
    npoints_var.putVar(&n_points);
 
    // Add the average track point latitude
-   NcVar lat_var = nc_out->addVar("TrackLat_mean", ncDouble);
+   NcVar lat_var = nc_out.get()->addVar("TrackLat_mean", ncDouble);
    add_att(&lat_var, "long_name", "Track Point Latitude Mean");
    add_att(&lat_var, "units", "degrees_north");
    add_att(&lat_var, "standard_name", "latitude_track");
@@ -639,7 +648,7 @@ static void write_stats() {
    lat_var.putVar(&lat_mean);
 
    // Add the average track point latitude
-   NcVar lon_var = nc_out->addVar("TrackLon_mean", ncDouble);
+   NcVar lon_var = nc_out.get()->addVar("TrackLon_mean", ncDouble);
    add_att(&lon_var, "long_name", "Track Point Longitude Mean");
    add_att(&lon_var, "units", "degrees_east");
    add_att(&lon_var, "standard_name", "longitude_track");
@@ -647,7 +656,7 @@ static void write_stats() {
    double lon_mean = track_lon.mean();
    lon_var.putVar(&lon_mean);
 
-   nc_out->close();
+   nc_out.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -875,11 +884,11 @@ static TrackInfo read_nc_track() {
    f.open(adeck_source.c_str());
 
    NcDim track_line_dim;
-   get_dim(nc_in, "track_line", n_track_line, true);
+   get_dim(nc_in.get(), "track_line", n_track_line, true);
 
    mlog << Debug(3) << "Reading " << n_track_line << " track lines.\n";
 
-   NcVar track_lines_var = get_nc_var(nc_in, "TrackLines");
+   NcVar track_lines_var = get_nc_var(nc_in.get(), "TrackLines");
 
    vector<size_t> counts;
    vector<size_t> offsets;

@@ -27,11 +27,23 @@ class SemiLatLonGrid : public GridRep {
 
       friend class Grid;
 
+         //
+         //  Key is private, so only Grid and SemiLatLonGrid itself can create
+         //  one.  It lets the constructors below be public - which is
+         //  what std::make_unique needs - without opening grid
+         //  construction up to the rest of the code.
+         //
+
+      struct Key { explicit Key() = default; };
+
+   public:
+
+     ~SemiLatLonGrid();
+      SemiLatLonGrid(const SemiLatLonData &, Key);
+
    private:
 
       SemiLatLonGrid();
-     ~SemiLatLonGrid();
-      SemiLatLonGrid(const SemiLatLonData &);
 
       void add_dimension(const NumArray &, NumArray &);
 
@@ -68,7 +80,7 @@ class SemiLatLonGrid : public GridRep {
 
       void xy_to_latlon(double x, double y, double & lat, double & lon) const;
 
-      double calc_area(int x, int y) const;
+      double calc_area(int x, int y, bool centered) const;
 
       int nx() const;
       int ny() const;
@@ -89,7 +101,7 @@ class SemiLatLonGrid : public GridRep {
 
       void shift_right(int);
 
-      GridRep * copy() const;
+      std::unique_ptr<GridRep> copy() const;
 
 };
 

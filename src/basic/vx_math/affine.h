@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 
 
@@ -199,7 +200,7 @@ class GeneralAffine {
       virtual void der_reverse (double dx, double dy, double & du, double & dv) const = 0;
 
 
-      virtual GeneralAffine * copy() const = 0;
+      virtual std::unique_ptr<GeneralAffine> copy() const = 0;
 
       virtual void     operator()(double  u, double  v, double &  x, double &  y) const = 0;
 
@@ -284,7 +285,7 @@ class Affine : public GeneralAffine {
 
       void     operator()(double  u, double  v, double &  x, double &  y) const;
 
-      GeneralAffine * copy() const;
+      std::unique_ptr<GeneralAffine> copy() const;
 
 };
 
@@ -425,7 +426,7 @@ class ConformalAffine : public GeneralAffine {
 
       void     operator()(double  u, double  v, double &  x, double &  y) const;
 
-      GeneralAffine * copy() const;
+      std::unique_ptr<GeneralAffine> copy() const;
 
 };
 

@@ -43,27 +43,18 @@ FlateEncodeFilter::FlateEncodeFilter()
 
 {
 
-inbuf  = new unsigned char [buf_size];
-outbuf = new unsigned char [buf_size];
+inbuf.assign(buf_size, 0);
+outbuf.assign(buf_size, 0);
 
-s = new z_stream;
+s = std::make_unique<z_stream>();
 
-if ( !inbuf || !outbuf || !s )  {
-
-   mlog << Error 
-        << "\n\n  FlateEncodeFilter::FlateEncodeFilter() -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-memset(s, 0, sizeof(*s));
+memset(s.get(), 0, sizeof(*s));
 
 s->zalloc = NULL;
 s->zfree  = NULL;
 s->opaque = NULL;
 
-if ( deflateInit(s, Z_BEST_COMPRESSION) != Z_OK )  {
+if ( deflateInit(s.get(), Z_BEST_COMPRESSION) != Z_OK )  {
 
    mlog << Error
         << "\n\n  FlateEncodeFilter::FlateEncodeFilter() -> can't initialize the z_stream\n\n";
@@ -86,10 +77,10 @@ FlateEncodeFilter::~FlateEncodeFilter()
 
 {
 
-if (  inbuf )  { delete []  inbuf;   inbuf = (unsigned char *) nullptr; }
-if ( outbuf )  { delete [] outbuf;  outbuf = (unsigned char *) nullptr; }
+inbuf.clear();
+outbuf.clear();
 
-if ( s )  { delete s;  s = (z_stream *) nullptr; }
+s.reset();
 
 inbytes = 0;
 
@@ -123,7 +114,7 @@ if ( inbytes < buf_size )  {
 
 s->avail_in = buf_size;
 
-s->next_in = inbuf;
+s->next_in = inbuf.data();
 
 do_output();
 
@@ -158,7 +149,7 @@ void FlateEncodeFilter::eod()
 
 s->avail_in = (uInt) inbytes;
 
-s->next_in = inbuf;
+s->next_in = inbuf.data();
 
 flush_mode = Z_FINISH;
 
@@ -170,7 +161,7 @@ inbytes = 0;
    //  finish up the zlib stuff
    //
 
-(void) deflateEnd(s);
+(void) deflateEnd(s.get());
 
    //
    //  send the "end of data" signal to the next filter down the line
@@ -203,16 +194,16 @@ do {
 
    s->avail_out = buf_size;
 
-   s->next_out = outbuf;
+   s->next_out = outbuf.data();
 
-   status = deflate(s, flush_mode);
+   status = deflate(s.get(), flush_mode);
 
    if ( status == Z_STREAM_ERROR )  {
 
       mlog << Error
            << "\n\n  FlateEncodeFilter::do_output() -> runtime error\n\n";
 
-      (void) deflateEnd(s);
+      (void) deflateEnd(s.get());
 
       exit ( 1 );
 
@@ -234,7 +225,7 @@ if ( (flush_mode == Z_FINISH) && (status != Z_STREAM_END) )  {
    mlog << Error
         << "\n\n  FlateEncodeFilter::do_output() -> bad status at end of operations\n\n";
 
-   (void) deflateEnd(s);
+   (void) deflateEnd(s.get());
 
    exit ( 1 );
 

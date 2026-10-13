@@ -2061,7 +2061,7 @@ void write_tracks(const TrackPairInfoArray &p) {
    TcHdrColumns tchc;
    ConcatString out_file;
    AsciiTable out_at;
-   ofstream *out = (ofstream *) nullptr;
+   std::unique_ptr<std::ofstream> out;
 
    // Set the track pair output file name
    out_file << out_base << tc_stat_file_ext;
@@ -2115,11 +2115,10 @@ void write_tracks(const TrackPairInfoArray &p) {
    }
 
    // Write the AsciiTable contents and clean up
-   if(out != (ofstream *) 0) {
+   if(out) {
       *out << out_at;
       out->close();
-      delete out;
-      out = (ofstream *) nullptr;
+      out.reset();
    }
 
    return;
@@ -2132,7 +2131,7 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
    TcHdrColumns tchc;
    ConcatString out_file;
    AsciiTable out_at;
-   ofstream *out = (ofstream *) nullptr;
+   std::unique_ptr<std::ofstream> out;
 
    // Set the track pair output file name
    out_file << out_base << "_PROBRIRW" << tc_stat_file_ext;
@@ -2193,11 +2192,10 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
    }
 
    // Write the AsciiTable contents and clean up
-   if(out != (ofstream *) 0) {
+   if(out) {
       *out << out_at;
       out->close();
-      delete out;
-      out = (ofstream *) nullptr;
+      out.reset();
    }
 
    return;

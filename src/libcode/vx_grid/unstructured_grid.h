@@ -27,11 +27,23 @@ class UnstructuredGrid : public GridRep {
 
       friend class Grid;
 
+         //
+         //  Key is private, so only Grid and UnstructuredGrid itself can create
+         //  one.  It lets the constructors below be public - which is
+         //  what std::make_unique needs - without opening grid
+         //  construction up to the rest of the code.
+         //
+
+      struct Key { explicit Key() = default; };
+
+   public:
+
+     ~UnstructuredGrid();
+      UnstructuredGrid(const UnstructuredData &, Key);
+
    protected:
 
       UnstructuredGrid();
-     ~UnstructuredGrid();
-      UnstructuredGrid(const UnstructuredData &);
 
 
       int Nx;
@@ -55,7 +67,7 @@ class UnstructuredGrid : public GridRep {
 
       virtual void xy_to_latlon(double x, double y, double & lat, double & lon) const;
 
-      virtual double calc_area(int x, int y) const;
+      virtual double calc_area(int x, int y, bool centered) const;
 
       virtual int nx() const;
       virtual int ny() const;
@@ -76,7 +88,7 @@ class UnstructuredGrid : public GridRep {
 
       void shift_right(int);
 
-      GridRep * copy() const;
+      std::unique_ptr<GridRep> copy() const;
 
 };
 

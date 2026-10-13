@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 
 #include "cloudsat_swath_file.h"
@@ -60,7 +61,7 @@ class ModisFile {
 
       unixtime ScanStartTime;
 
-      CloudsatSwath * Swath;   //  allocated
+      std::unique_ptr<CloudsatSwath> Swath;
 
          //
          //  geolocation fields

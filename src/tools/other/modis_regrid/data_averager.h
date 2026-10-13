@@ -18,6 +18,7 @@
 
 
 #include "vx_grid.h"
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -41,11 +42,11 @@ class DataAverager {
       int Nx;
       int Ny;
 
-      double * Sum;   //  allocated
+      std::vector<double> Sum;
 
-      int * Counts;   //  allocated
+      std::vector<int> Counts;
 
-      bool * DataOk;   //  allocated
+      std::vector<bool> DataOk;   //  index-only, so vector<bool> is safe here
 
       const Grid * grid;   //  not allocated
 

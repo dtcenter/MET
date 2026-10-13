@@ -11,6 +11,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -46,8 +47,8 @@ int pad;
 double w, h;
 unsigned char u;
 Color color;
-PSFilter *out = (PSFilter *) nullptr;
-PSFilter **v = &out;
+std::unique_ptr<PSFilter> out;
+std::unique_ptr<PSFilter> *v = &out;
 
 
 nx = pbm.nx();
@@ -69,11 +70,11 @@ if ( info.n_filters() == 0 )  {
    //  put bitfilter on front
    //
 
-BitFilter *b = new BitFilter;
+auto b = std::make_unique<BitFilter>();
 
 b->bits_per_component = 1;
 
-*v = b;
+*v = std::move(b);
 v = &((*v)->next);
 
    //
@@ -85,17 +86,17 @@ for (j=0; j<(info.n_filters()); ++j)  {
    switch ( info.filter(j) )  {
 
       case ASCII85Encode:
-         *v = new ASCII85EncodeFilter();
+         *v = std::make_unique<ASCII85EncodeFilter>();
          v = &((*v)->next);
          break;
 
       case HexEncode:
-         *v = new HexEncodeFilter();
+         *v = std::make_unique<HexEncodeFilter>();
          v = &((*v)->next);
          break;
 
       case RunLengthEncode:
-         *v = new RunLengthEncodeFilter();
+         *v = std::make_unique<RunLengthEncodeFilter>();
          v = &((*v)->next);
          break;
 
@@ -111,13 +112,13 @@ for (j=0; j<(info.n_filters()); ++j)  {
    //  put an output filter on the back end
    //
 
-PSOutputFilter * psout = new PSOutputFilter(plot.psout);
+auto psout = std::make_unique<PSOutputFilter>(plot.psout);
 
 psout->ignore_columns = false;
 
-*v = psout;
+*v = std::move(psout);
 
-v = (PSFilter **) nullptr;
+v = nullptr;
 
 
 
@@ -194,7 +195,7 @@ for (r=0; r<ny; ++r)  {
 
 out->eod();
 
-delete out;   out = (PSFilter *) nullptr;
+out.reset();
 
 plot.file() << "\n\n";
 

@@ -75,7 +75,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-MercatorGrid::MercatorGrid(const MercatorData & data)
+MercatorGrid::MercatorGrid(const MercatorData & data, Key)
 
 {
 
@@ -285,18 +285,25 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double MercatorGrid::calc_area(int x, int y) const
+double MercatorGrid::calc_area(int x, int y, bool centered) const
 
 {
 
 double u[4], v[4];
 double sum;
 
-xy_to_uv(x      , y      , u[0], v[0]);  //  lower left
-xy_to_uv(x + 1.0, y      , u[1], v[1]);  //  lower right
-xy_to_uv(x + 1.0, y + 1.0, u[2], v[2]);  //  upper right
-xy_to_uv(x      , y + 1.0, u[3], v[3]);  //  upper left
-
+if ( centered ) {
+   xy_to_uv(x - 0.5, y - 0.5, u[0], v[0]);  //  lower left
+   xy_to_uv(x + 0.5, y - 0.5, u[1], v[1]);  //  lower right
+   xy_to_uv(x + 0.5, y + 0.5, u[2], v[2]);  //  upper right
+   xy_to_uv(x - 0.5, y + 0.5, u[3], v[3]);  //  upper left
+}
+else {
+   xy_to_uv(x      , y      , u[0], v[0]);  //  lower left
+   xy_to_uv(x + 1.0, y      , u[1], v[1]);  //  lower right
+   xy_to_uv(x + 1.0, y + 1.0, u[2], v[2]);  //  upper right
+   xy_to_uv(x      , y + 1.0, u[3], v[3]);  //  upper left
+}
 
 sum = uv_closedpolyline_area(u, v, 4);
 
@@ -365,48 +372,6 @@ for (j=0; j<n; ++j)  {
 }   //  for j
 
 sum = fabs(sum);
-
-return sum;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double MercatorGrid::xy_closedpolyline_area(const double * x, const double * y, int n) const
-
-{
-
-int j;
-double sum;
-double *u = (double *) nullptr;
-double *v = (double *) nullptr;
-
-u = new double [n];
-v = new double [n];
-
-if ( !u || !v )  {
-
-   mlog << Error << "\nMercatorGrid::xy_closedpolyline_area() -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for (j=0; j<n; ++j)  {
-
-   xy_to_uv(x[j], y[j], u[j], v[j]);
-
-}
-
-sum = uv_closedpolyline_area(u, v, n);
-
-sum *= earth_radius_km*earth_radius_km;
-
-delete [] u;  u = (double *) nullptr;
-delete [] v;  v = (double *) nullptr;
 
 return sum;
 
@@ -591,11 +556,11 @@ exit ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * MercatorGrid::copy() const
+std::unique_ptr<GridRep> MercatorGrid::copy() const
 
 {
 
-auto * p = new MercatorGrid (Data);
+auto p = std::make_unique<MercatorGrid>(Data, Key{});
 
 p->Name = Name;
 
@@ -769,16 +734,8 @@ void Grid::set(const MercatorData & data)
 
 clear();
 
-rep = new MercatorGrid (data);
+rep = std::make_unique<MercatorGrid>(data, MercatorGrid::Key{});
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const MercatorData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 

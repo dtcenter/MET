@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <vector>
 
 #include "vx_util.h"
@@ -28,7 +29,7 @@ bool get_series_entry(int, VarInfo*, const StringArray&,
                       bool error_out=true,
                       bool print_warning=true);
 
-bool get_series_entries(int, std::vector<VarInfo*>&, const StringArray&,
+bool get_series_entries(int, const std::vector<std::unique_ptr<VarInfo>>&, const StringArray&,
                         const GrdFileType, std::vector<DataPlane>&, Grid&,
                         bool error_out=true,
                         bool print_warning=true);

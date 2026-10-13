@@ -287,7 +287,7 @@ grid = met_ptr->grid();
    //  done
    //
 
-delete met_ptr;   met_ptr = nullptr;
+met_ptr.reset();
 
 return;
 

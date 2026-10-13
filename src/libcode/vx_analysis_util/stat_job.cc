@@ -76,13 +76,14 @@ STATAnalysisJob & STATAnalysisJob::operator=(
 
 void STATAnalysisJob::init_from_scratch() {
 
-   dump_row      = (char *)     nullptr;
-   dr_out        = (ofstream *) nullptr;
+   dump_row.clear();
+   dr_out.reset();
    n_dump        =              0;
-   stat_file     = (char *)     nullptr;
-   stat_out      = (ofstream *) nullptr;
-   boot_rng      = (char *)     nullptr;
-   boot_seed     = (char *)     nullptr;
+   stat_file.clear();
+   stat_out.reset();
+   boot_rng.clear();
+   boot_seed.clear();
+   boot_seed_set = false;
 
    model.set_ignore_case(1);
    desc.set_ignore_case(1);
@@ -184,8 +185,6 @@ void STATAnalysisJob::clear() {
    close_dump_row_file();
    close_stat_file();
 
-   if(dump_row)  { delete [] dump_row;  dump_row  = (char *) nullptr; }
-   if(stat_file) { delete [] stat_file; stat_file = (char *) nullptr; }
 
    stat_row = 0;
 
@@ -368,11 +367,11 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
 
    stat_row             = aj.stat_row;
 
-   set_dump_row (aj.dump_row);
-   set_stat_file(aj.stat_file);
+   set_dump_row (aj.dump_row.c_str());
+   set_stat_file(aj.stat_file.c_str());
 
-   set_boot_rng (aj.boot_rng);
-   set_boot_seed(aj.boot_seed);
+   set_boot_rng (aj.boot_rng.c_str());
+   set_boot_seed(aj.boot_seed_set ? aj.boot_seed.c_str() : nullptr);
 
    return;
 }
@@ -1066,7 +1065,7 @@ double STATAnalysisJob::get_column_double(const STATLine &L,
 ////////////////////////////////////////////////////////////////////////
 
 void STATAnalysisJob::parse_job_command(const char *jobstring) {
-   char *line = (char *)nullptr;
+   std::string line;
    char *c    = (char *)nullptr;
    char *lp   = (char *)nullptr;
    char *temp_ptr = (char *)nullptr;
@@ -1075,7 +1074,6 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    StringArray col_value;
    ConcatString thresh_cs;
    int i, n;
-   const char *method_name = "STATAnalysisJob::parse_job_command()";
 
    // If jobstring is null, simply return;
    if(jobstring) n = m_strlen(jobstring);
@@ -1088,10 +1086,9 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    // Create a temporary copy of the jobstring for use in parsing
    //
 
-   line = m_strcpy2(jobstring, method_name);
-   if (!line) return;
+   line = jobstring;
 
-   lp = line;
+   lp = line.data();
 
    //
    // Parse the command line entries into a StringArray object
@@ -1215,7 +1212,6 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
             mlog << Error << "\nSTATAnalysisJob::STATAnalysisJob::parse_job_command() -> "
                  << "unrecognized job type specified \"" << jc_array[i]
                  << "\" in job command line: " << jobstring << "\n\n";
-            if(line) { delete [] line; line = (char *) nullptr; }
             throw 1;
          }
          i++;
@@ -1637,7 +1633,6 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
               << "unrecognized switch \"" << jc_array[i]
               << "\" in job command line: "
               << jobstring << "\n\n";
-         if(line) { delete [] line; line = (char *) nullptr; }
          throw 1;
       } // end if
 
@@ -1659,7 +1654,6 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
                  << "no match found for "
                  << (line_type.n() == 1 ? line_type[0] : "header")
                  << " column named \"" << hdr_name[i] << "\"\n\n";
-            if(line) { delete [] line; line = (char *) nullptr; }
             throw 1;
          }
       } // end for
@@ -1673,7 +1667,6 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    //
    // Deallocate memory
    //
-   if(line) { delete [] line; line = (char *) nullptr; }
    lp = (char *) nullptr;
 
    return;
@@ -1713,13 +1706,12 @@ int STATAnalysisJob::set_job_type(const char *c) {
 
 void STATAnalysisJob::set_dump_row(const char *c) {
 
-   if(dump_row) { delete [] dump_row; dump_row = (char *) nullptr; }
+   dump_row.clear();
 
    if(!c) return;
 
-   const char *method_name = "STATAnalysisJob::set_dump_row()";
 
-   dump_row = m_strcpy2(c, method_name, "dump_row");
+   dump_row = c;
 
    return;
 }
@@ -1728,13 +1720,12 @@ void STATAnalysisJob::set_dump_row(const char *c) {
 
 void STATAnalysisJob::set_stat_file(const char *c) {
 
-   if(stat_file) { delete [] stat_file; stat_file = (char *) nullptr; }
+   stat_file.clear();
 
    if(!c) return;
 
-   const char *method_name = "STATAnalysisJob::set_stat_file()";
 
-   stat_file = m_strcpy2(c, method_name, "stat_file");
+   stat_file = c;
 
    return;
 }
@@ -1823,13 +1814,12 @@ void STATAnalysisJob::set_mask_sid(const char *c) {
 
 void STATAnalysisJob::set_boot_rng(const char *c) {
 
-   if(boot_rng) { delete [] boot_rng; boot_rng = (char *) nullptr; }
+   boot_rng.clear();
 
    if(!c) return;
 
-   const char *method_name = "STATAnalysisJob::set_boot_rng()";
 
-   boot_rng = m_strcpy2(c, method_name, "boot_rng");
+   boot_rng = c;
 
    return;
 }
@@ -1838,13 +1828,14 @@ void STATAnalysisJob::set_boot_rng(const char *c) {
 
 void STATAnalysisJob::set_boot_seed(const char *c) {
 
-   if(boot_seed) { delete [] boot_seed; boot_seed = (char *) nullptr; }
+   boot_seed.clear();
+   boot_seed_set = false;
 
    if(!c) return;
 
-   const char *method_name = "STATAnalysisJob::set_boot_rng()";
 
-   boot_seed = m_strcpy2(c, method_name, "boot_seed");
+   boot_seed = c;
+   boot_seed_set = true;
 
    return;
 }
@@ -1888,10 +1879,10 @@ void STATAnalysisJob::open_dump_row_file() {
 
    close_dump_row_file();
 
-   if(!dump_row) return;
+   if(dump_row.empty()) return;
 
-   dr_out = new ofstream;
-   met_open(*dr_out, dump_row);
+   dr_out = std::make_unique<ofstream>();
+   met_open(*dr_out, dump_row.c_str());
    n_dump = 0;
 
    if(!(*dr_out)) {
@@ -1917,8 +1908,7 @@ void STATAnalysisJob::close_dump_row_file() {
       *dr_out << dump_at;
 
       dr_out->close();
-      delete dr_out;
-      dr_out = (ofstream *) nullptr;
+      dr_out.reset();
       n_dump = 0;
    }
 
@@ -1933,10 +1923,10 @@ void STATAnalysisJob::open_stat_file() {
 
    stat_row = 0;
 
-   if(!stat_file) return;
+   if(stat_file.empty()) return;
 
-   stat_out = new ofstream;
-   met_open(*stat_out, stat_file);
+   stat_out = std::make_unique<ofstream>();
+   met_open(*stat_out, stat_file.c_str());
 
    if(!(*stat_out)) {
       mlog << Error << "\nSTATAnalysisJob::open_stat_file()-> "
@@ -2140,8 +2130,7 @@ void STATAnalysisJob::close_stat_file() {
       *stat_out << stat_at;
 
       stat_out->close();
-      delete stat_out;
-      stat_out = (ofstream *) nullptr;
+      stat_out.reset();
    }
 
    return;
@@ -2672,10 +2661,10 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // dump_row
-   if(dump_row) js << "-dump_row " << dump_row << " ";
+   if(!dump_row.empty()) js << "-dump_row " << dump_row << " ";
 
    // out_stat
-   if(stat_file) js << "-out_stat " << stat_file << " ";
+   if(!stat_file.empty()) js << "-out_stat " << stat_file << " ";
 
    // mask_grid
    if(mask_grid_str.nonempty()) js << "-mask_grid " << mask_grid_str << " ";
@@ -2844,8 +2833,8 @@ ConcatString STATAnalysisJob::get_jobstring() const {
          js << "-boot_rep_prop " << boot_rep_prop << " ";
          js << "-n_boot_rep "    << n_boot_rep    << " ";
          js << "-boot_rng "      << boot_rng      << " ";
-         if(boot_seed) {
-            if(m_strlen(boot_seed) == 0) {
+         if(boot_seed_set) {
+            if(boot_seed.empty()) {
                js << "-boot_seed '' ";
             }
             else {

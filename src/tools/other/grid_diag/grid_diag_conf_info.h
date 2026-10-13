@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <iostream>
 
 #include "vx_config.h"
@@ -61,7 +62,7 @@ class GridDiagConfInfo {
       ConcatString version;        // Config file version
       ConcatString desc;           // Data description
 
-      std::vector<VarInfo *> data_info; // VarInfo pointer array [n_data]
+      std::vector<std::unique_ptr<VarInfo>> data_info; // [n_data]
 
       // Power spectrum options
       std::vector<PowerSpectrumInfo> ps_info; // [n_data]

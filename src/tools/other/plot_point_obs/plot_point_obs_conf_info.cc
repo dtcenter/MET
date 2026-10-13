@@ -18,6 +18,7 @@
 #include "vx_statistics.h"
 
 #include "plot_point_obs_conf_info.h"
+#include <memory>
 
 using namespace std;
 
@@ -352,7 +353,7 @@ PlotPointObsConfInfo::~PlotPointObsConfInfo() {
 void PlotPointObsConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   grid_data_info = (VarInfo *) nullptr;
+   grid_data_info.reset();
 
    clear();
 
@@ -373,7 +374,7 @@ void PlotPointObsConfInfo::clear() {
    version.clear();
 
    // Delete allocated memory
-   if(grid_data_info) { delete grid_data_info; grid_data_info = 0; }
+   grid_data_info.reset();
 
    return;
 }
@@ -411,7 +412,7 @@ void PlotPointObsConfInfo::process_config(
    Dictionary *fdict = nullptr;
    Dictionary i_fdict;
    StringArray sa;
-   Met2dDataFile *met_ptr = nullptr;
+   std::unique_ptr<Met2dDataFile> met_ptr;
    PlotPointObsOpt opt;
    int i, n_vx;
 
@@ -450,8 +451,9 @@ void PlotPointObsConfInfo::process_config(
               << plot_grid_string << "\".\n";
 
          // Open the data file
-         if(!(met_ptr = Met2dDataFileFactory::new_met_2d_data_file(
-                           plot_grid_string, ftype))) {
+         met_ptr = Met2dDataFileFactory::new_met_2d_data_file(
+                           plot_grid_string, ftype);
+   if(!met_ptr) {
             mlog << Error
                  << "\nPlotPointObsConfInfo::process_config() -> "
                  << "can't open file \"" << plot_grid_string
@@ -508,7 +510,7 @@ void PlotPointObsConfInfo::process_config(
       }
 
       // Cleanup
-      if(met_ptr) { delete met_ptr; met_ptr = 0; }
+      met_ptr.reset();
 
    } // end if plot_grid_string
 

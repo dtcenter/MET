@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <map>
 
 #include "concat_string.h"
@@ -176,11 +177,12 @@ class SeepsClimo : public SeepsClimoBase {
    private:
 
       int nstn;
-      std::map<int,SeepsClimoRecord *> seeps_score_00_map;
-      std::map<int,SeepsClimoRecord *> seeps_score_12_map;
+      std::map<int,std::unique_ptr<SeepsClimoRecord>> seeps_score_00_map;
+      std::map<int,std::unique_ptr<SeepsClimoRecord>> seeps_score_12_map;
 
-      SeepsClimoRecord *create_climo_record(int sid, double lat, double lon, double elv,
-                                            double *p1, double *p2, double *t1, double *t2, 
+      std::unique_ptr<SeepsClimoRecord> create_climo_record(
+                                            int sid, double lat, double lon, double elv,
+                                            double *p1, double *p2, double *t1, double *t2,
                                             double *scores);
       void print_record(SeepsClimoRecord *record, bool with_header=false);
       void read_records(const ConcatString &filename);
@@ -196,10 +198,10 @@ class SeepsClimo : public SeepsClimoBase {
       SeepsClimo(const ConcatString &seeps_climo_name);
      ~SeepsClimo();
 
-      SeepsRecord *get_record(int sid, int month, int hour);
+      std::unique_ptr<SeepsRecord> get_record(int sid, int month, int hour);
       double get_seeps_category(int sid, double p_fcst, double p_obs,
                                 int month, int hour);
-      SeepsScore *get_seeps_score(int sid, double p_fcst, double p_obs,
+      std::unique_ptr<SeepsScore> get_seeps_score(int sid, double p_fcst, double p_obs,
                                   int month, int hour);
 
       void print_all();
@@ -245,7 +247,7 @@ class SeepsClimoGrid : public SeepsClimoBase {
       SeepsClimoGrid(int month, int hour, const ConcatString &seeps_climo_name);
      ~SeepsClimoGrid();
 
-      SeepsScore *get_record(int ix, int iy, double p_fcst, double p_obs);
+      std::unique_ptr<SeepsScore> get_record(int ix, int iy, double p_fcst, double p_obs);
       double get_seeps_score(int offset, int obs_cat, int fcst_cat);
       void print_all();
 

@@ -104,7 +104,7 @@ class RngAziGrid : public RotatedLatLonGrid {
 
       bool wrap_lon() const;
 
-      GridRep * copy() const;
+      std::unique_ptr<GridRep> copy() const;
 
 };
 

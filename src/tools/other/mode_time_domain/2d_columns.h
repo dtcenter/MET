@@ -15,6 +15,9 @@
 #define  __2D_ATT_COLUMNS_H__
 
 
+#include <iterator>
+
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -47,7 +50,7 @@ static const char * att_2d_cols [] = {
 };
 
 
-static const int n_2d_cols = sizeof(att_2d_cols)/sizeof(*att_2d_cols);
+static const int n_2d_cols = std::size(att_2d_cols);
 
 
 ////////////////////////////////////////////////////////////////////////
