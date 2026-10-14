@@ -111,7 +111,7 @@ class AsciiHeader {
       AsciiHeader();
       ~AsciiHeader();
       AsciiHeader(const AsciiHeader &);
-      AsciiHeader(const char *version);
+      explicit AsciiHeader(const char *version);
       AsciiHeader & operator=(const AsciiHeader &);
 
       void clear();

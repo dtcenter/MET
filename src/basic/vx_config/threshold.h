@@ -403,7 +403,7 @@ class SingleThresh {
       ~SingleThresh();
       SingleThresh(const SingleThresh &);
       SingleThresh(SingleThresh &&) noexcept;
-      SingleThresh(const char *);
+      explicit SingleThresh(const char *);
       SingleThresh & operator=(const SingleThresh &);
       SingleThresh & operator=(SingleThresh &&) noexcept;
 

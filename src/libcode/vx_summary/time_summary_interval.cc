@@ -39,7 +39,4 @@ TimeSummaryInterval::TimeSummaryInterval(const time_t base_time,
 
 ////////////////////////////////////////////////////////////////////////
 
-TimeSummaryInterval::~TimeSummaryInterval()
-{
-  // Do nothing
-}
+TimeSummaryInterval::~TimeSummaryInterval() = default;

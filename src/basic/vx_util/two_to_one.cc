@@ -136,9 +136,9 @@ void TwoOne::clear()
 
 {
 
-TO = (TwoToOneFunction) 0;
+TO = nullptr;
 
-OT = (OneToTwoFunction) 0;
+OT = nullptr;
 
 return;
 
@@ -622,7 +622,7 @@ if ( !check )  {
 }
 
 const int k = 4*xdir + 2*ydir + order;
-TwoToOneFunction f = (TwoToOneFunction) 0;
+TwoToOneFunction f = nullptr;
 
 
 switch ( k )  {
@@ -674,7 +674,7 @@ if ( !check )  {
 }
 
 const int k = 4*xdir + 2*ydir + order;
-OneToTwoFunction f = (OneToTwoFunction) 0;
+OneToTwoFunction f = nullptr;
 
 
 switch ( k )  {

@@ -43,7 +43,7 @@ MetNcMetDataFile::MetNcMetDataFile() {
 
 MetNcMetDataFile::~MetNcMetDataFile() {
 
-   close();
+   MetNcMetDataFile::close();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ void MetNcMetDataFile::nc_met_init_from_scratch() {
 
    MetNc.reset();
 
-   close();
+   MetNcMetDataFile::close();
 
    return;
 }

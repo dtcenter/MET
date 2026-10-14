@@ -112,7 +112,7 @@ name.clear();
 
 text.clear();
 
-e = 0;
+e = nullptr;
 
 
 return;
@@ -135,7 +135,7 @@ name.clear();
 
 text.clear();
 
-e = 0;
+e = nullptr;
 
 
 type = no_cell_type;

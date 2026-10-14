@@ -723,7 +723,7 @@ void ObsErrInfo::validate() {
    entry.validate();
 
    // Make sure the rng_ptr is set
-   if(rng_ptr == (gsl_rng *) 0) {
+   if(rng_ptr == nullptr) {
       mlog << Error << "\nObsErrInfo::validate() -> "
            << "random number generator pointer is not set!\n\n";
       exit(1);

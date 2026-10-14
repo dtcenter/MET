@@ -376,7 +376,7 @@ for (j=0; j<n_subrecs; ++j)  {
 }
 
 
-return 0;
+return nullptr;
 
 }
 
@@ -762,7 +762,7 @@ const char * DbfFile::filename() const
 
 {
 
-if ( Filename.empty() )  return (const char *) 0;
+if ( Filename.empty() )  return nullptr;
 
 return Filename.text();
 

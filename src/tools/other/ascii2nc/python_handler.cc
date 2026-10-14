@@ -71,12 +71,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-PythonHandler::~PythonHandler()
-
-{
-
-
-}
+PythonHandler::~PythonHandler() = default;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -328,7 +323,7 @@ const int N = user_script_args.n();
 ConcatString command;
 ConcatString path;
 ConcatString tmp_ascii_path;
-const char * tmp_dir = 0;
+const char * tmp_dir = nullptr;
 int status;
 
 mlog << Debug(2)
@@ -344,7 +339,7 @@ path << cs_erase
      << tmp_dir << '/'
      << tmp_base_name;
 
-tmp_ascii_path = make_temp_file_name(path.text(), 0);
+tmp_ascii_path = make_temp_file_name(path.text(), nullptr);
 tmp_ascii_path << ".txt";
 
 command << cs_erase

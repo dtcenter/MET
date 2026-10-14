@@ -52,7 +52,7 @@ MetUGridDataFile::MetUGridDataFile() {
 
 MetUGridDataFile::~MetUGridDataFile() {
 
-   close();
+   MetUGridDataFile::close();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@ void MetUGridDataFile::ugrid_init_from_scratch() {
    _cur_time_index = -1;
    _cur_vert_index = -1;
 
-   close();
+   MetUGridDataFile::close();
 
    return;
 }

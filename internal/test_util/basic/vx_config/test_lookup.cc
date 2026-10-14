@@ -92,7 +92,7 @@ for (j=1; j<argc; ++j)  {   //  j starts at one, here
    //  test
    //
 
-const DictionaryEntry * e = (const DictionaryEntry *) 0;
+const DictionaryEntry * e = nullptr;
 
 
 cout << "\n\n";
