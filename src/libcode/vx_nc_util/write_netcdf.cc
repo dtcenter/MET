@@ -260,6 +260,11 @@ void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
          add_att(&wgt_var, units_att_name, "km^2");
          break;
 
+      case GridWeightType::Area_Cntr:
+         add_att(&wgt_var, long_name_att_name, "true area centered grid weight");
+         add_att(&wgt_var, units_att_name, "km^2");
+         break;
+
       default:
          add_att(&wgt_var, long_name_att_name, "default grid weight");
          add_att(&wgt_var, units_att_name, "NA");

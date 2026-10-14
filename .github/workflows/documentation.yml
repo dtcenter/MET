@@ -13,6 +13,11 @@ on:
     types: [opened, reopened, synchronize]
   workflow_dispatch:
 
+# Group by workflow name and branch/PR reference
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   documentation:
     name: Build Documentation
