@@ -3761,7 +3761,7 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
 
          // Write only header columns for unspecified line type
          case STATLineType::none:
-            write_header_row((const char **) 0, 0, 1, stat_at, 0, 0);
+            write_header_row(nullptr, 0, 1, stat_at, 0, 0);
             break;
           
          default:

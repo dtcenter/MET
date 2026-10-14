@@ -96,7 +96,7 @@ MetConfig::~MetConfig()
 
 {
 
-clear();
+MetConfig::clear();
 
 }
 
@@ -150,7 +150,7 @@ void MetConfig::init_from_scratch()
 
 {
 
-clear();
+MetConfig::clear();
 
 return;
 
@@ -184,7 +184,7 @@ void MetConfig::assign(const MetConfig & c)
 
 {
 
-clear();
+MetConfig::clear();
 
 Filename = c.Filename;
 

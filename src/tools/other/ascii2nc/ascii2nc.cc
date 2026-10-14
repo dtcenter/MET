@@ -272,7 +272,7 @@ int met_main(int argc, char *argv[]) {
    //
    auto file_handler = create_file_handler(ascii_format, asfile_list[0]);
 
-   if(file_handler == 0) return 0;
+   if(file_handler == nullptr) return 0;
 
    int deflate_level = compress_level;
    if(deflate_level < 0) deflate_level = config_info.get_compression_level();

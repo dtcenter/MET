@@ -133,7 +133,7 @@ int met_main(int argc, char * argv [])
    ModeConfInfo config;
    StringArray Argv;
    string s;
-   const char * user_config_filename = 0;
+   const char * user_config_filename = nullptr;
 
    //
    // MET #3278 parse global command line options

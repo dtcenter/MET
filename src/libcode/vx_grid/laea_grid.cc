@@ -103,7 +103,7 @@ aff.set_mb(1.0/(data.dx_km), 0.0, 0.0, 1.0/(data.dy_km), 0.0, 0.0);
 
 double xx, yy;
 
-latlon_to_xy(data.lat_first, data.lon_first, xx, yy);
+LaeaGrid::latlon_to_xy(data.lat_first, data.lon_first, xx, yy);
 
 aff.set_translation(-xx, -yy);
 
@@ -173,23 +173,23 @@ geoid.set_name("Undefined");
 
 aff.set_mb(1.0/(Data.dx_km), 0.0, 0.0, 1.0/(Data.dy_km), 0.0, 0.0);
 
-latlon_to_xy(nc.proj_origin_lat, nc.proj_origin_lon, u, v);
+LaeaGrid::latlon_to_xy(nc.proj_origin_lat, nc.proj_origin_lon, u, v);
 
 aff.set_translation(nc.x_pin - u, nc.y_pin - v);
 
       ////////////////////////
 
-xy_to_latlon(0.0, 0.0, lat, lon);
+LaeaGrid::xy_to_latlon(0.0, 0.0, lat, lon);
 
 Data.lat_first = lat;
 Data.lon_first = lon;
 
-xy_to_latlon(Nx - 1.0, 0.0, lat, lon);
+LaeaGrid::xy_to_latlon(Nx - 1.0, 0.0, lat, lon);
 
 lat_LR = lat;
 lon_LR = lon;
 
-xy_to_latlon(0.0, Ny - 1.0, lat, lon);
+LaeaGrid::xy_to_latlon(0.0, Ny - 1.0, lat, lon);
 
 lat_UL = lat;
 lon_UL = lon;

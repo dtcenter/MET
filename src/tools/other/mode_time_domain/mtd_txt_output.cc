@@ -289,7 +289,7 @@ int j, r, c;
 ofstream out;
 AsciiTable table;
 PairAtt3DArray pa_new;
-const PairAtt3DArray * a = 0;
+const PairAtt3DArray * a = nullptr;
 
    //
    //  if we're doing clusters, make a new array where all the object numbers match

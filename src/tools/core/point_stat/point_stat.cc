@@ -2172,7 +2172,7 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
          shc.set_fcst_thresh (conf_info.vx_opt[i_vx].fcat_ta[i]);
          shc.set_obs_thresh  (conf_info.vx_opt[i_vx].ocat_ta[i]);
          shc.set_thresh_logic(SetLogic::None);
-         shc.set_cov_thresh  (na_str);
+         shc.set_cov_thresh  (SingleThresh(na_str));
 
          // Write out the MPR lines
          if(conf_info.vx_opt[i_vx].output_flag[i_mpr] != STATOutputType::None) {

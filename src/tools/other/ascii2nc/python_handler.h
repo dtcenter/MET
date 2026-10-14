@@ -41,7 +41,7 @@ class PythonHandler : public FileHandler
 
    public:
 
-      PythonHandler(const std::string &program_name);
+      explicit PythonHandler(const std::string &program_name);
       virtual ~PythonHandler();
 
       bool isFileType(LineDataFile &ascii_file) const;

@@ -31,7 +31,7 @@ class BitFilter : public PSFilter {
       BitFilter();
      ~BitFilter();
 
-      BitFilter(int);
+      explicit BitFilter(int);
 
       unsigned char u;
 

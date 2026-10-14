@@ -51,7 +51,4 @@ SummaryKey::SummaryKey(const string &header_type,
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryKey::~SummaryKey()
-{
-  // Do nothing
-}
+SummaryKey::~SummaryKey() = default;

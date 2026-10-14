@@ -53,7 +53,7 @@ MetPythonDataFile::~MetPythonDataFile()
 
 {
 
-close();
+MetPythonDataFile::close();
 
 }
 
@@ -99,7 +99,7 @@ PythonCommand.clear();
 Plane.clear();
 VInfo.clear();
 
-close();
+MetPythonDataFile::close();
 
 return;
 

@@ -2327,7 +2327,7 @@ static void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       vx_opt.output_flag[i_orank] != STATOutputType::None) {
 
       // Set the header column
-      shc.set_obs_thresh(na_str);
+      shc.set_obs_thresh(SingleThresh(na_str));
 
       // Store current obtype value
       string cur_obtype = shc.get_obtype();

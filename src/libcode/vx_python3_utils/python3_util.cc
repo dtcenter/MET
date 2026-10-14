@@ -63,7 +63,7 @@ out << buf;
    // cleanup
    //
 
-Py_DECREF(str_obj);   str_obj = 0;
+Py_DECREF(str_obj);   str_obj = nullptr;
 
    //
    // done
@@ -81,7 +81,7 @@ PyObject * get_attribute(PyObject * obj, const char * attribute_name)
 
 {
 
-if ( PyObject_HasAttrString(obj, attribute_name) == 0 )  return (PyObject *) 0;
+if ( PyObject_HasAttrString(obj, attribute_name) == 0 )  return nullptr;
 
 PyObject * att = PyObject_GetAttrString(obj, attribute_name);
 
@@ -237,7 +237,7 @@ StringArray pyobject_as_string_array (PyObject * obj)
 
 StringArray a;
 ConcatString s;
-PyObject *item = 0;
+PyObject *item = nullptr;
 
 int size = PyList_Size (obj);
 for (int idx=0; idx<size; idx++) {

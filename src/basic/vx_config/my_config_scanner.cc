@@ -1347,7 +1347,7 @@ if ( (pos2 = s.find('}', pos)) == string::npos )  {
 
 std::string out;
 std::string env;
-char * tmp_env_value = 0;
+char * tmp_env_value = nullptr;
 
 env = s.substr(pos1 + 2, pos2 - pos1 - 2);
 

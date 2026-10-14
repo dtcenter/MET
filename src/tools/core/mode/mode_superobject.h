@@ -36,7 +36,7 @@ class ModeSuperObject {
                    int r_index, int t_index,
                    const std::vector<std::unique_ptr<MultiVarData>> &mvd,
                    BoolCalc &calc);
-   inline ~ModeSuperObject() {}
+   inline ~ModeSuperObject() = default;
 
    void mask_data_simple(const std::string &name, MultiVarData &mvd) const;
    void mask_data_super(const std::string &name, const MultiVarData &mvd);

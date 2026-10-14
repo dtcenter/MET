@@ -30,13 +30,13 @@ class ForecastHourResults:
 
         # All the other variables just have forecast hour as the coordinates
         # For convenience
-        hour_results_shape = len(forecast_hours)
+        hour_results_shape = (len(forecast_hours),)
         hour_results_coords = {"forecast_hour": forecast_hours}
 
         self.pressure_independent = self._init_dataset(
             hour_results_shape,
             hour_results_coords,
-            ("forecast_hour"),
+            ("forecast_hour",),
             pressure_independent_var_names,
         )
 
@@ -68,9 +68,9 @@ class ForecastHourResults:
 
     def _init_dataset(
         self,
-        shape: Tuple[int],
+        shape: Tuple[int, ...],
         coords: Dict["str", List[int]],
-        dims: List[str],
+        dims: Tuple[str, ...],
         var_names: List[str],
     ) -> xr.Dataset:
         data_arrays = {}

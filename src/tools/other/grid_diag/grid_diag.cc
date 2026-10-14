@@ -1084,8 +1084,12 @@ static void setup_nc_file(void) {
       for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
          offsets[0] = i_mask;
          counts[0] = 1;
-         string mask_name(conf_info.mask_name[i_mask]);
-         mask_name_var.putVar(offsets, counts, &mask_name);
+         // NC_STRING data is written from a const char *, not a std::string.
+         // StringArray::operator[] returns by value, so keep the copy alive
+         // for the duration of the putVar() call.
+         const string mask_name(conf_info.mask_name[i_mask]);
+         const char *mask_name_cstr = mask_name.c_str();
+         mask_name_var.putVar(offsets, counts, &mask_name_cstr);
          int mask_size = conf_info.mask_mp[i_mask].count();
          mask_size_var.putVar(offsets, counts, &mask_size);
       }

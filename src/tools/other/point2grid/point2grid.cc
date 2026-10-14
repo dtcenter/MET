@@ -2136,7 +2136,6 @@ static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
       exit(1);
    }
    else if (data_size > 0) {
-      int last_idx = data_size - 1;
       int lat_count = get_data_size(&var_lat);
       int lon_count = get_data_size(&var_lon);
       vector<float> latitudes(lat_count, bad_data_float);
@@ -2149,12 +2148,17 @@ static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
                                  from_lat_count, from_lon_count, skip_times,
                                  !fr_grid.get_swap_to_north(), (lon_count==data_size));
 
-         if (is_eq(latitudes[0], latitudes[last_idx]) ||
-             is_eq(longitudes[0], longitudes[last_idx])) {
+         // Compare each array's first and last values.  With 1D latitude
+         // and longitude arrays, each one is shorter than data_size.
+         int last_lat = lat_count - 1;
+         int last_lon = lon_count - 1;
+         if (lat_count > 0 && lon_count > 0 &&
+             (is_eq(latitudes[0], latitudes[last_lat]) ||
+              is_eq(longitudes[0], longitudes[last_lon]))) {
             mlog << Warning << "\n" << method_name << "same latitude or longitude. lat[0]="
-                 << latitudes[0] << " lat[" << last_idx << "]=" << latitudes[last_idx]
-                 << " lon[0]=" << longitudes[0] << " lon[" << last_idx << "]="
-                 << longitudes[last_idx] << "\n\n";
+                 << latitudes[0] << " lat[" << last_lat << "]=" << latitudes[last_lat]
+                 << " lon[0]=" << longitudes[0] << " lon[" << last_lon << "]="
+                 << longitudes[last_lon] << "\n\n";
          }
       }
    }   //  if data_size > 0
