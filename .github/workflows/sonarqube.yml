@@ -76,7 +76,6 @@ jobs:
           MET_BASE_TAG: ${{ steps.get_met_base_image.outputs.met_base_tag }}
           SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
           WD_REFERENCE_BRANCH: ${{ github.event.inputs.reference_branch }}
-          SONAR_SCANNER_VERSION: 5.0.1.3006
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
