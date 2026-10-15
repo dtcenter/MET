@@ -485,7 +485,7 @@ extern double compute_interp(const DataPlaneArray &dpa,
                              const double thresh,
                              const bool spfh_flag, const LevelType lvl_typ,
                              const double to_lvl, const int i_blw, const int i_abv,
-                             const SingleThresh *cat_thresh = 0,
+                             const SingleThresh *cat_thresh = nullptr,
                              const UGridNeighbors *ugrid_nbrs = nullptr);
 
 extern void get_interp_points(const DataPlaneArray &dpa,

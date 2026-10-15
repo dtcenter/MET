@@ -157,7 +157,7 @@ class ConcatString {
 
       void elim_trailing_whitespace();
 
-      int format(const char *format, ...);
+      int format(const char *format, ...) __attribute__((format(printf, 2, 3)));
 
       bool read_line(std::istream &);   //  read a line from the input stream
 

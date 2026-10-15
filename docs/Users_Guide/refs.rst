@@ -69,7 +69,7 @@ References
 |   *AMS 22nd Conference on Weather Analysis and Forecasting and 18th*
 |   *Conference on Numerical Weather Prediction*, 25-29 June, Park City, Utah,
 |   American Meteorological Society (Boston), Available at
-|   http://ams.confex.com/ams/pdfpapers/124856.pdf.
+|   https://ams.confex.com/ams/pdfpapers/124856.pdf.
 |
 
 .. _Bröcker-2007:
@@ -137,7 +137,7 @@ References
 | Denis, B., J. Cote, R. Laprise, 2002:
 |    Spectral Decomposition of Two-Dimensional Atmospheric Fields on Limited-Area
 |    Domains Using the Discrete Cosine Transform (DCT). *Monthly Weather Review*, 130, 1812-1829.
-|    https://doi.org/10.1175/1520-0493(2002)130<1812:SDOTDA>2.0.CO;2
+|    doi: `https://doi.org/10.1175/1520-0493(2002)130<1812:SDOTDA>2.0.CO;2 <https://doi.org/10.1175/1520-0493(2002)130\<1812:SDOTDA\>2.0.CO;2>`_
 |
 
 .. _Durran-2017:
@@ -225,13 +225,12 @@ References
 |   doi: https://doi.org/10.5194/ascmo-7-13-2021
 |
 
-.. _Gneiting-2004:
+.. _Gneiting-2005:
 
-| Gneiting, T., A. Westveld, A. Raferty, and T. Goldman, 2004: *Calibrated*
-|   *Probabilistic Forecasting Using Ensemble Model Output Statistics and*
-|   *Minimum CRPS Estimation*. Technical Report no. 449, Department of
-|   Statistics, University of Washington. Available at
-|   https://stat.uw.edu/research/tech-reports/calibrated-probabilistic-forecasting-using-ensemble-model-output-statistics-and-minimum-crps
+| Gneiting, T., A. E. Raftery, A. H. Westveld, and T. Goldman, 2005: Calibrated
+|   probabilistic forecasting using ensemble model output statistics and
+|   minimum CRPS estimation. *Monthly Weather Review*, 133 (5), 1098-1118.
+|   doi: https://doi.org/10.1175/MWR2904.1
 |
 
 .. _Haiden-2012:
@@ -340,7 +339,7 @@ References
 
 | Rodwell, M.J., T. Haiden, D.S. Richardson, 2011: Developments in Precipitation
 |   Verification. *ECMWF Newsletter* Number 128.
-|   https://www.ecmwf.int/node/14595
+|   https://www.ecmwf.int/en/elibrary/78205-newsletter-no-128-summer-2011
 |
 
 .. _Röpnack-2013:

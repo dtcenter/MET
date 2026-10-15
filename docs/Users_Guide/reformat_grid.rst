@@ -318,7 +318,7 @@ The usage statement for the shift_data_plane utility is shown below:
          -to lat lon
          [-method type]
          [-width n]
-	 [-shape SHAPE]
+         [-shape SHAPE]
          [-log file]
          [-v level]
          [-compress level]
@@ -370,7 +370,7 @@ In this example, the Shift-Data-Plane tool reads 12-hour accumulated precipitati
 MODIS regrid Tool
 =================
 
-This section contains a description of running the MODIS regrid tool. This tool may be run to create a NetCDF file for use in other MET tools from `MODIS level 2 cloud product from NASA. <https://ladsweb.modaps.eosdis.nasa.gov>`_
+This section contains a description of running the MODIS regrid tool. This tool may be run to create a NetCDF file for use in other MET tools from `MODIS level 2 cloud product from NASA. <https://atmosphere-imager.gsfc.nasa.gov/products/cloud>`_
 
 modis_regrid Usage
 ------------------

@@ -184,7 +184,7 @@ theta_pin = H*Cone*(rescale_deg(Lon_orient - data.lon_pin, -180.0, 180.0));
 Bx = data.x_pin - Alpha*r_pin*H*sind(theta_pin);
 By = data.y_pin + Alpha*r_pin*H*cosd(theta_pin);
 
-xy_to_latlon(0.0, 0.0, Lat_LL, Lon_LL);
+LambertGrid::xy_to_latlon(0.0, 0.0, Lat_LL, Lon_LL);
 
 reduce(Lon_LL);
 
@@ -325,25 +325,25 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double LambertGrid::calc_area(int x, int y) const
+double LambertGrid::calc_area(int x, int y, bool centered) const
 
 {
 
 double u[4], v[4];
 double sum;
 
-
-// xy_to_uv(x - 0.5, y - 0.5, u[0], v[0]);  //  lower left
-// xy_to_uv(x + 0.5, y - 0.5, u[1], v[1]);  //  lower right
-// xy_to_uv(x + 0.5, y + 0.5, u[2], v[2]);  //  upper right
-// xy_to_uv(x - 0.5, y + 0.5, u[3], v[3]);  //  upper left
-
-
-xy_to_uv(x      , y      , u[0], v[0]);  //  lower left
-xy_to_uv(x + 1.0, y      , u[1], v[1]);  //  lower right
-xy_to_uv(x + 1.0, y + 1.0, u[2], v[2]);  //  upper right
-xy_to_uv(x      , y + 1.0, u[3], v[3]);  //  upper left
-
+if ( centered ) {
+   xy_to_uv(x - 0.5, y - 0.5, u[0], v[0]);  //  lower left
+   xy_to_uv(x + 0.5, y - 0.5, u[1], v[1]);  //  lower right
+   xy_to_uv(x + 0.5, y + 0.5, u[2], v[2]);  //  upper right
+   xy_to_uv(x - 0.5, y + 0.5, u[3], v[3]);  //  upper left
+}
+else {
+   xy_to_uv(x      , y      , u[0], v[0]);  //  lower left
+   xy_to_uv(x + 1.0, y      , u[1], v[1]);  //  lower right
+   xy_to_uv(x + 1.0, y + 1.0, u[2], v[2]);  //  upper right
+   xy_to_uv(x      , y + 1.0, u[3], v[3]);  //  upper left
+}
 
 sum = uv_closedpolyline_area(u, v, 4);
 

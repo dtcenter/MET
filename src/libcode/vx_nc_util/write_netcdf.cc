@@ -103,11 +103,11 @@ return;
 void write_netcdf_latlon(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                          const Grid &grid) {
    // Write 1-dimensional arrays for lat/lon grids
-   if(grid.info().ll != 0) {
+   if(grid.info().ll != nullptr) {
       write_netcdf_latlon_1d(f_out, lat_dim, lon_dim, grid);
    }
    // Write 2-dimensional arrays for all others, except SemiLatLon
-   else if(grid.info().sl == 0) {
+   else if(grid.info().sl == nullptr) {
       write_netcdf_latlon_2d(f_out, lat_dim, lon_dim, grid);
    }
 
@@ -257,6 +257,11 @@ void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
 
       case GridWeightType::Area:
          add_att(&wgt_var, long_name_att_name, "true area grid weight");
+         add_att(&wgt_var, units_att_name, "km^2");
+         break;
+
+      case GridWeightType::Area_Cntr:
+         add_att(&wgt_var, long_name_att_name, "true area centered grid weight");
          add_att(&wgt_var, units_att_name, "km^2");
          break;
 

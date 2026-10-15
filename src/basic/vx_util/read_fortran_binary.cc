@@ -55,7 +55,7 @@ long long read_fortran_binary(const int fd, void * buf, const int buf_size,
 
 {
 
-ShuffleFunc shuffle = 0;
+ShuffleFunc shuffle = nullptr;
 
    //
    //  we don't "shuffle" the data ... only the record pads
@@ -74,7 +74,7 @@ switch ( rec_pad_length )  {
 }
 
 int n_read;
-unsigned long long rec_size_1, rec_size_2;
+long long rec_size_1, rec_size_2;
 int bytes;
 
    //

@@ -102,8 +102,6 @@ class UGridFile {
          //  data
          //
 
-      double getData(netCDF::NcVar *, const LongArray &) const;
-
       bool getData(netCDF::NcVar *, const LongArray &, DataPlane &) const;
 
       bool getData(const char *, const LongArray &, DataPlane &, NcVarInfo *&) const;

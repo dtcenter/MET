@@ -2017,14 +2017,14 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             if(hira_pd.ocmn_na.n_valid()                  > 0 &&
                hira_pd.ocsd_na.n_valid()                  > 0 &&
                conf_info.vx_opt[i_vx].cdf_info.cdf_ta.n() > 0) {
-               mlog << Debug(3) << "Resetting the empty HiRA \""
+               mlog << Debug(3) << "Resetting the unspecified HiRA \""
                     << conf_key_prob_cat_thresh << "\" thresholds to "
                     << "climatological distribution thresholds.\n";
                rps_info.set_cdp_thresh(conf_info.vx_opt[i_vx].cdf_info.cdf_ta);
             }
             // Otherwise, use categorical observation thresholds
             else {
-               mlog << Debug(3) << "Resetting the empty HiRA \""
+               mlog << Debug(3) << "Resetting the unspecified HiRA \""
                     << conf_key_prob_cat_thresh << "\" thresholds to the "
                     << "observed categorical thresholds.\n";
                rps_info.set_prob_cat_thresh(conf_info.vx_opt[i_vx].ocat_ta);
@@ -2197,7 +2197,7 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
          shc.set_fcst_thresh (conf_info.vx_opt[i_vx].fcat_ta[i]);
          shc.set_obs_thresh  (conf_info.vx_opt[i_vx].ocat_ta[i]);
          shc.set_thresh_logic(SetLogic::None);
-         shc.set_cov_thresh  (na_str);
+         shc.set_cov_thresh  (SingleThresh(na_str));
 
          // Write out the MPR lines
          if(conf_info.vx_opt[i_vx].output_flag[i_mpr] != STATOutputType::None) {

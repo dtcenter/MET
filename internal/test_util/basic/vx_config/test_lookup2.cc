@@ -128,7 +128,7 @@ void test_lookup(const char * name)
 
 {
 
-const DictionaryEntry * e = (const DictionaryEntry *) 0;
+const DictionaryEntry * e = nullptr;
 
 e = config.lookup(name);
 

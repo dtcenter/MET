@@ -37,6 +37,7 @@
 #include <unistd.h>
 
 #include <netcdf>
+#include <iterator>
 
 #include "main.h"
 #include "grib_classes.h"
@@ -76,7 +77,7 @@ static const char *default_land_data_files [] = {
    "MET_BASE/tc_data/shland.dat"
 };
 static const int n_default_land_data_files =
-   sizeof(default_land_data_files)/sizeof(*default_land_data_files);
+   std::size(default_land_data_files);
 
 ////////////////////////////////////////////////////////////////////////
 //    

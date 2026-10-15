@@ -2627,8 +2627,8 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
       if(strstr(s.c_str(), "-") == nullptr && strstr(s.c_str(), "ERR") == nullptr) {
          mlog << Debug(4)
               << "Skipping frequency of superior performance for "
-              << "column \"" << Column[i] << "\" since it is not an "
-              << "error or difference.\n";
+              << "column \"" << Column[i] << "\" since it is neither "
+              << "an ERR column nor a difference.\n";
          continue;
       }
 
@@ -3761,7 +3761,7 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
 
          // Write only header columns for unspecified line type
          case STATLineType::none:
-            write_header_row((const char **) 0, 0, 1, stat_at, 0, 0);
+            write_header_row(nullptr, 0, 1, stat_at, 0, 0);
             break;
           
          default:
