@@ -891,17 +891,19 @@ int LineDataFile::peek_line(DataLine & a)
 
 {
 
+int status = 0;
+
 if ( ok() ) {
 
    int cur_pos = in->tellg();
 
-   a.read_line(this);
+   status = a.read_line(this);
 
    in->seekg(cur_pos);
 
 }
 
-return 1;
+return status;
 
 }
 
