@@ -1569,7 +1569,11 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg,
                       [](double w) { return is_bad_data(w); })) {
          mlog << Warning << "\n" << method_name
               << "unable to compute station density weights for "
-              << seeps_mprs.size() << " SEEPS pairs!\n\n";
+              << seeps_mprs.size() << " SEEPS pairs! "
+              << "Using unweighted means.\n\n";
+         score_sum_wgt = seeps_agg->score;
+         fcst_sum_wgt  = seeps_agg->mean_fcst;
+         obs_sum_wgt   = seeps_agg->mean_obs;
       }
       else {
 
@@ -1753,6 +1757,10 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
       seeps_agg->mean_fcst = fcst_sum / seeps_count;
       seeps_agg->mean_obs  = obs_sum / seeps_count;
       seeps_agg->score     = seeps_score_sum / seeps_count;
+
+      // Grid points are weighted equally
+      seeps_agg->mean_fcst_wgt = seeps_agg->mean_fcst;
+      seeps_agg->mean_obs_wgt  = seeps_agg->mean_obs;
    }
 
    mlog << Debug(6) << method_name

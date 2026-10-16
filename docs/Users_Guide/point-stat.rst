@@ -183,9 +183,7 @@ SEEPS Weighting
 
 When calculating a single SEEPS value over observing stations for a particular region, the scores should have a density weighting applied which accounts for uneven station distribution in the region of interest (see Section 9.1 in :ref:`Rodwell et al., 2010 <Rodwell-2010>`). For point data, MET always computes these **station density weights** for the SEEPS line type, even when **point_weight_flag = NONE**. They are computed the same way as the **point_weight_flag = KDE** weights described in :numref:`config_options`, using the same **kde_ref_angle** option (0.75 degrees by default), but separately from those weights. The SEEPS line type does not apply the **point_weight_flag** weights in Point-Stat and Pair-Stat, or the **grid_weight_flag** weights in Grid-Stat. The columns of the SEEPS line type (:numref:`table_PS_format_info_SEEPS`) are computed as follows:
 
-* The **PF1, PF2, PF3, PV1, PV2, and PV3** columns are relative frequencies weighted by the station density weights. These weights are computed separately for each SEEPS output line, meaning for each combination of message type, masking region, and interpolation method, using only the matched pairs with a valid SEEPS score. Each unique station ID is treated as a single point in the density calculation.
-
-* The **MEAN_FCST, MEAN_OBS, and SEEPS** columns are unweighted means over the matched pairs with a valid SEEPS score.
+* The **PF1, PF2, PF3, PV1, PV2, PV3, MEAN_FCST, MEAN_OBS, and SEEPS** columns are means weighted by the station density weights. These weights are computed separately for each SEEPS output line, meaning for each combination of message type, masking region, and interpolation method, using only the matched pairs with a valid SEEPS score. Each unique station ID is treated as a single point in the density calculation.
 
 * The **ODFL, ODFH, OLFD, OLFH, OHFD, and OHFL** columns are unweighted counts of the matched pairs in each off-diagonal forecast and observation category. They are provided for information only and are not used to compute any of the other columns.
 
@@ -1863,15 +1861,15 @@ The first set of header columns are common to all of the output files generated 
     - Double
   * - 38
     - MEAN_FCST
-    - Mean forecast value
+    - Weighted mean forecast value
     - Double
   * - 39
     - MEAN_OBS
-    - Mean observation value
+    - Weighted mean observation value
     - Double
   * - 40
     - SEEPS
-    - Averaged SEEPS (Stable Equitable Error in Probability Space) score
+    - Weighted mean SEEPS (Stable Equitable Error in Probability Space) score
     - Double
 
 The ODFL, ODFH, OLFD, OLFH, OHFD, and OHFL columns are the counts in the off-diagonal cells of the 3x3 forecast and observation category contingency table. The PF1, PF2, PF3, PV1, PV2, and PV3 columns are the marginal relative frequencies of the forecast and observation categories, and each set sums to 1. The weights applied to each of these columns, and to the MEAN_FCST, MEAN_OBS, and SEEPS columns, are described in :numref:`PS_seeps_weighting`.
