@@ -101,7 +101,6 @@ void IODA2NCConfInfo::process_config() {
    ConcatString mask_name;
    StringArray sa;
    Dictionary *dict = (Dictionary *) nullptr;
-   static const char *method_name = "IODA2NCConfInfo::process_config() -> ";
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);

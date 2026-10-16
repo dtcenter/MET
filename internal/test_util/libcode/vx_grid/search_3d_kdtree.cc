@@ -154,7 +154,6 @@ int main(int argc, char *argv[])
    IndexKDTree::ValueList neighbor = kdtree->closestPoints(target_point_first, closest_n);
    for (size_t i=0; i < neighbor.size(); i++) {
       size_t index(neighbor[i].payload());
-      int index2 = (int)neighbor[i].payload();
       distance_km = neighbor[i].distance() / 1000.;
       //in_distance = is_in_distance(distance_km);
       llh_to_ecef(lat_values[index], lon_values[index], alt_values[index], &x, &y, &z);
@@ -170,7 +169,6 @@ int main(int argc, char *argv[])
    neighbor = kdtree->closestPoints(target_point_mid, closest_n);
    for (size_t i=0; i < neighbor.size(); i++) {
       size_t index(neighbor[i].payload());
-      int index2 = (int)neighbor[i].payload();
       distance_km = neighbor[i].distance() / 1000.;
       //in_distance = is_in_distance(distance_km);
       llh_to_ecef(lat_values[index], lon_values[index], alt_values[index], &x, &y, &z);
@@ -186,7 +184,6 @@ int main(int argc, char *argv[])
    neighbor = kdtree->closestPoints(target_point_last, closest_n);
    for (size_t i=0; i < neighbor.size(); i++) {
       size_t index(neighbor[i].payload());
-      int index2 = (int)neighbor[i].payload();
       distance_km = neighbor[i].distance() / 1000.;
       //in_distance = is_in_distance(distance_km);
       llh_to_ecef(lat_values[index], lon_values[index], alt_values[index], &x, &y, &z);
@@ -202,7 +199,6 @@ int main(int argc, char *argv[])
    neighbor = kdtree->closestPoints(target_point, closest_n);
    for (size_t i=0; i < neighbor.size(); i++) {
       size_t index(neighbor[i].payload());
-      int index2 = (int)neighbor[i].payload();
       distance_km = neighbor[i].distance() / 1000.;
       //in_distance = is_in_distance(distance_km);
       llh_to_ecef(lat_values[index], lon_values[index], alt_values[index], &x, &y, &z);
@@ -245,13 +241,6 @@ std::unique_ptr<IndexKDTree> build_tree(vector<double> &lat, vector<double> &lon
 ////////////////////////////////////////////////////////////////////////
 
 void check_llh_to_ecef() {
-   double lat;
-   double lon;
-   double alt_m;
-   double true_x_km;
-   double true_y_km;
-   double true_z_km;
-
    test_llh_to_ecef(34.0522, -118.40806, 0.0, -2516.715, -4653.003, 3551.245, "LA");
    test_llh_to_ecef(-9.59874, 287.326, 100, 1873.072, -6004.143, -1056.531, "First Point");
    test_llh_to_ecef(-27.9711, 107.326, 100, -1678.837,  5381.522, -2973.724, "Middle Point");

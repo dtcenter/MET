@@ -143,7 +143,6 @@ void VarInfoNcWrf::set_default_levels(const ConcatString &lstr) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoNcWrf::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
-   const char *method_name = "VarInfoNcWrf::set_magic() -> ";
 
    // Store the magic string
    set_magic_pre(nstr, lstr);

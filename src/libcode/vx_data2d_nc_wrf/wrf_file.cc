@@ -18,6 +18,7 @@
 #include <cmath>
 
 #include <netcdf>
+#include <iterator>
 
 #include "vx_math.h"
 #include "vx_cal.h"
@@ -78,7 +79,6 @@ static const char *accum_var_names     [] = { "ACGRDFLX", "CUPPT",
                                               "RAINC",    "RAINNC",
                                               "SNOWNC",   "GRAUPELNC",
                                               "ACHFX",    "ACLHF" };
-static const int n_accum_var_names        = sizeof(accum_var_names)/sizeof(*accum_var_names);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -564,7 +564,6 @@ if (dim_count >= max_wrf_args )  {
 bool status = false;
 double fill_value;
 double d = bad_data_double;
-double missing_value = get_var_missing_value(var);
 get_var_fill_value(var, fill_value);
 
 status = get_nc_data(var, &d, a);

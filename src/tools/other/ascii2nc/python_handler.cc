@@ -34,11 +34,6 @@ static const char tmp_list_name          [] = "ascii_data";
 static const char tmp_base_name          [] = "tmp_ascii2nc";
 
 
-////////////////////////////////////////////////////////////////////////
-
-
-static const char sq = '\'';   //  single quote
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -76,12 +71,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-PythonHandler::~PythonHandler()
-
-{
-
-
-}
+PythonHandler::~PythonHandler() = default;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -333,7 +323,7 @@ const int N = user_script_args.n();
 ConcatString command;
 ConcatString path;
 ConcatString tmp_ascii_path;
-const char * tmp_dir = 0;
+const char * tmp_dir = nullptr;
 int status;
 
 mlog << Debug(2)
@@ -349,7 +339,7 @@ path << cs_erase
      << tmp_dir << '/'
      << tmp_base_name;
 
-tmp_ascii_path = make_temp_file_name(path.text(), 0);
+tmp_ascii_path = make_temp_file_name(path.text(), nullptr);
 tmp_ascii_path << ".txt";
 
 command << cs_erase
@@ -393,7 +383,7 @@ mlog << Debug(4) << "Reading temporary Python ascii observation file: "
 
 script->import_read_tmp_ascii_py();
 
-PyObject * dobj = script->read_tmp_ascii(tmp_ascii_path.text());
+script->read_tmp_ascii(tmp_ascii_path.text());
 
 PyObject * obj = script->lookup_ascii(tmp_list_name);
 

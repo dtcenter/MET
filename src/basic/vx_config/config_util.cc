@@ -161,6 +161,7 @@ void RegridInfo::validate() {
       method != InterpMthd::Lower_Right &&
       method != InterpMthd::Lower_Left &&
       method != InterpMthd::AW_Mean &&
+      method != InterpMthd::AW_Mean_Cntr &&
       method != InterpMthd::MaxGauss) {
       mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting the regridding method from \""
@@ -177,7 +178,8 @@ void RegridInfo::validate() {
        method == InterpMthd::Upper_Right ||
        method == InterpMthd::Lower_Right ||
        method == InterpMthd::Lower_Left ||
-       method == InterpMthd::AW_Mean) &&
+       method == InterpMthd::AW_Mean ||
+       method == InterpMthd::AW_Mean_Cntr) &&
       width != 1) {
       mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting regridding width from "
@@ -509,7 +511,6 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
    DictionaryEntry entry;
    StringArray lvl;
    int n_lvl;
-   int total;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_i_vx_dict() -> "
@@ -734,11 +735,7 @@ StringArray parse_sid_mask_as_list(const ConcatString &mask_sid_str) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-MaskLatLon::MaskLatLon(const MaskLatLon &a) {
-   name = a.name;
-   lat_thresh = a.lat_thresh;
-   lon_thresh = a.lon_thresh;
-}
+MaskLatLon::MaskLatLon(const MaskLatLon &a) = default;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1263,7 +1260,6 @@ map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 map<ConcatString,ConcatString> parse_conf_obs_name_map(Dictionary *dict) {
-   const char *method_name = "parse_conf_obs_name_map() -> ";
    return parse_conf_key_value_map(dict, conf_key_obs_name_map);
 }
 
@@ -1446,9 +1442,7 @@ void TimeSummaryInfo::clear() {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-BootInfo::BootInfo(const BootInfo &a)
-   : interval(a.interval), rep_prop(a.rep_prop), n_rep(a.n_rep),
-     rng(a.rng), seed(a.seed) { }
+BootInfo::BootInfo(const BootInfo &a) = default;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1989,13 +1983,7 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-ClimoCDFInfo::ClimoCDFInfo(const ClimoCDFInfo &a) {
-   flag = a.flag;
-   n_bin = a.n_bin;
-   cdf_ta = a.cdf_ta;
-   write_bins = a.write_bins;
-   direct_prob = a.direct_prob;
-}
+ClimoCDFInfo::ClimoCDFInfo(const ClimoCDFInfo &a) = default;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -2092,7 +2080,7 @@ ClimoCDFInfo &ClimoCDFInfo::operator=(ClimoCDFInfo &&a) noexcept {
       a.flag = false;
       n_bin = a.n_bin;
       a.n_bin = 0;
-      cdf_ta = move(a.cdf_ta);
+      cdf_ta = std::move(a.cdf_ta);
       write_bins = a.write_bins;
       a.write_bins = false;
       direct_prob = a.direct_prob;
@@ -2531,9 +2519,10 @@ GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
    v = dict->lookup_int(conf_key_grid_weight_flag);
 
    // Convert integer to enumerated GridWeightType
-        if(v == conf_const.lookup_int(conf_val_none))    t = GridWeightType::None;
-   else if(v == conf_const.lookup_int(conf_val_cos_lat)) t = GridWeightType::Cos_Lat;
-   else if(v == conf_const.lookup_int(conf_val_area))    t = GridWeightType::Area;
+        if(v == conf_const.lookup_int(conf_val_none))      t = GridWeightType::None;
+   else if(v == conf_const.lookup_int(conf_val_cos_lat))   t = GridWeightType::Cos_Lat;
+   else if(v == conf_const.lookup_int(conf_val_area))      t = GridWeightType::Area;
+   else if(v == conf_const.lookup_int(conf_val_area_cntr)) t = GridWeightType::Area_Cntr;
    else {
       mlog << Error << "\n" << method_name
            << "Unexpected config file value of " << v << " for \""
@@ -2894,7 +2883,6 @@ SurfaceInfo parse_conf_surface_info(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void parse_conf_topo_mask_interp(Dictionary *dict, SurfaceInfo &sfc_info) {
-   const char *method_name = "parse_conf_topo_mask_interp() -> ";
 
    // Conf: topo_mask.interp
    Dictionary *interp_dict = dict->lookup_dictionary(conf_key_topo_mask_interp);
@@ -3167,28 +3155,29 @@ void check_climo_n_vx(Dictionary *dict, const int n_input) {
 InterpMthd int_to_interpmthd(int i) {
    InterpMthd m = InterpMthd::None;
 
-        if(i == conf_const.lookup_int(interpmthd_none_str))        m = InterpMthd::None;
-   else if(i == conf_const.lookup_int(interpmthd_min_str))         m = InterpMthd::Min;
-   else if(i == conf_const.lookup_int(interpmthd_max_str))         m = InterpMthd::Max;
-   else if(i == conf_const.lookup_int(interpmthd_median_str))      m = InterpMthd::Median;
-   else if(i == conf_const.lookup_int(interpmthd_uw_mean_str))     m = InterpMthd::UW_Mean;
-   else if(i == conf_const.lookup_int(interpmthd_dw_mean_str))     m = InterpMthd::DW_Mean;
-   else if(i == conf_const.lookup_int(interpmthd_aw_mean_str))     m = InterpMthd::AW_Mean;
-   else if(i == conf_const.lookup_int(interpmthd_ls_fit_str))      m = InterpMthd::LS_Fit;
-   else if(i == conf_const.lookup_int(interpmthd_bilin_str))       m = InterpMthd::Bilin;
-   else if(i == conf_const.lookup_int(interpmthd_nbrhd_str))       m = InterpMthd::Nbrhd;
-   else if(i == conf_const.lookup_int(interpmthd_nearest_str))     m = InterpMthd::Nearest;
-   else if(i == conf_const.lookup_int(interpmthd_budget_str))      m = InterpMthd::Budget;
-   else if(i == conf_const.lookup_int(interpmthd_force_str))       m = InterpMthd::Force;
-   else if(i == conf_const.lookup_int(interpmthd_best_str))        m = InterpMthd::Best;
-   else if(i == conf_const.lookup_int(interpmthd_upper_left_str))  m = InterpMthd::Upper_Left;
-   else if(i == conf_const.lookup_int(interpmthd_upper_right_str)) m = InterpMthd::Upper_Right;
-   else if(i == conf_const.lookup_int(interpmthd_lower_right_str)) m = InterpMthd::Lower_Right;
-   else if(i == conf_const.lookup_int(interpmthd_lower_left_str))  m = InterpMthd::Lower_Left;
-   else if(i == conf_const.lookup_int(interpmthd_gaussian_str))    m = InterpMthd::Gaussian;
-   else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))    m = InterpMthd::MaxGauss;
-   else if(i == conf_const.lookup_int(interpmthd_geog_match_str))  m = InterpMthd::Geog_Match;
-   else if(i == conf_const.lookup_int(interpmthd_hira_str))        m = InterpMthd::HiRA;
+        if(i == conf_const.lookup_int(interpmthd_none_str))         m = InterpMthd::None;
+   else if(i == conf_const.lookup_int(interpmthd_min_str))          m = InterpMthd::Min;
+   else if(i == conf_const.lookup_int(interpmthd_max_str))          m = InterpMthd::Max;
+   else if(i == conf_const.lookup_int(interpmthd_median_str))       m = InterpMthd::Median;
+   else if(i == conf_const.lookup_int(interpmthd_uw_mean_str))      m = InterpMthd::UW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_dw_mean_str))      m = InterpMthd::DW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_aw_mean_str))      m = InterpMthd::AW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_aw_mean_cntr_str)) m = InterpMthd::AW_Mean_Cntr;
+   else if(i == conf_const.lookup_int(interpmthd_ls_fit_str))       m = InterpMthd::LS_Fit;
+   else if(i == conf_const.lookup_int(interpmthd_bilin_str))        m = InterpMthd::Bilin;
+   else if(i == conf_const.lookup_int(interpmthd_nbrhd_str))        m = InterpMthd::Nbrhd;
+   else if(i == conf_const.lookup_int(interpmthd_nearest_str))      m = InterpMthd::Nearest;
+   else if(i == conf_const.lookup_int(interpmthd_budget_str))       m = InterpMthd::Budget;
+   else if(i == conf_const.lookup_int(interpmthd_force_str))        m = InterpMthd::Force;
+   else if(i == conf_const.lookup_int(interpmthd_best_str))         m = InterpMthd::Best;
+   else if(i == conf_const.lookup_int(interpmthd_upper_left_str))   m = InterpMthd::Upper_Left;
+   else if(i == conf_const.lookup_int(interpmthd_upper_right_str))  m = InterpMthd::Upper_Right;
+   else if(i == conf_const.lookup_int(interpmthd_lower_right_str))  m = InterpMthd::Lower_Right;
+   else if(i == conf_const.lookup_int(interpmthd_lower_left_str))   m = InterpMthd::Lower_Left;
+   else if(i == conf_const.lookup_int(interpmthd_gaussian_str))     m = InterpMthd::Gaussian;
+   else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))     m = InterpMthd::MaxGauss;
+   else if(i == conf_const.lookup_int(interpmthd_geog_match_str))   m = InterpMthd::Geog_Match;
+   else if(i == conf_const.lookup_int(interpmthd_hira_str))         m = InterpMthd::HiRA;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
            << "Unexpected value of " << i

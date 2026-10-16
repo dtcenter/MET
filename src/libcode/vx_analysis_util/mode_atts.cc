@@ -1900,6 +1900,7 @@ void ModeAttributes::parse_command_line(StringArray & a)
 {
 
 int j;
+std::string cs;
 const char * c = (const char *) nullptr;
 
 
@@ -1907,7 +1908,8 @@ j = 0;
 
 while ( j < (a.n_elements()) )  {
   
-   c = a[j].c_str();
+   cs = a[j];
+   c = cs.c_str();
 
    if ( c[0] != '-' )  { ++j;  continue; }
 

@@ -44,28 +44,34 @@ void update_pdf(double min, double delta, vector<long long>& pdf,
 //           vx_series_data library enables MET to compile on WCOSS2
 //           with Intel classic compilers. 
 
-//#pragma omp declare reduction(vec_long_long_plus : vector<long long> :    \
-//                              transform(omp_out.begin(), omp_out.end(),   \
-//                                         omp_in.begin(), omp_out.begin(), \
-//                                        plus<long long>()))               \
-//                    initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
+/*
+#pragma omp declare reduction(vec_long_long_plus : vector<long long> :    \
+                              transform(omp_out.begin(), omp_out.end(),   \
+                                         omp_in.begin(), omp_out.begin(), \
+                                        plus<long long>()))               \
+                    initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
+*/
 
-//#pragma omp parallel default(none) \
-//   shared(min, delta, pdf, dp, mp)
+/*
+#pragma omp parallel default(none) \
+   shared(min, delta, pdf, dp, mp)
+*/
 //   {
 
       // Update pdf counts
-//#pragma omp for schedule(static) \
-//                reduction(vec_long_long_plus : pdf) \
-//                collapse(2)
+/*
+#pragma omp for schedule(static) \
+                reduction(vec_long_long_plus : pdf) \
+                collapse(2)
+*/
       for(int x=0; x<dp.nx(); x++) {
          for(int y=0; y<dp.ny(); y++) {
             double value = dp.get(x, y);
             if(mp.s_is_on(x, y) && !is_bad_data(value)) {
 
                auto bin = (int) floor((value - min) / delta);
-                    if(bin < 0)           bin = 0;
-               else if(bin >= pdf.size()) bin = (int) pdf.size() - 1;
+                    if(bin < 0)                 bin = 0;
+               else if(bin >= (int) pdf.size()) bin = (int) pdf.size() - 1;
 
                pdf[bin]++;
             }
@@ -86,21 +92,27 @@ void update_joint_pdf(int n_A, int n_B, double min_A, double min_B,
 //           vx_series_data library enables MET to compile on WCOSS2
 //           with Intel classic compilers. 
 
-//#pragma omp declare reduction(vec_long_long_plus : vector<long long> :    \
-//                              transform(omp_out.begin(), omp_out.end(),   \
-//                                         omp_in.begin(), omp_out.begin(), \
-//                                        plus<long long>()))               \
-//                    initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
+/*
+#pragma omp declare reduction(vec_long_long_plus : vector<long long> :    \
+                              transform(omp_out.begin(), omp_out.end(),   \
+                                         omp_in.begin(), omp_out.begin(), \
+                                        plus<long long>()))               \
+                    initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
+*/
 
-//#pragma omp parallel default(none)                  \
-//   shared(n_A, n_B, min_A, min_B, delta_A, delta_B) \
-//   shared(pdf, dp_A, dp_B, mp)
+/*
+#pragma omp parallel default(none)                  \
+   shared(n_A, n_B, min_A, min_B, delta_A, delta_B) \
+   shared(pdf, dp_A, dp_B, mp)
+*/
 //   {
 
       // Update joint pdf counts
-//#pragma omp for schedule(static) \
-//                reduction(vec_long_long_plus : pdf) \
-//                collapse(2)
+/*
+#pragma omp for schedule(static) \
+                reduction(vec_long_long_plus : pdf) \
+                collapse(2)
+*/
       for(int x=0; x<dp_A.nx(); x++) {
          for(int y=0; y<dp_A.ny(); y++) {
             double value_A = dp_A.get(x, y);
@@ -131,9 +143,10 @@ void update_joint_pdf(int n_A, int n_B, double min_A, double min_B,
 void print_pdf(double min, double delta,
                const vector<long long>& pdf) {
 
-   for(int k=0; k<pdf.size(); k++) {
-      double bin_min = min + k * delta;
-      double bin_max = min + (k + 1) * delta;
+   for(size_t k=0; k<pdf.size(); k++) {
+      auto dk = static_cast<double>(k);
+      double bin_min = min + dk * delta;
+      double bin_max = min + (dk + 1) * delta;
       cout << "[" << bin_min << ", " << bin_max << "] "
            << pdf[k] << "\n";
    }
@@ -149,10 +162,11 @@ void write_nc_pdf(const NcFile* nc_out, const VarInfo& info,
    vector<double> bin_max;
    vector<double> bin_mid;
 
-   for(int k=0; k<pdf.size(); k++) {
-      bin_min.emplace_back(min + delta * k);
-      bin_max.emplace_back(min + delta * (k + 1));
-      bin_mid.emplace_back(min + delta * (k + 0.5));
+   for(size_t k=0; k<pdf.size(); k++) {
+      auto dk = static_cast<double>(k);
+      bin_min.emplace_back(min + delta * dk);
+      bin_max.emplace_back(min + delta * (dk + 1));
+      bin_mid.emplace_back(min + delta * (dk + 0.5));
    }
 
    ConcatString var_name = info.name();

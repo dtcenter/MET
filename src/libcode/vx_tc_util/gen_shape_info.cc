@@ -299,7 +299,7 @@ void GenShapeInfoArray::assign(const GenShapeInfoArray &ga) {
 
    clear();
 
-   for(int i=0; i<ga.GenShape.size(); i++) add(ga[i]);
+   for(int i=0; i<(int) ga.GenShape.size(); i++) add(ga[i]);
 
    return;
 }
@@ -309,7 +309,7 @@ void GenShapeInfoArray::assign(const GenShapeInfoArray &ga) {
 const GenShapeInfo & GenShapeInfoArray::operator[](int n) const {
 
    // Check range
-   if((n < 0) || (n >= GenShape.size())) {
+   if((n < 0) || (n >= (int) GenShape.size())) {
       mlog << Error << "\nGenShapeInfoArray::operator[](int) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
@@ -329,7 +329,7 @@ bool GenShapeInfoArray::add(const GenShapeInfo &gsi, bool check_dup) {
    if(check_dup) {
 
       // Loop over existing shapes
-      for(int i=0; i<GenShape.size(); i++) {
+      for(int i=0; i<(int) GenShape.size(); i++) {
 
          // Handle duplicates
          if(GenShape[i].is_duplicate(gsi)) {
@@ -368,7 +368,7 @@ bool GenShapeInfoArray::add(const GenShapeInfo &gsi, bool check_dup) {
 
 bool GenShapeInfoArray::has(const GenShapeInfo &gsi) const {
 
-   for(int i=0; i<GenShape.size(); i++) {
+   for(int i=0; i<(int) GenShape.size(); i++) {
       if(gsi == GenShape[i]) return true;
    }
 

@@ -103,7 +103,7 @@ aff.set_mb(1.0/(data.dx_km), 0.0, 0.0, 1.0/(data.dy_km), 0.0, 0.0);
 
 double xx, yy;
 
-latlon_to_xy(data.lat_first, data.lon_first, xx, yy);
+LaeaGrid::latlon_to_xy(data.lat_first, data.lon_first, xx, yy);
 
 aff.set_translation(-xx, -yy);
 
@@ -122,8 +122,6 @@ return;
 LaeaGrid::LaeaGrid(const LaeaNetcdfData & nc, Key)
 
 {
-
-const char * method_name = "LaeaGrid::LaeaGrid(const LaeaNetcdfData &) -> ";
 
 double u, v, lat, lon;
 const double tol = 1.0e-5;
@@ -173,23 +171,23 @@ geoid.set_name("Undefined");
 
 aff.set_mb(1.0/(Data.dx_km), 0.0, 0.0, 1.0/(Data.dy_km), 0.0, 0.0);
 
-latlon_to_xy(nc.proj_origin_lat, nc.proj_origin_lon, u, v);
+LaeaGrid::latlon_to_xy(nc.proj_origin_lat, nc.proj_origin_lon, u, v);
 
 aff.set_translation(nc.x_pin - u, nc.y_pin - v);
 
       ////////////////////////
 
-xy_to_latlon(0.0, 0.0, lat, lon);
+LaeaGrid::xy_to_latlon(0.0, 0.0, lat, lon);
 
 Data.lat_first = lat;
 Data.lon_first = lon;
 
-xy_to_latlon(Nx - 1.0, 0.0, lat, lon);
+LaeaGrid::xy_to_latlon(Nx - 1.0, 0.0, lat, lon);
 
 lat_LR = lat;
 lon_LR = lon;
 
-xy_to_latlon(0.0, Ny - 1.0, lat, lon);
+LaeaGrid::xy_to_latlon(0.0, Ny - 1.0, lat, lon);
 
 lat_UL = lat;
 lon_UL = lon;
@@ -332,17 +330,25 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double LaeaGrid::calc_area(int x, int y) const
+double LaeaGrid::calc_area(int x, int y, bool centered) const
 
 {
 
 double u[4], v[4];
 double sum;
 
-xy_to_uv(x - 0.5, y - 0.5, u[0], v[0]);  //  lower left
-xy_to_uv(x + 0.5, y - 0.5, u[1], v[1]);  //  lower right
-xy_to_uv(x + 0.5, y + 0.5, u[2], v[2]);  //  upper right
-xy_to_uv(x - 0.5, y + 0.5, u[3], v[3]);  //  upper left
+if ( centered )  {
+   xy_to_uv(x - 0.5, y - 0.5, u[0], v[0]);  //  lower left
+   xy_to_uv(x + 0.5, y - 0.5, u[1], v[1]);  //  lower right
+   xy_to_uv(x + 0.5, y + 0.5, u[2], v[2]);  //  upper right
+   xy_to_uv(x - 0.5, y + 0.5, u[3], v[3]);  //  upper left
+}
+else {
+   xy_to_uv(x,       y,       u[0], v[0]);  //  lower left
+   xy_to_uv(x + 1.0, y,       u[1], v[1]);  //  lower right
+   xy_to_uv(x + 1.0, y + 1.0, u[2], v[2]);  //  upper right
+   xy_to_uv(x,       y + 1.0, u[3], v[3]);  //  upper left
+}
 
 sum = uv_closedpolyline_area(u, v, 4);
 

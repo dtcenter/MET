@@ -460,7 +460,7 @@ void ProbRIRWPairInfoArray::subset_write_valid(const TimeArray &ta) {
    if(ta.n() == 0) return;
 
    ProbRIRWPairInfoArray new_pairs;
-   for(int i=0; i<Pairs.size(); i++) {
+   for(int i=0; i<(int) Pairs.size(); i++) {
       if(ta.has(Pairs[i].prob_rirw().valid())) new_pairs.add(Pairs[i]);
    }
 

@@ -44,6 +44,11 @@ on:
         default: ''
         required: false
 
+# Group by workflow name and branch/PR reference
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   DOCKERHUB_REPO: dtcenter/met-dev
 

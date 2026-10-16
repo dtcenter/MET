@@ -58,9 +58,7 @@ SummaryCalcPercentile::SummaryCalcPercentile(const string &type_string) :
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryCalcPercentile::~SummaryCalcPercentile()
-{
-}
+SummaryCalcPercentile::~SummaryCalcPercentile() = default;
 
 ////////////////////////////////////////////////////////////////////////
 // Protected/Private Methods

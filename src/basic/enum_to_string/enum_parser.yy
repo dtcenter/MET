@@ -89,11 +89,15 @@ static void do_class_prefix(const char *);
 
 
 
-%token ENUM L_CURLY R_CURLY EQ INTEGER ID CLASS
+%token ENUM
+%token <ival> L_CURLY R_CURLY
+%token EQ
+%token <ival> INTEGER
+%token <name> ID
+%token CLASS
 
 
-%type <name> ID class_prefix
-%type <ival> INTEGER L_CURLY R_CURLY
+%type <name> class_prefix
 
 
 

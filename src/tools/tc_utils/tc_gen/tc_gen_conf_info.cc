@@ -303,7 +303,7 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    // Conf: output_flag
    OutputMap = parse_conf_output_flag(&dict, txt_file_type, n_txt);
 
-   for(i=0, status=false; i<OutputMap.size(); i++) {
+   for(i=0, status=false; i<(int) OutputMap.size(); i++) {
       if(OutputMap[txt_file_type[i]] != STATOutputType::None) {
          status = true;
          break;
@@ -787,7 +787,7 @@ void TCGenConfInfo::process_config() {
    // Check that each filter has a unique description
    if(VxOpt.size() > 1) {
       StringArray desc_sa;
-      for(i=0; i<VxOpt.size(); i++) {
+      for(i=0; i<(int) VxOpt.size(); i++) {
          if(desc_sa.has(VxOpt[i].Desc)) {
              mlog << Error << "\nTCGenConfInfo::process_config() -> "
                   << "a unique \"" << conf_key_desc
@@ -947,7 +947,7 @@ STATOutputType TCGenConfInfo::output_map(STATLineType t) const {
 int TCGenConfInfo::get_max_n_prob_thresh() const {
    int i, n;
 
-   for(i=0,n=0; i<VxOpt.size(); i++) {
+   for(i=0,n=0; i<(int) VxOpt.size(); i++) {
       n = max(n, VxOpt[i].ProbGenThresh.n());
    }
 

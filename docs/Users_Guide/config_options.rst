@@ -341,16 +341,25 @@ files when specifying paths and the appropriate path will be substituted in.
 If MET_BASE is defined as an environment variable, its value will be used
 instead of the one defined at compilation time.
 
-.. _met_obs_error_table:
+.. _met_obs_err_table:
 
-MET_OBS_ERROR_TABLE
--------------------
+MET_OBS_ERR_TABLE
+-----------------
 
-The MET_OBS_ERROR_TABLE environment variable can be set to specify the location
+The MET_OBS_ERR_TABLE environment variable can be set to specify the location
 of an ASCII file defining observation error information. The default table can
-be found in the installed *share/met/table_files/obs_error_table.txt*. This
+be found in the installed *share/met/table_files/obs_err_table.txt*. This
 observation error logic is applied in Ensemble-Stat to perturb ensemble member
-values and/or define observation bias corrections.
+values and/or define observation bias corrections. If MET_OBS_ERR_TABLE is set
+to a directory, all files in it whose names begin with "obs_err" and end with
+".txt" are read.
+
+.. note:: The "MET_OBS_ERR_TABLE" environment variable was named
+          "MET_OBS_ERROR_TABLE" and the default "obs_err_table.txt" file was
+          named "obs_error_table.txt" prior to MET version 13.0.0. The
+          deprecated environment variable name is still supported for
+          backward compatibility but should be replaced. User-defined table
+          files whose names begin with "obs_error" are still read.
 
 When processing point and gridded observations, Ensemble-Stat searches the table
 to find the entry defining the observation error information. The table
@@ -366,7 +375,7 @@ BEG,END where BEG and END specify the range of values to be used. The
 INST_BIAS_SCALE and INST_BIAS_OFFSET columns define instrument bias adjustments
 which are applied to the observation values. The DIST_TYPE and DIST_PARM
 columns define the distribution from which random perturbations should be drawn
-and applied to the ensemble member values. See the obs_error description below
+and applied to the ensemble member values. See the obs_err description below
 for details on the supported error distributions. The last two columns, MIN and
 MAX, define the bounds for the valid range of the bias-corrected observation
 values and randomly perturbed ensemble member values. Values less than MIN are
@@ -407,7 +416,7 @@ The following lines consist of 4 integers followed by 3 strings:
 | Column 7: units
 
 References:
-| `Office Note 388 GRIB1 <http://www.nco.ncep.noaa.gov/pmb/docs/on388>`_
+| `Office Note 388 GRIB1 <https://www.nco.ncep.noaa.gov/pmb/docs/on388/>`_
 | `A Guide to the Code Form FM 92-IX Ext. GRIB Edition 1 <https://community.wmo.int/site/knowledge-hub/programmes-and-initiatives/wmo-information-system-wis/grib-edition-1>`_
 
 
@@ -428,7 +437,7 @@ The following lines consist of 8 integers followed by 3 strings.
 | Column 11: units
 
 References:
-| `NCEP WMO GRIB2 Documentation <http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc>`_
+| `NCEP WMO GRIB2 Documentation <https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/>`_
 
 .. _omp_num_threads:
 
@@ -589,21 +598,25 @@ If the environment variable is set to any value, the subgrid values will be read
 Settings Common to Multiple Tools
 =================================
 
-exit_on_warning
----------------
+exit_on_warn
+------------
 
-The "exit_on_warning" entry in ConfigConstants may be set to true or false.
+The "exit_on_warn" entry in ConfigConstants may be set to true or false.
 If set to true and a MET tool encounters a warning, it will immediately exit
 with bad status after writing the warning message.
 
+.. note:: The "exit_on_warn" entry was named "exit_on_warning" prior to
+          MET version 13.0.0. The deprecated name is still supported for
+          backward compatibility but should be replaced.
+
 .. code-block:: none
 
-  exit_on_warning = FALSE;
+  exit_on_warn = FALSE;
 
-time_offset_warning
--------------------
+time_offset_warn
+----------------
 
-The "time_offset_warning" entry in ConfigConstants defines an allowable
+The "time_offset_warn" entry in ConfigConstants defines an allowable
 offset in seconds to silence time differences warning messages. Several
 MET tools check the timestamps of the datasets being compared and print a
 warning message if they differ. Increasing this option from its default
@@ -612,9 +625,13 @@ without triggering a warning. If the absolute value of a non-zero time
 difference is less than or equal to this setting, a debug log message is
 written instead of a warning.
 
+.. note:: The "time_offset_warn" entry was named "time_offset_warning" prior
+          to MET version 13.0.0. The deprecated name is still supported for
+          backward compatibility but should be replaced.
+
 .. code-block:: none
 
-  time_offset_warning = 0;
+  time_offset_warn = 0;
 
 nc_compression
 --------------
@@ -878,27 +895,57 @@ The "method" entry defines the regridding method to be used.
 
   * Valid regridding methods:
 
-    * MIN         for the minimum value
+    * MIN          for the minimum value
 
-    * MAX         for the maximum value
+    * MAX          for the maximum value
 
-    * MEDIAN      for the median value
+    * MEDIAN       for the median value
 
-    * UW_MEAN     for the unweighted average value
+    * UW_MEAN      for the unweighted average value
 
-    * DW_MEAN     for the distance-weighted average value (weight =
+    * DW_MEAN      for the distance-weighted average value (weight =
       distance^-2)
 
-    * AW_MEAN     for an area-weighted mean when regridding from
-      high to low resolution grids (width = 1)
+    * AW_MEAN      for an area-weighted mean when regridding from
+      high to low resolution grids (width = 1), weighting each input
+      point by the area of the grid box whose lower-left corner is that
+      point. Input points lying exactly on the boundary between output
+      grid boxes are all assigned to the same side, which can shift
+      the result by a fraction of a grid box when the input and output
+      grids are aligned (e.g. 0.25 to 1.0 degree lat/lon). Prior to
+      version 13.0.0, input points within half a grid box of the western
+      edge of regional lat/lon grids, or of the first column of global
+      ones, were discarded.
 
-    * LS_FIT      for a least-squares fit
+    * AW_MEAN_CNTR for an area-weighted mean when regridding from
+      high to low resolution grids (width = 1), weighting each input
+      point by the area of the grid box centered on that point. When an
+      input grid box overlaps multiple output grid boxes, its weight is
+      divided among them in proportion to the overlap. This option is
+      recommended over AW_MEAN.
 
-    * BILIN       for bilinear interpolation (width = 2)
+      * The number of output grid boxes over which the weight is divided
+        is determined by the extent of each input grid box and is not
+        subject to a fixed limit.
 
-    * NEAREST     for the nearest grid point (width = 1)
+      * Input grid boxes which straddle the edge of a regional output grid,
+        or the longitude seam of a global one, are divided by their overlap
+        like any other, for lat/lon, rotated lat/lon, and Mercator output
+        grids.
 
-    * BUDGET      for the mass-conserving budget interpolation
+      * Prior to version 13.0.0, the AW_MEAN option computed centered grid
+        box areas for Lambert Azimuthal Equal Area grids, unlike all other
+        grid projections. Use AW_MEAN_CNTR to most closely reproduce that
+        behavior, noting that it also divides each input grid box weight by
+        the overlap and so will not match exactly.
+
+    * LS_FIT       for a least-squares fit
+
+    * BILIN        for bilinear interpolation (width = 2)
+
+    * NEAREST      for the nearest grid point (width = 1)
+
+    * BUDGET       for the mass-conserving budget interpolation
 
       * The budget interpolation method is often used for precipitation
         in order to roughly conserve global averages. However it is
@@ -911,18 +958,18 @@ The "method" entry defines the regridding method to be used.
         values, assuming enough valid data is present to meet the
         "vld_thresh" threshold.
 
-    * FORCE       to compare gridded data directly with no interpolation
+    * FORCE        to compare gridded data directly with no interpolation
       as long as the grid x and y dimensions match.
 
-    * UPPER_LEFT  for the upper left grid point (width = 1)
+    * UPPER_LEFT   for the upper left grid point (width = 1)
 
-    * UPPER_RIGHT for the upper right grid point (width = 1)
+    * UPPER_RIGHT  for the upper right grid point (width = 1)
 
-    * LOWER_RIGHT for the lower right grid point (width = 1)
+    * LOWER_RIGHT  for the lower right grid point (width = 1)
 
-    * LOWER_LEFT  for the lower left grid point (width = 1)
+    * LOWER_LEFT   for the lower left grid point (width = 1)
 
-    * MAXGAUSS    to compute the maximum value in the neighborhood
+    * MAXGAUSS     to compute the maximum value in the neighborhood
       and apply a Gaussian smoother to the result
 
     The BEST, GEOG_MATCH, and HIRA options are not valid for regridding.
@@ -1306,9 +1353,9 @@ GRIB1 and GRIB2
 
   * The "name" entry specifies a GRIB code number or abbreviation.
 
-    * `GRIB1 Product Definition Section <http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html>`_
+    * `GRIB1 Product Definition Section <https://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html>`_
 
-    * `GRIB2 Product Definition Section <http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc>`_
+    * `GRIB2 Product Definition Section <https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/>`_
 
   * The "level" entry specifies a level type and value:
 
@@ -1967,7 +2014,7 @@ used. The standard NCEP grids are named "GNNN" where NNN indicates the
 three digit grid number. Supplying a value of "FULL" indicates that the
 verification should be performed over the entire grid on which the data
 resides.
-See: `ON388 - TABLE B, GRID IDENTIFICATION (PDS Octet 7), MASTER LIST OF NCEP STORAGE GRIDS, GRIB Edition 1 (FM92) <http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html>`_.
+See: `ON388 - TABLE B, GRID IDENTIFICATION (PDS Octet 7), MASTER LIST OF NCEP STORAGE GRIDS, GRIB Edition 1 (FM92) <https://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html>`_.
 The "grid" entry can be the gridded data file defining the grid.
 
 poly
@@ -2015,7 +2062,7 @@ These three options are described below:
 
   .. code-block:: none
 
-     mask = { poly = [ "share/met/poly/CONUS.poly" ]; }
+     mask = { poly = [ "MET_BASE/poly/CONUS.poly" ]; }
 
 * Option 2 - Gen-Vx-Mask output:
 
@@ -2098,7 +2145,7 @@ is included in the mask.
   mask = {
      grid    = [ "FULL" ];
      poly    = [ "MET_BASE/poly/LMV.poly",
-                 "MET_BASE/out/gen_vx_mask/CONUS_poly.nc",
+                 "/path/to/gen_vx_mask/CONUS_poly.nc",
                  "MET_BASE/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
                  {name = \"TMP\"; level = \"Z2\";} >273"
                ];
@@ -2757,14 +2804,23 @@ verification, which is controlled by the "point_weight_flag" option.
 It can only be defined once at the highest level of config file context
 and applies to all verification tasks for that run.
 
-Three grid weighting options are currently supported:
+Four grid weighting options are currently supported:
 
 * NONE to disable grid weighting using a constant weight of 1.0 (default).
 
 * COS_LAT to define the weight as the cosine of the grid point latitude.
   This is an approximation for grid box area used by NCEP and WMO.
 
-* AREA to define the weight as the true area of the grid box (km^2).
+* AREA to define the weight as the true area of the grid box (km^2)
+  defined by the lower-left corner of each grid box.
+
+* AREA_CNTR to define the weight as the true area of the grid box (km^2)
+  defined by the center point of each grid box.
+
+.. note::
+   Prior to version 13.0.0, the AREA option computed centered grid box
+   areas for Lambert Azimuthal Equal Area grids, unlike all other grid
+   projections. Use AREA_CNTR to reproduce that behavior.
 
 If requested in the config file, the raw grid weights can be written to
 the NetCDF output from Grid-Stat and Ensemble-Stat.
@@ -3387,27 +3443,33 @@ random.
 
   skip_const = FALSE;
 
-obs_error
-^^^^^^^^^
+.. _config_options-obs_err:
+
+obs_err
+^^^^^^^
 
 Observation error options:
 
-obs_error.flag
-""""""""""""""
+.. note:: The "obs_err" dictionary was named "obs_error" prior to MET
+          version 13.0.0. The deprecated name is still supported for
+          backward compatibility but should be replaced.
+
+obs_err.flag
+""""""""""""
 The "flag" entry toggles the observation error logic on (TRUE) and off (FALSE).
 When flag is TRUE, random observation error perturbations are applied to the
 ensemble member values. No perturbation is applied to the observation values
 but the bias scale and offset values, if specified, are applied.
 
-obs_error.dist_type
-"""""""""""""""""""
+obs_err.dist_type
+"""""""""""""""""
 Set "dist_type" to NONE to use the observation error table instead.
 May be set separately in each "obs.field" entry.
-The obs_error dictionary controls how observation error information should be
+The obs_err dictionary controls how observation error information should be
 handled. Observation error information can either be specified directly in
 the configuration file or by parsing information from an external table file.
-By default, the *MET_BASE/data/table_files/obs_error_table.txt* file is read
-but this may be overridden by setting the $MET_OBS_ERROR_TABLE environment
+By default, the *MET_BASE/table_files/obs_err_table.txt* file is read
+but this may be overridden by setting the $MET_OBS_ERR_TABLE environment
 variable at runtime.
 
 The "dist_type" entry may be set to NONE, NORMAL, EXPONENTIAL, CHISQUARED,
@@ -3415,17 +3477,17 @@ GAMMA, UNIFORM, or BETA. The default value of NONE indicates that the
 observation error table file should be used rather than the configuration
 file settings.
 
-obs_error.dist_parm
-"""""""""""""""""""
+obs_err.dist_parm
+"""""""""""""""""
 The "dist_parm" entry is an array of length 1 or 2 specifying the parameters
 for the distribution selected in dist_type. The NORMAL, EXPONENTIAL, and
 CHISQUARED distributions are defined by a single parameter. The GAMMA,
 UNIFORM, and BETA distributions are defined by two parameters. See the
-`GNU Scientific Library Reference Manual <https://www.gnu.org/software/gsl/manual>`_
+`GNU Scientific Library Reference Manual <https://www.gnu.org/software/gsl/doc/html/>`_
 for more information on these distributions.
 
-obs_error.inst_bias_scale and obs_error.inst_bias_offset
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+obs_err.inst_bias_scale and obs_err.inst_bias_offset
+""""""""""""""""""""""""""""""""""""""""""""""""""""
 The "inst_bias_scale" and "inst_bias_offset" entries specify bias scale and
 offset values that should be applied to observation values prior to
 perturbing them. These entries enable bias-correction on the fly.
@@ -3442,7 +3504,7 @@ levels, and range of values.
 
 .. code-block:: none
 
-  obs_error = {
+  obs_err = {
      flag             = FALSE;   TRUE or FALSE
      dist_type        = NONE;    Distribution type
      dist_parm        = [];      Distribution parameters
@@ -4180,7 +4242,7 @@ For example:
 
 | message_type[] = [ "ADPUPA", "AIRCAR" ];
 
-`Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
+`Current Table A Entries in PREPBUFR mnemonic table <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
 
 .. code-block:: none
 
@@ -4222,7 +4284,7 @@ retained. The numeric "pb_report_type" entry allows for further
 stratification within message types. An empty list indicates that all should
 be retained.
 
-See: `Code table for PREPBUFR report types used by Regional NAM GSI analyses <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_4.htm>`_
+See: `Code table for PREPBUFR report types used by Regional NAM GSI analyses <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_4.htm>`_
 
 For example:
 
@@ -4242,7 +4304,7 @@ retained. The numeric "in_report_type" entry provides additional
 stratification of observations. An empty list indicates that all should
 be retained.
 
-See: `Code table for input report types <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm>`_
+See: `Code table for input report types <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm>`_
 
 For example:
 
@@ -4305,7 +4367,7 @@ categories should be retained:
 
 An empty list indicates that all should be retained.
 
-See: `Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
+See: `Current Table A Entries in PREPBUFR mnemonic table <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
 
 .. code-block:: none
 
@@ -4377,7 +4439,7 @@ The "quality_mark_thresh" entry specifies a threshold to filter observations
 based on their quality mark value. Only those observations whose quality
 mark value meets this threshold criteria will be used.
 
-See `Code table for observation quality markers <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_7.htm>`_
+See `Code table for observation quality markers <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_7.htm>`_
 
 .. code-block:: none
 

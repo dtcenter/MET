@@ -55,12 +55,7 @@ mtdd_init_from_scratch();
 ////////////////////////////////////////////////////////////////////////
 
 
-Met2dData::~Met2dData()
-
-{
-
-
-}
+Met2dData::~Met2dData() = default;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -325,7 +320,7 @@ DataPlane cur_dp;
    // Loop over requested VarInfo objects
    //
 
-for(int i=0; i<vi_list.size(); i++) {
+for(size_t i=0; i<vi_list.size(); i++) {
 
    //
    // Initialize

@@ -61,7 +61,7 @@ MetGrib1DataFile::~MetGrib1DataFile()
 
 {
 
-close();
+MetGrib1DataFile::close();
 
 }
 
@@ -107,7 +107,7 @@ GF.reset();
 
 Plane.clear();
 
-close();
+MetGrib1DataFile::close();
 
 return;
 
@@ -281,7 +281,7 @@ bool MetGrib1DataFile::read_record(const int n, const bool read_plane /* = true 
    //
    // check range
    //
-if ( (n < 0) || (n > GF->n_records()) )  {
+if ( (n < 0) || (n > (int) GF->n_records()) )  {
 
 mlog << Error << "\nMetGrib1DataFile::read_record() -> "
      << "range check error ... n = " << n << "\n\n";
@@ -343,7 +343,7 @@ count = 0;
 
 j_match = -1;
 
-for (j=0; j<(GF->n_records()); ++j)  {
+for (j=0; j<((int) GF->n_records()); ++j)  {
 
    if ( ! read_record(j) )  {
 
@@ -480,7 +480,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
    plane_array.clear();
 
    // Loop through the records in the GRIB file looking for matches
-   for(int i=0; i<GF->n_records(); i++) {
+   for(int i=0; i<(int) GF->n_records(); i++) {
 
       // Read the current record
       GF->seek_record(i);
@@ -631,7 +631,7 @@ int MetGrib1DataFile::index(VarInfo &vinfo){
    }
 
    //  look at records until a match is found
-   for (rec=0; rec < GF->n_records(); rec++){
+   for (rec=0; rec < (int) GF->n_records(); rec++){
 
       //  read only the header information
       if( ! read_record(rec, false) ){

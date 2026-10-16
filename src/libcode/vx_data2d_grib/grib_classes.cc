@@ -123,13 +123,7 @@ Sec4_offset_in_file = -1;
 ////////////////////////////////////////////////////////////////////////
 
 
-GribRecord::~GribRecord()
-
-{
-
-//if ( data ) { delete data; data = (vector<unsigned char> *) nullptr; }
-//if ( bitmap ) { delete bitmap; bitmap = (vector<unsigned char> *) nullptr; }
-}
+GribRecord::~GribRecord() = default;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -263,7 +257,7 @@ return *this;
 
 void GribRecord::extend_data(int n)
 {
-    if (data.capacity() >= n)
+    if ((int) data.capacity() >= n)
         return;
 
     data.reserve(n);
@@ -275,7 +269,7 @@ void GribRecord::extend_data(int n)
 
 void GribRecord::extend_bitmap(int n)
 {
-    if (bitmap.capacity() >= n)
+    if ((int) bitmap.capacity() >= n)
         return;
 
     bitmap.reserve(n);
@@ -601,7 +595,7 @@ GribFile::GribFile(const char *filename)
 
 rep.reset();
 
-open(filename);
+GribFile::open(filename);
 
 }
 
@@ -616,7 +610,7 @@ bool GribFile::open(const char *filename)
 int j;
 const char *method_name = "GribFile::open(char *) -> ";
 
-close();
+GribFile::close();
 
 rep = std::make_shared<GribFileRep>();
 
@@ -669,14 +663,7 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-GribFile::GribFile(const GribFile &g)
-
-{
-
-rep = g.rep;
-
-
-}
+GribFile::GribFile(const GribFile &g) = default;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -705,7 +692,7 @@ GribFile::~GribFile()
 
 {
 
-close();
+GribFile::close();
 
 }
 
@@ -741,7 +728,7 @@ int m, d, y, hh, mm;
 int D, E;
 off_t file_pos;
 off_t bytes_processed;
-unsigned char *c = (unsigned char *) 0, c3[3];
+unsigned char *c = nullptr, c3[3];
 double t;
 float r[4];
 uint4 ibm;
@@ -759,7 +746,7 @@ bytes_processed = 0;
    //  Infer the record number by the current file position
    //
 
-for (g.rec_num=0,j=0; j<(rep->n_records); ++j)  {
+for (g.rec_num=0,j=0; j<((int) rep->n_records); ++j)  {
 
    if ( file_pos == rep->record_info[j].lseek_offset )  {
       g.rec_num = j+1;
@@ -777,11 +764,11 @@ g.Sec0_offset_in_record = bytes_processed;
 
 bytes = sizeof(Section0_Header);
 
-if ( (n_read = read(rep->buf.data(), bytes)) == 0 ) return 0;
+if ( (n_read = GribFile::read(rep->buf.data(), bytes)) == 0 ) return 0;
 
 memcpy(g.is.get(), rep->buf.data(), 8);
 
-if ( (n_read < 0) || (n_read != bytes) )  {
+if ( n_read != bytes )  {
 
    mlog << Error << "\nGribFile::read_record() -> error reading section 0 header ... nread = " << n_read << "\n\n";
 
@@ -1030,7 +1017,7 @@ int GribFile::skip_header()
 
 {
 
-size_t j, n_read;
+ssize_t j, n_read;
 off_t pos;
 
 bool found = false;
@@ -1062,7 +1049,7 @@ if ( n_read < 0 )  {
 
 }
 
-for (j=0; j<=min(grib_search_bytes, (n_read - 4)); ++j)  {
+for (j=0; j<=min<ssize_t>(grib_search_bytes, (n_read - 4)); ++j)  {
 
    if ( strncmp((char *) (rep->buf.data() + j), "GRIB", 4) == 0 )  {
       found = true;
@@ -1112,7 +1099,7 @@ while ( read_record(*g) )  {
 
    ++rep->n_records;
 
-   if ( rep->n_records >= rep->n_alloc )  rep->record_extend(rep->n_alloc + 1);
+   if ( (int) rep->n_records >= rep->n_alloc )  rep->record_extend(rep->n_alloc + 1);
 
 }
 
@@ -1127,7 +1114,7 @@ size_t GribFile::read()
 
 {
 
-size_t n_read;
+ssize_t n_read;
 
 if ( (n_read = ::read(rep->fd, (char *) rep->buf.data(), rep->buf_size)) < 0 )  {
 
@@ -1137,7 +1124,7 @@ if ( (n_read = ::read(rep->fd, (char *) rep->buf.data(), rep->buf_size)) < 0 )  
 
 }
 
-return n_read;
+return static_cast<size_t>(n_read);
 
 }
 
@@ -1149,7 +1136,7 @@ size_t GribFile::read(size_t bytes)
 
 {
 
-size_t n_read;
+ssize_t n_read;
 
 if ( bytes > rep->buf_size )  {
 
@@ -1168,7 +1155,7 @@ if ( (n_read = ::read(rep->fd, (char *) rep->buf.data(), bytes)) < 0 )  {
 
 }
 
-return n_read;
+return static_cast<size_t>(n_read);
 
 }
 
@@ -1195,7 +1182,7 @@ B = min<int>(bytes, rep->buf_size - buffer_offset);   //  to please fortify
 
 n_read = ::read(rep->fd, (rep->buf.data() + buffer_offset), B);
 
-if ( n_read != B )  {
+if ( n_read != static_cast<size_t>(B) )  {
 
    mlog << Error << "\nGribFile::read() -> file read error ... requested " << B << " bytes, got " << n_read << "\n\n";
 
@@ -1263,7 +1250,7 @@ off_t GribFile::record_offset(int n)
 
 {
 
-if ( (n < 0) || (n >= (rep->n_records)) )  {
+if ( (n < 0) || (n >= ((int) rep->n_records)) )  {
 
    mlog << Error << "\nGribFile::record_offset(int) -> range check error\n\n";
 
@@ -1283,7 +1270,7 @@ int GribFile::gribcode(int n)
 
 {
 
-if ( (n < 0) || (n >= (rep->n_records)) )  {
+if ( (n < 0) || (n >= ((int) rep->n_records)) )  {
 
    mlog << Error << "\nGribFile::gribcode(int) -> range check error\n\n";
 
@@ -1327,7 +1314,7 @@ const char * GribFile::name()
 
 {
 
-if ( !rep ) return ( (char *) 0 );
+if ( !rep ) return ( nullptr );
 
 return ( rep->name.c_str() );
 
@@ -1341,7 +1328,7 @@ void GribFile::seek_record(int n)
 
 {
 
-if ( (n < 0) || (n >= (rep->n_records)) )  {
+if ( (n < 0) || (n >= ((int) rep->n_records)) )  {
 
    mlog << Error << "\nGribFile::seek_record(int) -> range check error\n\n";
 
@@ -1867,7 +1854,7 @@ long find_magic_cookie(int fd)
 {
 
 int j;
-size_t n_read;
+ssize_t n_read;
 long pos = 0;
 char buf[100];
 

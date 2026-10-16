@@ -15,6 +15,9 @@
 #define  __3D_SINGLE_ATT_COLUMNS_H__
 
 
+#include <iterator>
+
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -53,7 +56,7 @@ static const char * att_3d_single_cols [] = {
 };
 
 
-static const int n_3d_single_cols = sizeof(att_3d_single_cols)/sizeof(*att_3d_single_cols);
+static const int n_3d_single_cols = std::size(att_3d_single_cols);
 
 
 ////////////////////////////////////////////////////////////////////////

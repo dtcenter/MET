@@ -266,8 +266,8 @@ double InterestCalculator::operator()(const PairAtt3D & p)
 int j;
 double sum;
 double w, x, I;
-PWL f = 0;
-Argument a = 0;
+PWL f = nullptr;
+Argument a = nullptr;
 
 sum = 0.0;
 

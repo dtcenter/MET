@@ -139,7 +139,7 @@ void PSOutputFilter::detach()
 
 if ( file )  eod();
 
-file = 0;
+file = nullptr;
 
 column = 0;
 

@@ -31,7 +31,7 @@ class AeronetHandler : public FileHandler
 
 public:
 
-  AeronetHandler(const std::string &program_name);
+  explicit AeronetHandler(const std::string &program_name);
   virtual ~AeronetHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;

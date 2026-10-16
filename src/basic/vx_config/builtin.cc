@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <cmath>
+#include <iterator>
 
 #include "builtin.h"
 
@@ -65,9 +66,6 @@ static double  my_dmod      (double, double);
 
 static int     my_istep     (int);
 static double  my_dstep     (double);
-
-static double  my_F_to_C    (double);
-static double  my_C_to_F    (double);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -117,9 +115,7 @@ const BuiltinInfo binfo[] = {
 
    { "step",   1, Builtin::step,    my_istep, nullptr, my_dstep,  nullptr },
 
-   // Functions defined in ConfigConstants
-   // { "F_to_C", 1, Builtin::F_to_C,  nullptr, nullptr, my_F_to_C,  nullptr },
-   // { "C_to_F", 1, Builtin::C_to_F,  nullptr, nullptr, my_C_to_F,  nullptr },
+   // F_to_C and C_to_F are defined in data/config/ConfigConstants
 
    { "nint",   1, Builtin::nint,    nullptr, nullptr, nullptr,  nullptr },
    { "sign",   1, Builtin::sign,    nullptr, nullptr, nullptr,  nullptr },
@@ -132,13 +128,7 @@ const BuiltinInfo binfo[] = {
 };
 
 
-const int n_binfos = sizeof(binfo)/sizeof(binfo[0]);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static const double five_ninths = 5.0/9.0;    //  used in conversion between farenheight and celcius
+const int n_binfos = std::size(binfo);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -437,35 +427,6 @@ double my_dstep(double x)
 if ( x >= 0.0 )  return 1.0;
 
 return 0.0;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  F = (9/5)*C + 32
-   //
-
-
-double my_F_to_C(double F)
-
-{
-
-return ( five_ninths*(F - 32.0) );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double my_C_to_F(double C)
-
-{
-
-return ( 1.8*C + 32.0 );
 
 }
 

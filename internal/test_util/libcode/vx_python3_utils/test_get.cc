@@ -66,7 +66,7 @@ script_name.chomp(".py");
 
 Python3_Script script(script_name.c_str());
 
-PyObject * var = 0;
+PyObject * var = nullptr;
 
 
 var = script.lookup(variable_name.c_str());

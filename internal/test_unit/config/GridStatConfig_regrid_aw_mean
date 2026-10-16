@@ -1,0 +1,72 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Grid-Stat configuration file.
+//
+// Compare the same GFS fields at 1.0 and 0.25 degree resolution after
+// regridding both to a coarser grid with an area-weighted mean. Ideally,
+// the differences are small. See MET #3178.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+model  = "GFS_1P00";
+desc   = "${REGRID_METHOD}";
+obtype = "GFS_0P25";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+//
+regrid = {
+   to_grid    = "latlon 144 91 -90.000 -180.000 2.000 2.500";
+   method     = ${REGRID_METHOD};
+   width      = 1;
+   vld_thresh = 0.5;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+   field = [
+      { name = "HGT_P500"; level = "(*,*)"; },
+      { name = "TMP_Z2";   level = "(*,*)"; }
+   ];
+}
+obs = {
+   field = [
+      { name = "HGT"; level = "P500"; },
+      { name = "TMP"; level = "Z2";   }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+mask = {
+   grid = [ "FULL" ];
+   poly = [ ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+output_flag = {
+   cnt   = STAT;
+   sl1l2 = STAT;
+}
+
+nc_pairs_flag = {
+   latlon = TRUE;
+   raw    = TRUE;
+   diff   = TRUE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+tmp_dir       = "/tmp";
+output_prefix = "${REGRID_METHOD}";
+
+////////////////////////////////////////////////////////////////////////////////

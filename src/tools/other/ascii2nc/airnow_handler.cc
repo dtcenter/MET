@@ -25,7 +25,6 @@
 using namespace std;
 
 
-static const char *AIRNOW_NA_STR = "N/A";
 static const char *airnow_stations_env = "MET_AIRNOW_STATIONS";
 
 const int AirnowHandler::AIRNOW_FORMAT_VERSION_HOURLY = 1;
@@ -121,9 +120,7 @@ AirnowHandler::AirnowHandler(const string &program_name) :
 ////////////////////////////////////////////////////////////////////////
 
 
-AirnowHandler::~AirnowHandler()
-{
-}
+AirnowHandler::~AirnowHandler() = default;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -242,13 +239,10 @@ bool AirnowHandler::_readObservationsStandard(LineDataFile &ascii_file,
   //
   // Process the observation lines
   //
-  int bad_line_count = 0;
   data_line.set_delimiter(delimiter.c_str());
   while (ascii_file >> data_line) {
-    if (!_parseObservationLineStandard(data_line, ascii_file.filename(),
-                                       column_cnt, header_type)) {
-      bad_line_count++;
-    }
+    _parseObservationLineStandard(data_line, ascii_file.filename(),
+                                  column_cnt, header_type);
   }
   return true;
 }
@@ -315,8 +309,6 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
   string units;
   double value;
   int avgPeriodSec;
-  int aqiValue;
-  int aqiCategory;
 
   if (format_version == AIRNOW_FORMAT_VERSION_DAILYV2) {
 
@@ -326,10 +318,6 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
     value        = atof(col.c_str());
     col          = _extractColumn(data_line, avgperiodPtr);
     avgPeriodSec = atoi(col.c_str()) * 3600;
-    col          = _extractColumn(data_line, aqiPtr);
-    aqiValue     = atoi(col.c_str());
-    col          = _extractColumn(data_line, aqiCategoryPtr);
-    aqiCategory  = atoi(col.c_str());
 
     // add the observation
     _addObservations(Observation(header_type, stationId, valid_time,
@@ -367,7 +355,6 @@ bool AirnowHandler::_readObservationsHourlyAqobs(LineDataFile &ascii_file,
   //
   // Process the observation lines
   //
-  int bad_line_count = 0;
 
   //
   // hack set the delimiter to something invalid so you get one big string
@@ -378,10 +365,8 @@ bool AirnowHandler::_readObservationsHourlyAqobs(LineDataFile &ascii_file,
   int lineNumber = -1;
   while (ascii_file >> data_line) {
     lineNumber++;
-    if (!_parseObservationLineAqobs(data_line[0], column_cnt, header_type,
-                                    lineNumber, ascii_file.filename())) {
-      ++bad_line_count;
-    }
+    _parseObservationLineAqobs(data_line[0], column_cnt, header_type,
+                               lineNumber, ascii_file.filename());
   }
   return true;
 }
@@ -498,7 +483,6 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
   int status = atoi(data_line[measuredPtr].c_str());
   if (status == 1) {
     double value;
-    int aqi = atoi(data_line[aqiPtr].c_str());
     if (doubleOrMissing(data_line[valuePtr], value)) {
       string units = data_line[unitPtr];
 

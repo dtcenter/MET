@@ -34,11 +34,6 @@ static const int error_code_missing_time_offsets    = 4;
 static const int error_code_empty_times             = 5;
 static const int error_code_bad_increment           = 6;
 static const int error_code_bad_offset              = 7;
-static const int error_code_no_vert_dim             = 11;
-static const int error_code_missing_vert_value      = 12;
-static const int error_code_missing_vert_values     = 13;
-static const int error_code_missing_vert_offsets    = 14;
-static const int error_code_empty_verticals         = 15;
 static const int error_code_unknown                 = 999;
 
 ////////////////////////////////////////////////////////////////////////
@@ -57,7 +52,7 @@ MetUGridDataFile::MetUGridDataFile() {
 
 MetUGridDataFile::~MetUGridDataFile() {
 
-   close();
+   MetUGridDataFile::close();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -94,7 +89,7 @@ void MetUGridDataFile::ugrid_init_from_scratch() {
    _cur_time_index = -1;
    _cur_vert_index = -1;
 
-   close();
+   MetUGridDataFile::close();
 
    return;
 }
@@ -398,8 +393,6 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
 ////////////////////////////////////////////////////////////////////////
 
 LongArray MetUGridDataFile::collect_time_offsets(VarInfo &vinfo) const {
-   int n_rec = 0;
-   bool status = false;
    VarInfoUGrid *vinfo_nc = (VarInfoUGrid *)&vinfo;
    static const string method_name
          = "MetUGridDataFile::collect_time_offsets(VarInfo &) -> ";
