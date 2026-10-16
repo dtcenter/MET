@@ -1843,6 +1843,14 @@ The first set of header columns are common to all of the output files generated 
     - Marginal probabilities of the observed heavy (OBS_CAT 2)
     - Double
   * - 38
+    - MEAN_FCST
+    - Mean forecast value
+    - Double
+  * - 39
+    - MEAN_OBS
+    - Mean observation value
+    - Double
+  * - 40
     - SEEPS
     - Averaged SEEPS (Stable Equitable Error in Probability Space) score
     - Double
