@@ -1050,7 +1050,7 @@ void TableHelper::write_xy1_to_cell (int r, int c,
 check_plot();
 
 const Box box = cell_box(r, c);
-const char * t = 0;
+const char * t = nullptr;
 
 if ( text )  t = text;
 

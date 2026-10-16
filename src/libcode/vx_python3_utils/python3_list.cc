@@ -102,7 +102,7 @@ void Python3_List::init_from_scratch()
 
 {
 
-Object = 0;
+Object = nullptr;
 
 clear();
 
@@ -118,7 +118,7 @@ void Python3_List::clear()
 
 {
 
-Object = 0;  //  don't deallocate
+Object = nullptr;  //  don't deallocate
 
 Size = 0;
 
@@ -163,7 +163,7 @@ PyObject * Python3_List::operator[](int n) const
 
 {
 
-PyObject * a = 0;
+PyObject * a = nullptr;
 
 if ( (n < 0) || (n >= Size) )  {
 

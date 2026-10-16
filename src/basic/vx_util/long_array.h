@@ -63,7 +63,7 @@ class LongArray {
 
       long & operator[](int) const;
 
-      operator long * () const;
+      explicit operator long * () const;
 
 };
 

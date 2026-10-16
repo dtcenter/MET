@@ -76,7 +76,7 @@ void ATCFLineBase::init_from_scratch() {
    DataLine::init_from_scratch();
 
    // ATCF lines are comma-delimited
-   set_delimiter(",");
+   DataLine::set_delimiter(",");
 
    // Initialize pointers
    BasinMap      = (map<ConcatString,ConcatString> *) nullptr;

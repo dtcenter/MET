@@ -74,7 +74,7 @@ while ( find_magic_cookie(in) >= 0 )  {
 
    memset(buf, 0, sizeof(buf));
 
-   if ( (n_written = write(out, buf, nullpad)) != nullpad )  {
+   if ( (n_written = write(out, buf, nullpad)) != static_cast<int>(nullpad) )  {
 
       mlog << Error << "\ndo_blocking() -> "
            << "write error in null-padding, n_written = " << n_written << "\n\n";

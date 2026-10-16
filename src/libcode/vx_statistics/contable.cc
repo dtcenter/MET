@@ -78,7 +78,7 @@ ContingencyTable & ContingencyTable::operator+=(const ContingencyTable & t) {
    Npairs += t.Npairs;
 
    // Increment table entries
-   for(int i=0; i<E.size(); ++i) E[i] += t.E[i];
+   for(size_t i=0; i<E.size(); ++i) E[i] += t.E[i];
 
    return *this;
 }
@@ -362,8 +362,7 @@ TTContingencyTable::TTContingencyTable() {
 
 ////////////////////////////////////////////////////////////////////////
 
-TTContingencyTable::~TTContingencyTable() {
-}
+TTContingencyTable::~TTContingencyTable() = default;
 
 ////////////////////////////////////////////////////////////////////////
 

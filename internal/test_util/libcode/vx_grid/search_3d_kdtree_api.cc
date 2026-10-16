@@ -128,13 +128,13 @@ int main(int argc, char *argv[])
    double distance_km;
    int closest_n = 5;
 
+   llh_to_ecef(lat, lon, alt, &x, &y, &z);
    cout << "The requested point: "
         << lat << ", " << lon << ", " << alt
         << "] to [" << x << ", " << y << ", " << z << "])\n";
    IndexKDTree::ValueList neighbor = ugrid_data.closest_points(lat, lon, closest_n, alt);
    for (size_t i=0; i < neighbor.size(); i++) {
       size_t index(neighbor[i].payload());
-      int index2 = (int)neighbor[i].payload();
       distance_km = neighbor[i].distance() / 1000.;
       llh_to_ecef(lat_values[index], lon_values[index], alt_values[index], &x, &y, &z);
       cout << " - " << i << ": index=" << index << "  distance=" << distance_km << " from ["

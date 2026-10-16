@@ -81,6 +81,7 @@
 #include <unistd.h>
 #include <assert.h>
 
+#include <algorithm>
 #include <array>
 #include <netcdf>
 
@@ -174,7 +175,6 @@ const std::array<int, n_derive_gc> derive_gc = {
 // The fortran code is hard-coded with 200 levels
 constexpr int MAX_CAPE_VALUE = 10000;
 constexpr int MAX_CAPE_LEVEL = 200;
-constexpr int CAPE_INPUT_VARS = 3;
 static std::array<double, MAX_CAPE_LEVEL> cape_data_pres;
 static std::array<double, MAX_CAPE_LEVEL> cape_data_temp;
 static std::array<double, MAX_CAPE_LEVEL> cape_data_spfh;
@@ -280,7 +280,6 @@ constexpr char bufr_avail_latlon_names[] = "XOB CLON CLONH YOB CLAT CLATH";
 constexpr char derived_mlcape[] = "D_MLCAPE";
 constexpr char derived_cape[] = "D_CAPE";
 constexpr char derived_pbl[]  = "D_PBL";
-constexpr double MLCAPE_INTERVAL = 3000.;
 
 // Derived variable metadata maps
 static const map<string,string> derived_var_units_map = {
@@ -406,7 +405,7 @@ static bool   keep_level_category(int);
 static double derive_grib_code(int, const double *, const double *, double, double&);
 
 static int    combine_tqz_and_uv(map<double, double*> &, map<double, double*> &,
-                                 vector<double *> &);
+                                 vector<std::unique_ptr<double[]>> &);
 static double compute_pbl(map<double, double*> pqtzuv_map_tq,
                           map<double, double*> pqtzuv_map_uv);
 static void   copy_pqtzuv(double *to_pqtzuv, const double *from_pqtzuv, bool copy_all=true);
@@ -603,7 +602,7 @@ static void initialize() {
    prepbufr_derive_vars.add("D_MLCAPE");
    prepbufr_derive_vars.add("D_PBL");
 
-   for (int idx=0; idx<(sizeof(hdr) / sizeof(hdr[0])); idx++) {
+   for (size_t idx=0; idx<(std::size(hdr)); idx++) {
       hdr[idx] = r8bfms * 10;
    }
 
@@ -722,9 +721,22 @@ bool is_prepbufr_file(const StringArray *events) {
 void get_variable_info(ConcatString &blk_file, int unit) {
    static const char *method_name = "  get_variable_info()";
 
-   FILE * fp;
-   char * line = nullptr;
-   size_t len = 1024;
+   ifstream in;
+   string line_str;
+
+   // Lines are padded with spaces so that every fixed-width field
+   // can be read without running past the end of the line
+   constexpr size_t min_line_len = max({
+      BUFR_NUMBER_START + 1,
+      BUFR_NAME_START + BUFR_NAME_LEN,
+      BUFR_DESCRIPTION_START + BUFR_DESCRIPTION_LEN,
+      BUFR_UNIT_START + BUFR_UNIT_LEN,
+      BUFR_SEQUENCE_START + BUFR_SEQUENCE_LEN });
+   auto read_line = [&in, &line_str]() -> bool {
+      if (!getline(in, line_str)) return false;
+      if (line_str.size() < min_line_len) line_str.resize(min_line_len, ' ');
+      return true;
+   };
 
    event_names.clear();
    event_members.clear();
@@ -736,22 +748,16 @@ void get_variable_info(ConcatString &blk_file, int unit) {
 
    ConcatString tbl_filename = save_bufr_table_to_file(blk_file.c_str(), unit);
 
-   fp = fopen(tbl_filename.c_str(), "r");
-   if (fp != nullptr) {
+   in.open(tbl_filename.c_str());
+   if (in.is_open()) {
       char var_name[BUFR_NAME_LEN+1];
       char var_desc[max(BUFR_DESCRIPTION_LEN,BUFR_SEQUENCE_LEN)+1];
       char var_unit_str[BUFR_UNIT_LEN+1];
       bool find_mnemonic = false;
 
-      line = (char *)malloc(len * sizeof(char));
-      if( line == nullptr) {
-         mlog << Error << "\n" << method_name << " -> "
-              << "Unable to allocate buffer\n\n";
-         exit(1);
-      }
       // Processing section 1
-      int var_count1 = 0;
-      while (getline(&line, &len, fp) != -1) {
+      while (read_line()) {
+         const char *line = line_str.c_str();
          if (nullptr != strstr(line,"--------")) continue;
          if (nullptr != strstr(line,"MNEMONIC")) {
             if (find_mnemonic) break;
@@ -769,7 +775,6 @@ void get_variable_info(ConcatString &blk_file, int unit) {
          }
          if (0 == m_strlen(var_name)) continue;
 
-         var_count1++;
          m_strncpy(var_desc, (line+BUFR_DESCRIPTION_START), BUFR_DESCRIPTION_LEN,
                    method_name, "var_desc", true);
          var_desc[BUFR_DESCRIPTION_LEN] = '\0';
@@ -786,7 +791,8 @@ void get_variable_info(ConcatString &blk_file, int unit) {
       }
 
       // Skip section 2
-      while (getline(&line, &len, fp) != -1) {
+      while (read_line()) {
+         const char *line = line_str.c_str();
          if (nullptr != strstr(line,"MNEMONIC")) break;
          if (nullptr == strstr(line,"EVENT")) continue;
 
@@ -812,10 +818,11 @@ void get_variable_info(ConcatString &blk_file, int unit) {
          event_names.add(var_name);
          event_members.add(var_desc);
       }
-      getline(&line, &len, fp);
+      read_line();
 
       // Processing section 3
-      while (getline(&line, &len, fp) != -1) {
+      while (read_line()) {
+         const char *line = line_str.c_str();
          if (' ' == line[BUFR_NAME_START]) continue;
          if ('-' == line[BUFR_NAME_START]) break;
 
@@ -849,8 +856,7 @@ void get_variable_info(ConcatString &blk_file, int unit) {
          }
       }
 
-      fclose(fp);
-      if (line) free(line);
+      in.close();
 
    }
 
@@ -2235,7 +2241,6 @@ void process_pbfile_metadata(int i_pb) {
    int i_ret;
    int lv;
    int var_index;
-   int debug_threshold = 10;
 
    int nlev_max_req;
    bool check_all = do_all_vars || collect_metadata;
@@ -2837,9 +2842,10 @@ static void cleanup_hdr_typ(char *hdr_typ, bool is_prepbufr) {
 ////////////////////////////////////////////////////////////////////////
 
 static void dbl2str(double *d, ConcatString & str) {
-   const char *fmt_str = "%s";
-
-   str.format(fmt_str, d);
+   // BUFR character data is packed into the bytes of a double and is only
+   // null-terminated when shorter than sizeof(double)
+   const char *c = reinterpret_cast<const char *>(d);
+   str = string(c, strnlen(c, sizeof(double)));
    if (str.empty()) {
       str = "NA";
    }
@@ -3127,7 +3133,7 @@ static int combine_tqz_and_uv(map<double, double*> &pqtzuv_map_tq,
       bool no_overlap = (tq_pres_max < uv_pres_min) || (tq_pres_min > uv_pres_max);
       mlog << Debug(6) << method_name << "TQZ pressures: " << tq_pres_max
            << " to " << tq_pres_min << "  UV pressures: " << uv_pres_max
-           << " to " << uv_pres_min << (no_overlap ? "  no overlap!" : "  overlapping") << "\n";
+           << " to " << uv_pres_min << (no_overlap ? "  no overlap" : "  overlapping") << "\n";
       if( no_overlap ) {
          mlog << Debug(4) << "\n" << method_name
               << "Can not combine TQ and UV records because of no overlapping."
@@ -3243,7 +3249,7 @@ static double compute_pbl(map<double, double*> pqtzuv_map_tq,
 
       if (pbl_level <= 0) {
          mlog << Debug(4) << method_name
-              << "Skip CALPBL because of an empty list after combining TQZ and UV\n";
+              << "Skip CALPBL because no data remains after combining TQZ and UV\n";
       }
       else if (pbl_level == 1) {
          mlog << Debug(4) << method_name

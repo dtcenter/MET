@@ -193,7 +193,7 @@ found = false;
 
 while ( line.read_line(in) )  {
 
-   if ( strstr(line.c_str(), target_start) != 0 )  { found = true;  break; }
+   if ( strstr(line.c_str(), target_start) != nullptr )  { found = true;  break; }
 
 }
 

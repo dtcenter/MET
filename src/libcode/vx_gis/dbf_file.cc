@@ -177,7 +177,7 @@ void DbfHeader::dump(ostream & out, int depth) const
 
 Indent p0(depth);
 Indent p1(depth + 1);
-int j, pos;
+int j;
 int m, d, y;
 
    //
@@ -200,8 +200,6 @@ out << p1 << "table_flag       = " << table_flag       << '\n';
 out << p1 << "code_page_mark   = " << code_page_mark   << '\n';
 out << p1 << "n_subrecs        = " << n_subrecs        << "   (inferred)\n";
 
-pos = 0;
-
    //
    //  subrecords (if any)
    //
@@ -213,13 +211,9 @@ if ( !subrec.empty() )  {
 
    for (j=0; j<n_subrecs; ++j)  {
 
-      // out << "cumulative length = " << pos << '\n';
-
       out << p1 << "SubRecord " << j << "\n";
 
       subrec[j].dump(out, p1.depth + 1);
-
-      pos += subrec[j].field_length;
 
    }
 
@@ -382,7 +376,7 @@ for (j=0; j<n_subrecs; ++j)  {
 }
 
 
-return 0;
+return nullptr;
 
 }
 
@@ -768,7 +762,7 @@ const char * DbfFile::filename() const
 
 {
 
-if ( Filename.empty() )  return (const char *) 0;
+if ( Filename.empty() )  return nullptr;
 
 return Filename.text();
 
@@ -783,7 +777,6 @@ bool DbfFile::open(const char * path)
 {
 
 size_t n_read, bytes;
-int j;
 
 close();
 
@@ -969,7 +962,7 @@ StringArray DbfFile::subrecord_values(int i_rec)
 
 {
 
-size_t n_read, bytes, pos;
+size_t n_read, bytes;
 const size_t buf_size = 65536;
 unsigned char buf[buf_size];
 ConcatString cs;
@@ -1015,7 +1008,7 @@ if ( n_read != bytes )  {
 
 }
 
-if ( Header.record_length < buf_size)  buf[Header.record_length] = 0;
+if ( bytes < buf_size)  buf[Header.record_length] = 0;
 
    //
    //  parse each subrecord value, skip first byte

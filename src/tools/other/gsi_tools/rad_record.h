@@ -275,7 +275,7 @@ class RadRecord : public GsiRecord {
 inline int RadRecord::n1() const { return N1; }
 inline int RadRecord::n2() const { return N2; }
 
-inline bool RadRecord::has_extra() const { return ( extra != 0 ); }
+inline bool RadRecord::has_extra() const { return ( extra != nullptr ); }
 
 inline unixtime RadRecord::date() const { return Date; }
 

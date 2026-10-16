@@ -541,85 +541,6 @@ static void process_data_file() {
 }
 
 ////////////////////////////////////////////////////////////////////////
-// returns true if no error
-
-bool get_nc_data_int_array(NcFile *nc, char *var_name, int *data_array, bool stop=true) {
-   bool status = false;
-   NcVar nc_var = get_nc_var(nc, var_name, stop);
-   if (IS_INVALID_NC(nc_var)) {
-      if (stop) exit(1);
-   }
-   else {
-      status = get_nc_data(&nc_var, data_array);
-   }
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
-// returns true if no error
-
-bool get_nc_data_int_array(NcFile *nc, const char *var_name, int *data_array, bool stop=true) {
-   bool status = false;
-   char *_var_name = strdup(var_name);
-   if (_var_name) {
-      status = get_nc_data_int_array(nc, _var_name, data_array, stop);
-      free(_var_name);
-   }
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
-// returns true if no error
-
-bool get_nc_data_float_array(NcFile *nc, char *var_name, float *data_array) {
-   NcVar nc_var = get_nc_var(nc, var_name);
-   if (IS_INVALID_NC(nc_var)) exit(1);
-
-   bool status = get_nc_data(&nc_var, data_array);
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
-// returns true if no error
-
-bool get_nc_data_float_array(NcFile *nc, const char *var_name, float *data_array) {
-   bool status = false;
-   char *_var_name = strdup(var_name);
-   if (_var_name) {
-      status = get_nc_data_float_array(nc, _var_name, data_array);
-      free(_var_name);
-   }
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
-// returns true if no error
-
-bool get_nc_data_string_array(NcFile *nc, char *var_name,
-                              StringArray *stringArray) {
-   NcVar nc_var = get_nc_var(nc, var_name, true);
-   if (IS_INVALID_NC(nc_var)) exit(1);
-
-   bool status = get_nc_data_to_array(&nc_var, stringArray);
-   return status;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-// returns true if no error
-
-bool get_nc_data_string_array(NcFile *nc, const char *var_name,
-                              StringArray *stringArray) {
-   bool status = false;
-   char *_var_name = strdup(var_name);
-   if (_var_name) {
-      status = get_nc_data_string_array(nc, _var_name, stringArray);
-      free(_var_name);
-   }
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
 
 static int get_obs_type(NcFile *nc) {
    int obs_type = TYPE_UNKNOWN;
@@ -812,9 +733,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 
    // Loop through the requested fields
    int obs_count_zero_to = 0;
-   int obs_count_zero_from = 0;
    int obs_count_non_zero_to = 0;
-   int obs_count_non_zero_from = 0;
    vector<IntArray> cellMapping;
    for(int i=0; i<FieldSA.n(); i++) {
 
@@ -897,7 +816,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          }
          if (empty_input) {
             mlog << Debug(2) << method_name
-                 << error_msg << "\tBut ignored because of empty input\n";
+                 << error_msg << "\tBut ignored since the input contains no data\n";
          }
          else {
             mlog << Error << "\n" << method_name
@@ -1004,8 +923,6 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 
             var_index_array.add(idx);
             var_count++;
-            if (is_eq(obs_data->obs_vals[idx], (float)0.)) obs_count_zero_from++;
-            else obs_count_non_zero_from++;
          }
       }
 
@@ -1019,7 +936,6 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          NumArray dataArray;
          int offset = 0;
          int valid_count = 0;
-         int censored_count = 0;
          double data_value;
          double from_min_value =  10e10;
          double from_max_value = -10e10;
@@ -1055,7 +971,6 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
                         // Break out after the first match.
                         if(vinfo->censor_thresh()[ic].check(data_value)) {
                            data_value = vinfo->censor_val()[ic];
-                           censored_count++;
                            break;
                         }
                      }
@@ -2027,7 +1942,7 @@ static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
    int obs_count = obs_index_array.n();
    if (0 == obs_count) {
       mlog << Debug(2) << method_name
-           << "no valid point observation data!\n";
+           << "no valid point observation data\n";
       return status;
    }
 
@@ -2215,7 +2130,6 @@ static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
       exit(1);
    }
    else if (data_size > 0) {
-      int last_idx = data_size - 1;
       int lat_count = get_data_size(&var_lat);
       int lon_count = get_data_size(&var_lon);
       vector<float> latitudes(lat_count, bad_data_float);
@@ -2228,12 +2142,17 @@ static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
                                  from_lat_count, from_lon_count, skip_times,
                                  !fr_grid.get_swap_to_north(), (lon_count==data_size));
 
-         if (is_eq(latitudes[0], latitudes[last_idx]) ||
-             is_eq(longitudes[0], longitudes[last_idx])) {
+         // Compare each array's first and last values.  With 1D latitude
+         // and longitude arrays, each one is shorter than data_size.
+         int last_lat = lat_count - 1;
+         int last_lon = lon_count - 1;
+         if (lat_count > 0 && lon_count > 0 &&
+             (is_eq(latitudes[0], latitudes[last_lat]) ||
+              is_eq(longitudes[0], longitudes[last_lon]))) {
             mlog << Warning << "\n" << method_name << "same latitude or longitude. lat[0]="
-                 << latitudes[0] << " lat[" << last_idx << "]=" << latitudes[last_idx]
-                 << " lon[0]=" << longitudes[0] << " lon[" << last_idx << "]="
-                 << longitudes[last_idx] << "\n\n";
+                 << latitudes[0] << " lat[" << last_lat << "]=" << latitudes[last_lat]
+                 << " lon[0]=" << longitudes[0] << " lon[" << last_lon << "]="
+                 << longitudes[last_lon] << "\n\n";
          }
       }
    }   //  if data_size > 0
@@ -2344,7 +2263,6 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
    to_dp.set_size(to_lon_count, to_lat_count);
 
    if (data_size > 0) {
-      int lat_count = data_size;
       int lon_count = data_size;
       float *latitudes = nullptr;
       float *longitudes = nullptr;
@@ -2359,7 +2277,6 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
             NcVar var_lat = get_nc_var(coord_nc_in.get(), var_name_lat);
             NcVar var_lon = get_nc_var(coord_nc_in.get(), var_name_lon);
             if (IS_VALID_NC(var_lat) && IS_VALID_NC(var_lon)) {
-               lat_count = get_data_size(&var_lat);
                lon_count = get_data_size(&var_lon);
                latitudes = latitudes_buf.data();
                longitudes = longitudes_buf.data();
@@ -2660,7 +2577,6 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
 
    int from_index;
    int absent_count = 0;
-   int censored_count = 0;
    int missing_count = 0;
    int to_cell_count = 0;
    int non_missing_count = 0;
@@ -2717,7 +2633,6 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
                   // Break out after the first match.
                   if(vinfo->censor_thresh()[i].check(data_value)) {
                      data_value = vinfo->censor_val()[i];
-                     censored_count++;
                      break;
                   }
                }
@@ -2840,7 +2755,7 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
 
    if (to_cell_count == 0) {
       mlog << Debug(2) << method_name
-           << "No valid data!\n";
+           << "No valid data\n";
    }
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "

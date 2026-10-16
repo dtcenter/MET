@@ -71,9 +71,7 @@ RectangularTemplate::RectangularTemplate(int height, int width, bool wrap_lon) :
 
 ///////////////////////////////////////////////////////////////////////////////
 
-RectangularTemplate::~RectangularTemplate(void) {
-   // Do nothing
-}
+RectangularTemplate::~RectangularTemplate(void) = default;
 
 ///////////////////////////////////////////////////////////////////////////////
 

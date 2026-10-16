@@ -262,7 +262,7 @@ ConcatString get_rad_key(const RadData &d) {
 
 int key_to_integer(const char * key) {
    int int_key = 0;
-   for (unsigned int idx=0; idx<m_strlen(key); idx++) {
+   for (int idx=0; idx<m_strlen(key); idx++) {
       int_key += ((int)key[idx]) << (idx%3)*8;
       //int_key += (int)key[idx];
    }
@@ -272,7 +272,7 @@ int key_to_integer(const char * key) {
 ////////////////////////////////////////////////////////////////////////
 
 bool is_conv(const char *s) {
-   return(strstr(get_short_name(s), conv_id_str) != (char *) 0);
+   return(strstr(get_short_name(s), conv_id_str) != nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -281,7 +281,7 @@ bool is_micro(const char *s) {
    bool status = false;
 
    for(int i=0; i<n_micro_id_str; i++) {
-      if(strstr(get_short_name(s), micro_id_str[i]) != 0) {
+      if(strstr(get_short_name(s), micro_id_str[i]) != nullptr) {
          status = true;
          break;
       }

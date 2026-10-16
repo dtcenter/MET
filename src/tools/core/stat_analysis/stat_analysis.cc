@@ -782,7 +782,7 @@ static void set_out_filename(const StringArray & a) {
 
 static void set_tmp_dir(const StringArray & a) {
    tmp_dir << a[0];
-   DIR * dp = 0;
+   DIR * dp = nullptr;
 
    dp = met_opendir(tmp_dir.c_str());
    if(!dp) {

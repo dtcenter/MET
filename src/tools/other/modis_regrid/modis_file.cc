@@ -127,11 +127,11 @@ FileId = -1;
 
 Swath.reset();
 
-Latitude = 0;
+Latitude = nullptr;
 
-Longitude = 0;
+Longitude = nullptr;
 
-Field = 0;
+Field = nullptr;
 
 
 
@@ -234,7 +234,7 @@ int32 size;
 int n0, n1;
 double dt;
 StringArray a;
-SwathDataField * sst = 0;   //  scan start time
+SwathDataField * sst = nullptr;   //  scan start time
 bool status = false;
 
 
@@ -315,7 +315,7 @@ Swath->get_attributes();
 
 Swath->get_geo_fields();
 
-SatDimension * dim = 0;
+SatDimension * dim = nullptr;
 
 dim = Swath->dimension(dim0_name);
 
@@ -559,11 +559,11 @@ Filename.clear();
 
 Swath.reset();
 
-Latitude = 0;
+Latitude = nullptr;
 
-Longitude = 0;
+Longitude = nullptr;
 
-Field = 0;
+Field = nullptr;
 
 NumberType = default_numbertype;
 
@@ -608,7 +608,7 @@ ConcatString _field_name = field->name();
 
 char * field_name = (char *) _field_name.c_str();
 
-status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
+status = SWreadfield(Swath->swath_id(), field_name, start, nullptr, edge_2, buf);
 
 if ( status < 0 )  {
 
@@ -661,7 +661,7 @@ ConcatString _field_name = field->name();
 
 char * field_name = (char *) _field_name.c_str();
 
-status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
+status = SWreadfield(Swath->swath_id(), field_name, start, nullptr, edge_2, buf);
 
 if ( status < 0 )  {
 
@@ -710,7 +710,7 @@ ConcatString _field_name = field->name();
 
 char * field_name = (char *) _field_name.c_str();
 
-status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
+status = SWreadfield(Swath->swath_id(), field_name, start, nullptr, edge_2, buf);
 
 if ( status < 0 )  {
 
@@ -763,7 +763,7 @@ ConcatString _field_name = field->name();
 
 char * field_name = (char *) _field_name.c_str();
 
-status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
+status = SWreadfield(Swath->swath_id(), field_name, start, nullptr, edge_2, buf);
 
 if ( status < 0 )  {
 

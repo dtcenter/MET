@@ -11,6 +11,9 @@
 #ifndef  __STAT_COLUMN_DEFS_H__
 #define  __STAT_COLUMN_DEFS_H__
 
+#include <iterator>
+
+
 ////////////////////////////////////////////////////////////////////////
 
 static const char * const hdr_columns [] = {
@@ -397,57 +400,57 @@ static const char * const seeps_columns [] = {
 
 static const int max_stat_col           = 100;
 
-static const int n_header_columns       = sizeof(hdr_columns)/sizeof(*hdr_columns);
+static const int n_header_columns       = std::size(hdr_columns);
 
-static const int n_fho_columns          = sizeof(fho_columns)/sizeof(*fho_columns);
-static const int n_ctc_columns          = sizeof(ctc_columns)/sizeof(*ctc_columns);
-static const int n_cts_columns          = sizeof(cts_columns)/sizeof(*cts_columns);
-static const int n_mctc_columns         = sizeof(mctc_columns)/sizeof(*mctc_columns);
-static const int n_mcts_columns         = sizeof(mcts_columns)/sizeof(*mcts_columns);
+static const int n_fho_columns          = std::size(fho_columns);
+static const int n_ctc_columns          = std::size(ctc_columns);
+static const int n_cts_columns          = std::size(cts_columns);
+static const int n_mctc_columns         = std::size(mctc_columns);
+static const int n_mcts_columns         = std::size(mcts_columns);
 
-static const int n_cnt_columns          = sizeof(cnt_columns)/sizeof(*cnt_columns);
-static const int n_sl1l2_columns        = sizeof(sl1l2_columns)/sizeof(*sl1l2_columns);
-static const int n_sal1l2_columns       = sizeof(sal1l2_columns)/sizeof(*sal1l2_columns);
+static const int n_cnt_columns          = std::size(cnt_columns);
+static const int n_sl1l2_columns        = std::size(sl1l2_columns);
+static const int n_sal1l2_columns       = std::size(sal1l2_columns);
 
-static const int n_vl1l2_columns        = sizeof(vl1l2_columns)/sizeof(*vl1l2_columns);
-static const int n_val1l2_columns       = sizeof(val1l2_columns)/sizeof(*val1l2_columns);
-static const int n_vcnt_columns         = sizeof(vcnt_columns)/sizeof(*vcnt_columns);
-static const int n_seeps_columns        = sizeof(seeps_columns)/sizeof(*seeps_columns);
-static const int n_seeps_mpr_columns    = sizeof(seeps_mpr_columns)/sizeof(*seeps_mpr_columns);
+static const int n_vl1l2_columns        = std::size(vl1l2_columns);
+static const int n_val1l2_columns       = std::size(val1l2_columns);
+static const int n_vcnt_columns         = std::size(vcnt_columns);
+static const int n_seeps_columns        = std::size(seeps_columns);
+static const int n_seeps_mpr_columns    = std::size(seeps_mpr_columns);
 
-static const int n_pct_columns          = sizeof(pct_columns)/sizeof(*pct_columns);
-static const int n_pstd_columns         = sizeof(pstd_columns)/sizeof(*pstd_columns);
-static const int n_pjc_columns          = sizeof(pjc_columns)/sizeof(*pjc_columns);
-static const int n_prc_columns          = sizeof(prc_columns)/sizeof(*prc_columns);
-static const int n_eclv_columns         = sizeof(eclv_columns)/sizeof(*eclv_columns);
+static const int n_pct_columns          = std::size(pct_columns);
+static const int n_pstd_columns         = std::size(pstd_columns);
+static const int n_pjc_columns          = std::size(pjc_columns);
+static const int n_prc_columns          = std::size(prc_columns);
+static const int n_eclv_columns         = std::size(eclv_columns);
 
-static const int n_mpr_columns          = sizeof(mpr_columns)/sizeof(*mpr_columns);
+static const int n_mpr_columns          = std::size(mpr_columns);
 
-static const int n_nbrctc_columns       = sizeof(nbrctc_columns)/sizeof(*nbrctc_columns);
-static const int n_nbrcts_columns       = sizeof(nbrcts_columns)/sizeof(*nbrcts_columns);
-static const int n_nbrcnt_columns       = sizeof(nbrcnt_columns)/sizeof(*nbrcnt_columns);
+static const int n_nbrctc_columns       = std::size(nbrctc_columns);
+static const int n_nbrcts_columns       = std::size(nbrcts_columns);
+static const int n_nbrcnt_columns       = std::size(nbrcnt_columns);
 
-static const int n_grad_columns         = sizeof(grad_columns)/sizeof(*grad_columns);
-static const int n_dmap_columns         = sizeof(dmap_columns)/sizeof(*dmap_columns);
-static const int n_isc_columns          = sizeof(isc_columns)/sizeof(*isc_columns);
+static const int n_grad_columns         = std::size(grad_columns);
+static const int n_dmap_columns         = std::size(dmap_columns);
+static const int n_isc_columns          = std::size(isc_columns);
 
-static const int n_job_summary_columns  = sizeof(job_summary_columns)/sizeof(*job_summary_columns);
-static const int n_job_wdir_columns     = sizeof(job_wdir_columns)/sizeof(*job_wdir_columns);
-static const int n_job_ramp_columns     = sizeof(job_ramp_columns)/sizeof(*job_ramp_columns);
-static const int n_job_ramp_mpr_columns = sizeof(job_ramp_mpr_columns)/sizeof(*job_ramp_mpr_columns);
+static const int n_job_summary_columns  = std::size(job_summary_columns);
+static const int n_job_wdir_columns     = std::size(job_wdir_columns);
+static const int n_job_ramp_columns     = std::size(job_ramp_columns);
+static const int n_job_ramp_mpr_columns = std::size(job_ramp_mpr_columns);
 
-static const int n_ecnt_columns         = sizeof(ecnt_columns)/sizeof(*ecnt_columns);
-static const int n_rps_columns          = sizeof(rps_columns)/sizeof(*rps_columns);
+static const int n_ecnt_columns         = std::size(ecnt_columns);
+static const int n_rps_columns          = std::size(rps_columns);
 
-static const int n_rhist_columns        = sizeof(rhist_columns)/sizeof(*rhist_columns);
-static const int n_phist_columns        = sizeof(phist_columns)/sizeof(*phist_columns);
-static const int n_orank_columns        = sizeof(orank_columns)/sizeof(*orank_columns);
-static const int n_ssvar_columns        = sizeof(ssvar_columns)/sizeof(*ssvar_columns);
-static const int n_relp_columns         = sizeof(relp_columns)/sizeof(*relp_columns);
+static const int n_rhist_columns        = std::size(rhist_columns);
+static const int n_phist_columns        = std::size(phist_columns);
+static const int n_orank_columns        = std::size(orank_columns);
+static const int n_ssvar_columns        = std::size(ssvar_columns);
+static const int n_relp_columns         = std::size(relp_columns);
 
-static const int n_ssidx_columns        = sizeof(ssidx_columns)/sizeof(*ssidx_columns);
+static const int n_ssidx_columns        = std::size(ssidx_columns);
 
-static const int n_genmpr_columns       = sizeof(genmpr_columns)/sizeof(*genmpr_columns);
+static const int n_genmpr_columns       = std::size(genmpr_columns);
 
 ////////////////////////////////////////////////////////////////////////
 

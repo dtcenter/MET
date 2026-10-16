@@ -50,7 +50,7 @@ class MetNcWrfDataFile : public Met2dDataFile {
    public:
 
       MetNcWrfDataFile();
-     ~MetNcWrfDataFile();
+     ~MetNcWrfDataFile() override;
      
          //
          //  set stuff
@@ -60,7 +60,7 @@ class MetNcWrfDataFile : public Met2dDataFile {
          //  get stuff
          //
 
-      GrdFileType file_type() const;
+      GrdFileType file_type() const override;
 
          //  retrieve the first matching data plane
 
@@ -78,11 +78,11 @@ class MetNcWrfDataFile : public Met2dDataFile {
          //  do stuff
          //
 
-      bool open  (const char * filename);
+      bool open  (const char * filename) override;
 
-      void close ();
+      void close () override;
 
-      void dump(std::ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const override;
 
 };
 

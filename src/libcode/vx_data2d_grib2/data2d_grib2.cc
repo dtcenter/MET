@@ -22,6 +22,7 @@
 #include <utility>
 #include <limits>
 #include <list>
+#include <new>
 
 #include "data2d_grib2.h"
 #include "grib_strings.h"
@@ -58,7 +59,7 @@ MetGrib2DataFile::MetGrib2DataFile() {
 
 MetGrib2DataFile::~MetGrib2DataFile() {
 
-   close();
+   MetGrib2DataFile::close();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -373,8 +374,6 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
 void MetGrib2DataFile::find_record_matches(const VarInfoGrib2* vinfo,
                                            vector<Grib2Record*> &listMatchExact,
                                            vector<Grib2Record*> &listMatchRange) {
-
-   const char *method_name = "MetGrib2DataFile::find_record_matches() -> ";
 
    //  clear the contents of the result vectors
    listMatchExact.clear();
@@ -1309,8 +1308,8 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
       //   The wgrib2 utility does NOT when populating gfld->igdtmpl.
       //   However, the wgrib2 -get_byte and -get_int options do work,
       //   as shown below:
-      //      wgrib2 ukv_agl_temperature_1.5_12.grib2 \
-      //        -get_byte 3 43 4 -get_int 3 43 1 \
+      //      wgrib2 ukv_agl_temperature_1.5_12.grib2
+      //        -get_byte 3 43 4 -get_int 3 43 1
       //        -get_byte 3 51 4 -get_int 3 51 1
       //
       //   The longitudes are correctly parsed as -17.117129 and -2.5, respectively.

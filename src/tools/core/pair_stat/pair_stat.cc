@@ -63,7 +63,6 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
-static void setup_pairs();
 
 static void setup_txt_files();
 static void setup_table    (AsciiTable &);

@@ -51,7 +51,7 @@ static int compress_level = -1;
 ModeFrontEnd::ModeFrontEnd() :
    default_out_dir(".")
 {
-   mode_exec = 0;
+   mode_exec = nullptr;
    compress_level = -1;
 }  
 

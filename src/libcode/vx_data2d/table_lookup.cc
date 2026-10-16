@@ -434,7 +434,7 @@ GribEntryMatch Grib2TableEntry::match(const int &mtab, const int &_cntr, const i
       status = GribEntryMatch::match;
    }
    // Check master table
-   else if (bad_data_int == mtab || mtab_low <= mtab && mtab_high >= mtab) {
+   else if (bad_data_int == mtab || (mtab_low <= mtab && mtab_high >= mtab)) {
       if (bad_data_int != _cntr && cntr == _cntr &&
           bad_data_int != _ltab && ltab == _ltab) status = GribEntryMatch::exact_match;
       else if (cntr == 0 && ltab == 0) status = GribEntryMatch::match;

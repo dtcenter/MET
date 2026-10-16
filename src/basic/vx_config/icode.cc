@@ -34,12 +34,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int icodevector_alloc_inc = 50;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
    //
    //  Code for class IcodeCell
    //
@@ -118,7 +112,7 @@ name.clear();
 
 text.clear();
 
-e = 0;
+e = nullptr;
 
 
 return;
@@ -141,7 +135,7 @@ name.clear();
 
 text.clear();
 
-e = 0;
+e = nullptr;
 
 
 type = no_cell_type;
@@ -1413,7 +1407,7 @@ void ICVQueue::init_from_scratch()
 
 {
 
-memset(v, 0, sizeof(v));
+for (auto & p : v)  p.reset();
 
 Nelements = 0;
 

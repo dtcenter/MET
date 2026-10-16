@@ -69,7 +69,7 @@ MtdIntFile::~MtdIntFile()
 
 {
 
-clear();
+MtdIntFile::clear();
 
 }
 
@@ -112,7 +112,7 @@ void MtdIntFile::int_init_from_scratch()
 {
 
 
-clear();
+MtdIntFile::clear();
 
 return;
 
@@ -161,11 +161,10 @@ void MtdIntFile::int_assign(const MtdIntFile & f)
 
 {
 
-clear();
+MtdIntFile::clear();
 
-int n;
 
-base_assign(f);
+base_copy(f);
 
 DataMin = f.DataMin;
 DataMax = f.DataMax;
@@ -182,15 +181,11 @@ Nobjects = f.Nobjects;
 
 FileType = f.FileType;
 
-n = Nx*Ny*Nt;
-
 if ( ! f.Data.empty() )  {
 
    Data = f.Data;
 
 }
-
-n = Nobjects;
 
 ObjVolume = f.ObjVolume;
 
@@ -532,7 +527,7 @@ lengths.add(Nt);
 lengths.add(Ny);
 lengths.add(Nx);
 
-if ( ! put_nc_data(&data_var, Data.data(), lengths, offsets) )  {
+if ( ! put_nc_data(&data_var, Data.data(), static_cast<long *>(lengths), static_cast<long *>(offsets)) )  {
 
    mlog << Error << "\nMtdIntFile::write(const char *) -> "
         << "trouble getting data\n\n";
@@ -1139,7 +1134,7 @@ void MtdIntFile::split()
 {
 
 int j, k;
-int * d = 0;
+int * d = nullptr;
 MtdIntFile old;
 
 old = ::split(*this, Nobjects);
@@ -1303,9 +1298,6 @@ if ( n_new > 0 )  {
 
 }
 
-int replace_count = 0;
-int zero_count = 0;
-
 d = Data.data();
 
 if ( n_new > 0 )  {
@@ -1318,8 +1310,8 @@ if ( n_new > 0 )  {
 
       k = old_to_new[k - 1];
 
-      if ( k < 0 )    { *d = 0;      ++zero_count; }
-      else            { *d = 1 + k;  ++replace_count; }
+      if ( k < 0 )    *d = 0;
+      else            *d = 1 + k;
 
    }
 

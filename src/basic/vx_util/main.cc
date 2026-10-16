@@ -36,6 +36,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <csignal>
+#include <new>
 #include <pwd.h>
 
 #include "main.h"
@@ -56,8 +57,6 @@ using namespace std;
 
 static string met_cmdline = "";
 
-static int met_start_time;
-static int met_end_time;
 static uid_t met_user_id;
 static string met_user_name;
 static string met_tool_name;

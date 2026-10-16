@@ -33,9 +33,6 @@ static const LatLonData GlobalTenthData =
    { "GlobalTenthDegree", -90.0, -0.0, 0.1, 0.1, 1801, 3601 };
 static const Grid grid_mask(GlobalTenthData);
 
-// Reference valid time for climatology data
-static unixtime vx_valid_ut = 0;
-
 // Indices for the output flag types in the configuration file
 static const int i_fho       =  0;
 static const int i_ctc       =  1;

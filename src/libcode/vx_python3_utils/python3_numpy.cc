@@ -27,12 +27,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char junk_var_name [] = "__junk__";
-
-
-////////////////////////////////////////////////////////////////////////
-
-
    //
    //  Code for class Python3_Numpy
    //
@@ -71,7 +65,7 @@ void Python3_Numpy::clear()
 
 {
 
-Object = 0;
+Object = nullptr;
 
 Name.clear();
 
@@ -79,15 +73,15 @@ Dim.clear();
 
 N_Dims = 0;
 
-Data_Obj = 0;
+Data_Obj = nullptr;
 
 N_Data = 0;
 
-Buffer = 0;
+Buffer = nullptr;
 
 Item_Size = 0;
 
-Script = 0;
+Script = nullptr;
 
 Dtype.clear();
 
@@ -104,7 +98,7 @@ void Python3_Numpy::init_from_scratch()
 {
 
 
-Buffer = 0;
+Buffer = nullptr;
 
 clear();
 
@@ -259,7 +253,7 @@ if ( ! obj )  {
 
 Object = obj;
 
-Script = 0;
+Script = nullptr;
 
 
    //
@@ -273,7 +267,7 @@ N_Dims = PyTuple_Size (shape_tuple);
 Dim.resize(N_Dims);
 
 int j;
-PyObject * item = 0;
+PyObject * item = nullptr;
 
 for (j=0; j<N_Dims; ++j)  {
 

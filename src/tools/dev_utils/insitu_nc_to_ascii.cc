@@ -66,7 +66,7 @@ int met_main(int argc, char * argv [])
   // Open the output file
 
   FILE *output_file;
-  if ((output_file = met_fopen(output_filepath, "w")) == 0)
+  if ((output_file = met_fopen(output_filepath, "w")) == nullptr)
   {
     cerr << "Error opening output file: " << output_filepath << endl;
 

@@ -1625,10 +1625,10 @@ void aggr_mpr_wind_lines(LineDataFiles &f, STATAnalysisJob &job,
          // For other output (e.g. VL1L1 and VCNT), use all vector pairs.
          //
          if(job.out_line_type.has(stat_wdir_str) &&
-            (is_eq(it->second.pd_u.f_na[i], 0.0) &&
-             is_eq(it->second.pd_v.f_na[i], 0.0)) ||
-            (is_eq(it->second.pd_u.o_na[i], 0.0) &&
-             is_eq(it->second.pd_v.o_na[i], 0.0))) {
+            ((is_eq(it->second.pd_u.f_na[i], 0.0) &&
+              is_eq(it->second.pd_v.f_na[i], 0.0)) ||
+             (is_eq(it->second.pd_u.o_na[i], 0.0) &&
+              is_eq(it->second.pd_v.o_na[i], 0.0)))) {
             mlog << Debug(4) << "aggr_mpr_wind_lines() -> "
                  << "for WDIR output, skip pair with angle not defined for zero forecast ("
                  << it->second.pd_u.f_na[i] << ", " << it->second.pd_v.f_na[i]
@@ -2184,12 +2184,12 @@ void aggr_ecnt_lines(LineDataFiles &f, STATAnalysisJob &job,
 
       // Compute aggregated empirical CRPSS
       it->second.ens_pd.crpss_emp =
-         (is_bad_data(crps_emp) || is_bad_data(crpscl_emp) && is_eq(crpscl_emp, 0.0) ?
+         (is_bad_data(crps_emp) || is_bad_data(crpscl_emp) || is_eq(crpscl_emp, 0.0) ?
          bad_data_double : (crpscl_emp - crps_emp)/crpscl_emp);
 
       // Compute aggregated Gaussian CRPSS
       it->second.ens_pd.crpss_gaus =
-         (is_bad_data(crps_gaus) || is_bad_data(crpscl_gaus) && is_eq(crpscl_gaus, 0.0) ?
+         (is_bad_data(crps_gaus) || is_bad_data(crpscl_gaus) || is_eq(crpscl_gaus, 0.0) ?
          bad_data_double : (crpscl_gaus - crps_gaus)/crpscl_gaus);
 
    } // end for it
@@ -2609,7 +2609,7 @@ void aggr_orank_lines(LineDataFiles &f, STATAnalysisJob &job,
 
             aggr.clear();
 
-            aggr.ens_pd.obs_error_flag = !is_bad_data(cur.ens_mean_oerr);
+            aggr.ens_pd.obs_err_flag = !is_bad_data(cur.ens_mean_oerr);
             aggr.ens_pd.set_ens_size(cur.n_ens);
             aggr.ens_pd.extend(cur.total);
             for(int i=0; i<cur.n_ens+1; i++) aggr.ens_pd.rhist_na.add(0);
@@ -2715,7 +2715,7 @@ void aggr_orank_lines(LineDataFiles &f, STATAnalysisJob &job,
          // Compute observation error log scores
          double v_conv;
          double v_corr;
-         compute_obs_error_log_scores(
+         compute_obs_err_log_scores(
             cur.ens_mean, cur.spread, cur.obs, oerr_var,
             v_conv, v_corr);
          m[key].ens_pd.ign_conv_oerr_na.add(v_conv);

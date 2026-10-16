@@ -30,7 +30,7 @@ class MetHandler : public FileHandler
 
 public:
 
-  MetHandler(const std::string &program_name);
+  explicit MetHandler(const std::string &program_name);
   virtual ~MetHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;
