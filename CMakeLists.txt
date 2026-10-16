@@ -445,8 +445,6 @@ add_library(vx_util
         src/basic/vx_util/mask_poly.h
         src/basic/vx_util/memory.cc
         src/basic/vx_util/memory.h
-        src/basic/vx_util/met_buffer.cc
-        src/basic/vx_util/met_buffer.h
         src/basic/vx_util/ncrr_array.h
         src/basic/vx_util/normalize.cc
         src/basic/vx_util/normalize.h
@@ -765,8 +763,8 @@ add_library(vx_statistics
         src/libcode/vx_statistics/grid_closed_poly.h
         src/libcode/vx_statistics/met_stats.cc
         src/libcode/vx_statistics/met_stats.h
-        src/libcode/vx_statistics/obs_error.cc
-        src/libcode/vx_statistics/obs_error.h
+        src/libcode/vx_statistics/obs_err.cc
+        src/libcode/vx_statistics/obs_err.h
         src/libcode/vx_statistics/pair_base.cc
         src/libcode/vx_statistics/pair_base.h
         src/libcode/vx_statistics/pair_data_ensemble.cc
@@ -935,8 +933,6 @@ add_library(vx_shapedata
         src/libcode/vx_shapedata/mode_field_info.h
         src/libcode/vx_shapedata/moments.cc
         src/libcode/vx_shapedata/moments.h
-        src/libcode/vx_shapedata/node.cc
-        src/libcode/vx_shapedata/node.h
         src/libcode/vx_shapedata/set.cc
         src/libcode/vx_shapedata/set.h
         src/libcode/vx_shapedata/shape.h
