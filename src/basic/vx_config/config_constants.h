@@ -551,17 +551,6 @@ enum class GridWeightType {
 ////////////////////////////////////////////////////////////////////////
 
 //
-// Enumeration for point_weight_flag configuration parameter
-//
-
-enum class PointWeightType {
-   None, // Apply no point weighting
-   SID   // Apply station ID weighting
-};
-
-////////////////////////////////////////////////////////////////////////
-
-//
 // Enumeration for grid_decomp_flag configuration parameter
 //
 
@@ -789,6 +778,9 @@ static const char conf_key_cov_thresh[]        = "cov_thresh";
 static const char conf_key_ps_plot_flag[]      = "ps_plot_flag";
 static const char conf_key_nc_pairs_flag[]     = "nc_pairs_flag";
 static const char conf_key_grid_weight_flag[]  = "grid_weight_flag";
+static const char conf_key_point_weight_flag[] = "point_weight_flag";
+static const char conf_key_kde_ref_angle[]     = "kde_ref_angle";
+static const char conf_key_write_weights[]     = "write_weights";
 static const char conf_key_duplicate_flag[]    = "duplicate_flag";
 static const char conf_key_obs_summary[]       = "obs_summary";
 static const char conf_key_percentile[]        = "obs_perc_value";
@@ -919,8 +911,7 @@ static const char conf_key_msl_agl_conversion_msl_to_agl[]  = "msl_agl_conversio
 // Point-Stat specific parameter key names
 //
 
-static const char conf_key_hira[]               = "hira";
-static const char conf_key_point_weight_flag[]  = "point_weight_flag";
+static const char conf_key_hira[] = "hira";
 
 //
 // Pair-Stat specific parameter key names
@@ -1507,6 +1498,7 @@ static const char conf_val_area_cntr[] = "AREA_CNTR";
 
 // Point weight flag values
 static const char conf_val_sid[]     = "SID";
+static const char conf_val_kde[]     = "KDE";
 
 // Duplicate flag values
 static const char conf_val_unique[] = "UNIQUE";

@@ -75,10 +75,10 @@ fcst = {
    //${METPLUS_FCST_VLD_THRESH}
    //${METPLUS_FCST_FILTER_ATTR_NAME}
    filter_attr_name = ["AREA"];
-   
+
    //${METPLUS_FCST_FILTER_ATTR_THRESH}
    filter_attr_thresh = [>=25];
-   
+
    //${METPLUS_FCST_MERGE_THRESH}
    //${METPLUS_FCST_MERGE_FLAG}
    //${METPLUS_FCST_FILE_TYPE}
