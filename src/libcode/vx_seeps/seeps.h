@@ -59,8 +59,9 @@ constexpr char def_seeps_grid_filename[] =
 
 //density_radius = 0.75 degrees (83km; this is described as “the smallest possible
 // value that ensures approximately equal representation of all subregions of Europe”.)
+// MET #3465: Default reference angle for the SEEPS station density weights
+// when no "kde_ref_angle" configuration option is available.
 constexpr double density_radius = 0.75;
-const double density_radius_rad = density_radius * rad_per_deg;
 
 ////////////////////////////////////////////////////////////////////////
 

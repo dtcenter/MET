@@ -2881,6 +2881,12 @@ Three point weighting options are currently supported:
   located at the first location encountered for that station within each
   verification task.
 
+  The SEEPS line type applies its own station density weighting, computed the
+  same way and using the same "kde_ref_angle" option, regardless of the
+  "point_weight_flag" setting. The "point_weight_flag" weights are applied only to
+  the ODFL, ODFH, OLFD, OLFH, OHFD, and OHFL columns of the SEEPS line type. See
+  :numref:`PS_seeps_weighting` for details.
+
 .. code-block:: none
 
   point_weight_flag = NONE;
@@ -2889,11 +2895,14 @@ kde_ref_angle
 -------------
 
 The "kde_ref_angle" entry defines the reference angle used when computing the
-weights for "point_weight_flag = KDE". This reference angle is defined in degrees
+weights for "point_weight_flag = KDE". It also defines the reference angle for the
+station density weights that are always applied to the SEEPS line type, regardless
+of the "point_weight_flag" setting, as described in :numref:`PS_seeps_weighting`.
+This reference angle is defined in degrees
 with a default value of 0.75. As described in :ref:`Haiden et al., 2012 <Haiden-2012>`,
 an increase of this parameter increases the weights of data-sparse regions in global
 or continental-scale averages. The value must be greater than 0 when
-"point_weight_flag = KDE".
+"point_weight_flag = KDE" or when the SEEPS line type is requested.
 
 .. code-block:: none
 
@@ -2912,6 +2921,8 @@ other than letters, digits, "-", and "." in the NAME and LEVEL strings are repla
 with "_". If multiple verification tasks have the same NAME and LEVEL, the 1-based
 task index is appended (e.g. "_TMP_Z2_vx4") to make the file names unique. These
 files can be used to define the "mask.sid" station ID masking file in future runs.
+The station density weights that are always applied to the SEEPS line type are
+not written to these files.
 
 Note that "mask.sid" can be specified separately for each verification task, and,
 technically, the same station could be assigned different weights for different

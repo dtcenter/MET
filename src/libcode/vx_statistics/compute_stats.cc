@@ -1493,7 +1493,8 @@ void compute_ecnt_mean(const ECNTInfo *ecnt_info, int n,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg) {
+void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg,
+                              double kde_ref_angle) {
    static const char *method_name = "compute_aggregated_seeps() -> ";
 
    //
@@ -1563,7 +1564,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
       // Station density weights, one entry per element of seeps_mprs
       //IDL: w = 1/d
       vector<double> weight;
-      compute_seeps_point_weights(pd, weight);
+      compute_seeps_point_weights(pd, kde_ref_angle, weight);
 
       if (weight.size() != seeps_mprs.size() ||
           std::any_of(weight.begin(), weight.end(),
@@ -1789,20 +1790,30 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
 ////////////////////////////////////////////////////////////////////////
 
 void compute_seeps_point_weights(const PairDataPoint *pd,
+                                 double kde_ref_angle,
                                  vector<double> &weights) {
    static const char *method_name = "compute_seeps_point_weights() -> ";
 
    weights.clear();
 
+   // Check for a positive reference angle
+   if (kde_ref_angle <= 0.0) {
+      mlog << Error << "\n" << method_name
+           << "The \"" << conf_key_kde_ref_angle << "\" value ("
+           << kde_ref_angle << ") must be greater than 0 to compute "
+           << "SEEPS station density weights.\n\n";
+      exit(1);
+   }
+
    //
    // MET #3465: Station density weighting from Section 9.1 of
    // Rodwell et al. (2010), computed using the same kernel density
-   // estimation as point_weight_flag = KDE, but only for the stations
-   // of the current pairs that have a valid SEEPS score
+   // estimation and kde_ref_angle as point_weight_flag = KDE, but only
+   // for the stations of the current pairs that have a valid SEEPS score
    //
    PointWeightInfo pw_info;
    pw_info.set_type(PointWeightType::KDE);
-   pw_info.set_kde_ref_angle(density_radius);
+   pw_info.set_kde_ref_angle(kde_ref_angle);
 
    vector<int> pair_idx;
    for(int i=0; i<pd->n_obs; i++) {
