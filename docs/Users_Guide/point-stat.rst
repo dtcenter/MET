@@ -174,7 +174,24 @@ The Stable Equitable Error in Probability Space (SEEPS) was devised for monitori
 
 For use with precipitation, three categories are used, named ‘dry’, ‘light’ and ‘heavy’. The ‘dry’ category is defined (using the WMO observing guidelines) with any accumulation (rounded to the nearest 0.1 millimeter) that is less than or equal to 0.2 mm.  The remaining precipitation is divided into ‘light’ and ‘heavy’ categories whose thresholds are with respect to a climatology and thus location specific. The light precipitation is defined to occur twice as often as heavy precipitation.
 
-When calculating a single SEEPS value over observing stations for a particular region, the scores should have a density weighting applied which accounts for uneven station distribution in the region of interest (see Section 9.1 in :ref:`Rodwell et al., 2010 <Rodwell-2010>`). Point-Stat applies a station density weighting when computing the weighted counts and scores in the SEEPS line type, independent of the **point_weight_flag** option. The **point_weight_flag = KDE** option applies a similar station density weighting to the other output line types, as described in :numref:`config_options`. Global precipitation climatologies calculated from the WMO SYNOP records from 1980-2009 are supplied with the release. At the moment, a 24-hour climatology is available (valid at 00 UTC or 12 UTC), but in future a 6-hour climatology will become available.
+Global precipitation climatologies calculated from the WMO SYNOP records from 1980-2009 are supplied with the release. At the moment, a 24-hour climatology is available (valid at 00 UTC or 12 UTC), but in future a 6-hour climatology will become available. In addition to the precipitation thresholds, the climatology file defines the SEEPS scoring matrix for each station and month, which determines the SEEPS score of each matched pair. The scoring matrix is not related to the weights described below.
+
+.. _PS_seeps_weighting:
+
+SEEPS Weighting
+^^^^^^^^^^^^^^^
+
+When calculating a single SEEPS value over observing stations for a particular region, the scores should have a density weighting applied which accounts for uneven station distribution in the region of interest (see Section 9.1 in :ref:`Rodwell et al., 2010 <Rodwell-2010>`). For point data, MET always computes these **station density weights** for the SEEPS line type, even when **point_weight_flag = NONE**. They are computed the same way as the **point_weight_flag = KDE** weights described in :numref:`config_options`, using the same **kde_ref_angle** option (0.75 degrees by default), but separately from those weights. The SEEPS line type does not apply the **point_weight_flag** weights in Point-Stat and Pair-Stat, or the **grid_weight_flag** weights in Grid-Stat. The columns of the SEEPS line type (:numref:`table_PS_format_info_SEEPS`) are computed as follows:
+
+* The **PF1, PF2, PF3, PV1, PV2, PV3, MEAN_FCST, MEAN_OBS, and SEEPS** columns are means weighted by the station density weights. These weights are computed separately for each SEEPS output line, meaning for each combination of message type, masking region, and interpolation method, using only the matched pairs with a valid SEEPS score. Each unique station ID is treated as a single point in the density calculation.
+
+* The **ODFL, ODFH, OLFD, OLFH, OHFD, and OHFL** columns are unweighted counts of the matched pairs in each off-diagonal forecast and observation category. They are provided for information only and are not used to compute any of the other columns.
+
+Because the station density weights and the **point_weight_flag = KDE** weights are computed over different sets of stations, a station can have a different weight in the SEEPS line type than it has in the other line types, even with the same **kde_ref_angle**. The station density weights are not written to the files requested by the **write_weights** option.
+
+Pair-Stat computes SEEPS in the same way as Point-Stat. In Grid-Stat, no station density weighting is applied, and the PF1, PF2, PF3, PV1, PV2, PV3, MEAN_FCST, MEAN_OBS, and SEEPS columns are computed by weighting each grid point equally.
+
+When aggregating SEEPS_MPR lines, the Stat-Analysis "aggregate_stat" job recomputes the station density weights from the station locations in those lines, using the default reference angle of 0.75 degrees, since Stat-Analysis has no **kde_ref_angle** option. When aggregating SEEPS lines, the "aggregate" job sums the ODFL, ODFH, OLFD, OLFH, OHFD, and OHFL columns and computes the remaining columns as means weighted by the TOTAL column of each line.
 
 .. _PS_Statistical-measures:
 
@@ -1796,28 +1813,28 @@ The first set of header columns are common to all of the output files generated 
     - Integer
   * - 26
     - ODFL
-    - Counts multiplied by the weights for the observation dry, forecast light category
-    - Double
+    - Count of matched pairs in the observation dry, forecast light category
+    - Integer
   * - 27
     - ODFH
-    - Counts multiplied by the weights for the observation dry, forecast heavy category
-    - Double
+    - Count of matched pairs in the observation dry, forecast heavy category
+    - Integer
   * - 28
     - OLFD
-    - Counts multiplied by the weights for the observation light, forecast dry category
-    - Double
+    - Count of matched pairs in the observation light, forecast dry category
+    - Integer
   * - 29
     - OLFH
-    - Counts multiplied by the weights for the observation light, forecast heavy category
-    - Double
+    - Count of matched pairs in the observation light, forecast heavy category
+    - Integer
   * - 30
     - OHFD
-    - Counts multiplied by the weights for the observation heavy, forecast dry category
-    - Double
+    - Count of matched pairs in the observation heavy, forecast dry category
+    - Integer
   * - 31
     - OHFL
-    - Counts multiplied by the weights for the observation heavy, forecast light category
-    - Double
+    - Count of matched pairs in the observation heavy, forecast light category
+    - Integer
   * - 32
     - PF1
     - Marginal probabilities of the forecast dry (FCST_CAT 0)
@@ -1843,9 +1860,19 @@ The first set of header columns are common to all of the output files generated 
     - Marginal probabilities of the observed heavy (OBS_CAT 2)
     - Double
   * - 38
-    - SEEPS
-    - Averaged SEEPS (Stable Equitable Error in Probability Space) score
+    - MEAN_FCST
+    - Weighted mean forecast value
     - Double
+  * - 39
+    - MEAN_OBS
+    - Weighted mean observation value
+    - Double
+  * - 40
+    - SEEPS
+    - Weighted mean SEEPS (Stable Equitable Error in Probability Space) score
+    - Double
+
+The ODFL, ODFH, OLFD, OLFH, OHFD, and OHFL columns are the counts in the off-diagonal cells of the 3x3 forecast and observation category contingency table. The PF1, PF2, PF3, PV1, PV2, and PV3 columns are the marginal relative frequencies of the forecast and observation categories, and each set sums to 1. The weights applied to each of these columns, and to the MEAN_FCST, MEAN_OBS, and SEEPS columns, are described in :numref:`PS_seeps_weighting`.
 
 
 The STAT output files described for point_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by point_stat, please see :numref:`stat-analysis`.

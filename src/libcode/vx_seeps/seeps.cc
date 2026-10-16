@@ -99,7 +99,6 @@ void SeepsAggScore::clear() {
 
    n_obs = 0;
    c_odfl = c_odfh = c_olfd = c_olfh = c_ohfd = c_ohfl = 0;
-   s_odfl = s_odfh = s_olfd = s_olfh = s_ohfd = s_ohfl = 0.0;
    pv1 = pv2 = pv3 = 0.0;
    pf1 = pf2 = pf3 = 0.0;
    mean_fcst = mean_fcst_wgt = bad_data_double;
@@ -130,17 +129,9 @@ SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
    c_olfh += c.c_olfh;
    c_ohfd += c.c_ohfd;
    c_ohfl += c.c_ohfl;
-   
-   // Compute weighted averages
-   s_odfl = weighted_average(s_odfl, w1, c.s_odfl, w2);
-   s_odfh = weighted_average(s_odfh, w1, c.s_odfh, w2);
-   s_olfd = weighted_average(s_olfd, w1, c.s_olfd, w2);
-   s_olfh = weighted_average(s_olfh, w1, c.s_olfh, w2);
-   s_ohfd = weighted_average(s_ohfd, w1, c.s_ohfd, w2);
-   s_ohfl = weighted_average(s_ohfl, w1, c.s_ohfl, w2);
    mlog << Debug(9) << method_name
-        << "s_odfl, o_odfh => "
-        << s_odfl << " " << s_odfh << "\n";
+        << "c_odfl, c_odfh => "
+        << c_odfl << " " << c_odfh << "\n";
 
    pv1 = weighted_average(pv1, w1, c.pv1, w2);
    pv2 = weighted_average(pv2, w1, c.pv2, w2);
@@ -160,6 +151,28 @@ SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
    score_wgt = weighted_average(score_wgt, w1, c.score_wgt, w2);
 
    return *this;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Increment the count (c_*) for the off-diagonal
+// forecast/observation category of a SEEPS pair.
+// Return false for pairs on the diagonal or with invalid categories.
+//
+////////////////////////////////////////////////////////////////////////
+
+bool SeepsAggScore::inc_category(int fcst_cat, int obs_cat) {
+   bool status = true;
+
+   if     (fcst_cat == 0 && obs_cat == 1) c_olfd++;
+   else if(fcst_cat == 0 && obs_cat == 2) c_ohfd++;
+   else if(fcst_cat == 1 && obs_cat == 0) c_odfl++;
+   else if(fcst_cat == 1 && obs_cat == 2) c_ohfl++;
+   else if(fcst_cat == 2 && obs_cat == 0) c_odfh++;
+   else if(fcst_cat == 2 && obs_cat == 1) c_olfh++;
+   else status = false;
+
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////

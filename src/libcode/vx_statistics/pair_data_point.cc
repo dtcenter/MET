@@ -98,7 +98,7 @@ void PairDataPoint::erase() {
 
    f_na.erase();
    f_lead_na.erase();
-   for (auto &s : seeps_mpr) s.reset();
+   seeps_mpr.clear();
 
    return;
 }
@@ -111,9 +111,7 @@ void PairDataPoint::extend(int n) {
 
    f_na.extend(n);
    f_lead_na.extend(n);
-   for (auto idx = (int) seeps_mpr.size(); idx<n; idx++) {
-      seeps_mpr.emplace_back(nullptr);
-   }
+   seeps_mpr.reserve(n);
 
    return;
 }
@@ -154,8 +152,9 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
                pd.lvl_na[i], pd.hgt_na[i],
                pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
                cpi, pd.wgt_na[i]) &&
-            i < pd.seeps_mpr.size()) {
-            set_seeps_score(seeps_mpr[i].get(), i);
+            i < (int) pd.seeps_mpr.size()) {
+            // Store the score for the pair just added
+            set_seeps_score(pd.seeps_mpr[i].get());
          }
       }
    }
@@ -209,7 +208,7 @@ void PairDataPoint::set_seeps_score(SeepsScore *seeps, int index) {
    if (seeps) {
       auto seeps_count = (int) seeps_mpr.size();
       if(index < 0) index = seeps_count - 1;
-      if(index < seeps_count) {
+      if(index >= 0 && index < seeps_count) {
          if (!seeps_mpr[index]) seeps_mpr[index] = std::make_unique<SeepsScore>();
          *seeps_mpr[index] = *seeps;
       }
@@ -246,7 +245,8 @@ void PairDataPoint::set_point_pair(int i_obs,
 
    f_na.set(i_obs, f);
    f_lead_na.set(i_obs, sec);
-   *seeps_mpr[i_obs] = *seeps;
+   if(seeps) seeps_mpr[i_obs] = std::make_unique<SeepsScore>(*seeps);
+   else      seeps_mpr[i_obs].reset();
 
    return;
 }
@@ -292,6 +292,7 @@ bool PairDataPoint::add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
    wgt_na.add(wgt_in);
 
    for(int i=0; i<o_in.n(); i++) {
+      seeps_mpr.emplace_back(nullptr);
       ClimoPntInfo cpi(fcmn_in[i], fcsd_in[i], ocmn_in[i], ocsd_in[i]);
       add_climo(o_in[i], cpi);
    }
@@ -383,8 +384,10 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
                          nint(f_lead_na[i]), vld_ta[i],
                          lvl_na[i], hgt_na[i],
                          f_na[i], o_na[i], o_qc_sa[i].c_str(),
-                         cpi, wgt_na[i])) {
-               out_pd.set_seeps_score(seeps_mpr[i].get(), i);
+                         cpi, wgt_na[i]) &&
+               i < (int) seeps_mpr.size()) {
+               // Store the score for the pair just added
+               out_pd.set_seeps_score(seeps_mpr[i].get());
             }
          }
          // Handle gridded data
