@@ -7,7 +7,7 @@ TC-RMW Tool
 Introduction
 ============
 
-The TC-RMW tool regrids tropical cyclone model data onto a moving range-azimuth grid centered on points along the storm track provided in ATCF format. It can process forecast storm tracks found in ATCF adeck files or analysis tracks (e.g. BEST track) found in ATCF bdeck files. The radial grid spacing can be defined in kilometers or as a factor of the radius of maximum winds (RMW). The azimuthal grid spacing is defined in degrees clockwise from due east. If wind vector fields are specified in the configuration file, the radial and tangential wind components will be computed. Any regridding method available in MET can be used to interpolate data on the model output grid to the specified range-azimuth grid. The regridding will be done separately on each vertical level.
+The TC-RMW tool regrids tropical cyclone model data onto a moving range-azimuth grid centered on points along the storm track provided in ATCF format. It can process forecast storm tracks found in ATCF adeck files or analysis tracks (e.g., BEST track) found in ATCF bdeck files. The radial grid spacing can be defined in kilometers or as a factor of the radius of maximum winds (RMW). The azimuthal grid spacing is defined in degrees clockwise from due east. If wind vector fields are specified in the configuration file, the radial and tangential wind components will be computed. Any regridding method available in MET can be used to interpolate data on the model output grid to the specified range-azimuth grid. The regridding will be done separately on each vertical level.
 
 Each run of TC-RMW processes a single track. Users should define track filtering criteria in the TC-RMW configuration file to select a single one. While earlier versions of TC-RMW required that the gridded input data files and filtered track points must exactly coincide, that requirement has been relaxed. However output is only written for track points for which gridded input data is provided.
 
@@ -23,7 +23,7 @@ The following sections describe the usage statement, required arguments, and opt
 
   Usage: tc_rmw
          -data file_1 ... file_n | file_list
-         -deck file
+         -deck path
          -config file
          -out file
          [-log file]
@@ -36,7 +36,7 @@ Required Arguments for tc_rmw
 
 1. The **-data file_1 ... file_n | file_list** option specifies the gridded data files or an ASCII file containing a list of files to be used, as described in :numref:`ascii_file_lists`.
 
-2. The **-deck source** argument is the ATCF format data source.
+2. The **-deck path** argument is the ATCF format data source.
 
 3. The **-config file** argument is the configuration file to be used. The contents of the configuration file are discussed below.
 
@@ -179,17 +179,17 @@ _______________________
   tangential_velocity_long_field_name = "Tangential Velocity";
 
 
-The **tangential_velocity_field_name** and **tangential_velocity_long_field_name** parameters define the field names to give the output tangential velocity grid in the netCDF output file. The parameters are used only if **compute_tangential_and_radial_winds** is set to TRUE.
+The **tangential_velocity_field_name** and **tangential_velocity_long_field_name** parameters define the field names to give the output tangential velocity grid in the NetCDF output file. The parameters are used only if **compute_tangential_and_radial_winds** is set to TRUE.
 
 _______________________
 
 .. code-block:: none
 
-  radial_velocity_field_name = "VT";
+  radial_velocity_field_name = "VR";
   radial_velocity_long_field_name = "Radial Velocity";
 
 
-The **radial_velocity_field_name** and **radial_velocity_long_field_name** parameters define the field names to give the output radial velocity grid in the netCDF output file. The parameters are used only if **compute_radial_and_radial_winds** is set to TRUE.
+The **radial_velocity_field_name** and **radial_velocity_long_field_name** parameters define the field names to give the output radial velocity grid in the NetCDF output file. The parameters are used only if **compute_tangential_and_radial_winds** is set to TRUE.
 
 
 tc_rmw Output File
@@ -199,7 +199,7 @@ The NetCDF output file contains the following dimensions:
 
 1. *track_point* - the track points corresponding to the model output valid times
 
-2. *pressure* - if any pressure levels are specified in the data variable list, they will be sorted and combined into a 3D NetCDF variable, which pressure as the vertical dimension and range and azimuth as the horizontal dimensions
+2. *pressure* - if any pressure levels are specified in the data variable list, they will be sorted and combined into a 3D NetCDF variable, with pressure as the vertical dimension and range and azimuth as the horizontal dimensions
 
 3. *range* - the radial dimension of the range-azimuth grid
 
