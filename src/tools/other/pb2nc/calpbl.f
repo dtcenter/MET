@@ -64,11 +64,11 @@ C --------------------------------------------------------------------
         real(C_DOUBLE), intent(in) :: Z(NLEV)   ! height (m)
         real(C_DOUBLE), intent(in) :: U(NLEV)   ! u-component (m/s)
         real(C_DOUBLE), intent(in) :: V(NLEV)   ! v-component (m/s)
-        integer,        intent(in) :: MZBL      ! top model level index
+        integer(C_INT), intent(in) :: MZBL      ! top model level index
 
         ! Outputs
         real(C_DOUBLE), intent(out) :: HPBL   ! atmospheric boundary-layer depth (m)
-        integer,        intent(out) :: JPBL   ! boundary-layer top level index
+        integer(C_INT), intent(out) :: JPBL   ! boundary-layer top level index
 
         ! Local parameters and variables
         real(C_DOUBLE), parameter :: H10E5 = 100000.0   ! 1.0E5
