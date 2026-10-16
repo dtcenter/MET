@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <iostream>
 #include <map>
 #include <netcdf>
@@ -114,7 +115,7 @@ class TCDiagConfInfo {
       NumArray     lead_time;
 
       // Vector of VarInfo objects from data.field (allocated)
-      std::vector<VarInfo *> var_info;
+      std::vector<std::unique_ptr<VarInfo>> var_info;
 
       // Pressure level values from the config file
       std::set<double> pressure_levels;

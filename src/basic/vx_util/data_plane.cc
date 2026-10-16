@@ -458,6 +458,16 @@ void DataPlane::set_all(float *data, int nx, int ny) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+bool DataPlane::has_bad_data() const {
+
+   // Search for bad data
+   auto it = find(Data.begin(), Data.end(), bad_data_double);
+
+   return it != Data.end();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 bool DataPlane::is_all_bad_data() const {
    bool status = true;
 
@@ -490,6 +500,27 @@ int DataPlane::n_good_data() const {
    } // End omp parallel
 
    return n;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+double DataPlane::mean() const {
+   double sum = 0.0;
+   int n = 0;
+
+#pragma omp parallel default(none) \
+   shared(sum, n)
+   {
+
+      // Accumulate sum
+#pragma omp for schedule(static) \
+                reduction(+: sum, n)
+      for(int j=0; j<Nxy; ++j) {
+         if(!is_bad_data(Data[j])) { sum += Data[j]; n++; }
+      }
+   } // End omp parallel
+
+   return (n > 0 ? sum / n : bad_data_double);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1117,9 +1148,32 @@ DataPlaneArray::DataPlaneArray(const DataPlaneArray & a) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+DataPlaneArray::DataPlaneArray(DataPlaneArray &&a) noexcept
+   : Lower(move(a.Lower)),
+     Upper(move(a.Upper)),
+     Plane(move(a.Plane)),
+     Nplanes(a.Nplanes) {
+   a.Nplanes = 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 DataPlaneArray & DataPlaneArray::operator=(const DataPlaneArray & a) {
    if(this == &a) return *this;
    assign(a);
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+DataPlaneArray & DataPlaneArray::operator=(DataPlaneArray &&a) noexcept {
+   if (this != &a) {
+      Lower   = move(a.Lower);
+      Upper   = move(a.Upper);
+      Plane   = move(a.Plane);
+      Nplanes = a.Nplanes;
+      a.Nplanes = 0;
+   }
    return *this;
 }
 
@@ -1328,6 +1382,24 @@ void DataPlaneArray::levels(int n, double & _low, double & _up) const {
    _low = Lower [n];
 
    return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool DataPlaneArray::levels_match(const DataPlaneArray &d) const {
+
+   // Check for matching number of levels
+   if(Nplanes != d.Nplanes) return false;
+
+   for(int i=0; i<Nplanes; i++) {
+
+      // Check for matching level values
+      if(Lower[i] != d.Lower[i] || Upper[i] != d.Upper[i]) {
+         return false;
+      }
+   }
+
+   return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

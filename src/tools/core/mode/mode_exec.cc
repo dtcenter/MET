@@ -20,6 +20,7 @@
 #include "mode_exec.h"
 #include "nc_utils.h"
 #include "vx_regrid.h"
+#include <memory>
 
 using namespace std;
 using namespace netCDF;
@@ -87,9 +88,6 @@ void ModeExecutive::init_from_scratch()
 
 {
 
-   fcst_mtddf = (Met2dDataFile *) nullptr;
-   obs_mtddf = (Met2dDataFile *) nullptr;
-
    clear();
 
    return;
@@ -111,8 +109,8 @@ void ModeExecutive::clear()
    fcst_file.clear();
    obs_file.clear();
 
-   if ( fcst_mtddf )  { delete fcst_mtddf;  fcst_mtddf = (Met2dDataFile *) nullptr; }
-   if (  obs_mtddf )  { delete  obs_mtddf;   obs_mtddf = (Met2dDataFile *) nullptr; }
+   fcst_mtddf.reset();
+   obs_mtddf.reset();
 
    for (int j=0; j<n_cts; ++j)  cts[j].zero_out();
 
@@ -156,14 +154,16 @@ void ModeExecutive::init_traditional(int n_files)
 
 
    // Read observation file
-   if(!(obs_mtddf = Met2dDataFileFactory::new_met_2d_data_file(obs_file.c_str(), otype))) {
+   obs_mtddf = Met2dDataFileFactory::new_met_2d_data_file(obs_file.c_str(), otype);
+   if(!obs_mtddf) {
       mlog << Error << "\nTrouble reading observation file \""
            << obs_file << "\"\n\n";
       exit(1);
    }
 
    // Read forecast file
-   if(!(fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype))) {
+   fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype);
+   if(!fcst_mtddf) {
       mlog << Error << "\nTrouble reading forecast file \""
            << fcst_file << "\"\n\n";
       exit(1);
@@ -1301,7 +1301,7 @@ void ModeExecutive::process_output_multivar_intensity_compare(const MultiVarData
    else if(!is_bad_data(fmax) &&  is_bad_data(omax)) dmax = fmax;
    else if( is_bad_data(fmax) && !is_bad_data(omax)) dmax = omax;
          
-   set_raw_to_full(mvdf->_simple->_raw_data,mvdo->_simple->_raw_data,
+   set_raw_to_full(mvdf->_simple->_raw_data.data(),mvdo->_simple->_raw_data.data(),
                    mvdf->_nx, mvdf->_ny, dmin, dmax);
 
    write_obj_netcdf(engine.conf_info.nc_info);
@@ -1654,10 +1654,10 @@ void ModeExecutive::write_obj_stats()
 
 //////////////////////////////////////////////////////////////////////
 
-MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
+std::unique_ptr<MultiVarData> ModeExecutive::get_multivar_data(ModeDataType dtype)
 {
    bool simple=true;
-   MultiVarData *mvd = new MultiVarData();
+   auto mvd = std::make_unique<MultiVarData>();
 
    switch (dtype)
    {
@@ -1667,8 +1667,8 @@ MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
       replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
       mvd->init(dtype, obs_magic_string, grid, 
                 ounits, olevel, data_min, data_max);
-      mvd->set_obj(engine.obs_split, simple);
-      mvd->set_raw(engine.obs_raw, simple);
+      mvd->set_obj(engine.obs_split.get(), simple);
+      mvd->set_raw(engine.obs_raw.get(), simple);
       mvd->set_shapedata(Obs_sd, simple);
       mvd->set_conv_thresh_array(engine.conf_info.Obs->conv_thresh_array, simple);
       mvd->set_merge_thresh_array(engine.conf_info.Obs->merge_thresh_array, simple);
@@ -1679,8 +1679,8 @@ MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
       replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
       mvd->init(dtype, fcst_magic_string, grid, 
                 funits, flevel, data_min, data_max);
-      mvd->set_obj(engine.fcst_split, simple);
-      mvd->set_raw(engine.fcst_raw, simple);
+      mvd->set_obj(engine.fcst_split.get(), simple);
+      mvd->set_raw(engine.fcst_raw.get(), simple);
       mvd->set_shapedata(Fcst_sd, simple);
       mvd->set_conv_thresh_array(engine.conf_info.Fcst->conv_thresh_array, simple);
       mvd->set_merge_thresh_array(engine.conf_info.Fcst->merge_thresh_array, simple);
@@ -1703,15 +1703,15 @@ void ModeExecutive::add_multivar_merge_data(MultiVarData *mvd, ModeDataType dtyp
    switch (dtype)
    {
    case ModeDataType::MvMode_Obs:
-      mvd->set_obj(engine.obs_split, simple);
-      mvd->set_raw(engine.obs_raw, simple);
+      mvd->set_obj(engine.obs_split.get(), simple);
+      mvd->set_raw(engine.obs_raw.get(), simple);
       mvd->set_shapedata(Obs_sd, simple);
       mvd->set_conv_thresh_array(engine.conf_info.Obs->conv_thresh_array, simple);
       mvd->set_merge_thresh_array(engine.conf_info.Obs->merge_thresh_array, simple);
       break;
    case ModeDataType::MvMode_Fcst:
-      mvd->set_obj(engine.fcst_split, simple);
-      mvd->set_raw(engine.fcst_raw, simple);
+      mvd->set_obj(engine.fcst_split.get(), simple);
+      mvd->set_raw(engine.fcst_raw.get(), simple);
       mvd->set_shapedata(Fcst_sd, simple);
       mvd->set_conv_thresh_array(engine.conf_info.Fcst->conv_thresh_array, simple);
       mvd->set_merge_thresh_array(engine.conf_info.Fcst->merge_thresh_array, simple);
@@ -1738,7 +1738,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    const ConcatString fcst_thresh = engine.conf_info.Fcst->conv_thresh.get_str(5);
    const ConcatString  obs_thresh = engine.conf_info.Obs->conv_thresh.get_str(5);
 
-   NcFile *f_out             = nullptr;
+   std::unique_ptr<netCDF::NcFile> f_out;
 
    NcDim  lat_dim;
    NcDim  lon_dim;
@@ -1776,80 +1776,79 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    //
    f_out = open_ncfile(out_file.c_str(), true);
 
-   if(IS_INVALID_NC_P(f_out)) {
+   if(IS_INVALID_NC_P(f_out.get())) {
       mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
            << "trouble opening output file " << out_file << "\n\n";
-      delete f_out;
-      f_out = (NcFile *) nullptr;
+      f_out.reset();
 
       exit(1);
    }
 
    // Add global attributes
-   write_netcdf_global(f_out, out_file.text(), program_name,
+   write_netcdf_global(f_out.get(), out_file.text(), program_name,
                        engine.conf_info.model.c_str(),
                        engine.conf_info.obtype.c_str(),
                        engine.conf_info.desc.c_str());
 
    // Add the projection information
-   write_netcdf_proj(f_out, grid, lat_dim, lon_dim);
+   write_netcdf_proj(f_out.get(), grid, lat_dim, lon_dim);
 
-   fcst_thresh_dim = add_dim(f_out, "fcst_thresh_length", fcst_thresh.length());
-   obs_thresh_dim = add_dim(f_out,  "obs_thresh_length",  obs_thresh.length());
+   fcst_thresh_dim = add_dim(f_out.get(), "fcst_thresh_length", fcst_thresh.length());
+   obs_thresh_dim = add_dim(f_out.get(),  "obs_thresh_length",  obs_thresh.length());
 
    // Add the lat/lon variables
-   if ( info.do_latlon )  write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
+   if ( info.do_latlon )  write_netcdf_latlon(f_out.get(), &lat_dim, &lon_dim, grid);
 
    int deflate_level = info.compress_level;
 
    // Define Variables
    if ( info.do_raw ) {
-      fcst_raw_var     = add_var(f_out, "fcst_raw",     ncFloat, lat_dim, lon_dim, deflate_level);
+      fcst_raw_var     = add_var(f_out.get(), "fcst_raw",     ncFloat, lat_dim, lon_dim, deflate_level);
       add_att(&fcst_raw_var, "long_name", "Forecast Raw Values");
       add_att(&fcst_raw_var, "_FillValue", bad_data_float);
    }
    if ( info.do_object_raw ) {
-      fcst_obj_raw_var = add_var(f_out, "fcst_obj_raw", ncFloat, lat_dim, lon_dim, deflate_level);
+      fcst_obj_raw_var = add_var(f_out.get(), "fcst_obj_raw", ncFloat, lat_dim, lon_dim, deflate_level);
       add_att(&fcst_obj_raw_var, "long_name", "Forecast Object Raw Values");
       add_att(&fcst_obj_raw_var, "_FillValue", bad_data_float);
    }
    if ( info.do_object_id ) {
-      fcst_obj_var     = add_var(f_out, "fcst_obj_id",  ncInt,   lat_dim, lon_dim, deflate_level);
+      fcst_obj_var     = add_var(f_out.get(), "fcst_obj_id",  ncInt,   lat_dim, lon_dim, deflate_level);
       add_att(&fcst_obj_var, "long_name", "Forecast Object ID");
       add_att(&fcst_obj_var, "_FillValue", bad_data_int);
    }
    if ( info.do_cluster_id ) {
-      fcst_clus_var    = add_var(f_out, "fcst_clus_id", ncInt,   lat_dim, lon_dim, deflate_level);
+      fcst_clus_var    = add_var(f_out.get(), "fcst_clus_id", ncInt,   lat_dim, lon_dim, deflate_level);
       add_att(&fcst_clus_var, "long_name", "Forecast Cluster Object ID");
       add_att(&fcst_clus_var, "_FillValue", bad_data_int);
    }
 
    if ( info.do_raw ) {
-      obs_raw_var      = add_var(f_out, "obs_raw",     ncFloat, lat_dim, lon_dim, deflate_level);
+      obs_raw_var      = add_var(f_out.get(), "obs_raw",     ncFloat, lat_dim, lon_dim, deflate_level);
       add_att(&obs_raw_var, "long_name", "Observation Raw Values");
       add_att(&obs_raw_var, "_FillValue", bad_data_float);
    }
    if ( info.do_object_raw ) {
-      obs_obj_raw_var  = add_var(f_out, "obs_obj_raw", ncFloat, lat_dim, lon_dim, deflate_level);
+      obs_obj_raw_var  = add_var(f_out.get(), "obs_obj_raw", ncFloat, lat_dim, lon_dim, deflate_level);
       add_att(&obs_obj_raw_var, "long_name", "Observation Object Raw Values");
       add_att(&obs_obj_raw_var, "_FillValue", bad_data_float);
    }
    if ( info.do_object_id ) {
-      obs_obj_var      = add_var(f_out, "obs_obj_id",  ncInt,   lat_dim, lon_dim, deflate_level);
+      obs_obj_var      = add_var(f_out.get(), "obs_obj_id",  ncInt,   lat_dim, lon_dim, deflate_level);
       add_att(&obs_obj_var, "long_name", "Observation Object ID");
       add_att(&obs_obj_var, "_FillValue", bad_data_int);
    }
    if ( info.do_cluster_id ) {
-      obs_clus_var     = add_var(f_out, "obs_clus_id", ncInt,   lat_dim, lon_dim, deflate_level);
+      obs_clus_var     = add_var(f_out.get(), "obs_clus_id", ncInt,   lat_dim, lon_dim, deflate_level);
       add_att(&obs_clus_var, "long_name", "Observation Cluster Object ID");
       add_att(&obs_clus_var, "_FillValue", bad_data_int);
    }
 
-   fcst_radius_var = add_var(f_out, (string)"fcst_conv_radius", ncInt, deflate_level);
-   obs_radius_var = add_var(f_out, (string) "obs_conv_radius", ncInt, deflate_level);
+   fcst_radius_var = add_var(f_out.get(), (string)"fcst_conv_radius", ncInt, deflate_level);
+   obs_radius_var = add_var(f_out.get(), (string) "obs_conv_radius", ncInt, deflate_level);
 
-   fcst_thresh_var = add_var(f_out, "fcst_conv_threshold", ncChar, fcst_thresh_dim, deflate_level);
-   obs_thresh_var = add_var(f_out,  "obs_conv_threshold", ncChar,  obs_thresh_dim, deflate_level);
+   fcst_thresh_var = add_var(f_out.get(), "fcst_conv_threshold", ncChar, fcst_thresh_dim, deflate_level);
+   obs_thresh_var = add_var(f_out.get(),  "obs_conv_threshold", ncChar,  obs_thresh_dim, deflate_level);
 
    //
    //  write the radius and threshold values
@@ -1874,23 +1873,23 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    //
 
    if (isMultivarSuperOutput) {
-      nc_add_string(f_out, engine.conf_info.fcst_multivar_name.c_str(),  "fcst_variable", "fcst_variable_length");
-      nc_add_string(f_out, engine.conf_info.obs_multivar_name.c_str(),    "obs_variable",  "obs_variable_length");
+      nc_add_string(f_out.get(), engine.conf_info.fcst_multivar_name.c_str(),  "fcst_variable", "fcst_variable_length");
+      nc_add_string(f_out.get(), engine.conf_info.obs_multivar_name.c_str(),    "obs_variable",  "obs_variable_length");
 
-      nc_add_string(f_out, engine.conf_info.fcst_multivar_level.c_str(), "fcst_level",    "fcst_level_length");
-      nc_add_string(f_out, engine.conf_info.obs_multivar_level.c_str(),   "obs_level",     "obs_level_length");
+      nc_add_string(f_out.get(), engine.conf_info.fcst_multivar_level.c_str(), "fcst_level",    "fcst_level_length");
+      nc_add_string(f_out.get(), engine.conf_info.obs_multivar_level.c_str(),   "obs_level",     "obs_level_length");
 
-      nc_add_string(f_out, "NA", "fcst_units",    "fcst_units_length");
-      nc_add_string(f_out, "NA", "obs_units",     "obs_units_length");
+      nc_add_string(f_out.get(), "NA", "fcst_units",    "fcst_units_length");
+      nc_add_string(f_out.get(), "NA", "obs_units",     "obs_units_length");
    } else {
-      nc_add_string(f_out, engine.conf_info.Fcst->var_info->name_attr().c_str(),  "fcst_variable", "fcst_variable_length");
-      nc_add_string(f_out, engine.conf_info.Obs->var_info->name_attr().c_str(),    "obs_variable",  "obs_variable_length");
+      nc_add_string(f_out.get(), engine.conf_info.Fcst->var_info->name_attr().c_str(),  "fcst_variable", "fcst_variable_length");
+      nc_add_string(f_out.get(), engine.conf_info.Obs->var_info->name_attr().c_str(),    "obs_variable",  "obs_variable_length");
 
-      nc_add_string(f_out, engine.conf_info.Fcst->var_info->level_attr().c_str(), "fcst_level",    "fcst_level_length");
-      nc_add_string(f_out, engine.conf_info.Obs->var_info->level_attr().c_str(),   "obs_level",     "obs_level_length");
+      nc_add_string(f_out.get(), engine.conf_info.Fcst->var_info->level_attr().c_str(), "fcst_level",    "fcst_level_length");
+      nc_add_string(f_out.get(), engine.conf_info.Obs->var_info->level_attr().c_str(),   "obs_level",     "obs_level_length");
 
-      nc_add_string(f_out, engine.conf_info.Fcst->var_info->units_attr().c_str(), "fcst_units",    "fcst_units_length");
-      nc_add_string(f_out, engine.conf_info.Obs->var_info->units_attr().c_str(),   "obs_units",     "obs_units_length");
+      nc_add_string(f_out.get(), engine.conf_info.Fcst->var_info->units_attr().c_str(), "fcst_units",    "fcst_units_length");
+      nc_add_string(f_out.get(), engine.conf_info.Obs->var_info->units_attr().c_str(),   "obs_units",     "obs_units_length");
    }
 
    // Add forecast variable attributes
@@ -2103,13 +2102,12 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    // Write out the values of the vertices of the polylines.
    //
 
-   if ( info.do_polylines ) write_poly_netcdf(f_out);
+   if ( info.do_polylines ) write_poly_netcdf(f_out.get());
 
    //
    // Close the NetCDF file
    //
-   delete f_out;
-   f_out = (NcFile *) nullptr;
+   f_out.reset();
 
    return;
 }
@@ -2175,14 +2173,14 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    double lat;
    double lon;
 
-   Polyline **poly = nullptr;
+   std::vector<Polyline *> poly;
 
-   int   *poly_start = nullptr;
-   int   *poly_npts  = nullptr;
-   float *poly_lat   = nullptr;
-   float *poly_lon   = nullptr;
-   int   *poly_x     = nullptr;
-   int   *poly_y     = nullptr;
+   std::vector<int>   poly_start;
+   std::vector<int>   poly_npts;
+   std::vector<float> poly_lat;
+   std::vector<float> poly_lon;
+   std::vector<int>   poly_x;
+   std::vector<int>   poly_y;
 
    // Dimensions and variables for each object
    NcDim obj_dim;
@@ -2299,7 +2297,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    y_long_name     << cs_erase << field_long << " " << poly_long << " Point Y-Coordinate";
 
    // Allocate pointers for the polylines to be written
-   poly = new Polyline * [n_poly];
+   poly.assign(n_poly, nullptr);
 
    // Point at the polyline to be written
    for(int i=0; i<n_poly; i++) {
@@ -2370,12 +2368,12 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Allocate memory for the polyline points
    //
-   poly_start = new int   [n_poly];
-   poly_npts  = new int   [n_poly];
-   poly_lat   = new float [n_pts];
-   poly_lon   = new float [n_pts];
-   poly_x     = new int   [n_pts];
-   poly_y     = new int   [n_pts];
+   poly_start.resize(n_poly);
+   poly_npts.resize(n_poly);
+   poly_lat.resize(n_pts);
+   poly_lon.resize(n_pts);
+   poly_x.resize(n_pts);
+   poly_y.resize(n_pts);
 
    //
    // Store the points for each polyline
@@ -2407,8 +2405,8 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Write the polyline information
    //
-   if( !put_nc_data_with_dims(&obj_poly_start_var, &poly_start[0], n_poly) ||
-       !put_nc_data_with_dims(&obj_poly_npts_var, &poly_npts[0], n_poly) ) {
+   if( !put_nc_data_with_dims(&obj_poly_start_var, poly_start.data(), n_poly) ||
+       !put_nc_data_with_dims(&obj_poly_npts_var, poly_npts.data(), n_poly) ) {
 
       mlog << Error << "\nModeExecutive::write_poly_netcdf() -> "
            << "error with " << start_var_name << "->put or "
@@ -2419,8 +2417,8 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Write the forecast boundary lat/lon points
    //
-   if( !put_nc_data_with_dims(&poly_lat_var, &poly_lat[0], n_pts) ||
-       !put_nc_data_with_dims(&poly_lon_var, &poly_lon[0], n_pts) ) {
+   if( !put_nc_data_with_dims(&poly_lat_var, poly_lat.data(), n_pts) ||
+       !put_nc_data_with_dims(&poly_lon_var, poly_lon.data(), n_pts) ) {
 
       mlog << Error << "\nModeExecutive::write_poly_netcdf() -> "
            << "error with " << lat_var_name << "->put or "
@@ -2431,25 +2429,14 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Write the forecast boundary (x,y) points
    //
-   if( !put_nc_data_with_dims(&poly_x_var, &poly_x[0], n_pts) ||
-       !put_nc_data_with_dims(&poly_y_var, &poly_y[0], n_pts) ) {
+   if( !put_nc_data_with_dims(&poly_x_var, poly_x.data(), n_pts) ||
+       !put_nc_data_with_dims(&poly_y_var, poly_y.data(), n_pts) ) {
 
       mlog << Error << "\nModeExecutive::write_poly_netcdf() -> "
            << "error with " << x_var_name << "->put or"
            << y_var_name << "->put\n\n";
       exit(1);
    }
-
-   //
-   // Delete allocated memory
-   //
-   if(poly)       { delete [] poly;       poly       = (Polyline **) nullptr; }
-   if(poly_start) { delete [] poly_start; poly_start = (int       *) nullptr; }
-   if(poly_npts)  { delete [] poly_npts;  poly_npts  = (int       *) nullptr; }
-   if(poly_lat)   { delete [] poly_lat;   poly_lat   = (float     *) nullptr; }
-   if(poly_lon)   { delete [] poly_lon;   poly_lon   = (float     *) nullptr; }
-   if(poly_x)     { delete [] poly_x;     poly_x     = (int       *) nullptr; }
-   if(poly_y)     { delete [] poly_y;     poly_y     = (int       *) nullptr; }
 
    return;
 }

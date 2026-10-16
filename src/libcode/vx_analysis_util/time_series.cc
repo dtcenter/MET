@@ -94,7 +94,6 @@ void TimeSeries::init_from_scratch()
 
 {
 
-Value = (double *) nullptr;
 
 clear();
 
@@ -110,7 +109,7 @@ void TimeSeries::clear()
 
 {
 
-if ( Value )  { delete [] Value;  Value = (double *) nullptr; }
+Value.clear();
 
 Nelements = 0;
 
@@ -139,7 +138,7 @@ TimeDelta = ts.TimeDelta;
 
 Nelements = ts.Nelements;
 
-Value     = new double [ Nelements ];
+Value.resize(Nelements);
 
 int j;
 

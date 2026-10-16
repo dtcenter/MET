@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <map>
 
 #include "concat_string.h"
@@ -152,17 +153,18 @@ class SeepsClimoBase {
       bool is_seeps_ready() { return seeps_ready; };
       void increase_filtered_count() { filtered_count++; };
       bool check_seeps_p1_thresh(double p1) { return seeps_p1_thresh.check(p1); };
-      ConcatString get_climo_filename();
+      ConcatString get_climo_filename(const ConcatString &env_climo_name,
+                                      const char *def_climo_name);
 
       virtual void clear();
       virtual ConcatString get_env_climo_name() { return "not defined"; };
       virtual char *get_def_climo_name() { return nullptr; };
-      virtual void read_seeps_climo_grid(const ConcatString &filename) {};
+      virtual void read_seeps_climo_grid(const ConcatString &filename) = 0;
       void set_seeps_ready(bool _seeps_ready) { seeps_ready = _seeps_ready; };
 
    public:
 
-      SeepsClimoBase(const ConcatString &seeps_climo_name);
+      explicit SeepsClimoBase(const ConcatString &seeps_climo_name);
       virtual ~SeepsClimoBase();
       void set_p1_thresh(const SingleThresh &p1_thresh);
       int get_filtered_count() const;
@@ -176,11 +178,12 @@ class SeepsClimo : public SeepsClimoBase {
    private:
 
       int nstn;
-      std::map<int,SeepsClimoRecord *> seeps_score_00_map;
-      std::map<int,SeepsClimoRecord *> seeps_score_12_map;
+      std::map<int,std::unique_ptr<SeepsClimoRecord>> seeps_score_00_map;
+      std::map<int,std::unique_ptr<SeepsClimoRecord>> seeps_score_12_map;
 
-      SeepsClimoRecord *create_climo_record(int sid, double lat, double lon, double elv,
-                                            double *p1, double *p2, double *t1, double *t2, 
+      std::unique_ptr<SeepsClimoRecord> create_climo_record(
+                                            int sid, double lat, double lon, double elv,
+                                            double *p1, double *p2, double *t1, double *t2,
                                             double *scores);
       void print_record(SeepsClimoRecord *record, bool with_header=false);
       void read_records(const ConcatString &filename);
@@ -193,13 +196,13 @@ class SeepsClimo : public SeepsClimoBase {
 
    public:
 
-      SeepsClimo(const ConcatString &seeps_climo_name);
+      explicit SeepsClimo(const ConcatString &seeps_climo_name);
      ~SeepsClimo();
 
-      SeepsRecord *get_record(int sid, int month, int hour);
+      std::unique_ptr<SeepsRecord> get_record(int sid, int month, int hour);
       double get_seeps_category(int sid, double p_fcst, double p_obs,
                                 int month, int hour);
-      SeepsScore *get_seeps_score(int sid, double p_fcst, double p_obs,
+      std::unique_ptr<SeepsScore> get_seeps_score(int sid, double p_fcst, double p_obs,
                                   int month, int hour);
 
       void print_all();
@@ -245,7 +248,7 @@ class SeepsClimoGrid : public SeepsClimoBase {
       SeepsClimoGrid(int month, int hour, const ConcatString &seeps_climo_name);
      ~SeepsClimoGrid();
 
-      SeepsScore *get_record(int ix, int iy, double p_fcst, double p_obs);
+      std::unique_ptr<SeepsScore> get_record(int ix, int iy, double p_fcst, double p_obs);
       double get_seeps_score(int offset, int obs_cat, int fcst_cat);
       void print_all();
 

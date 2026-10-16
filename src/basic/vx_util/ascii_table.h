@@ -112,7 +112,6 @@ static const bool default_fill_blank = false;
 static const int ascii_table_default_precision         = 2;
 
 static const int ascii_table_max_precision             = 12;
-static const int ascii_table_buf_size                  = ascii_table_max_precision + 4;
 
 static const double ascii_table_default_bad_data_value = -9999.0;
 
@@ -164,8 +163,6 @@ class AsciiTable {
 
       std::string BadDataStr;
 
-      char   f_FloatFormat[ascii_table_buf_size];
-      char   g_FloatFormat[ascii_table_buf_size];
 
 
       bool   DoCommaString;   //  do comma string?
@@ -309,8 +306,6 @@ class AsciiTable {
 
       virtual int precision() const;
 
-      virtual const char * f_float_format() const;
-      virtual const char * g_float_format() const;
 
       virtual bool delete_trailing_blank_rows() const;
 
@@ -344,8 +339,6 @@ inline int  AsciiTable::table_indent () const { return TableIndent; }
 
 inline int  AsciiTable::precision() const { return Precision; }
 
-inline const char * AsciiTable::f_float_format() const { return f_FloatFormat; }
-inline const char * AsciiTable::g_float_format() const { return g_FloatFormat; }
 
 inline bool AsciiTable::comma_string() const { return DoCommaString; }
 

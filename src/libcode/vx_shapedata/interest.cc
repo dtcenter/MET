@@ -28,6 +28,7 @@
 #include <string.h>
 #include <cmath>
 #include <numeric>
+#include <vector>
 
 #include "interest.h"
 #include "vx_math.h"
@@ -94,8 +95,6 @@ void SingleFeature::init_from_scratch()
 
 {
 
-boundary = (Polyline *) nullptr;
-
 clear();
 
 }
@@ -137,7 +136,7 @@ void SingleFeature::clear()
    //
    // Deallocate memory
    //
-   if(boundary) { delete [] boundary;  boundary = (Polyline *) nullptr; }
+   boundary.clear();
    n_bdy = 0;
 
    return;
@@ -184,7 +183,7 @@ void SingleFeature::assign(const SingleFeature & s)
    // Allocate memory
    //
    n_bdy    = s.n_bdy;
-   boundary = new Polyline [n_bdy];
+   boundary.resize(n_bdy);
    for(i=0; i<n_bdy; i++) boundary[i] = s.boundary[i];
 
    return;
@@ -265,7 +264,7 @@ void SingleFeature::set(const ShapeData &raw_sd, const ShapeData &thresh_sd,
    // Split the mask field and store the boundary for each object.
    //
    ShapeData cur_split_sd = split(mask_sd, n_bdy);
-   boundary = new Polyline [n_bdy];
+   boundary.resize(n_bdy);
 
 #pragma omp parallel default(none) \
    shared(n_bdy, cur_split_sd, boundary)

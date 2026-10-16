@@ -11,6 +11,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <map>
 #include <utility>
 
@@ -232,14 +233,16 @@ class VxPairBase {
 
       void init_from_scratch();
       void assign(const VxPairBase &);
-      void copy_var_info(const VarInfo *info, VarInfo *&copy);
+      void copy_var_info(const VarInfo *info, std::unique_ptr<VarInfo> &copy);
 
    public:
 
       VxPairBase();
       ~VxPairBase();
       VxPairBase(const VxPairBase &);
+      VxPairBase(VxPairBase &&) noexcept;
       VxPairBase & operator=(const VxPairBase &);
+      VxPairBase & operator=(VxPairBase &&) noexcept;
 
       //////////////////////////////////////////////////////////////////
       //
@@ -247,11 +250,11 @@ class VxPairBase {
       //
       //////////////////////////////////////////////////////////////////
 
-      VarInfo *fcst_info;        // Forecast field, allocated by VarInfoFactory
-      VarInfo *obs_info;         // Observation field, allocated by VarInfoFactory
+      std::unique_ptr<VarInfo> fcst_info;   // Forecast field
+      std::unique_ptr<VarInfo> obs_info;    // Observation field
 
-      VarInfo *fclm_info;        // Forecast climatology field, allocated by VarInfoFactory
-      VarInfo *oclm_info;        // Observation climatology field, allocated by VarInfoFactory
+      std::unique_ptr<VarInfo> fclm_info;   // Forecast climatology field
+      std::unique_ptr<VarInfo> oclm_info;   // Observation climatology field
 
       ConcatString desc;         // User description from config file
 
@@ -475,7 +478,7 @@ extern double compute_interp(const DataPlaneArray &dpa,
                              const double thresh,
                              const bool spfh_flag, const LevelType lvl_typ,
                              const double to_lvl, const int i_blw, const int i_abv,
-                             const SingleThresh *cat_thresh = 0);
+                             const SingleThresh *cat_thresh = nullptr);
 
 extern void get_interp_points(const DataPlaneArray &dpa,
                               const double obs_x, const double obs_y,

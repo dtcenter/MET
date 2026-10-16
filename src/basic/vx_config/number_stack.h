@@ -24,6 +24,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 #include "is_number.h"
 
@@ -39,16 +40,9 @@ class NumberStack {
 
       void assign(const NumberStack &);
 
-      void extend(int);
-
-
-      int Nelements;
-
-      int Nalloc;
-
       int AllocInc;
 
-      Number * e;   //  allocated
+      std::vector<Number> e;
 
 
    public:
@@ -95,7 +89,7 @@ class NumberStack {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int NumberStack::depth() const { return Nelements; }
+inline int NumberStack::depth() const { return (int) e.size(); }
 
 
 ////////////////////////////////////////////////////////////////////////

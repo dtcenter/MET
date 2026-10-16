@@ -25,6 +25,7 @@
 #include "mfhdf.h"
 
 #include "HdfEosDef.h"
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -111,9 +112,9 @@ class SatAttribute {
 
       ConcatString Sval;
 
-      int * Ival;      //  allocated
+      std::vector<int> Ival;
 
-      double * Dval;   //  allocated
+      std::vector<double> Dval;
 
    public:
 
@@ -201,7 +202,7 @@ class SwathDataField {
 
       int Ndimensions;
 
-      SatDimension ** Dimensions;  //  array is allocated, but not elements
+      std::vector<SatDimension *> Dimensions;  //  elements are not owned
 
    public:
 
@@ -278,19 +279,19 @@ class CloudsatSwath {
 
       int Ndatafields;
 
-      SwathDataField * DataField;   //  allocated
+      std::vector<SwathDataField> DataField;
 
       int Nattributes;
 
-      SatAttribute * Attribute;     //  allocated
+      std::vector<SatAttribute> Attribute;
 
       int Ngeofields;
 
-      SwathDataField * GeoField;    //  allocated
+      std::vector<SwathDataField> GeoField;
 
       int Ndimensions;
 
-      SatDimension * Dimension;     //  allocated
+      std::vector<SatDimension> Dimension;
 
 
       SwathDataField * Latitude;     //  not allocated
@@ -406,7 +407,7 @@ class CloudsatSwathFile {
 
       int Nswaths;
 
-      CloudsatSwath * Swath;   //  allocated
+      std::vector<CloudsatSwath> Swath;
 
    public:
 

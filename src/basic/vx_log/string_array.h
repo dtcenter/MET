@@ -48,8 +48,11 @@ class StringArray {
       StringArray();
      ~StringArray();
       StringArray(const StringArray &);
+      StringArray(StringArray &&) noexcept;
       explicit StringArray(const std::vector<std::string> &);
+
       StringArray & operator=(const StringArray &);
+      StringArray & operator=(StringArray &&) noexcept;
       bool operator==(const StringArray &) const;
 
       void clear();

@@ -270,8 +270,10 @@ struct BootInfo {
 
    BootInfo() { clear(); }
    ~BootInfo() { clear(); }
-   BootInfo(BootInfo const &i) { *this = i; }
-   BootInfo &operator=(const BootInfo &a) noexcept;  // SonarQube findings
+   BootInfo(const BootInfo &);
+   BootInfo(BootInfo &&) noexcept;
+   BootInfo &operator=(const BootInfo &);
+   BootInfo &operator=(BootInfo &&) noexcept;
    void clear();
 };
 
@@ -294,9 +296,17 @@ struct InterpInfo {
    ~InterpInfo() { clear(); }
    InterpInfo(InterpInfo const &i) { *this = i; }
    InterpInfo &operator=(const InterpInfo &a) noexcept; // SonarQube findings
-   bool operator==(const InterpInfo &) const;
    void clear();
    void validate(); // Ensure that width and method are accordant
+
+   friend bool operator==(const InterpInfo &lhs, const InterpInfo &rhs) {
+      return(lhs.field      == rhs.field      &&
+             lhs.vld_thresh == rhs.vld_thresh &&
+             lhs.n_interp   == rhs.n_interp   &&
+             lhs.method     == rhs.method     &&
+             lhs.width      == rhs.width      &&
+             lhs.shape      == rhs.shape);
+   }
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -348,8 +358,10 @@ struct ClimoCDFInfo {
 
    ClimoCDFInfo() { clear(); }
    ~ClimoCDFInfo() { clear(); }
-   ClimoCDFInfo(ClimoCDFInfo const &i) { *this = i; }
-   ClimoCDFInfo &operator=(const ClimoCDFInfo &a) noexcept; // SonarQube findings
+   ClimoCDFInfo(const ClimoCDFInfo &);
+   ClimoCDFInfo(ClimoCDFInfo &&) noexcept;
+   ClimoCDFInfo &operator=(const ClimoCDFInfo &);
+   ClimoCDFInfo &operator=(ClimoCDFInfo &&) noexcept;
    void clear();
    void set_cdf_ta(int, bool &); // Construct equally-likely thresholds
 };
@@ -448,10 +460,51 @@ struct MaskLatLon {
 
    MaskLatLon() { clear(); }
    ~MaskLatLon() { clear(); }
-   MaskLatLon(MaskLatLon const &i) { *this = i; }
-   MaskLatLon &operator=(const MaskLatLon &a) noexcept;
-   bool operator==(const MaskLatLon &) const;
+   MaskLatLon(const MaskLatLon &);
+   MaskLatLon(MaskLatLon &&) noexcept;
+   MaskLatLon &operator=(const MaskLatLon &);
+   MaskLatLon &operator=(MaskLatLon &&) noexcept;
    void clear();
+
+   friend bool operator==(const MaskLatLon &lhs, const MaskLatLon &rhs) {
+      return(lhs.name       == rhs.name       &&
+             lhs.lat_thresh == rhs.lat_thresh &&
+             lhs.lon_thresh == rhs.lon_thresh);
+   }
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// Struct to store wind vector metadata
+//
+
+struct WindMetadata {
+   StringArray u_wind;         // U-wind field names
+   StringArray v_wind;         // V-wind field names
+   StringArray wind_speed;     // Wind speed field names
+   StringArray wind_direction; // Wind direction field names
+
+   WindMetadata() { clear(); }
+   ~WindMetadata() { clear(); }
+   WindMetadata(WindMetadata const &i) { *this = i; }
+   WindMetadata &operator=(const WindMetadata &a) noexcept;
+   void clear();
+
+   bool is_u_wind(const std::string &s) const { return u_wind.has(s); }
+   bool is_v_wind(const std::string &s) const { return v_wind.has(s); }
+   bool is_wind_speed(const std::string &s) const { return wind_speed.has(s); }
+   bool is_wind_direction(const std::string &s) const { return wind_direction.has(s); }
+
+   // Supported derivations
+   bool is_kinetic_energy(const std::string &s) const { return s == "KENG"; }
+
+   friend bool operator==(const WindMetadata &lhs, const WindMetadata &rhs) {
+      return(lhs.u_wind         == rhs.u_wind     &&
+             lhs.v_wind         == rhs.v_wind     &&
+             lhs.wind_speed     == rhs.wind_speed &&
+             lhs.wind_direction == rhs.wind_direction);
+   }
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -489,9 +542,10 @@ enum class ObsSummary {
 //
 
 enum class GridWeightType {
-   None,    // Apply no grid box weighting
-   Cos_Lat, // Apply cosine latitude weighting
-   Area     // Apply true grid box area weighting
+   None,     // Apply no grid box weighting
+   Cos_Lat,  // Apply cosine latitude weighting
+   Area,     // Apply true grid box area weighting
+   Area_Cntr // Apply centered true grid box area weighting
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -561,6 +615,35 @@ enum class MatchType {
 };
 
 ////////////////////////////////////////////////////////////////////////
+
+//
+// Enumeration for Grid-Diag Power Spectrum missing flag options
+//
+
+enum class MissingDataType {
+   None, // No missing data type
+   Mean, // Replace missing data with the mean of the field
+   Value // Replace missing data with a constant value
+};
+
+//
+// Struct to store power spectrum information
+//
+
+struct PowerSpectrumInfo {
+   MissingDataType missing_flag;
+   double          missing_value;
+   double          vld_thresh;
+   bool            skip;
+
+   PowerSpectrumInfo() { clear(); }
+   ~PowerSpectrumInfo() { clear(); }
+   PowerSpectrumInfo(PowerSpectrumInfo const &i) { *this = i; }
+   PowerSpectrumInfo &operator=(const PowerSpectrumInfo &a) noexcept;
+   void clear();
+};
+
+////////////////////////////////////////////////////////////////////////
 //
 // Constants used in configuartion files
 //
@@ -573,10 +656,19 @@ static const char config_map_data_filename[] = "MET_BASE/config/ConfigMapData";
 // Parameter key names common to multiple tools
 //
 
-static const char conf_key_exit_on_warning[]     = "exit_on_warning";
-static const char conf_key_time_offset_warning[] = "time_offset_warning";
+static const char conf_key_exit_on_warn[]        = "exit_on_warn";
+static const char conf_key_time_offset_warn[]    = "time_offset_warn";
 static const char conf_key_nc_compression[]      = "nc_compression";
 static const char conf_key_output_precision[]    = "output_precision";
+
+//
+// Deprecated parameter key names (MET #3455), still parsed for
+// backward compatibility
+//
+
+static const char conf_key_exit_on_warn_deprecated[]     = "exit_on_warning";
+static const char conf_key_time_offset_warn_deprecated[] = "time_offset_warning";
+static const char conf_key_obs_err_deprecated[]          = "obs_error";
 
 static const char conf_key_version[]           = "version";
 static const char conf_key_model[]             = "model";
@@ -752,6 +844,15 @@ static const char conf_key_ugrid_max_distance_km[]  = "ugrid_max_distance_km";
 static const char conf_key_ugrid_metadata_map[]     = "ugrid_metadata_map";
 
 //
+// Entries to define wind vector metadata
+//
+
+static const char conf_key_u_wind_field_name[]         = "u_wind_field_name";
+static const char conf_key_v_wind_field_name[]         = "v_wind_field_name";
+static const char conf_key_wind_speed_field_name[]     = "wind_speed_field_name";
+static const char conf_key_wind_direction_field_name[] = "wind_direction_field_name";
+
+//
 // Entries to override file metadata 
 //
 
@@ -771,6 +872,7 @@ static const char conf_key_is_v_wind[]            = "is_v_wind";
 static const char conf_key_is_grid_relative[]     = "is_grid_relative";
 static const char conf_key_is_wind_speed[]        = "is_wind_speed";
 static const char conf_key_is_wind_direction[]    = "is_wind_direction";
+static const char conf_key_is_kinetic_energy[]    = "is_kinetic_energy";
 static const char conf_key_is_prob[]              = "is_prob";
 
 //
@@ -882,7 +984,7 @@ static const char conf_key_ssvar_bin[]        = "ens_ssvar_bin_size";
 static const char conf_key_phist_bin[]        = "ens_phist_bin_size";
 static const char conf_key_prob_cat_thresh[]  = "prob_cat_thresh";
 static const char conf_key_prob_pct_thresh[]  = "prob_pct_thresh";
-static const char conf_key_obs_error[]        = "obs_error";
+static const char conf_key_obs_err[]          = "obs_err";
 static const char conf_key_dist_type[]        = "dist_type";
 static const char conf_key_dist_parm[]        = "dist_parm";
 static const char conf_key_inst_bias_scale[]  = "inst_bias_scale";
@@ -924,9 +1026,13 @@ static const char conf_val_beta[]        = "BETA";
 // Grid-Diag specific parameter key names
 //
 
-static const char conf_key_hist1d_flag[]      = "histogram_1d";
-static const char conf_key_hist2d_flag[]      = "histogram_2d";
-static const char conf_key_info_theory_flag[] = "info_theory";
+static const char conf_key_hist1d_flag[]         = "histogram_1d";
+static const char conf_key_hist2d_flag[]         = "histogram_2d";
+static const char conf_key_info_theory_flag[]    = "info_theory";
+static const char conf_key_power_spectrum_flag[] = "power_spectrum";
+static const char conf_key_power_spectrum[]      = "power_spectrum";
+static const char conf_key_missing_flag[]        = "missing_flag";
+static const char conf_key_missing_value[]       = "missing_value";
 
 //
 // STAT-Analysis and Pair-Stat specific parameter key names
@@ -1329,8 +1435,6 @@ static const char conf_key_n_azimuth[]   = "n_azimuth";
 static const char conf_key_delta_range[] = "delta_range_km";
 static const char conf_key_rmw_scale[]   = "rmw_scale";
 static const char conf_key_compute_tangential_and_radial_winds[] = "compute_tangential_and_radial_winds";
-static const char conf_key_u_wind_field_name[] = "u_wind_field_name";
-static const char conf_key_v_wind_field_name[] = "v_wind_field_name";
 static const char conf_key_radial_velocity_field_name[] = "radial_velocity_field_name";
 static const char conf_key_tangential_velocity_field_name[] = "tangential_velocity_field_name";
 static const char conf_key_radial_velocity_long_field_name[] = "radial_velocity_long_field_name";
@@ -1397,8 +1501,9 @@ static const char conf_val_pctile[] = "PCTILE";
 static const char conf_val_bca[]    = "BCA";
 
 // Grid weight flag values
-static const char conf_val_cos_lat[] = "COS_LAT";
-static const char conf_val_area[]    = "AREA";
+static const char conf_val_cos_lat[]   = "COS_LAT";
+static const char conf_val_area[]      = "AREA";
+static const char conf_val_area_cntr[] = "AREA_CNTR";
 
 // Point weight flag values
 static const char conf_val_sid[]     = "SID";
@@ -1445,6 +1550,14 @@ static const char conf_val_engine[] = "ENGINE";
 static const char conf_val_merge_both[] = "MERGE_BOTH";
 static const char conf_val_merge_fcst[] = "MERGE_FCST";
 static const char conf_val_no_merge[]   = "NO_MERGE";
+
+//
+// Grid-Diag specific parameter value names
+//
+
+// Power spectrum missing flag values
+static const char conf_val_mean[]  = "MEAN";
+static const char conf_val_value[] = "VALUE";
 
 ////////////////////////////////////////////////////////////////////////
 

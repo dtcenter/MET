@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -74,7 +75,7 @@ struct RecordInfo {
 };
 
 
-static RecordInfo * records = 0;
+static std::vector<RecordInfo> records;
 
 static int n_records = 0;
 
@@ -324,9 +325,9 @@ ConcatString s;
 char junk[512];
 DbfHeader hd;
 DbfSubRecord rd;
-DbfSubRecord * country_name_rec = 0;
-DbfSubRecord *   admin_name_rec = 0;
-DbfSubRecord * r                = 0;
+DbfSubRecord * country_name_rec = nullptr;
+DbfSubRecord *   admin_name_rec = nullptr;
+DbfSubRecord * r                = nullptr;
 
    //
    //  get the country names (and admin names, if they're there) from the dbf file
@@ -385,7 +386,7 @@ if ( ! country_name_rec )  {
 
 n_records = hd.n_records;
 
-records = new RecordInfo [n_records];
+records.assign(n_records, RecordInfo());
 
    //
    //  dbf records

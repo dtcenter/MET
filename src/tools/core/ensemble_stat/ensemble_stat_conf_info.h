@@ -132,7 +132,7 @@ class EnsembleStatVxOpt {
       ObsSummary     obs_summary;        // Summarize observations
       int            obs_perc;           // Summary percentile value
       bool           skip_const;         // Skip points with constant data values
-      ObsErrorInfo   obs_error;          // Observation error handling
+      ObsErrInfo     obs_err;            // Observation error handling
 
       // Output file options
       STATOutputType output_flag[n_txt]; // Flag for each output line type
@@ -212,7 +212,7 @@ class EnsembleStatConfInfo {
       StringArray          ens_member_ids;  // Array of ensemble member ID strings
       ConcatString         control_id;      // Control ID
 
-      EnsembleStatVxOpt  * vx_opt;          // Array of vx task options [n_vx] (allocated)
+      std::vector<EnsembleStatVxOpt> vx_opt;   // Vx task options, one per verified field
       bool                 grib_codes_set;
       bool                 var_units_set;
 

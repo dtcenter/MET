@@ -17,6 +17,7 @@
 //////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 #include <fstream>
 #include <string.h>
@@ -71,7 +72,7 @@ class MsgLevel
          // do stuff
          //
 
-      operator const int & () const;
+      explicit operator const int & () const;
 
 };
 
@@ -169,7 +170,7 @@ class LoggerDebug {
          // do stuff
          //
 
-      operator int () const;
+      explicit operator int () const;
 
 };
 
@@ -219,7 +220,7 @@ class Logger
          //
       ConcatString LogFilename;
 
-      std::ofstream * out;  // allocated
+      std::unique_ptr<std::ofstream> out;
 
          //
          // do stuff

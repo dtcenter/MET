@@ -17,6 +17,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
+#include <memory>
 #include <iostream>
 
 #include "object_types.h"
@@ -64,16 +66,16 @@ class DictionaryEntry {
       double Dval;
       bool Bval;
 
-      ConcatString * Text;           //  allocated
+      std::unique_ptr<ConcatString> Text;
 
-      Dictionary * Dict;             //  allocated
+      std::unique_ptr<Dictionary> Dict;
                                      //  also used for arrays
 
-      SingleThresh * Thresh;         //  allocated
+      std::unique_ptr<SingleThresh> Thresh;
 
-      PiecewiseLinear * PWL;         //  allocated
+      std::unique_ptr<PiecewiseLinear> PWL;
 
-      IcodeVector * v;               //  allocated
+      std::unique_ptr<IcodeVector> v;
 
       int Nargs;                     //  only for user functions
 
@@ -166,9 +168,9 @@ inline bool DictionaryEntry::is_array() const { return ( Type == ArrayType ); }
 
 inline int DictionaryEntry::n_args() const { return Nargs; }
 
-inline const IcodeVector * DictionaryEntry::icv() const { return v; }
+inline const IcodeVector * DictionaryEntry::icv() const { return v.get(); }
 
-inline Dictionary * DictionaryEntry::dict() const { return Dict; }
+inline Dictionary * DictionaryEntry::dict() const { return Dict.get(); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -194,12 +196,13 @@ class Dictionary {
 
       void assign(const Dictionary &);
 
-      void extend(int);
 
       void patch_parents();
 
       virtual const DictionaryEntry * lookup_simple(const std::string name,
                                                     bool search_parent = true);   //  no scope
+
+      bool has_entry(const char * name) const;   //  this scope only, no parents
 
 
       int Nentries;
@@ -208,7 +211,7 @@ class Dictionary {
 
       bool IsArray;
 
-      DictionaryEntry ** e;   // allocated
+      std::vector<std::unique_ptr<DictionaryEntry>> e;
 
       Dictionary * Parent;   //  not allocated
 
@@ -258,6 +261,14 @@ class Dictionary {
       virtual void store(const Dictionary &);
 
       virtual const DictionaryEntry * lookup(const std::string name, bool search_parent = true);
+
+         //
+         //  MET #3455 for renamed configuration options, return
+         //  either the current or deprecated name, whichever is
+         //  defined in the scope closest to this dictionary
+         //
+
+      const char * resolve_name(const char * name, const char * deprecated_name);
 
          //
          //  convenience functions
@@ -377,10 +388,15 @@ class DictionaryStack {
       DictionaryStack & operator=(const DictionaryStack &);
 
         //
-        //  all but the first one is allocated
+        //  D[0] points at the caller's Dictionary and is NOT owned.  D[1] and
+        //  up are owned by DStore, and D holds a borrowed view of each so that
+        //  every reader can keep using D[j] unchanged.  The two arrays exist
+        //  because the ownership of element zero genuinely differs.
         //
 
       Dictionary * D [max_dictionary_depth];
+
+      std::unique_ptr<Dictionary> DStore [max_dictionary_depth];
 
       int Nelements;
 

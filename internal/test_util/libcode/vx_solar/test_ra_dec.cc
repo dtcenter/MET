@@ -56,7 +56,7 @@ double ra_error, dec_error;
 double max_error;
 unixtime gmt;
 ConcatString cs;
-const char * format = "%10.5f";
+constexpr char format[] = "%10.5f";
 
 
 gmt = mdyhms_to_unix(10, 13, 1992, 0, 0, 0);

@@ -17,6 +17,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <cmath>
+#include <vector>
 
 #include "concat_string.h"
 #include "logger.h"
@@ -73,6 +74,18 @@ ConcatString::ConcatString(const ConcatString & c)
 ////////////////////////////////////////////////////////////////////////
 
 
+ConcatString::ConcatString(ConcatString && c) noexcept
+   : Precision(c.Precision),
+     FloatFormat(move(c.FloatFormat)),
+     s(move(c.s))
+{
+   init_from_scratch();
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 ConcatString::ConcatString(const std::string & Text)
 {
    init_from_scratch();
@@ -104,6 +117,22 @@ ConcatString::ConcatString(const char * Text)
 ConcatString & ConcatString::operator=(const ConcatString & c)
 {
    assign(c);
+
+   return *this;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString & ConcatString::operator=(ConcatString && c) noexcept
+{
+   if(this != &c) {
+      s           = move(c.s);
+      FloatFormat = move(c.FloatFormat);
+      Precision   = c.Precision;
+      c.Precision = concat_string_default_precision;
+   }
 
    return *this;
 }
@@ -156,7 +185,7 @@ ConcatString & ConcatString::operator=(const char c)
 void ConcatString::init_from_scratch()
 {
    // MET #3253 Initialize to fix SonarQube reliability issue
-   Precision = 0;
+   Precision = concat_string_default_precision;
 
    set_precision(concat_string_default_precision);
 }
@@ -469,21 +498,29 @@ void ConcatString::strip_chars_from(const char *chars_to_remove)
 int ConcatString::format(const char *fmt, ...)
 {
    va_list vl;
+   va_list vl_copy;
    int status = -1;
-   char *tmp = nullptr;
 
    va_start(vl, fmt);
-   status = vasprintf(&tmp, fmt, vl);
 
-   if (status == -1) {
+   // First pass computes the required length
+   va_copy(vl_copy, vl);
+   status = vsnprintf(nullptr, 0, fmt, vl_copy);
+   va_end(vl_copy);
+
+   if (status < 0) {
+      va_end(vl);
       mlog << Error << "\nConcatString::format() -> "
-           << "could not allocate a temporary buffer.\n\n";
+           << "could not format the output string.\n\n";
       exit(1);
    }
 
-   s.assign(tmp);
-   free(tmp);
+   // Second pass writes into a buffer with room for the terminator
+   std::vector<char> tmp(status + 1);
+   vsnprintf(tmp.data(), tmp.size(), fmt, vl);
    va_end(vl);
+
+   s.assign(tmp.data(), status);
 
    return status;
 }

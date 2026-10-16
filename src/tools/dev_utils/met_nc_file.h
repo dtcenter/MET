@@ -19,6 +19,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -33,7 +34,7 @@ class MetNcFile
 
 public:
 
-  MetNcFile(const std::string &file_path);
+  explicit MetNcFile(const std::string &file_path);
   
   virtual ~MetNcFile();
 
@@ -51,7 +52,7 @@ protected:
 
   std::string _filePath;
   
-  netCDF::NcFile *_ncFile;
+  std::unique_ptr<netCDF::NcFile> _ncFile;
 
   netCDF::NcDim *_hdrArrDim;
   netCDF::NcDim *_obsArrDim;

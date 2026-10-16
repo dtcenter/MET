@@ -38,8 +38,8 @@ bool dataplane_from_xarray(PyObject * data_array, DataPlane & dp_out, Grid & gri
 {
 
 DataPlane dp;
-PyObject * numpy_array = 0;
-PyObject * attrs_dict  = 0;
+PyObject * numpy_array = nullptr;
+PyObject * attrs_dict  = nullptr;
 
 
 numpy_array = PyObject_GetAttrString(data_array, data_attr_name);
@@ -53,7 +53,7 @@ Python3_Numpy np;
 
 np.set(numpy_array);
 
-bool status = dataplane_from_numpy_array(np, attrs_dict, dp_out, grid_out, vinfo);
+bool status = dataplane_from_numpy_array(np, Python3_Dict(attrs_dict), dp_out, grid_out, vinfo);
 
    //
    //  done

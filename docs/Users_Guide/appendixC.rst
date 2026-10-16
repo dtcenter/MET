@@ -977,7 +977,7 @@ The ideal forecast (i.e., one with perfect reliability) has conditional observed
 
 .. figure:: figure/appendixC-rel_diag.jpg
 
-	    Example of Reliability Diagram
+            Example of Reliability Diagram
 
 Receiver Operating Characteristic
 ---------------------------------
@@ -992,7 +992,7 @@ A ROC curve shows how well the forecast discriminates between two outcomes, so i
 
 .. figure:: figure/appendixC-roc_example.jpg
 
-	    Example of ROC Curve
+            Example of ROC Curve
 
 Area Under the ROC Curve (AUC)
 ------------------------------
@@ -1033,7 +1033,7 @@ CRPS
 
 Called "CRPS", "CRPSCL", "CRPS_EMP", "CRPS_EMP_FAIR" and "CRPSCL_EMP" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). In MET, the CRPS is calculated two ways: using a normal distribution fit to the ensemble forecasts (CRPS and CRPSCL), and using the empirical ensemble distribution (CRPS_EMP and CRPSCL_EMP). The empirical ensemble CRPS can be adjusted (bias corrected) by subtracting 1/(2*m) times the mean absolute difference of the ensemble members, where m is the ensemble size. This is reported as a separate statistic called CRPS_EMP_FAIR. In some cases, use of other distributions would be better.
+The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (:ref:`Gneiting et al., 2005 <Gneiting-2005>`). In MET, the CRPS is calculated two ways: using a normal distribution fit to the ensemble forecasts (CRPS and CRPSCL), and using the empirical ensemble distribution (CRPS_EMP and CRPSCL_EMP). The empirical ensemble CRPS can be adjusted (bias corrected) by subtracting 1/(2*m) times the mean absolute difference of the ensemble members, where m is the ensemble size. This is reported as a separate statistic called CRPS_EMP_FAIR. In some cases, use of other distributions would be better.
 
 WARNING: The normal distribution is probably a good fit for temperature and pressure, and possibly a not horrible fit for winds. However, the normal approximation will not work on most precipitation forecasts and may fail for many other atmospheric variables.
 
@@ -1131,7 +1131,7 @@ IGN
 
 Called "IGN" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-The ignorance score (IGN) is the negative logarithm of a predictive probability density function (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). In MET, the IGN is calculated based on a normal approximation to the forecast distribution (i.e. a normal pdf is fit to the forecast values). This approximation may not be valid, especially for discontinuous forecasts like precipitation, and also for very skewed forecasts. For a single normal distribution **N** with parameters :math:`\mu \text{ and } \sigma`, the ignorance score is
+The ignorance score (IGN) is the negative logarithm of a predictive probability density function (:ref:`Gneiting et al., 2005 <Gneiting-2005>`). In MET, the IGN is calculated based on a normal approximation to the forecast distribution (i.e. a normal pdf is fit to the forecast values). This approximation may not be valid, especially for discontinuous forecasts like precipitation, and also for very skewed forecasts. For a single normal distribution **N** with parameters :math:`\mu \text{ and } \sigma`, the ignorance score is
 
 .. math:: \text{ign} (N( \mu, \sigma),y) = \frac{1}{2} \ln (2 \pi \sigma^2 ) + \frac{(y - \mu)^2}{2\sigma^2}.
 

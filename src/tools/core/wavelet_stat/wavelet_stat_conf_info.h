@@ -14,6 +14,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <vector>
+#include <memory>
 
 #include "vx_config.h"
 
@@ -84,11 +86,11 @@ class WaveletStatConfInfo {
       ConcatString            obtype;             // Observation type
 
       StringArray             desc;               // Description
-      VarInfo **              fcst_info;          // Array of pointers for fcst VarInfo [n_vx]
-      VarInfo **              obs_info;           // Array of pointers for obs VarInfo [n_vx]
+      std::vector<std::unique_ptr<VarInfo>> fcst_info;          // Array of pointers for fcst VarInfo [n_vx]
+      std::vector<std::unique_ptr<VarInfo>> obs_info;           // Array of pointers for obs VarInfo [n_vx]
 
-      ThreshArray *           fcat_ta;            // Array for fcst categorical thresholds [n_vx]
-      ThreshArray *           ocat_ta;            // Array for obs categorical thresholds [n_vx]
+      std::vector<ThreshArray> fcat_ta;            // Array for fcst categorical thresholds [n_vx]
+      std::vector<ThreshArray> ocat_ta;            // Array for obs categorical thresholds [n_vx]
 
       FieldType               mask_missing_flag;  // Mask missing data between fcst and obs
 

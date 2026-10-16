@@ -118,11 +118,11 @@ void Mode_Field_Info::init_from_scratch()
 
 {
 
-dict = 0;
+dict = nullptr;
 
-conf = 0;
+conf = nullptr;
 
-var_info = 0;
+var_info.reset();
 
 clear();
 
@@ -141,9 +141,9 @@ void Mode_Field_Info::clear()
 
 index = -1;
 
-dict = 0;   //  not allocated, so don't delete
+dict = nullptr;   //  not allocated, so don't delete
 
-conf = 0;   //  not allocated, so don't delete
+conf = nullptr;   //  not allocated, so don't delete
 
 gft = FileType_None;
 
@@ -155,7 +155,7 @@ conv_radius = 0;
 
 vld_thresh = 0.0;
 
-if ( var_info )  { delete var_info;  var_info = 0; }
+var_info.reset();
 
 conv_radius_array.clear();
 

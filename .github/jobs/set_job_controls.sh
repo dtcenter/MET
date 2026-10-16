@@ -5,8 +5,6 @@ run_push=false
 run_unit_tests=false
 run_diff=false
 run_update_truth=false
-met_base_repo=met-base
-met_base_tag=3.4-latest
 input_data_version=develop
 truth_data_version=develop
 
@@ -119,10 +117,9 @@ if [ "$run_update_truth" == "true" ] ||
 
 fi
 
-# if running unit tests, use unit_test MET base image and push image
+# if running unit tests, push the image
 if [ "$run_unit_tests" == "true" ]; then
 
-  met_base_repo=met-base-unit-test
   run_push=true
 
 fi
@@ -132,8 +129,6 @@ echo "run_push=${run_push}" >> $GITHUB_OUTPUT
 echo "run_unit_tests=${run_unit_tests}" >> $GITHUB_OUTPUT
 echo "run_diff=${run_diff}" >> $GITHUB_OUTPUT
 echo "run_update_truth=${run_update_truth}" >> $GITHUB_OUTPUT
-echo "met_base_repo=${met_base_repo}" >> $GITHUB_OUTPUT
-echo "met_base_tag=${met_base_tag}" >> $GITHUB_OUTPUT
 echo "input_data_version=${input_data_version}" >> $GITHUB_OUTPUT
 echo "truth_data_version=${truth_data_version}" >> $GITHUB_OUTPUT
 
@@ -142,10 +137,12 @@ echo run_push: $run_push
 echo run_unit_tests: $run_unit_tests
 echo run_diff: $run_diff
 echo run_update_truth: $run_update_truth
-echo met_base_repo: $met_base_repo
-echo met_base_tag: $met_base_tag
 echo input_data_version: $input_data_version
 echo truth_data_version: $truth_data_version
+
+# get the METbaseimage repository and tag
+export RUN_UNIT_TESTS=${run_unit_tests}
+.github/jobs/get_met_base_image.sh
 
 # get name of branch
 .github/jobs/get_branch_name.sh

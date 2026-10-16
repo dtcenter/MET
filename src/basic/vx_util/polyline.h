@@ -29,6 +29,7 @@
 #include "vx_util.h"
 #include "vx_math.h"
 // #include "vx_grid.h"
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -57,11 +58,10 @@ class Polyline {
 
       std::string name;  
       
-      double * u;    //  allocated
-      double * v;    //  allocated
+      std::vector<double> u;
+      std::vector<double> v;
 
       int n_points;
-      int n_alloc;
 
       void set_name(std::string);
       

@@ -161,13 +161,13 @@ PadChar = default_table_pad_char;
 
 Nrows = Ncols = 0;
 
-set_precision(ascii_table_default_precision);
+AsciiTable::set_precision(ascii_table_default_precision);
 
-set_bad_data_value(ascii_table_default_bad_data_value);
+AsciiTable::set_bad_data_value(ascii_table_default_bad_data_value);
 
 snprintf(tmp_str, sizeof(tmp_str), "%.0f", ascii_table_default_bad_data_value);
 
-set_bad_data_str(tmp_str);
+AsciiTable::set_bad_data_str(tmp_str);
 
 DoCommaString = false;
 
@@ -247,7 +247,7 @@ clear();
 
 if ( a.e.empty() )  return;
 
-set_size(a.nrows(), a.ncols());
+AsciiTable::set_size(a.nrows(), a.ncols());
 
 
 int r, c;
@@ -272,14 +272,7 @@ Precision    = a.Precision;
 
 BadDataValue = a.BadDataValue;
 
-set_bad_data_str(a.BadDataStr);
-
-int f_buf_size = sizeof(a.f_FloatFormat);
-int g_buf_size = sizeof(a.g_FloatFormat);
-if (f_buf_size > ascii_table_buf_size) f_buf_size = ascii_table_buf_size;
-if (g_buf_size > ascii_table_buf_size) g_buf_size = ascii_table_buf_size;
-memcpy(f_FloatFormat, a.f_FloatFormat, f_buf_size);
-memcpy(g_FloatFormat, a.g_FloatFormat, g_buf_size);
+AsciiTable::set_bad_data_str(a.BadDataStr);
 
 DoCommaString = a.DoCommaString;
 
@@ -296,7 +289,7 @@ for (r=0; r<Nrows; ++r)  {
 
    for (c=0; c<Ncols; ++c)  {
 
-      set_entry(r, c, a(r, c));
+      AsciiTable::set_entry(r, c, a(r, c));
 
    }
 
@@ -706,16 +699,6 @@ if ( (k < 0) || (k > ascii_table_max_precision) )  {
 
 Precision = k;
 
-int f_buf_size = sizeof(f_FloatFormat);
-int g_buf_size = sizeof(g_FloatFormat);
-if (f_buf_size > ascii_table_buf_size) f_buf_size = ascii_table_buf_size;
-if (g_buf_size > ascii_table_buf_size) g_buf_size = ascii_table_buf_size;
-memset(f_FloatFormat, 0, f_buf_size);
-memset(g_FloatFormat, 0, g_buf_size);
-
-snprintf(f_FloatFormat, f_buf_size, "%%.%df", Precision);
-snprintf(g_FloatFormat, g_buf_size, "%%.%dg", Precision);
-
 return;
 
 }
@@ -970,7 +953,7 @@ return;
 void AsciiTable::set_entry(const int r, const int c, const char* text)
 
 {
-  set_entry(r, c, (string)text);
+  AsciiTable::set_entry(r, c, (string)text);
 }
 
 
@@ -983,7 +966,7 @@ void AsciiTable::set_entry(const int r, const int c, int a)
 ConcatString cs;
 
 if ( fabs(a - BadDataValue) < 0.0001 )  {
-   set_entry(r, c, BadDataStr);
+   AsciiTable::set_entry(r, c, BadDataStr);
    return;
 
 } else if ( DoCommaString )  {
@@ -992,7 +975,7 @@ if ( fabs(a - BadDataValue) < 0.0001 )  {
   cs.format("%d", a);
 }
 
-set_entry(r, c, cs);
+AsciiTable::set_entry(r, c, cs);
 
 return;
 
@@ -1012,8 +995,8 @@ const char *method_name = "AsciiTable::set_entry() -> ";
 if ( fabs(x - BadDataValue) < 0.0001 )  str = BadDataStr;
 else  {
 
-  if ( fabs(x) >= 1.0 )   str.format(f_FloatFormat, x);
-  else                    str.format(g_FloatFormat, x);
+  if ( fabs(x) >= 1.0 )   str.format("%.*f", Precision, x);
+  else                    str.format("%.*g", Precision, x);
 
 }
 
@@ -1044,9 +1027,9 @@ if ( DoCommaString )  {
 
    if ( Precision > 0 && p )  s << '.' << p;
 
-   set_entry(r, c, s.string());
+   AsciiTable::set_entry(r, c, s.string());
 
-} else set_entry(r, c, str);
+} else AsciiTable::set_entry(r, c, str);
 
 return;
 
@@ -1064,7 +1047,7 @@ ConcatString cs;
 
 cs = a;
 
-set_entry(r, c, cs);
+AsciiTable::set_entry(r, c, cs);
 
 return;
 
@@ -1238,17 +1221,16 @@ if ( e[n].empty() )  {
 
 }
 
-char * out = new char [10 + w];   //  just to be safe
+vector<char> out(10 + w);   //  just to be safe
 
-justified_item(e[n].c_str(), ColWidth[c], PadChar, Just[n], out);
+justified_item(e[n].c_str(), ColWidth[c], PadChar, Just[n], out.data());
 
-s = out;
+s = out.data();
 
    //
    //  done
    //
 
-if ( out )  { delete [] out;  out = (char *) nullptr; }
 
 return s;
 

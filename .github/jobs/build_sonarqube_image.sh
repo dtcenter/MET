@@ -43,3 +43,7 @@ id=$(docker create ${DOCKERHUB_TAG})
 time_command mkdir -p /tmp/scannerwork
 time_command docker cp $id:/met/.scannerwork/report-task.txt /tmp/scannerwork/report-task.txt
 docker rm -v $id
+
+# Copy report-task.txt into the logs directory so it is included in the
+# logs_sonarqube artifact uploaded by the workflow
+cp /tmp/scannerwork/report-task.txt ${RUNNER_WORKSPACE}/logs/report-task.txt

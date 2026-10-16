@@ -117,6 +117,35 @@ _______________________
 
 The forecast value at P is chosen as the grid point inside the interpolation area whose value most closely matches the observation value.
 
+.. _PS_wind_rotation_derivation:
+
+Wind Rotation and Derivation
+----------------------------
+
+Numerical weather prediction model output often defines winds relative to the orientation of the model grid rather than true north-south and east-west directions on the earth.
+However point observations typically define winds relative to true earth directions. Prior to comparing them, the model wind data must be rotated from grid-relative to
+to earth-relative. While the degree of grid-to-earth rotation varies based on the projection type and location, failing to rotate the winds can have a significant impact on
+the verification results.
+
+For simplicity, the MET library code attempts to rotate all wind components from being grid-relative to earth-relative regardless of whether they are being compared to point
+observations with the Point-Stat tool or gridded analyses with the Grid-Stat tool. Running the MET tools at verbosity level 3 (-v 3) prints log messages to describing the wind
+rotation process. While the logic to determine whether input winds are grid-relative varies by file type, specifying the **is_grid_relative = FALSE;** configuration option
+manually overrides that logic and prevents winds from being rotated.
+
+Wind fields which must be rotated include wind direction and both the U and V components of the wind vector. While wind direction can be rotated by itself, both U and V are
+required to rotate either component. When processing U-wind data, MET attempts to read corresponding V-wind data and vice-versa.
+
+The configuration options for wind rotation and derivation in MET are described in section :numref:`config_wind_field_names`.
+
+When reading V-wind data to rotate U-wind or U-wind data to rotate V-wind, MET first searches using the same field name, but with both upper and lowercase U's and V's
+swapped (e.g. for "U_PL" search for "V_PL"). If the result is unsuccesful, it searches other common field names specified by the **u_wind_field_name** and **v_wind_field_name**
+configuration options. If needed, users should set these configuration options to indicate how the U-wind and V-wind data should be paired.
+
+In addition to rotating winds, MET can also derive them. If U-wind and V-wind are present in the input file, request field names of **WDIR**, **WIND**, or **KENG**
+to derive wind direction, wind speed, and kinetic engery from the U and V components, respectively. If wind speed and direction are present in the input file, request field
+names of **UGRD** or **VGRD** for MET to derive the U and V components from them. Depending on the wind field naming conventions, the configuration options described in
+:numref:`config_wind_field_names` may be required to configure this derivation logic.
+
 .. _PS_HiRA_framework:
 
 HiRA Framework
@@ -152,7 +181,7 @@ When calculating a single SEEPS value over observing stations for a particular r
 Statistical Measures
 --------------------
 
-The Point-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into statistics for categorical variables and statistics for continuous variables. The categories of measures are briefly described here; specific descriptions of the measures are provided in :numref:`Appendix C, Section %s <appendixC>`. Additional information can be found in :ref:`Wilks (2011) <Wilks-2011>` and :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>`, and at Collaboration for Australian Weather and Climate Research.  Forecast Verification - `Issues, Methods and FAQ web page. <https://www.cawcr.gov.au/projects/verification/verif_web_page.html>`_
+The Point-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into statistics for categorical variables and statistics for continuous variables. The categories of measures are briefly described here; specific descriptions of the measures are provided in :numref:`Appendix C, Section %s <appendixC>`. Additional information can be found in :ref:`Wilks (2011) <Wilks-2011>` and :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>`, and at the WMO Joint Working Group on Forecast Verification Research (JWGFVR) Forecast Verification - `Issues, Methods and FAQ web page <https://jwgfvr.github.io/forecastverification/>`_
 
 In addition to these verification measures, the Point-Stat tool also computes partial sums and other FHO statistics that are produced by the NCEP verification system. These statistics are also described in :numref:`Appendix C, Section %s <appendixC>`.
 

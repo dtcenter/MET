@@ -125,15 +125,13 @@ static void _debug_shape_examine(const string &name, const ShapeData &sd,
 
 ////////////////////////////////////////////////////////////////////////
 
-ModeSuperObject::ModeSuperObject()
-{
-}
+ModeSuperObject::ModeSuperObject() = default;
 
 ////////////////////////////////////////////////////////////////////////
 
 ModeSuperObject::ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
                                  int r_index, int t_index,
-                                 const vector<MultiVarData *> &mvd,
+                                 const vector<unique_ptr<MultiVarData>> &mvd,
                                  BoolCalc &calc)
 {
    _hasUnion = calc.has_union();

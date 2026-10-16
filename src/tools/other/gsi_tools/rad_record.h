@@ -20,6 +20,7 @@
 
 #include "gsi_record.h"
 #include "vx_cal.h"
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -108,7 +109,7 @@ class RadFile {
 
       RadParams R_params;
 
-      ChannelParams * C_params;   //  allocated
+      std::vector<ChannelParams> C_params;
 
       void read_rad_params();
 
@@ -274,7 +275,7 @@ class RadRecord : public GsiRecord {
 inline int RadRecord::n1() const { return N1; }
 inline int RadRecord::n2() const { return N2; }
 
-inline bool RadRecord::has_extra() const { return ( extra != 0 ); }
+inline bool RadRecord::has_extra() const { return ( extra != nullptr ); }
 
 inline unixtime RadRecord::date() const { return Date; }
 

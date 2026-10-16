@@ -71,23 +71,23 @@ void Python3_Numpy::clear()
 
 {
 
-Object = 0;
+Object = nullptr;
 
 Name.clear();
 
-if ( Dim )  { delete [] Dim;  Dim = 0; }
+Dim.clear();
 
 N_Dims = 0;
 
-Data_Obj = 0;
+Data_Obj = nullptr;
 
 N_Data = 0;
 
-Buffer = 0;
+Buffer = nullptr;
 
 Item_Size = 0;
 
-Script = 0;
+Script = nullptr;
 
 Dtype.clear();
 
@@ -103,9 +103,8 @@ void Python3_Numpy::init_from_scratch()
 
 {
 
-Dim = 0;
 
-Buffer = 0;
+Buffer = nullptr;
 
 clear();
 
@@ -260,7 +259,7 @@ if ( ! obj )  {
 
 Object = obj;
 
-Script = 0;
+Script = nullptr;
 
 
    //
@@ -271,10 +270,10 @@ PyObject * shape_tuple = PyObject_GetAttrString (Object, "shape");
 
 N_Dims = PyTuple_Size (shape_tuple);
 
-Dim = new int [N_Dims];
+Dim.resize(N_Dims);
 
 int j;
-PyObject * item = 0;
+PyObject * item = nullptr;
 
 for (j=0; j<N_Dims; ++j)  {
 

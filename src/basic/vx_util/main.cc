@@ -139,14 +139,12 @@ void do_post_process() {
 ////////////////////////////////////////////////////////////////////////
 
 string get_current_time() {
-   time_t curr_time;
-   tm * curr_tm;
+   time_t curr_time = time(nullptr);
+   struct tm curr_tm;
+   gmtime_r(&curr_time, &curr_tm);
+
    char date_string[MET_BUF_SIZE];
-
-   time(&curr_time);
-   curr_tm = gmtime (&curr_time);
-
-   strftime(date_string, MET_BUF_SIZE, "%Y-%m-%d %TZ", curr_tm);
+   strftime(date_string, MET_BUF_SIZE, "%Y-%m-%d %TZ", &curr_tm);
 
    return string(date_string);
 }
@@ -184,10 +182,14 @@ void set_handlers() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_user_id() {
-   met_user_id = geteuid ();
-   struct passwd *pw;
-   pw = getpwuid (met_user_id);
-   if (pw) met_user_name = string(pw->pw_name);
+   met_user_id = geteuid();
+   struct passwd pw;
+   struct passwd *result = nullptr;
+   std::vector<char> buf(MET_BUF_SIZE+1);
+   int ret = getpwuid_r(met_user_id, &pw, buf.data(), buf.size(), &result);
+   if(ret == 0 && result != nullptr) {
+      met_user_name = string(pw.pw_name);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////

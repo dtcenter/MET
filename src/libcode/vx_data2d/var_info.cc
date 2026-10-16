@@ -87,6 +87,7 @@ void VarInfo::init_from_scratch() {
 void VarInfo::assign(const VarInfo &v) {
 
    // Copy
+   Dict      = v.Dict;
    MagicStr  = v.MagicStr;
    ReqName   = v.ReqName;
    Name      = v.Name;
@@ -119,6 +120,9 @@ void VarInfo::assign(const VarInfo &v) {
    DefaultRegrid = v.DefaultRegrid;
    Regrid = v.Regrid;
 
+   GridRelativeFlag = v.GridRelativeFlag;
+   WindInfo = v.WindInfo;
+
    SetAttrName = v.SetAttrName;
    SetAttrUnits = v.SetAttrUnits;
    SetAttrLevel = v.SetAttrLevel;
@@ -138,6 +142,7 @@ void VarInfo::assign(const VarInfo &v) {
    SetAttrIsGridRelative = v.SetAttrIsGridRelative;
    SetAttrIsWindSpeed = v.SetAttrIsWindSpeed;
    SetAttrIsWindDirection = v.SetAttrIsWindDirection;
+   SetAttrIsKineticEnergy = v.SetAttrIsKineticEnergy;
    SetAttrIsProb = v.SetAttrIsProb;
 
    return;
@@ -148,6 +153,7 @@ void VarInfo::assign(const VarInfo &v) {
 void VarInfo::clear() {
 
    // Initialize
+   Dict.clear();
    MagicStr.clear();
    ReqName.clear();
    Name.clear();
@@ -180,6 +186,9 @@ void VarInfo::clear() {
    DefaultRegrid.clear();
    Regrid.clear();
 
+   GridRelativeFlag = false;
+   WindInfo.clear();
+
    SetAttrName.clear();
    SetAttrUnits.clear();
    SetAttrLevel.clear();
@@ -199,6 +208,7 @@ void VarInfo::clear() {
    SetAttrIsGridRelative = bad_data_int;
    SetAttrIsWindSpeed = bad_data_int;
    SetAttrIsWindDirection = bad_data_int;
+   SetAttrIsKineticEnergy = bad_data_int;
    SetAttrIsProb = bad_data_int;
 
    return;
@@ -289,6 +299,13 @@ void VarInfo::set_req_name(const char *str) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfo::set_req_name(const string &str) {
+   set_req_name(str.c_str());
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_name(const char *str) {
    Name = str;
    return;
@@ -296,8 +313,8 @@ void VarInfo::set_name(const char *str) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfo::set_name(const string str) {
-   Name = str;
+void VarInfo::set_name(const string &str) {
+   set_name(str.c_str());
    return;
 }
 
@@ -319,6 +336,13 @@ void VarInfo::set_long_name(const char *str) {
 
 void VarInfo::set_units(const char *str) {
    Units = str;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfo::set_units(const string &str) {
+   set_units(str.c_str());
    return;
 }
 
@@ -457,6 +481,21 @@ void VarInfo::set_regrid(const RegridInfo &ri) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfo::set_grid_relative_flag(bool f) {
+   GridRelativeFlag = f;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfo::set_earth_relative() {
+   GridRelativeFlag = false;
+   SetAttrIsGridRelative = 0;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 
    // Check for embedded whitespace
@@ -501,6 +540,9 @@ bool VarInfo::set_dict(Dictionary &dict, bool do_exit) {
    bool b;
    int n;
    const char *method_name = "VarInfo::set_dict(Dictionary &dict) -> ";
+
+   // Store the dictionary
+   Dict = dict;
 
    // Set init time, if present
    s = dict.lookup_string(conf_key_init_time, false);
@@ -549,6 +591,9 @@ bool VarInfo::set_dict(Dictionary &dict, bool do_exit) {
    // Parse regrid, if present
    Regrid = parse_conf_regrid(&dict, &DefaultRegrid, false);
 
+   // Parse wind metadata
+   WindInfo = parse_conf_wind_metadata(&dict);
+
    // Parse set_attr strings
    SetAttrName =
       parse_set_attr_string(dict, conf_key_set_attr_name, true);
@@ -582,12 +627,14 @@ bool VarInfo::set_dict(Dictionary &dict, bool do_exit) {
       parse_set_attr_flag(dict, conf_key_is_u_wind);
    SetAttrIsVWind =
       parse_set_attr_flag(dict, conf_key_is_v_wind);
+   SetAttrIsGridRelative =
+      parse_set_attr_flag(dict, conf_key_is_grid_relative);
    SetAttrIsWindSpeed =
       parse_set_attr_flag(dict, conf_key_is_wind_speed);
    SetAttrIsWindDirection =
       parse_set_attr_flag(dict, conf_key_is_wind_direction);
-   SetAttrIsGridRelative =
-      parse_set_attr_flag(dict, conf_key_is_grid_relative);
+   SetAttrIsKineticEnergy =
+      parse_set_attr_flag(dict, conf_key_is_kinetic_energy);
    SetAttrIsProb =
       parse_set_attr_flag(dict, conf_key_is_prob);
 
@@ -599,8 +646,16 @@ bool VarInfo::set_dict(Dictionary &dict, bool do_exit) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfo::set_level_info_grib(Dictionary & dict){
+bool VarInfo::reset_dict_with_name(const char *str) {
+   DictionaryEntry e;
+   e.set_string(conf_key_name, str);
+   Dict.store(e);
+   return set_dict(Dict);
+}
 
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfo::set_level_info_grib(Dictionary & dict){
    ConcatString field_level = dict.lookup_string(conf_key_level, false);
    LevelType lt;
    string lvl_type, lvl_val1, lvl_val2;
@@ -612,7 +667,7 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
 
       //  parse the level string components
       int num_mat = 0;
-      char** mat = nullptr;
+      StringArray mat;
       const char* pat_mag = "([ALPRZ])([0-9\\.]+)(\\-[0-9\\.]+)?";
       if( 3 > (num_mat = regex_apply(pat_mag, 4, field_level.text(), mat)) ){
          mlog << Error << "\nVarInfo::set_level_info_grib() - failed to parse level string '"
@@ -626,7 +681,6 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
          lvl_val2 = mat[3];
          lvl2 = atof( lvl_val2.substr(1, lvl_val2.length() - 1).data() );
       }
-      regex_clean(mat);
 
       //  set the level type based on the letter abbreviation
       if      (lvl_type == "A") lt = LevelType_Accum;
@@ -774,6 +828,21 @@ bool VarInfo::is_flag_set(int flag) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+int VarInfo::get_wind_flag(const int set_attr_val,
+                           const StringArray &field_names) const {
+   int flag = bad_data_int;
+
+   // Use explicit boolean definition, if provided
+   if(!is_bad_data(set_attr_val)) flag = set_attr_val != 0;
+
+   // Otherwise, check the list of field names
+   if(is_bad_data(flag) && field_names.has(Name)) flag = 1;
+
+   return flag;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 bool VarInfo::is_precipitation() const {
    return is_flag_set(SetAttrIsPrecipitation);
 }
@@ -787,25 +856,66 @@ bool VarInfo::is_specific_humidity() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_u_wind() const {
-   return is_flag_set(SetAttrIsUWind);
+   return is_flag_set(get_wind_flag(SetAttrIsUWind,
+                                    WindInfo.u_wind));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_v_wind() const {
-   return is_flag_set(SetAttrIsVWind);
+   return is_flag_set(get_wind_flag(SetAttrIsVWind,
+                                    WindInfo.v_wind));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_wind_speed() const {
-   return is_flag_set(SetAttrIsWindSpeed);
+   return is_flag_set(get_wind_flag(SetAttrIsWindSpeed,
+                                    WindInfo.wind_speed));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_wind_direction() const {
-   return is_flag_set(SetAttrIsWindDirection);
+   return is_flag_set(get_wind_flag(SetAttrIsWindDirection,
+                                    WindInfo.wind_direction));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_kinetic_energy() const {
+   return WindInfo.is_kinetic_energy(Name);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_wind_rotation() const {
+   return (is_u_wind() ||
+           is_v_wind() ||
+           is_wind_direction());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_grid_relative() const {
+   return (!is_bad_data(SetAttrIsGridRelative) ?
+           SetAttrIsGridRelative != 0 :
+           GridRelativeFlag);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::need_uv_wind() const { 
+   return(is_wind_speed()     ||
+          is_wind_direction() ||
+          is_kinetic_energy());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::need_rotation() const {
+   return is_wind_rotation() &&
+          is_grid_relative();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -865,13 +975,17 @@ bool VarInfo::validate_wind_attributes(bool do_exit, const char *caller_name) co
    if(SetAttrIsVWind         == 1) n++;
    if(SetAttrIsWindSpeed     == 1) n++;
    if(SetAttrIsWindDirection == 1) n++;
+   if(SetAttrIsKineticEnergy == 1) n++;
 
    if(n > 1) {
       ConcatString msg;
       msg << "\n" << (caller_name == nullptr ? "" : caller_name)
           << "At most one wind attribute flag ("
-          << conf_key_is_u_wind << ", " << conf_key_is_v_wind << ", "
-          << conf_key_is_wind_speed << ", " << conf_key_is_wind_direction
+          << conf_key_is_u_wind << ", "
+          << conf_key_is_v_wind << ", "
+          << conf_key_is_wind_speed << ", "
+          << conf_key_is_wind_direction << ", "
+          << conf_key_is_kinetic_energy
           << ") can be set to true for each field.\n\n";
       handle_config_error(msg, do_exit);
       return false;
@@ -882,7 +996,7 @@ bool VarInfo::validate_wind_attributes(bool do_exit, const char *caller_name) co
 ///////////////////////////////////////////////////////////////////////////////
 
 ConcatString parse_set_attr_string(Dictionary &dict, const char *key,
-                                    bool check_ws) {
+                                   bool check_ws) {
    ConcatString cs;
 
    cs = dict.lookup_string(key, false);
@@ -920,67 +1034,59 @@ int parse_set_attr_flag(Dictionary &dict, const char *key) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-EnsVarInfo::EnsVarInfo() {
-   ctrl_info = nullptr;
-}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
 
-InputInfo &InputInfo::operator=(const InputInfo &a) noexcept {
-   if ( this != &a ) {
-      file_index = a.file_index;
-      ens_member_id = a.ens_member_id;
-
-      var_info = (a.var_info == nullptr) ? nullptr : a.var_info;
-
-      if (file_list == nullptr) file_list = new StringArray();
-      else file_list->clear();
-      if (a.file_list != nullptr) {
-         for (int i=0; i<a.file_list->n(); i++) {
-           file_list->add((*a.file_list)[i]);
-         }
-      }
-   }
-   return *this;
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
 
-EnsVarInfo::~EnsVarInfo() {
-   clear();
-}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
 EnsVarInfo::EnsVarInfo(const EnsVarInfo &f) {
-
-   clear();
 
    assign(f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EnsVarInfo::clear() {
-   vector<InputInfo>::const_iterator it;
-   for(it = inputs.begin(); it != inputs.end(); it++) {
-      if((*it).var_info) { delete (*it).var_info; }
-   }
+EnsVarInfo & EnsVarInfo::operator=(const EnsVarInfo &f) {
 
-   if(ctrl_info) { delete ctrl_info; }
+   if(this != &f) assign(f);
+
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void EnsVarInfo::clear() {
+   inputs.clear();
+   ctrl_info.reset();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void EnsVarInfo::assign(const EnsVarInfo &v) {
 
-   // Copy
-   inputs        = v.inputs;
-   ctrl_info     = v.ctrl_info;
+   clear();
+
+   // Deep copy each input. file_list is not owned, so the alias is intentional.
+   for(const auto &in : v.inputs) {
+      InputInfo copy;
+      if(in.var_info) copy.var_info = in.var_info->clone();
+      copy.file_index    = in.file_index;
+      copy.file_list     = in.file_list;
+      copy.ens_member_id = in.ens_member_id;
+      inputs.push_back(std::move(copy));
+   }
+
+   if(v.ctrl_info) ctrl_info = v.ctrl_info->clone();
 
    nc_var_str    = v.nc_var_str;
    cat_ta        = v.cat_ta;
@@ -992,7 +1098,7 @@ void EnsVarInfo::assign(const EnsVarInfo &v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void EnsVarInfo::add_input(InputInfo input) {
-   inputs.emplace_back(input);
+   inputs.push_back(std::move(input));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1003,26 +1109,26 @@ int EnsVarInfo::inputs_n() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EnsVarInfo::set_ctrl(VarInfo * ctrl) {
-   ctrl_info = ctrl;
+void EnsVarInfo::set_ctrl(std::unique_ptr<VarInfo> ctrl) {
+   ctrl_info = std::move(ctrl);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 VarInfo * EnsVarInfo::get_ctrl(int index) {
    if(ctrl_info) {
-      return ctrl_info;
+      return ctrl_info.get();
    }
-   return inputs[index].var_info;
+   return inputs[index].var_info.get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 VarInfo * EnsVarInfo::get_var_info(int index) {
    if(inputs[index].var_info) {
-      return inputs[index].var_info;
+      return inputs[index].var_info.get();
    }
-   return inputs[0].var_info;
+   return inputs[0].var_info.get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

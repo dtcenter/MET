@@ -18,6 +18,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 
 #include <netcdf>
@@ -74,13 +75,15 @@ class MtdFileBase {
 
       void base_init_from_scratch();
 
-      void base_assign(const MtdFileBase &);
+      void base_assign(const MtdFileBase &);   //  clear(), then base_copy()
+
+      void base_copy(const MtdFileBase &);     //  copy members, no clear()
 
       virtual void read  (netCDF::NcFile &);
       virtual void write (netCDF::NcFile &) const;
 
 
-      Grid * G;        //  allocated
+      std::unique_ptr<Grid> G;
 
       int Nx, Ny, Nt;
 

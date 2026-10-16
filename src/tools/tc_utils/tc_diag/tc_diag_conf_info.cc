@@ -182,9 +182,6 @@ void TCDiagConfInfo::clear() {
    lead_time.clear();
 
    // Deallocate memory
-   for(int i=0; i<var_info.size(); i++) {
-      if(var_info[i]) { delete var_info[i]; var_info[i] = (VarInfo *) nullptr; }
-   }
    var_info.clear();
 
    pressure_levels.clear();
@@ -303,9 +300,9 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
       Dictionary i_dict = parse_conf_i_vx_dict(dict, i);
 
       // Conf: field.name and field.level
-      auto vi = VarInfoFactory::new_var_info(file_type);
+      var_info.push_back(VarInfoFactory::new_var_info(file_type));
+      VarInfo *vi = var_info.back().get();
       vi->set_dict(i_dict);
-      var_info.emplace_back(vi);
 
       // Unique list of requested pressure levels
       if(vi->level().type() == LevelType_Pres) {
@@ -325,7 +322,7 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
       // Store domain-specific VarInfo pointers
       for(j=0; j<domain_info.size(); j++) {
          if(sa.n() == 0 || sa.has(domain_info[j].domain)) {
-            domain_info[j].var_info_ptr.emplace_back(var_info.back());
+            domain_info[j].var_info_ptr.emplace_back(var_info.back().get());
          }
       }
    }

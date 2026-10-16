@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -47,7 +48,7 @@ void WwmcaRegridder::do_output(const char * output_filename)
 
 {
 
-   NcFile * ncfile   = (NcFile *) nullptr;
+   std::unique_ptr<netCDF::NcFile> ncfile;
    NcDim   lat_dim  ;
    NcDim   lon_dim  ;
    NcVar   data_var ;
@@ -65,7 +66,7 @@ void WwmcaRegridder::do_output(const char * output_filename)
    //
 
    ncfile = open_ncfile(output_filename, true);
-   if ( IS_INVALID_NC_P(ncfile) )  {
+   if ( IS_INVALID_NC_P(ncfile.get()) )  {
       mlog << Error << "\nWwmcaRegridder::do_output(const char * output_filename) -> Netcdf file is not valid!\n\n";
       exit ( 1 );
    }
@@ -74,19 +75,19 @@ void WwmcaRegridder::do_output(const char * output_filename)
    //  global attributes
    //
 
-   write_netcdf_global(ncfile, output_filename, "wwmca_regrid");
+   write_netcdf_global(ncfile.get(), output_filename, "wwmca_regrid");
 
    //
    // Add the projection information
    //
 
-   write_netcdf_proj(ncfile, *ToGrid, lat_dim, lon_dim);
+   write_netcdf_proj(ncfile.get(), *ToGrid, lat_dim, lon_dim);
 
    //
    //  lat/lon variables
    //
 
-   write_netcdf_latlon(ncfile, &lat_dim, &lon_dim, *ToGrid);
+   write_netcdf_latlon(ncfile.get(), &lat_dim, &lon_dim, *ToGrid);
 
    //
    //  variable attributes
@@ -97,7 +98,7 @@ void WwmcaRegridder::do_output(const char * output_filename)
 
    s = Config->lookup_string(conf_key_variable_name);
    
-   data_var = add_var(ncfile, s.c_str(), ncFloat, lat_dim, lon_dim, deflate_level);
+   data_var = add_var(ncfile.get(), s.c_str(), ncFloat, lat_dim, lon_dim, deflate_level);
    
    s = Config->lookup_string(conf_key_units);
    
@@ -233,7 +234,7 @@ void WwmcaRegridder::do_output(const char * output_filename)
    //  done
    //
 
-   if ( ncfile )  { delete ncfile;  ncfile = (NcFile *) nullptr; }
+   ncfile.reset();
 
    //
    //  list output file name

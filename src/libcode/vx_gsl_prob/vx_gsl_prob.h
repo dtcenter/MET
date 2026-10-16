@@ -16,6 +16,7 @@
 
 #include "gsl_cdf.h"
 #include "gsl_bvn.h"
+#include "gsl_fft2d.h"
 #include "gsl_randist.h"
 #include "gsl_statistics.h"
 #include "gsl_wavelet2d.h"

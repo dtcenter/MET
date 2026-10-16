@@ -95,15 +95,29 @@ if [ "$MET_GIT_NAME" != "$SONAR_REFERENCE_BRANCH" ]; then
   echo "sonar.newCode.referenceBranch=${SONAR_REFERENCE_BRANCH}" >> $SONAR_PROPERTIES
 fi
 
-# Disable development mode so that auto-generated code will not be recreated 
-unset MET_DEVELOPMENT
+# Enable development mode.  src/basic/enum_to_string, src/tools/dev_utils and
+# internal/test_util are only added to SUBDIRS under ENABLE_DEVELOPMENT, so
+# without this they are never compiled, never appear in the build-wrapper's
+# compile_commands.json, and are therefore never analysed no matter what
+# sonar.sources says.
+#
+# This depends on the BUILT_SOURCES declarations added in the same change.
+# The "make clean" below removes the generated *_to_string.* files and the
+# generated parsers, and it also removes the .deps that would otherwise
+# record which objects depend on them.  Without BUILT_SOURCES the rebuild
+# falls back to _SOURCES order and can compile a consumer before its header
+# has been regenerated.
+#
+# The parsers are regenerated as a result, but config.tab.* and
+# color_parser_yacc.* stay in sonar.exclusions, so that code is still not
+# reported.
+export MET_DEVELOPMENT=true
 
 # Run the MET configure script
 time_command ./configure \
   BUFRLIB_NAME=${BUFRLIB_NAME} \
   GRIB2CLIB_NAME=${GRIB2CLIB_NAME} \
   --enable-all \
-  MET_CXX_STANDARD=11 \
   CPPFLAGS="-I/usr/local/include" \
   LIBS="-ltirpc"
 
@@ -112,6 +126,13 @@ time_command make clean
 
 # Run SonarQube make
 time_command $SONAR_WRAPPER --out-dir $SONARQUBE_OUT_DIR make
+status=$?
+
+# Check return status
+if [[ $status -ne 0 ]]; then
+  echo "ERROR: ${0} -> the SonarQube build-wrapper make returned with non-zero status (${status})!"
+  exit ${status}
+fi
 
 # Run SonarQube scan
 time_command $SONAR_SCANNER

@@ -1,8 +1,7 @@
-module load ncarenv/24.12
-#Upgrade compiler and check cmake version
-module load intel/2024.2.1
-module load cmake/3.31.0
-module load proj/9.2.1
+module load ncarenv/25.10
+module load intel/2025.2.1
+module load cmake/3.31.8
+module load proj/9.7.0
 
 export CC=`which icx`
 export CXX=`which icpx`
@@ -10,20 +9,19 @@ export FC=`which ifx`
 export F77=`which ifx`
 export F90=`which ifx`
 export TEST_BASE=/glade/work/dtcrt/METplus/casper/components/MET/installations/13.0.0
-#Upgrade compiler
-export COMPILER=intel-oneapi_2024.2.1
+export COMPILER=intel_2025.2.1
 export MET_SUBDIR=${TEST_BASE}
 export MET_TARBALL=v13.0.0.tar.gz
 export USE_MODULES=TRUE
-export MET_PYTHON=/glade/work/dtcrt/METplus/casper/miniconda/miniconda3/envs/metplus_v6.1_py3.12
-export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.12
+export MET_PYTHON=/glade/work/dtcrt/METplus/casper/miniconda/miniconda3/envs/metplus_v13.0_py3.14
+export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.14
 export MET_PYTHON_LD=`${MET_PYTHON}/bin/python3-config --ldflags --embed`
 #export ADDTL_DIR=/usr/lib64
 export EXTERNAL_LIBS=${TEST_BASE}/external_libs
 export COMPILE_ECKIT=1
 export COMPILE_ATLAS=1
-export MET_PROJLIB=/glade/u/apps/casper/24.12/spack/opt/spack/proj/9.2.1/oneapi/2024.2.1/7kjl/lib64
-export MET_PROJINC=/glade/u/apps/casper/24.12/spack/opt/spack/proj/9.2.1/oneapi/2024.2.1/7kjl/include
+export MET_PROJLIB=${NCAR_LDFLAGS_PROJ64}
+export MET_PROJINC=${NCAR_INC_PROJ}
 #export MET_ECKIT=${EXTERNAL_LIBS}
 #export MET_ATLAS=${EXTERNAL_LIBS}
 #export MET_GSL=${EXTERNAL_LIBS}
@@ -34,7 +32,6 @@ export MET_PROJINC=/glade/u/apps/casper/24.12/spack/opt/spack/proj/9.2.1/oneapi/
 #export GRIB2CLIB_NAME=-lg2c
 #export LIB_JASPER=${EXTERNAL_LIBS}/lib64
 #export LIB_LIBPNG=${EXTERNAL_LIBS}/lib
-#export LIB_LIBAEC=${EXTERNAL_LIBS}/lib
 #export LIB_Z=${EXTERNAL_LIBS}/lib
 #export LIB_JPEG=${EXTERNAL_LIBS}/lib
 #export MET_NETCDF=${EXTERNAL_LIBS}
@@ -45,3 +42,4 @@ export MET_PROJINC=/glade/u/apps/casper/24.12/spack/opt/spack/proj/9.2.1/oneapi/
 #export SQLITE_LIB_DIR=${EXTERNAL_LIBS}/lib
 export MAKE_ARGS="-j 5"
 #export SKIP_MET=true
+#export SKIP_LIBS=true

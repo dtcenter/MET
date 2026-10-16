@@ -1,15 +1,16 @@
+# check=skip=InvalidDefaultArgInFrom
 ARG MET_BASE_REPO=met-base
-ARG MET_BASE_TAG=3.5-latest
+ARG MET_BASE_TAG
 
 FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_TAG}
-MAINTAINER John Halley Gotway <johnhg@ucar.edu>
+LABEL maintainer="John Halley Gotway <johnhg@ucar.edu>"
 
 #
 # This Dockerfile checks out MET from GitHub and runs the
 # SonarQube static code analysis on the specified branch or tag.
 # https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/
 #
-ARG SONAR_SCANNER_VERSION=6.1.0.4477
+ARG SONAR_SCANNER_VERSION=8.1.0.6389
 ARG SONAR_HOST_URL
 ARG SONAR_TOKEN
 ARG SOURCE_BRANCH
@@ -60,17 +61,12 @@ ENV MET_GIT_URL=https://github.com/dtcenter/MET
 #
 RUN echo "Installing SonarQube into $HOME/.sonar" \
  && mkdir -p $HOME/.sonar \
- && curl -sSLo $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip \
+ && curl -sSfL --proto '=https' -o $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux-x64.zip \
  && unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/ \
- && echo export PATH="$HOME/.sonar/sonar-scanner-${SONAR_SCANNER_VERSION}-linux/bin:\$PATH" >> $HOME/.bashrc \
- && curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip ${SONAR_HOST_URL}/static/cpp/build-wrapper-linux-x86.zip \
+ && echo export PATH="$HOME/.sonar/sonar-scanner-${SONAR_SCANNER_VERSION}-linux-x64/bin:\$PATH" >> $HOME/.bashrc \
+ && curl -sSfL --proto '=https' -o $HOME/.sonar/build-wrapper-linux-x86.zip ${SONAR_HOST_URL}/static/cpp/build-wrapper-linux-x86.zip \
  && unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/ \
  && echo export PATH="$HOME/.sonar/build-wrapper-linux-x86:\$PATH" >> $HOME/.bashrc
-
-#
-# Update the OS, as needed.
-#
-RUN apt update
 
 #
 # Set the working directory.
@@ -80,8 +76,7 @@ WORKDIR /met
 #
 # Copy MET Download and install MET.
 #
-RUN echo "Copying MET into ${MET_REPO_DIR}" \
- && mkdir -p ${MET_REPO_DIR}
+RUN echo "Copying MET into ${MET_REPO_DIR}" && mkdir -p ${MET_REPO_DIR}
 
 COPY . ${MET_REPO_DIR}
 
@@ -90,5 +85,6 @@ RUN if [ ! -e "${MET_REPO_DIR}/configure.ac" ]; then \
     exit 1; \
   fi
 
-RUN cd ${MET_REPO_DIR} \
- && internal/scripts/docker/build_met_sonarqube.sh
+RUN \
+    echo "Build MET for SonarQube" &&\
+    (cd ${MET_REPO_DIR} && internal/scripts/docker/build_met_sonarqube.sh)

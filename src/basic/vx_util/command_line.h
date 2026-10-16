@@ -17,6 +17,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
+
 #include "concat_string.h"
 #include "string_array.h"
 
@@ -83,13 +85,10 @@ class CLOptionInfoArray {
       void extend(int);
 
 
-      int Nelements;
-
-      int Nalloc;
 
       int AllocInc;
 
-      CLOptionInfo * e;
+      std::vector<CLOptionInfo> e;
 
 
    public:
@@ -120,7 +119,7 @@ class CLOptionInfoArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int CLOptionInfoArray::n_elements() const { return Nelements; }
+inline int CLOptionInfoArray::n_elements() const { return (int) e.size(); }
 
 
 ////////////////////////////////////////////////////////////////////////

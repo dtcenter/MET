@@ -1,3 +1,4 @@
+#include <memory>
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -36,15 +37,11 @@ class MetGrib1DataFile : public Met2dDataFile {
       MetGrib1DataFile(const MetGrib1DataFile &);
       MetGrib1DataFile & operator=(const MetGrib1DataFile &);
 
-      GribFile * GF;   //  allocated
+      std::unique_ptr<GribFile> GF;
 
       GribRecord CurrentRecord;
 
       DataPlane Plane;
-
-      void rotate_winds(VarInfoGrib &, DataPlane &);
-      
-      bool data_plane_scalar(VarInfoGrib &, DataPlane &);
 
    public:
 
@@ -86,15 +83,15 @@ class MetGrib1DataFile : public Met2dDataFile {
 
          //  retrieve the first matching data plane
 
-      bool data_plane(VarInfo &, DataPlane &);
+      bool data_plane(VarInfo &, DataPlane &, bool do_winds = true) override;
 
          //  retrieve all matching data planes
 
-      int data_plane_array(VarInfo &, DataPlaneArray &);
+      int data_plane_array(VarInfo &, DataPlaneArray &, bool do_winds = true) override;
 
          //  retrieve the index of the first matching record
 
-      int index(VarInfo &);
+      int index(VarInfo &) override;
 
 };
 

@@ -369,6 +369,12 @@ AM_YFLAGS = --defines=color_parser_yacc.h -p color
 
 # The library
 noinst_LIBRARIES = libvx_color.a
+
+# BUILT_SOURCES so bison runs before my_color_scanner.cc, which
+# includes color_parser_yacc.h, is compiled.  The .cc is named
+# rather than the .h because only the .cc has a rule - automake
+# emits the header as a side effect of it.
+@ENABLE_DEVELOPMENT_TRUE@BUILT_SOURCES = color_parser_yacc.cc
 @ENABLE_DEVELOPMENT_FALSE@libvx_color_a_SOURCES =  \
 @ENABLE_DEVELOPMENT_FALSE@	color_parser_yacc.cc \
 @ENABLE_DEVELOPMENT_FALSE@	color_parser_yacc.h \
@@ -389,7 +395,8 @@ libvx_color_a_CPPFLAGS = ${MET_CPPFLAGS}
 @ENABLE_DEVELOPMENT_TRUE@        	color_parser_yacc.h \
 @ENABLE_DEVELOPMENT_TRUE@        	lex.color.cc
 
-all: all-am
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .cc .o .obj .yy
@@ -621,11 +628,14 @@ distdir-am: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(LIBRARIES)
 installdirs:
-install: install-am
-install-exec: install-exec-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
+install-exec: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
 
@@ -656,6 +666,7 @@ maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 	-rm -f color_parser_yacc.cc
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 clean: clean-am
 
@@ -734,7 +745,7 @@ ps-am:
 
 uninstall-am:
 
-.MAKE: install-am install-strip
+.MAKE: all check install install-am install-exec install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-am clean \
 	clean-generic clean-noinstLIBRARIES cscopelist-am ctags \

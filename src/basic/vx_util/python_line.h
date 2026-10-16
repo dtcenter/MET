@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 
 extern "C" {
@@ -69,7 +70,7 @@ class PyLineDataFile : public LineDataFile {
       void close();
 
 
-      Python3_Script * script;
+      std::unique_ptr<Python3_Script> script;
 
 
       bool first_call;
@@ -91,7 +92,7 @@ class PyLineDataFile : public LineDataFile {
 
 ////////////////////////////////////////////////////////////////////////
 
-extern Python3_Script *get_python3_script();
+extern std::unique_ptr<Python3_Script> get_python3_script();
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -53,7 +53,7 @@ Pgm::Pgm()
 
 {
 
-init_from_scratch();
+Pgm::init_from_scratch();
 
 }
 
@@ -65,9 +65,9 @@ Pgm::Pgm(const char * filename)
 
 {
 
-init_from_scratch();
+Pgm::init_from_scratch();
 
-if ( !read(filename) )  {
+if ( !Pgm::read(filename) )  {
 
    mlog << Error << "\nPgm::Pgm(const char *filename) -> failed to read file \"" << filename << "\"\n\n";
 
@@ -85,7 +85,7 @@ Pgm::~Pgm()
 
 {
 
-clear();
+Pgm::clear();
 
 }
 
@@ -97,7 +97,7 @@ Pgm::Pgm(const Pgm & p)
 
 {
 
-init_from_scratch();
+Pgm::init_from_scratch();
 
 assign(p);
 
@@ -127,7 +127,7 @@ void Pgm::clear()
 
 {
 
-clear_common();
+PxmBase::clear_common();
 
 return;
 
@@ -157,7 +157,7 @@ void Pgm::assign(const Pgm & p)
 
 {
 
-copy_common(p);
+PxmBase::copy_common(p);
 
 return;
 
@@ -259,7 +259,7 @@ ifstream in;
    //  clear out old image, if any
    //
 
-clear();
+Pgm::clear();
 
    //
    //  open input file
@@ -279,19 +279,7 @@ if ( !in )  {
    //  copy filename
    //
 
-Name = new char [1 + m_strlen(filename)];
-
-if ( !Name )  {
-
-   mlog << Warning << "\nPgm::read() -> can't allocate memory for file name\n\n";
-
-   clear();
-
-   return 0;
-
-}
-
-memcpy(Name, filename, 1 + m_strlen(filename));
+Name = filename;
 
    //
    //  read magic cookie
@@ -304,7 +292,7 @@ if ( !in )  {
 
    mlog << Warning << "\nPgm::read() -> unable to read magic cookie in image file \"" << filename << "\"\n\n";
 
-   clear();
+   Pgm::clear();
 
    return 0;
 
@@ -314,7 +302,7 @@ if ( (c1 != 'P') || (c2 != '5') )  {
 
    mlog << Warning << "\nPgm::read() -> bad magic number in image file \"" << filename << "\"\n\n";
 
-   clear();
+   Pgm::clear();
 
    return 0;
 
@@ -334,7 +322,7 @@ while ( true )  {
 
    get_comment(in, junk);
 
-   add_comment(junk);
+   PxmBase::add_comment(junk);
 
 }
 
@@ -350,7 +338,7 @@ if ( maxval != 255 )  {
 
    mlog << Warning << "\nPgm::read() -> bad maxval: \"" << maxval << "\"\n\n";
 
-   clear();
+   Pgm::clear();
 
    return 0;
 
@@ -362,21 +350,13 @@ if ( maxval != 255 )  {
 
 n = Nrows*Ncols;
 
-if ( !(data = new unsigned char [n]) )  {
+data.assign(n, 0);
 
-   mlog << Warning << "\nPgm::read() -> memory allocation error\n\n";
-
-   clear();
-
-   return 0;
-
-}
-
-if ( !in.read((char *) data, n) )  {
+if ( !in.read((char *) data.data(), n) )  {
 
    mlog << Warning << "\nPgm::read() -> trouble reading image data\n\n";
 
-   clear();
+   Pgm::clear();
 
    return 0;
 
@@ -482,9 +462,9 @@ void Pgm::all_black()
 
 {
 
-if ( !data )  return;
+if ( data.empty() )  return;
 
-(void) memset(data, 0, Nrows*Ncols);
+(void) memset(data.data(), 0, Nrows*Ncols);
 
 return;
 
@@ -498,9 +478,9 @@ void Pgm::all_white()
 
 {
 
-if ( !data )  return;
+if ( data.empty() )  return;
 
-(void) memset(data, 255, Nrows*Ncols);
+(void) memset(data.data(), 255, Nrows*Ncols);
 
 return;
 
@@ -516,15 +496,7 @@ void Pgm::set_size_rc(int NR, int NC)
 
 clear();
 
-data = new unsigned char [NR*NC];
-
-if ( !data )  {
-
-   mlog << Error << "\nPgm::set_size(int, int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
+data.assign(NR*NC, 0);
 
 Nrows = NR;
 Ncols = NC;
@@ -565,7 +537,7 @@ void Pgm::reverse_video()
 
 {
 
-if ( !data )  {
+if ( data.empty() )  {
 
    mlog << Error << "\nvoid Pgm::reverse_video() -> bad image\n\n";
 
@@ -610,7 +582,6 @@ int row, col;
 int Nrows_new, Ncols_new, bytes;
 int row_new = 0, col_new = 0;
 int n_new, n_old;
-unsigned char *u = (unsigned char *) nullptr;
 
 
 if ( a == 2 )  {   //  a == 0 has already been checked for
@@ -627,13 +598,7 @@ if ( a == 2 )  {   //  a == 0 has already been checked for
 
 bytes = (Nrows)*(Ncols);
 
-if ( !(u = new unsigned char [bytes]) )  {
-
-   mlog << Error << "\nPgm::rotate(int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
+std::vector<unsigned char> u(bytes);
 
 for (row=0; row<Nrows; ++row)  {
 
@@ -672,7 +637,7 @@ for (row=0; row<Nrows; ++row)  {
 Ncols = Ncols_new;
 Nrows = Nrows_new;
 
-delete [] data;  data = u;
+data = std::move(u);
 
 return;
 

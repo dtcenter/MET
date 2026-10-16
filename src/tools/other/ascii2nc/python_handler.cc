@@ -76,12 +76,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-PythonHandler::~PythonHandler()
-
-{
-
-
-}
+PythonHandler::~PythonHandler() = default;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -246,7 +241,14 @@ user_base.chomp(".py");
    //  start up the python interpreter
    //
 
-Python3_Script *script = get_python3_script();
+   //
+   //  deliberately leaked: ~Python3_Script calls Py_Finalize(), and the
+   //  PyObject values taken from this script are used after this call
+   //  returns.  This matches the previous behaviour, where the raw
+   //  pointer was simply never deleted.
+   //
+
+Python3_Script *script = get_python3_script().release();
 
    //
    //  set up a "new" sys.argv list
@@ -326,7 +328,7 @@ const int N = user_script_args.n();
 ConcatString command;
 ConcatString path;
 ConcatString tmp_ascii_path;
-const char * tmp_dir = 0;
+const char * tmp_dir = nullptr;
 int status;
 
 mlog << Debug(2)
@@ -342,7 +344,7 @@ path << cs_erase
      << tmp_dir << '/'
      << tmp_base_name;
 
-tmp_ascii_path = make_temp_file_name(path.text(), 0);
+tmp_ascii_path = make_temp_file_name(path.text(), nullptr);
 tmp_ascii_path << ".txt";
 
 command << cs_erase
@@ -372,7 +374,14 @@ if ( status )  {
 
 }
 
-Python3_Script *script = get_python3_script();
+   //
+   //  deliberately leaked: ~Python3_Script calls Py_Finalize(), and the
+   //  PyObject values taken from this script are used after this call
+   //  returns.  This matches the previous behaviour, where the raw
+   //  pointer was simply never deleted.
+   //
+
+Python3_Script *script = get_python3_script().release();
 
 mlog << Debug(4) << "Reading temporary Python ascii observation file: "
      << tmp_ascii_path << "\n";

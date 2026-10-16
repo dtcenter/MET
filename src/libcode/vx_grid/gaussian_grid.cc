@@ -53,8 +53,6 @@ GaussianGrid::GaussianGrid()
 
 {
 
-Latitudes = 0;
-
 clear();
 
 }
@@ -89,7 +87,7 @@ Delta_Lon = 0.0;
 
 memset(&Data, 0, sizeof(Data));
 
-if ( Latitudes )  { delete [] Latitudes;  Latitudes = 0; }
+Latitudes.clear();
 
 return;
 
@@ -99,11 +97,9 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-GaussianGrid::GaussianGrid(const GaussianData & data)
+GaussianGrid::GaussianGrid(const GaussianData & data, Key)
 
 {
-
-Latitudes = 0;
 
 clear();
 
@@ -145,11 +141,9 @@ double latitude;
 const int ny_half = Ny/2;
 
 
-Latitudes = new double [Ny];
+Latitudes.assign(Ny, 0.0);
 
 L.set_max_degree(Ny);
-
-for (j=0; j<Ny; ++j)  Latitudes[j] = 0.0;
 
 for (j=0; j<ny_half; ++j)  {
 
@@ -158,7 +152,6 @@ for (j=0; j<ny_half; ++j)  {
    k = Ny - 1 - i;
 
    L.lether_root_weight(k, r, w);
-   // L.d_and_r_root_weight(k, r, w);
 
    latitude = asind(r);
 
@@ -272,17 +265,21 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double GaussianGrid::calc_area(int x, int y) const
+double GaussianGrid::calc_area(int x, int y, bool centered) const
 
 {
 
 double lat_top, lat_bot;
 double area;
 
-if ( y == (Ny - 1) )  lat_top = 90.0;
-else                  lat_top = Latitudes[y + 1];
-
-lat_bot = Latitudes[y];
+if ( centered ) {
+   lat_top = (y == (Ny - 1) ? 90.0 : (Latitudes[y] + Latitudes[y+1]) / 2.0);
+   lat_bot = (y == 0        ? -90.0 : (Latitudes[y] + Latitudes[y-1]) / 2.0);
+}
+else {
+   lat_top = (y == (Ny - 1) ? 90.0 : Latitudes[y+1]);
+   lat_bot = Latitudes[y];
+}
 
 area = rad_per_deg*fabs(Delta_Lon);   //  Delta_Lon in radians
 
@@ -453,11 +450,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * GaussianGrid::copy() const
+std::unique_ptr<GridRep> GaussianGrid::copy() const
 
 {
 
-auto * p = new GaussianGrid (Data);
+auto p = std::make_unique<GaussianGrid>(Data, Key{});
 
 p->Name = Name;
 
@@ -497,16 +494,8 @@ void Grid::set(const GaussianData & data)
 
 clear();
 
-rep = new GaussianGrid ( data );
+rep = std::make_unique<GaussianGrid>(data, GaussianGrid::Key{});
 
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const GaussianData &) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
 
 return;
 

@@ -63,6 +63,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -132,7 +133,7 @@ int met_main(int argc, char * argv [])
    ModeConfInfo config;
    StringArray Argv;
    string s;
-   const char * user_config_filename = 0;
+   const char * user_config_filename = nullptr;
 
    //
    // MET #3278 parse global command line options
@@ -194,19 +195,16 @@ int met_main(int argc, char * argv [])
 
       // run the multivar version of mode
 
-      MultivarFrontEnd *frontend = new MultivarFrontEnd();
+      auto frontend = std::make_unique<MultivarFrontEnd>();
       status = frontend->run(Argv);
-      if ( frontend )  { delete frontend;  frontend = 0; }
 
    } else {
 
 
       // run the traditional version of mode
       
-      ModeFrontEnd *frontend = new ModeFrontEnd;
+      auto frontend = std::make_unique<ModeFrontEnd>();
       status = frontend->run_traditional(Argv);
-
-      if ( frontend )  { delete frontend;  frontend = 0; }
    }
 
    //

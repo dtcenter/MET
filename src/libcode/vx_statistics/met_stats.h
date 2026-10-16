@@ -11,6 +11,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <vector>
+
 #include "contable.h"
 #include "pair_data_point.h"
 
@@ -47,12 +49,12 @@ class CIInfo {
       double vif;
 
       // Confidence interval computed using a normal approximation
-      double *v_ncl;
-      double *v_ncu;
+      std::vector<double> v_ncl;
+      std::vector<double> v_ncu;
 
       // Confidence interval computed using a bootstrap approach
-      double *v_bcl;
-      double *v_bcu;
+      std::vector<double> v_bcl;
+      std::vector<double> v_bcu;
 
       void clear();
       void set_bad_data();
@@ -80,7 +82,7 @@ class CTSInfo {
 
       // Confidence interval alpha values
       int     n_alpha;
-      double *alpha;
+      std::vector<double> alpha;
 
       TTContingencyTable cts;
       SingleThresh       fthresh;
@@ -127,7 +129,7 @@ class MCTSInfo {
 
       // Confidence interval alpha values
       int     n_alpha;
-      double *alpha;
+      std::vector<double> alpha;
 
       ContingencyTable cts;
       ThreshArray      fthresh;
@@ -175,7 +177,7 @@ class CNTInfo {
 
       // Confidence interval alpha values
       int     n_alpha;
-      double *alpha;
+      std::vector<double> alpha;
 
       // Number of points
       int n;
@@ -289,7 +291,7 @@ class VL1L2Info {
 
       // Confidence interval alpha values
       int     n_alpha;
-      double *alpha;
+      std::vector<double> alpha;
 
       // Number of points
       int n;
@@ -456,7 +458,7 @@ class NBRCNTInfo {
 
       // Confidence interval alpha values
       int     n_alpha;
-      double *alpha;
+      std::vector<double> alpha;
 
       // Fractions Brier Score,
       // Fractions Skill Score,
@@ -506,18 +508,18 @@ class ISCInfo {
 
       // Mean Squared Error for each scale (MSE)
       double  mse;
-      double *mse_scale;
+      std::vector<double> mse_scale;
 
       // Intensity Scale Score for each scale (ISC)
       double  isc;
-      double *isc_scale;
+      std::vector<double> isc_scale;
 
       // Engery in the forecast and observation fields for each scale
       double  fen;
-      double *fen_scale;
+      std::vector<double> fen_scale;
 
       double  oen;
-      double *oen_scale;
+      std::vector<double> oen_scale;
 
       // Base Rate and Frequency Bias from the contingency table
       int     total;
@@ -553,7 +555,7 @@ class PCTInfo {
 
       // Confidence interval alpha values
       int     n_alpha;
-      double *alpha;
+      std::vector<double> alpha;
 
       Nx2ContingencyTable pct;
       Nx2ContingencyTable climo_pct;
@@ -754,9 +756,6 @@ struct SSIDXData {
 //
 ////////////////////////////////////////////////////////////////////////
 
-extern int  parse_message_type(const char *, char **&);
-extern int  parse_dbl_list(const char *, double *&);
-extern int  parse_int_list(const char *, int *&);
 
 extern int  max_int(const int *, int);
 extern int  min_int(const int *, int);

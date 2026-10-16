@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <memory>
 #include <iostream>
 #include <map>
 #include <time.h>
@@ -47,7 +48,7 @@ class FileHandler
 
 public:
 
-  FileHandler(const std::string &program_name);
+  explicit FileHandler(const std::string &program_name);
   virtual ~FileHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const = 0;
@@ -84,7 +85,7 @@ protected:
 
   // Variables for writing output NetCDF file
 
-  netCDF::NcFile   *_ncFile;
+  std::unique_ptr<netCDF::NcFile> _ncFile;
   MetNcPointObsOut nc_point_obs;
 
   long _nhdr;

@@ -47,7 +47,6 @@ GridStatConfInfo::~GridStatConfInfo() {
 void GridStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   vx_opt = (GridStatVxOpt *) nullptr;
 
 #ifdef WITH_UGRID
    ignore_ugrid_dataset = false;
@@ -88,7 +87,7 @@ void GridStatConfInfo::clear() {
    seeps_p1_thresh.clear();
 
    // Deallocate memory
-   if(vx_opt) { delete [] vx_opt; vx_opt = (GridStatVxOpt *) nullptr; }
+   vx_opt.clear();
 
    // Reset counts
    n_vx = 0;
@@ -208,7 +207,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 
    // Allocate memory for the verification task options
    n_vx   = n_fvx;
-   vx_opt = new GridStatVxOpt [n_vx];
+   vx_opt.resize(n_vx);
 
    // Check for consistent number of climatology fields
    check_climo_n_vx(fdict, n_vx);
@@ -575,8 +574,8 @@ GridStatVxOpt::~GridStatVxOpt() {
 void GridStatVxOpt::init_from_scratch() {
 
    // Initialize pointers
-   fcst_info   = (VarInfo *)    nullptr;
-   obs_info    = (VarInfo *)    nullptr;
+   fcst_info.reset();
+   obs_info.reset();
 
    clear();
 
@@ -641,8 +640,8 @@ void GridStatVxOpt::clear() {
    nc_info.clear();
 
    // Deallocate memory
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) nullptr; }
-   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) nullptr; }
+   fcst_info.reset();
+   obs_info.reset();
 
    return;
 }

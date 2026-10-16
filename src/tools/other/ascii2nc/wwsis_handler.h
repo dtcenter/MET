@@ -33,7 +33,7 @@ class WwsisHandler : public FileHandler
 
 public:
 
-  WwsisHandler(const std::string &program_name);
+  explicit WwsisHandler(const std::string &program_name);
   virtual ~WwsisHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;

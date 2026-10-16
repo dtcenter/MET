@@ -19,6 +19,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 #include "vx_cal.h"
 
@@ -39,7 +40,7 @@ class TimeSeries {
 
       int TimeDelta;   //  seconds
 
-      double * Value;
+      std::vector<double> Value;
 
       int Nelements;
 

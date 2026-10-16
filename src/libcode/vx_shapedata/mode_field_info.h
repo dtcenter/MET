@@ -73,7 +73,7 @@ class Mode_Field_Info {
       int            conv_radius;         // Convolution radius in grid squares
       double         vld_thresh;          // Minimum ratio of valid data points in the convolution area
 
-      VarInfo *      var_info;            // allocated
+      std::unique_ptr<VarInfo> var_info;
       IntArray       conv_radius_array;   // List of convolution radii in grid squares
 
       ThreshArray    conv_thresh_array;   // List of conv thresholds to use

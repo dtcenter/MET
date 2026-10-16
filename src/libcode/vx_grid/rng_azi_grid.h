@@ -37,7 +37,7 @@ class RngAziGrid : public RotatedLatLonGrid {
 
       RngAziGrid();
      ~RngAziGrid();
-      RngAziGrid(const RngAziData &);
+      explicit RngAziGrid(const RngAziData &);
       RngAziGrid & operator=(const RngAziGrid &);
 
       void calc_ijk();   //  calculate rotated basis vectors
@@ -104,7 +104,7 @@ class RngAziGrid : public RotatedLatLonGrid {
 
       bool wrap_lon() const;
 
-      GridRep * copy() const;
+      std::unique_ptr<GridRep> copy() const;
 
 };
 

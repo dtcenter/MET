@@ -330,21 +330,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-GeneralAffine::GeneralAffine()
-
-{
-
-}
+GeneralAffine::GeneralAffine() = default;
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-GeneralAffine::~GeneralAffine()
-
-{
-
-}
+GeneralAffine::~GeneralAffine() = default;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -374,7 +366,7 @@ Affine::~Affine()
 
 {
 
-clear();
+Affine::clear();
 
 }
 
@@ -416,7 +408,7 @@ void Affine::init_from_scratch()
 
 {
 
-clear();
+Affine::clear();
 
 return;
 
@@ -451,7 +443,7 @@ void Affine::assign(const Affine & g)
 
 {
 
-clear();
+Affine::clear();
 
 M11 = g.M11;
 M12 = g.M12;
@@ -744,13 +736,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-GeneralAffine * Affine::copy() const
+std::unique_ptr<GeneralAffine> Affine::copy() const
 
 {
 
-Affine * a = new Affine ( *this );
-
-return a;
+return std::make_unique<Affine>( *this );
 
 }
 
@@ -816,7 +806,7 @@ ConformalAffine::~ConformalAffine()
 
 {
 
-clear();
+ConformalAffine::clear();
 
 }
 
@@ -858,7 +848,7 @@ void ConformalAffine::init_from_scratch()
 
 {
 
-clear();
+ConformalAffine::clear();
 
 return;
 
@@ -896,7 +886,7 @@ void ConformalAffine::assign(const ConformalAffine & c)
 
 {
 
-clear();
+ConformalAffine::clear();
 
 Angle = c.Angle;
 
@@ -1003,13 +993,11 @@ return ca;
 ////////////////////////////////////////////////////////////////////////
 
 
-GeneralAffine * ConformalAffine::copy() const
+std::unique_ptr<GeneralAffine> ConformalAffine::copy() const
 
 {
 
-ConformalAffine * ca = new ConformalAffine ( *this );
-
-return ca;
+return std::make_unique<ConformalAffine>( *this );
 
 }
 

@@ -7,6 +7,7 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -44,7 +45,7 @@ int main(int argc, char *argv[]) {
 
     mlog << Debug(1) << "Reading " << inputfile << "\n";
 
-    NcFile* nc_out = open_ncfile(inputfile.c_str(), false);
+    std::unique_ptr<netCDF::NcFile> nc_out = open_ncfile(inputfile.c_str(), false);
 
     return 0;
 }
