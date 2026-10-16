@@ -144,7 +144,7 @@ for (j=0; j<(h.n_records); ++j)  {
 
    }
 
-   if ( h.record_length < buf_size) {
+   if ( static_cast<size_t>(h.record_length) < buf_size) {
      buf[h.record_length] = 0;
    }
    

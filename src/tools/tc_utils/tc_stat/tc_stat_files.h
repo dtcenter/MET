@@ -34,6 +34,7 @@ class TCStatFiles : public LineDataFiles {
 
       void add_files(const StringArray &);
 
+      using LineDataFiles::operator>>;
       bool operator>>(TrackPairInfo    &);
       bool operator>>(ProbRIRWPairInfo &);
       bool operator>>(TCStatLine       &);

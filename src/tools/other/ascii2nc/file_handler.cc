@@ -34,8 +34,6 @@ using namespace netCDF;
 
 const float FileHandler::FILL_VALUE = -9999.f;
 
-const int DEF_DEFALTE_LEVEL = 2;
-
 
 ////////////////////////////////////////////////////////////////////////
 

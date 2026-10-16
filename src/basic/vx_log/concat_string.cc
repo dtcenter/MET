@@ -76,8 +76,8 @@ ConcatString::ConcatString(const ConcatString & c)
 
 ConcatString::ConcatString(ConcatString && c) noexcept
    : Precision(c.Precision),
-     FloatFormat(move(c.FloatFormat)),
-     s(move(c.s))
+     FloatFormat(std::move(c.FloatFormat)),
+     s(std::move(c.s))
 {
    init_from_scratch();
 }
@@ -128,8 +128,8 @@ ConcatString & ConcatString::operator=(const ConcatString & c)
 ConcatString & ConcatString::operator=(ConcatString && c) noexcept
 {
    if(this != &c) {
-      s           = move(c.s);
-      FloatFormat = move(c.FloatFormat);
+      s           = std::move(c.s);
+      FloatFormat = std::move(c.FloatFormat);
       Precision   = c.Precision;
       c.Precision = concat_string_default_precision;
    }
@@ -486,7 +486,7 @@ void ConcatString::strip_paren()
 
 void ConcatString::strip_chars_from(const char *chars_to_remove)
 {
-   for (unsigned int i=0; i<m_strlen(chars_to_remove); ++i) {
+   for (int i=0; i<m_strlen(chars_to_remove); ++i) {
       s.erase(remove(s.begin(), s.end(), chars_to_remove[i]), s.end());
    }
 }

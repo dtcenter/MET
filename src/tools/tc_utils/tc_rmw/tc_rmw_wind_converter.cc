@@ -168,11 +168,9 @@ bool TCRMWWindConverter::compute_winds_if_input_is_u(int i_point,
     return false;
   }
 
-  int uIndex = -1;
   int vIndex = -1;
   VarInfo *v_wind_info = (VarInfo *) nullptr;
   if (varName == _conf->u_wind_field_name.string()) {
-    uIndex = _uIndexMap[varLevel];
     vIndex = _vIndexMap[varLevel];
     v_wind_info = _conf->data_info[vIndex].get();
     v_wind_info->set_valid(valid_time);

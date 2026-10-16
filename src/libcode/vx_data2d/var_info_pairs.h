@@ -35,14 +35,14 @@ class VarInfoPairs : public VarInfo {
       VarInfoPairs & operator=(const VarInfoPairs &);
       std::unique_ptr<VarInfo> clone() const override;
 
-      void dump(std::ostream &) const;
+      void dump(std::ostream &) const override;
       void clear();
 
          //
          // get stuff
          //
 
-      GrdFileType file_type() const;
+      GrdFileType file_type() const override;
 
          //
          // set stuff

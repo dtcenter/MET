@@ -92,6 +92,8 @@ class MetConfig : public Dictionary {
 
       bool read_string(const char * config_string);
 
+      using Dictionary::lookup;
+
       const DictionaryEntry * lookup(const char * name);
 
       const DictionaryEntry * lookup(const char * name, const ConfigObjectType expected_type);

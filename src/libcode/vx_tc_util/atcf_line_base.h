@@ -29,8 +29,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char *atcf_suffix  = ".dat";
-static const char *atcf_reg_exp = ".dat$";
+static const char * const atcf_suffix  = ".dat";
+static const char * const atcf_reg_exp = ".dat$";
 
 ////////////////////////////////////////////////////////////////////////
 

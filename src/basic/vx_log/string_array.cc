@@ -29,18 +29,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int stringarray_alloc_inc = 50;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static int lex_comp (const void *, const void *);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
    //
    //  Code for class StringArray
    //
@@ -88,7 +76,7 @@ assign(a);
 
 
 StringArray::StringArray(StringArray && a) noexcept
-   : s(move(a.s)), MaxLength(a.MaxLength), IgnoreCase(a.IgnoreCase), Sorted(a.Sorted)
+   : s(std::move(a.s)), MaxLength(a.MaxLength), IgnoreCase(a.IgnoreCase), Sorted(a.Sorted)
 
 {
 
@@ -137,7 +125,7 @@ StringArray & StringArray::operator=(StringArray && a) noexcept
 
 if ( this == &a )  return *this;
 
-s = move(a.s);
+s = std::move(a.s);
 MaxLength = a.MaxLength;
 IgnoreCase = a.IgnoreCase;
 Sorted = a.Sorted;
@@ -848,6 +836,11 @@ regex_t *preg = &buffer;
 // Check for null pointers
 if( !reg_exp_str || !test_str ) return false;
 
+// An empty pattern matches everything. Check for it explicitly since
+// POSIX leaves it undefined: glibc accepts it but macOS regcomp()
+// returns REG_EMPTY.
+if( *reg_exp_str == '\0' ) return true;
+
 if( regcomp(preg, reg_exp_str, REG_EXTENDED*REG_NOSUB) != 0 ) {
    mlog << Error << "\ncheck_reg_exp(char *, char *) -> "
         << "regcomp error for \""
@@ -862,26 +855,6 @@ if( regexec(preg, test_str, 0, nullptr, 0) == 0 ) { valid = true; }
 regfree( preg );
 
 return valid;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static int lex_comp(const void * a, const void * b)
-
-{
-
-int status;
-auto ca = (const char **) a;
-auto cb = (const char **) b;
-
-
-status = strcmp(*ca, *cb);
-
-
-return status;
 
 }
 

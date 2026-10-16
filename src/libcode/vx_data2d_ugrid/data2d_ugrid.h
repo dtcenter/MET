@@ -60,7 +60,7 @@ class MetUGridDataFile : public Met2dDataFile {
       MetUGridDataFile();
      ~MetUGridDataFile();
 
-      virtual int nx() const
+      int nx() const override
       {
          if (_file == nullptr)
             return 0;
@@ -69,7 +69,7 @@ class MetUGridDataFile : public Met2dDataFile {
       }
       
 
-      virtual int ny() const
+      int ny() const override
       {
          return 1;
       }
@@ -83,7 +83,7 @@ class MetUGridDataFile : public Met2dDataFile {
       //  get stuff
       //
 
-      GrdFileType file_type() const;
+      GrdFileType file_type() const override;
 
       //  retrieve the first matching data plane
 
@@ -108,15 +108,15 @@ class MetUGridDataFile : public Met2dDataFile {
       //  do stuff
       //
 
-      bool open  (const char * filename);
+      bool open  (const char * filename) override;
       bool open_metadata(const char * filename);
       ConcatString coordinate_file() const;
       void set_ugrid_configs(const ConcatString &dataset_name, double max_distance_km,
                              const ConcatString &map_config_filename);
 
-      void close ();
+      void close () override;
 
-      void dump(std::ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const override;
 
 };
 

@@ -733,9 +733,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 
    // Loop through the requested fields
    int obs_count_zero_to = 0;
-   int obs_count_zero_from = 0;
    int obs_count_non_zero_to = 0;
-   int obs_count_non_zero_from = 0;
    vector<IntArray> cellMapping;
    for(int i=0; i<FieldSA.n(); i++) {
 
@@ -925,8 +923,6 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 
             var_index_array.add(idx);
             var_count++;
-            if (is_eq(obs_data->obs_vals[idx], (float)0.)) obs_count_zero_from++;
-            else obs_count_non_zero_from++;
          }
       }
 
@@ -940,7 +936,6 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          NumArray dataArray;
          int offset = 0;
          int valid_count = 0;
-         int censored_count = 0;
          double data_value;
          double from_min_value =  10e10;
          double from_max_value = -10e10;
@@ -976,7 +971,6 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
                         // Break out after the first match.
                         if(vinfo->censor_thresh()[ic].check(data_value)) {
                            data_value = vinfo->censor_val()[ic];
-                           censored_count++;
                            break;
                         }
                      }
@@ -2269,7 +2263,6 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
    to_dp.set_size(to_lon_count, to_lat_count);
 
    if (data_size > 0) {
-      int lat_count = data_size;
       int lon_count = data_size;
       float *latitudes = nullptr;
       float *longitudes = nullptr;
@@ -2284,7 +2277,6 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
             NcVar var_lat = get_nc_var(coord_nc_in.get(), var_name_lat);
             NcVar var_lon = get_nc_var(coord_nc_in.get(), var_name_lon);
             if (IS_VALID_NC(var_lat) && IS_VALID_NC(var_lon)) {
-               lat_count = get_data_size(&var_lat);
                lon_count = get_data_size(&var_lon);
                latitudes = latitudes_buf.data();
                longitudes = longitudes_buf.data();
@@ -2585,7 +2577,6 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
 
    int from_index;
    int absent_count = 0;
-   int censored_count = 0;
    int missing_count = 0;
    int to_cell_count = 0;
    int non_missing_count = 0;
@@ -2642,7 +2633,6 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
                   // Break out after the first match.
                   if(vinfo->censor_thresh()[i].check(data_value)) {
                      data_value = vinfo->censor_val()[i];
-                     censored_count++;
                      break;
                   }
                }

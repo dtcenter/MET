@@ -123,8 +123,6 @@ LaeaGrid::LaeaGrid(const LaeaNetcdfData & nc, Key)
 
 {
 
-const char * method_name = "LaeaGrid::LaeaGrid(const LaeaNetcdfData &) -> ";
-
 double u, v, lat, lon;
 const double tol = 1.0e-5;
 

@@ -475,7 +475,7 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
 
       // Loop over the to grid to compute the area weighted average
 #pragma omp for schedule(static)
-      for(int n=0; n<to_data_sum.size(); n++) {
+      for(int n=0; n<static_cast<int>(to_data_sum.size()); n++) {
 
          int xt;
          int yt;

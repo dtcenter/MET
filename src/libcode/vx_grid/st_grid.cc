@@ -712,7 +712,6 @@ double st_eccentricity_func(double semi_major_axis, double semi_minor_axis,
                             double inverse_flattening)
 {
 
-double c;
 double eccentricity = bad_data_double;
 
 if (is_eq(semi_minor_axis, bad_data_double)) {

@@ -435,13 +435,9 @@ if ( dimCount >= max_met_args )  {
 
 }
 
-int i;
-short s;
-float f;
 double d = bad_data_double;
 bool status;
 double fill_value;
-double missing_value = get_var_missing_value(var);
 get_var_fill_value(var, fill_value);
 
 status = get_nc_data(var, &d, a);
