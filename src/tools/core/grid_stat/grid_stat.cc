@@ -1247,7 +1247,7 @@ void process_scores() {
 
             // Compute SEEPS statistics
             unix_to_mdyhms(fcst_dp.valid(), month, day, year, hour, minute, second);
-            compute_aggregated_seeps_grid(fcst_dp_smooth, obs_dp_smooth,
+            compute_aggregated_seeps_grid(fcst_dp_smooth, obs_dp_smooth, wgt_dp,
                                           seeps_dp, seeps_dp_fcat, seeps_dp_ocat,
                                           &seeps_agg, month, hour,
                                           conf_info.seeps_p1_thresh, conf_info.seeps_climo_name);

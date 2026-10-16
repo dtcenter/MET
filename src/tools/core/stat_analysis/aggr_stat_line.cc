@@ -3019,6 +3019,7 @@ void aggr_seeps_mpr_lines(LineDataFiles &f, STATAnalysisJob &job,
          m[key].pd.o_na.add(cur.obs);
          m[key].pd.lat_na.add(cur.obs_lat);
          m[key].pd.lon_na.add(cur.obs_lon);
+         m[key].pd.wgt_na.add(1.0);
 
          m[key].pd.seeps_mpr.push_back(
             std::make_unique<SeepsScore>(cur.seeps_mpr));

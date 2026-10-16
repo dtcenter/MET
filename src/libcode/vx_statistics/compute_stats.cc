@@ -1507,18 +1507,14 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
    SeepsScore *seeps_mpr = nullptr;
    int count = 0;
    int count_diagonal = 0;
-   int c_odfl = 0;
-   int c_odfh = 0;
-   int c_olfd = 0;
-   int c_olfh = 0;
-   int c_ohfd = 0;
-   int c_ohfl = 0;
    double score_sum = 0.0;
    double obs_sum_wgt = 0.0;
    double fcst_sum_wgt = 0.0;
    double obs_sum = 0.0;
    double fcst_sum = 0.0;
    vector<SeepsScore *> seeps_mprs;
+
+   seeps_agg->clear();
 
    for(int i=0; i<pd->n_obs; i++) {
       if (i >= pd->seeps_mpr.size()) break;
@@ -1529,29 +1525,21 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
       obs_sum  += pd->o_na[i];   // Observation Value
       fcst_sum += pd->f_na[i];   // Forecast Value
       score_sum += seeps_mpr->score;
-      if (seeps_mpr->fcst_cat == 0) {
-         if (seeps_mpr->obs_cat == 1) c_olfd++;
-         else if(seeps_mpr->obs_cat == 2) c_ohfd++;
-         else count_diagonal++;
-      }
-      else if (seeps_mpr->fcst_cat == 1) {
-         if (seeps_mpr->obs_cat == 0) c_odfl++;
-         else if(seeps_mpr->obs_cat == 2) c_ohfl++;
-         else count_diagonal++;
-      }
-      else if (seeps_mpr->fcst_cat == 2) {
-         if (seeps_mpr->obs_cat == 0) c_odfh++;
-         else if (seeps_mpr->obs_cat == 1) c_olfh++;
-         else count_diagonal++;
-      }
+
+      // MET #3465: Sum the pair weights for each category, like CTC
+      double wgt = (i < pd->wgt_na.n() && !is_bad_data(pd->wgt_na[i]) ?
+                    pd->wgt_na[i] : 1.0);
+      if (!seeps_agg->inc_category(seeps_mpr->fcst_cat,
+                                   seeps_mpr->obs_cat, wgt)) count_diagonal++;
       seeps_mprs.emplace_back(seeps_mpr);
    }
    if (count > 0) {
 
       mlog << Debug(9) << method_name
            << "Categories c_odfl, c_odfh, c_olfd, c_olfh, c_ohfd, c_ohfl => "
-           << c_odfl << " " << c_odfh << " " << c_olfd << " "
-           << c_olfh << " " << c_ohfd << " " << c_ohfl << "\n";
+           << seeps_agg->c_odfl << " " << seeps_agg->c_odfh << " "
+           << seeps_agg->c_olfd << " " << seeps_agg->c_olfh << " "
+           << seeps_agg->c_ohfd << " " << seeps_agg->c_ohfl << "\n";
 
       // Unweighted means
       seeps_agg->n_obs = count;
@@ -1567,7 +1555,6 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
 
       double score_sum_wgt = 0.0;
       vector<double> pvf(SEEPS_MATRIX_SIZE, 0.0);
-      vector<double> svf(SEEPS_MATRIX_SIZE, 0.0);
 
       vector<double> density_vector;
       compute_seeps_density_vector(pd, seeps_agg, density_vector);
@@ -1606,10 +1593,8 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
                mlog << Debug(9) << method_name
                     << "score_sum_wgt (seeps_mpr*weight) => "
                     << score_sum_wgt << "\n";
-               //IDL: svf(cat{i)) = svf(cat{i)) + c(4+cat(i) * w{i)
                //IDL: pvf(cat{i)) = pvf(cat{i)) + w{i)
                pvf[seeps_mpr->s_idx] += weight[i];
-               svf[seeps_mpr->s_idx] += seeps_mpr->score * weight[i];
             }
             else {
                mlog << Debug(1) << method_name
@@ -1623,19 +1608,12 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
       density_vector.clear();
       seeps_mprs.clear();
 
-      // The weight for odfl to ohfl come from climo file
       seeps_agg->pv1 = pvf[0] + pvf[3] + pvf[6];    // sum by column for obs
       seeps_agg->pv2 = pvf[1] + pvf[4] + pvf[7];    // sum by column for obs
       seeps_agg->pv3 = pvf[2] + pvf[5] + pvf[8];    // sum by column for obs
       seeps_agg->pf1 = pvf[0] + pvf[1] + pvf[2];    // sum by row for forecast
       seeps_agg->pf2 = pvf[3] + pvf[4] + pvf[5];    // sum by row for forecast
       seeps_agg->pf3 = pvf[6] + pvf[7] + pvf[8];    // sum by row for forecast
-      seeps_agg->s_odfl = (is_eq(svf[3], 0.0) ? 0.0 : svf[3]);
-      seeps_agg->s_odfh = (is_eq(svf[6], 0.0) ? 0.0 : svf[6]);
-      seeps_agg->s_olfd = (is_eq(svf[1], 0.0) ? 0.0 : svf[1]);
-      seeps_agg->s_olfh = (is_eq(svf[7], 0.0) ? 0.0 : svf[7]);
-      seeps_agg->s_ohfd = (is_eq(svf[2], 0.0) ? 0.0 : svf[2]);
-      seeps_agg->s_ohfl = (is_eq(svf[5], 0.0) ? 0.0 : svf[5]);
       seeps_agg->mean_fcst_wgt = fcst_sum_wgt;
       seeps_agg->mean_obs_wgt  = obs_sum_wgt;
       seeps_agg->score_wgt     = score_sum_wgt;
@@ -1651,19 +1629,14 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
            << "no SEEPS_MPR available\n";
    }
 
-   seeps_agg->c_odfl = c_odfl;
-   seeps_agg->c_odfh = c_odfh;
-   seeps_agg->c_olfd = c_olfd;
-   seeps_agg->c_olfh = c_olfh;
-   seeps_agg->c_ohfd = c_ohfd;
-   seeps_agg->c_ohfl = c_ohfl;
-
-   if (count != (c_odfl+c_odfh+c_olfd+c_olfh+c_ohfd+c_ohfl+count_diagonal)){
+   if (count != (seeps_agg->c_odfl + seeps_agg->c_odfh + seeps_agg->c_olfd +
+                 seeps_agg->c_olfh + seeps_agg->c_ohfd + seeps_agg->c_ohfl +
+                 count_diagonal)) {
       mlog << Debug(6) << method_name
            << "INFO check count: all=" << count
-           << " s_odfl=" << c_odfl << " s_odfh=" << c_odfh
-           << " s_olfd=" << c_olfd << " s_olfh=" << c_olfh
-           << " s_ohfd=" << c_ohfd << " s_ohfl=" << c_ohfl << "\n";
+           << " c_odfl=" << seeps_agg->c_odfl << " c_odfh=" << seeps_agg->c_odfh
+           << " c_olfd=" << seeps_agg->c_olfd << " c_olfh=" << seeps_agg->c_olfh
+           << " c_ohfd=" << seeps_agg->c_ohfd << " c_ohfl=" << seeps_agg->c_ohfl << "\n";
    }
 
    return;
@@ -1672,7 +1645,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
 ////////////////////////////////////////////////////////////////////////
 
 void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &obs_dp,
-                                   DataPlane &seeps_dp, DataPlane &seeps_dp_fcat,
+                                   const DataPlane &wgt_dp, DataPlane &seeps_dp, DataPlane &seeps_dp_fcat,
                                    DataPlane &seeps_dp_ocat, SeepsAggScore *seeps_agg,
                                    int month, int hour, const SingleThresh &seeps_p1_thresh,
                                    const ConcatString &seeps_climo_name) {
@@ -1687,12 +1660,7 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
    int count_diagonal = 0;
    int nan_count = 0;
    int bad_count = 0;
-   int c_odfl = 0;
-   int c_odfh = 0;
-   int c_olfd = 0;
-   int c_olfh = 0;
-   int c_ohfd = 0;
-   int c_ohfl = 0;
+   bool wgt_flag = (wgt_dp.nx() == nx && wgt_dp.ny() == ny);
    double seeps_score = 0.0;
    double seeps_score_sum = 0.0;
    double seeps_score_partial_sum = 0.0;
@@ -1714,7 +1682,6 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
 
    vector<int>    pvf_cnt(SEEPS_MATRIX_SIZE, 0);
    vector<double> pvf(SEEPS_MATRIX_SIZE, 0.0);
-   vector<double> svf(SEEPS_MATRIX_SIZE, 0.0);
 
    for (int ix=0; ix<nx; ix++) {
       seeps_score_partial_sum = 0.;
@@ -1733,21 +1700,6 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
             if (seeps_mpr != nullptr) {
                fcst_cat = seeps_mpr->fcst_cat;
                obs_cat = seeps_mpr->obs_cat;
-               if (fcst_cat == 0) {
-                  if (obs_cat == 1) c_olfd++;
-                  else if(obs_cat == 2) c_odfh++;
-                  else count_diagonal++;
-               }
-               else if (fcst_cat == 1) {
-                  if (obs_cat == 0) c_odfl++;
-                  else if(obs_cat == 2) c_ohfd++;
-                  else count_diagonal++;
-               }
-               else if (fcst_cat == 2) {
-                  if (obs_cat == 0) c_odfh++;
-                  else if (obs_cat == 1) c_olfh++;
-                  else count_diagonal++;
-               }
                seeps_score = seeps_mpr->score;
                mlog << Debug(9) << method_name
                     << "ix, iy, obs_cat, fcst_cat, seeps_score:"
@@ -1764,8 +1716,15 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
                   obs_sum += obs_value;
                   fcst_sum += fcst_value;
                   seeps_score_partial_sum += seeps_score;
+
+                  // MET #3465: Sum the grid weights for each category, like CTC
+                  double wgt = 1.0;
+                  if (wgt_flag && !is_bad_data(wgt_dp.get(ix, iy))) {
+                     wgt = wgt_dp.get(ix, iy);
+                  }
+                  if (!seeps_agg->inc_category(fcst_cat, obs_cat, wgt)) count_diagonal++;
+
                   //IDL: s = s + c(4+cat(i) * w{i)  <-- this is done by summing scores
-                  //IDL: svf(cat{i)) = svf(cat{i)) + c(4+cat(i) * w{i)
                   //IDL: pvf(cat{i)) = pvf(cat{i)) + w{i)
                   //pvf[seeps_mpr->s_idx] += weight;
                   pvf_cnt[seeps_mpr->s_idx] += 1;
@@ -1784,8 +1743,9 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
       seeps_score_sum += seeps_score_partial_sum;
    }
    mlog << Debug(9) << method_name
-        << "dp_size, nan_count, bad_count: "
-        << dp_size << " " << nan_count << " " << bad_count << "\n";
+        << "dp_size, nan_count, bad_count, count_diagonal: "
+        << dp_size << " " << nan_count << " " << bad_count << " "
+        << count_diagonal << "\n";
    int cell_count = dp_size - nan_count - bad_count;
    if (cell_count > 0) {
       seeps_agg->score_wgt = seeps_score_sum/cell_count;
@@ -1795,12 +1755,6 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
    }
 
    seeps_agg->n_obs = seeps_count;
-   seeps_agg->c_odfl = c_odfl;
-   seeps_agg->c_odfh = c_odfh;
-   seeps_agg->c_olfd = c_olfd;
-   seeps_agg->c_olfh = c_olfh;
-   seeps_agg->c_ohfd = c_ohfd;
-   seeps_agg->c_ohfl = c_ohfl;
 
    if (seeps_count > 0) {
       seeps_agg->pv1 = pvf[0] + pvf[3] + pvf[6];    // sum by column for obs
@@ -1809,13 +1763,6 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
       seeps_agg->pf1 = pvf[0] + pvf[1] + pvf[2];    // sum by row for forecast
       seeps_agg->pf2 = pvf[3] + pvf[4] + pvf[5];    // sum by row for forecast
       seeps_agg->pf3 = pvf[6] + pvf[7] + pvf[8];    // sum by row for forecast
-
-      seeps_agg->s_odfl = (is_eq(svf[3], 0.0) ? 0.0 : svf[3]);
-      seeps_agg->s_odfh = (is_eq(svf[6], 0.0) ? 0.0 : svf[6]);
-      seeps_agg->s_olfd = (is_eq(svf[1], 0.0) ? 0.0 : svf[1]);
-      seeps_agg->s_olfh = (is_eq(svf[7], 0.0) ? 0.0 : svf[7]);
-      seeps_agg->s_ohfd = (is_eq(svf[2], 0.0) ? 0.0 : svf[2]);
-      seeps_agg->s_ohfl = (is_eq(svf[5], 0.0) ? 0.0 : svf[5]);
 
       seeps_agg->mean_fcst = fcst_sum / seeps_count;
       seeps_agg->mean_obs  = obs_sum / seeps_count;

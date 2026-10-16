@@ -1796,27 +1796,27 @@ The first set of header columns are common to all of the output files generated 
     - Integer
   * - 26
     - ODFL
-    - Counts multiplied by the weights for the observation dry, forecast light category
+    - Sum of weights for the observation dry, forecast light category
     - Double
   * - 27
     - ODFH
-    - Counts multiplied by the weights for the observation dry, forecast heavy category
+    - Sum of weights for the observation dry, forecast heavy category
     - Double
   * - 28
     - OLFD
-    - Counts multiplied by the weights for the observation light, forecast dry category
+    - Sum of weights for the observation light, forecast dry category
     - Double
   * - 29
     - OLFH
-    - Counts multiplied by the weights for the observation light, forecast heavy category
+    - Sum of weights for the observation light, forecast heavy category
     - Double
   * - 30
     - OHFD
-    - Counts multiplied by the weights for the observation heavy, forecast dry category
+    - Sum of weights for the observation heavy, forecast dry category
     - Double
   * - 31
     - OHFL
-    - Counts multiplied by the weights for the observation heavy, forecast light category
+    - Sum of weights for the observation heavy, forecast light category
     - Double
   * - 32
     - PF1
@@ -1846,6 +1846,8 @@ The first set of header columns are common to all of the output files generated 
     - SEEPS
     - Averaged SEEPS (Stable Equitable Error in Probability Space) score
     - Double
+
+The ODFL, ODFH, OLFD, OLFH, OHFD, and OHFL columns are computed like the cells of the CTC line type. Each matched pair contributes its weight, as defined by the "point_weight_flag" option in Point-Stat or the "grid_weight_flag" option in Grid-Stat, to its forecast and observation category. By default, all weights are 1, and these columns contain the raw counts. When Stat-Analysis aggregates SEEPS lines, these columns are summed.
 
 
 The STAT output files described for point_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by point_stat, please see :numref:`stat-analysis`.

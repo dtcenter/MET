@@ -80,6 +80,7 @@ struct SeepsScore { // For SEEPS_MPR
 struct SeepsAggScore {  // For SEEPS
    void clear();
    SeepsAggScore & operator+=(const SeepsAggScore &);
+   bool inc_category(int fcst_cat, int obs_cat, double wgt);
 
    int    n_obs;
    int    c_odfl;
