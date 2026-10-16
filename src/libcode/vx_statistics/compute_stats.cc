@@ -8,6 +8,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <algorithm>
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -1513,11 +1514,12 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
    double obs_sum = 0.0;
    double fcst_sum = 0.0;
    vector<SeepsScore *> seeps_mprs;
+   vector<int> pair_idx;
 
    seeps_agg->clear();
 
    for(int i=0; i<pd->n_obs; i++) {
-      if (i >= pd->seeps_mpr.size()) break;
+      if (i >= (int) pd->seeps_mpr.size()) break;
       seeps_mpr = pd->seeps_mpr[i].get();
       if (!seeps_mpr || is_eq(seeps_mpr->score, bad_data_double)) continue;
 
@@ -1532,6 +1534,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
       if (!seeps_agg->inc_category(seeps_mpr->fcst_cat,
                                    seeps_mpr->obs_cat, wgt)) count_diagonal++;
       seeps_mprs.emplace_back(seeps_mpr);
+      pair_idx.emplace_back(i);
    }
    if (count > 0) {
 
@@ -1556,57 +1559,47 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
       double score_sum_wgt = 0.0;
       vector<double> pvf(SEEPS_MATRIX_SIZE, 0.0);
 
+      // Station density, one entry per element of seeps_mprs
       vector<double> density_vector;
       compute_seeps_density_vector(pd, seeps_agg, density_vector);
-      int density_cnt = density_vector.size();
-      if(density_cnt > count) density_cnt = count;
 
-      //IDL: w = 1/d
-      double weight_sum = 0.0;
-      vector<double> weight(count, 0.0);
-      for (int i=0; i<density_cnt; i++) {
-         if (!is_eq(density_vector[i], 0.0)) {
+      if (density_vector.size() != seeps_mprs.size()) {
+         mlog << Warning << "\n" << method_name
+              << "the length of the density vector (" << density_vector.size()
+              << ") does not match the number of SEEPS pairs ("
+              << seeps_mprs.size() << ")!\n\n";
+      }
+      else {
+
+         //IDL: w = 1/d
+         //IDL: w = w/sum(w)
+         vector<double> weight(count, 0.0);
+         double weight_sum = 0.0;
+         for (int i=0; i<count; i++) {
             weight[i] = 1.0 / density_vector[i];
             weight_sum += weight[i];
-            mlog << Debug(9) << method_name
-                 << "i, dens_vec(i), weight(i), weight_sum => "
-                 << i << " " << density_vector[i] << " "
-                 << weight[i] << " " << weight_sum << "\n";
          }
-      }
-      if (!is_eq(weight_sum, 0.0)) {
-         //IDL: w = w/sum(w)
          for (int i=0; i<count; i++) weight[i] /= weight_sum;
 
          //IDL: for i=0l, n-1l do begin
-         for (int i=0; i<seeps_mprs.size(); i++) {
+         for (int i=0; i<count; i++) {
             seeps_mpr = seeps_mprs[i];
+            int j = pair_idx[i];
+            mlog << Debug(9) << method_name
+                 << "i, density, weight, seeps, s_idx => "
+                 << i << " " << density_vector[i] << " " << weight[i] << " "
+                 << seeps_mpr->score << " " << seeps_mpr->s_idx << "\n";
+
             //IDL: s = s + c(4+cat(i) * w{i)
-            if (i < density_cnt) {
-               mlog << Debug(9) << method_name
-                    << "i, seeps_mpr, weight(i), s_idx => "
-                    << i << " " << seeps_mpr->score
-                    << " " << weight[i] << " " << seeps_mpr->s_idx << "\n"; 
-               score_sum_wgt += seeps_mpr->score * weight[i];
-               obs_sum_wgt   += pd->o_na[i] * weight[i];
-               fcst_sum_wgt  += pd->f_na[i] * weight[i];
-               mlog << Debug(9) << method_name
-                    << "score_sum_wgt (seeps_mpr*weight) => "
-                    << score_sum_wgt << "\n";
-               //IDL: pvf(cat{i)) = pvf(cat{i)) + w{i)
-               pvf[seeps_mpr->s_idx] += weight[i];
-            }
-            else {
-               mlog << Debug(1) << method_name
-                    << "the length of density vector (" << density_cnt
-                    << ") is less than SEEPS MPR (" << seeps_mprs.size() << ").\n";
-               break;
-            }
+            score_sum_wgt += seeps_mpr->score * weight[i];
+            obs_sum_wgt   += pd->o_na[j] * weight[i];
+            fcst_sum_wgt  += pd->f_na[j] * weight[i];
+
+            //IDL: pvf(cat{i)) = pvf(cat{i)) + w{i)
+            int s_idx = (seeps_mpr->fcst_cat*3) + seeps_mpr->obs_cat;
+            if (s_idx >= 0 && s_idx < SEEPS_MATRIX_SIZE) pvf[s_idx] += weight[i];
          }
       }
-
-      density_vector.clear();
-      seeps_mprs.clear();
 
       seeps_agg->pv1 = pvf[0] + pvf[3] + pvf[6];    // sum by column for obs
       seeps_agg->pv2 = pvf[1] + pvf[4] + pvf[7];    // sum by column for obs
@@ -1746,7 +1739,9 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
         << "dp_size, nan_count, bad_count, count_diagonal: "
         << dp_size << " " << nan_count << " " << bad_count << " "
         << count_diagonal << "\n";
-   int cell_count = dp_size - nan_count - bad_count;
+   // MET #3465: Normalize by the number of valid SEEPS grid points,
+   // excluding points with missing data or no climatology
+   int cell_count = seeps_count;
    if (cell_count > 0) {
       seeps_agg->score_wgt = seeps_score_sum/cell_count;
       for (int i=0; i<SEEPS_MATRIX_SIZE; i++) {
@@ -1798,135 +1793,67 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
 
 void compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps,
                                   vector<double> &density_vector) {
-   int seeps_idx;
-   SeepsScore *seeps_mpr;
-   int seeps_cnt = seeps->n_obs;
-   vector<double> rlat(seeps_cnt), rlon(seeps_cnt);
-   vector<double> clat(seeps_cnt), clon(seeps_cnt);
-   vector<double> slat(seeps_cnt), slon(seeps_cnt);
-   vector< vector<double> > clat_m(seeps_cnt, vector<double> (seeps_cnt));
-   vector< vector<double> > clon_m(seeps_cnt, vector<double> (seeps_cnt));
-   vector< vector<double> > slat_m(seeps_cnt, vector<double> (seeps_cnt));
-   vector< vector<double> > slon_m(seeps_cnt, vector<double> (seeps_cnt));
-   vector< vector<double> > clon_slat(seeps_cnt, vector<double> (seeps_cnt));
-   vector< vector<double> > density_m(seeps_cnt, vector<double> (seeps_cnt));
    static const char *method_name = "compute_seeps_density_vector() -> ";
 
-   if (seeps_cnt == 0) {
+   density_vector.clear();
+
+   if (seeps->n_obs == 0) {
       mlog << Debug(1) << method_name
            << "no SEEPS_MPR available.\n";
       return;
    }
 
-   // Get lat/lon & convert them to radian and get sin/cos values
-   seeps_idx = 0;
+   // Get the sin/cos of the lat/lon of each valid SEEPS pair
+   vector<double> clat, slat, clon, slon;
+   clat.reserve(seeps->n_obs);
+   slat.reserve(seeps->n_obs);
+   clon.reserve(seeps->n_obs);
+   slon.reserve(seeps->n_obs);
    for(int i=0; i<pd->n_obs; i++) {
-      if (i >= pd->seeps_mpr.size()) break;
-      seeps_mpr = pd->seeps_mpr[i].get();
-      mlog << Debug(9) << method_name
-           << "seeps_idx, seeps_mpr => "
-           << seeps_idx << " " << seeps_mpr << "\n";
-
+      if (i >= (int) pd->seeps_mpr.size()) break;
+      const SeepsScore *seeps_mpr = pd->seeps_mpr[i].get();
       if (!seeps_mpr || is_eq(seeps_mpr->score, bad_data_double)) continue;
-      mlog << Debug(4) << method_name
-           << "lat, long => " << pd->lat_na[i] << " "
-           << fmod((pd->lon_na[i] + 360.), 360.) << "\n";
 
-      rlat[seeps_idx] = pd->lat_na[i] * rad_per_deg;    // radian of lat
-      rlon[seeps_idx] = fmod((pd->lon_na[i] + 360.), 360.) * rad_per_deg;    // radian of long
-      clat[seeps_idx] = cos(rlat[seeps_idx]);
-      clon[seeps_idx] = cos(rlon[seeps_idx]);
-      slat[seeps_idx] = sin(rlat[seeps_idx]);
-      slon[seeps_idx] = sin(rlon[seeps_idx]);
-      mlog << Debug(9) << method_name
-           << "clat, clon, slat, slon => "
-           << clat[seeps_idx] << " " << clon[seeps_idx]
-           << " " << slat[seeps_idx] << " " << slon[seeps_idx] << "\n"; 
-
-      seeps_idx++;
+      double rlat = pd->lat_na[i] * rad_per_deg;
+      double rlon = pd->lon_na[i] * rad_per_deg;
+      clat.push_back(cos(rlat));
+      slat.push_back(sin(rlat));
+      clon.push_back(cos(rlon));
+      slon.push_back(sin(rlon));
    }
 
-   // produces n by n matrix by multiplying transposed vector
- 
-   // Initialize
-   int v_count = 0;
-   mlog << Debug(9) << method_name
-        << "seeps_idx, seeps_cnt => "
-        << seeps_idx << " " << seeps_cnt << "\n";
-
-   if (seeps_idx < seeps_cnt) seeps_cnt = seeps_idx;
-   density_vector.reserve(seeps_cnt);
-   for(int j=0; j<seeps_cnt; j++) {
-      density_vector.emplace_back(0.);
-      for(int i=0; i<seeps_cnt; i++) {
-         // Make n by n matrix: clat_m = clat#transpose(clat), slat_m = slat#transpose(slat) by IDL
-         clat_m[i][j] = clat[i] * clat[j];
-         slat_m[i][j] = slat[i] * slat[j];
-         clon_m[i][j] = clon[i] * clon[j];
-         slon_m[i][j] = slon[i] * slon[j];
-         mlog << Debug(9)  << method_name
-              << "j, i, clat_m[i][j], slat_m[i][j], clon_m[i][j], slon_m[i][j] => "
-              << j << " " << i << " " << clat_m[i][j] << " " << slat_m[i][j] << " "
-              << clon_m[i][j] << " " << slon_m[i][j] << "\n";
-
-         //IDL: r=(clat#transpose(clat))*(slon#transpose(slon)) + (clon#transpose(clon))*(slat#transpose(slat))
-         double density = clat_m[i][j] * slon_m[i][j] + clon_m[i][j] * slat_m[i][j];
-         double density2 = (clat_m[i][j] * (slon_m[i][j] + clon_m[i][j])) + slat_m[i][j];
-         mlog << Debug(9) << method_name
-              << "density, density2 => " << density << " " << density2 << "\n";
-
-         //IDL: r * ((r lt 1.) and (r gt -1.)) + (r ge 1.) - (r le -1.)
-         double mask1 = (density < 1.0 && density > -1.0) ? 1. : 0.;
-         double mask2 = (density >= 1.0 ) ? 1. : 0.;
-         double mask3 = (density <= -1.0) ? 1. : 0.;
-         double mask5 = (density2 < 1.0 && density > -1.0) ? 1. : 0.;
-         double mask6 = (density2 >= 1.0 ) ? 1. : 0.;
-         double mask7 = (density2 <= -1.0) ? 1. : 0.;
-         density = density * mask1 + mask2 - mask3;
-         density2 = density2 * mask5 + mask6 - mask7;
-         mlog << Debug(9) << method_name
-              << "density, density2 => " << density << " " << density2 << "\n";
-
-         //IDL: r = acos(r)
-         density = acos(density);
-         //IDL: if r0 gt 0.0 then r = exp(-(r/r0)^2) * (r le 4. * r0) else r = (r*0.)+1.
-                  if (density_radius_rad > 0.) {
-         if (density < 4.0 * density_radius_rad) {
-              mask3 = (density <= 4.0) ? 1. : 0.;
-              double temp = density / density_radius_rad;
-              density = exp(-(temp * temp)) * mask3 * density_radius_rad;
-            }
-            else {
-              density = 0.;
-            }
-            if (density2 < 4.0 * density_radius_rad) {
-              density2 = exp(-(pow(density2 / density_radius_rad,2)));
-            }
-            else {
-              density2 = 0.;
-            }
-            mlog << Debug(4) << method_name
-                 << "final density, density2 => "
-                 << density << " " << density2 << "\n";
-         } else {
-            density = 1.;
+   //
+   // MET #3465: Station density from Section 9.1 of Rodwell et al. (2010):
+   //   density(k) = sum over l of exp(-(alpha(k,l)/alpha0)^2)
+   // where alpha(k,l) is the angle between stations k and l and alpha0
+   // is the density radius. Contributions beyond 4*alpha0 are ignored.
+   // Each station contributes 1 to its own density.
+   //
+   //IDL: r=(clat#transpose(clat))*(clon#transpose(clon) + slon#transpose(slon)) + slat#transpose(slat)
+   //IDL: r = acos(r * ((r lt 1.) and (r gt -1.)) + (r ge 1.) - (r le -1.))
+   //IDL: r = exp(-(r/r0)^2) * (r le 4. * r0)
+   //
+   auto n = (int) clat.size();
+   density_vector.assign(n, 1.0);
+   for(int k=0; k<n; k++) {
+      for(int l=k+1; l<n; l++) {
+         double cos_alpha = clat[k] * clat[l] * (clon[k] * clon[l] + slon[k] * slon[l])
+                          + slat[k] * slat[l];
+         double alpha = acos(std::clamp(cos_alpha, -1.0, 1.0));
+         if (alpha <= 4.0 * density_radius_rad) {
+            double ratio = alpha / density_radius_rad;
+            double density = exp(-(ratio * ratio));
+            density_vector[k] += density;
+            density_vector[l] += density;
          }
-         mlog << Debug(4) << method_name
-              << "For Info - Feeding density2 (not density) back as vector "
-              << "as density all zeros in final output" << "\n";
-         density_vector[j] += density2;
       }
-      if (!is_eq(density_vector[j], 0.)) v_count++;
    }
-   if (v_count == 0) {
-      mlog << Debug(4) << method_name
-           << "no non-zero values at density_vector\n";
-   }
-   if (seeps_cnt > 0) {
+
+   if (n > 0) {
       mlog << Debug(9) << method_name
-           << " non zero count=" << v_count << " seeps_cnt=" << seeps_cnt
+           << "seeps_cnt=" << n
            << " density_vector[0]=" << density_vector[0]
-           << " density_vector[" << (seeps_cnt-1) << "]=" << density_vector[seeps_cnt-1] << "\n";
+           << " density_vector[" << (n-1) << "]=" << density_vector[n-1] << "\n";
    }
 
    return;

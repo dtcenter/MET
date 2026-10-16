@@ -657,6 +657,7 @@ void parse_seeps_mpr_line(STATLine &l, SEEPSMPRData &s_data) {
 
    s_data.seeps_mpr.fcst_cat = atoi(l.get_item("FCST_CAT"));
    s_data.seeps_mpr.obs_cat  = atoi(l.get_item("OBS_CAT"));
+   s_data.seeps_mpr.s_idx    = (s_data.seeps_mpr.fcst_cat*3)+s_data.seeps_mpr.obs_cat;
    s_data.seeps_mpr.p1       = atof(l.get_item("P1"));
    s_data.seeps_mpr.p2       = atof(l.get_item("P2"));
    s_data.seeps_mpr.t1       = atof(l.get_item("T1"));
