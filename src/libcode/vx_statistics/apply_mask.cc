@@ -115,9 +115,10 @@ Grid parse_grid_string(const char *grid_str) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_grid_weight(const Grid &grid, const GridWeightType t,
-                       DataPlane &wgt_dp) {
+                       DataPlane &wgt_dp, DataPlane *area_dp) {
 
    // Initialize
+   if(area_dp) area_dp->clear();
    wgt_dp.clear();
    wgt_dp.set_size(grid.nx(), grid.ny());
 
@@ -155,6 +156,36 @@ void parse_grid_weight(const Grid &grid, const GridWeightType t,
          } // end for y
       } // end for x
    } // End omp parallel
+
+   // Normalize the AREA and AREA_CNTR weights to the range (0, 1]
+   if(t == GridWeightType::Area || t == GridWeightType::Area_Cntr) {
+
+      const char *area_str = (t == GridWeightType::Area_Cntr ?
+                              conf_val_area_cntr : conf_val_area);
+
+      // Store the true grid box areas, if requested
+      if(area_dp) *area_dp = wgt_dp;
+
+      double area_min;
+      double area_max;
+      wgt_dp.data_range(area_min, area_max);
+
+      // Check for grids that do not define the grid box area
+      if(is_bad_data(area_max) || area_max <= 0.0) {
+         mlog << Error << "\nparse_grid_weight() -> "
+              << "\"" << conf_key_grid_weight_flag << " = " << area_str
+              << "\" is not supported since the grid box area is not "
+              << "defined for this grid type.\n\n";
+         exit(1);
+      }
+
+      // Divide by the maximum grid box area
+      wgt_dp /= area_max;
+
+      mlog << Debug(3) << "Normalized the " << area_str
+           << " grid weights by the maximum grid box area of "
+           << area_max << " km^2.\n";
+   }
 
    return;
 }
