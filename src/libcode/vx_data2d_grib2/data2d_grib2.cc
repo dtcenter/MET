@@ -22,6 +22,7 @@
 #include <utility>
 #include <limits>
 #include <list>
+#include <new>
 
 #include "data2d_grib2.h"
 #include "grib_strings.h"
