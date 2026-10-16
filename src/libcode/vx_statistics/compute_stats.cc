@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
+#include <numeric>
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -1559,26 +1560,22 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
       double score_sum_wgt = 0.0;
       vector<double> pvf(SEEPS_MATRIX_SIZE, 0.0);
 
-      // Station density, one entry per element of seeps_mprs
-      vector<double> density_vector;
-      compute_seeps_density_vector(pd, seeps_agg, density_vector);
+      // Station density weights, one entry per element of seeps_mprs
+      //IDL: w = 1/d
+      vector<double> weight;
+      compute_seeps_point_weights(pd, weight);
 
-      if (density_vector.size() != seeps_mprs.size()) {
+      if (weight.size() != seeps_mprs.size() ||
+          std::any_of(weight.begin(), weight.end(),
+                      [](double w) { return is_bad_data(w); })) {
          mlog << Warning << "\n" << method_name
-              << "the length of the density vector (" << density_vector.size()
-              << ") does not match the number of SEEPS pairs ("
-              << seeps_mprs.size() << ")!\n\n";
+              << "unable to compute station density weights for "
+              << seeps_mprs.size() << " SEEPS pairs!\n\n";
       }
       else {
 
-         //IDL: w = 1/d
          //IDL: w = w/sum(w)
-         vector<double> weight(count, 0.0);
-         double weight_sum = 0.0;
-         for (int i=0; i<count; i++) {
-            weight[i] = 1.0 / density_vector[i];
-            weight_sum += weight[i];
-         }
+         double weight_sum = std::accumulate(weight.begin(), weight.end(), 0.0);
          for (int i=0; i<count; i++) weight[i] /= weight_sum;
 
          //IDL: for i=0l, n-1l do begin
@@ -1586,8 +1583,8 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
             seeps_mpr = seeps_mprs[i];
             int j = pair_idx[i];
             mlog << Debug(9) << method_name
-                 << "i, density, weight, seeps, s_idx => "
-                 << i << " " << density_vector[i] << " " << weight[i] << " "
+                 << "i, weight, seeps, s_idx => "
+                 << i << " " << weight[i] << " "
                  << seeps_mpr->score << " " << seeps_mpr->s_idx << "\n";
 
             //IDL: s = s + c(4+cat(i) * w{i)
@@ -1791,70 +1788,51 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps,
-                                  vector<double> &density_vector) {
-   static const char *method_name = "compute_seeps_density_vector() -> ";
+void compute_seeps_point_weights(const PairDataPoint *pd,
+                                 vector<double> &weights) {
+   static const char *method_name = "compute_seeps_point_weights() -> ";
 
-   density_vector.clear();
+   weights.clear();
 
-   if (seeps->n_obs == 0) {
-      mlog << Debug(1) << method_name
-           << "no SEEPS_MPR available.\n";
-      return;
-   }
+   //
+   // MET #3465: Station density weighting from Section 9.1 of
+   // Rodwell et al. (2010), computed using the same kernel density
+   // estimation as point_weight_flag = KDE, but only for the stations
+   // of the current pairs that have a valid SEEPS score
+   //
+   PointWeightInfo pw_info;
+   pw_info.set_type(PointWeightType::KDE);
+   pw_info.set_kde_ref_angle(density_radius);
 
-   // Get the sin/cos of the lat/lon of each valid SEEPS pair
-   vector<double> clat, slat, clon, slon;
-   clat.reserve(seeps->n_obs);
-   slat.reserve(seeps->n_obs);
-   clon.reserve(seeps->n_obs);
-   slon.reserve(seeps->n_obs);
+   vector<int> pair_idx;
    for(int i=0; i<pd->n_obs; i++) {
       if (i >= (int) pd->seeps_mpr.size()) break;
       const SeepsScore *seeps_mpr = pd->seeps_mpr[i].get();
       if (!seeps_mpr || is_eq(seeps_mpr->score, bad_data_double)) continue;
 
-      double rlat = pd->lat_na[i] * rad_per_deg;
-      double rlon = pd->lon_na[i] * rad_per_deg;
-      clat.push_back(cos(rlat));
-      slat.push_back(sin(rlat));
-      clon.push_back(cos(rlon));
-      slon.push_back(sin(rlon));
+      pw_info.add_sid(pd->sid_sa[i], pd->lat_na[i], pd->lon_na[i]);
+      pair_idx.push_back(i);
    }
 
-   //
-   // MET #3465: Station density from Section 9.1 of Rodwell et al. (2010):
-   //   density(k) = sum over l of exp(-(alpha(k,l)/alpha0)^2)
-   // where alpha(k,l) is the angle between stations k and l and alpha0
-   // is the density radius. Contributions beyond 4*alpha0 are ignored.
-   // Each station contributes 1 to its own density.
-   //
-   //IDL: r=(clat#transpose(clat))*(clon#transpose(clon) + slon#transpose(slon)) + slat#transpose(slat)
-   //IDL: r = acos(r * ((r lt 1.) and (r gt -1.)) + (r ge 1.) - (r le -1.))
-   //IDL: r = exp(-(r/r0)^2) * (r le 4. * r0)
-   //
-   auto n = (int) clat.size();
-   density_vector.assign(n, 1.0);
-   for(int k=0; k<n; k++) {
-      for(int l=k+1; l<n; l++) {
-         double cos_alpha = clat[k] * clat[l] * (clon[k] * clon[l] + slon[k] * slon[l])
-                          + slat[k] * slat[l];
-         double alpha = acos(std::clamp(cos_alpha, -1.0, 1.0));
-         if (alpha <= 4.0 * density_radius_rad) {
-            double ratio = alpha / density_radius_rad;
-            double density = exp(-(ratio * ratio));
-            density_vector[k] += density;
-            density_vector[l] += density;
-         }
-      }
+   if (pair_idx.empty()) {
+      mlog << Debug(5) << method_name
+           << "no SEEPS_MPR available.\n";
+      return;
    }
 
-   if (n > 0) {
-      mlog << Debug(9) << method_name
-           << "seeps_cnt=" << n
-           << " density_vector[0]=" << density_vector[0]
-           << " density_vector[" << (n-1) << "]=" << density_vector[n-1] << "\n";
+   pw_info.compute_kde_weights();
+
+   // Look up the weight for the station of each pair
+   weights.reserve(pair_idx.size());
+   for(int i : pair_idx) {
+      double wgt;
+      if (!pw_info.has_sid(pd->sid_sa[i], wgt)) wgt = bad_data_double;
+      weights.push_back(wgt);
    }
+
+   mlog << Debug(9) << method_name
+        << "computed " << weights.size() << " SEEPS point weights for "
+        << pw_info.n_stn() << " stations.\n";
 
    return;
 }
