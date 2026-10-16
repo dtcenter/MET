@@ -57,7 +57,7 @@ Optional Arguments for pb2nc
 
 4. The **-nmsg num_messages** option may be used for testing purposes. This argument indicates that only the first "num_messages" PrepBUFR messages should be processed rather than the whole file. This option is provided to speed up testing because running the PB2NC tool can take a few minutes for each file. Most users will not need this option.
 
-5. The **-dump path** option may be used to dump the entire contents of the PrepBUFR file to several ASCII files written to the directory specified by "path". The user may use this option to view a human-readable version of the input PrepBUFR file, although writing the contents to ASCII files can be slow.
+5. The **-dump path** option may be used to dump the contents of the PrepBUFR file to ASCII files written to the directory specified by "path". One file is written for each message type, named *dump_PREFIX_TYPE.txt*, where PREFIX is the input file name and TYPE is the message type. Only the message types requested by the **message_type** configuration option are written, and the mass and wind subsets of each station report are combined into a single report. The user may use this option to view a human-readable version of the input PrepBUFR file, although writing the contents to ASCII files can be slow, especially when all message types are written.
 
 6. The **-index** option shows the available variables with valid data from the BUFR input. It collects the available variable list from BUFR input and checks the existence of valid data and directs the variable names with valid data to the screen. The NetCDF output won't be generated.
 

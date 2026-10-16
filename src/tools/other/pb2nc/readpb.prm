@@ -1,6 +1,6 @@
        use iso_fortran_env, only: dp => real64
 
-       REAL(DP), PARAMETER :: R8BFMS = 10.0E10 ! "Missing" value for BUFR data
+       REAL(DP), PARAMETER :: R8BFMS = 10.0E10_dp ! "Missing" value for BUFR data
 !
        INTEGER, PARAMETER :: MXR8PM = 10    ! Maximum number of BUFR parameters
 !
@@ -15,20 +15,6 @@
        INTEGER, PARAMETER :: MXSTRL = 80    ! Maximum size of a string
        INTEGER, PARAMETER :: FILEMXSTRL = 512   ! Maximum length of a file name
 !
-       INTEGER  :: nlev
-
-       REAL(dp) :: hdr (MXR8PM)
-       REAL(dp) :: evns (MXR8PM, MXR8LV, MXR8VN, MXR8VT)
-       REAL(dp) :: obse (MXR8PM, MXR8LV, MXR8VN)
-       REAL(dp) :: obsi (MXR8PM, MXR8LV)
-
-       REAL(dp) :: evns_t (MXR8PM, MXR8LV_T, MXR8VN, MXR8VT)
-       REAL(dp) :: obse_t (MXR8PM, MXR8LV_T, MXR8VN)
-       REAL(dp) :: obsi_t (MXR8PM, MXR8LV_T)
-       REAL(dp) :: evns_s (MXR8PM, MXR8LV_S, MXR8VN, MXR8VT)
-       REAL(dp) :: obse_s (MXR8PM, MXR8LV_S, MXR8VN)
-       REAL(dp) :: obsi_s (MXR8PM, MXR8LV_S)
-       REAL(dp) :: evns_m (MXR8PM, MXR8LV_M, MXR8VN, MXR8VT)
-       REAL(dp) :: obse_m (MXR8PM, MXR8LV_M, MXR8VN)
-       REAL(dp) :: obsi_m (MXR8PM, MXR8LV_M)
+!      Only PARAMETERs belong here.  Variables declared here would become
+!      separate local copies in every routine that INCLUDEs this file.
 !

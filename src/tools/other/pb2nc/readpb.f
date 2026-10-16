@@ -58,7 +58,13 @@ C*
         REAL*8, intent(out) :: chdr(MXR8PM)
         REAL*8, intent(out) :: cevns(MXR8PM, MXR8LV, MXR8VN, MXR8VT)
 
-        INTEGER :: max_lvl
+        INTEGER :: nlev
+        REAL(dp) :: hdr(MXR8PM)
+        ! Use static storage for the large read buffers
+        REAL(dp), SAVE :: evns(MXR8PM, MXR8LV, MXR8VN, MXR8VT)
+        REAL(dp), SAVE :: evns_t(MXR8PM, MXR8LV_T, MXR8VN, MXR8VT)
+        REAL(dp), SAVE :: evns_s(MXR8PM, MXR8LV_S, MXR8VN, MXR8VT)
+        REAL(dp), SAVE :: evns_m(MXR8PM, MXR8LV_M, MXR8VN, MXR8VT)
         INTEGER :: ii, jj, kk, lv, jret
         LOGICAL :: small_buf, medium_buf, tiny_buf
 C*
@@ -177,6 +183,7 @@ C*
         integer, intent(out) :: iret
         real*8, intent(out) :: chdr(MXR8PM)
 
+        real(dp) :: hdr(MXR8PM)
         character(len=MXSTRL) :: head
         integer :: ii, jret
 C*
@@ -233,7 +240,12 @@ C*
         real*8, intent(out) :: cobs(MXR8PM, MXR8LV)
         character(len=*), intent(in) :: ostr    ! CHARACTER*(MXSTRL) ostr
         logical :: small_buf, medium_buf, tiny_buf
-        integer :: lv, ii, max_nlev
+        integer :: nlev, lv, ii, max_nlev
+        ! Use static storage for the large read buffers
+        real(dp), save :: obsi(MXR8PM, MXR8LV)
+        real(dp), save :: obsi_t(MXR8PM, MXR8LV_T)
+        real(dp), save :: obsi_s(MXR8PM, MXR8LV_S)
+        real(dp), save :: obsi_m(MXR8PM, MXR8LV_M)
 C*
 C-----------------------------------------------------------------------
         iret = 0
@@ -330,7 +342,12 @@ C*
         real*8, intent(out) :: cobs(MXR8PM, MXR8LV, MXR8VN)
         character(len=*), intent(in) :: ostr    ! CHARACTER*(MXSTRL) ostr
         logical :: small_buf, medium_buf, tiny_buf
-        integer :: jj, lv, ii, max_nlev
+        integer :: nlev, jj, lv, ii, max_nlev
+        ! Use static storage for the large read buffers
+        real(dp), save :: obse(MXR8PM, MXR8LV, MXR8VN)
+        real(dp), save :: obse_t(MXR8PM, MXR8LV_T, MXR8VN)
+        real(dp), save :: obse_s(MXR8PM, MXR8LV_S, MXR8VN)
+        real(dp), save :: obse_m(MXR8PM, MXR8LV_M, MXR8VN)
 C*
 C-----------------------------------------------------------------------
         iret = 0
