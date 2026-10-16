@@ -68,9 +68,7 @@ enum class Builtin {
 
    step,
 
-   // Functions defined in ConfigConstants
-   // F_to_C,
-   // C_to_F,
+   // F_to_C and C_to_F are defined in data/config/ConfigConstants
 
 
       //

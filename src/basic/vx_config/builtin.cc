@@ -115,9 +115,7 @@ const BuiltinInfo binfo[] = {
 
    { "step",   1, Builtin::step,    my_istep, nullptr, my_dstep,  nullptr },
 
-   // Functions defined in ConfigConstants
-   // { "F_to_C", 1, Builtin::F_to_C,  nullptr, nullptr, my_F_to_C,  nullptr },
-   // { "C_to_F", 1, Builtin::C_to_F,  nullptr, nullptr, my_C_to_F,  nullptr },
+   // F_to_C and C_to_F are defined in data/config/ConfigConstants
 
    { "nint",   1, Builtin::nint,    nullptr, nullptr, nullptr,  nullptr },
    { "sign",   1, Builtin::sign,    nullptr, nullptr, nullptr,  nullptr },
