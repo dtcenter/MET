@@ -87,14 +87,14 @@ PairBase::PairBase() {
 ////////////////////////////////////////////////////////////////////////
 
 PairBase::~PairBase() {
-   clear();
+   PairBase::clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void PairBase::init_from_scratch() {
 
-   clear();
+   PairBase::clear();
 
    return;
 }
@@ -932,7 +932,7 @@ VxPairBase::VxPairBase() {
 ////////////////////////////////////////////////////////////////////////
 
 VxPairBase::~VxPairBase() {
-   clear();
+   VxPairBase::clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1062,7 +1062,7 @@ VxPairBase & VxPairBase::operator=(VxPairBase &&v) noexcept {
 
 void VxPairBase::init_from_scratch() {
 
-   clear();
+   VxPairBase::clear();
 
    return;
 }
@@ -1140,7 +1140,7 @@ void VxPairBase::clear() {
 
 void VxPairBase::assign(const VxPairBase &vx_pb) {
 
-   clear();
+   VxPairBase::clear();
 
    set_fcst_info(vx_pb.fcst_info.get());
    set_obs_info(vx_pb.obs_info.get());
@@ -1179,7 +1179,7 @@ void VxPairBase::assign(const VxPairBase &vx_pb) {
 
    sfc_info = vx_pb.sfc_info;
 
-   set_size(vx_pb.n_msg_typ, vx_pb.n_mask, vx_pb.n_interp);
+   VxPairBase::set_size(vx_pb.n_msg_typ, vx_pb.n_mask, vx_pb.n_interp);
 
    pb_ptr = vx_pb.pb_ptr;
 

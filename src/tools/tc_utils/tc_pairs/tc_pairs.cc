@@ -1050,7 +1050,7 @@ void process_diags(TrackInfoArray &tracks) {
       for(j=0,n=0; j<cur_files.n(); j++) {
 
          // Check for diagnostic info map entry
-         DiagInfo * info_ptr = 0;
+         DiagInfo * info_ptr = nullptr;
          if(conf_info.DiagInfoMap.count(diag_source[i]) < 1) {
             mlog << Error << "\nprocess_diags() -> "
                  << "no \"" << conf_key_diag_info_map
@@ -1061,7 +1061,7 @@ void process_diags(TrackInfoArray &tracks) {
          info_ptr = &conf_info.DiagInfoMap.at(diag_source[i]);
 
          // Check for diagnostic conversion map entry
-         map<ConcatString,UserFunc_1Arg> * convert_ptr = 0;
+         map<ConcatString,UserFunc_1Arg> * convert_ptr = nullptr;
          map< ConcatString,map<ConcatString,UserFunc_1Arg> >::iterator it;
          for(it = conf_info.DiagConvertMap.begin();
              it != conf_info.DiagConvertMap.end(); it++) {
@@ -1830,7 +1830,7 @@ void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
            << unix_to_yyyymmdd_hhmmss(valid_list[i])
            << ", ADECK: index = " << i_adeck << ", dland = " << adeck_dland
            << ", BDECK: index = " << i_bdeck << ", dland = " << bdeck_dland
-           << ", ERROR: track = " << e_tk << ", x = " << e_x << ", y = " << e_y
+           << ", TRACK_ERR: track = " << e_tk << ", x = " << e_x << ", y = " << e_y
            << ", along = " << e_altk << ", cross = " << e_crtk << "\n";
 
       // Add this info to the TrackPairInfoArray
@@ -1907,7 +1907,7 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
    n_ut = (ut_max-ut_min)/ut_inc + 1;
 
    mlog << Debug(3)
-        << "Computing track errors for " << n_ut << " vaild times: "
+        << "Computing track differences for " << n_ut << " valid times: "
         << unix_to_yyyymmdd_hhmmss(ut_min)
         << " to " << unix_to_yyyymmdd_hhmmss(ut_max)
         << " by " << sec_to_hhmmss(ut_inc) << " increment.\n";
@@ -2005,12 +2005,12 @@ void process_watch_warn(TrackPairInfoArray &p) {
    // Check for non-empty file name
    if(file_name.empty()) {
       mlog << Debug(1)
-           << "No watch/warning file specified.\n";
+           << "No watch/warn file specified.\n";
       return;
    }
 
    mlog << Debug(1)
-        << "Watch/Warning file: " << file_name << "\n";
+        << "Watch/Warn file: " << file_name << "\n";
 
    // Open the watch/warning ASCII file
    if(!f_in.open(file_name.c_str())) {

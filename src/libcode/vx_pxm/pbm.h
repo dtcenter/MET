@@ -40,7 +40,7 @@ class Pbm : public PxmBase {
    public:
 
       Pbm();
-      Pbm(const char *);
+      explicit Pbm(const char *);
       virtual ~Pbm();
       Pbm(const Pbm &);
       Pbm & operator=(const Pbm &);

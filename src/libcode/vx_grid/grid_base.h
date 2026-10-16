@@ -132,7 +132,7 @@ class GridInterface {   //  pure abstract class for grid public interface
 
       virtual void xy_to_latlon(double x, double y, double &lat, double &lon) const = 0;
 
-      virtual double calc_area(int x, int y) const = 0;
+      virtual double calc_area(int x, int y, bool centered) const = 0;
 
       virtual int nx() const = 0;
       virtual int ny() const = 0;
@@ -207,20 +207,20 @@ class Grid : public GridInterface {
    public:
 
       Grid();
-      Grid(const char *);   //  lookup by name
-      Grid(const LambertData       &);
-      Grid(const StereographicData &);
-      Grid(const LatLonData        &);
-      Grid(const RotatedLatLonData &);
-      Grid(const MercatorData      &);
-      Grid(const GaussianData      &);
-      Grid(const GoesImagerData    &);
-      Grid(const RngAziData        &);
-      Grid(const LaeaData          &);
-      Grid(const LaeaNetcdfData    &);
-      Grid(const SemiLatLonData    &);
+      explicit Grid(const char *);   //  lookup by name
+      explicit Grid(const LambertData       &);
+      explicit Grid(const StereographicData &);
+      explicit Grid(const LatLonData        &);
+      explicit Grid(const RotatedLatLonData &);
+      explicit Grid(const MercatorData      &);
+      explicit Grid(const GaussianData      &);
+      explicit Grid(const GoesImagerData    &);
+      explicit Grid(const RngAziData        &);
+      explicit Grid(const LaeaData          &);
+      explicit Grid(const LaeaNetcdfData    &);
+      explicit Grid(const SemiLatLonData    &);
 #ifdef WITH_UGRID
-      Grid(const UnstructuredData  &);
+      explicit Grid(const UnstructuredData  &);
 #endif
       virtual ~Grid();
       Grid(const Grid &);
@@ -257,7 +257,7 @@ class Grid : public GridInterface {
 
       void xy_to_latlon(double x, double y, double & lat, double & lon) const;
 
-      double calc_area(int x, int y) const;
+      double calc_area(int x, int y, bool centered) const;
 
       int nx() const;
       int ny() const;

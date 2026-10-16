@@ -35,7 +35,7 @@ class Pgm : public PxmBase {
    public:
 
       Pgm();
-      Pgm(const char *);
+      explicit Pgm(const char *);
       virtual ~Pgm();
       Pgm(const Pgm &);
       Pgm & operator=(const Pgm &);

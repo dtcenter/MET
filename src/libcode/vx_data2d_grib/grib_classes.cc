@@ -123,13 +123,7 @@ Sec4_offset_in_file = -1;
 ////////////////////////////////////////////////////////////////////////
 
 
-GribRecord::~GribRecord()
-
-{
-
-//if ( data ) { delete data; data = (vector<unsigned char> *) nullptr; }
-//if ( bitmap ) { delete bitmap; bitmap = (vector<unsigned char> *) nullptr; }
-}
+GribRecord::~GribRecord() = default;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -601,7 +595,7 @@ GribFile::GribFile(const char *filename)
 
 rep.reset();
 
-open(filename);
+GribFile::open(filename);
 
 }
 
@@ -616,7 +610,7 @@ bool GribFile::open(const char *filename)
 int j;
 const char *method_name = "GribFile::open(char *) -> ";
 
-close();
+GribFile::close();
 
 rep = std::make_shared<GribFileRep>();
 
@@ -669,14 +663,7 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-GribFile::GribFile(const GribFile &g)
-
-{
-
-rep = g.rep;
-
-
-}
+GribFile::GribFile(const GribFile &g) = default;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -705,7 +692,7 @@ GribFile::~GribFile()
 
 {
 
-close();
+GribFile::close();
 
 }
 
@@ -741,7 +728,7 @@ int m, d, y, hh, mm;
 int D, E;
 off_t file_pos;
 off_t bytes_processed;
-unsigned char *c = (unsigned char *) 0, c3[3];
+unsigned char *c = nullptr, c3[3];
 double t;
 float r[4];
 uint4 ibm;
@@ -777,7 +764,7 @@ g.Sec0_offset_in_record = bytes_processed;
 
 bytes = sizeof(Section0_Header);
 
-if ( (n_read = read(rep->buf.data(), bytes)) == 0 ) return 0;
+if ( (n_read = GribFile::read(rep->buf.data(), bytes)) == 0 ) return 0;
 
 memcpy(g.is.get(), rep->buf.data(), 8);
 
@@ -1327,7 +1314,7 @@ const char * GribFile::name()
 
 {
 
-if ( !rep ) return ( (char *) 0 );
+if ( !rep ) return ( nullptr );
 
 return ( rep->name.c_str() );
 

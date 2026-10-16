@@ -878,12 +878,12 @@ else {
 if ( data.levels.n() > 0 )  {
    nc_dim = add_dim(ncfile, "level", (long) data.levels.n());
    write_semilatlon_var(ncfile, "level", &nc_dim, data.levels,
-                        "level", 0, 0);
+                        "level", nullptr, nullptr);
 }
 else if ( data.times.n() > 0 )  {
    nc_dim = add_dim(ncfile, "time", (long) data.times.n());
    write_semilatlon_var(ncfile, "times", &nc_dim, data.times,
-                        "time", 0, 0);
+                        "time", nullptr, nullptr);
 }
 else {
    mlog << Error << "\nsemilatlon_grid_output(const GridInfo & info, NcFile * ncfile) -> "

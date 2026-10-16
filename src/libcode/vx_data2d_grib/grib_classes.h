@@ -534,7 +534,7 @@ class GribFile {
       GribFile(const GribFile &);
       GribFile &operator=(const GribFile &);
 
-      GribFile(const char *);
+      explicit GribFile(const char *);
 
       virtual bool open(const char *);
 

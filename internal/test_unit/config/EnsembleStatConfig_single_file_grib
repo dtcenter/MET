@@ -111,7 +111,7 @@ skip_const      = FALSE;
 // Set dist_type to NONE to use the observation error table instead
 // May be set separately in each "obs.field" entry
 //
-obs_error = {
+obs_err = {
    flag             = FALSE;   // TRUE or FALSE
    dist_type        = NONE;    // Distribution type
    dist_parm        = [];      // Distribution parameters

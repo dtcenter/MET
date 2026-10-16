@@ -64,14 +64,13 @@ FileHandler::FileHandler(const string &program_name) :
 
 ////////////////////////////////////////////////////////////////////////
 
-FileHandler::~FileHandler()
-{
-  //
-  //  _ncFile is a unique_ptr and closes itself.  This used to delete the
-  //  pointer it owns, which double freed whenever writeNetcdfFile() returned
-  //  early from _writeObservations() with the file still open.
-  //
-}
+//
+//  _ncFile is a unique_ptr and closes itself.  This used to delete the
+//  pointer it owns, which double freed whenever writeNetcdfFile() returned
+//  early from _writeObservations() with the file still open.
+//
+
+FileHandler::~FileHandler() = default;
 
 ////////////////////////////////////////////////////////////////////////
 

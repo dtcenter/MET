@@ -113,7 +113,7 @@ option_text.clear();
 
 Nargs = 0;
 
-f = (CLSetFunction) 0;
+f = nullptr;
 
 return;
 
@@ -500,7 +500,7 @@ options.clear();
 
 ProgramName.clear();
 
-Usage = (UsageFunction) 0;
+Usage = nullptr;
 
 AllowNumbers = false;
 

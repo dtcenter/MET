@@ -58,7 +58,7 @@ MetGrib2DataFile::MetGrib2DataFile() {
 
 MetGrib2DataFile::~MetGrib2DataFile() {
 
-   close();
+   MetGrib2DataFile::close();
 }
 
 ////////////////////////////////////////////////////////////////////////
