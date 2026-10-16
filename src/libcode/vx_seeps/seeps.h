@@ -81,7 +81,7 @@ struct SeepsScore { // For SEEPS_MPR
 struct SeepsAggScore {  // For SEEPS
    void clear();
    SeepsAggScore & operator+=(const SeepsAggScore &);
-   bool inc_category(int fcst_cat, int obs_cat, double wgt);
+   bool inc_category(int fcst_cat, int obs_cat);
 
    int    n_obs;
    int    c_odfl;
@@ -90,12 +90,6 @@ struct SeepsAggScore {  // For SEEPS
    int    c_olfh;
    int    c_ohfd;
    int    c_ohfl;
-   double s_odfl;
-   double s_odfh;
-   double s_olfd;
-   double s_olfh;
-   double s_ohfd;
-   double s_ohfl;
    double pv1;   // marginal probabilities of the observed values
    double pv2;
    double pv3;

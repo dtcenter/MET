@@ -2798,6 +2798,7 @@ The "grid_weight_flag" specifies how grid weighting should be applied
 during the computation of contingency tables (CTC, MCTC, PCT, and
 NBRCTC), partial sums (SL1L2, SAL1L2, VL1L2, and VAL1L2), and statistics
 (CNT, CTS, MCTS, PSTD, PRC, PJC, ECLV, NBRCNT, and NBRCTS).
+It is not applied to the SEEPS line type (see :numref:`PS_seeps_weighting`).
 It is meant to account for grid box area distortion and is often applied
 to global Lat/Lon grids. It is only applied for grid-to-grid verification
 in Grid-Stat and Ensemble-Stat and is not applied for grid-to-point
@@ -2883,9 +2884,8 @@ Three point weighting options are currently supported:
 
   The SEEPS line type applies its own station density weighting, computed the
   same way and using the same "kde_ref_angle" option, regardless of the
-  "point_weight_flag" setting. The "point_weight_flag" weights are applied only to
-  the ODFL, ODFH, OLFD, OLFH, OHFD, and OHFL columns of the SEEPS line type. See
-  :numref:`PS_seeps_weighting` for details.
+  "point_weight_flag" setting. The "point_weight_flag" weights are not applied to
+  the SEEPS line type. See :numref:`PS_seeps_weighting` for details.
 
 .. code-block:: none
 

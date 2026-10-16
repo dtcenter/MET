@@ -1530,11 +1530,9 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg,
       fcst_sum += pd->f_na[i];   // Forecast Value
       score_sum += seeps_mpr->score;
 
-      // MET #3465: Sum the pair weights for each category, like CTC
-      double wgt = (i < pd->wgt_na.n() && !is_bad_data(pd->wgt_na[i]) ?
-                    pd->wgt_na[i] : 1.0);
+      // MET #3465: Count the pairs in each off-diagonal category
       if (!seeps_agg->inc_category(seeps_mpr->fcst_cat,
-                                   seeps_mpr->obs_cat, wgt)) count_diagonal++;
+                                   seeps_mpr->obs_cat)) count_diagonal++;
       seeps_mprs.emplace_back(seeps_mpr);
       pair_idx.emplace_back(i);
    }
@@ -1636,7 +1634,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &obs_dp,
-                                   const DataPlane &wgt_dp, DataPlane &seeps_dp, DataPlane &seeps_dp_fcat,
+                                   DataPlane &seeps_dp, DataPlane &seeps_dp_fcat,
                                    DataPlane &seeps_dp_ocat, SeepsAggScore *seeps_agg,
                                    int month, int hour, const SingleThresh &seeps_p1_thresh,
                                    const ConcatString &seeps_climo_name) {
@@ -1651,7 +1649,6 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
    int count_diagonal = 0;
    int nan_count = 0;
    int bad_count = 0;
-   bool wgt_flag = (wgt_dp.nx() == nx && wgt_dp.ny() == ny);
    double seeps_score = 0.0;
    double seeps_score_sum = 0.0;
    double seeps_score_partial_sum = 0.0;
@@ -1708,12 +1705,8 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
                   fcst_sum += fcst_value;
                   seeps_score_partial_sum += seeps_score;
 
-                  // MET #3465: Sum the grid weights for each category, like CTC
-                  double wgt = 1.0;
-                  if (wgt_flag && !is_bad_data(wgt_dp.get(ix, iy))) {
-                     wgt = wgt_dp.get(ix, iy);
-                  }
-                  if (!seeps_agg->inc_category(fcst_cat, obs_cat, wgt)) count_diagonal++;
+                  // MET #3465: Count the grid points in each off-diagonal category
+                  if (!seeps_agg->inc_category(fcst_cat, obs_cat)) count_diagonal++;
 
                   //IDL: s = s + c(4+cat(i) * w{i)  <-- this is done by summing scores
                   //IDL: pvf(cat{i)) = pvf(cat{i)) + w{i)

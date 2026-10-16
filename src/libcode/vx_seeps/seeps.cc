@@ -99,7 +99,6 @@ void SeepsAggScore::clear() {
 
    n_obs = 0;
    c_odfl = c_odfh = c_olfd = c_olfh = c_ohfd = c_ohfl = 0;
-   s_odfl = s_odfh = s_olfd = s_olfh = s_ohfd = s_ohfl = 0.0;
    pv1 = pv2 = pv3 = 0.0;
    pf1 = pf2 = pf3 = 0.0;
    mean_fcst = mean_fcst_wgt = bad_data_double;
@@ -130,17 +129,9 @@ SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
    c_olfh += c.c_olfh;
    c_ohfd += c.c_ohfd;
    c_ohfl += c.c_ohfl;
-   
-   // Increment sums of weights
-   s_odfl += c.s_odfl;
-   s_odfh += c.s_odfh;
-   s_olfd += c.s_olfd;
-   s_olfh += c.s_olfh;
-   s_ohfd += c.s_ohfd;
-   s_ohfl += c.s_ohfl;
    mlog << Debug(9) << method_name
-        << "s_odfl, o_odfh => "
-        << s_odfl << " " << s_odfh << "\n";
+        << "c_odfl, c_odfh => "
+        << c_odfl << " " << c_odfh << "\n";
 
    pv1 = weighted_average(pv1, w1, c.pv1, w2);
    pv2 = weighted_average(pv2, w1, c.pv2, w2);
@@ -164,21 +155,21 @@ SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Increment the count (c_*) and sum of weights (s_*) for the
-// off-diagonal forecast/observation category of a SEEPS pair.
+// Increment the count (c_*) for the off-diagonal
+// forecast/observation category of a SEEPS pair.
 // Return false for pairs on the diagonal or with invalid categories.
 //
 ////////////////////////////////////////////////////////////////////////
 
-bool SeepsAggScore::inc_category(int fcst_cat, int obs_cat, double wgt) {
+bool SeepsAggScore::inc_category(int fcst_cat, int obs_cat) {
    bool status = true;
 
-   if     (fcst_cat == 0 && obs_cat == 1) { c_olfd++; s_olfd += wgt; }
-   else if(fcst_cat == 0 && obs_cat == 2) { c_ohfd++; s_ohfd += wgt; }
-   else if(fcst_cat == 1 && obs_cat == 0) { c_odfl++; s_odfl += wgt; }
-   else if(fcst_cat == 1 && obs_cat == 2) { c_ohfl++; s_ohfl += wgt; }
-   else if(fcst_cat == 2 && obs_cat == 0) { c_odfh++; s_odfh += wgt; }
-   else if(fcst_cat == 2 && obs_cat == 1) { c_olfh++; s_olfh += wgt; }
+   if     (fcst_cat == 0 && obs_cat == 1) c_olfd++;
+   else if(fcst_cat == 0 && obs_cat == 2) c_ohfd++;
+   else if(fcst_cat == 1 && obs_cat == 0) c_odfl++;
+   else if(fcst_cat == 1 && obs_cat == 2) c_ohfl++;
+   else if(fcst_cat == 2 && obs_cat == 0) c_odfh++;
+   else if(fcst_cat == 2 && obs_cat == 1) c_olfh++;
    else status = false;
 
    return status;

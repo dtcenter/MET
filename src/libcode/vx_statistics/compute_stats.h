@@ -62,7 +62,7 @@ extern void   compute_i_mean_stdev(const NumArray &,
 extern void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps,
                                      double kde_ref_angle = density_radius);
 extern void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &obs_dp,
-                                          const DataPlane &wgt_dp, DataPlane &seeps_dp, DataPlane &seeps_dp_fcat,
+                                          DataPlane &seeps_dp, DataPlane &seeps_dp_fcat,
                                           DataPlane &seeps_dp_ocat,SeepsAggScore *seeps,
                                           int month, int hour, const SingleThresh &seeps_p1_thresh,
                                           const ConcatString &seeps_climo_name);
