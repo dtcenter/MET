@@ -16,7 +16,7 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
 
      * **Generalize support for automated derivation of wind speed and direction and rotation of winds from grid to earth-relative**
        (`#1518 <https://github.com/dtcenter/MET/issues/1518>`_).
-     * **Revisit AW_MEAN regridding and grid weighting options**
+     * **Enhance area-weighted regridding and grid weighting to support centered grid boxes**
        (`#3178 <https://github.com/dtcenter/MET/issues/3178>`_).
      * **Add power spectra calculation capability to the Grid-Diag tool in MET**
        (`#3304 <https://github.com/dtcenter/MET/issues/3304>`_).
