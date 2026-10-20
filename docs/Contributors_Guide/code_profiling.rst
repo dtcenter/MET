@@ -2,16 +2,14 @@
 Code Profiling
 **************
 
-Benchmarking (also referred to as profiling) of MET tools is accomplished using the CTRACK tool:
-  https://github.com/Compaile/ctrack
+Benchmarking (also referred to as profiling) of MET tools is accomplished using the `CTRACK tool <https://github.com/Compaile/ctrack>`_.
 
-This code is licensed under the MIT License:
-  https://github.com/Compaile/ctrack/blob/main/LICENSE
+  This code is licensed under the `MIT License <https://github.com/Compaile/ctrack/blob/main/LICENSE>`_.
 
 Benchmarking uses a macro and the C++ source code is readily instrumented by
 including ctrack.hpp and by adding **CTRACK** at the top of the function of interest.
 By default, the tool generates summary and detail metrics to stdout (standard output)
-in easy to read, well-formatted tables.  The ctrack.hpp file has been modified to permit
+in easy-to-read, well-formatted tables.  The ctrack.hpp file has been modified to permit
 saving these tables to their respective text files (summary_output.txt and detail_output.txt).
 
 
@@ -50,12 +48,12 @@ The following code is instrumented using CTRACK:
 Benchmarking with Python script
 -------------------------------
 
-The benchmarking.py script invokes MET code either via **MET command line commands** or **METplus use cases** as
+The benchmark.py script invokes MET code either via **MET command line commands** or **METplus use cases** as
 specified by the **run_met_directly** setting in the benchmark.yaml configuration file.
 The metrics from the summary and detail tables are consolidated into csv and tabular text files
 (the locations of these consolidated metrics text files are specified in the benchmark.yaml configuration file).
 The CTRACK summary_output.txt and detail_output.txt reports (containing the performance metrics) are written to the directory
-from which the benchmarking.py script was executed.  An information file is also generated that captures the version
+from which the benchmark.py script was executed.  An information file is also generated that captures the version
 of Python used, a timestamp, and any other relevant information for capturing the environment under which the code was
 profiled/benchmarked.
 
@@ -84,7 +82,7 @@ Overview of Steps for Performing Benchmarking
 
        The CTRACK directive is placed at the top of the function of interest.  Use the preprocessor directive for WITH_PROFILER:
 
-       e.g. ensemble_stat.cc:
+       e.g., ensemble_stat.cc:
 
         .. code-block:: ini
 
@@ -98,7 +96,7 @@ Overview of Steps for Performing Benchmarking
       and the *ctrack::result_print* is placed within the corresponding MET tool's
       **main()/met_main()** function
 
-       e.g. ensemble_stat.cc
+       e.g., ensemble_stat.cc
 
          .. code-block:: ini
 
@@ -205,7 +203,7 @@ Overview of Steps for Performing Benchmarking
 
      .. note::
 
-        the benchmark.py and benchmark.yaml files **must** reside in the same directory
+        The benchmark.py and benchmark.yaml files **must** reside in the same directory
         (the benchmark.yaml file does **NOT** need to be specified at the command line)
 
 
@@ -218,7 +216,7 @@ Overview of Steps for Performing Benchmarking
 
          #
          # filename
-         # Timestamp in ISO 1806 format is used to generate output filename
+         # Timestamp in ISO 8601 format is used to generate output filename
          # If filename setting is empty string, then timestamp is used.
          # Otherwise, the specified filename followed by the timestamp will
          # be used for the output filename.
@@ -283,7 +281,7 @@ Overview of Steps for Performing Benchmarking
         - filename
 
           - **optional**
-          - the supplied filename prepended with a Timestamp that follows ISO 1806 format
+          - the supplied filename followed by a timestamp that follows ISO 8601 format
           - if left empty, the timestamp alone will be used as the filename
 
         - run_met_directly
@@ -325,7 +323,7 @@ Overview of Steps for Performing Benchmarking
         - filename
 
           - **optional**
-          - the supplied filename prepended with a Timestamp that follows ISO 1806 format
+          - the supplied filename followed by a timestamp that follows ISO 8601 format
           - if left empty, the timestamp alone will be used as the filename
 
 
@@ -339,8 +337,8 @@ Overview of Steps for Performing Benchmarking
           - **required**
           - location of the METplus source code, specified by one of the following methods:
 
-             - indicated as a full path e.g. /home/username/METplus
-             - setting the METPLUS_BASE environment variable and use the current environment syntax like the following:
+             - indicated as a full path e.g., /home/username/METplus
+             - setting the METPLUS_BASE environment variable and using the current environment syntax like the following:
 
               .. code-block:: ini
 
@@ -387,7 +385,7 @@ Overview of Steps for Performing Benchmarking
 
     .. dropdown::  Running MET command
 
-       Define any necessary environment variables for the corresponding MET tool (e.g. Ensemble-Stat tool environment
+       Define any necessary environment variables for the corresponding MET tool (e.g., Ensemble-Stat tool environment
        variables specified in the $HOME/METplus/metplus/parm/met_config/EnsembleStatConfig_wrapped)
 
       .. dropdown:: Example Ensemble-Stat config
