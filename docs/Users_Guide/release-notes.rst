@@ -58,7 +58,7 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3407 <https://github.com/dtcenter/MET/issues/3407>`_).
      * Enhance the documentation by correcting broken links and typos
        (`#3416 <https://github.com/dtcenter/MET/issues/3416>`_).
-     * Fix SonarQube findings for MET version 13.0.0
+     * **Fix SonarQube findings for MET version 13.0.0**
        (`#3443 <https://github.com/dtcenter/MET/issues/3443>`_).
      * Update the SonarQube scanner so that the scan runs on Java 21 as required by the upgraded SonarQube server
        (`#3470 <https://github.com/dtcenter/MET/issues/3470>`_).
