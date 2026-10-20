@@ -18,15 +18,15 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#1518 <https://github.com/dtcenter/MET/issues/1518>`_).
      * **Revisit AW_MEAN regridding and grid weighting options**
        (`#3178 <https://github.com/dtcenter/MET/issues/3178>`_).
-     * **Add power spectra calculation capability to the Grid-Diag tool**
+     * **Add power spectra calculation capability to the Grid-Diag tool in MET**
        (`#3304 <https://github.com/dtcenter/MET/issues/3304>`_).
      * Add lookup tables for data types of MET output
        (`#3384 <https://github.com/dtcenter/MET/issues/3384>`_).
-     * Enhance the "@value" NetCDF dimension lookup logic to support negative values
+     * Enhance ``@value`` NetCDF dimension lookup logic to support negative values
        (`#3406 <https://github.com/dtcenter/MET/issues/3406>`_).
      * Improve Ensemble-Stat to more efficiently apply observation error corrections and perturbations
        (`#3426 <https://github.com/dtcenter/MET/issues/3426>`_).
-     * Rename MET configuration options to avoid names like "warning" and "error"
+     * Rename MET configuration options to avoid names like ``warning`` and ``error``
        (`#3455 <https://github.com/dtcenter/MET/issues/3455>`_).
 
   .. dropdown:: Bugfixes
@@ -52,7 +52,7 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
 
      * Update the configuration files and modulefiles
        (`#3393 <https://github.com/dtcenter/MET/issues/3393>`_).
-     * Remove the R dependency from the MET unit test logic
+     * Remove R dependency from the MET unit test logic
        (`#3395 <https://github.com/dtcenter/MET/issues/3395>`_).
      * Upgrade MET to use METbaseimage version 3.5
        (`#3407 <https://github.com/dtcenter/MET/issues/3407>`_).
