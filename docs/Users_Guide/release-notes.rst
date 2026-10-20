@@ -35,7 +35,7 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3291 <https://github.com/dtcenter/MET/issues/3291>`_).
      * Fix NetCDF CF convention support to read Stage IV precipitation files
        (`#3358 <https://github.com/dtcenter/MET/issues/3358>`_).
-     * Correctly handle invalid latitude values from an MPAS file
+     * Fix MPAS UGRID support to correctly handle invalid latitude values
        (`#3381 <https://github.com/dtcenter/MET/issues/3381>`_).
      * Refine RPS library code to use centered probability bins
        (`#3396 <https://github.com/dtcenter/MET/issues/3396>`_).
