@@ -65,7 +65,7 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
      * Automate link checking with Sphinx
        (`METplus #3247 <https://github.com/dtcenter/METplus/issues/3247>`_).
      * Resolve blockers from the AF SonarQube quality gate scanner
-       (`METplus-Internal #68 <https://github.com/dtcenter/METplus-Internal/issues/68>`_).
+       (METplus-Internal #68, `MET PR #3440 <https://github.com/dtcenter/MET/pull/3440>`_).
 
 MET Version 13.0.0-beta2 Release Notes (20260508)
 -------------------------------------------------
