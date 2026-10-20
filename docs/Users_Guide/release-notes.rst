@@ -18,7 +18,7 @@ MET Version 12.2.3 Release Notes (TBD)
        (`#3358 <https://github.com/dtcenter/MET/issues/3358>`_).
      * Fix PB2NC so that derived HPBL output does not depend on which other stations are processed
        (`#3450 <https://github.com/dtcenter/MET/issues/3450>`_).
-     * Fix CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
+     * Fix Stat-Analysis CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
        (`#3478 <https://github.com/dtcenter/MET/issues/3478>`_).
 
   .. dropdown:: Repository, build, and test
