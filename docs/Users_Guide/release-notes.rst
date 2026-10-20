@@ -248,6 +248,19 @@ MET Version 13.0.0 Upgrade Instructions
      output grid box of those edges were previously discarded rather than assigned to the
      nearest output grid box.
 
+   * Stat-Analysis summary jobs that use the "-derive" option to compute CNT statistics from
+     SAL1L2 input lines now write output. As described in MET
+     `#3478 <https://github.com/dtcenter/MET/issues/3478>`_, the anomaly partial sums were
+     previously not read from SAL1L2 lines, so the derived anomaly statistics (e.g. ANOM_CORR,
+     ANOM_CORR_UNCNTR, RMSFA, and RMSOA) were always bad data and no output was written.
+
+   * The FOBAR and FOABAR columns of the SL1L2 and SAL1L2 output lines written by Point-Stat,
+     Grid-Stat, and Pair-Stat for the climatology bin means (VX_MASK ending in "_BIN_MEAN")
+     now contain the mean across bins. As described in MET
+     `#3478 <https://github.com/dtcenter/MET/issues/3478>`_, these columns were previously
+     always zero, so statistics derived from them, such as RMSE, PR_CORR, and ANOM_CORR,
+     were incorrect.
+
 .. dropdown:: Additional upgrade instructions
 
    Recommendations when upgrading to MET version 13.0.0:
