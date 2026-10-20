@@ -39,5 +39,27 @@
     </output>
   </test>
 
+  <test name="tc_diag_IAN_NO_F000">
+    <exec>mkdir -p &OUTPUT_DIR;/tc_diag/no_f000; \
+          echo "&DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f006.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f012.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f018.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f024.grib2" \
+                > &OUTPUT_DIR;/tc_diag/no_f000/gfs_2022092400_file_list; \
+          &MET_BIN;/tc_diag</exec>
+    <param> \
+      -deck &DATA_DIR;/adeck/aal092022_OFCL_SHIP_AVNO.dat \
+      -data parent GFSO &OUTPUT_DIR;/tc_diag/no_f000/gfs_2022092400_file_list \
+      -config &CONFIG_DIR;/TCDiagConfig_ian \
+      -outdir &OUTPUT_DIR;/tc_diag/no_f000 \
+      -v 2
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/tc_diag/no_f000/sal092022_gfso_doper_2022092400_cyl_grid_parent.nc</exist>
+      <exist>&OUTPUT_DIR;/tc_diag/no_f000/sal092022_gfso_doper_2022092400_diag.nc</exist>
+      <exist>&OUTPUT_DIR;/tc_diag/no_f000/sal092022_gfso_doper_2022092400_diag.dat</exist>
+    </output>
+  </test>
+
 </met_test>
 
