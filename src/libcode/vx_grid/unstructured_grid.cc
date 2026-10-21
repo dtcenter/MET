@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <array>
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -457,9 +458,9 @@ void UnstructuredData::closest_faces(double lat, double lon, int n,
    // consistently which does not matter for the interpolation.
    const double lat_r = lat*rad_per_deg;
    const double lon_r = lon*rad_per_deg;
-   const double p0[3] = { cos(lat_r)*cos(lon_r), cos(lat_r)*sin(lon_r), sin(lat_r) };
-   const double e[3]  = { -sin(lon_r), cos(lon_r), 0.0 };
-   const double nv[3] = { -sin(lat_r)*cos(lon_r), -sin(lat_r)*sin(lon_r), cos(lat_r) };
+   const std::array<double, 3> p0 = { cos(lat_r)*cos(lon_r), cos(lat_r)*sin(lon_r), sin(lat_r) };
+   const std::array<double, 3> e  = { -sin(lon_r), cos(lon_r), 0.0 };
+   const std::array<double, 3> nv = { -sin(lat_r)*cos(lon_r), -sin(lat_r)*sin(lon_r), cos(lat_r) };
 
    nbrs.index.reserve(neighbor.size());
    nbrs.dist_km.reserve(neighbor.size());
@@ -474,9 +475,9 @@ void UnstructuredData::closest_faces(double lat, double lon, int n,
       double f_lon = has_PointLatLon() ? points_lonlat[index].x() : points_XYZ[index].x();
       double f_lat_r = f_lat*rad_per_deg;
       double f_lon_r = f_lon*rad_per_deg;
-      double d[3] = { cos(f_lat_r)*cos(f_lon_r) - p0[0],
-                      cos(f_lat_r)*sin(f_lon_r) - p0[1],
-                      sin(f_lat_r)              - p0[2] };
+      const std::array<double, 3> d = { cos(f_lat_r)*cos(f_lon_r) - p0[0],
+                                        cos(f_lat_r)*sin(f_lon_r) - p0[1],
+                                        sin(f_lat_r)              - p0[2] };
       nbrs.index.push_back(index);
       nbrs.dist_km.push_back(distance_km);
       nbrs.x_km.push_back(earth_radius_km*(d[0]*e[0]  + d[1]*e[1]  + d[2]*e[2]));

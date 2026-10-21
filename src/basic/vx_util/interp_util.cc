@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <cstdlib>
 #include <iostream>
@@ -979,12 +980,12 @@ static bool ugrid_fit_at_origin(const vector<double> &x, const vector<double> &y
    if(scale <= 0.0) return false;
 
    // Normal equations M * c = r
-   double M[4][4] = {};
-   double r[4] = {};
+   std::array<std::array<double, 4>, 4> M{};
+   std::array<double, 4> r{};
    for(int i=0; i<n; i++) {
       double xs = x[i]/scale;
       double ys = y[i]/scale;
-      double col[4] = { 1.0, xs, ys, xs*ys };
+      const std::array<double, 4> col = { 1.0, xs, ys, xs*ys };
       for(int j=0; j<n_coef; j++) {
          r[j] += col[j]*v[i];
          for(int k=0; k<n_coef; k++) M[j][k] += col[j]*col[k];
@@ -999,7 +1000,7 @@ static bool ugrid_fit_at_origin(const vector<double> &x, const vector<double> &y
       for(int k=j+1; k<n_coef; k++) if(fabs(M[k][j]) > fabs(M[p][j])) p = k;
       if(fabs(M[p][j]) <= 1.0e-10*max_diag) return false;
       if(p != j) {
-         for(int k=0; k<n_coef; k++) std::swap(M[j][k], M[p][k]);
+         std::swap(M[j], M[p]);
          std::swap(r[j], r[p]);
       }
       for(int k=j+1; k<n_coef; k++) {
@@ -1010,7 +1011,7 @@ static bool ugrid_fit_at_origin(const vector<double> &x, const vector<double> &y
    }
 
    // Back substitution
-   double c[4] = {};
+   std::array<double, 4> c{};
    for(int j=n_coef-1; j>=0; j--) {
       double sum = r[j];
       for(int k=j+1; k<n_coef; k++) sum -= M[j][k]*c[k];
