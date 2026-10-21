@@ -1341,9 +1341,9 @@ const std::vector<UGridNeighbors> *Grid::ugrid_neighbor_table(int n) const
 {
 
 #ifdef WITH_UGRID
-const auto ug = dynamic_cast<const UnstructuredGrid *>(rep.get());
-
-if ( ug )  return &(ug->Data.neighbor_table(n));
+if (const auto ug = dynamic_cast<const UnstructuredGrid *>(rep.get()); ug) {
+    return &(ug->Data.neighbor_table(n));
+}
 #endif
 
 return nullptr;
