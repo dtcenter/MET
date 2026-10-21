@@ -78,39 +78,56 @@ def bilin(v, xyz_faces, p, la, lo):
     return np.nan
 
 
-def reference(method, n_points, obs_lat, obs_lon, obs_v, xyz, area, vals):
-    la, lo, p = unit_vector(obs_lat, obs_lon)
-    dist = np.linalg.norm(xyz - p, axis=1)
-    idx = np.argsort(dist)[:n_points]
-    v, d_km = vals[idx], dist[idx] * EARTH_RADIUS_KM
-    if method == 'NEAREST':
-        return v[0]
-    if method == 'UW_MEAN':
-        return v.mean()
-    if method == 'AW_MEAN':
-        w = area[idx] if area is not None else np.ones(len(idx))
-        return (w * v).sum() / w.sum()
-    if method == 'DW_MEAN':
-        if d_km[0] <= SAME_POINT_KM:
-            return v[0]
-        w = d_km ** -2
-        return (w * v).sum() / w.sum()
-    if method == 'MIN':
-        return v.min()
-    if method == 'MAX':
-        return v.max()
-    if method == 'MEDIAN':
-        return np.median(v)
-    if method == 'BEST':
-        return v[np.argmin(np.abs(v - obs_v))]
-    if method == 'BILIN':
-        if d_km[0] <= SAME_POINT_KM:
-            return v[0]
-        return bilin(v, xyz[idx], p, la, lo)
-    raise ValueError(f"unsupported interpolation method: {method}")
+class Faces:
+    """The N closest faces of an observation."""
+
+    def __init__(self, obs_lat, obs_lon, obs_v, n_points, xyz, area, vals):
+        self.la, self.lo, self.p = unit_vector(obs_lat, obs_lon)
+        dist = np.linalg.norm(xyz - self.p, axis=1)
+        self.idx = np.argsort(dist)[:n_points]
+        self.v = vals[self.idx]
+        self.d_km = dist[self.idx] * EARTH_RADIUS_KM
+        self.xyz = xyz[self.idx]
+        self.area = area[self.idx] if area is not None else np.ones(len(self.idx))
+        self.obs_v = obs_v
+
+    def at_face(self):
+        """True if the observation is at the closest face (within 1 meter)."""
+        return self.d_km[0] <= SAME_POINT_KM
 
 
-def main():
+def weighted_mean(v, w):
+    return (w * v).sum() / w.sum()
+
+
+def dw_mean(f):
+    return f.v[0] if f.at_face() else weighted_mean(f.v, f.d_km ** -2)
+
+
+def bilin_faces(f):
+    return f.v[0] if f.at_face() else bilin(f.v, f.xyz, f.p, f.la, f.lo)
+
+
+METHODS = {
+    'NEAREST': lambda f: f.v[0],
+    'UW_MEAN': lambda f: f.v.mean(),
+    'AW_MEAN': lambda f: weighted_mean(f.v, f.area),
+    'DW_MEAN': dw_mean,
+    'MIN':     lambda f: f.v.min(),
+    'MAX':     lambda f: f.v.max(),
+    'MEDIAN':  lambda f: np.median(f.v),
+    'BEST':    lambda f: f.v[np.argmin(np.abs(f.v - f.obs_v))],
+    'BILIN':   bilin_faces,
+}
+
+
+def reference(method, faces):
+    if method not in METHODS:
+        raise ValueError(f"unsupported interpolation method: {method}")
+    return METHODS[method](faces)
+
+
+def parse_args():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('stat_file')
@@ -119,45 +136,60 @@ def main():
     parser.add_argument('var_name', help='forecast variable name, e.g. temperature_925hPa')
     parser.add_argument('--tol', type=float, default=1.0e-3,
                         help='maximum allowed |MET - reference| (default 1e-3)')
-    args = parser.parse_args()
+    return parser.parse_args()
 
+
+def read_mpr(stat_file):
+    """Yield (method, n_points, obs_lat, obs_lon, fcst, obs) of the MPR lines."""
+    with open(stat_file) as stat:
+        lines = [l.split() for l in stat]
+    col = {name: i for i, name in enumerate(lines[0])}
+    # MPR: TOTAL INDEX OBS_SID OBS_LAT OBS_LON OBS_LVL OBS_ELV FCST OBS ...
+    b = col['LINE_TYPE'] + 1
+    for r in lines[1:]:
+        if len(r) <= STAT_LINE_TYPE_COL or r[STAT_LINE_TYPE_COL] != 'MPR':
+            continue
+        method = r[col['INTERP_MTHD']].replace('_SQUARE', '').replace('_CIRCLE', '')
+        yield (method, int(r[col['INTERP_PNTS']]),
+               float(r[b + 3]), float(r[b + 4]), float(r[b + 7]), float(r[b + 8]))
+
+
+def compare(mpr_lines, xyz, area, vals):
+    """Return {(method, n_points): [count, max |MET - reference|]}."""
+    stats = {}
+    for method, n_points, obs_lat, obs_lon, fcst, obs in mpr_lines:
+        if method == 'NBRHD':        # HiRA
+            continue
+        faces = Faces(obs_lat, obs_lon, obs, n_points, xyz, area, vals)
+        ref = reference(method, faces)
+        s = stats.setdefault((method, n_points), [0, 0.0])
+        s[0] += 1
+        s[1] = max(s[1], abs(fcst - ref)) if np.isfinite(ref) else np.inf
+    return stats
+
+
+def report(stats, tol):
+    status = 0
+    print(f"{'method':8s} {'N':>3s} {'pairs':>6s} {'max|MET-ref|':>13s}")
+    for (method, n_points), (count, err) in sorted(stats.items()):
+        ok = err <= tol
+        status |= (not ok)
+        print(f"{method:8s} {n_points:3d} {count:6d} {err:13.5f}  {'ok' if ok else 'FAIL'}")
+    print("PASS" if status == 0 else f"FAIL: difference larger than {tol}")
+    return status
+
+
+def main():
+    args = parse_args()
     xyz, area = read_coords(args.coord_file)
     vals = np.asarray(netCDF4.Dataset(args.data_file).variables[args.var_name][0, :],
                       dtype=float)
 
-    lines = [l.split() for l in open(args.stat_file)]
-    hdr = lines[0]
-    col = {name: i for i, name in enumerate(hdr)}
-    rows = [l for l in lines[1:]
-            if len(l) > STAT_LINE_TYPE_COL and l[STAT_LINE_TYPE_COL] == 'MPR']
-    # MPR: TOTAL INDEX OBS_SID OBS_LAT OBS_LON OBS_LVL OBS_ELV FCST OBS ...
-    b = col['LINE_TYPE'] + 1
-
-    stats = {}
-    for r in rows:
-        method = r[col['INTERP_MTHD']].replace('_SQUARE', '').replace('_CIRCLE', '')
-        if method == 'NBRHD':        # HiRA
-            continue
-        n_points = int(r[col['INTERP_PNTS']])
-        obs_lat, obs_lon = float(r[b + 3]), float(r[b + 4])
-        fcst, obs = float(r[b + 7]), float(r[b + 8])
-        ref = reference(method, n_points, obs_lat, obs_lon, obs, xyz, area, vals)
-        s = stats.setdefault((method, n_points), [0, 0.0])
-        s[0] += 1
-        s[1] = max(s[1], abs(fcst - ref)) if np.isfinite(ref) else np.inf
-
+    stats = compare(read_mpr(args.stat_file), xyz, area, vals)
     if not stats:
         print(f"ERROR: no MPR lines found in {args.stat_file}")
         return 1
-
-    status = 0
-    print(f"{'method':8s} {'N':>3s} {'pairs':>6s} {'max|MET-ref|':>13s}")
-    for (method, n_points), (count, err) in sorted(stats.items()):
-        ok = err <= args.tol
-        status |= (not ok)
-        print(f"{method:8s} {n_points:3d} {count:6d} {err:13.5f}  {'ok' if ok else 'FAIL'}")
-    print("PASS" if status == 0 else f"FAIL: difference larger than {args.tol}")
-    return status
+    return report(stats, args.tol)
 
 
 if __name__ == '__main__':
