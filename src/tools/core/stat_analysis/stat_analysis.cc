@@ -827,8 +827,8 @@ static void setup_tmp_dir() {
    // while parse_conf_tmp_dir() checks the MET_TMP_DIR environment
    // variable prior to the dictionary entry.
    //
-   if(tmp_dir.length() == 0) {
-      tmp_dir = parse_conf_tmp_dir(config_file.length() != 0 ?
+   if(tmp_dir.empty()) {
+      tmp_dir = parse_conf_tmp_dir(!config_file.empty() ?
                                    &conf : nullptr);
    }
 
