@@ -4,7 +4,7 @@
 //
 // For additional information, please see the MET User's Guide.
 //
-// Negative test: BILIN is not supported for the unstructured grid. Point-Stat
+// Negative test: LS_FIT is not supported for the unstructured grid. Point-Stat
 // should exit with an error while processing the configuration.
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -30,7 +30,7 @@ obs = {
 interp = {
    vld_thresh = 1.0;
    type = [
-      { method = BILIN; width = 2; }
+      { method = LS_FIT; width = 3; }
    ];
 }
 

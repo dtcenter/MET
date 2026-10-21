@@ -1822,10 +1822,12 @@ void InterpInfo::validate() {
 ///////////////////////////////////////////////////////////////////////////////
 //
 // The unstructured grid uses the N closest faces instead of the grid
-// template. Methods that need the regular grid structure (bilinear,
-// least-squares fit, grid box corners, Gaussian filters, geography
-// match) are not supported. The distance-weighted mean is not supported
-// for smoothing since each face is its own closest face.
+// template. Methods that need the regular grid structure (least-squares
+// fit, grid box corners, Gaussian filters, geography match) are not
+// supported. The bilinear interpolation fits a bilinear surface through
+// the width * width closest faces. The distance-weighted mean and the
+// bilinear interpolation are not supported for smoothing since each
+// face is its own closest face.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1845,6 +1847,7 @@ void InterpInfo::validate_ugrid(bool smoothing, const char *caller) const {
       if(!smoothing) {
          supported = supported ||
                      methodi == InterpMthd::DW_Mean ||
+                     methodi == InterpMthd::Bilin   ||
                      methodi == InterpMthd::Best;
       }
 
@@ -1855,7 +1858,8 @@ void InterpInfo::validate_ugrid(bool smoothing, const char *caller) const {
                  << interpmthd_uw_mean_str << ", ";
          if(!smoothing) choices << interpmthd_dw_mean_str << ", ";
          choices << interpmthd_aw_mean_str;
-         if(!smoothing) choices << ", " << interpmthd_best_str;
+         if(!smoothing) choices << ", " << interpmthd_bilin_str
+                                << ", " << interpmthd_best_str;
 
          mlog << Error << "\n" << caller
               << "the \"" << method[i] << "\" interpolation method is not "

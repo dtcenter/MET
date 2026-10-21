@@ -1,0 +1,164 @@
+#!/usr/bin/env python3
+"""
+Verify the Point-Stat N closest faces interpolation for the unstructured
+grid (UGRID) by recomputing each MPR forecast value from the raw MPAS data.
+
+The reference is independent of MET: it finds the N closest faces by the
+chord distance on the unit sphere and applies each interpolation method
+with numpy.
+
+  NEAREST  value of the closest face
+  UW_MEAN  mean of the N closest faces
+  AW_MEAN  mean weighted by the face area (areaCell), equal weights if missing
+  DW_MEAN  mean weighted by 1/distance^2
+  MIN, MAX, MEDIAN, BEST (closest to the observation)
+  BILIN    least-squares fit of a + b*x + c*y + d*x*y in the local tangent
+           plane, plane fit if singular, limited to the range of the faces
+
+N is INTERP_PNTS from the MPR line. HiRA (NBRHD) lines are skipped.
+
+Usage:
+  check_ugrid_point_stat.py stat_file data_file coord_file var_name [--tol K]
+
+Example (unit_ugrid.xml point_stat_ugrid_mpas_npts):
+  check_ugrid_point_stat.py \\
+    ${MET_TEST_OUTPUT}/point_stat_ugrid/point_stat_UGRID_MPAS_NPTS_120000L_20250518_120000V.stat \\
+    ${MET_TEST_INPUT}/ugrid_data/mpas/diag.2025-05-18_12.00.00.9506.OK.nc \\
+    ${MET_TEST_INPUT}/ugrid_data/mpas/static.2025-05-17.9506.OK_reduced.nc \\
+    temperature_925hPa
+
+Exits with 1 if any method differs from the reference by more than --tol.
+"""
+
+import argparse
+import sys
+
+import numpy as np
+import netCDF4
+
+EARTH_RADIUS_KM = 6378.14        # earth_radius_km in MET
+SAME_POINT_KM = 0.001            # MET uses the face value within 1 meter
+STAT_LINE_TYPE_COL = 23          # LINE_TYPE column index in the STAT file
+
+
+def read_coords(coord_file):
+    coord = netCDF4.Dataset(coord_file)
+    lat = np.asarray(coord.variables['latCell'][:], dtype=float)
+    lon = np.asarray(coord.variables['lonCell'][:], dtype=float)
+    xyz = np.stack([np.cos(lat) * np.cos(lon),
+                    np.cos(lat) * np.sin(lon),
+                    np.sin(lat)], axis=1)
+    area = None
+    if 'areaCell' in coord.variables:
+        area = np.asarray(coord.variables['areaCell'][:], dtype=float)
+    return xyz, area
+
+
+def unit_vector(lat_deg, lon_deg):
+    la, lo = np.radians(lat_deg), np.radians(lon_deg)
+    return la, lo, np.array([np.cos(la) * np.cos(lo),
+                             np.cos(la) * np.sin(lo),
+                             np.sin(la)])
+
+
+def bilin(v, xyz_faces, p, la, lo):
+    """Bilinear (or plane) least-squares fit evaluated at the target point."""
+    east = np.array([-np.sin(lo), np.cos(lo), 0.0])
+    north = np.array([-np.sin(la) * np.cos(lo), -np.sin(la) * np.sin(lo), np.cos(la)])
+    dxyz = xyz_faces - p
+    x = EARTH_RADIUS_KM * dxyz @ east
+    y = EARTH_RADIUS_KM * dxyz @ north
+    for cols in ([np.ones_like(x), x, y, x * y], [np.ones_like(x), x, y]):
+        a_mat = np.stack(cols, axis=1)
+        n_coef = a_mat.shape[1]
+        if len(v) >= n_coef and \
+           np.linalg.matrix_rank(a_mat, tol=1e-6 * np.abs(a_mat).max()) == n_coef:
+            coef = np.linalg.lstsq(a_mat, v, rcond=None)[0]
+            return min(max(coef[0], v.min()), v.max())
+    return np.nan
+
+
+def reference(method, n_points, obs_lat, obs_lon, obs_v, xyz, area, vals):
+    la, lo, p = unit_vector(obs_lat, obs_lon)
+    dist = np.linalg.norm(xyz - p, axis=1)
+    idx = np.argsort(dist)[:n_points]
+    v, d_km = vals[idx], dist[idx] * EARTH_RADIUS_KM
+    if method == 'NEAREST':
+        return v[0]
+    if method == 'UW_MEAN':
+        return v.mean()
+    if method == 'AW_MEAN':
+        w = area[idx] if area is not None else np.ones(len(idx))
+        return (w * v).sum() / w.sum()
+    if method == 'DW_MEAN':
+        if d_km[0] <= SAME_POINT_KM:
+            return v[0]
+        w = d_km ** -2
+        return (w * v).sum() / w.sum()
+    if method == 'MIN':
+        return v.min()
+    if method == 'MAX':
+        return v.max()
+    if method == 'MEDIAN':
+        return np.median(v)
+    if method == 'BEST':
+        return v[np.argmin(np.abs(v - obs_v))]
+    if method == 'BILIN':
+        if d_km[0] <= SAME_POINT_KM:
+            return v[0]
+        return bilin(v, xyz[idx], p, la, lo)
+    raise ValueError(f"unsupported interpolation method: {method}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('stat_file')
+    parser.add_argument('data_file', help='MPAS file with the forecast variable')
+    parser.add_argument('coord_file', help='MPAS file with latCell, lonCell (and areaCell)')
+    parser.add_argument('var_name', help='forecast variable name, e.g. temperature_925hPa')
+    parser.add_argument('--tol', type=float, default=1.0e-3,
+                        help='maximum allowed |MET - reference| (default 1e-3)')
+    args = parser.parse_args()
+
+    xyz, area = read_coords(args.coord_file)
+    vals = np.asarray(netCDF4.Dataset(args.data_file).variables[args.var_name][0, :],
+                      dtype=float)
+
+    lines = [l.split() for l in open(args.stat_file)]
+    hdr = lines[0]
+    col = {name: i for i, name in enumerate(hdr)}
+    rows = [l for l in lines[1:]
+            if len(l) > STAT_LINE_TYPE_COL and l[STAT_LINE_TYPE_COL] == 'MPR']
+    # MPR: TOTAL INDEX OBS_SID OBS_LAT OBS_LON OBS_LVL OBS_ELV FCST OBS ...
+    b = col['LINE_TYPE'] + 1
+
+    stats = {}
+    for r in rows:
+        method = r[col['INTERP_MTHD']].replace('_SQUARE', '').replace('_CIRCLE', '')
+        if method == 'NBRHD':        # HiRA
+            continue
+        n_points = int(r[col['INTERP_PNTS']])
+        obs_lat, obs_lon = float(r[b + 3]), float(r[b + 4])
+        fcst, obs = float(r[b + 7]), float(r[b + 8])
+        ref = reference(method, n_points, obs_lat, obs_lon, obs, xyz, area, vals)
+        s = stats.setdefault((method, n_points), [0, 0.0])
+        s[0] += 1
+        s[1] = max(s[1], abs(fcst - ref)) if np.isfinite(ref) else np.inf
+
+    if not stats:
+        print(f"ERROR: no MPR lines found in {args.stat_file}")
+        return 1
+
+    status = 0
+    print(f"{'method':8s} {'N':>3s} {'pairs':>6s} {'max|MET-ref|':>13s}")
+    for (method, n_points), (count, err) in sorted(stats.items()):
+        ok = err <= args.tol
+        status |= (not ok)
+        print(f"{method:8s} {n_points:3d} {count:6d} {err:13.5f}  {'ok' if ok else 'FAIL'}")
+    print("PASS" if status == 0 else f"FAIL: difference larger than {args.tol}")
+    return status
+
+
+if __name__ == '__main__':
+    sys.exit(main())

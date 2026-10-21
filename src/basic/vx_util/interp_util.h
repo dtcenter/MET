@@ -98,6 +98,8 @@ struct UGridNeighbors {
    std::vector<int>    index;    // Face index
    std::vector<double> dist_km;  // Distance from the target point (km)
    std::vector<double> area_km2; // Face area (km^2), empty if unknown
+   std::vector<double> x_km;     // Local east offset from the target point (km)
+   std::vector<double> y_km;     // Local north offset from the target point (km)
 
    void clear();
    int  n() const;
@@ -107,6 +109,8 @@ inline void UGridNeighbors::clear() {
    index.clear();
    dist_km.clear();
    area_km2.clear();
+   x_km.clear();
+   y_km.clear();
 }
 
 inline int UGridNeighbors::n() const { return static_cast<int>(index.size()); }
@@ -151,7 +155,8 @@ extern double   interp_best    (const DataPlane &dp, const GridTemplate &gt, int
 extern void     get_xy_ll      (double x, double y, int w, int h, int &x_ll, int &y_ll);
 
 // Unstructured grid version uses the N closest faces
-extern int      ugrid_interp_n_points(const int width, const GridTemplateFactory::GridTemplates shape);
+extern int      ugrid_interp_n_points(const int width, const GridTemplateFactory::GridTemplates shape,
+                                      const InterpMthd mthd = InterpMthd::None);
 extern NumArray interp_ugrid_points  (const DataPlane &dp, const UGridNeighbors &nbrs, int n_points);
 extern double   interp_ugrid         (const DataPlane &dp, const UGridNeighbors &nbrs,
                                       const InterpMthd mthd, int n_points,

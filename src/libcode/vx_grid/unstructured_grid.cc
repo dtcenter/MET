@@ -451,15 +451,36 @@ void UnstructuredData::closest_faces(double lat, double lon, int n,
    IndexKDTree::ValueList neighbor = closest_points(lat, lon, n, alt_m);
    bool has_area = (face_area_km2.size() == static_cast<size_t>(n_face));
 
+   // Local tangent plane at the target point: unit vectors toward the
+   // increasing longitude (e) and latitude (n). The longitude is degrees
+   // west for both the target and the faces, so the x axis is mirrored
+   // consistently which does not matter for the interpolation.
+   const double lat_r = lat*rad_per_deg;
+   const double lon_r = lon*rad_per_deg;
+   const double p0[3] = { cos(lat_r)*cos(lon_r), cos(lat_r)*sin(lon_r), sin(lat_r) };
+   const double e[3]  = { -sin(lon_r), cos(lon_r), 0.0 };
+   const double nv[3] = { -sin(lat_r)*cos(lon_r), -sin(lat_r)*sin(lon_r), cos(lat_r) };
+
    nbrs.index.reserve(neighbor.size());
    nbrs.dist_km.reserve(neighbor.size());
+   nbrs.x_km.reserve(neighbor.size());
+   nbrs.y_km.reserve(neighbor.size());
    if (has_area) nbrs.area_km2.reserve(neighbor.size());
    for (const auto &x : neighbor) {
       double distance_km = x.distance()/1000.;
       if (!is_in_distance(distance_km)) continue;
       int index = x.payload();
+      double f_lat = has_PointLatLon() ? points_lonlat[index].y() : points_XYZ[index].y();
+      double f_lon = has_PointLatLon() ? points_lonlat[index].x() : points_XYZ[index].x();
+      double f_lat_r = f_lat*rad_per_deg;
+      double f_lon_r = f_lon*rad_per_deg;
+      double d[3] = { cos(f_lat_r)*cos(f_lon_r) - p0[0],
+                      cos(f_lat_r)*sin(f_lon_r) - p0[1],
+                      sin(f_lat_r)              - p0[2] };
       nbrs.index.push_back(index);
       nbrs.dist_km.push_back(distance_km);
+      nbrs.x_km.push_back(earth_radius_km*(d[0]*e[0]  + d[1]*e[1]  + d[2]*e[2]));
+      nbrs.y_km.push_back(earth_radius_km*(d[0]*nv[0] + d[1]*nv[1] + d[2]*nv[2]));
       if (has_area) nbrs.area_km2.push_back(face_area_km2[index]);
    }
 

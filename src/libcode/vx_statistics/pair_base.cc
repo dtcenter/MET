@@ -1876,7 +1876,8 @@ bool VxPairBase::is_keeper_grd(
             const PairBase *pb = pb_ptr[three_to_one(0, 0, i_interp)];
             ugrid_n_max = max(ugrid_n_max,
                               ugrid_interp_n_points(pb->interp_wdth,
-                                                    pb->interp_shape));
+                                                    pb->interp_shape,
+                                                    pb->interp_mthd));
          }
       }
       gr.ugrid_closest_faces(hdr_lat, -1.0*hdr_lon, ugrid_n_max, ugrid_nbrs);
@@ -2642,7 +2643,7 @@ double compute_interp(const DataPlaneArray &dpa,
 
    // Horizontal interpolation: the closest N faces for an unstructured
    // grid, the grid template otherwise
-   int n_points = (ugrid_nbrs ? ugrid_interp_n_points(width, shape) : 0);
+   int n_points = (ugrid_nbrs ? ugrid_interp_n_points(width, shape, method) : 0);
    auto horz_interp = [&](const DataPlane &dp) {
       if(ugrid_nbrs) {
          return interp_ugrid(dp, *ugrid_nbrs, method, n_points,

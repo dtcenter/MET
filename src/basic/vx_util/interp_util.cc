@@ -925,7 +925,12 @@ void get_xy_ll(double x, double y, int w, int h, int &x_ll, int &y_ll) {
 ////////////////////////////////////////////////////////////////////////
 
 int ugrid_interp_n_points(const int width,
-                          const GridTemplateFactory::GridTemplates shape) {
+                          const GridTemplateFactory::GridTemplates shape,
+                          const InterpMthd mthd) {
+
+   // Bilinear interpolation uses the width * width closest faces
+   if(mthd == InterpMthd::Bilin) return std::max(1, width*width);
+
    GridTemplateFactory gtf;
    const auto gt = gtf.buildGT(shape, width, false);
    return std::max(1, gt->size());
@@ -952,6 +957,100 @@ NumArray interp_ugrid_points(const DataPlane &dp, const UGridNeighbors &nbrs,
    }
 
    return points;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Least-squares fit of v = a + b*x + c*y (n_coef = 3) or
+// v = a + b*x + c*y + d*x*y (n_coef = 4) and return a, the value at the
+// origin (the target point). The coordinates are scaled to O(1) to keep
+// the normal equations well conditioned. Return false if singular.
+//
+////////////////////////////////////////////////////////////////////////
+
+static bool ugrid_fit_at_origin(const vector<double> &x, const vector<double> &y,
+                                const NumArray &v, int n_coef, double &a) {
+
+   int n = v.n();
+   if(n < n_coef) return false;
+
+   double scale = 0.0;
+   for(int i=0; i<n; i++) scale = std::max(scale, std::max(fabs(x[i]), fabs(y[i])));
+   if(scale <= 0.0) return false;
+
+   // Normal equations M * c = r
+   double M[4][4] = {};
+   double r[4] = {};
+   for(int i=0; i<n; i++) {
+      double xs = x[i]/scale;
+      double ys = y[i]/scale;
+      double col[4] = { 1.0, xs, ys, xs*ys };
+      for(int j=0; j<n_coef; j++) {
+         r[j] += col[j]*v[i];
+         for(int k=0; k<n_coef; k++) M[j][k] += col[j]*col[k];
+      }
+   }
+
+   // Gaussian elimination with partial pivoting
+   double max_diag = 0.0;
+   for(int j=0; j<n_coef; j++) max_diag = std::max(max_diag, fabs(M[j][j]));
+   for(int j=0; j<n_coef; j++) {
+      int p = j;
+      for(int k=j+1; k<n_coef; k++) if(fabs(M[k][j]) > fabs(M[p][j])) p = k;
+      if(fabs(M[p][j]) <= 1.0e-10*max_diag) return false;
+      if(p != j) {
+         for(int k=0; k<n_coef; k++) std::swap(M[j][k], M[p][k]);
+         std::swap(r[j], r[p]);
+      }
+      for(int k=j+1; k<n_coef; k++) {
+         double f = M[k][j]/M[j][j];
+         for(int m=j; m<n_coef; m++) M[k][m] -= f*M[j][m];
+         r[k] -= f*r[j];
+      }
+   }
+
+   // Back substitution
+   double c[4] = {};
+   for(int j=n_coef-1; j>=0; j--) {
+      double sum = r[j];
+      for(int k=j+1; k<n_coef; k++) sum -= M[j][k]*c[k];
+      c[j] = sum/M[j][j];
+   }
+
+   a = c[0];
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Bilinear interpolation for the unstructured grid. Fit the bilinear
+// surface v = a + b*x + c*y + d*x*y through the closest faces in the
+// local tangent plane (km) and evaluate it at the target point. For the
+// 4 corners of a regular grid box, this is the standard bilinear
+// interpolation. If the cross term can not be determined (for example,
+// only 3 faces), fit a plane instead which is the barycentric
+// interpolation for 3 faces. The result is limited to the range of the
+// face values, as the bilinear interpolation of the regular grid is.
+//
+////////////////////////////////////////////////////////////////////////
+
+static double interp_ugrid_bilin(const NumArray &values,
+                                 const vector<double> &dists,
+                                 const vector<double> &xs,
+                                 const vector<double> &ys) {
+
+   // If the target point is at a face (1 meter), use the value at the face
+   for(int i=0; i<values.n(); i++) {
+      if(dists[i] <= 0.001) return values[i];
+   }
+
+   double a;
+   if(!ugrid_fit_at_origin(xs, ys, values, 4, a) &&
+      !ugrid_fit_at_origin(xs, ys, values, 3, a)) {
+      return bad_data_double;
+   }
+
+   return std::min(std::max(a, values.min()), values.max());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -983,7 +1082,11 @@ double interp_ugrid(const DataPlane &dp, const UGridNeighbors &nbrs,
    NumArray values;
    vector<double> dists;
    vector<double> areas;
+   vector<double> xs;
+   vector<double> ys;
    bool has_area = !nbrs.area_km2.empty();
+   bool has_xy = (static_cast<int>(nbrs.x_km.size()) == nbrs.n() &&
+                  static_cast<int>(nbrs.y_km.size()) == nbrs.n());
    int n_use = std::min(n_points, nbrs.n());
    for(int i=0; i<n_use; i++) {
       int idx = nbrs.index[i];
@@ -993,6 +1096,10 @@ double interp_ugrid(const DataPlane &dp, const UGridNeighbors &nbrs,
       values.add(v);
       dists.push_back(nbrs.dist_km[i]);
       if(has_area) areas.push_back(nbrs.area_km2[i]);
+      if(has_xy) {
+         xs.push_back(nbrs.x_km[i]);
+         ys.push_back(nbrs.y_km[i]);
+      }
    }
 
    // Check whether enough valid faces were found
@@ -1069,6 +1176,16 @@ double interp_ugrid(const DataPlane &dp, const UGridNeighbors &nbrs,
          v = (double) count_thr/count;
          break;
       }
+
+      case InterpMthd::Bilin:       // Bilinear interpolation
+         if(!has_xy) {
+            mlog << Error << "\n" << method_name
+                 << "the face locations are required for "
+                 << interpmthd_to_string(mthd) << ".\n\n";
+            exit(1);
+         }
+         v = interp_ugrid_bilin(values, dists, xs, ys);
+         break;
 
       case InterpMthd::Best: {      // Best Match
          double min_d = bad_data_double;
