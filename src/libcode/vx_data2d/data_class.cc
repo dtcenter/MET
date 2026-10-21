@@ -920,12 +920,16 @@ for(int i=0; i<search_names.n(); i++) {
 
 ProcessPlanes = process_planes;
 
+   // A single lookup can miss without the overall request failing, for
+   // example when searching a list of files for climatology data. Report
+   // the miss here and let the caller warn if the derivation or rotation
+   // it is attempting ultimately fails.
+
 if(!status) {
-   mlog << Warning << "\n" << method_name
+   mlog << Debug(3) << method_name
         << "No matching wind field found for name(s) \""
-        << write_css(search_names) << "\".\n"
-        << "Set \"" << conf_key
-        << "\" to specify the matching variable name.\n\n";
+        << write_css(search_names) << "\". Set \"" << conf_key
+        << "\" to specify the matching variable name.\n";
 }
 
 return status;
@@ -975,12 +979,16 @@ for(int i=0; i<search_names.n(); i++) {
 
 ProcessPlanes = process_planes;
 
+   // A single lookup can miss without the overall request failing, for
+   // example when searching a list of files for climatology data. Report
+   // the miss here and let the caller warn if the derivation or rotation
+   // it is attempting ultimately fails.
+
 if(!status) {
-   mlog << Warning << "\n" << method_name
+   mlog << Debug(3) << method_name
         << "No matching wind field(s) found for name(s) \""
-        << write_css(search_names) << "\".\n"
-        << "Set \"" << conf_key
-        << "\" to specify the matching variable name.\n\n";
+        << write_css(search_names) << "\". Set \"" << conf_key
+        << "\" to specify the matching variable name.\n";
 }
 
 return status;

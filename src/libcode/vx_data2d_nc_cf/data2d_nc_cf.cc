@@ -328,8 +328,11 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
       get_real_dimension(vinfo, data_var, dimension);
    }
    else if (!do_winds) {
-      mlog << Error << "\n" << method_name
-           << "\"" << vinfo.req_name() << "\" variable does not exist\n\n";
+
+      // Wind processing is disabled only while reading a companion wind
+      // component, which is a speculative lookup that is allowed to miss
+      mlog << Debug(3) << method_name
+           << "\"" << vinfo.req_name() << "\" variable does not exist.\n";
       return false;
    }
 
