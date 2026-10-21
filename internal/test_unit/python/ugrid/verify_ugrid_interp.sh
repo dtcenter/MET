@@ -35,5 +35,5 @@ ${PYTHON} ${SCRIPT_DIR}/check_ugrid_grid_stat_smooth.py \
    ${MPAS_DIR}/static.40962_reduced.nc || status=1
 
 echo
-[ ${status} -eq 0 ] && echo "verify_ugrid_interp.sh: PASS" || echo "verify_ugrid_interp.sh: FAIL"
+[[ ${status} -eq 0 ]] && echo "verify_ugrid_interp.sh: PASS" || echo "verify_ugrid_interp.sh: FAIL"
 exit ${status}
