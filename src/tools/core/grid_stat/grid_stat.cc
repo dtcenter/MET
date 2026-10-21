@@ -3227,8 +3227,8 @@ void finish_txt_files() {
 //
 ////////////////////////////////////////////////////////////////////////
 
-void smooth_vx_field(const DataPlane &dp, DataPlane &smooth_dp,
-                     InterpMthd interp_mthd, const InterpInfo *interp, int j) {
+static void smooth_vx_field(const DataPlane &dp, DataPlane &smooth_dp,
+                            InterpMthd interp_mthd, const InterpInfo *interp, int j) {
 
    // No smoothing for nearest neighbor (avoid building the neighbor table)
    if(interp->width[j] == 1 && interp_mthd == InterpMthd::Nearest) {
