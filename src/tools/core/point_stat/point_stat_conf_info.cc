@@ -490,9 +490,9 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PointStatConfInfo::check_ugrid_sfc_interp(const PointStatVxOpt &vx_opt) const {
+void PointStatConfInfo::check_ugrid_sfc_interp(const PointStatVxOpt &p_vx_opt) const {
    const char *method_name = "PointStatConfInfo::check_ugrid_sfc_interp() -> ";
-   const SurfaceInfo &sfc_info = vx_opt.vx_pd.sfc_info;
+   const SurfaceInfo &sfc_info = p_vx_opt.vx_pd.sfc_info;
 
    if(sfc_info.need_topo() &&
       sfc_info.topo_interp_mthd != InterpMthd::Nearest) {
@@ -506,15 +506,15 @@ void PointStatConfInfo::check_ugrid_sfc_interp(const PointStatVxOpt &vx_opt) con
    }
 
    if(sfc_info.land_flag || sfc_info.topo_flag) {
-      for(int j=0; j<vx_opt.interp_info.n_interp; j++) {
-         if(string_to_interpmthd(vx_opt.interp_info.method[j].c_str())
+      for(int j=0; j<p_vx_opt.interp_info.n_interp; j++) {
+         if(string_to_interpmthd(p_vx_opt.interp_info.method[j].c_str())
             != InterpMthd::Nearest) {
             mlog << Error << "\n" << method_name
                  << "only the " << interpmthd_nearest_str << " interpolation "
                  << "method is supported with \"" << conf_key_land_mask
                  << "\" or \"" << conf_key_topo_mask << "\" enabled for "
                  << "the unstructured grid, not \""
-                 << vx_opt.interp_info.method[j] << "\".\n\n";
+                 << p_vx_opt.interp_info.method[j] << "\".\n\n";
             exit(1);
          }
       }
