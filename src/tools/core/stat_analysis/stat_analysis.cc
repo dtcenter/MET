@@ -43,6 +43,8 @@
 //                    ascii.
 //   013    07/16/21  Halley Gotway  MET #1788 Add CBS Index.
 //   014    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   015    10/21/26  Halley Gotway  MET #2698 Resolve the temporary
+//                    directory once, prior to processing the jobs.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -108,6 +110,7 @@ static void set_config(const char *);
 static void set_search_dir(const char *);
 static void set_out_file(const char *);
 
+static void setup_tmp_dir();
 static void open_temp_file();
 
 ////////////////////////////////////////////////////////////////////////
@@ -142,6 +145,11 @@ int met_main(int argc, char * argv []) {
    // Sanity check the command line and config file options
    //
    sanity_check();
+
+   //
+   // Resolve the temporary directory to be used by the jobs
+   //
+   setup_tmp_dir();
 
    //
    // Setup the default job using the config file options
@@ -806,16 +814,50 @@ static void set_config_file(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void open_temp_file() {
+static void setup_tmp_dir() {
 
    //
-   // If the tmp_dir has not already been set on the command line,
-   // use the config file setting or default setting.
+   // Determine the temporary directory using the following precedence:
+   //   - the "-tmp_dir" command line option
+   //   - the MET_TMP_DIR environment variable
+   //   - the "tmp_dir" config file entry, when "-config" is used
+   //   - the default temporary directory
+   //
+   // The "-tmp_dir" option has already been handled by set_tmp_dir(),
+   // while parse_conf_tmp_dir() checks the MET_TMP_DIR environment
+   // variable prior to the dictionary entry.
    //
    if(tmp_dir.length() == 0) {
-      if(config_file.length() != 0) tmp_dir = parse_conf_tmp_dir(&conf);
-      else                          tmp_dir = default_tmp_dir;
+      tmp_dir = parse_conf_tmp_dir(config_file.length() != 0 ?
+                                   &conf : nullptr);
    }
+
+   //
+   // Make sure the temporary directory is writable since it is used
+   // when computing bootstrap confidence intervals, in addition to
+   // the intermediate temp file.
+   //
+   if(access(tmp_dir.c_str(), W_OK) != 0) {
+      mlog << Error << "\nsetup_tmp_dir() -> "
+           << "cannot write to the temporary directory: "
+           << tmp_dir << "\n\n";
+      exit(1);
+   }
+
+   //
+   // Export the temporary directory so that it is also used when
+   // running python scripts.
+   //
+   setenv("MET_TMP_DIR", tmp_dir.c_str(), 1);
+
+   mlog << Debug(2) << "Using temporary directory: " << tmp_dir << "\n";
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void open_temp_file() {
 
    //
    // Build the temp file name

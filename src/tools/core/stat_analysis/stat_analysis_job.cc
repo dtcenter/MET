@@ -176,6 +176,16 @@ void do_job(const ConcatString &jobstring, const StringArray &in_files,
         << jobstring << "\n";
 
    //
+   // The temporary directory is needed when computing bootstrap
+   // confidence intervals for aggregate stat jobs.
+   //
+   if(tmp_dir.empty()) {
+      mlog << Error << "\ndo_job() -> "
+           << "the temporary directory has not been set!\n\n";
+      throw 1;
+   }
+
+   //
    // If the -dump_row option was supplied, open the file
    //
    if(!job.dump_row.empty()) {
