@@ -2353,6 +2353,14 @@ applied to the points in the box:
   "topo_mask.flag = FALSE") results in a warning message. Without input
   geography data, GEOG_MATCH produces the same result as NEAREST.
 
+.. note::
+
+  For unstructured grids (UGRIDs), the interpolation is computed from the
+  N closest grid cells, where N is the number of points defined by the
+  width and shape, rather than the N x N box of grid points. The AW_MEAN
+  method, weighted by the cell area, is also supported, and some methods
+  are not supported. See :ref:`ugrid_interpolation` for details.
+
 If multiple "method" and "width" options are specified, all possible
 permutations of their values are applied.
 
