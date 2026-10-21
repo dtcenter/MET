@@ -93,6 +93,16 @@ class Met2dDataFile : public Met2dData {
 
       bool GridShifted;
 
+         //
+         //  Cleared while reading the companion wind components needed to
+         //  derive or rotate the requested field. Those components are read
+         //  raw so that the convert, censor, set_attr and shift settings of
+         //  the requested field are applied once, to the final data plane,
+         //  rather than to each component and then again to the result.
+         //
+
+      bool ProcessPlanes;
+
    protected:
 
       std::unique_ptr<Grid> Raw_Grid;    //  Grid for raw data

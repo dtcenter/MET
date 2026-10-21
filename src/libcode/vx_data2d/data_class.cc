@@ -116,6 +116,7 @@ void Met2dDataFile::mtddf_init_from_scratch()
 
 ShiftRight = 0;
 GridShifted = false;
+ProcessPlanes = true;
 
 return;
 
@@ -136,6 +137,7 @@ Filename.clear();
 
 ShiftRight = 0;
 GridShifted = false;
+ProcessPlanes = true;
 
 return;
 
@@ -896,6 +898,12 @@ bool status = false;
 
 StringArray search_names(swap_uv_name(vinfo, conf_key, names));
 
+    // Read this component raw, since the convert, censor, set_attr and
+    // shift settings of the requested field are applied to the result
+
+bool process_planes = ProcessPlanes;
+ProcessPlanes = false;
+
     // Try each of the possible names
 
 for(int i=0; i<search_names.n(); i++) {
@@ -909,6 +917,8 @@ for(int i=0; i<search_names.n(); i++) {
       break;
    }
 }
+
+ProcessPlanes = process_planes;
 
 if(!status) {
    mlog << Warning << "\n" << method_name
@@ -943,6 +953,12 @@ bool status = false;
 
 StringArray search_names(swap_uv_name(vinfo, conf_key, names));
 
+    // Read these components raw, since the convert, censor, set_attr and
+    // shift settings of the requested field are applied to the result
+
+bool process_planes = ProcessPlanes;
+ProcessPlanes = false;
+
     // Try each of the possible names
 
 for(int i=0; i<search_names.n(); i++) {
@@ -956,6 +972,8 @@ for(int i=0; i<search_names.n(); i++) {
       break;
    }
 }
+
+ProcessPlanes = process_planes;
 
 if(!status) {
    mlog << Warning << "\n" << method_name
@@ -978,6 +996,13 @@ bool Met2dDataFile::process_data_plane(VarInfo *vinfo, DataPlane &dp)
 {
 
 if ( ! vinfo )  return false;
+
+   //
+   // Skip processing while reading a companion wind component, so that these
+   // settings are applied once, to the derived or rotated data plane
+   //
+
+if ( ! ProcessPlanes )  return true;
 
    //
    // Apply conversion logic

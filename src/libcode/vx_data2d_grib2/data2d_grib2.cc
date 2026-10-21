@@ -332,6 +332,11 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
            << " matching derived records for '"
            << vinfo_g2->magic_str() << "'\n\n";
 
+      //  post-process each derived data plane
+      for(int i=0; i<plane_array.n_planes(); i++) {
+         process_data_plane(vinfo_g2, plane_array.at(i));
+      }
+
       return plane_array.n_planes();
    }
 
