@@ -983,8 +983,7 @@ void UGridFile::read_face_area(vector<double> &area_km2) const
 
   // Default unit is m^2
   double scale = 1.0e-6;
-  ConcatString units_value;
-  if (get_var_units(_areaVar, units_value)) {
+  if (ConcatString units_value; get_var_units(_areaVar, units_value)) {
     if (units_value == "km^2" || units_value == "km2" || units_value == "km**2") scale = 1.0;
     else if (units_value != "m^2" && units_value != "m2" && units_value != "m**2") {
       mlog << Debug(4) << method_name << "assume m^2 for the units \""
