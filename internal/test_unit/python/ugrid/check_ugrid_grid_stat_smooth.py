@@ -40,8 +40,12 @@ import numpy as np
 import netCDF4
 from scipy.spatial import cKDTree
 
+from ugrid_check_util import input_file, var_name
+
 STAT_LINE_TYPE_COL = 23          # LINE_TYPE column index in the STAT file
 BAD_DATA_LIMIT = 1.0e20          # treat larger magnitudes as fill values
+STAT_SUFFIXES = ('.stat',)
+NC_SUFFIXES = ('.nc', '.nc4')
 
 
 def as_nan(values):
@@ -77,12 +81,13 @@ def smooth(v, method, nbr, area):
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('stat_file')
-    parser.add_argument('fcst_file')
-    parser.add_argument('fcst_var')
-    parser.add_argument('obs_file')
-    parser.add_argument('obs_var')
-    parser.add_argument('coord_file', help='MPAS file with latCell, lonCell (and areaCell)')
+    parser.add_argument('stat_file', type=input_file(STAT_SUFFIXES))
+    parser.add_argument('fcst_file', type=input_file(NC_SUFFIXES))
+    parser.add_argument('fcst_var', type=var_name)
+    parser.add_argument('obs_file', type=input_file(NC_SUFFIXES))
+    parser.add_argument('obs_var', type=var_name)
+    parser.add_argument('coord_file', type=input_file(NC_SUFFIXES),
+                        help='MPAS file with latCell, lonCell (and areaCell)')
     parser.add_argument('--obs-level', type=int, default=None,
                         help='vertical index of a 3-D observation variable')
     parser.add_argument('--tol', type=float, default=1.0e-3,

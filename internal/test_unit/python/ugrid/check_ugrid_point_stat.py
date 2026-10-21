@@ -36,9 +36,13 @@ import sys
 import numpy as np
 import netCDF4
 
+from ugrid_check_util import input_file, var_name
+
 EARTH_RADIUS_KM = 6378.14        # earth_radius_km in MET
 SAME_POINT_KM = 0.001            # MET uses the face value within 1 meter
 STAT_LINE_TYPE_COL = 23          # LINE_TYPE column index in the STAT file
+STAT_SUFFIXES = ('.stat',)
+NC_SUFFIXES = ('.nc', '.nc4')
 
 
 def read_coords(coord_file):
@@ -130,10 +134,13 @@ def reference(method, faces):
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('stat_file')
-    parser.add_argument('data_file', help='MPAS file with the forecast variable')
-    parser.add_argument('coord_file', help='MPAS file with latCell, lonCell (and areaCell)')
-    parser.add_argument('var_name', help='forecast variable name, e.g. temperature_925hPa')
+    parser.add_argument('stat_file', type=input_file(STAT_SUFFIXES))
+    parser.add_argument('data_file', type=input_file(NC_SUFFIXES),
+                        help='MPAS file with the forecast variable')
+    parser.add_argument('coord_file', type=input_file(NC_SUFFIXES),
+                        help='MPAS file with latCell, lonCell (and areaCell)')
+    parser.add_argument('var_name', type=var_name,
+                        help='forecast variable name, e.g. temperature_925hPa')
     parser.add_argument('--tol', type=float, default=1.0e-3,
                         help='maximum allowed |MET - reference| (default 1e-3)')
     return parser.parse_args()

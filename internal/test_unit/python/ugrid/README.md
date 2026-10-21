@@ -28,6 +28,17 @@ MET_TEST_INPUT=/path/to/unit_test MET_TEST_OUTPUT=/path/to/unit_test_output \
 needs numpy, netCDF4 and scipy. Each script exits with 1 if a value
 differs from the reference by more than `--tol` (default 1e-3).
 
+The command line arguments are validated by `ugrid_check_util.py` before
+any file is opened (exit status 2 if invalid):
+
+- Each input file must be an existing regular file under `MET_TEST_INPUT`
+  or `MET_TEST_OUTPUT` (the current directory if neither is set). Paths
+  are resolved with `os.path.realpath()`, so `..` and symbolic links can
+  not point outside of them.
+- The STAT file must end with `.stat` and the NetCDF files with `.nc` or
+  `.nc4`.
+- Variable names may contain only letters, digits, `_`, `.` and `-`.
+
 ## Notes
 
 - `PointStatConfig_ugrid_mpas_npts` sets `ugrid_max_distance_km = 20`.
