@@ -2557,7 +2557,7 @@ void ModeFuzzyEngine::set_data_type(ModeDataType type)
 
 int ModeFuzzyEngine::get_info_index(int pair_n) const {
 
-   for(int i=0; i<info_singles.size(); i++) {
+   for(int i=0; i<static_cast<int>(info_singles.size()); i++) {
 
       if(info_singles[i].pair_number == pair_n) return i;
 

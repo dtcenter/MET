@@ -159,7 +159,7 @@ bool has_pressure_level(vector<string> levels) {
 
     bool status = false;
 
-    for (int j = 0; j < levels.size(); j++) {
+    for (int j = 0; j < (int) levels.size(); j++) {
         if (levels[j].substr(0, 1) == "P") {
             status = true;
             break;
@@ -179,7 +179,7 @@ set<string> get_pressure_level_strings(
     for (map<string, vector<string> >::iterator i = variable_levels.begin();
         i != variable_levels.end(); ++i) {
         vector<string> levels = variable_levels[i->first];
-        for (int j = 0; j < levels.size(); j++) {
+        for (int j = 0; j < (int) levels.size(); j++) {
             string label = levels[j].substr(0, 1);
             if (label == "P") {
                 pressure_level_strings.insert(levels[j]);
@@ -200,7 +200,7 @@ set<double> get_pressure_levels(
     for (map<string, vector<string> >::iterator i = variable_levels.begin();
         i != variable_levels.end(); ++i) {
         vector<string> levels = variable_levels[i->first];
-        for (int j = 0; j < levels.size(); j++) {
+        for (int j = 0; j < (int) levels.size(); j++) {
             string label = levels[j].substr(0, 1);
             double level = atof(levels[j].substr(1).c_str());
             if (label == "P") {

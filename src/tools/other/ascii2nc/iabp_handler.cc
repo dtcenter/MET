@@ -24,9 +24,6 @@ const double IabpHandler::IABP_MISSING_VALUE = -999.0;
 
 const int IabpHandler::MIN_NUM_HDR_COLS = 8;
 
-// days in the month
-static int daysOfMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};    
-
 static int _lookfor(const DataLine &dl, const string &name);
 static int _lookfor(const DataLine &dl, const string &name, const string &ascii_file, bool &ok);
 static time_t _time(const string &syear, const string &shour, const string &smin, const string &sdoy);

@@ -48,7 +48,6 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
    ConcatString tmp1_str, tmp2_str, tmp3_str;
    int i, mon, day, yr, hr, minute, sec;
    unixtime t;
-   const char *method_name = "ModePsFile::do_page_1()";
 
    ////////////////////////////////////////////////////////////////////
    //

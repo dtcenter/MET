@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
         i != variable_levels.end(); ++i) {
         cout << i->first << ": ";
         vector<string> levels = variable_levels[i->first];
-        for (int j = 0; j < levels.size(); j++) {
+        for (size_t j = 0; j < levels.size(); j++) {
             cout << levels[j] << " ";
         }
         cout << endl;

@@ -75,7 +75,7 @@ class MetNcCFDataFile : public Met2dDataFile {
       MetNcCFDataFile();
      ~MetNcCFDataFile();
 
-      virtual int nx() const
+      int nx() const override
       {
          if (_file == nullptr) return 0;
 
@@ -83,7 +83,7 @@ class MetNcCFDataFile : public Met2dDataFile {
       }
 
 
-      virtual int ny() const
+      int ny() const override
       {
          if (_file == nullptr) return 0;
 
@@ -99,7 +99,7 @@ class MetNcCFDataFile : public Met2dDataFile {
       //  get stuff
       //
 
-      GrdFileType file_type() const;
+      GrdFileType file_type() const override;
 
       //  retrieve the first matching data plane
 
@@ -117,11 +117,11 @@ class MetNcCFDataFile : public Met2dDataFile {
       //  do stuff
       //
 
-      bool open  (const char * filename);
+      bool open  (const char * filename) override;
 
-      void close ();
+      void close () override;
 
-      void dump(std::ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const override;
 
       Grid build_grid_from_lat_lon_vars(netCDF::NcVar *lat_var, netCDF::NcVar *lon_var,
                                         const long lat_counts, const long lon_counts);

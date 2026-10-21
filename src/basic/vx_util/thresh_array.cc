@@ -38,7 +38,7 @@ ThreshArray::ThreshArray(const ThreshArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 ThreshArray::ThreshArray(ThreshArray && a) noexcept
-   : t(move(a.t)) { }
+   : t(std::move(a.t)) { }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -57,7 +57,7 @@ ThreshArray & ThreshArray::operator=(ThreshArray && a) noexcept {
 
    if(this == &a) return *this;
 
-   t = move(a.t);
+   t = std::move(a.t);
 
    return *this;
 }

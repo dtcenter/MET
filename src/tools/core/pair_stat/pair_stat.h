@@ -115,9 +115,8 @@ static ConcatString out_base;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-// Timing information
-static unixtime fcst_valid_ut = (unixtime) 0;
-static int      fcst_lead_sec = bad_data_int;
+// Reference valid time for climatology data
+static unixtime vx_valid_ut = (unixtime) 0;
 
 // Output STAT file
 static ConcatString     stat_file;

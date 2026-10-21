@@ -191,7 +191,6 @@ ConcatString TrackPairInfo::serialize_r(int n, int indent_depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 void TrackPairInfo::assign(const TrackPairInfo &t) {
-   int i;
 
    clear();
 
@@ -953,7 +952,7 @@ void TrackPairInfoArray::dump(ostream &out, int indent_depth) const {
 
    out << prefix << "NPairs = " << Pair.size() << "\n";
 
-   for(int i=0; i<Pair.size(); i++) {
+   for(int i=0; i<(int) Pair.size(); i++) {
       out << prefix << "TrackPairInfo[" << i+1 << "]:" << "\n";
       Pair[i].dump(out, indent_depth+1);
    }
@@ -984,7 +983,7 @@ ConcatString TrackPairInfoArray::serialize_r(int indent_depth) const {
 
    s << prefix << serialize() << ", Pairs:\n";
 
-   for(int i=0; i<Pair.size(); i++) {
+   for(int i=0; i<(int) Pair.size(); i++) {
       s << Pair[i].serialize_r(i+1, indent_depth+1);
    }
 
@@ -1012,7 +1011,7 @@ void TrackPairInfoArray::assign(const TrackPairInfoArray &t) {
 void TrackPairInfoArray::extend(int n, bool exact) {
 
    // Check if enough memory is already reserved 
-   if(Pair.capacity() >= n) return;
+   if((int) Pair.capacity() >= n) return;
 
    // Compute the allocation size
    if(!exact) {
@@ -1031,7 +1030,7 @@ void TrackPairInfoArray::extend(int n, bool exact) {
 const TrackPairInfo & TrackPairInfoArray::operator[](int n) const {
 
    // Check range
-   if((n < 0) || (n >= Pair.size())) {
+   if((n < 0) || (n >= (int) Pair.size())) {
       mlog << Error << "\nTrackPairInfoArray::operator[](int) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);

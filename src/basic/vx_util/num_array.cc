@@ -64,7 +64,7 @@ NumArray::NumArray(const NumArray & a)
 
 
 NumArray::NumArray(NumArray && a) noexcept
-   : e(move(a.e)), Sorted(a.Sorted)
+   : e(std::move(a.e)), Sorted(a.Sorted)
 {
 
    a.Sorted = false;
@@ -97,7 +97,7 @@ NumArray & NumArray::operator=(NumArray && a) noexcept
 
    if ( this == &a )  return *this;
 
-   e = move(a.e);
+   e = std::move(a.e);
    Sorted = a.Sorted;
    a.Sorted = false;
 
@@ -652,7 +652,9 @@ int NumArray::rank_array(int &ties)
    vector<int   > data_loc  (n);
    vector<double> data_rank (n);
 
-   if ( data.size() < n || data_loc.size() < n || data_rank.size() < n)  {
+   if ( static_cast<int>(data.size())      < n ||
+        static_cast<int>(data_loc.size())  < n ||
+        static_cast<int>(data_rank.size()) < n )  {
    
       mlog << Error << "\nint NumArray::rank_array() -> "
            << "memory allocation error\n\n";
