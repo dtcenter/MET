@@ -240,4 +240,92 @@
     </output>
   </test>
 
+  <!-- Grid-Stat options which are not supported for the unstructured -->
+  <!-- grid must be rejected before writing any output                -->
+
+  <test name="grid_stat_ugrid_mpas_BAD_NC_PAIRS">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <retval>1</retval>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_BAD_NC_PAIRS</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2012-04-09_12.00.00_reduced.nc \
+      &DATA_DIR_UGRID;/mpas/mpasout.2012-04-09_12.00.00_reduced.nc \
+      &CONFIG_DIR;/GridStatConfig_ugrid_mpas_bad_nc_pairs \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_BAD_NC_PAIRS_120000L_20120409_120000V.stat</not_exist>
+    </output>
+  </test>
+
+  <test name="grid_stat_ugrid_mpas_BAD_FOURIER">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <retval>1</retval>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_BAD_FOURIER</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2012-04-09_12.00.00_reduced.nc \
+      &DATA_DIR_UGRID;/mpas/mpasout.2012-04-09_12.00.00_reduced.nc \
+      &CONFIG_DIR;/GridStatConfig_ugrid_mpas_bad_fourier \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_BAD_FOURIER_120000L_20120409_120000V.stat</not_exist>
+    </output>
+  </test>
+
+  <test name="grid_stat_ugrid_mpas_BAD_NBRHD">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <retval>1</retval>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_BAD_NBRHD</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2012-04-09_12.00.00_reduced.nc \
+      &DATA_DIR_UGRID;/mpas/mpasout.2012-04-09_12.00.00_reduced.nc \
+      &CONFIG_DIR;/GridStatConfig_ugrid_mpas_bad_nbrhd \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_BAD_NBRHD_120000L_20120409_120000V.stat</not_exist>
+    </output>
+  </test>
+
+  <test name="grid_stat_ugrid_mpas_BAD_GRID_WEIGHT">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <retval>1</retval>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_BAD_GRID_WEIGHT</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2012-04-09_12.00.00_reduced.nc \
+      &DATA_DIR_UGRID;/mpas/mpasout.2012-04-09_12.00.00_reduced.nc \
+      &CONFIG_DIR;/GridStatConfig_ugrid_mpas_bad_grid_weight \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_BAD_GRID_WEIGHT_120000L_20120409_120000V.stat</not_exist>
+    </output>
+  </test>
+
+  <test name="grid_stat_ugrid_mpas_BAD_REGRID">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <retval>1</retval>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_BAD_REGRID</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2012-04-09_12.00.00_reduced.nc \
+      &DATA_DIR_UGRID;/mpas/mpasout.2012-04-09_12.00.00_reduced.nc \
+      &CONFIG_DIR;/GridStatConfig_ugrid_mpas_bad_regrid \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_BAD_REGRID_120000L_20120409_120000V.stat</not_exist>
+    </output>
+  </test>
+
 </met_test>

@@ -50,9 +50,8 @@ struct UnstructuredData {
    std::vector<double> face_area_km2;           // optional, empty if unknown
    std::unique_ptr<atlas::util::IndexKDTree> kdtree;
 
-   // Cached closest faces for every face (built on demand)
-   mutable int nbr_table_n;
-   mutable std::vector<UGridNeighbors> nbr_table;
+   // Cached closest faces of every face (built on demand)
+   mutable UGridNeighborTable nbr_table;
 
    UnstructuredData();
    ~UnstructuredData();
@@ -76,7 +75,7 @@ struct UnstructuredData {
    void closest_faces(double lat, double lon, int n,
                       UGridNeighbors &nbrs,
                       double alt_m=bad_data_double) const;
-   const std::vector<UGridNeighbors> &neighbor_table(int n) const;
+   const UGridNeighborTable &neighbor_table(int n) const;
 
 
    void dump() const;

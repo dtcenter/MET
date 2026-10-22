@@ -402,7 +402,6 @@ void UnstructuredData::clear_data() {
    points_XYZ.clear();
    points_XYZ_km.clear();
    face_area_km2.clear();
-   nbr_table_n = 0;
    nbr_table.clear();
    lat_checksum = lon_checksum = alt_checksum = 0.;
 
@@ -1312,6 +1311,24 @@ return false;
 ////////////////////////////////////////////////////////////////////////
 
 
+bool Grid::ugrid_has_face_area() const
+
+{
+
+#ifdef WITH_UGRID
+const auto ug = dynamic_cast<const UnstructuredGrid *>(rep.get());
+
+return ( ug && !ug->Data.face_area_km2.empty() );
+#else
+return false;
+#endif
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool Grid::ugrid_closest_faces(double lat, double lon, int n, UGridNeighbors &nbrs) const
 
 {
@@ -1336,7 +1353,7 @@ return false;
 ////////////////////////////////////////////////////////////////////////
 
 
-const std::vector<UGridNeighbors> *Grid::ugrid_neighbor_table(int n) const
+const UGridNeighborTable *Grid::ugrid_neighbor_table(int n) const
 
 {
 

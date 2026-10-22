@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <algorithm>
 #include <array>
 #include <cstdio>
 #include <iostream>
@@ -132,7 +133,7 @@ void UnstructuredGrid::set_from_data(const UnstructuredData &data) {
 void UnstructuredGrid::set_max_distance_km(double max_distance) {
 
    Data.max_distance_km = max_distance;
-   Data.nbr_table_n = 0;    // the cached neighbors depend on the max distance
+   Data.nbr_table.clear();  // the cached neighbors depend on the max distance
 
 }
 
@@ -462,11 +463,11 @@ void UnstructuredData::closest_faces(double lat, double lon, int n,
    const std::array<double, 3> e  = { -sin(lon_r), cos(lon_r), 0.0 };
    const std::array<double, 3> nv = { -sin(lat_r)*cos(lon_r), -sin(lat_r)*sin(lon_r), cos(lat_r) };
 
+   nbrs.face_area = has_area ? &face_area_km2 : nullptr;
    nbrs.index.reserve(neighbor.size());
    nbrs.dist_km.reserve(neighbor.size());
    nbrs.x_km.reserve(neighbor.size());
    nbrs.y_km.reserve(neighbor.size());
-   if (has_area) nbrs.area_km2.reserve(neighbor.size());
    for (const auto &x : neighbor) {
       double distance_km = x.distance()/1000.;
       if (!is_in_distance(distance_km)) continue;
@@ -482,7 +483,6 @@ void UnstructuredData::closest_faces(double lat, double lon, int n,
       nbrs.dist_km.push_back(distance_km);
       nbrs.x_km.push_back(earth_radius_km*(d[0]*e[0]  + d[1]*e[1]  + d[2]*e[2]));
       nbrs.y_km.push_back(earth_radius_km*(d[0]*nv[0] + d[1]*nv[1] + d[2]*nv[2]));
-      if (has_area) nbrs.area_km2.push_back(face_area_km2[index]);
    }
 
    if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
@@ -492,30 +492,38 @@ void UnstructuredData::closest_faces(double lat, double lon, int n,
 }
 
 ////////////////////////////////////////////////////////////////////////
-// The n closest faces for each face, used to smooth the gridded field.
-// It is cached and rebuilt only when n changes.
+// The n closest faces of every face, used to smooth the gridded field.
+// Only the face indices are stored. The closest faces are sorted by
+// distance and the faces beyond the max distance are at the end, so the
+// first n faces of a table built for a larger n are the n closest faces.
+// The table is cached and rebuilt only when a larger n is requested.
 
-const std::vector<UGridNeighbors> &UnstructuredData::neighbor_table(int n) const {
+const UGridNeighborTable &UnstructuredData::neighbor_table(int n) const {
 
-   if (n == nbr_table_n && nbr_table.size() == static_cast<size_t>(n_face)) {
-      return nbr_table;
-   }
+   if (n <= nbr_table.n_max && nbr_table.n_face == n_face) return nbr_table;
 
    mlog << Debug(4) << "UnstructuredData::neighbor_table() "
         << "finding " << n << " closest faces for " << n_face << " faces\n";
 
    nbr_table.clear();
-   nbr_table.resize(n_face);
+   nbr_table.n_face = n_face;
+   nbr_table.n_max = n;
+   nbr_table.index.assign(static_cast<size_t>(n_face)*n, -1);
+   nbr_table.face_area =
+      (face_area_km2.size() == static_cast<size_t>(n_face) ? &face_area_km2 : nullptr);
+
+   UGridNeighbors nbrs;
    for (int i=0; i<n_face; i++) {
       if (has_PointLatLon()) {
-         closest_faces(points_lonlat[i].y(), points_lonlat[i].x(), n, nbr_table[i]);
+         closest_faces(points_lonlat[i].y(), points_lonlat[i].x(), n, nbrs);
       }
       else {
-         closest_faces(points_XYZ[i].y(), points_XYZ[i].x(), n, nbr_table[i],
+         closest_faces(points_XYZ[i].y(), points_XYZ[i].x(), n, nbrs,
                        points_XYZ[i].z());
       }
+      std::copy(nbrs.index.begin(), nbrs.index.end(),
+                nbr_table.index.begin() + static_cast<size_t>(i)*n);
    }
-   nbr_table_n = n;
 
    return nbr_table;
 }

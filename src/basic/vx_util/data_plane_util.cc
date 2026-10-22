@@ -225,7 +225,7 @@ DataPlane smooth_field(const DataPlane &dp,
 void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                   InterpMthd mthd, int width,
                   const GridTemplateFactory::GridTemplates shape,
-                  double t, const std::vector<UGridNeighbors> &nbr_table) {
+                  double t, const UGridNeighborTable &nbr_table) {
 
    // Initialize the smoothed field to the raw field
    smooth_dp = dp;
@@ -248,24 +248,30 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    }
 
    int n_face = dp.nx();
-   if(nbr_table.size() != static_cast<size_t>(n_face)) {
+   int n_points = ugrid_interp_n_points(width, shape);
+   if(nbr_table.n_face != n_face || nbr_table.n_max < n_points) {
       mlog << Error << "\nsmooth_field() -> "
-           << "the number of faces of the neighbor table ("
-           << nbr_table.size() << ") does not match the field ("
-           << n_face << ").\n\n";
+           << "the neighbor table (" << nbr_table.n_face << " faces, "
+           << nbr_table.n_max << " closest faces) does not match the field ("
+           << n_face << " faces, " << n_points << " closest faces).\n\n";
       exit(1);
    }
-
-   int n_points = ugrid_interp_n_points(width, shape);
 
    mlog << Debug(3)
         << "Smoothing unstructured grid field using the "
         << interpmthd_to_string(mthd) << "(" << n_points
         << ") closest faces interpolation method.\n";
 
-#pragma omp parallel for schedule(static) default(shared)
-   for(int i=0; i<n_face; i++) {
-      smooth_dp.set(interp_ugrid(dp, nbr_table[i], mthd, n_points, t), i, 0);
+#pragma omp parallel default(shared)
+   {
+      // The closest faces of the current face (one per thread)
+      UGridNeighbors nbrs;
+
+#pragma omp for schedule(static)
+      for(int i=0; i<n_face; i++) {
+         nbr_table.get(i, n_points, nbrs);
+         smooth_dp.set(interp_ugrid(dp, nbrs, mthd, n_points, t), i, 0);
+      }
    }
 
    return;

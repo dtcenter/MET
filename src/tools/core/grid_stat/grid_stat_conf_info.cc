@@ -390,6 +390,34 @@ void GridStatConfInfo::process_flags() {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Exit for the options which are not supported when verifying on an
+// unstructured grid: the smoothing methods which need the regular grid
+// structure, the NetCDF matched pairs output, the Fourier decomposition,
+// and the neighborhood, gradient, and distance map outputs.
+//
+////////////////////////////////////////////////////////////////////////
+
+void GridStatConfInfo::check_ugrid() const {
+   const char *method_name = "GridStatConfInfo::check_ugrid() -> ";
+
+   for(int i=0; i<n_vx; i++) {
+      vx_opt[i].interp_info.validate_ugrid(UGridInterpUse::Smoothing, method_name);
+      vx_opt[i].check_ugrid(method_name);
+   }
+
+   if(output_nc_flag) {
+      mlog << Error << "\n" << method_name
+           << "the NetCDF matched pairs output is not supported for the "
+           << "unstructured grid. Set \"" << conf_key_nc_pairs_flag
+           << " = FALSE;\".\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 
 void GridStatConfInfo::process_masks(const Grid &grid) {
    MaskPlane mp;
@@ -1014,6 +1042,36 @@ void GridStatVxOpt::parse_nc_info(Dictionary &odict) {
 // Check the settings that would impact the number of matched pairs
 // when searching for U/V matches.
 //
+////////////////////////////////////////////////////////////////////////
+//
+// Exit for the Fourier decomposition and the neighborhood, gradient, and
+// distance map outputs, which rely on the regular grid structure and are
+// not meaningful for an unstructured grid.
+//
+////////////////////////////////////////////////////////////////////////
+
+void GridStatVxOpt::check_ugrid(const char *method_name) const {
+
+   if(get_n_wave_1d() > 0) {
+      mlog << Error << "\n" << method_name
+           << "the Fourier decomposition (\"" << conf_key_fourier
+           << "\") is not supported for the unstructured grid. "
+           << "Leave \"wave_1d_beg\" and \"wave_1d_end\" empty.\n\n";
+      exit(1);
+   }
+
+   for(int i : { i_nbrctc, i_nbrcts, i_nbrcnt, i_grad, i_dmap }) {
+      if(output_flag[i] == STATOutputType::None) continue;
+      mlog << Error << "\n" << method_name
+           << "the \"" << statlinetype_to_string(txt_file_type[i])
+           << "\" output is not supported for the unstructured grid. "
+           << "Set it to NONE in \"output_flag\".\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {

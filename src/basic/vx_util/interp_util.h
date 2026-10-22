@@ -96,10 +96,13 @@ struct SurfaceInfo {
 struct UGridNeighbors {
 
    std::vector<int>    index;    // Face index
-   std::vector<double> dist_km;  // Distance from the target point (km)
-   std::vector<double> area_km2; // Face area (km^2), empty if unknown
+   std::vector<double> dist_km;  // Distance from the target point (km), empty if not needed
    std::vector<double> x_km;     // Local east offset from the target point (km)
    std::vector<double> y_km;     // Local north offset from the target point (km)
+
+   // Area (km^2) of every face, indexed by the face index (not allocated),
+   // nullptr if unknown
+   const std::vector<double> *face_area = nullptr;
 
    void clear();
    int  n() const;
@@ -108,12 +111,38 @@ struct UGridNeighbors {
 inline void UGridNeighbors::clear() {
    index.clear();
    dist_km.clear();
-   area_km2.clear();
    x_km.clear();
    y_km.clear();
+   face_area = nullptr;
 }
 
 inline int UGridNeighbors::n() const { return static_cast<int>(index.size()); }
+
+//
+// Closest faces of every face for smoothing the unstructured grid. Only
+// the face indices are stored, n_max per face sorted by distance, with -1
+// after the last face within the maximum distance. The first n faces of
+// a row are the n closest faces, so the table serves any n <= n_max.
+//
+
+struct UGridNeighborTable {
+
+   int              n_face = 0;
+   int              n_max  = 0;
+   std::vector<int> index;       // [n_face * n_max]
+
+   // Area (km^2) of every face (not allocated), nullptr if unknown
+   const std::vector<double> *face_area = nullptr;
+
+   void clear();
+   void get(int face, int n, UGridNeighbors &nbrs) const;
+};
+
+inline void UGridNeighborTable::clear() {
+   n_face = n_max = 0;
+   std::vector<int>().swap(index);   // release the memory
+   face_area = nullptr;
+}
 
 //
 // Point information for the unstructured grid interpolation: the

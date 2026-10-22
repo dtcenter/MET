@@ -1079,6 +1079,7 @@ struct UGridValues {
    vector<double> areas;
    vector<double> xs;
    vector<double> ys;
+   bool           has_dist = false;
    bool           has_area = false;
    bool           has_xy = false;
 };
@@ -1086,7 +1087,9 @@ struct UGridValues {
 static UGridValues collect_ugrid_values(const DataPlane &dp, const UGridNeighbors &nbrs,
                                         int n_points) {
    UGridValues u;
-   u.has_area = !nbrs.area_km2.empty();
+   u.has_dist = (static_cast<int>(nbrs.dist_km.size()) == nbrs.n());
+   u.has_area = (nbrs.face_area != nullptr &&
+                 static_cast<int>(nbrs.face_area->size()) == dp.nx());
    u.has_xy = (static_cast<int>(nbrs.x_km.size()) == nbrs.n() &&
                static_cast<int>(nbrs.y_km.size()) == nbrs.n());
 
@@ -1097,14 +1100,30 @@ static UGridValues collect_ugrid_values(const DataPlane &dp, const UGridNeighbor
       double v = dp.get(idx, 0);
       if(is_bad_data(v)) continue;
       u.values.add(v);
-      u.dists.push_back(nbrs.dist_km[i]);
-      if(u.has_area) u.areas.push_back(nbrs.area_km2[i]);
+      if(u.has_dist) u.dists.push_back(nbrs.dist_km[i]);
+      if(u.has_area) u.areas.push_back((*nbrs.face_area)[idx]);
       if(u.has_xy) {
          u.xs.push_back(nbrs.x_km[i]);
          u.ys.push_back(nbrs.y_km[i]);
       }
    }
    return u;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Copy the first n closest faces of a face from the neighbor table.
+//
+////////////////////////////////////////////////////////////////////////
+
+void UGridNeighborTable::get(int face, int n, UGridNeighbors &nbrs) const {
+   nbrs.clear();
+   nbrs.face_area = face_area;
+   if(face < 0 || face >= n_face) return;
+
+   const int *row = index.data() + static_cast<size_t>(face)*n_max;
+   int m = std::min(n, n_max);
+   for(int k=0; k<m && row[k] >= 0; k++) nbrs.index.push_back(row[k]);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1123,6 +1142,13 @@ static double ugrid_nearest(const DataPlane &dp, const UGridNeighbors &nbrs) {
 
 // Distance-weighted mean, the value at the face within 1 meter
 static double ugrid_dw_mean(const UGridValues &u) {
+   if(!u.has_dist) {
+      mlog << Error << "\ninterp_ugrid() -> "
+           << "the face distances are required for "
+           << interpmthd_dw_mean_str << ".\n\n";
+      exit(1);
+   }
+
    double wght_sum = 0.0;
    double numerator = 0.0;
    for(int i=0; i<u.values.n(); i++) {
@@ -1202,7 +1228,7 @@ static double ugrid_best(const UGridValues &u, double obs_v) {
 
 static double ugrid_bilin(const UGridValues &u) {
 
-   if(!u.has_xy) {
+   if(!u.has_xy || !u.has_dist) {
       mlog << Error << "\ninterp_ugrid() -> "
            << "the face locations are required for "
            << interpmthd_bilin_str << ".\n\n";

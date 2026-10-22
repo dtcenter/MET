@@ -233,6 +233,8 @@ class GridStatVxOpt {
       int get_n_nbrhd_wdth()   const;
       int get_n_cov_thresh()   const;
       int get_n_wave_1d()      const;
+
+      void check_ugrid(const char *) const;
       int get_n_grad()         const;
       int get_n_ci_alpha()     const;
 };
@@ -319,6 +321,8 @@ class GridStatConfInfo {
       int  get_compression_level();
       bool get_output_ascii_flag() const;
       bool get_output_nc_flag()    const;
+
+      void check_ugrid() const;
 
       // Compute the maximum number of output lines possible based
       // on the contents of the configuration file

@@ -53,7 +53,7 @@ To correctly parse the UGRID topology, MET needs the following information that 
     - Coordinate variable name for the vertical coordinate
     - Optional
   * - area_face
-    - Variable name for the area of each UGRID cell (e.g. "areaCell" for MPAS), in m\ :sup:`2` or km\ :sup:`2` as given by its "units" attribute (m\ :sup:`2` if missing). It is used as the weight for the AW_MEAN interpolation method (see :ref:`ugrid_interpolation`) and for the AREA grid weighting.
+    - Variable name for the area of each UGRID cell (e.g. "areaCell" for MPAS), in m\ :sup:`2` or km\ :sup:`2` as given by its "units" attribute (m\ :sup:`2` if missing). It is used as the weight for the AW_MEAN interpolation method (see :ref:`ugrid_interpolation`), the AREA and AREA_CNTR grid weighting (**grid_weight_flag**), and the AW_MEAN regridding method. See :ref:`ugrid_limitations` for the behavior without it.
     - Optional
 
 Unstructured Grid Configuration Entries
@@ -155,6 +155,8 @@ The following PointStat example uses the 9 closest cells within 20 km of each ob
   ugrid_dataset          = "mpas";
   ugrid_max_distance_km  = 20;
 
+.. _ugrid_limitations:
+
 Unstructured Grid Limitations
 =============================
 
@@ -162,12 +164,22 @@ We anticipate expanding the UGRID capabilities in MET in the near future. Until 
 
 1. In GridStat, verifying directly on a UGRID (**regrid.to_grid = NONE**) is supported only when the forecast and observation are on the same UGRID, and with the following restrictions:
 
-   * The NetCDF matched pairs output is not supported. Set **nc_pairs_flag = FALSE**.
-   * The Fourier decomposition (**fourier**) treats the UGRID as one row of cells and is very slow for large UGRIDs. Leave **fourier.wave_1d_beg** and **fourier.wave_1d_end** empty.
-   * The neighborhood statistics (NBRCTC, NBRCTS, NBRCNT), gradients, and distance maps rely on the structure of a regular grid. They do not account for the UGRID cell locations and their results are not meaningful for a UGRID.
+   * The NetCDF matched pairs output is not supported. Set **nc_pairs_flag = FALSE**, since it is enabled by default.
+   * The Fourier decomposition (**fourier**) is not supported. Leave **fourier.wave_1d_beg** and **fourier.wave_1d_end** empty (the default).
+   * The neighborhood statistics (NBRCTC, NBRCTS, NBRCNT), gradients (GRAD), and distance maps (DMAP) rely on the structure of a regular grid and are not supported. Set them to NONE in **output_flag** (the default).
+
+   GridStat checks these settings after determining the verification grid and exits with an error, before writing any output, if any of them is requested for a UGRID.
 
    Otherwise, the UGRID (either forecast, obs, or both) must be regridded to a structured verification grid prior to verification being performed. In most cases, gridded observations are on a structured grid and so the users are encouraged to regrid their UGRID forecast to the structured observation grid. The user is referred to :ref:`appendixB` for guidance on defining a structured verification grid, being mindful that the regridding can be slow for large verification grids. For Point-Stat, evaluation occurs by interpolating UGRID data directly to observation point locations and does not require regridding.
 
 2. Data at cell edges are currently not supported, only those variables which have data at the cell centers are supported. Users should note in particular that wind components that are typically derived using data at cell edges are currently unsupported.
 
 3. The interpolation and smoothing methods supported for UGRIDs are listed in :ref:`ugrid_interpolation`. In PointStat, when the land/sea mask (**land_mask**) or topography (**topo_mask**) is enabled, only the NEAREST method is supported for both **interp** and **topo_mask.interp**, since the surface interpolation does not yet use the closest cells.
+
+4. The area of the UGRID cells is available only when **area_face** is defined in the **ugrid_metadata_map** (see :numref:`table_ugrid_metadata`). Without it:
+
+   * **grid_weight_flag** = AREA or AREA_CNTR results in an error.
+   * The AW_MEAN regridding method from a UGRID results in an error.
+   * The AW_MEAN interpolation method uses equal weights (same as UW_MEAN) and prints a warning.
+
+5. The cell area of a UGRID is the area of the cell itself, so the centered variants are not distinct: **grid_weight_flag** = AREA_CNTR is identical to AREA. The AW_MEAN_CNTR regridding method is not supported from a UGRID and results in an error, since it computes the extent of each input grid box from the neighboring grid indices, which are not neighboring cells on a UGRID. Use AW_MEAN instead. AW_MEAN_CNTR is not an interpolation method for PointStat or GridStat and is rejected for UGRIDs (see :ref:`ugrid_interpolation`).

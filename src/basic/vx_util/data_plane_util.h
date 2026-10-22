@@ -34,7 +34,7 @@
 
 #include <vector>
 
-struct UGridNeighbors;   // defined in interp_util.h
+struct UGridNeighborTable;   // defined in interp_util.h
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -58,7 +58,7 @@ extern DataPlane smooth_field(const DataPlane &dp,
 extern void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                InterpMthd mthd, int width,
                const GridTemplateFactory::GridTemplates shape,
-               double t, const std::vector<UGridNeighbors> &nbr_table);
+               double t, const UGridNeighborTable &nbr_table);
 
 extern void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                int width, GridTemplateFactory::GridTemplates shape,

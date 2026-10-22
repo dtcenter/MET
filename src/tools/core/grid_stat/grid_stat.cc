@@ -192,6 +192,7 @@ static void finish_txt_files();
 
 static void clean_up();
 
+static int  ugrid_max_n_points();
 static void smooth_vx_field(const DataPlane &, DataPlane &, InterpMthd,
                             const InterpInfo *, int);
 
@@ -358,13 +359,8 @@ void process_command_line(int argc, char **argv) {
    grid = parse_vx_grid(conf_info.vx_opt[0].fcst_info->regrid(),
                         &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
 
-   // Check the smoothing methods for the unstructured grid
-   if(grid.is_ugrid()) {
-      for(int i=0; i<conf_info.get_n_vx(); i++) {
-         conf_info.vx_opt[i].interp_info.validate_ugrid(UGridInterpUse::Smoothing,
-            "process_command_line() -> ");
-      }
-   }
+   // Check the options which are not supported for the unstructured grid
+   if(grid.is_ugrid()) conf_info.check_ugrid();
 
    // Compute weight for each grid point
    parse_grid_weight(grid, conf_info.grid_weight_flag, wgt_dp);
@@ -3222,6 +3218,30 @@ void finish_txt_files() {
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Largest number of the closest faces over all smoothing methods and
+// widths, so that the neighbor table of the unstructured grid is built
+// only once.
+//
+////////////////////////////////////////////////////////////////////////
+
+static int ugrid_max_n_points() {
+   static int n_max = 0;
+
+   if(n_max > 0) return n_max;
+
+   n_max = 1;
+   for(int i=0; i<conf_info.get_n_vx(); i++) {
+      const InterpInfo &info = conf_info.vx_opt[i].interp_info;
+      for(int j=0; j<info.n_interp; j++) {
+         n_max = max(n_max, ugrid_interp_n_points(info.width[j], info.shape));
+      }
+   }
+
+   return n_max;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // Smooth the field on the verification grid. For an unstructured grid,
 // use the closest faces of each face instead of the grid template.
 //
@@ -3235,10 +3255,10 @@ static void smooth_vx_field(const DataPlane &dp, DataPlane &smooth_dp,
       smooth_dp = dp;
    }
    else if(grid.is_ugrid()) {
-      int n_points = ugrid_interp_n_points(interp->width[j], interp->shape);
+      // Build the neighbor table once for the largest number of faces
       smooth_field(dp, smooth_dp, interp_mthd,
                    interp->width[j], interp->shape, interp->vld_thresh,
-                   *grid.ugrid_neighbor_table(n_points));
+                   *grid.ugrid_neighbor_table(ugrid_max_n_points()));
    }
    else {
       smooth_field(dp, smooth_dp, interp_mthd,
