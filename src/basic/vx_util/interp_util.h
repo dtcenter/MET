@@ -139,7 +139,8 @@ struct UGridNeighborTable {
 };
 
 inline void UGridNeighborTable::clear() {
-   n_face = n_max = 0;
+   n_face = 0;
+   n_max = 0;
    std::vector<int>().swap(index);   // release the memory
    face_area = nullptr;
 }

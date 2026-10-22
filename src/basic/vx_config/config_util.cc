@@ -1833,21 +1833,21 @@ void InterpInfo::validate() {
 
 void InterpInfo::validate_ugrid(UGridInterpUse use, const char *caller) const {
 
-   static const vector<InterpMthd> point_methods = {
+   static const vector point_methods = {
       InterpMthd::Nearest, InterpMthd::Min,     InterpMthd::Max,
       InterpMthd::Median,  InterpMthd::UW_Mean, InterpMthd::DW_Mean,
       InterpMthd::AW_Mean, InterpMthd::Bilin,   InterpMthd::Best };
-   static const vector<InterpMthd> smoothing_methods = {
+   static const vector smoothing_methods = {
       InterpMthd::Nearest, InterpMthd::Min,     InterpMthd::Max,
       InterpMthd::Median,  InterpMthd::UW_Mean, InterpMthd::AW_Mean };
 
-   const vector<InterpMthd> &supported =
+   const auto &supported =
       (use == UGridInterpUse::Smoothing ? smoothing_methods : point_methods);
 
    for(int i=0; i<n_interp; i++) {
 
-      InterpMthd methodi = string_to_interpmthd(method[i].c_str());
-      if(std::find(supported.begin(), supported.end(), methodi) != supported.end()) continue;
+      if(InterpMthd methodi = string_to_interpmthd(method[i].c_str());
+         std::find(supported.begin(), supported.end(), methodi) != supported.end()) continue;
 
       ConcatString choices;
       for(const auto &m : supported) {

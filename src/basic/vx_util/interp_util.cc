@@ -1268,8 +1268,9 @@ double interp_ugrid(const DataPlane &dp, const UGridNeighbors &nbrs,
 
    // Check whether enough valid faces were found
    UGridValues u = collect_ugrid_values(dp, nbrs, n_points);
-   int count = u.values.n();
-   if(count == 0 || ((double) count)/n_points < t) return bad_data_double;
+   if(int count = u.values.n(); count == 0 || ((double) count)/n_points < t) {
+      return bad_data_double;
+   }
 
    double v = bad_data_double;
    switch(mthd) {
