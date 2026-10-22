@@ -2812,18 +2812,27 @@ Four grid weighting options are currently supported:
   This is an approximation for grid box area used by NCEP and WMO.
 
 * AREA to define the weight as the true area of the grid box (km^2)
-  defined by the lower-left corner of each grid box.
+  defined by the lower-left corner of each grid box, divided by the maximum
+  grid box area in the verification grid.
 
 * AREA_CNTR to define the weight as the true area of the grid box (km^2)
-  defined by the center point of each grid box.
+  defined by the center point of each grid box, divided by the maximum
+  grid box area in the verification grid.
+
+For both AREA and AREA_CNTR, the resulting weights are in the range (0, 1],
+consistent with the other weighting options. For a regular lat/lon grid, they
+are approximately equal to the COS_LAT weights. Since the grid box area is not
+defined for unstructured, semi-lat/lon, or GOES grids, AREA and AREA_CNTR
+weighting are not supported for them.
 
 .. note::
    Prior to version 13.0.0, the AREA option computed centered grid box
    areas for Lambert Azimuthal Equal Area grids, unlike all other grid
    projections. Use AREA_CNTR to reproduce that behavior.
 
-If requested in the config file, the raw grid weights can be written to
-the NetCDF output from Grid-Stat and Ensemble-Stat.
+If requested in the config file, the grid weights applied can be written to
+the NetCDF output from Grid-Stat and Ensemble-Stat. For AREA and AREA_CNTR
+weighting, the true grid box areas (km^2) are also written to the NetCDF output.
 
 When computing partial sums and continuous statistics, the weights are
 first normalized by dividing by the sum of the weights for the current
