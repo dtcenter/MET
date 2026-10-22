@@ -43,9 +43,9 @@ C----------------------------------------------------------------------
       integer, parameter :: IM=1, JM=1, LM=200, LP1=LM+1
 
       ! Inputs: upto NLEV=256. MZBL <= NLEV
-      integer, intent(in) :: ivirt, itype
-      integer, intent(in) :: IMM, JMM, LMM
-      integer, intent(in) :: LMH(IM,JM)
+      integer(C_INT), intent(in) :: ivirt, itype
+      integer(C_INT), intent(in) :: IMM, JMM, LMM
+      integer(C_INT), intent(in) :: LMH(IM,JM)
       real(C_DOUBLE), intent(in) :: T(IM,JM,LM), P(IM,JM,LM)
       real(C_DOUBLE), intent(in) :: p1d(IM,JM), t1d(IM,JM)
       real(C_DOUBLE), intent(in) :: PINT(IM,JM,LM+1)
@@ -95,17 +95,16 @@ C----------------------------------------------------------------------
       real(C_DOUBLE) :: dpbnd
       integer :: I, J, L, KB, N, KNUML, KNUMH, IEQK, LCLK
       integer :: IVI
-      integer :: ITTBK, IQ, IPTBK, ITHTBK
-      integer :: IMJM, IT, KBMAX
+      integer :: ITTBK, IQ
+      integer :: IMJM, IT
       real(C_DOUBLE) :: TBTK, QBTK, APEBTK, TTHBTK, TTHK, BQS00K, SQS00K
       real(C_DOUBLE) :: BQS10K, SQS10K, BQK, SQK, TQK
       real(C_DOUBLE) :: P00K, P10K, P01K, P11K, TPSPK, APESPK, TTHESK
-      real(C_DOUBLE) :: PKL, PSFCK, TTHBK
+      real(C_DOUBLE) :: PKL, PSFCK
       real(C_DOUBLE) :: DP, PRESK, DZKL, THETAP, THETAA, DELTA
       real(C_DOUBLE) :: esatp, eps, oneps, qsatp, tvp
-      real(C_DOUBLE) :: TTH, QQtmp
       real(C_DOUBLE) :: APESTS, FPVSNEW
-      integer :: KBcount, LMHK
+      integer :: LMHK
 
       ! Tables and state that are filled once in original code via TABLE1/TABLEQ
       logical, save :: ITABL = .FALSE.
@@ -175,6 +174,7 @@ c      print*,'itype=',itype
          CAPE(I,J) = 0.0
          CINS(I,J) = 0.0
          THESP(I,J)= 0.0
+         PSP(I,J)  = 0.0
          IEQL(I,J) = LM+1
 
          LCL(I,J)=0
@@ -505,7 +505,7 @@ C     ******************************************************************
       real(C_DOUBLE), intent(out) :: QS0(JTB), SQS(JTB)
       real(C_DOUBLE), intent(out) :: STHE(ITB), THE0(ITB)
 
-      integer :: K, KTHM, KPM, KTHM1, KPM1, KP, KTH
+      integer :: KTHM, KPM, KTHM1, KPM1, KP, KTH
       real(C_DOUBLE) :: APE, DP, DQS, DTH, DTHE, P, QS0K, QS
       real(C_DOUBLE) :: SQSK, STHEK, TH, THE0K
       real(C_DOUBLE), dimension(JTB) :: QSOLD, POLD, QSNEW, PNEW
@@ -656,7 +656,7 @@ C     ******************************************************************
       real(C_DOUBLE), intent(out) :: STHE(ITB), THE0(ITB)
 
       integer :: KTHM, KPM, KTHM1, KPM1
-      integer :: K, KP, KTH
+      integer :: KP, KTH
 
       real(C_DOUBLE), parameter :: THH=325.,PH=105000.
      &                            ,PQ0=379.90516,A1=610.78
@@ -769,7 +769,7 @@ C----------------------------------------------------------------------
 
       ! Locals
       integer :: KK, I, J
-      integer :: IPTBK, ITHTBK, ITH, IP
+      integer :: IPTBK, ITH, IP
       real(C_DOUBLE) :: PK, TPK
       real(C_DOUBLE) :: BTHE00K, STHE00K, BTHE10K, STHE10K
       real(C_DOUBLE) :: BTHK, STHK, TTHK
@@ -895,13 +895,18 @@ C     ******************************************************************
        real(C_DOUBLE), intent(out) :: YNEW(JTB)
        real(C_DOUBLE), intent(inout) :: P(JTB), Q(JTB)
 
-       integer :: i, k, k1, k2, kidx, kold, kp
-       integer :: lastInterval, NOLDM1
+       integer :: k, k1, k2, kold
+       integer :: NOLDM1
        real(C_DOUBLE) :: dxl, dxr, dydxl, dydxr, rtdxc, dx, rdx
        real(C_DOUBLE) :: dx_c, den, ak, bk, ck, x, XK, xsq
        real(C_DOUBLE) :: Y2K, Y2KP1
 
 C-----------------------------------------------------------------------
+C     AK, BK, and CK are always set at label 500 before use at label
+C     550, but initialize them to avoid compiler warnings.
+      AK=0.
+      BK=0.
+      CK=0.
       NOLDM1=NOLD-1
 C
       DXL=XOLD(2)-XOLD(1)
@@ -1050,7 +1055,7 @@ c   c1xpvs=1.-xmin/xinc
       c1xpvs=1.-xmin*c2xpvs
 c    xj=min(max(c1xpvs+c2xpvs*t,1.0),real(nxpvs,krealfp))
       xj=min(max(c1xpvs+c2xpvs*t,1.0),float(nxpvs))
-      jx=min(xj,float(nxpvs)-1.0)
+      jx=int(min(xj,float(nxpvs)-1.0))
       x=xmin+(jx-1)*xinc
 
       tr=con_ttp/x

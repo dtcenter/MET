@@ -248,6 +248,13 @@ MET Version 13.0.0 Upgrade Instructions
      output grid box of those edges were previously discarded rather than assigned to the
      nearest output grid box.
 
+   * The contents of the ASCII files written by the PB2NC "-dump" command line option are
+     corrected. As described in MET `#3468 <https://github.com/dtcenter/MET/issues/3468>`_,
+     MET version 12.2.0 and earlier wrote the mass and wind subsets of each PrepBUFR station
+     report as separate reports and wrote the last report of each message type to the dump file
+     for the next message type. Now the mass and wind subsets are combined into a single report,
+     and each report is written to the dump file for its own message type.
+
 .. dropdown:: Additional upgrade instructions
 
    Recommendations when upgrading to MET version 13.0.0:
