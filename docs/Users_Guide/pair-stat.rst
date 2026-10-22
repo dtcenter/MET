@@ -111,6 +111,8 @@ ________________________
   model             = "FCST";
   desc              = "NA";
   point_weight_flag = NONE;
+  kde_ref_angle     = 0.75;
+  write_weights     = FALSE;
   tmp_dir           = "/tmp";
   version           = "VN.N";
 
@@ -365,3 +367,9 @@ The output STAT file is named by appending **.stat** to the output base string.
 
 The output ASCII files are named by appending **_TYPE.txt** to the output base string
 for each output line TYPE set to **BOTH** in the **output_flag** configuration dictionary.
+
+When **write_weights = TRUE** and **point_weight_flag** is set to SID or KDE, the point
+weights for each verification task are written to a separate ASCII file, named by
+appending **_NAME_LEVEL_TYPE_point_weights.txt** to the output base string, where NAME
+and LEVEL are the forecast variable name and level for that task and TYPE is SID or KDE,
+as described in :numref:`config_options`.
