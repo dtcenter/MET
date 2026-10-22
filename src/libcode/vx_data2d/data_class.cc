@@ -35,6 +35,10 @@ static bool wind_orientations_match(const VarInfo *,
                                     const VarInfo *,
                                     const char *);
 
+static void log_wind_rotation(const VarInfo *);
+
+static void log_wind_rotation(const VarInfo *, int);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -694,12 +698,7 @@ if(!vinfo) return false;
 
 if(!vinfo->is_wind_rotation()) return true;
 
-if(vinfo->is_grid_relative()) {
-   mlog << Debug(3) << "Rotating wind field \""
-        << vinfo->magic_str()
-        << "\" from grid-relative to earth-relative.\n";
-}
-else {
+if(!vinfo->is_grid_relative()) {
    mlog << Debug(3) << "Identified wind field \""
         << vinfo->magic_str()
         << "\" as being earth-relative.\n";
@@ -730,6 +729,7 @@ if(vinfo->is_u_wind()) {
                                                        vinfo_wind.get(),
                                                        method_name);
    if(status && !skip_rotation) {
+      log_wind_rotation(vinfo);
       status = rotate_uv_grid_to_earth(uwnd_dp, vwnd_dp, *Raw_Grid,
                                        dp, tmp_dp);
    }
@@ -745,12 +745,14 @@ else if(vinfo->is_v_wind()) {
                                                        vinfo_wind.get(),
                                                        method_name);
    if(status && !skip_rotation) {
+      log_wind_rotation(vinfo);
       status = rotate_uv_grid_to_earth(uwnd_dp, vwnd_dp, *Raw_Grid,
                                        tmp_dp, dp);
    }
 }
 // Rotate Wind Direction
 else if(vinfo->is_wind_direction()) {
+   log_wind_rotation(vinfo);
    tmp_dp = dp;
    rotate_wind_direction_grid_to_earth(tmp_dp, *Raw_Grid, dp);
    status = true;
@@ -782,12 +784,7 @@ if(!vinfo) return false;
 
 if(!vinfo->is_wind_rotation() || dpa.n_planes() == 0) return true;
 
-if(vinfo->is_grid_relative()) {
-   mlog << Debug(3) << "Rotating " << dpa.n_planes()
-        << " wind field(s) for \"" << vinfo->magic_str()
-        << "\" from grid-relative to earth-relative.\n";
-}
-else {
+if(!vinfo->is_grid_relative()) {
    mlog << Debug(3) << "Identified " << dpa.n_planes()
         << " wind field(s) for \"" << vinfo->magic_str()
         << "\" as being earth-relative.\n";
@@ -845,6 +842,7 @@ if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
 
    // Rotate each plane
    if(status && !skip_rotation) {
+      log_wind_rotation(vinfo, uwnd_dpa.n_planes());
       for(int i=0; i<uwnd_dpa.n_planes(); i++) {
          status = rotate_uv_grid_to_earth(
                      uwnd_dpa[i], vwnd_dpa[i],
@@ -855,6 +853,7 @@ if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
 }
 // Rotate Wind Direction
 else if(vinfo->is_wind_direction()) {
+   log_wind_rotation(vinfo, dpa.n_planes());
    tmp_dpa = dpa;
 
    // Rotate each plane
@@ -1138,6 +1137,45 @@ static StringArray swap_uv_name(const VarInfo *vinfo,
    }
 
    return sa;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static void log_wind_rotation(const VarInfo *vinfo)
+
+{
+
+   //
+   // Report a wind rotation that is about to be performed. This is logged
+   // once the companion component has been read and checked, rather than
+   // when the rotation is first requested, so that it is never printed for
+   // a rotation that does not actually happen.
+   //
+
+mlog << Debug(3) << "Rotating wind field \""
+     << vinfo->magic_str()
+     << "\" from grid-relative to earth-relative.\n";
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static void log_wind_rotation(const VarInfo *vinfo, int n_planes)
+
+{
+
+mlog << Debug(3) << "Rotating " << n_planes
+     << " wind field(s) for \"" << vinfo->magic_str()
+     << "\" from grid-relative to earth-relative.\n";
+
+return;
 
 }
 
