@@ -9,6 +9,14 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 13.0.0-beta3 Release Notes (YYYYMMDD)
+-------------------------------------------------
+
+  .. dropdown:: Enhancements
+
+     * **Enhance Point-Stat and Grid-Stat to support interpolation and smoothing methods other than NEAREST for unstructured grids (UGRIDs) using the N closest grid cells, including the distance-weighted, area-weighted, and bilinear methods**
+       (`#3334 <https://github.com/dtcenter/MET/issues/3334>`_).
+
 MET Version 13.0.0-beta2 Release Notes (20260508)
 -------------------------------------------------
 
@@ -193,6 +201,31 @@ MET Version 13.0.0 Upgrade Instructions
        be replaced. This applies both to the top-level entry and to entries set separately
        in each "obs.field" entry.
 
+   * UGRID configuration files
+
+     * The new optional "area_face" entry of "ugrid_metadata_map" specifies the variable name
+       for the area of each UGRID cell. It is set to "areaCell" in the default MPAS configuration
+       (UGridConfig_mpas) and is used by the AW_MEAN interpolation and regridding methods and the
+       AREA and AREA_CNTR grid weighting. See :numref:`table_ugrid_metadata`.
+
+   * Point-Stat and Grid-Stat configuration files
+
+     * For UGRIDs, the "interp" methods other than NEAREST are now supported using the N closest
+       grid cells, where N is the number of points defined by "width" and "shape" (the
+       width x width closest cells for BILIN). Point-Stat supports MIN, MAX, MEDIAN, UW_MEAN,
+       DW_MEAN, AW_MEAN, BILIN, BEST, and HiRA, and Grid-Stat supports MIN, MAX, MEDIAN, UW_MEAN,
+       and AW_MEAN for smoothing. Setting "ugrid_max_distance_km" is recommended to limit the
+       closest cells. See :ref:`ugrid_interpolation`.
+
+     * For UGRIDs, the following settings, which were previously accepted, now result in an error
+       when the configuration is processed: unsupported "interp" methods (for example, LS_FIT,
+       GAUSSIAN, and the grid box corners), "topo_mask.interp" methods other than NEAREST, and,
+       when Grid-Stat verifies directly on a UGRID, the NetCDF matched pairs output
+       ("nc_pairs_flag", enabled by default), the Fourier decomposition ("fourier"), and the
+       NBRCTC, NBRCTS, NBRCNT, GRAD, and DMAP output. The AREA and AREA_CNTR grid weighting and the
+       AW_MEAN regridding method from a UGRID require "area_face", and the AW_MEAN_CNTR regridding
+       method from a UGRID is not supported. See :ref:`ugrid_limitations`.
+
    * ConfigConstants configuration file
 
      * The "u_wind_field_name", "v_wind_field_name", "wind_speed_field_name", and "wind_direction_field_name"
@@ -247,6 +280,13 @@ MET Version 13.0.0 Upgrade Instructions
      `#3178 <https://github.com/dtcenter/MET/issues/3178>`_, input grid points within half an
      output grid box of those edges were previously discarded rather than assigned to the
      nearest output grid box.
+
+   * Point-Stat and Grid-Stat output for unstructured grids (UGRIDs) using interpolation or
+     smoothing methods other than NEAREST changes. As described in MET
+     `#3334 <https://github.com/dtcenter/MET/issues/3334>`_, these methods previously used the
+     UGRID cells with neighboring indices rather than neighboring locations, and BILIN returned
+     the value of the nearest cell. They now use the N closest cells. The "AREA" grid weight for
+     UGRIDs, previously 0 for every cell, is now the cell area.
 
    * The contents of the ASCII files written by the PB2NC "-dump" command line option are
      corrected. As described in MET `#3468 <https://github.com/dtcenter/MET/issues/3468>`_,
