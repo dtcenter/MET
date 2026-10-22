@@ -28,7 +28,7 @@ function usage {
 }
 
 # Check for arguments
-if [ $# -lt 2 ]; then usage; exit 1; fi
+if [[ $# -lt 2 ]]; then usage; exit 1; fi
 
 if [[ ${1} == ${2} ]]; then
   echo "ERROR: the two versions must be different!"
@@ -82,7 +82,7 @@ for PID in $PID_LIST; do
 done
 
 # Check return status
-if [ "$FAILURE" == "1" ]; then
+if [[ "$FAILURE" == "1" ]]; then
    echo "ERROR: unit test failed";
    exit 1
 fi
