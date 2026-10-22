@@ -45,6 +45,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3429 <https://github.com/dtcenter/MET/issues/3429>`_).
      * Fix PB2NC so that derived HPBL output does not depend on which other stations are processed
        (`#3450 <https://github.com/dtcenter/MET/issues/3450>`_).
+     * Fix the PB2NC ``-dump`` segfault and reduce PB2NC compiler warnings
+       (`#3468 <https://github.com/dtcenter/MET/issues/3468>`_).
      * Fix Stat-Analysis CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
        (`#3478 <https://github.com/dtcenter/MET/issues/3478>`_).
 
@@ -320,6 +322,13 @@ MET Version 13.0.0 Upgrade Instructions
      unused input records from one station's profile carried over into the next, and deep
      profiles read past the levels actually stored. The PBL derived for each station now
      depends only on that station's own observations.
+
+   * The contents of the ASCII files written by the PB2NC "-dump" command line option are
+     corrected. As described in MET `#3468 <https://github.com/dtcenter/MET/issues/3468>`_,
+     MET version 12.2.0 and earlier wrote the mass and wind subsets of each PrepBUFR station
+     report as separate reports and wrote the last report of each message type to the dump file
+     for the next message type. Now the mass and wind subsets are combined into a single report,
+     and each report is written to the dump file for its own message type.
 
    * Stat-Analysis summary jobs that use the "-derive" option to compute CNT statistics from
      SAL1L2 input lines now write output. As described in MET
