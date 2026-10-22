@@ -792,7 +792,7 @@ static void process_obs_file(int i_nc) {
 #ifdef WITH_PYTHON
    MetPythonPointDataFile met_point_file;
    if (use_python) {
-      int offset = python_command.find("=");
+      size_t offset = python_command.find("=");
       if (offset == std::string::npos) {
          mlog << Error << "\n" << method_name
               << "trouble parsing the python command " << python_command << ".\n\n";
@@ -2172,7 +2172,7 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
          shc.set_fcst_thresh (conf_info.vx_opt[i_vx].fcat_ta[i]);
          shc.set_obs_thresh  (conf_info.vx_opt[i_vx].ocat_ta[i]);
          shc.set_thresh_logic(SetLogic::None);
-         shc.set_cov_thresh  (na_str);
+         shc.set_cov_thresh  (SingleThresh(na_str));
 
          // Write out the MPR lines
          if(conf_info.vx_opt[i_vx].output_flag[i_mpr] != STATOutputType::None) {

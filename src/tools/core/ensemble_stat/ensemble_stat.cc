@@ -1001,7 +1001,7 @@ static void process_point_obs(int i_nc) {
 #ifdef WITH_PYTHON
    MetPythonPointDataFile met_point_file;
    if (use_python) {
-      int offset = python_command.find("=");
+      size_t offset = python_command.find("=");
       if (offset == std::string::npos) {
          mlog << Error << "\n" << method_name
               << "trouble parsing the python command " << python_command << ".\n\n";
@@ -2327,7 +2327,7 @@ static void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       vx_opt.output_flag[i_orank] != STATOutputType::None) {
 
       // Set the header column
-      shc.set_obs_thresh(na_str);
+      shc.set_obs_thresh(SingleThresh(na_str));
 
       // Store current obtype value
       string cur_obtype = shc.get_obtype();

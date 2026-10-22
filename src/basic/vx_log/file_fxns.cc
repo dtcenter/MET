@@ -111,7 +111,7 @@ DIR *met_opendir(const char *path) {
 void met_closedir(DIR * & dp) {
 
    int status = ::closedir(dp);
-   dp = 0;
+   dp = nullptr;
 
    if(status < 0) {
 

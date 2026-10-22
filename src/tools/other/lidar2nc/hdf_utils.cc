@@ -103,7 +103,7 @@ if ( (info.id = SDselect(hdf_sd_id, info.index)) < 0 )  {
 
 }
 
-if ( SDgetinfo(info.id, 0, &(info.rank), info.dimsizes, &(info.type), &(info.atts)) < 0 )  {
+if ( SDgetinfo(info.id, nullptr, &(info.rank), info.dimsizes, &(info.type), &(info.atts)) < 0 )  {
 
    mlog << Error
         << "\n\n  get_hdf_var_info() -> SDgetinfo failed\n\n";

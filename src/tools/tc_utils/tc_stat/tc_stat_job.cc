@@ -664,8 +664,6 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
    // Check InitDiagThreshMap
    if(keep == true) {
 
-      int i_diag;
-
       // Loop through the numeric diagnostic thresholds
       for(thr_it=InitDiagThreshMap.begin(); thr_it!= InitDiagThreshMap.end(); thr_it++) {
 
@@ -3761,7 +3759,7 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
 
          // Write only header columns for unspecified line type
          case STATLineType::none:
-            write_header_row((const char **) 0, 0, 1, stat_at, 0, 0);
+            write_header_row(nullptr, 0, 1, stat_at, 0, 0);
             break;
           
          default:
@@ -3812,7 +3810,6 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    TimeArray Valid;
    unixtime valid_beg, valid_end;
    int lead_time;
-   int i, j, r, c;
 
    // Setup -out_stat file
    setup_stat_file(1 + (int) RIRWMap.size());
@@ -3841,7 +3838,7 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    //
    // Loop through the map
    //
-   for(it = RIRWMap.begin(), r=1; it != RIRWMap.end(); it++) {
+   for(it = RIRWMap.begin(); it != RIRWMap.end(); it++) {
 
       // Set the output MODEL column
       shc.set_model(write_css(it->second.AModel).c_str());
@@ -3896,11 +3893,6 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
       // Write the output STAT header columns
       //
       
-      //
-      // Initialize
-      //
-      c = 0;
-
       // Split the current map key, eliminating the job name in the first entry
       StringArray ByValue = it->first.split(":");
       ByValue.shift_down(0, 1);

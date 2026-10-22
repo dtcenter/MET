@@ -204,8 +204,8 @@ void do_latlon(NcFile & out, const Grid & grid)
 
 int x, y;
 double lat, lon;
-float * Lat = 0;
-float * Lon = 0;
+float * Lat = nullptr;
+float * Lon = nullptr;
 const int nx = grid.nx();
 const int ny = grid.ny();
 

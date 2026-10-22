@@ -53,7 +53,7 @@ BasicModeAnalysisJob::BasicModeAnalysisJob()
 
 {
 
-init_from_scratch();
+BasicModeAnalysisJob::init_from_scratch();
 
 }
 
@@ -65,7 +65,7 @@ BasicModeAnalysisJob::~BasicModeAnalysisJob()
 
 {
 
-clear();
+BasicModeAnalysisJob::clear();
 
 }
 
@@ -77,9 +77,9 @@ BasicModeAnalysisJob::BasicModeAnalysisJob(const BasicModeAnalysisJob & aj)
 
 {
 
-init_from_scratch();
+BasicModeAnalysisJob::init_from_scratch();
 
-assign_basic_job(aj);
+BasicModeAnalysisJob::assign_basic_job(aj);
 
 }
 
@@ -92,6 +92,14 @@ BasicModeAnalysisJob & BasicModeAnalysisJob::operator=(const BasicModeAnalysisJo
 {
 
 if ( this == &aj )  return *this;
+
+   //
+   //  assign_basic_job() only clears the BasicModeAnalysisJob members, so
+   //  clear any derived class members first when assigning through a
+   //  base class reference
+   //
+
+clear();
 
 assign_basic_job(aj);
 
@@ -112,7 +120,7 @@ dumpfile = (ostream *)  nullptr;   //  don't delete
 
 outfile  = (ostream *)  nullptr;   //  don't delete
 
-clear();
+BasicModeAnalysisJob::clear();
 
 return;
 
@@ -159,7 +167,7 @@ void BasicModeAnalysisJob::assign_basic_job(const BasicModeAnalysisJob & a)
 
 {
 
-clear();
+BasicModeAnalysisJob::clear();
 
 precision = a.precision;
 
@@ -373,7 +381,7 @@ SummaryJob::SummaryJob()
 
 {
 
-init_from_scratch();
+SummaryJob::init_from_scratch();
 
 }
 
@@ -385,7 +393,7 @@ SummaryJob::~SummaryJob()
 
 {
 
-clear();
+SummaryJob::clear();
 
 }
 
@@ -397,7 +405,7 @@ SummaryJob::SummaryJob(const SummaryJob & job)
 
 {
 
-init_from_scratch();
+SummaryJob::init_from_scratch();
 
 assign(job);
 
@@ -429,6 +437,13 @@ void SummaryJob::init_from_scratch()
 
 BasicModeAnalysisJob::init_from_scratch();
 
+   //
+   //  BasicModeAnalysisJob::init_from_scratch() only clears the base class
+   //  members, so clear this class's members too
+   //
+
+SummaryJob::clear();
+
 return;
 
 }
@@ -455,7 +470,7 @@ void SummaryJob::assign(const SummaryJob & job)
 
 {
 
-clear();
+SummaryJob::clear();
 
 BasicModeAnalysisJob::assign_basic_job(job);
 
@@ -701,7 +716,7 @@ ByCaseJob::ByCaseJob()
 
 {
 
-init_from_scratch();
+ByCaseJob::init_from_scratch();
 
 }
 
@@ -713,7 +728,7 @@ ByCaseJob::~ByCaseJob()
 
 {
 
-clear();
+ByCaseJob::clear();
 
 }
 
@@ -725,7 +740,7 @@ ByCaseJob::ByCaseJob(const ByCaseJob & job)
 
 {
 
-init_from_scratch();
+ByCaseJob::init_from_scratch();
 
 assign(job);
 
@@ -757,6 +772,13 @@ void ByCaseJob::init_from_scratch()
 
 BasicModeAnalysisJob::init_from_scratch();
 
+   //
+   //  BasicModeAnalysisJob::init_from_scratch() only clears the base class
+   //  members, so clear this class's members too
+   //
+
+ByCaseJob::clear();
+
 return;
 
 }
@@ -787,7 +809,7 @@ void ByCaseJob::assign(const ByCaseJob & job)
 
 {
 
-clear();
+ByCaseJob::clear();
 
 BasicModeAnalysisJob::assign_basic_job(job);
 

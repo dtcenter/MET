@@ -43,7 +43,7 @@ Pbm::Pbm()
 
 {
 
-init_from_scratch();
+Pbm::init_from_scratch();
 
 }
 
@@ -55,9 +55,9 @@ Pbm::Pbm(const char * filename)
 
 {
 
-init_from_scratch();
+Pbm::init_from_scratch();
 
-if ( !read(filename) )  {
+if ( !Pbm::read(filename) )  {
 
    mlog << Error << "\nPbm::Pbm(const char *filename) -> failed to read file \"" << filename << "\"\n\n";
 
@@ -75,7 +75,7 @@ Pbm::~Pbm()
 
 {
 
-clear();
+Pbm::clear();
 
 }
 
@@ -87,7 +87,7 @@ Pbm::Pbm(const Pbm & p)
 
 {
 
-init_from_scratch();
+Pbm::init_from_scratch();
 
 assign(p);
 
@@ -117,7 +117,7 @@ void Pbm::clear()
 
 {
 
-clear_common();
+PxmBase::clear_common();
 
 return;
 
@@ -145,7 +145,7 @@ void Pbm::assign(const Pbm & p)
 
 {
 
-copy_common(p);
+PxmBase::copy_common(p);
 
 return;
 
@@ -310,7 +310,7 @@ const char *method_name = "Pbm::read() -> ";
    //  clear out old image, if any
    //
 
-clear();
+Pbm::clear();
 
    //
    //  open input file
@@ -342,7 +342,7 @@ if ( !in )  {
 
    mlog << Warning << "\n" << method_name << "unable to read magic cookie in image file \"" << filename << "\"\n\n";
 
-   clear();
+   Pbm::clear();
 
    return 0;
 
@@ -352,7 +352,7 @@ if ( (c1 != 'P') || (c2 != '4') )  {
 
    mlog << Warning << "\n" << method_name << "bad magic number in image file \"" << filename << "\"\n\n";
 
-   clear();
+   Pbm::clear();
 
    return 0;
 
@@ -372,7 +372,7 @@ while ( true )  {
 
    get_comment(in, junk);
 
-   add_comment(junk);
+   PxmBase::add_comment(junk);
 
 }
 
@@ -395,7 +395,7 @@ if ( !in.read((char *) data.data(), n) )  {
 
    mlog << Warning << "\n" << method_name << "trouble reading image data\n\n";
 
-   clear();
+   Pbm::clear();
 
    return 0;
 

@@ -46,7 +46,7 @@ Pcm::Pcm()
 
 {
 
-init_from_scratch();
+Pcm::init_from_scratch();
 
 }
 
@@ -58,9 +58,9 @@ Pcm::Pcm(const char * filename)
 
 {
 
-init_from_scratch();
+Pcm::init_from_scratch();
 
-if ( !read(filename) )  {
+if ( !Pcm::read(filename) )  {
 
    mlog << Error << "\nPcm::Pcm(const char *filename) -> failed to read file \"" << filename << "\"\n\n";
 
@@ -78,7 +78,7 @@ Pcm::~Pcm()
 
 {
 
-clear();
+Pcm::clear();
 
 }
 
@@ -90,7 +90,7 @@ Pcm::Pcm(const Pcm & p)
 
 {
 
-init_from_scratch();
+Pcm::init_from_scratch();
 
 assign(p);
 
@@ -120,7 +120,7 @@ void Pcm::clear()
 
 {
 
-clear_common();
+PxmBase::clear_common();
 
 Colormap.clear();
 
@@ -165,9 +165,9 @@ void Pcm::assign(const Pcm & p)
 int trouble;
 
 
-clear();
+Pcm::clear();
 
-copy_common(p);
+PxmBase::copy_common(p);
 
 
 int j;
@@ -178,7 +178,7 @@ Colormap = p.Colormap;
 
 if ( trouble )  {
 
-   clear();
+   Pcm::clear();
 
    mlog << Error << "\nPcm::assign() -> memory allocation error\n\n";
 
@@ -371,7 +371,7 @@ unsigned char r, g, b;
    //  clear out old image, if any
    //
 
-clear();
+Pcm::clear();
 
    //
    //  open input file
@@ -404,7 +404,7 @@ if ( !in )  {
 
    mlog << Warning << "\nPcm::read() -> unable to read magic cookie in image file \"" << filename << "\"\n\n";
 
-   clear();
+   Pcm::clear();
 
    return 0;
 
@@ -414,7 +414,7 @@ if ( (c1 != 'P') || (c2 != '9') )  {
 
    mlog << Warning << "\nPcm::read() -> bad magic number in image file \"" << filename << "\"\n\n";
 
-   clear();
+   Pcm::clear();
 
    return 0;
 
@@ -434,7 +434,7 @@ while ( true )  {
 
    get_comment(in, junk);
 
-   add_comment(junk);
+   PxmBase::add_comment(junk);
 
 }
 
@@ -447,18 +447,6 @@ Nrows = parse_number(in);
 maxval = parse_number(in);
 
 Ncolors = maxval + 1;
-
-/*
-if ( maxval != 255 )  {
-
-   mlog << Warning << "\nPcm::read() -> bad maxval: \"" << maxval << "\"\n\n";
-
-   clear();
-
-   return 0;
-
-}
-*/
 
    //
    //  get colormap
@@ -480,7 +468,7 @@ for (j=0; j<Ncolors; ++j)  {
 
       mlog << Warning << "\nPcm::read() -> trouble reading colormap data\n\n";
 
-      clear();
+      Pcm::clear();
 
       return 0;
 
@@ -502,7 +490,7 @@ if ( !in.read((char *) data.data(), n) )  {
 
    mlog << Warning << "\nPcm::read() -> trouble reading image data\n\n";
 
-   clear();
+   Pcm::clear();
 
    return 0;
 

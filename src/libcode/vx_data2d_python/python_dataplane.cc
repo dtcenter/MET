@@ -248,7 +248,7 @@ if ( use_xarray )  {
 
    np.set(numpy_array_obj);
 
-   dataplane_from_numpy_array(np, attrs_dict_obj, met_dp_out, met_grid_out, vinfo);
+   dataplane_from_numpy_array(np, Python3_Dict(attrs_dict_obj), met_dp_out, met_grid_out, vinfo);
 
 }
 
@@ -425,7 +425,7 @@ Python3_Numpy np;
 
 np.set(numpy_array_obj);
 
-dataplane_from_numpy_array(np, attrs_dict_obj, met_dp_out, met_grid_out, vinfo);
+dataplane_from_numpy_array(np, Python3_Dict(attrs_dict_obj), met_dp_out, met_grid_out, vinfo);
 
    //
    //  cleanup

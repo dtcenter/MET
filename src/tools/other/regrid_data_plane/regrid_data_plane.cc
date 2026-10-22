@@ -71,8 +71,6 @@ static const InterpMthd DefaultInterpMthd = InterpMthd::Nearest;
 static const int        DefaultInterpWdth = 1;
 static const double     DefaultVldThresh  = 0.5;
 
-static const float      MISSING_LATLON = -999.0;
-
 // Variables for command line arguments
 static ConcatString InputFilename;
 static ConcatString OutputFilename;

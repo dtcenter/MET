@@ -60,7 +60,7 @@ assign(a);
 
 
 TimeArray::TimeArray(TimeArray && a) noexcept
-   : e(move(a.e)), Sorted(a.Sorted)
+   : e(std::move(a.e)), Sorted(a.Sorted)
 {
 
 a.Sorted = false;
@@ -92,7 +92,7 @@ TimeArray & TimeArray::operator=(TimeArray && a) noexcept
 
 if ( this == &a )  return *this;
 
-e = move(a.e);
+e = std::move(a.e);
 Sorted = a.Sorted;
 a.Sorted = false;
 

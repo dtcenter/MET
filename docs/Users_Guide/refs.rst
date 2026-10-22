@@ -69,7 +69,7 @@ References
 |   *AMS 22nd Conference on Weather Analysis and Forecasting and 18th*
 |   *Conference on Numerical Weather Prediction*, 25-29 June, Park City, Utah,
 |   American Meteorological Society (Boston), Available at
-|   http://ams.confex.com/ams/pdfpapers/124856.pdf.
+|   https://ams.confex.com/ams/pdfpapers/124856.pdf.
 |
 
 .. _Bröcker-2007:
@@ -137,7 +137,7 @@ References
 | Denis, B., J. Cote, R. Laprise, 2002:
 |    Spectral Decomposition of Two-Dimensional Atmospheric Fields on Limited-Area
 |    Domains Using the Discrete Cosine Transform (DCT). *Monthly Weather Review*, 130, 1812-1829.
-|    https://doi.org/10.1175/1520-0493(2002)130<1812:SDOTDA>2.0.CO;2
+|    doi: `https://doi.org/10.1175/1520-0493(2002)130<1812:SDOTDA>2.0.CO;2 <https://doi.org/10.1175/1520-0493(2002)130\<1812:SDOTDA\>2.0.CO;2>`_
 |
 
 .. _Durran-2017:
@@ -156,7 +156,7 @@ References
 
 .. _Ebert-Uphoff-2024:
 
-| Ebert-Uphoff, I.,, 2024: An Investigation of Metrics to Evaluate the Sharpness
+| Ebert-Uphoff, I., 2024: An Investigation of Metrics to Evaluate the Sharpness
 |   in AI-Generated Meteorological Imagery. *Draft version - Jan 26, 2024*
 |
 
@@ -169,8 +169,8 @@ References
 
 .. _Efron-2007:
 
-| Efron, B. 2007: Correlation and large-scale significance testing. *Journal*
-|   of the American Statistical Association*, 102(477), 93-103.
+| Efron, B. 2007: Correlation and large-scale significance testing. *Journal of*
+|   *the American Statistical Association*, 102(477), 93-103.
 |
 
 .. _Epstein-1969:
@@ -185,6 +185,14 @@ References
 | Ferro C. A. T., 2017: Measuring forecast performance in the presence of observation error.
 |   *Q. J. R. Meteorol. Soc.*, 143 (708), 2665-2676.
 |   doi: https://doi.org/10.1002/qj.3115
+|
+
+.. _Ferro-2011:
+
+| Ferro, C. A. T., and D. B. Stephenson, 2011: Extremal Dependence Indices: Improved
+|   Verification Measures for Deterministic Forecasts of Rare Binary Events.
+|   *Weather and Forecasting*, 26 (5), 699-713.
+|   doi: https://doi.org/10.1175/WAF-D-10-05030.1
 |
 
 .. _Gilleland-2010:
@@ -225,13 +233,12 @@ References
 |   doi: https://doi.org/10.5194/ascmo-7-13-2021
 |
 
-.. _Gneiting-2004:
+.. _Gneiting-2005:
 
-| Gneiting, T., A. Westveld, A. Raferty, and T. Goldman, 2004: *Calibrated*
-|   *Probabilistic Forecasting Using Ensemble Model Output Statistics and*
-|   *Minimum CRPS Estimation*. Technical Report no. 449, Department of
-|   Statistics, University of Washington. Available at
-|   https://stat.uw.edu/research/tech-reports/calibrated-probabilistic-forecasting-using-ensemble-model-output-statistics-and-minimum-crps
+| Gneiting, T., A. E. Raftery, A. H. Westveld, and T. Goldman, 2005: Calibrated
+|   probabilistic forecasting using ensemble model output statistics and
+|   minimum CRPS estimation. *Monthly Weather Review*, 133 (5), 1098-1118.
+|   doi: https://doi.org/10.1175/MWR2904.1
 |
 
 .. _Haiden-2012:
@@ -263,8 +270,8 @@ References
 .. _Knaff-2003:
 
 | Knaff, J.A., M. DeMaria, C.R. Sampson, and J.M. Gross, 2003: Statistical,
-|   Five-Day Tropical Cyclone Intensity Forecasts Derived from Climatology
-|   and Persistence. *Weather and Forecasting*, Vol. 18 Issue 2, p. 80-92.
+|   5-Day Tropical Cyclone Intensity Forecasts Derived from Climatology
+|   and Persistence. *Weather and Forecasting*, Vol. 18 Issue 1, p. 80-92.
 |
 
 .. _Mason-2004:
@@ -332,7 +339,7 @@ References
 
 | Rodwell, M.J., D.S. Richardson, T.D. Hewson and T. Haiden, 2010: A new equitable
 |   score suitable for verifying precipitation in numerical weather prediction.
-|   *Quarterly Journal of the Royal Meteorological Society*, 136: 1344-1463.
+|   *Quarterly Journal of the Royal Meteorological Society*, 136: 1344-1363.
 |   https://doi.org/10.1002/qj.656
 |
 
@@ -340,7 +347,7 @@ References
 
 | Rodwell, M.J., T. Haiden, D.S. Richardson, 2011: Developments in Precipitation
 |   Verification. *ECMWF Newsletter* Number 128.
-|   https://www.ecmwf.int/node/14595
+|   https://www.ecmwf.int/en/elibrary/78205-newsletter-no-128-summer-2011
 |
 
 .. _Röpnack-2013:

@@ -139,7 +139,7 @@ int Nx2ContingencyTable::value_to_row(double t) const {
 
 void Nx2ContingencyTable::set_thresholds(const vector<double> &Values) {
 
-   if(Values.size() != Nrows + 1) {
+   if(static_cast<int>(Values.size()) != Nrows + 1) {
       mlog << Error << "\nNx2ContingencyTable::set_thresholds(const double *) -> "
            << "expected " << Nrows + 1 << " thresholds but only received "
            << Values.size() << "!\n\n";
@@ -156,7 +156,7 @@ void Nx2ContingencyTable::set_thresholds(const vector<double> &Values) {
 double Nx2ContingencyTable::threshold(int k) const {
 
    // There are Nrows + 1 thresholds
-   if(k < 0 || k > Thresholds.size()) {
+   if(k < 0 || k >= static_cast<int>(Thresholds.size())) {
       mlog << Error << "\nNx2ContingencyTable::threshold(int) const -> "
            << "range check error!\n\n";
       exit(1);

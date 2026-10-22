@@ -389,8 +389,8 @@ SingleAtt2D calc_2d_single_atts(const MtdIntFile & mask_2d, const DataPlane & ra
 
 SingleAtt2D a;
 Mtd_2D_Moments moments;
-const int    * i = 0;
-const double * r = 0;
+const int    * i = nullptr;
+const double * r = nullptr;
 const int nxy = (mask_2d.nx())*(mask_2d.ny());
 int j, n;
 

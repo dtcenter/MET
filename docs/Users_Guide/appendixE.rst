@@ -4,7 +4,7 @@
 Appendix E WWMCA Tools
 **********************
 
-There are two WWMCA tools available. The WWMCA-Plot tool makes a PostScript plot of one or more WWMCA cloud percent files and the WWMCA-Regrid tool regrids WWMCA cloud percent files and reformats them into netCDF files that the other MET tools can read.
+There are two WWMCA tools available. The WWMCA-Plot tool makes a PostScript plot of one or more WWMCA cloud percent files and the WWMCA-Regrid tool regrids WWMCA cloud percent files and reformats them into NetCDF files that the other MET tools can read.
 
 The WWMCA tools get valid time and hemisphere (north or south) information from the file names, so it's important for both of the WWMCA tools that these file names not be changed.
 
@@ -24,15 +24,15 @@ The optional **-outdir** argument specifies a directory where the output PostScr
 
 .. figure:: figure/reformat_grid_fig2.png
 
-	    Example output of WWMCA-Plot tool.
+            Example output of WWMCA-Plot tool.
 
 The usage statement for wwmca_regrid is
 
 .. code-block:: none
 
-  wwmca_regrid -out filename config filename [ -nh filename ] [ -sh filename ]
+  wwmca_regrid -out filename -config filename [ -nh filename ] [ -sh filename ]
 
-Here, the **-out** switch tells wwmca_regrid what to name the output netCDF file. The **-config** switch gives the name of the config file that wwmca_regrid should use-like many of the MET tools, wwmca-regrid uses a configuration file to specify user-changeable parameters. The format of this file will be explained below.
+Here, the **-out** switch tells wwmca_regrid what to name the output NetCDF file. The **-config** switch gives the name of the config file that wwmca_regrid should use-like many of the MET tools, wwmca_regrid uses a configuration file to specify user-changeable parameters. The format of this file will be explained below.
 
 The **-nh** and **-sh** options give names of WWMCA cloud percent files that wwmca_regrid should use as input. Northern hemisphere files are specified with **-nh**, and southern hemisphere files with **-sh**. At least one of these must be given, but in many cases both need not be given.
 
@@ -44,7 +44,7 @@ Now let's talk about the details of the config file. The config file has the sam
 
   To grid = "G218";
 
-and that will work. Failing that, you must give the parameters that specify the grid and it's projection. Please refer the description of the grid specification strings in :ref:`appendixB`.
+and that will work. Failing that, you must give the parameters that specify the grid and its projection. Please refer to the description of the grid specification strings in :ref:`appendixB`.
 
 Thankfully, the rest of the parameters in the config file are easier to specify.
 
@@ -68,9 +68,9 @@ The next variable, **good_percent**, tells what fraction of the values in the in
 
 .. code-block:: none
 
-  good percent = 0;
+  good_percent = 0;
 
-The rest of the config file parameters have to do with how the output netCDF file represents the data. These should be self-explanatory, so I'll just give an example:
+The rest of the config file parameters have to do with how the output NetCDF file represents the data. These should be self-explanatory, so I'll just give an example:
 
 .. code-block:: none
 

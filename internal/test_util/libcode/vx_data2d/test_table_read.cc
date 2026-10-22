@@ -47,7 +47,7 @@ if ( argc == 1 )  {
 int j;
 TableFlatFile f;
 bool status = false;
-const char * input_filename = (const char *) 0;
+const char * input_filename = nullptr;
 
 for (j=1; j<argc; ++j)  {   //  j starts at one, here
 

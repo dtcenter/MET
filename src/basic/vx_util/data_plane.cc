@@ -131,8 +131,6 @@ DataPlane & DataPlane::operator/=(const double v) {
 
 bool DataPlane::operator==(const DataPlane &d) const {
 
-   const char *method_name = "DataPlane::operator==(const DataPlane &) -> ";
-
    // don't check times, only data
    
    // Check for matching dimensions
@@ -250,7 +248,7 @@ void DataPlane::debug_examine(bool show_all_values) const {
    map<double,int> value_count_map;
    int total_count = 0;
 
-   for(int i=0; i<Data.size(); i++) {
+   for(size_t i=0; i<Data.size(); i++) {
 
       // Count positive values
       if(Data[i] > 0) total_count++;
@@ -1045,7 +1043,7 @@ void DataPlane::put(const double value, const int x, const int y) {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool DataPlane::fitwav_1d(const int start_wave, const int end_wave) {
-   const int unsigned mnw = (Nx + 1)/2;
+   const int mnw = (Nx + 1)/2;
 
    // Check for bad data
    for(int i=0; i<Nxy; ++i) {
@@ -1149,9 +1147,9 @@ DataPlaneArray::DataPlaneArray(const DataPlaneArray & a) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DataPlaneArray::DataPlaneArray(DataPlaneArray &&a) noexcept
-   : Lower(move(a.Lower)),
-     Upper(move(a.Upper)),
-     Plane(move(a.Plane)),
+   : Lower(std::move(a.Lower)),
+     Upper(std::move(a.Upper)),
+     Plane(std::move(a.Plane)),
      Nplanes(a.Nplanes) {
    a.Nplanes = 0;
 }
@@ -1168,9 +1166,9 @@ DataPlaneArray & DataPlaneArray::operator=(const DataPlaneArray & a) {
 
 DataPlaneArray & DataPlaneArray::operator=(DataPlaneArray &&a) noexcept {
    if (this != &a) {
-      Lower   = move(a.Lower);
-      Upper   = move(a.Upper);
-      Plane   = move(a.Plane);
+      Lower   = std::move(a.Lower);
+      Upper   = std::move(a.Upper);
+      Plane   = std::move(a.Plane);
       Nplanes = a.Nplanes;
       a.Nplanes = 0;
    }

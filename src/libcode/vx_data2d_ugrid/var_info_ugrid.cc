@@ -144,8 +144,6 @@ void VarInfoUGrid::set_default_levels(const ConcatString &lstr) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
-   const char *method_name = "VarInfoUGrid::set_magic() -> ";
-
    // Store the magic string
    set_magic_pre(nstr, lstr);
 

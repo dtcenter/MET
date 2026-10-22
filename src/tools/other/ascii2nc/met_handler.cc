@@ -48,9 +48,7 @@ MetHandler::MetHandler(const string &program_name) :
 ////////////////////////////////////////////////////////////////////////
 
 
-MetHandler::~MetHandler()
-{
-}
+MetHandler::~MetHandler() = default;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -156,7 +154,7 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
     // Save the observation info
 
     int grib_code = atoi(data_line[6]);
-    for (unsigned int i=0; i<m_strlen(data_line[6]); i++) {
+    for (int i=0; i<m_strlen(data_line[6]); i++) {
       if( !isdigit(data_line[6][i]) )  {
         int var_index;
         use_var_id = true;

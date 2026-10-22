@@ -34,7 +34,7 @@ class MetNcFile
 
 public:
 
-  MetNcFile(const std::string &file_path);
+  explicit MetNcFile(const std::string &file_path);
   
   virtual ~MetNcFile();
 

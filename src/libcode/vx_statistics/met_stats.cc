@@ -4037,7 +4037,6 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
 
    // Compute actual DMAP statistics here.
    int max_events;
-   int non_zero_count;
    double f_distance, o_distance, zhu_common, abs_diff_distance;
    double sum_event_diff = 0.0;
    double fom_fo_sum = 0.0;
@@ -4045,8 +4044,6 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
    double med_fo_sum = 0.0;
    double med_of_sum = 0.0;
    double baddeley_delta_sum = 0.0;
-
-   non_zero_count = 0;
 
    for (int i=0; i<fdmap_na.n(); i++) {
 
@@ -4082,7 +4079,6 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
       abs_diff_distance = abs(f_distance - o_distance);
       if (abs_diff_distance > 0.0) {
          baddeley_delta_sum += pow((double)abs_diff_distance, baddeley_p);
-         non_zero_count++;
       }
 
       // Distance metrics

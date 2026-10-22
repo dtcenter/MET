@@ -90,9 +90,7 @@ LittleRHandler::LittleRHandler(const string &program_name) :
 ////////////////////////////////////////////////////////////////////////
 
 
-LittleRHandler::~LittleRHandler()
-{
-}
+LittleRHandler::~LittleRHandler() = default;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -284,7 +282,9 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
       //    wind speed, wind direction, u-wind, v-wind,
       //    relative humidity
 
-      for (int i = 0; i < data_line.n_items(); ++i)
+      // Step by 2 to skip over the QC entry following each value
+
+      for (int i = 0; i < data_line.n_items(); i += 2)
       {
         // Only store valid observation values with a
         // valid corresponding GRIB code
@@ -313,10 +313,6 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
                                        obs_prs, obs_hgt, obs_val,
                                        lr_grib_names[i/2]));
         }
-
-        // Increment i to skip over the QC entry
-
-        i++;
       }
 
       // Increment the data line count
