@@ -906,7 +906,7 @@ Dictionary::~Dictionary()
 
 {
 
-clear();
+Dictionary::clear();
 
 }
 
@@ -957,7 +957,7 @@ Nentries = 0;
 
 Nalloc = 0;
 
-clear();
+Dictionary::clear();
 
 return;
 
@@ -995,7 +995,7 @@ void Dictionary::assign(const Dictionary & d)
 
 {
 
-clear();
+Dictionary::clear();
 
 if ( d.Nentries > 0 )  {
 
@@ -1005,7 +1005,7 @@ if ( d.Nentries > 0 )  {
 
    for (j=0; j<(d.Nentries); ++j)  {
 
-      store( *(d.e[j]) );
+      Dictionary::store( *(d.e[j]) );
 
    }
 
@@ -1170,7 +1170,7 @@ void Dictionary::store(const Dictionary & d)
 
 for (int j=0; j<(d.n_entries()); ++j)  {
 
-   store( *(d[j]) );
+   Dictionary::store( *(d[j]) );
 
 }
 
@@ -1343,6 +1343,81 @@ if ( search_parent )  {
 LastLookupStatus = (E != nullptr);
 
 return E;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Dictionary::has_entry(const char * name) const
+
+{
+
+for (int j=0; j<Nentries; ++j)  {
+
+   if ( e[j]->Name == name )  return true;
+
+}
+
+return false;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const char * Dictionary::resolve_name(const char * name, const char * deprecated_name)
+
+{
+
+   //
+   //  MET #3455 the deprecated names already warned about
+   //
+
+static StringArray warned_names;
+
+   //
+   //  walk up from this dictionary through its parents,
+   //  checking only the current scope at each step
+   //
+
+for (const Dictionary * D = this; D; D = D->Parent)  {
+
+      //
+      //  check the deprecated name first since all config files are
+      //  merged into the same top-level dictionary. A deprecated name
+      //  in a user config file must override the current name defined
+      //  in the default config file.
+      //
+
+   if ( D->has_entry(deprecated_name) )  {
+
+      if ( !warned_names.has(deprecated_name) )  {
+
+         mlog << Warning << "\nDictionary::resolve_name() -> "
+              << "the \"" << deprecated_name
+              << "\" configuration option is deprecated. "
+              << "Replace it with \"" << name << "\"!\n\n";
+
+         warned_names.add(deprecated_name);
+
+      }
+
+      return deprecated_name;
+
+   }
+
+   if ( D->has_entry(name) )  return name;
+
+}
+
+   //
+   //  neither name was found, so use the current one
+   //
+
+return name;
 
 }
 
@@ -2346,7 +2421,7 @@ DictionaryStack::~DictionaryStack()
 
 {
 
-clear();
+DictionaryStack::clear();
 
 }
 
@@ -2402,7 +2477,7 @@ for (j=0; j<max_dictionary_depth; ++j)  {
 
 }
 
-clear();
+DictionaryStack::clear();
 
 return;
 

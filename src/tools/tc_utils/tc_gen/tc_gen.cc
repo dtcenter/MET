@@ -867,7 +867,7 @@ void do_probgen_pct(const TCGenVxOpt &vx_opt,
 
       // Pointer to the matching BEST track
       bgi = (is_bad_data(i_bga) ?
-             (const GenesisInfo *) 0 :
+             nullptr :
              &best_ga[i_bga]);
 
       // Loop over the individual probabilities
@@ -916,7 +916,7 @@ void do_genshape_pct(const TCGenVxOpt &vx_opt,
 
       // Pointer to the matching BEST track
       bgi = (is_bad_data(i_bga) ?
-             (const GenesisInfo *) 0 :
+             nullptr :
              &best_ga[i_bga]);
 
       // Score each probability
@@ -1873,7 +1873,7 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
       setup_table(stat_at);
 
       // Write the text header row
-      write_header_row((const char **) 0, 0, 1, stat_at, 0, 0);
+      write_header_row(nullptr, 0, 1, stat_at, 0, 0);
 
       // Initialize the row index to 1 to account for the header
       i_stat_row = 1;
@@ -2067,8 +2067,8 @@ void write_ctc_genmpr_row(StatHdrColumns &shc,
    shc.set_line_type(stat_genmpr_str);
 
    // Not Applicable
-   shc.set_fcst_thresh(na_str);
-   shc.set_obs_thresh(na_str);
+   shc.set_fcst_thresh(SingleThresh(na_str));
+   shc.set_obs_thresh(SingleThresh(na_str));
    shc.set_alpha(bad_data_double);
 
    // Write a line for each matched pair
@@ -2278,12 +2278,12 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
    shc.set_line_type(stat_genmpr_str);
 
    // Not Applicable
-   shc.set_fcst_thresh(na_str);
-   shc.set_obs_thresh(na_str);
+   shc.set_fcst_thresh(SingleThresh(na_str));
+   shc.set_obs_thresh(SingleThresh(na_str));
    shc.set_alpha(bad_data_double);
 
    // Write a line for each matched pair
-   for(i=0; i<pgi.ProbGenMap[lead_hr].size(); i++) {
+   for(i=0; i<(int) pgi.ProbGenMap[lead_hr].size(); i++) {
 
       // Pointers for current case
       const ProbGenInfo *fgi = pgi.ProbGenMap[lead_hr][i];
@@ -2575,31 +2575,31 @@ __attribute__((noreturn)) static void usage(int exit_code) {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\t-genesis source\n"
-        << "\t-edeck source\n"
-        << "\t-shape source\n"
-        << "\t-track source\n"
+        << "\t-genesis path\n"
+        << "\t-edeck path\n"
+        << "\t-shape path\n"
+        << "\t-track path\n"
         << "\t-config file\n"
         << "\t[-out base]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"-genesis source\" is one or more ATCF genesis "
+        << "\twhere\t\"-genesis path\" is one or more ATCF genesis "
         << "files, an ASCII file list containing them, or a top-level "
         << "directory with files matching the regular expression \""
         << atcf_gen_reg_exp << "\" (required if no -edeck or -shape).\n"
 
-        << "\t\t\"-edeck source\" is one or more ensemble model output "
+        << "\t\t\"-edeck path\" is one or more ensemble model output "
         << "files, an ASCII file list containing them, or a top-level "
         << "directory with files matching the regular expression \""
         << atcf_reg_exp << "\" (required if no -genesis or -shape).\n"
 
-        << "\t\t\"-shape source\" is one or more genesis area shapefiles, "
+        << "\t\t\"-shape path\" is one or more genesis area shapefiles, "
         << "an ASCII file list containing them, or a top-level "
         << "directory with files matching the regular expression \""
         << gen_shp_reg_exp << "\" (required if no -genesis or -edeck).\n"
 
-        << "\t\t\"-track source\" is one or more ATCF track "
+        << "\t\t\"-track path\" is one or more ATCF track "
         << "files, an ASCII file list containing them, or a top-level "
         << "directory with files matching the regular expression \""
         << atcf_reg_exp << "\" for the verifying BEST and operational "

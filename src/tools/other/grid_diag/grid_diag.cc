@@ -218,7 +218,7 @@ static void process_command_line(int argc, char **argv) {
 
    // Multiple -data options must match the number of fields
    if(data_files.size() > 1 &&
-      data_files.size() != conf_info.get_n_data()) {
+      static_cast<int>(data_files.size()) != conf_info.get_n_data()) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the number of \"-data\" options ("
            << data_files.size() << ") does not match the number of "
@@ -228,7 +228,7 @@ static void process_command_line(int argc, char **argv) {
    }
 
    // Process the input data file lists
-   for(int i=0; i < data_files.size(); i++) {
+   for(int i=0; i < static_cast<int>(data_files.size()); i++) {
 
       // Parse the data file list
       data_files[i] = parse_file_list(data_files[i]);
@@ -259,7 +259,7 @@ static void process_command_line(int argc, char **argv) {
 
    // If not already set, determine the grid from the data source,
    // reading the data if needed.
-   for(int i=0; i < data_files.size() && !data_grid.is_set(); i++) {
+   for(int i=0; i < static_cast<int>(data_files.size()) && !data_grid.is_set(); i++) {
 
       // When a single "-data" option is used for all fields, use field 0.
       // Otherwise each "-data" options and fields correspond.
@@ -788,7 +788,7 @@ static void sum_spectral_variance(vector<double> &sum,
       }
 
       // Increment each element
-      for(int i=0; i<sum.size(); i++) {
+      for(size_t i=0; i<sum.size(); i++) {
          if(is_bad_data(sum[i]) || is_bad_data(cur[i])) {
             sum[i] = bad_data_double;
          }
@@ -1084,8 +1084,12 @@ static void setup_nc_file(void) {
       for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
          offsets[0] = i_mask;
          counts[0] = 1;
-         string mask_name(conf_info.mask_name[i_mask]);
-         mask_name_var.putVar(offsets, counts, &mask_name);
+         // NC_STRING data is written from a const char *, not a std::string.
+         // StringArray::operator[] returns by value, so keep the copy alive
+         // for the duration of the putVar() call.
+         const string mask_name(conf_info.mask_name[i_mask]);
+         const char *mask_name_cstr = mask_name.c_str();
+         mask_name_var.putVar(offsets, counts, &mask_name_cstr);
          int mask_size = conf_info.mask_mp[i_mask].count();
          mask_size_var.putVar(offsets, counts, &mask_size);
       }

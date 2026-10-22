@@ -54,22 +54,22 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Program name
-static const char* program_name = "tc_diag";
+static const char* const program_name = "tc_diag";
 
 // Default configuration file name
-static const char* default_config_filename =
+static const char* const default_config_filename =
    "MET_BASE/config/TCDiagConfig_default";
 
 // Default output directory
-static const char* default_out_dir = ".";
+static const char* const default_out_dir = ".";
 
 // Output file suffix names
-static const char* nc_cyl_grid_suffix = "_cyl_grid_{domain}.nc";
-static const char* nc_diag_suffix     = "_diag.nc";
-static const char* cira_diag_suffix   = "_diag.dat";
+static const char* const nc_cyl_grid_suffix = "_cyl_grid_{domain}.nc";
+static const char* const nc_diag_suffix     = "_diag.nc";
+static const char* const cira_diag_suffix   = "_diag.dat";
 
 // Default output prefix
-static const char* default_out_prefix = "";
+static const char* const default_out_prefix = "";
 
 // Diagnostics bad data value
 static const double diag_bad_data_double = 9999.0;
@@ -89,7 +89,6 @@ static std::map<std::string,DataOptInfo> data_opt_map;
 static StringArray    deck_source, deck_model_suffix;
 static ConcatString   config_file;
 static TCDiagConfInfo conf_info;
-static GrdFileType    file_type = FileType_None;
 
 // Optional arguments
 static ConcatString out_dir;
@@ -198,8 +197,6 @@ static std::map<std::string,TmpFileInfo> tmp_file_map;
 // Variables for Output Files
 //
 ////////////////////////////////////////////////////////////////////////
-
-static unixtime init_ut = (unixtime) 0;
 
 class OutFileInfo {
 

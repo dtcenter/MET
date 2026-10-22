@@ -826,7 +826,8 @@ void NcCfFile::dump(ostream & out, int depth) const
     if (Var[j].x_slot >= 0)
       out << Var[j].x_slot;
     else
-      out << '_';  out << ", ";
+      out << '_';
+    out << ", ";
 
     if (Var[j].y_slot >= 0)
       out << Var[j].y_slot;
@@ -1039,7 +1040,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     offsets.add((a[k] == vx_data2d_star) ? 0 : a[k]);
     lengths.add(1);
     dim_size = v->getDim(k).getSize();
-    if (dim_size < offsets[k]) {
+    if (dim_size < static_cast<size_t>(offsets[k])) {
       mlog << Error << "\n" << method_name
            << "offset (" << offsets[k] << ") at " << k
            << "th dimension (" << long(dim_size) << ") is too big for variable \""

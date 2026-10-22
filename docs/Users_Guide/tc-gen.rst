@@ -7,7 +7,7 @@ TC-Gen Tool
 Introduction
 ============
 
-The TC-Gen tool provides verification of deterministic and probabilistic tropical cyclone genesis forecasts in the ATCF file and shapefile formats. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by genesis tracking software (e.g. GFDL vortex tracker), ATCF edeck files containing probability of genesis forecasts, operational shapefile warning areas, and ATCF reference track dataset(s) (e.g. Best Track analysis and CARQ operational tracks). It writes categorical counts and statistics. The capability to modify the spatial and temporal tolerances when matching forecasts to reference genesis events, as well as scoring those matched pairs, gives users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlined in :numref:`tc-gen_stat_aspects` and practical aspects of the TC-Gen tool are described in :numref:`tc-gen_practical_info`.
+The TC-Gen tool provides verification of deterministic and probabilistic tropical cyclone genesis forecasts in the ATCF file and shapefile formats. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by genesis tracking software (e.g., GFDL vortex tracker), ATCF edeck files containing probability of genesis forecasts, operational shapefile warning areas, and ATCF reference track dataset(s) (e.g., Best Track analysis and CARQ operational tracks). It writes categorical counts and statistics. The capability to modify the spatial and temporal tolerances when matching forecasts to reference genesis events, as well as scoring those matched pairs, gives users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlined in :numref:`tc-gen_stat_aspects` and practical aspects of the TC-Gen tool are described in :numref:`tc-gen_practical_info`.
 
 .. _tc-gen_stat_aspects:
 
@@ -20,15 +20,15 @@ For deterministic forecasts specified using the **-track** command line option, 
 
 As with other extreme events (where the event occurs much less frequently than the non-event), the correct negative category is not computed since the non-events would dominate the contingency table. Therefore, only statistics that do not include correct negatives should be considered for this tool. The following CTS statistics are relevant: Base rate (BASER), Mean forecast (FMEAN), Frequency Bias (FBIAS), Probability of Detection (PODY), False Alarm Ratio (FAR), Critical Success Index (CSI), Gilbert Skill Score (GSS), Extreme Dependency Score (EDS), Symmetric Extreme Dependency Score (SEDS), Bias-Adjusted Gilbert Skill Score (BAGSS).
 
-For probabilistic forecasts specified using the **-edeck** command line option, it identifies genesis events in the reference dataset. It applies user-specified configuration options to pair the forecast probabilities to the reference genesis events. These pairs are added to an Nx2 probabilistic contingency table. If the reference genesis event occurs within in the predicted time window, the pair is counted in the observation-yes column. Otherwise, it is added to the observation-no column.
+For probabilistic forecasts specified using the **-edeck** command line option, it identifies genesis events in the reference dataset. It applies user-specified configuration options to pair the forecast probabilities to the reference genesis events. These pairs are added to an Nx2 probabilistic contingency table. If the reference genesis event occurs within the predicted time window, the pair is counted in the observation-yes column. Otherwise, it is added to the observation-no column.
 
-For warning area shapefiles specified using the **-shape** command line option, it processes metadata from the corresponding database files. The database file is assumed to exist at exactly the same path as the shapefile, but with a ".dbf" suffix instead of ".shp". Note that only shapefiles exactly following the NOAA National Hurricane Center's (NHC) "gtwo_areas_YYYYMMDDHHMM.shp" file naming and corresonding metadata conventions are supported. For each shapefile record, the database file defines corresponding probability values for one or more time periods. Percentages may be provided for the probability of genesis inside the shape within 2, 5, or 7 days from issuance time that is parsed from the file name. Note that 5 day probabilities were discontinued in 2023. The 2 and 7 day probabilities are provided in database file fields named "PROB2DAY" and "PROB7DAY", respectively. Care is taken to identify and either ignore or update duplicate shapes found in the input.
+For warning area shapefiles specified using the **-shape** command line option, it processes metadata from the corresponding database files. The database file is assumed to exist at exactly the same path as the shapefile, but with a ".dbf" suffix instead of ".shp". Note that only shapefiles exactly following the NOAA National Hurricane Center's (NHC) "gtwo_areas_YYYYMMDDHHMM.shp" file naming and corresponding metadata conventions are supported. For each shapefile record, the database file defines corresponding probability values for one or more time periods. Percentages may be provided for the probability of genesis inside the shape within 2, 5, or 7 days from issuance time that is parsed from the file name. Note that 5 day probabilities were discontinued in 2023. The 2 and 7 day probabilities are provided in database file fields named "PROB2DAY" and "PROB7DAY", respectively. Care is taken to identify and either ignore or update duplicate shapes found in the input.
 
-The shapes are then subset based on the filtering criteria in the configuration file. For each probability and shape, the reference genesis events are searched for a match within the defined time window. These pairs are added to an Nx2 probabilistic contingency table. The probabilistic contingeny tables and statistics are computed and reported separately for filter defined and lead hour encountered in the input.
+The shapes are then subset based on the filtering criteria in the configuration file. For each probability and shape, the reference genesis events are searched for a match within the defined time window. These pairs are added to an Nx2 probabilistic contingency table. The probabilistic contingency tables and statistics are computed and reported separately for each filter defined and lead hour encountered in the input.
 
 Other considerations for interpreting the output of the TC-Gen tool involve the size of the contingency table output. The size of the contingency table will change depending on the number of matches. Additionally, the number of misses is based on the forecast duration and interval (specified in the configuration file). This change is due to the number of model opportunities to forecast the event, which is determined by the specified duration/interval.
 
-Care should be taken when interpreting the statistics for filtered data. In some cases, variables (e.g. storm name) are only available in either the forecast or reference datasets, rather than both. When filtering on a field that is only present in one dataset, the contingency table counts will be impacted. Similarly, the initialization field only impacts the model forecast data. If the valid time (which will impact the reference dataset) isn't also specified, the forecasts will be filtered and matched such that the number of misses will erroneously increase. See :numref:`tc-gen_practical_info` for more detail.
+Care should be taken when interpreting the statistics for filtered data. In some cases, variables (e.g., storm name) are only available in either the forecast or reference datasets, rather than both. When filtering on a field that is only present in one dataset, the contingency table counts will be impacted. Similarly, the initialization field only impacts the model forecast data. If the valid time (which will impact the reference dataset) isn't also specified, the forecasts will be filtered and matched such that the number of misses will erroneously increase. See :numref:`tc-gen_practical_info` for more detail.
 
 .. _tc-gen_practical_info:
 
@@ -45,10 +45,10 @@ The usage statement for tc_gen is shown below:
 .. code-block:: none
 
   Usage: tc_gen
-         -genesis source
-         -edeck source
-         -shape source
-         -track source
+         -genesis path
+         -edeck path
+         -shape path
+         -track path
          -config file
          [-out base]
          [-log file]
@@ -59,15 +59,15 @@ TC-Gen has three required arguments and accepts optional ones.
 Required Arguments for tc_gen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-genesis source** argument is the path to one or more ATCF or fort.66 (see documentation listed below) files generated by the Geophysical Fluid Dynamics Laboratory (GFDL) Vortex Tracker when run in tcgen mode or an ASCII file list or a top-level directory containing them. The required file format is described in the "Output formats" section of the `GFDL Vortex Tracker users guide. <https://dtcenter.org/sites/default/files/community-code/gfdl/standalone_tracker_UG_v3.9a.pdf>`_
+1. The **-genesis path** argument is the path to one or more ATCF or fort.66 (see documentation listed below) files generated by the Geophysical Fluid Dynamics Laboratory (GFDL) Vortex Tracker when run in tcgen mode or an ASCII file list or a top-level directory containing them. The required file format is described in the "Output formats" section of the `GFDL Vortex Tracker users guide. <https://dtcenter.org/sites/default/files/community-code/gfdl/standalone_tracker_UG_v3.9a.pdf>`_
 
-2. The **-edeck source** argument is the path to one or more ATCF edeck files, an ASCII file list containing them, or a top-level directory with files matching the regular expression ".dat". The probability of genesis are read from each edeck input file and verified against at the **-track** data.
+2. The **-edeck path** argument is the path to one or more ATCF edeck files, an ASCII file list containing them, or a top-level directory with files matching the regular expression ".dat". The probability of genesis are read from each edeck input file and verified against the **-track** data.
 
-3. The **-shape source** argument is the path to one or more NHC genesis warning area shapefiles, an ASCII file list containing them, or a top-level directory with files matching the regular expression "gtwo_areas.*.shp". The genesis warning areas and corresponding forecast probability values area verified against the **-track** data.
+3. The **-shape path** argument is the path to one or more NHC genesis warning area shapefiles, an ASCII file list containing them, or a top-level directory with files matching the regular expression "gtwo_areas.*.shp". The genesis warning areas and corresponding forecast probability values are verified against the **-track** data.
 
-Note: At least one of the **-genesis**, **-edeck**, or **-shape** command line options are required.
+Note: At least one of the **-genesis**, **-edeck**, or **-shape** command line options is required.
 
-4. The **-track source** argument is one or more ATCF reference track files or an ASCII file list or top-level directory containing them, with files ending in ".dat". This tool processes either Best track data from bdeck files, or operational track data (e.g. CARQ) from adeck files, or both. Providing both bdeck and adeck files will result in a richer dataset to match with the **-genesis** files.  Both adeck and bdeck data should be provided using the **-track** option. The **-track** option must be used at least once.
+4. The **-track path** argument is one or more ATCF reference track files or an ASCII file list or top-level directory containing them, with files ending in ".dat". This tool processes either Best track data from bdeck files, or operational track data (e.g., CARQ) from adeck files, or both. Providing both bdeck and adeck files will result in a richer dataset to match with the **-genesis** files.  Both adeck and bdeck data should be provided using the **-track** option. The **-track** option must be used at least once.
 
 5. The **-config** file argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
@@ -93,7 +93,7 @@ The TC-Gen tool implements the following logic:
 
  * Loop over the filters defined in the configuration file and apply the following logic for each.
 
-  * For each Best track genesis event meeting the filter critera, determine the initialization and lead times for which the model had an opportunity to forecast that genesis event. Store an unmatched genesis pair for each case.
+  * For each Best track genesis event meeting the filter criteria, determine the initialization and lead times for which the model had an opportunity to forecast that genesis event. Store an unmatched genesis pair for each case.
 
   * For each forecast genesis event, search for a matching Best track. A configurable boolean option controls whether all Best track points are considered for a match or only the single Best track genesis point. A match occurs if the Best track point valid time is within a configurable window around the forecast genesis time and the Best track point location is within a configurable radius of the forecast genesis location. If a Best track match is found, store the storm ID.
 
@@ -121,7 +121,7 @@ The TC-Gen tool implements the following logic:
 
  * Loop over the filters defined in the configuration file and apply the following logic for each.
 
-  * Subset the genesis probability forecasts based on the current filter criteria. Typically, genesis probability forecast are provided for multiple lead times. Create separate Nx2 probabilistic contingency tables for each unique combination of predicted lead time and model name.
+  * Subset the genesis probability forecasts based on the current filter criteria. Typically, genesis probability forecasts are provided for multiple lead times. Create separate Nx2 probabilistic contingency tables for each unique combination of predicted lead time and model name.
 
   * For each genesis probability forecast, search for a matching Best track. A configurable boolean option controls whether all Best track points are considered for a match or only the single Best track genesis point. A match occurs if the Best track point valid time is within a configurable window around the forecast genesis time and the Best track point location is within a configurable radius of the forecast genesis location. If a Best track match is found, store the storm ID.
 
@@ -129,13 +129,13 @@ The TC-Gen tool implements the following logic:
 
   * If no matching storm ID is found, add the unmatched forecast to the observation-no column of the Nx2 probabilistic contingency table.
 
-  * If a matching storm ID is found, check whether that storm's genesis occurred within the predicted time window: between the forecast initialization time and the predicted lead time. If so, add the matched forecast to the observation-yes column. If not, add it to observation-no column.
+  * If a matching storm ID is found, check whether that storm's genesis occurred within the predicted time window: between the forecast initialization time and the predicted lead time. If so, add the matched forecast to the observation-yes column. If not, add it to the observation-no column.
 
  * Report the Nx2 probabilistic contingency table counts and statistics for each forecast model, lead time, and configuration file filter. These counts and statistics are identified in the output files as *PROB_GENESIS*.
 
 * For **-shape** inputs:
 
- * For each input shapefile, parse the timestamp from the "gtwo_areas_YYYYMMDDHHMM.shp" naming convention, and error out otherwise. Round the timestamp to the nearest synoptic time (e.g. 00, 06, 12, 18) and store that as the issuance time.
+ * For each input shapefile, parse the timestamp from the "gtwo_areas_YYYYMMDDHHMM.shp" naming convention, and error out otherwise. Round the timestamp to the nearest synoptic time (e.g., 00, 06, 12, 18) and store that as the issuance time.
 
  * Open the shapefile and corresponding database file. Process each record.
 
@@ -313,7 +313,7 @@ ______________________
 
   basin_mask = [];
 
-The **basin_mask** entry is an array of strings listing tropical cycline basin abbreviations (e.g. AL, EP, CP, WP, NI, SI, AU, and SP). The configuration entry **basin_file** defines the path to a NetCDF file which defines these regions. The default file (**basin_global_tenth_degree.nc**) is bundled with MET. If **basin_mask** is left empty, genesis events for all basins will be included. If non-empty, the union of specified basins will be used. If **vx_mask** is also specified, the analysis is done on the intersection of those masking areas.
+The **basin_mask** entry is an array of strings listing tropical cyclone basin abbreviations (e.g., AL, EP, CP, WP, NI, SI, AU, and SP). The configuration entry **basin_file** defines the path to a NetCDF file which defines these regions. The default file (**basin_global_tenth_degree.nc**) is bundled with MET. If **basin_mask** is left empty, genesis events for all basins will be included. If non-empty, the union of specified basins will be used. If **vx_mask** is also specified, the analysis is done on the intersection of those masking areas.
 
 The **vx_mask** and **basin_mask** names are concatenated and written to the **VX_MASK** output column.
 
@@ -333,7 +333,7 @@ ______________________
 
   genesis_match_point_to_track = TRUE;
 
-The **genesis_match_point_to_track** entry is a boolean which controls the matching logic. When set to its default value of TRUE, for each forecast genesis event, all Best track points are searched for a match. This logic implements the method used by the NOAA National Hurricane Center. When set to FALSE, only the single Best track genesis point is considered for a match. When selecting FALSE, users are encouraged to adjust the **genesis_match_radius** and/or **gensesis_match_window** options, described below, to enable matches to be found.
+The **genesis_match_point_to_track** entry is a boolean which controls the matching logic. When set to its default value of TRUE, for each forecast genesis event, all Best track points are searched for a match. This logic implements the method used by the NOAA National Hurricane Center. When set to FALSE, only the single Best track genesis point is considered for a match. When selecting FALSE, users are encouraged to adjust the **genesis_match_radius** and/or **genesis_match_window** options, described below, to enable matches to be found.
 
 ______________________
 
@@ -352,7 +352,7 @@ ______________________
      end = 0;
   }
 
-The **genesis_match_window** entry defines a time window, in hours, relative to the forecast genesis time. When searching for a match, only Best or operational tracks with a track point falling within this time window will be considered. The default time window of 0 requires a Best or operational track to exist at the forecast genesis time for a match to be found. Increasing this time window should lead to an increase in the number matched genesis pairs. For example, setting *end = 12;* would allow forecast genesis events to match Best tracks up to 12 hours prior to their existence.
+The **genesis_match_window** entry defines a time window, in hours, relative to the forecast genesis time. When searching for a match, only Best or operational tracks with a track point falling within this time window will be considered. The default time window of 0 requires a Best or operational track to exist at the forecast genesis time for a match to be found. Increasing this time window should lead to an increase in the number of matched genesis pairs. For example, setting *end = 12;* would allow forecast genesis events to match Best tracks up to 12 hours prior to their existence.
 
 ______________________
 
@@ -382,7 +382,7 @@ ______________________
      end = 48;
   }
 
-The **ops_hit_window** entry defines a time window, in hours, relative to the Best track genesis time. The model initialization time for the forecast genesis event must occur within this time window for the pairs to be counted as a contingency table HIT for the operationl scoring method. Otherwise, the pair is counted as a FALSE ALARM.
+The **ops_hit_window** entry defines a time window, in hours, relative to the Best track genesis time. The model initialization time for the forecast genesis event must occur within this time window for the pairs to be counted as a contingency table HIT for the operational scoring method. Otherwise, the pair is counted as a FALSE ALARM.
 
 ______________________
 
@@ -390,7 +390,7 @@ ______________________
 
   discard_init_post_genesis_flag = TRUE;
 
-The **discard_init_post_genesis_flag** entry is a boolean which indicates whether or not forecast genesis events from model intializations occurring at or after the matching Best track genesis time should be discarded. If true, those cases are not scored in the contingency table. If false, they are included in the counts.
+The **discard_init_post_genesis_flag** entry is a boolean which indicates whether or not forecast genesis events from model initializations occurring at or after the matching Best track genesis time should be discarded. If true, those cases are not scored in the contingency table. If false, they are included in the counts.
 
 ______________________
 
@@ -417,7 +417,7 @@ ______________________
      best_fn_oy   = TRUE;
   }
 
-The **nc_pairs_flag** entry is a dictionary of booleans indicating which fields should be written to the NetCDF genesis pairs output file. Each type of output is enabled by setting it to TRUE and disabled by setting it to FALSE. The **latlon** option writes the latitude and longitude values of the output grid. The remaining options write a count of the number of points occuring within each grid cell. The **fcst_genesis** and **best_genesis** options write counts of the forecast and Best track genesis locations. The **fcst_track** and **best_track** options write counts of the full set of track point locations, which can be refined by the **valid_minus_genesis_diff_thresh** option, described below. The **fcst_fy_oy** and **fcst_fy_on** options write counts for the locations of forecast genesis event HITS and FALSE ALARMS. The **best_fy_oy** and **best_fn_oy** options write counts for the locations of Best track genesis event HITS and MISSES. Note that since matching forecast and Best track genesis events may occur in different grid cells, their counts are reported separately.
+The **nc_pairs_flag** entry is a dictionary of booleans indicating which fields should be written to the NetCDF genesis pairs output file. Each type of output is enabled by setting it to TRUE and disabled by setting it to FALSE. The **latlon** option writes the latitude and longitude values of the output grid. The remaining options write a count of the number of points occurring within each grid cell. The **fcst_genesis** and **best_genesis** options write counts of the forecast and Best track genesis locations. The **fcst_tracks** and **best_tracks** options write counts of the full set of track point locations, which can be refined by the **valid_minus_genesis_diff_thresh** option, described below. The **fcst_fy_oy** and **fcst_fy_on** options write counts for the locations of forecast genesis event HITS and FALSE ALARMS. The **best_fy_oy** and **best_fn_oy** options write counts for the locations of Best track genesis event HITS and MISSES. Note that since matching forecast and Best track genesis events may occur in different grid cells, their counts are reported separately.
 
 ______________________
 
@@ -426,7 +426,7 @@ ______________________
 
   valid_minus_genesis_diff_thresh = NA;
 
-The **valid_minus_genesis_diff_thresh** is a threshold which affects the counts in the NetCDF pairs output file. The fcst_tracks and best_tracks options, described above, turn on counts for the forecast and Best track points. This option defines which of those track points should be counted by thresholding the track point valid time minus genesis time difference. If set to NA, the default threshold which always evaluates to true, all track points will be counted. Setting <=0 would count the genesis point and all track points prior. Setting >0 would count all points after genesis. And setting >=-12||<=12 would could all points within 12 hours of the genesis time.
+The **valid_minus_genesis_diff_thresh** is a threshold which affects the counts in the NetCDF pairs output file. The fcst_tracks and best_tracks options, described above, turn on counts for the forecast and Best track points. This option defines which of those track points should be counted by thresholding the track point valid time minus genesis time difference. If set to NA, the default threshold which always evaluates to true, all track points will be counted. Setting <=0 would count the genesis point and all track points prior. Setting >0 would count all points after genesis. And setting >=-12||<=12 would count all points within 12 hours of the genesis time.
 
 ______________________
 

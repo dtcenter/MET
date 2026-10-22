@@ -59,7 +59,7 @@ MtdFloatFile::~MtdFloatFile()
 
 {
 
-clear();
+MtdFloatFile::clear();
 
 }
 
@@ -102,7 +102,7 @@ void MtdFloatFile::float_init_from_scratch()
 {
 
 
-clear();
+MtdFloatFile::clear();
 
 return;
 
@@ -143,9 +143,9 @@ void MtdFloatFile::float_assign(const MtdFloatFile & f)
 
 {
 
-clear();
+MtdFloatFile::clear();
 
-base_assign(f);
+base_copy(f);
 
 DataMin = f.DataMin;
 DataMax = f.DataMax;
@@ -155,8 +155,6 @@ Spatial_Radius = f.Spatial_Radius;
 TimeBeg = f.TimeBeg;
 
 TimeEnd = f.TimeEnd;
-
-const int n = Nx*Ny*Nt;
 
 if ( ! f.Data.empty() )  {
 
@@ -338,18 +336,13 @@ if ( (t < 0) || (t >= Nt) )  {
    //
 
 int x, y, n;
-int count;
 double value;
-
-count = 0;
 
 for (x=0; x<Nx; ++x)  {
 
    for (y=0; y<Ny; ++y)  {
 
       value = plane(x, y);
-
-      if ( value == bad_data_double )  ++count;
 
       n = mtd_three_to_one(Nx, Ny, Nt, x, y, t);
 

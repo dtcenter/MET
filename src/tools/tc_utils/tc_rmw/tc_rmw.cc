@@ -81,8 +81,6 @@ static void set_config(const StringArray&);
 static void set_out(const StringArray&);
 static void setup_grid();
 static void setup_nc_file();
-static void build_outfile_name(const ConcatString&,
-                const char*, ConcatString&);
 static void compute_lat_lon(vector<double> &, vector<double> &);
 static void process_fields(const TrackInfoArray&);
 
@@ -119,7 +117,7 @@ __attribute__((noreturn)) static void usage(int exit_code) {
          << ") ***\n\n"
          << "Usage: " << program_name << "\n"
          << "\t-data file_1 ... file_n | file_list\n"
-         << "\t-deck file\n"
+         << "\t-deck path\n"
          << "\t-config file\n"
          << "\t-out file\n"
          << "\t[-log file]\n"
@@ -129,10 +127,10 @@ __attribute__((noreturn)) static void usage(int exit_code) {
          << "specifies the gridded data files or an ASCII file "
          << "containing a list of files to be used (required).\n"
 
-         << "\t\t\"-deck source\" is the ATCF format data source "
+         << "\t\t\"-deck path\" is the ATCF format data source "
          << "(required).\n"
 
-         << "\t\t\"config_file\" is a TCRMWConfig file to be used "
+         << "\t\t\"-config file\" is a TCRMWConfig file to be used "
          << "(required).\n"
 
          << "\t\t\"-out file\" is the NetCDF output file to be written "
@@ -337,10 +335,6 @@ static void process_track_files(const StringArray& files,
     // Initialize
     tracks.clear();
 
-    // Initialize counts
-    int tot_read = 0;
-    int tot_add = 0;
-
     // Set metadata pointer
     line.set_best_technique(&conf_info.BestTechnique);
 
@@ -365,7 +359,6 @@ static void process_track_files(const StringArray& files,
 
             // Increment line counts
             cur_read++;
-            tot_read++;
 
             // Add model suffix, if specified
             if(model_suffix[i].length() > 0) {
@@ -380,7 +373,6 @@ static void process_track_files(const StringArray& files,
             // MET #3370 check for analysis tracks
             if(tracks.add(line, true, true)) {
                 cur_add++;
-                tot_add++;
             }
         }
 

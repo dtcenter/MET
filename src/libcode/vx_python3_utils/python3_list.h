@@ -53,7 +53,7 @@ class Python3_List {
    public:
 
       Python3_List();
-      Python3_List(PyObject *);
+      explicit Python3_List(PyObject *);
      ~Python3_List();
 
       // void dump(std::ostream &, int depth) const;

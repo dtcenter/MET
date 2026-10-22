@@ -365,8 +365,6 @@ static RngAziData get_tcrmw_data(NcFile * ncfile) {
 
 static LaeaData get_laea_data(const NcFile * ncfile) {
 
-   const char * method_name = "get_laea_data() -> ";
-
    LaeaData data;
    ConcatString att_value;
 

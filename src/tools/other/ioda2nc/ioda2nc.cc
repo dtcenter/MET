@@ -162,14 +162,8 @@ static void set_valid_beg_time(const StringArray &);
 static void set_valid_end_time(const StringArray &);
 static void set_verbosity(const StringArray &);
 
-static ConcatString find_meta_name(string meta_key, StringArray available_names);
-static bool get_meta_data_double(NcFile *, StringArray &, const char *, double *,
-                                 const int);
-static bool get_meta_data_strings(NcVar &, char *);
-static bool get_meta_data_strings(NcVar &, char **);
 static bool get_obs_data_double(NcFile *, const ConcatString &, NcVar *,
                                 double *, int *, const int, const e_ioda_format);
-static bool has_postfix(const std::string &, std::string const &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -385,7 +379,6 @@ static void process_ioda_file(int i_pb) {
    clock_t method_end;
 
    IntArray diff_file_times;
-   int diff_file_time_count;
    StringArray variables_big_nlevels;
    static const char *method_name = "process_ioda_file() -> ";
    static const char *method_name_s = "process_ioda_file() ";
@@ -465,7 +458,7 @@ static void process_ioda_file(int i_pb) {
       std::vector<int>    qc_data(nlocs, bad_data_int);
       std::vector<double> obs_data(nlocs, bad_data_double);
       mlog << Debug(7) << method_name
-           << "processing \"" << raw_var_names[idx] << "\" variable!\n";
+           << "processing \"" << raw_var_names[idx] << "\" variable\n";
       obs_var = get_var(f_in.get(), raw_var_names[idx].c_str(), obs_group_name);
       if (IS_INVALID_NC(obs_var)) obs_var = get_var(f_in.get(), raw_var_names[idx].c_str(), derived_obs_group_name);
       unit_attr.clear();
@@ -521,8 +514,6 @@ static void process_ioda_file(int i_pb) {
    map<ConcatString, ConcatString> message_type_map = conf_info.getMessageTypeMap();
 
    // Initialize
-   diff_file_time_count = 0;
-
    for(idx=0; idx<OBS_ARRAY_LEN; idx++) obs_arr[idx] = 0;
 
    // Loop through the IODA messages from the input file
@@ -581,7 +572,6 @@ static void process_ioda_file(int i_pb) {
               << " to " << end_time_str << "\n";
       }
       else if(file_ut != msg_ut) {
-         diff_file_time_count++;
          if(!diff_file_times.has(msg_ut)) diff_file_times.add(msg_ut);
       }
 
@@ -696,7 +686,7 @@ static void process_ioda_file(int i_pb) {
       // Store the index to the header data
       obs_arr[0] = (double)nc_point_obs.get_hdr_index();
       int n_hdr_obs = 0;
-      for(idx=0; idx<v_obs_data.size(); idx++ ) {
+      for(idx=0; idx<static_cast<int>(v_obs_data.size()); idx++ ) {
          int var_idx = 0;
          if (!obs_var_names.has(raw_var_names[idx], var_idx)) {
             mlog << Warning << "\n" << method_name
@@ -971,23 +961,6 @@ static bool keep_valid_time(const unixtime ut,
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool get_meta_data_strings(NcVar &var, char *metadata_buf) {
-   bool status = false;
-   static const char *method_name = "get_meta_data_strings() -> ";
-
-   if(IS_VALID_NC(var)) {
-      status = get_nc_data(&var, metadata_buf);
-      if(!status) {
-         mlog << Error << "\n" << method_name << " -> "
-              << "trouble getting " << GET_NC_NAME(var) << "\n\n";
-         exit(1);
-      }
-   }
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 static bool get_obs_data_double(NcFile *f_in, const ConcatString &var_name,
                                 NcVar *obs_var, double *obs_buf, int *qc_buf,
                                 const int nlocs, const e_ioda_format ioda_format_ver) {
@@ -1034,7 +1007,7 @@ static bool get_obs_data_double(NcFile *f_in, const ConcatString &var_name,
                           << "trouble getting " << var_name << "\n";
       }
       else mlog << Debug(4) << method_name
-                << "\"" << var_name << "\" does not exist!\n";
+                << "\"" << var_name << "\" does not exist\n";
    }
    if(status) {
       for(int idx=0; idx<nlocs; idx++)

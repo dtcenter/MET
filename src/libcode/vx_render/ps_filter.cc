@@ -48,7 +48,7 @@ PSFilter::PSFilter()
 
 {
 
-set_decimal_places(default_decimal_places);
+PSFilter::set_decimal_places(default_decimal_places);
 
 }
 

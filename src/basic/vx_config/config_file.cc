@@ -62,8 +62,6 @@ extern void finish_string_scan ();
 ////////////////////////////////////////////////////////////////////////
 
 
-static void recursive_envs(const char * infile, const char * outfile);
-
 static void recursive_envs(string &);
 
 static bool replace_env(string &);
@@ -96,7 +94,7 @@ MetConfig::~MetConfig()
 
 {
 
-clear();
+MetConfig::clear();
 
 }
 
@@ -150,7 +148,7 @@ void MetConfig::init_from_scratch()
 
 {
 
-clear();
+MetConfig::clear();
 
 return;
 
@@ -184,7 +182,7 @@ void MetConfig::assign(const MetConfig & c)
 
 {
 
-clear();
+MetConfig::clear();
 
 Filename = c.Filename;
 
@@ -260,7 +258,12 @@ void MetConfig::set_exit_on_warning()
 
 {
 
-bool b = lookup_bool(conf_key_exit_on_warning, false);
+   //
+   //  MET #3455 support the deprecated name
+   //
+
+bool b = lookup_bool(resolve_name(conf_key_exit_on_warn,
+                                  conf_key_exit_on_warn_deprecated), false);
 
 if ( LastLookupStatus )  mlog.set_exit_on_warning(b);
 
@@ -330,7 +333,12 @@ bool MetConfig::time_offset_warning(int offset)
 
 {
 
-int allowable_offset = lookup_int(conf_key_time_offset_warning, false);
+   //
+   //  MET #3455 support the deprecated name
+   //
+
+int allowable_offset = lookup_int(resolve_name(conf_key_time_offset_warn,
+                                               conf_key_time_offset_warn_deprecated), false);
 
 if (!LastLookupStatus )  allowable_offset = 0;
 
@@ -555,62 +563,6 @@ if ( !_e || (_e->type() != expected_type) )  {
 }
 
 return _e;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void recursive_envs(const char * infile, const char * outfile)
-
-{
-
-ifstream in;
-ofstream out;
-
-met_open(in, infile);
-
-if ( ! in )  {
-
-   mlog << Error << "\nrecursive_envs() -> "
-        << "unable to open input file \"" << infile << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-met_open(out, outfile);
-
-
-if ( ! out )  {
-
-   mlog << Error << "\nrecursive_envs() -> "
-        << "unable to open output file \"" << outfile << "\"\n\n";
-
-   in.close();
-   exit ( 1 );
-
-}
-
-string line;
-
-while ( getline(in, line) )  {
-
-   recursive_envs(line);
-
-   out << line << '\n';
-
-}
-
-   //
-   //  done
-   //
-
-in.close();
-out.close();
-
-return;
 
 }
 

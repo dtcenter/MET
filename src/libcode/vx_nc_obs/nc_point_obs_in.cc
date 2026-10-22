@@ -51,7 +51,7 @@ bool MetNcPointObsIn::check_nc(const char *nc_name, const char *caller) {
    bool exit_on_error = false;
    bool valid = obs_vars.is_valid(exit_on_error);
    if (!valid) {
-      mlog << Error << "\n" << (0 != caller ? caller : "") << " -> "
+      mlog << Error << "\n" << (nullptr != caller ? caller : "") << " -> "
            << "missing core data from the netCDF file: "
            << nc_name << "\n\n";
       exit(1);

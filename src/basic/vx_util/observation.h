@@ -63,7 +63,7 @@ public:
 #ifdef ENABLE_PYTHON
 
   Observation();
-  Observation(const Python3_List &);
+  explicit Observation(const Python3_List &);
 
   void set(const Python3_List &);
   void set(PyObject *);

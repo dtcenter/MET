@@ -57,7 +57,7 @@ class MetGrib1DataFile : public Met2dDataFile {
          //  get stuff
          //
 
-      GrdFileType file_type() const;
+      GrdFileType file_type() const override;
 
       double operator () (int x, int y) const;
 
@@ -71,11 +71,11 @@ class MetGrib1DataFile : public Met2dDataFile {
          //  do stuff
          //
 
-      bool open(const char * filename);
+      bool open(const char * filename) override;
 
-      void close();
+      void close() override;
 
-      void dump(std::ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const override;
 
       bool read_record(const int, const bool read_plane = true);
 

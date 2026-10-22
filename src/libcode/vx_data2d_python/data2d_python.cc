@@ -53,7 +53,7 @@ MetPythonDataFile::~MetPythonDataFile()
 
 {
 
-close();
+MetPythonDataFile::close();
 
 }
 
@@ -99,7 +99,7 @@ PythonCommand.clear();
 Plane.clear();
 VInfo.clear();
 
-close();
+MetPythonDataFile::close();
 
 return;
 
@@ -150,8 +150,6 @@ bool MetPythonDataFile::open(const char * cur_command)
 {
 
 close();
-
-const char *method_name = "MetPythonDataFile::open() ";
 
    //
    //  Store the PythonCommand that is being run

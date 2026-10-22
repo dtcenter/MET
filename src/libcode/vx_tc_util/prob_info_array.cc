@@ -88,14 +88,14 @@ void ProbInfoArray::dump(ostream &out, int indent_depth) const {
    out << prefix << "ProbInfoArray:\n"
        << prefix << "NProbRIRW = " << n_prob_rirw() << "\n";
 
-   for(i=0; i<ProbRIRW.size(); i++) {
+   for(i=0; i<(int) ProbRIRW.size(); i++) {
       out << prefix << "ProbRIRW[" << i+1 << "]:\n";
       ProbRIRW[i].dump(out, indent_depth+1);
    }
 
    out << prefix << "NProbGen = " << n_prob_gen() << "\n";
 
-   for(i=0; i<ProbGen.size(); i++) {
+   for(i=0; i<(int) ProbGen.size(); i++) {
       out << prefix << "ProbGen[" << i+1 << "]:\n";
       ProbGen[i].dump(out, indent_depth+1);
    }
@@ -127,7 +127,7 @@ ConcatString ProbInfoArray::serialize_r(int indent_depth) const {
    if(ProbRIRW.size() > 0 ) {
       s << prefix << serialize() << ", ProbRIRW:\n";
    }
-   for(i=0; i<ProbRIRW.size(); i++) {
+   for(i=0; i<(int) ProbRIRW.size(); i++) {
       s << ProbRIRW[i].serialize_r(i+1, indent_depth+1);
    }
 
@@ -135,7 +135,7 @@ ConcatString ProbInfoArray::serialize_r(int indent_depth) const {
       s << prefix << serialize() << ", ProbGen:\n";
    }
 
-   for(i=0; i<ProbGen.size(); i++) {
+   for(i=0; i<(int) ProbGen.size(); i++) {
       s << ProbGen[i].serialize_r(i+1, indent_depth+1);
    }
 
@@ -168,7 +168,7 @@ const ProbInfoBase * ProbInfoArray::operator[](int n) const {
    // Get a base pointer to the n-th probability
    const ProbInfoBase *ptr;
 
-   if(ProbRIRW.size() > 0 && n < ProbRIRW.size()) {
+   if(ProbRIRW.size() > 0 && n < (int) ProbRIRW.size()) {
       ptr = &ProbRIRW[n];
    }
    else {
@@ -213,12 +213,12 @@ int ProbInfoArray::n_technique() const {
    StringArray sa;
 
    // Count the number of unique technique names
-   for(int i=0; i<ProbRIRW.size(); i++) {
+   for(int i=0; i<(int) ProbRIRW.size(); i++) {
       if(!sa.has(ProbRIRW[i].technique())) {
          sa.add(ProbRIRW[i].technique());
       }
    }
-   for(int i=0; i<ProbGen.size(); i++) {
+   for(int i=0; i<(int) ProbGen.size(); i++) {
       if(!sa.has(ProbGen[i].technique())) {
          sa.add(ProbGen[i].technique());
       }

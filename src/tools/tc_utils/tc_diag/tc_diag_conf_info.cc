@@ -320,7 +320,7 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
       sa = i_dict.lookup_string_array(conf_key_domain);
 
       // Store domain-specific VarInfo pointers
-      for(j=0; j<domain_info.size(); j++) {
+      for(j=0; j<(int) domain_info.size(); j++) {
          if(sa.n() == 0 || sa.has(domain_info[j].domain)) {
             domain_info[j].var_info_ptr.emplace_back(var_info.back().get());
          }
@@ -401,7 +401,7 @@ void TCDiagConfInfo::parse_domain_info(map<string,DataOptInfo> dmap) {
       }
 
       // Check for duplicate entries
-      for(j=0; i<domain_info.size(); j++) {
+      for(j=0; j<(int) domain_info.size(); j++) {
          if(di.domain == domain_info[j].domain) {
             mlog << Error << "\nTCDiagConfInfo::parse_domain_info() -> "
                  << "multiple \"" << conf_key_domain_info
@@ -418,7 +418,7 @@ void TCDiagConfInfo::parse_domain_info(map<string,DataOptInfo> dmap) {
    map<string,DataOptInfo>::iterator it;
    for(it = dmap.begin(); it != dmap.end(); it++) {
 
-      for(i=0, found=false; i<domain_info.size(); i++) {
+      for(i=0, found=false; i<(int) domain_info.size(); i++) {
          if(it->first == domain_info[i].domain) {
             found = true;
             break;

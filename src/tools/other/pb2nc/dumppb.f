@@ -14,20 +14,23 @@ C*
         INTEGER, PARAMETER :: NFILO = 18
 
         ! -- Arguments
-        CHARACTER(LEN=*), intent(in) :: PBFILE
-        INTEGER,          intent(in) :: FID
-        CHARACTER(LEN=*), intent(in) :: OUTDIR
-        INTEGER,          intent(in) :: LEN1
-        CHARACTER(LEN=*), intent(in) :: PREFIX
-        INTEGER,          intent(in) :: LEN2
-        INTEGER,          intent(in) :: FLAG(NFILO)
+        ! Use fixed-length strings since C++ passes no hidden lengths
+        CHARACTER(LEN=FILEMXSTRL), intent(in) :: PBFILE
+        INTEGER,                   intent(in) :: FID
+        CHARACTER(LEN=FILEMXSTRL), intent(in) :: OUTDIR
+        INTEGER,                   intent(in) :: LEN1
+        CHARACTER(LEN=FILEMXSTRL), intent(in) :: PREFIX
+        INTEGER,                   intent(in) :: LEN2
+        INTEGER,                   intent(in) :: FLAG(NFILO)
 
         ! -- Local variables
         CHARACTER(LEN=MXSTRL) :: outstg
         CHARACTER(LEN=8)      :: subset
-        INTEGER               :: idate, ierrpb
+        INTEGER               :: idate, ierrpb, nlev
         INTEGER               :: ii, iuno, kk, jj, mm, lv
         LOGICAL               :: found
+        REAL(dp)              :: hdr(MXR8PM)
+        REAL(dp), ALLOCATABLE :: evns(:,:,:,:)
 
         ! initialize var and iunso and FILO consistent with original
         CHARACTER var ( MXR8VT )
@@ -62,12 +65,14 @@ C
         OPEN  ( UNIT = FID, FILE = PBFILE, FORM = 'UNFORMATTED' )
         CALL OPENBF  ( FID, 'IN', FID )
         CALL DATELEN  ( 10 )
+        ALLOCATE ( evns ( MXR8PM, MXR8LV, MXR8VN, MXR8VT ) )
 C
 C*      Get the next station report from the input file.
 C
-  10    CALL READPBDUMP  ( FID, subset, idate, ierrpb )
+  10    CALL READPBDUMP  ( FID, NFILO, FILO, FLAG, subset, idate,
+     +                     hdr, evns, nlev, ierrpb )
         IF ( ierrpb .eq. -1 )  THEN
-            STOP
+            GO TO 20
         END IF
 C
 C*      Set the appropriate output file unit number.
@@ -83,8 +88,12 @@ C
                 ii = ii + 1
             END IF
         END DO
-        IF  ( ( .not. found ) .and. ( ierrpb .eq. 0 ) )  THEN
-            GO TO 10
+        IF  ( .not. found )  THEN
+            IF  ( ierrpb .eq. 0 )  THEN
+                GO TO 10
+            ELSE
+                GO TO 20
+            END IF
         END IF
 C
 C*      Print the HDR data for this station report.
@@ -121,8 +130,18 @@ C
            GO TO 10
         END IF
 C
+C*      Close the output files.
+C
+  20    DO ii = 1, NFILO
+           IF ( FLAG ( ii ) .eq. 1 ) THEN
+              CLOSE ( UNIT = iunso ( ii ) )
+           END IF
+        END DO
+        DEALLOCATE ( evns )
+C
 C*      Close the input file
 C
+        CALL CLOSBF  ( FID )
         CLOSE  ( UNIT = FID )
 C
         RETURN
@@ -130,17 +149,21 @@ C
 
 C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
-        SUBROUTINE READPBDUMP  ( lunit, subset, idate, iret )
+        SUBROUTINE READPBDUMP  ( lunit, nfilo, filo, flag, subset,
+     +                           idate, hdr, evns, nlev, iret )
 C
 C*      This subroutine will read and combine the mass and wind subsets
 C*      of the next station report in the prepbufr file.  It is styled
 C*      after function IREADNS, and it only requires the prepbufr file
 C*      to be opened for reading with OPENBF.  The combined station
-C*      report is returned to the caller in COMMON /PREPBC/.
-C*      This common area contains the number of levels in the report,
-C*      a one dimensional array with the header information, and a four
-C*      dimensional array containing all events from the variables POB,
-C*      QOB, TOB, ZOB, UOB, and VOB for the report.
+C*      report is returned to the caller in the HDR, EVNS, and NLEV
+C*      arguments: a one dimensional array with the header information,
+C*      a four dimensional array containing all events from the
+C*      variables POB, QOB, TOB, ZOB, UOB, and VOB for the report, and
+C*      the number of levels in the report.
+C*
+C*      Data is only read for message types in FILO whose FLAG is 1.
+C*      For other message types, only SUBSET and IDATE are returned.
 C*
 C*      The header array contains the following list of mnemonics:
 C*
@@ -167,8 +190,8 @@ C*      include the six variable types into the same array.
 C*
 C*      The return codes are as follows:
 C*      iret =  0 - normal return
-C*           =  1 - the station report within COMMON /PREPBC/ contains the
-C*                  last available subset from within the prepbufr file
+C*           =  1 - the returned station report contains the last
+C*                  available subset from within the prepbufr file
 C*           = -1 - there are no more subsets available from within the
 C*                  prepbufr file
 C*
@@ -176,18 +199,26 @@ C*
 C*
 ! -- Arguments
         INTEGER, INTENT(IN)          :: lunit
+        INTEGER, INTENT(IN)          :: nfilo
+        CHARACTER(LEN=*), INTENT(IN) :: filo(nfilo)
+        INTEGER, INTENT(IN)          :: flag(nfilo)
         CHARACTER(LEN=*), INTENT(OUT):: subset
         INTEGER, INTENT(OUT)         :: idate
+        REAL(dp), INTENT(OUT)        :: hdr(MXR8PM)
+        REAL(dp), INTENT(OUT)        :: evns(MXR8PM, MXR8LV, MXR8VN,
+     +                                       MXR8VT)
+        INTEGER, INTENT(OUT)         :: nlev
         INTEGER, INTENT(OUT)         :: iret
 
-! -- Local (and shared via include) arrays and temporaries
+! -- Local arrays and temporaries
         CHARACTER(LEN=MXSTRL) :: head
         CHARACTER(LEN=MXSTRL) :: ostr(MXR8VT)
-        REAL(KIND=8)          :: hdr2(MXR8PM)
-        REAL(KIND=8)          :: evns2(MXR8PM, MXR8LV, MXR8VN, MXR8VT)
-        REAL(KIND=8)          :: r8sid, r8sid2, pob1, pob2
+        REAL(dp)              :: hdr2(MXR8PM)
+        REAL(dp), ALLOCATABLE :: evns2(:,:,:,:)
+        REAL(dp)              :: pob2
         CHARACTER(LEN=8)      :: csid, csid2, subst2
-        LOGICAL               :: match
+        LOGICAL               :: match = .TRUE.
+        LOGICAL               :: lvfound, keep
         INTEGER               :: ii, lv, lv2, kk, jj
         INTEGER               :: idate2, jret
         INTEGER               :: nlev2
@@ -201,10 +232,9 @@ C*
      +            'UOB WQM WPC WRC UFC UAN CAT',
      +            'VOB WQM WPC WRC VFC VAN CAT'  /
 
-        SAVE match, subst2, idate2
+        SAVE match, subst2, idate2, evns2
 C-----------------------------------------------------------------------
         iret = 0
-        match = .TRUE.
 C*
 C*      If the previous call to this subroutine did not yield matching
 C*      mass and wind subsets, then IREADNS is already pointing at an
@@ -221,6 +251,21 @@ C*
            idate = idate2
         END IF
 C*
+C*      Skip subsets whose message type will not be dumped, since
+C*      UFBEVN is expensive.  Matching mass and wind subsets share a
+C*      message type, so this cannot split a station report.
+C*
+        keep = .false.
+        DO ii = 1, nfilo
+           IF  ( ( subset (1:6) .eq. filo ( ii ) ) .and.
+     +           ( flag ( ii ) .eq. 1 ) )  keep = .true.
+        END DO
+        IF  ( .not. keep )  THEN
+           nlev = 0
+           match = .true.
+           RETURN
+        END IF
+C*
 C*      Read the HDR and EVNS data for the subset that is currently
 C*      being pointed to.
 C*
@@ -231,17 +276,23 @@ C*
         END DO
 C
 C*      Now, advance the subset pointer to the following subset and
-C*      read its HDR data.
+C*      read its HDR data.  Store its message type and date in SUBST2
+C*      and IDATE2 so that the next call can use them if this subset
+C*      does not match.
 C
-        IF ( IREADNS ( lunit, subset, idate ) .ne. 0 )  THEN
+        IF ( IREADNS ( lunit, subst2, idate2 ) .ne. 0 )  THEN
            iret = 1
+C
+C*         Reset for the next file.
+C
+           match = .true.
            RETURN
         END IF
         CALL UFBINT ( lunit, hdr2, MXR8PM, 1, jret, head )
 C
-C*      Check whether these two subsets have identical SID, YOB, XOB,
-C*      ELV, and DHR values.  If so, then they are matching mass and
-C*      wind subsets for a single station report.
+C*      Check whether these two subsets have identical message types
+C*      and SID, YOB, XOB, ELV, and DHR values.  If so, then they are
+C*      matching mass and wind subsets for a single station report.
 C
         match = .true.
 C
@@ -250,8 +301,10 @@ C
            RETURN
         END IF
 C
-        r8sid = hdr (1)
-        r8sid2 = hdr2 (1)
+C*      The 8-character SID is stored in the bytes of a REAL*8 value.
+C
+        csid = TRANSFER ( hdr (1), csid )
+        csid2 = TRANSFER ( hdr2 (1), csid2 )
         IF  ( csid .ne. csid2 )  THEN
            match = .false.
            RETURN
@@ -266,6 +319,9 @@ C
 C
 C*      Read the EVNS data for the second of the two matching subsets.
 C
+        IF  ( .not. ALLOCATED ( evns2 ) )  THEN
+           ALLOCATE ( evns2 ( MXR8PM, MXR8LV, MXR8VN, MXR8VT ) )
+        END IF
         DO ii = 1, MXR8VT
            CALL UFBEVN  ( lunit, evns2 ( 1, 1, 1, ii ), MXR8PM, MXR8LV,
      +                    MXR8VN, nlev2, ostr (ii) )
@@ -276,10 +332,10 @@ C*      single 4-D array.  Do this by merging the EVNS2 array into
 C*      the EVNS array.
 C
         DO lv2 = 1, nlev2
+           pob2 = evns2 ( 1, lv2, 1, 1 )
+           lvfound = .false.
            DO lv = 1, nlev
-              pob1 = evns ( 1, lv, 1, 1 )
-              pob2 = evns2 ( 1, lv2, 1, 1 )
-              IF  ( pob1 .eq. pob2 )  THEN
+              IF  ( evns ( 1, lv, 1, 1 ) .eq. pob2 )  THEN
 C
 C*            This pressure level from the second subset also exists
 C*            in the first subset, so overwrite any "missing" piece
@@ -297,19 +353,15 @@ C
                     END DO
                  END DO
               END DO
-
-              ELSE IF  (  ( pob2 .gt. pob1 )  .or.
-     +                    ( lv   .eq. nlev )  )  THEN
+              lvfound = .true.
+              EXIT
+              END IF
+           END DO
 C
-C*         Either all remaining pressure levels within the first
-C*         subset are less than this pressure level from the
-C*         second subset (since levels within each subset are
-C*         guaranteed to be in descending order wrt pressure!)
-C*         *OR* there are more total levels within the second
-C*         subset than in the first subset.  In either case, we
-C*         should now add this second subset level to the end of
-C*         the EVNS array.
+C*         This pressure level from the second subset does not exist
+C*         in the first subset, so add it to the end of the EVNS array.
 C
+           IF  ( ( .not. lvfound ) .and. ( nlev .lt. MXR8LV ) )  THEN
               nlev = nlev + 1
               DO kk = 1, MXR8VT
                  DO jj = 1, MXR8VN
@@ -321,8 +373,6 @@ C
               END DO
            END IF
         END DO
-
-        END DO
 C*
         RETURN
         END SUBROUTINE READPBDUMP
@@ -331,13 +381,13 @@ C*
 C*
         INCLUDE   'readpb.prm'
 C*
-        CHARACTER(LEN=*), INTENT(IN) :: PBFILE
-        INTEGER, INTENT(IN)          :: FID
-        CHARACTER(LEN=*), INTENT(IN) :: TBL_NAME
-        INTEGER, INTENT(IN)          :: LEN1
+        ! Use fixed-length strings since C++ passes no hidden lengths
+        CHARACTER(LEN=FILEMXSTRL), INTENT(IN) :: PBFILE
+        INTEGER, INTENT(IN)                   :: FID
+        CHARACTER(LEN=FILEMXSTRL), INTENT(IN) :: TBL_NAME
+        INTEGER, INTENT(IN)                   :: LEN1
 
         INTEGER :: TID
-        LOGICAL :: found
 C-----------------------------------------------------------------------
 C
 C*      Open the output files.
@@ -349,9 +399,6 @@ C
 C*      Dump BUFR table.
 C
         CALL DXDUMP  ( FID, TID )
-        IF ( ierrpb .eq. -1 )  THEN
-            STOP
-        END IF
 C
 C*      Close the input file
 C

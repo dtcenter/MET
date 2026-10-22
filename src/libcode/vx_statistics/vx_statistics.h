@@ -29,7 +29,7 @@
 #include "pair_data_point.h"
 #include "pair_data_ensemble.h"
 #include "read_climo.h"
-#include "obs_error.h"
+#include "obs_err.h"
 
 
 ////////////////////////////////////////////////////////////////////////

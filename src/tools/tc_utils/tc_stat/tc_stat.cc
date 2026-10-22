@@ -216,7 +216,7 @@ void process_jobs() {
               << cur_job->serialize() << "\n";
 
          // Initialize counts
-         memset(&n, 0, sizeof(TCPointCounts));
+         n = TCPointCounts();
 
          // Do the job
          cur_job->do_job(tcst_files, n);

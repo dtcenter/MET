@@ -41,7 +41,7 @@ class Pcm : public PxmBase {
    public:
 
       Pcm();
-      Pcm(const char *);
+      explicit Pcm(const char *);
       virtual ~Pcm();
       Pcm(const Pcm &);
       Pcm & operator=(const Pcm &);

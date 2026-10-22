@@ -45,7 +45,7 @@ recommended update frequency and method.
     :numref:`User's Guide Section %s <met_ndbc_stations>`, is read by
     ASCII2NC and contains buoy latitude and longitude locations that can
     change on a daily basis. To be used in real time, this file should be
-    regenerated daily and the :code:`MET_NDBC_STATION` environment variable
+    regenerated daily and the :code:`MET_NDBC_STATIONS` environment variable
     should define its location. Use the
     :code:`scripts/python/utility/build_ndbc_stations_from_web.py`
     utility to update its contents.
@@ -96,10 +96,10 @@ recommended update frequency and method.
 
 - Updated *by users* only as needed:
 
-  - :code:`table_files/obs_error_table.txt`, described in
-    :numref:`User's Guide Section %s <met_obs_error_table>`, is read by
+  - :code:`table_files/obs_err_table.txt`, described in
+    :numref:`User's Guide Section %s <met_obs_err_table>`, is read by
     Ensemble-Stat and defines assumptions about observation error. The
-    :code:`MET_OBS_ERROR_TABLE` environment variable can be set to
+    :code:`MET_OBS_ERR_TABLE` environment variable can be set to
     override its default location. Generally, the observation error
     assumptions in this file do not change over time. Instead, it should
     be copied and modified by researchers for specific scientific

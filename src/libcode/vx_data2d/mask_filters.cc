@@ -26,11 +26,11 @@ using namespace std;
 
 
 MaskFilters::MaskFilters():
-   grid_mask(0),
-   area_mask(0),
-   poly_mask(0),
-   sid_mask(0),
-   typ_mask(0)
+   grid_mask(nullptr),
+   area_mask(nullptr),
+   poly_mask(nullptr),
+   sid_mask(nullptr),
+   typ_mask(nullptr)
 {
    clear();
 }

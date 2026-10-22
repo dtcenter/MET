@@ -149,4 +149,30 @@
     </output>
   </test>
 
+  <!-- PB2NCConfig_dump sets message_type to ADPUPA, so only the ADPUPA  -->
+  <!-- dump file should be written. The not_exist check on ADPSFC, which -->
+  <!-- has data in this input file, verifies that -dump honors the       -->
+  <!-- message_type filter.                                              -->
+  <test name="pb2nc_NDAS_dump">
+    <exec>&MET_BIN;/pb2nc</exec>
+    <env>
+      <pair><name>STATION_ID</name>          <value></value></pair>
+      <pair><name>MASK_GRID</name>           <value></value></pair>
+      <pair><name>MASK_POLY</name>           <value></value></pair>
+      <pair><name>QUALITY_MARK_THRESH</name> <value>9</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/prepbufr/ndas/nam.20120409.t12z.prepbufr.tm00.nr \
+      &OUTPUT_DIR;/pb2nc_indy/ndas.20120409.t12z.prepbufr.tm00.dump.nc \
+      &CONFIG_DIR;/PB2NCConfig_dump \
+      -dump &OUTPUT_DIR;/pb2nc_indy/dump \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/pb2nc_indy/ndas.20120409.t12z.prepbufr.tm00.dump.nc</point_nc>
+      <exist>&OUTPUT_DIR;/pb2nc_indy/dump/dump_nam.20120409.t12z.prepbufr.tm00.nr_ADPUPA.txt</exist>
+      <not_exist>&OUTPUT_DIR;/pb2nc_indy/dump/dump_nam.20120409.t12z.prepbufr.tm00.nr_ADPSFC.txt</not_exist>
+    </output>
+  </test>
+
 </met_test>

@@ -175,7 +175,6 @@ const std::array<int, n_derive_gc> derive_gc = {
 // The fortran code is hard-coded with 200 levels
 constexpr int MAX_CAPE_VALUE = 10000;
 constexpr int MAX_CAPE_LEVEL = 200;
-constexpr int CAPE_INPUT_VARS = 3;
 static std::array<double, MAX_CAPE_LEVEL> cape_data_pres;
 static std::array<double, MAX_CAPE_LEVEL> cape_data_temp;
 static std::array<double, MAX_CAPE_LEVEL> cape_data_spfh;
@@ -281,7 +280,6 @@ constexpr char bufr_avail_latlon_names[] = "XOB CLON CLONH YOB CLAT CLATH";
 constexpr char derived_mlcape[] = "D_MLCAPE";
 constexpr char derived_cape[] = "D_CAPE";
 constexpr char derived_pbl[]  = "D_PBL";
-constexpr double MLCAPE_INTERVAL = 3000.;
 
 // Derived variable metadata maps
 static const map<string,string> derived_var_units_map = {
@@ -407,7 +405,7 @@ static bool   keep_level_category(int);
 static double derive_grib_code(int, const double *, const double *, double, double&);
 
 static int    combine_tqz_and_uv(map<double, double*> &, map<double, double*> &,
-                                 vector<double *> &);
+                                 vector<std::unique_ptr<double[]>> &);
 static double compute_pbl(map<double, double*> pqtzuv_map_tq,
                           map<double, double*> pqtzuv_map_uv);
 static void   copy_pqtzuv(double *to_pqtzuv, const double *from_pqtzuv, bool copy_all=true);
@@ -604,7 +602,7 @@ static void initialize() {
    prepbufr_derive_vars.add("D_MLCAPE");
    prepbufr_derive_vars.add("D_PBL");
 
-   for (int idx=0; idx<(std::size(hdr)); idx++) {
+   for (size_t idx=0; idx<(std::size(hdr)); idx++) {
       hdr[idx] = r8bfms * 10;
    }
 
@@ -758,7 +756,6 @@ void get_variable_info(ConcatString &blk_file, int unit) {
       bool find_mnemonic = false;
 
       // Processing section 1
-      int var_count1 = 0;
       while (read_line()) {
          const char *line = line_str.c_str();
          if (nullptr != strstr(line,"--------")) continue;
@@ -778,7 +775,6 @@ void get_variable_info(ConcatString &blk_file, int unit) {
          }
          if (0 == m_strlen(var_name)) continue;
 
-         var_count1++;
          m_strncpy(var_desc, (line+BUFR_DESCRIPTION_START), BUFR_DESCRIPTION_LEN,
                    method_name, "var_desc", true);
          var_desc[BUFR_DESCRIPTION_LEN] = '\0';
@@ -2245,7 +2241,6 @@ void process_pbfile_metadata(int i_pb) {
    int i_ret;
    int lv;
    int var_index;
-   int debug_threshold = 10;
 
    int nlev_max_req;
    bool check_all = do_all_vars || collect_metadata;
@@ -3138,7 +3133,7 @@ static int combine_tqz_and_uv(map<double, double*> &pqtzuv_map_tq,
       bool no_overlap = (tq_pres_max < uv_pres_min) || (tq_pres_min > uv_pres_max);
       mlog << Debug(6) << method_name << "TQZ pressures: " << tq_pres_max
            << " to " << tq_pres_min << "  UV pressures: " << uv_pres_max
-           << " to " << uv_pres_min << (no_overlap ? "  no overlap!" : "  overlapping") << "\n";
+           << " to " << uv_pres_min << (no_overlap ? "  no overlap" : "  overlapping") << "\n";
       if( no_overlap ) {
          mlog << Debug(4) << "\n" << method_name
               << "Can not combine TQ and UV records because of no overlapping."
@@ -3254,7 +3249,7 @@ static double compute_pbl(map<double, double*> pqtzuv_map_tq,
 
       if (pbl_level <= 0) {
          mlog << Debug(4) << method_name
-              << "Skip CALPBL because of an empty list after combining TQZ and UV\n";
+              << "Skip CALPBL because no data remains after combining TQZ and UV\n";
       }
       else if (pbl_level == 1) {
          mlog << Debug(4) << method_name

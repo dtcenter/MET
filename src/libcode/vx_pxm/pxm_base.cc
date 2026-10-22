@@ -40,7 +40,7 @@ PxmBase::PxmBase()
 
 {
 
-init_from_scratch();
+PxmBase::init_from_scratch();
 
 }
 
@@ -52,7 +52,7 @@ PxmBase::~PxmBase()
 
 {
 
-clear_common();
+PxmBase::clear_common();
 
 }
 
@@ -68,7 +68,7 @@ void PxmBase::init_from_scratch()
 Name.clear();
 
 
-clear_common();
+PxmBase::clear_common();
 
 
 return;
@@ -112,11 +112,10 @@ return;
 void PxmBase::copy_common(const PxmBase & p)
 
 {
-const char *method_name = "PxmBase::copy_common() ";
 
 if ( this == &p )  return;
 
-clear_common();
+PxmBase::clear_common();
 
 Nalloc = p.Nalloc;
 
@@ -130,7 +129,6 @@ Name = p.Name;
 if ( p.Ncomments > 0 )  {
 
    int j;
-   char a_var_name[512+1];
 
    Ncomments = p.Ncomments;
 

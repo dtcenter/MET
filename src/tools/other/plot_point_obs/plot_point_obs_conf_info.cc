@@ -25,6 +25,12 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+// Default configuration file name
+static const char * default_config_filename =
+   "MET_BASE/config/PlotPointObsConfig_default";
+
+////////////////////////////////////////////////////////////////////////
+
 bool LocationInfo::operator==(const LocationInfo &x) {
    return(is_eq(lat, x.lat) && is_eq(lon, x.lon) && is_eq(val, x.val));
 }

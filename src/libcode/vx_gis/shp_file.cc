@@ -284,7 +284,7 @@ const char * ShpFile::filename() const
 
 {
 
-if ( Filename.empty() )  return (const char *) 0;
+if ( Filename.empty() )  return nullptr;
 
 return Filename.text();
 

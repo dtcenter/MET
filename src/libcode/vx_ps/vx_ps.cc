@@ -156,7 +156,7 @@ PSfile::~PSfile()
 
 {
 
-close();
+PSfile::close();
 
 }
 
@@ -176,7 +176,7 @@ afm = std::make_unique<Afm>();
 
 showpage_count = 0;
 
-close();
+PSfile::close();
 
 
 return;

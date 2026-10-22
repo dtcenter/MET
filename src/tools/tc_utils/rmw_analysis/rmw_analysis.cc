@@ -277,7 +277,7 @@ static void setup() {
    min_3d.set_constant(1.0e6);
 
    // Initialize statistical data cube lists
-   for(int i_var = 0; i_var < data_names.size(); i_var++) {
+   for(int i_var = 0; i_var < static_cast<int>(data_names.size()); i_var++) {
 
       if(data_n_dims[i_var] == 2) {
          data_counts.emplace_back(zero_2d);
@@ -393,7 +393,7 @@ static void process_data_files() {
            << "\n";
 
       // Loop over variables to be processed 
-      for(int i_var = 0; i_var < data_names.size(); i_var++) {
+      for(int i_var = 0; i_var < static_cast<int>(data_names.size()); i_var++) {
          NcVar var = get_nc_var(nc_in.get(), data_names[i_var].c_str());
 
          mlog << Debug(3) << "Processing field: "
@@ -450,7 +450,7 @@ static void process_data_files() {
 
 static void normalize_stats() {
 
-   for(int i_var = 0; i_var < data_names.size(); i_var++) {
+   for(int i_var = 0; i_var < static_cast<int>(data_names.size()); i_var++) {
 
       // Normalize
       data_means[i_var].divide_assign(data_counts[i_var]);
@@ -476,7 +476,7 @@ static void write_stats() {
            << "No track points retained!\n\n";
 
       // Reset min and max to bad data
-      for(int i_var = 0; i_var < data_names.size(); i_var++) {
+      for(int i_var = 0; i_var < static_cast<int>(data_names.size()); i_var++) {
          data_mins[i_var].set_constant(bad_data_double);
          data_maxs[i_var].set_constant(bad_data_double);
       }
@@ -546,7 +546,7 @@ static void write_stats() {
    count_3d.emplace_back(n_range);
    count_3d.emplace_back(n_azimuth);
 
-   for(int i_var = 0; i_var < data_names.size(); i_var++) {
+   for(int i_var = 0; i_var < static_cast<int>(data_names.size()); i_var++) {
       if(data_n_dims[i_var] == 2) {
          NcVar var_mean = nc_out.get()->addVar(
             data_names[i_var] + "_mean",

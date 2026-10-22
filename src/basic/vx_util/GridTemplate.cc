@@ -594,7 +594,7 @@ GridTemplateFactory::~GridTemplateFactory() {
 
 GridTemplateFactory::GridTemplates GridTemplateFactory::string2Enum(string target) {
 
-   for(unsigned int ix = 0; ix < enum_class_as_int(GridTemplates::NUM_TEMPLATES); ix++) {
+   for(int ix = 0; ix < enum_class_as_int(GridTemplates::NUM_TEMPLATES); ix++) {
       if(enum_to_string[ix] == target) {
          return static_cast<GridTemplates>(ix);
       }
@@ -612,7 +612,7 @@ GridTemplateFactory::GridTemplates GridTemplateFactory::string2Enum(string targe
 
 string GridTemplateFactory::enum2String(GridTemplates target) {
 
-   if(static_cast<int>(target) > enum_to_string.size() - 1) {
+   if(static_cast<size_t>(target) > enum_to_string.size() - 1) {
       mlog << Error << "\nGridTemplateFactory::enum2String() -> "
            << "target out of range " << enum_class_as_int(target) << " > "
            << (static_cast<int>(enum_to_string.size()) - 1)

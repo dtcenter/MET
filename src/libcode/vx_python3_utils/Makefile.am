@@ -24,4 +24,4 @@ libvx_python3_utils_a_SOURCES = \
               python3_util.h python3_util.cc \
               vx_python3_utils.h \
               global_python.h
-libvx_python3_utils_a_CPPFLAGS = ${MET_CPPFLAGS} ${CPPFLAGS} ${MET_PYTHON_CC} $(MET_PYTHON_LD)
+libvx_python3_utils_a_CPPFLAGS = ${MET_CPPFLAGS} ${CPPFLAGS} ${MET_PYTHON_CC}

@@ -46,19 +46,11 @@ static const char tmp_list_name          [] = "ascii_data";
 
 static const char tmp_base_name          [] = "tmp_mpr";
 
-static const char line_type              [] = "MPR";
-
 
 ////////////////////////////////////////////////////////////////////////
 
 
 static void get_cs     (PyObject * in, ConcatString & out);
-
-static void get_int    (PyObject * in, int & out);
-
-static void get_double (PyObject * in, double & out);
-
-static bool is_na      (PyObject *);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -108,7 +100,7 @@ index = -1;
 
 N = -1;
 
-main_list = 0;   //  don't delete
+main_list = nullptr;   //  don't delete
 
 UserScriptPath.clear();
 
@@ -237,7 +229,7 @@ ConcatString PyLineDataFile::make_data_line()
 int j;
 ConcatString line;
 ConcatString a;
-PyObject * sublist = 0;
+PyObject * sublist = nullptr;
 
 
    //
@@ -389,7 +381,7 @@ const int N = UserScriptArgs.n();
 ConcatString command;
 ConcatString path;
 ConcatString tmp_ascii_path;
-const char * tmp_dir = 0;
+const char * tmp_dir = nullptr;
 int status;
 
 mlog << Debug(3) << "Calling " << UserPathToPython
@@ -404,7 +396,7 @@ path << cs_erase
      << tmp_dir << '/'
      << tmp_base_name;
 
-tmp_ascii_path = make_temp_file_name(path.text(), 0);
+tmp_ascii_path = make_temp_file_name(path.text(), nullptr);
 tmp_ascii_path << ".txt";
 
 command << cs_erase
@@ -441,7 +433,7 @@ mlog << Debug(4) << "Reading temporary Python line data file: "
 
 script->import_read_tmp_ascii_py();
 
-PyObject * dobj = script->read_tmp_ascii(tmp_ascii_path.text());
+script->read_tmp_ascii(tmp_ascii_path.text());
 
 main_list = script->lookup_ascii(tmp_list_name);
 
@@ -527,51 +519,6 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void get_int    (PyObject * in, int & out)
-
-{
-
-if ( is_na(in) )  {
-
-   out = bad_data_int;
-
-   return;
-
-}
-
-out = pyobject_as_int(in);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void get_double (PyObject * in, double & out)
-
-{
-
-if ( is_na(in) )  {
-
-   out = bad_data_double;
-
-   return;
-
-}
-
-out = pyobject_as_double(in);
-
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
 std::unique_ptr<Python3_Script> get_python3_script()
 
 {
@@ -599,37 +546,6 @@ setenv(env_PYTHONPATH, python_path.c_str(),1);
 return std::make_unique<Python3_Script>(path.text());
 
 }
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  check that it's a string and that the string contents are "NA"
-   //
-
-
-bool is_na (PyObject * obj)
-
-{
-
-if ( ! PyUnicode_Check(obj) )  return false;
-
-   //
-   //  now we know it's a string, the value had better be "NA"
-   //
-
-ConcatString s = pyobject_as_concat_string(obj);
-
-if ( strcmp(s.text(), na_string.c_str()) == 0 )  return true;
-
-   //
-   //  done
-   //
-
-return false;   //  control flow should never get here
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 

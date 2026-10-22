@@ -46,7 +46,7 @@ void write_netcdf_global(NcFile * f_out, const char *file_name,
                          const char *obtype, const char *desc)
 {
    int yr, mon, day, hr, min, sec;
-   char attribute_str[PATH_MAX];
+   ConcatString attribute_str;
    char hostname_str[max_str_len];
    char time_str[max_str_len];
 
@@ -54,10 +54,10 @@ void write_netcdf_global(NcFile * f_out, const char *file_name,
    snprintf(time_str, sizeof(time_str), "%.4i%.2i%.2i_%.2i%.2i%.2i",
            yr, mon, day, hr, min, sec);
    gethostname(hostname_str, max_str_len);
-   snprintf(attribute_str, sizeof(attribute_str),
-           "File %s generated %s UTC on host %s by the MET %s tool",
-           file_name, time_str, hostname_str, program_name);
-   f_out->putAtt("FileOrigins", attribute_str);
+   attribute_str << "File " << file_name << " generated " << time_str
+                 << " UTC on host " << hostname_str << " by the MET "
+                 << program_name << " tool";
+   f_out->putAtt("FileOrigins", attribute_str.c_str());
    f_out->putAtt("MET_version", met_version);
    f_out->putAtt("MET_tool", program_name);
    if(model_name) f_out->putAtt("model",  model_name);
@@ -107,11 +107,11 @@ return;
 void write_netcdf_latlon(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                          const Grid &grid) {
    // Write 1-dimensional arrays for lat/lon grids
-   if(grid.info().ll != 0) {
+   if(grid.info().ll != nullptr) {
       write_netcdf_latlon_1d(f_out, lat_dim, lon_dim, grid);
    }
    // Write 2-dimensional arrays for all others, except SemiLatLon
-   else if(grid.info().sl == 0) {
+   else if(grid.info().sl == nullptr) {
       write_netcdf_latlon_2d(f_out, lat_dim, lon_dim, grid);
    }
 

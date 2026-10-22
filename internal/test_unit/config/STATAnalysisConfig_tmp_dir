@@ -1,0 +1,25 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// STAT-Analysis configuration file.
+//
+// Used to check that the "tmp_dir" entry is applied to the temporary files
+// written when computing bootstrap confidence intervals (MET #2698). Only the
+// entries that differ from the default configuration file are set here.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// A single job, so that the intermediate temporary file is not needed and the
+// temporary directory is only used for the bootstrap temporary files
+//
+jobs = [
+   "-job aggregate_stat -line_type MPR -out_line_type CNT -by FCST_VAR,FCST_LEV -n_boot_rep 10 -boot_seed 1 -out_stat ${OUTPUT_DIR}/TMP_DIR_CONFIG_mpr_to_cnt.stat"
+];
+
+////////////////////////////////////////////////////////////////////////////////
+
+tmp_dir = "${TMP_DIR}";
+
+////////////////////////////////////////////////////////////////////////////////

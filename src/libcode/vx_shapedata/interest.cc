@@ -607,8 +607,6 @@ void get_percentiles(DistributionPercentiles &ptile,
                      const int perc, const bool precip_flag)
 
 {
-   const char *method_name = "get_percentiles() -> ";
-
    int nx = raw.data.nx();
    int ny = raw.data.ny();
 
