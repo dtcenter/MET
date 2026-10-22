@@ -265,9 +265,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 
 #pragma omp parallel for schedule(static) default(shared)
    for(int i=0; i<n_face; i++) {
-      smooth_dp.set(interp_ugrid(dp, nbr_table[i], mthd, n_points,
-                                 bad_data_double, nullptr, t),
-                    i, 0);
+      smooth_dp.set(interp_ugrid(dp, nbr_table[i], mthd, n_points, t), i, 0);
    }
 
    return;

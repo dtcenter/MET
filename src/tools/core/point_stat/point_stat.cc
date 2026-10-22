@@ -180,6 +180,8 @@ static void finish_txt_files();
 
 static void clean_up();
 
+static const UGridNeighbors *find_ugrid_nbrs(double, double, int, UGridNeighbors &);
+
 static void usage(int exit_code=1);
 static void set_point_obs(const StringArray &);
 static void set_ncfile(const StringArray &);
@@ -1872,7 +1874,6 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
                        conf_info.vx_opt[i_vx].hira_info.shape);
 
    // Closest faces for an unstructured grid
-   const bool is_ugrid = grid.is_ugrid();
    UGridNeighbors ugrid_nbrs;
 
    // Loop over the HiRA widths
@@ -1906,10 +1907,8 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
                        pd_ptr->lvl_na[j], lvl_blw, lvl_abv);
 
          // For an unstructured grid, find the closest faces
-         if(is_ugrid) {
-            grid.ugrid_closest_faces(pd_ptr->lat_na[j], -1.0*pd_ptr->lon_na[j],
-                                     gt->size(), ugrid_nbrs);
-         }
+         const UGridNeighbors *ugrid_ptr = find_ugrid_nbrs(
+            pd_ptr->lat_na[j], pd_ptr->lon_na[j], gt->size(), ugrid_nbrs);
 
          // Get the nearby forecast values
          get_interp_points(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
@@ -1918,8 +1917,7 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
             conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
             conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
-            pd_ptr->lvl_na[j], lvl_blw, lvl_abv, f_ens,
-            is_ugrid ? &ugrid_nbrs : nullptr);
+            pd_ptr->lvl_na[j], lvl_blw, lvl_abv, f_ens, ugrid_ptr);
 
          // Check for values
          if(f_ens.n() == 0) continue;
@@ -2077,7 +2075,6 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                        conf_info.vx_opt[i_vx].hira_info.shape);
 
    // Closest faces for an unstructured grid
-   const bool is_ugrid = grid.is_ugrid();
    UGridNeighbors ugrid_nbrs;
 
    // Loop over categorical thresholds and HiRA widths
@@ -2090,6 +2087,10 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
       for(int j=0; j<conf_info.vx_opt[i_vx].hira_info.width.n(); j++) {
 
          shc.set_interp_wdth(conf_info.vx_opt[i_vx].hira_info.width[j]);
+
+         // Number of closest faces for an unstructured grid
+         int ugrid_n = ugrid_interp_n_points(conf_info.vx_opt[i_vx].hira_info.width[j],
+                                             conf_info.vx_opt[i_vx].hira_info.shape);
 
          // Initialize
          hira_pd.clear();
@@ -2105,12 +2106,8 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                              pd_ptr->ocmn_na[k], pd_ptr->ocsd_na[k]);
 
             // For an unstructured grid, find the closest faces
-            if(is_ugrid) {
-               grid.ugrid_closest_faces(pd_ptr->lat_na[k], -1.0*pd_ptr->lon_na[k],
-                  ugrid_interp_n_points(conf_info.vx_opt[i_vx].hira_info.width[j],
-                                        conf_info.vx_opt[i_vx].hira_info.shape),
-                  ugrid_nbrs);
-            }
+            const UGridNeighbors *ugrid_ptr = find_ugrid_nbrs(
+               pd_ptr->lat_na[k], pd_ptr->lon_na[k], ugrid_n, ugrid_nbrs);
 
             // Compute the fractional coverage forecast value using the
             // observation level value
@@ -2124,7 +2121,7 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                        conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
                        conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
                        pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh,
-                       is_ugrid ? &ugrid_nbrs : nullptr);
+                       ugrid_ptr);
 
             // Check for bad data
             if(is_bad_data(f_cov)) continue;
@@ -2144,7 +2141,7 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                              conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
                              conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
                              pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh,
-                             is_ugrid ? &ugrid_nbrs : nullptr);
+                             ugrid_ptr);
 
                // Check for bad data
                if(is_bad_data(ocmn_cov)) continue;
@@ -2281,6 +2278,19 @@ static void finish_txt_files() {
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// For an unstructured grid, find the n closest faces of the matched
+// pair location (lon in degrees east) and return a pointer to them.
+// Return nullptr for other grids, which use the grid template.
+//
+////////////////////////////////////////////////////////////////////////
+
+static const UGridNeighbors *find_ugrid_nbrs(double lat, double lon, int n,
+                                             UGridNeighbors &nbrs) {
+   return grid.ugrid_closest_faces(lat, -1.0*lon, n, nbrs) ? &nbrs : nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -525,6 +525,28 @@ void PointStatConfInfo::check_ugrid_sfc_interp(const PointStatVxOpt &p_vx_opt) c
 
 ////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////
+//
+// The surface interpolation (land/sea and topography masks) uses the
+// grid template which supports only the nearest neighbor for the
+// unstructured grid.
+//
+////////////////////////////////////////////////////////////////////////
+
+void PointStatConfInfo::check_ugrid_geog() {
+
+   for(int i=0; i<n_vx; i++) {
+      if(vx_opt[i].vx_pd.sfc_info.need_topo()) {
+         parse_conf_topo_mask_interp(&conf, vx_opt[i].vx_pd.sfc_info);
+      }
+      check_ugrid_sfc_interp(vx_opt[i]);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PointStatConfInfo::process_geog(const Grid &grid,
                                      const char *fcst_file) {
    const string method_name = "PointStatConfInfo::process_geog() -> ";
@@ -554,17 +576,8 @@ void PointStatConfInfo::process_geog(const Grid &grid,
    // Check for no work to do
    if(!land && !topo) return;
 
-   // The surface interpolation (land/sea and topography masks) uses
-   // the grid template which supports only the nearest neighbor for
-   // the unstructured grid. Check before reading the geography data.
-   if(grid.is_ugrid()) {
-      for(int i=0; i<n_vx; i++) {
-         if(vx_opt[i].vx_pd.sfc_info.need_topo()) {
-            parse_conf_topo_mask_interp(&conf, vx_opt[i].vx_pd.sfc_info);
-         }
-         check_ugrid_sfc_interp(vx_opt[i]);
-      }
-   }
+   // Check the surface interpolation before reading the geography data
+   if(grid.is_ugrid()) check_ugrid_geog();
 
    mlog << Debug(2)
         << "Processing geography data.\n";
@@ -1105,7 +1118,7 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    // Conf: interp
    interp_info = parse_conf_interp(&odict, conf_key_interp);
    if(ftype == FileType_UGrid) {
-      interp_info.validate_ugrid(false, "PointStatVxOpt::process_config() -> ");
+      interp_info.validate_ugrid(UGridInterpUse::Point, "PointStatVxOpt::process_config() -> ");
    }
 
    // Conf: hira

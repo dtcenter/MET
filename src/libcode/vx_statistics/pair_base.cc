@@ -2644,8 +2644,8 @@ double compute_interp(const DataPlaneArray &dpa,
    int n_points = (ugrid_nbrs ? ugrid_interp_n_points(width, shape, method) : 0);
    auto horz_interp = [&](const DataPlane &dp) {
       if(ugrid_nbrs) {
-         return interp_ugrid(dp, *ugrid_nbrs, method, n_points,
-                             obs_v, cpi, thresh, cat_thresh);
+         return interp_ugrid(dp, *ugrid_nbrs, method, n_points, thresh,
+                             UGridPointInfo{ obs_v, cpi, cat_thresh });
       }
       return compute_horz_interp(dp, obs_x, obs_y, obs_v, cpi,
                                  method, width, shape, wrap_lon,

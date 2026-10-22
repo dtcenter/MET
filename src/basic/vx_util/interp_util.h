@@ -115,6 +115,18 @@ inline void UGridNeighbors::clear() {
 
 inline int UGridNeighbors::n() const { return static_cast<int>(index.size()); }
 
+//
+// Point information for the unstructured grid interpolation: the
+// observation value (BEST) and the categorical threshold and
+// climatology (NBRHD).
+//
+
+struct UGridPointInfo {
+   double              obs_v      = bad_data_double;
+   const ClimoPntInfo *cpi        = nullptr;
+   const SingleThresh *cat_thresh = nullptr;
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Utility functions for horizontal interpolation on a DataPlane
@@ -159,9 +171,8 @@ extern int      ugrid_interp_n_points(const int width, const GridTemplateFactory
                                       const InterpMthd mthd = InterpMthd::None);
 extern NumArray interp_ugrid_points  (const DataPlane &dp, const UGridNeighbors &nbrs, int n_points);
 extern double   interp_ugrid         (const DataPlane &dp, const UGridNeighbors &nbrs,
-                                      const InterpMthd mthd, int n_points,
-                                      double obs_v, const ClimoPntInfo *cpi,
-                                      double t, const SingleThresh *cat_thresh = nullptr);
+                                      const InterpMthd mthd, int n_points, double t,
+                                      const UGridPointInfo &pnt = UGridPointInfo());
 
 ///////////////////////////////////////////////////////////////////////////////
 //

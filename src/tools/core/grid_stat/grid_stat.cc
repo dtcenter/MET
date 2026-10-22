@@ -361,7 +361,7 @@ void process_command_line(int argc, char **argv) {
    // Check the smoothing methods for the unstructured grid
    if(grid.is_ugrid()) {
       for(int i=0; i<conf_info.get_n_vx(); i++) {
-         conf_info.vx_opt[i].interp_info.validate_ugrid(true,
+         conf_info.vx_opt[i].interp_info.validate_ugrid(UGridInterpUse::Smoothing,
             "process_command_line() -> ");
       }
    }

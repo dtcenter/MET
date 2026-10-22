@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <limits.h>
+#include <algorithm>
 
 #include "config_util.h"
 #include "enum_as_int.hpp"
@@ -1825,46 +1826,40 @@ void InterpInfo::validate() {
 // supported. The bilinear interpolation fits a bilinear surface through
 // the width * width closest faces. The distance-weighted mean and the
 // bilinear interpolation are not supported for smoothing since each
-// face is its own closest face.
+// face is its own closest face, and the best match since there is no
+// observation value.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-void InterpInfo::validate_ugrid(bool smoothing, const char *caller) const {
+void InterpInfo::validate_ugrid(UGridInterpUse use, const char *caller) const {
+
+   static const vector<InterpMthd> point_methods = {
+      InterpMthd::Nearest, InterpMthd::Min,     InterpMthd::Max,
+      InterpMthd::Median,  InterpMthd::UW_Mean, InterpMthd::DW_Mean,
+      InterpMthd::AW_Mean, InterpMthd::Bilin,   InterpMthd::Best };
+   static const vector<InterpMthd> smoothing_methods = {
+      InterpMthd::Nearest, InterpMthd::Min,     InterpMthd::Max,
+      InterpMthd::Median,  InterpMthd::UW_Mean, InterpMthd::AW_Mean };
+
+   const vector<InterpMthd> &supported =
+      (use == UGridInterpUse::Smoothing ? smoothing_methods : point_methods);
 
    for(int i=0; i<n_interp; i++) {
 
       InterpMthd methodi = string_to_interpmthd(method[i].c_str());
+      if(std::find(supported.begin(), supported.end(), methodi) != supported.end()) continue;
 
-      bool supported = (methodi == InterpMthd::Nearest ||
-                        methodi == InterpMthd::Min     ||
-                        methodi == InterpMthd::Max     ||
-                        methodi == InterpMthd::Median  ||
-                        methodi == InterpMthd::UW_Mean ||
-                        methodi == InterpMthd::AW_Mean);
-
-      if(!smoothing) {
-         supported = supported ||
-                     methodi == InterpMthd::DW_Mean ||
-                     methodi == InterpMthd::Bilin   ||
-                     methodi == InterpMthd::Best;
+      ConcatString choices;
+      for(const auto &m : supported) {
+         if(!choices.empty()) choices << ", ";
+         choices << interpmthd_to_string(m);
       }
 
-      if(!supported) {
-         ConcatString choices;
-         choices << interpmthd_nearest_str << ", " << interpmthd_min_str << ", "
-                 << interpmthd_max_str << ", " << interpmthd_median_str << ", "
-                 << interpmthd_uw_mean_str << ", ";
-         if(!smoothing) choices << interpmthd_dw_mean_str << ", ";
-         choices << interpmthd_aw_mean_str;
-         if(!smoothing) choices << ", " << interpmthd_bilin_str
-                                << ", " << interpmthd_best_str;
-
-         mlog << Error << "\n" << caller
-              << "the \"" << method[i] << "\" interpolation method is not "
-              << "supported for the unstructured grid. Choose from "
-              << choices << ".\n\n";
-         exit(1);
-      }
+      mlog << Error << "\n" << caller
+           << "the \"" << method[i] << "\" interpolation method is not "
+           << "supported for the unstructured grid. Choose from "
+           << choices << ".\n\n";
+      exit(1);
    }
 }
 
