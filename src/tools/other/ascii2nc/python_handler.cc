@@ -34,11 +34,6 @@ static const char tmp_list_name          [] = "ascii_data";
 static const char tmp_base_name          [] = "tmp_ascii2nc";
 
 
-////////////////////////////////////////////////////////////////////////
-
-
-static const char sq = '\'';   //  single quote
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -388,7 +383,7 @@ mlog << Debug(4) << "Reading temporary Python ascii observation file: "
 
 script->import_read_tmp_ascii_py();
 
-PyObject * dobj = script->read_tmp_ascii(tmp_ascii_path.text());
+script->read_tmp_ascii(tmp_ascii_path.text());
 
 PyObject * obj = script->lookup_ascii(tmp_list_name);
 

@@ -93,10 +93,6 @@ for (j=1; j<argc; ++j)  {   //  j starts at one, here
    //
 
 const DictionaryEntry * e = nullptr;
-const DictionaryEntry * m = nullptr;
-const DictionaryEntry * h = nullptr;
-Dictionary * ed = nullptr;
-Dictionary * md = nullptr;
 
 
 cout << "\n\n";

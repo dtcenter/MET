@@ -525,7 +525,7 @@ void UnstructuredData::set_points(int count, const std::vector<PointLonLat> &poi
 
    clear_data();
 
-   if (count != pointsLL.size()) {
+   if (count != (int) pointsLL.size()) {
       mlog << Warning << "\n" << method_name
            << " The count argument (" << count << ") does not match with vector ("
            << pointsLL.size() << ")\n\n";
@@ -555,7 +555,7 @@ void UnstructuredData::set_points(int count, const std::vector<PointXYZ> &points
 
    clear_data();
 
-   if (count != pointsXYZ.size()) {
+   if (count != (int) pointsXYZ.size()) {
       mlog << Warning << "\n" << method_name
            << " The count argument (" << count << ") does not match with vector ("
            << pointsXYZ.size() << ")\n\n";
@@ -593,7 +593,7 @@ void UnstructuredData::test_kdtree() {
    double distance_km;
    vector<int> indices  = {0, n_face/2, (n_face - 1)};
    if (has_PointLatLon()) {
-      if (n_face != points_lonlat.size()) {
+      if (n_face != (int) points_lonlat.size()) {
          mlog << Warning << "\n" << method_name
               << " The count argument (" << n_face << ") does not match with the vector (latlon="
               << points_lonlat.size() << ", XYZ=" << points_XYZ.size() << ")\n\n";
@@ -617,7 +617,7 @@ void UnstructuredData::test_kdtree() {
       double y_km;
       double z_km;
       double alt_m;
-      if (n_face != points_XYZ.size()) {
+      if (n_face != (int) points_XYZ.size()) {
          mlog << Warning << "\n" << method_name
               << " The count argument (" << n_face << ") does not match with the vector (XYZ="
               << points_XYZ.size() << ", latlon=" << points_lonlat.size() << ")\n\n";

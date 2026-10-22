@@ -139,4 +139,77 @@
     </output>
   </test>
 
+  <!--
+    MET #2698 Check that the temporary directory used for bootstrap
+    confidence intervals is resolved from the MET_TMP_DIR environment
+    variable and the "tmp_dir" configuration file entry, in addition to
+    the "-tmp_dir" command line option.
+
+    Setting the MET_KEEP_TEMP_FILE environment variable retains the bootstrap
+    temporary files so that the directory they were written to can be checked.
+    Their names contain the process id, so the check is made by listing them
+    and letting a non-zero exit status fail the test. The temporary directory
+    is removed afterwards to keep non-deterministic files out of the output
+    that is compared against the truth data.
+  -->
+
+  <test name="stat_analysis_POINT_STAT_BOOT_TMP_DIR_DEFAULT">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
+      -job aggregate_stat -line_type MPR -out_line_type CNT -by FCST_VAR,FCST_LEV \
+      -n_boot_rep 10 -boot_seed 1 \
+      -out_stat &OUTPUT_DIR;/stat_analysis_ps/BOOT_TMP_DIR_DEFAULT.stat \
+      -v 2
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/BOOT_TMP_DIR_DEFAULT.stat</stat>
+    </output>
+  </test>
+
+  <test name="stat_analysis_POINT_STAT_BOOT_MET_TMP_DIR">
+    <env>
+      <pair><name>MET_TMP_DIR</name>        <value>&OUTPUT_DIR;/stat_analysis_ps/tmp_env</value></pair>
+      <pair><name>MET_KEEP_TEMP_FILE</name> <value>true</value></pair>
+    </env>
+    <exec>rm -rf &OUTPUT_DIR;/stat_analysis_ps/tmp_env; \
+          mkdir -p &OUTPUT_DIR;/stat_analysis_ps/tmp_env; \
+          &MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
+      -job aggregate_stat -line_type MPR -out_line_type CNT -by FCST_VAR,FCST_LEV \
+      -n_boot_rep 10 -boot_seed 1 \
+      -out_stat &OUTPUT_DIR;/stat_analysis_ps/BOOT_MET_TMP_DIR.stat \
+      -v 2 \
+      &amp;&amp; ls &OUTPUT_DIR;/stat_analysis_ps/tmp_env/tmp_cnt_* > /dev/null \
+      &amp;&amp; rm -rf &OUTPUT_DIR;/stat_analysis_ps/tmp_env
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/BOOT_MET_TMP_DIR.stat</stat>
+    </output>
+  </test>
+
+  <test name="stat_analysis_POINT_STAT_BOOT_CONFIG_TMP_DIR">
+    <env>
+      <pair><name>OUTPUT_DIR</name>         <value>&OUTPUT_DIR;/stat_analysis_ps</value></pair>
+      <pair><name>TMP_DIR</name>            <value>&OUTPUT_DIR;/stat_analysis_ps/tmp_config</value></pair>
+      <pair><name>MET_KEEP_TEMP_FILE</name> <value>true</value></pair>
+    </env>
+    <exec>rm -rf &OUTPUT_DIR;/stat_analysis_ps/tmp_config; \
+          mkdir -p &OUTPUT_DIR;/stat_analysis_ps/tmp_config; \
+          &MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
+      -config &CONFIG_DIR;/STATAnalysisConfig_tmp_dir \
+      -out &OUTPUT_DIR;/stat_analysis_ps/BOOT_CONFIG_TMP_DIR.out \
+      -v 2 \
+      &amp;&amp; ls &OUTPUT_DIR;/stat_analysis_ps/tmp_config/tmp_cnt_* > /dev/null \
+      &amp;&amp; rm -rf &OUTPUT_DIR;/stat_analysis_ps/tmp_config
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis_ps/BOOT_CONFIG_TMP_DIR.out</exist>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/TMP_DIR_CONFIG_mpr_to_cnt.stat</stat>
+    </output>
+  </test>
+
 </met_test>

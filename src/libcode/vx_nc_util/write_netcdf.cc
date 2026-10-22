@@ -42,7 +42,7 @@ void write_netcdf_global(NcFile * f_out, const char *file_name,
                          const char *obtype, const char *desc)
 {
    int yr, mon, day, hr, min, sec;
-   char attribute_str[PATH_MAX];
+   ConcatString attribute_str;
    char hostname_str[max_str_len];
    char time_str[max_str_len];
 
@@ -50,10 +50,10 @@ void write_netcdf_global(NcFile * f_out, const char *file_name,
    snprintf(time_str, sizeof(time_str), "%.4i%.2i%.2i_%.2i%.2i%.2i",
            yr, mon, day, hr, min, sec);
    gethostname(hostname_str, max_str_len);
-   snprintf(attribute_str, sizeof(attribute_str),
-           "File %s generated %s UTC on host %s by the MET %s tool",
-           file_name, time_str, hostname_str, program_name);
-   f_out->putAtt("FileOrigins", attribute_str);
+   attribute_str << "File " << file_name << " generated " << time_str
+                 << " UTC on host " << hostname_str << " by the MET "
+                 << program_name << " tool";
+   f_out->putAtt("FileOrigins", attribute_str.c_str());
    f_out->putAtt("MET_version", met_version);
    f_out->putAtt("MET_tool", program_name);
    if(model_name) f_out->putAtt("model",  model_name);

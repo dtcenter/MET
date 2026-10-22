@@ -805,7 +805,7 @@ static void process_obs_file(int i_nc) {
 #ifdef WITH_PYTHON
    MetPythonPointDataFile met_point_file;
    if (use_python) {
-      int offset = python_command.find("=");
+      size_t offset = python_command.find("=");
       if (offset == std::string::npos) {
          mlog << Error << "\n" << method_name
               << "trouble parsing the python command " << python_command << ".\n\n";

@@ -224,7 +224,7 @@ void TCPolyArray::extend(int n, bool exact) {
 
 TCPoly TCPolyArray::operator[](int n) const {
 
-   if(n < 0 || n >= Poly.size()) {
+   if(n < 0 || n >= (int) Poly.size()) {
       mlog << Error << "\nTCPolyArray::operator[](int) const -> "
            << "range check error\n\n";
       exit(1);
@@ -300,7 +300,7 @@ double TCPolyArray::min_dist(double lat, double lon, int &imin) const {
    
    // Loop through the polylines
    double dmin = bad_data_double;
-   for(int i=0; i<Poly.size(); i++) {
+   for(int i=0; i<(int) Poly.size(); i++) {
 
       // Skip polylines whose centroids are too far away
       if(!is_bad_data(CheckDist)) {

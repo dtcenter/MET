@@ -89,7 +89,7 @@ Once object attributes :math:`\alpha_1,\alpha_2,\ldots,\alpha_n` are estimated, 
 
 The next step is to define confidence maps :math:`C_i` for each attribute. These maps (again with values ranging from zero to one) reflect how confident we are in the calculated value of an attribute. The confidence maps generally are functions of the entire attribute vector :math:`\alpha = (\alpha_1, \alpha_2, \ldots, \alpha_n)`, in contrast to the interest maps, where each :math:`I_i` is a function only of :math:`\alpha_i`. To see why this is necessary, imagine an electronic anemometer that outputs a stream of numerical values of wind speed and direction. It is typically the case for such devices that when the wind speed becomes small enough, the wind direction is poorly resolved. The wind must be at least strong enough to overcome friction and turn the anemometer. Thus, in this case, our confidence in one attribute (wind direction) is dependent on the value of another attribute (wind speed). In MODE, all of the confidence maps except the map for axis angle are set to a constant value of 1. The axis angle confidence map is a function of aspect ratio, with values near one having low confidence, and values far from one having high confidence.
 
-Next, scalar weights :math:`\boldsymbol{w}_i` are assigned to each attribute, representing an empirical judgment regarding the relative importance of the various attributes. As an example, the initial development of MODE, centroid distance was weighted more heavily than other attributes, because the location of storm systems close to each other in space seemed to be a strong indication (stronger than that given by any other attribute) that they were related.
+Next, scalar weights :math:`\boldsymbol{w}_i` are assigned to each attribute, representing an empirical judgment regarding the relative importance of the various attributes. As an example, in the initial development of MODE, centroid distance was weighted more heavily than other attributes, because the location of storm systems close to each other in space seemed to be a strong indication (stronger than that given by any other attribute) that they were related.
 
 Finally, all these ingredients are collected into a single number called the total interest, :math:`\boldsymbol{T}`, given by:
 
@@ -111,13 +111,13 @@ Multi-Variate MODE
 
 Traditionally, MODE defines objects by smoothing and thresholding data from a single input field. MET version 10.1.0 extends MODE by adding the option to define objects using multiple input fields.
 
-As described in :numref:`MODE-configuration-file`, the **field** entry in the forecast and observation dictionaries define the input data to be processed. If **field** is defined as a dictionary, the traditional method for running MODE is invoked, where objects are defined using a single input field. If **field** is defined as an array of dictionaries, each specifying a different input field, then the multi-variate MODE logic is invoked and requires the **multivar_logic** configuration entry to be set. Traditional MODE is run once for each input field to define objects for that field. Note that the object definition criteria can be defined separately for each field array entry. The objects from each input field are combined into forecast and observation data *super* objects
+As described in :numref:`MODE-configuration-file`, the **field** entry in the forecast and observation dictionaries define the input data to be processed. If **field** is defined as a dictionary, the traditional method for running MODE is invoked, where objects are defined using a single input field. If **field** is defined as an array of dictionaries, each specifying a different input field, then the multi-variate MODE logic is invoked and requires the **multivar_logic** configuration entry to be set. Traditional MODE is run once for each input field to define objects for that field. Note that the object definition criteria can be defined separately for each field array entry. The objects from each input field are combined into forecast and observation data *super* objects.
 
 The **multivar_logic** configuration entry, described in :numref:`MODE-configuration-file`, defines the boolean logic for combining objects from multiple fields into *super* objects. It can be defined once to apply to both the forecast and observation dictionaries if the field array lengths are the same, or defined separately within each dictionary. If defined separately within each dictionary, the field array lengths do not need to be the same for the forecast and observations. Note that the multi-variate MODE forecast and observation input fields and combination logic do not need to match.
 
-The **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** configuration entries, described in :numref:`MODE-configuration-file`, define the field array indexes for which to optionally compare intensities for individual input fields when the input is masked to non-missing only inside the *super* objects and are required to be the same length. For example, if **multivar_intensity_compare_fcst = [ 1, 2 ];** and **multivar_intensity_compare_obs = [ 2, 3 ];**, then index 1 (2) of the forecast field array will be compared with index 2 (3) of the observation field array. If an intensity comparision is requested, the corresponding pair of fields (fcst and obs) are masked to non-missing inside the fcst and obs super objects, and traditional mode is run on that pair of masked inputs producing uniquely named outputs. If **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty, the forecast and observation *super* objects are written to NetCDF, text, and postscript output files in the standard mode output format, but with no intensity information.
+The **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** configuration entries, described in :numref:`MODE-configuration-file`, define the field array indexes for which to optionally compare intensities for individual input fields when the input is masked to non-missing only inside the *super* objects and are required to be the same length. For example, if **multivar_intensity_compare_fcst = [ 1, 2 ];** and **multivar_intensity_compare_obs = [ 2, 3 ];**, then index 1 (2) of the forecast field array will be compared with index 2 (3) of the observation field array. If an intensity comparison is requested, the corresponding pair of fields (fcst and obs) are masked to non-missing inside the fcst and obs super objects, and traditional mode is run on that pair of masked inputs producing uniquely named outputs. If **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty, the forecast and observation *super* objects are written to NetCDF, text, and PostScript output files in the standard mode output format, but with no intensity information.
 
-When regridding to the FCST or OBS field (e.g. to_grid = FCST), the first field of the field array is used from the forecast and observation field dictionaries, respectively. All regridding is then done to that grid. Other regrid options described in :ref:`regrid` can also be used as normal.
+When regridding to the FCST or OBS field (e.g., to_grid = FCST), the first field of the field array is used from the forecast and observation field dictionaries, respectively. All regridding is then done to that grid. Other regrid options described in :ref:`regrid` can also be used as normal.
 
 "file_type" can be set independently for each input in multivariate mode. If not set for an input, MET uses file names and file content to determine the type.
 
@@ -128,16 +128,16 @@ In multivariate mode, with quilt=**TRUE**, for all inputs the number of forecast
 When setting a threshold to a percentile, some choices require both an observation input and a forecast input.  When this is the case, it's assumed the indices match, so for example if forecast input 1 has such a percentile setting, then observation input 1 will be used to compute the percentile.  Percentiles in which this will happen are:
 
 * SFP in an observation input.
-  * The matching forecast input will be used to determine the threshold.  e.g. ">SFP33.3" in the 2nd observation input means greater than 33.3-rd percentile of the 2nd forecast input will be used as the threshold for that observation input.
+  * The matching forecast input will be used to determine the threshold.  e.g., ">SFP33.3" in the 2nd observation input means greater than 33.3-rd percentile of the 2nd forecast input will be used as the threshold for that observation input.
 
 * SOP in a forecast input.
-  * The matching observation input will be used to determine the threshold. e.g. ">SOP33.3" in the 2nd forecast input means greater than 33.3-rd percentile of the 2nd observation input will be used as the threshold for that forecast input.
+  * The matching observation input will be used to determine the threshold. e.g., ">SOP33.3" in the 2nd forecast input means greater than 33.3-rd percentile of the 2nd observation input will be used as the threshold for that forecast input.
 
 * "==FBIAS" in an observation input.
-  * e.g. "==FBIAS1" in an observation input to automatically de-bias the data, using a simple threshold in the matching forecast input. For example, when observation input 3 has "==FBIAS1", and forecast input 3 has ">5.0", MET applies the >5.0 threshold to the forecast and then chooses an observation threshold which results in a frequency bias of 1. The frequency bias can be any float value > 0.0.
+  * e.g., "==FBIAS1" in an observation input to automatically de-bias the data, using a simple threshold in the matching forecast input. For example, when observation input 3 has "==FBIAS1", and forecast input 3 has ">5.0", MET applies the >5.0 threshold to the forecast and then chooses an observation threshold which results in a frequency bias of 1. The frequency bias can be any float value > 0.0.
 
 * "==FBIAS" in a forecast input.
-  * e.g. "==FBIAS1" in a forecast input to automatically de-bias the data, using a simple threshold in the matching observation input. For example, when forecast input 2 has "==FBIAS1", and observation input 2 has ">5.0", MET applies the >5.0 threshold to the observation and then chooses a forecast threshold which results in a frequency bias of 1.  The frequency bias can be any float value > 0.0.
+  * e.g., "==FBIAS1" in a forecast input to automatically de-bias the data, using a simple threshold in the matching observation input. For example, when forecast input 2 has "==FBIAS1", and observation input 2 has ">5.0", MET applies the >5.0 threshold to the observation and then chooses a forecast threshold which results in a frequency bias of 1.  The frequency bias can be any float value > 0.0.
 
 
 Practical Information
@@ -221,7 +221,7 @@ The default configuration file for the MODE tool, **MODEConfig_default**, can be
 
 A second default configuration file for the multivar MODE option, **MODEMultivarConfig_default**, is also found in the installed *share/met/config* directory. We encourage users to make a copy of this default configuration file when setting up a multivar configuration prior to modifying content. The two default config files **MODEConfig_default** and **MODEMultivarConfig_default** are similar, with **MODEMultivarConfig_default** having example multivar specific content.
 
-Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
+Note that environment variables may be used when editing configuration files, as described in :numref:`config_env_vars`.
 
 _____________________
 
@@ -282,7 +282,7 @@ _____________________
 
    multivar_name = "Super";
 
-The **multivar_name** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty. It can be thought of as an identifier for the multivariate super object.  It shows up in output files names and content.  It can be set separately for forecasts and observations or as a common value for both.
+The **multivar_name** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty. It can be thought of as an identifier for the multivariate super object.  It shows up in output file names and content.  It can be set separately for forecasts and observations or as a common value for both.
 
 _____________________
 
@@ -290,7 +290,7 @@ _____________________
 
    multivar_level = "LO";
 
-The **multivar_level** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty. It is the identifier for the multivariate super object as regards level.  It shows up in output files names and content.  If not set the default value is "NA".   It can be set separately for forecasts and observations, or as a common value for both.
+The **multivar_level** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty. It is the identifier for the multivariate super object as regards level.  It shows up in output file names and content.  If not set the default value is "NA".   It can be set separately for forecasts and observations, or as a common value for both.
 
 _____________________
 
@@ -313,15 +313,15 @@ _____________________
   }
   obs = fcst;
 
-The **field** entries in the forecast and observation dictionaries specify the model and observation variables and level to be compared. See a more complete description of them in :numref:`config_options`. In the above example, the forecast settings are copied into the observation dictionary using **obs = fcst;.**
+The **field** entries in the forecast and observation dictionaries specify the model and observation variables and level to be compared. See a more complete description of them in :numref:`config_options`. In the above example, the forecast settings are copied into the observation dictionary using **obs = fcst;**.
 
 When **field** is set to an array of dictionaries rather than a single one, the multi-variate MODE logic is invoked. Please see :numref:`MODE-multivar` for a description of that logic.
 
 The **censor_thresh** and **censor_val** entries are used to censor the raw data as described in :numref:`config_options`. Their functionality replaces the **raw_thresh** entry, which is deprecated in met-6.1. Prior to defining objects, it is recommended that the raw fields should be made to look similar to each other. For example, if the model only predicts values for a variable above some threshold, the observations should be thresholded at that same level. The censor thresholds can be specified using symbols. By default, no censor thresholding is applied.
 
-The **conv_radius** entry defines the radius of the circular convolution applied to smooth the raw fields. The radii are specified in terms of grid units. The default convolution radii are defined in terms of the previously defined **grid_res** entry. Multiple convolution radii may be specified as an array (e.g. **conv_radius = [ 5, 10, 15 ];**).
+The **conv_radius** entry defines the radius of the circular convolution applied to smooth the raw fields. The radii are specified in terms of grid units. The default convolution radii are defined in terms of the previously defined **grid_res** entry. Multiple convolution radii may be specified as an array (e.g., **conv_radius = [ 5, 10, 15 ];**).
 
-The **conv_thresh** entry specifies the threshold values to be applied to the convolved field to define objects. By default, objects are defined using a convolution threshold of 5.0. Multiple convolution thresholds may be specified as an array (e.g. **conv_thresh = [ >=5.0, >=10.0, >=15.0 ];)**.
+The **conv_thresh** entry specifies the threshold values to be applied to the convolved field to define objects. By default, objects are defined using a convolution threshold of 5.0. Multiple convolution thresholds may be specified as an array (e.g., **conv_thresh = [ >=5.0, >=10.0, >=15.0 ];**).
 
 Multiple convolution radii and thresholds are processed using the logic defined by the **quilt** entry.  The logic specific to multivariate mode is described in the multivariate mode section above.
 
@@ -335,7 +335,7 @@ The **filter_attr_thresh** entry is an array of thresholds for these object attr
 
 Note that the **area_thresh** and **inten_perc_thresh** entries from earlier versions of MODE are replaced by these options and are now deprecated.
 
-The **merge_thresh** entry is used to define larger objects for use in merging the original objects. It defines the threshold value used in the double thresholding merging technique. Note that in order to use this merging technique, it must be requested for both the forecast and observation fields. These thresholds should be chosen to define larger objects that fully contain the originally defined objects. For example, for objects defined as >=5.0, a merge threshold of >=2.5 will define larger objects that fully contain the original objects. Any two original objects contained within the same larger object will be merged. By default, the merge thresholds are set to be greater than or equal to 1.25. Multiple merge thresholds may be specified as an array (e.g. **merge_thresh = [ >=1.0, >=2.0, >=3.0 ];**). The number of **merge_thresh** entries must match the number of **conv_thresh** entries.
+The **merge_thresh** entry is used to define larger objects for use in merging the original objects. It defines the threshold value used in the double thresholding merging technique. Note that in order to use this merging technique, it must be requested for both the forecast and observation fields. These thresholds should be chosen to define larger objects that fully contain the originally defined objects. For example, for objects defined as >=5.0, a merge threshold of >=2.5 will define larger objects that fully contain the original objects. Any two original objects contained within the same larger object will be merged. By default, the merge thresholds are set to be greater than or equal to 1.25. Multiple merge thresholds may be specified as an array (e.g., **merge_thresh = [ >=1.0, >=2.0, >=3.0 ];**). The number of **merge_thresh** entries must match the number of **conv_thresh** entries.
 
 The **merge_flag** entry controls what type of merging techniques will be applied to the objects defined in each field.
 
@@ -501,7 +501,7 @@ _____________________
      color_table = "MET_BASE/colortables/mode_obj.ctable";
   }
 
-Specifying dictionaries to define the **color_table, plot_min**, and **plot_max** entries are described in :numref:`config_options`.
+Specifying dictionaries to define the **color_table, plot_min**, and **plot_max** entries is described in :numref:`config_options`.
 
 The MODE tool generates a color bar to represent the contents of the colortable that was used to plot a field of data. The number of entries in the color bar matches the number of entries in the color table. The values defined for each color in the color table are also plotted next to the color bar.
 
@@ -512,7 +512,7 @@ _____________________
 
   plot_valid_flag = FALSE;
 
-When applied, the **plot_valid_flag entry** indicates that only the region containing valid data after masking is applied should be plotted.
+When applied, the **plot_valid_flag** entry indicates that only the region containing valid data after masking is applied should be plotted.
 
 • **FALSE** indicates the entire domain should be plotted.
 
@@ -564,7 +564,7 @@ _____________________
 
   shift_right = 0;
 
-When MODE is run on global grids, this parameter specifies how many grid squares to shift the grid to the right. MODE does not currently connect objects from one side of a global grid to the other, potentially causing objects straddling the "cut" longitude to be separated into two objects. Shifting the grid by integer number of grid units enables the user to control where that longitude cut line occurs.
+When MODE is run on global grids, this parameter specifies how many grid squares to shift the grid to the right. MODE does not currently connect objects from one side of a global grid to the other, potentially causing objects straddling the "cut" longitude to be separated into two objects. Shifting the grid by an integer number of grid units enables the user to control where that longitude cut line occurs.
 
 .. _MODE-output:
 
@@ -784,9 +784,9 @@ This first file uses the following naming convention:
 
 *mode\_PREFIX\_FCST\_VAR\_LVL\_vs\_OBS\_VAR\_LVL\_HHMMSSL\_YYYYMMDD\_HHMMSSV\_HHMMSSA\_cts.txt*
 
-where *PREFIX* indicates the user-defined output prefix, *FCST\_VAR\_LVL* is the forecast variable and vertical level being used, *OBS\_VAR\_LVL* is the observation variable and vertical level being used, *HHMMSSL* indicates the forecast lead time, *YYYYMMDD\_HHMMSSV* indicates the forecast valid time, and *HHMMSSA* indicates the accumulation period. The {\tt cts} string stands for contingency table statistics. The generation of this file can be disabled using the *ct\_stats\_flag* option in the configuration file. This CTS output file differs somewhat from the CTS output of the Point-Stat and Grid-Stat tools. The columns of this output file are summarized in :numref:`CTS_output`.
+where *PREFIX* indicates the user-defined output prefix, *FCST\_VAR\_LVL* is the forecast variable and vertical level being used, *OBS\_VAR\_LVL* is the observation variable and vertical level being used, *HHMMSSL* indicates the forecast lead time, *YYYYMMDD\_HHMMSSV* indicates the forecast valid time, and *HHMMSSA* indicates the accumulation period. The *cts* string stands for contingency table statistics. The generation of this file can be disabled using the *ct\_stats\_flag* option in the configuration file. This CTS output file differs somewhat from the CTS output of the Point-Stat and Grid-Stat tools. The columns of this output file are summarized in :numref:`CTS_output`.
 
-The second ASCII file the MODE tool generates contains all of the attributes for simple objects, the merged cluster objects, and pairs of objects. Each line in this file contains the same number of columns, though those columns not applicable to a given line contain fill data. The first row of every MODE object attribute file is a header containing the column names. The number of lines in this file depends on the number of objects defined. This file contains lines of 6 types that are indicated by the contents of the **OBJECT_ID** column. The **OBJECT_ID** can take the following 6 forms: **FNN, ONN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN**. In each case, **NNN** is a three-digit number indicating the object index. While all lines have the first 18 header columns in common, these 6 forms for **OBJECT_ID** can be divided into two types - one for single objects and one for pairs of objects. The single object lines **(FNN, ONN, CFNNN**, and **CONNN)** contain valid data in columns 19-39 and fill data in columns 40-51. The object pair lines **(FNNN_ONNN** and **CFNNN_CONNN)** contain valid data in columns 40-51 and fill data in columns 19-39.
+The second ASCII file the MODE tool generates contains all of the attributes for simple objects, the merged cluster objects, and pairs of objects. Each line in this file contains the same number of columns, though those columns not applicable to a given line contain fill data. The first row of every MODE object attribute file is a header containing the column names. The number of lines in this file depends on the number of objects defined. This file contains lines of 6 types that are indicated by the contents of the **OBJECT_ID** column. The **OBJECT_ID** can take the following 6 forms: **FNNN, ONNN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN**. In each case, **NNN** is a three-digit number indicating the object index. While all lines have the first 18 header columns in common, these 6 forms for **OBJECT_ID** can be divided into two types - one for single objects and one for pairs of objects. The single object lines **(FNNN, ONNN, CFNNN**, and **CONNN)** contain valid data in columns 19-39 and fill data in columns 40-51. The object pair lines **(FNNN_ONNN** and **CFNNN_CONNN)** contain valid data in columns 40-51 and fill data in columns 19-39.
 
 These object identifiers are described in :numref:`MODE_object_attribute`.
 
@@ -964,7 +964,7 @@ The contents of the columns in this ASCII file are summarized in :numref:`MODE_o
     - Double
   * - 37
     - COMPLEXITY
-    - Ratio of the difference between the area of an object and the area of its convex hull divided by the area of the complex hull (unitless)
+    - Ratio of the difference between the area of an object and the area of its convex hull divided by the area of the convex hull (unitless)
     - Double
   * - 38-42
     - INTENSITY_10, _25, _50, _75, _90
@@ -980,7 +980,7 @@ The contents of the columns in this ASCII file are summarized in :numref:`MODE_o
     - Double
   * - 45
     - CENTROID_DIST
-    - Distance between two objects centroids (in grid units)
+    - Distance between two objects' centroids (in grid units)
     - Double
   * - 46
     - BOUNDARY_DIST
@@ -1051,9 +1051,9 @@ The dimensions and variables included in the mode NetCDF files are described in 
   * - NetCDF Dimension
     - Description
   * - lat
-    - Dimension of the latitude (i.e. Number of grid points in the North-South direction)
+    - Dimension of the latitude (i.e., Number of grid points in the North-South direction)
   * - lon
-    - Dimension of the longitude (i.e. Number of grid points in the East-West direction)
+    - Dimension of the longitude (i.e., Number of grid points in the East-West direction)
   * - fcst_thresh_length
     - Number of thresholds applied to the forecast
   * - obs_thresh_length
@@ -1306,7 +1306,7 @@ The dimensions and variables included in the mode NetCDF files are described in 
     - Observation Cluster Convex Hull Point Y-Coordinate
     - Integer
 
-**Postscript File**
+**PostScript File**
 
 Lastly, the MODE tool creates a PostScript plot summarizing the features-based approach used in the verification. The PostScript plot is generated using internal libraries and does not depend on an external plotting package. The generation of this PostScript output can be disabled using the **ps_plot_flag** configuration file option.
 

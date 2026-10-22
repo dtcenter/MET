@@ -13,7 +13,7 @@ Originally developed for the Statistical Hurricane Intensity Prediction Scheme (
 
 .. note:: A future version of the tool will include the capability to remove the model's own vortex, which will allow the user to specify any arbitrary track (such as the operational center's official forecast). Until then, users are advised that the track selected must be consistent with the model's predicted track.
 
-TC-Diag is run once for each initialization time to produce diagnostics for each user-specified combination of TC tracks and model fields. The user provides track data (such as one or more ATCF a-deck track files), along with track filtering criteria as needed, to select one or more tracks to be processed. The user also provides gridded model data from which diagnostics should be computed. Gridded data can be provided for multiple concurrent storms, multiple models, and/or multiple domains (i.e. parent and nest) in a single run.
+TC-Diag is run once for each initialization time to produce diagnostics for each user-specified combination of TC tracks and model fields. The user provides track data (such as one or more ATCF a-deck track files), along with track filtering criteria as needed, to select one or more tracks to be processed. The user also provides gridded model data from which diagnostics should be computed. Gridded data can be provided for multiple concurrent storms, multiple models, and/or multiple domains (i.e., parent and nest) in a single run.
 
 TC-Diag first determines the list of valid times that appear in any one of the tracks. For each valid time, it processes all track points for that time. For each track point, it reads the gridded model fields requested in the configuration file and transforms the gridded data to a range-azimuth cylindrical coordinates grid, as described for the TC-RMW tool in :numref:`tc-rmw`. For each domain, it writes the range-azimuth data to a temporary NetCDF file, as described in :numref:`Contributor's Guide Section %s <tmp_files_tc_diag>`.
 
@@ -39,7 +39,7 @@ The following sections describe the usage statement, required arguments, and opt
 
   Usage: tc_diag
          -data domain tech_id_list [ file_1 ... file_n | file_list ]
-         -deck file
+         -deck path
          -config file
          [-outdir path]
          [-log file]
@@ -52,7 +52,7 @@ Required Arguments for tc_diag
 
 1. The **-data domain tech_id_list [ file_1 ... file_n | file_list ]** option specifies a domain name, a comma-separated list of ATCF tech ID's, and a list of gridded data files or an ASCII file containing a list of files to be used, as described in :numref:`ascii_file_lists`. Specify **-data** once for each gridded data source.
 
-2. The **-deck source** option is the ATCF format track data source.
+2. The **-deck path** option is the ATCF format track data source.
 
 3. The **-config file** option is the TCDiagConfig file to be used. The contents of the configuration file are discussed below.
 
@@ -126,17 +126,17 @@ Configuring Domain Information
      }
   ];
 
-The **domain_info** entry is an array of dictionaries. Each dictionary consists of five entries. The **domain** entry is a user-specified string that provides a name for the domain. Each **domain** name must also appear in a **-deck** command line option, and the reverse is also true.
+The **domain_info** entry is an array of dictionaries. Each dictionary consists of five entries. The **domain** entry is a user-specified string that provides a name for the domain. Each **domain** name must also appear in a **-data** command line option, and the reverse is also true.
 
 The **n_range** entry is an integer specifying the number of equally spaced range intervals in the range-azimuth grid to be used for this data source.
 
-The **n_azimuth** entry is an integer specifying the number of equally spaced azimuth intervals in the range-azimuth grid to be used for this data source. The azimuthal grid spacing is 360 / **n_azimuth** degrees. Azimuths are defined by MET as *degrees clockwise* from due east. However, the TC-Diag Python code expects them as *radians counter-clockwise* from due east. The **tc_diag_driver/post_resample_driver.py** driver script performs the neccessary rotation and conversion operations.
+The **n_azimuth** entry is an integer specifying the number of equally spaced azimuth intervals in the range-azimuth grid to be used for this data source. The azimuthal grid spacing is 360 / **n_azimuth** degrees. Azimuths are defined by MET as *degrees clockwise* from due east. However, the TC-Diag Python code expects them as *radians counter-clockwise* from due east. The **tc_diag_driver/post_resample_driver.py** driver script performs the necessary rotation and conversion operations.
 
 The **delta_range_km** entry is a floating point value specifying the spacing of the range rings in kilometers.
 
 The **diag_script** entry is an array of strings. Each string specifies the path to a Python script to be executed to compute diagnostics from the transformed cylindrical coordinates data for this domain. When multiple Python diagnostics scripts are run, the union of the diagnostics computed are written to the output.
 
-The **override_diags** entry is an array of strings. Each string specifies the name of diagnostic value to be used for that domain. If set to an empty list, all diagnostics computed by the Python scripts in **diag_script** for that domain will be used. If non-empty, only the specific diagnostics listed will be used.
+The **override_diags** entry is an array of strings. Each string specifies the name of a diagnostic value to be used for that domain. If set to an empty list, all diagnostics computed by the Python scripts in **diag_script** for that domain will be used. If non-empty, only the specific diagnostics listed will be used.
 
 In the default configuration, seen above, the same Python script is run for both the *parent* and *nest* domains, each using a different configuration file. For the *parent* domain, all computed diagnostics are used since **override_diags** is empty. For the *nest* domain, only the specific diagnostics listed in **override_diags** are used to override the *parent* values. In general, diagnostics computed earlier in the list of **domain_info** entries can be overridden by diagnostics computed later in the list.
 
@@ -163,7 +163,7 @@ Configuring regridding options
      shape      = SQUARE;
   }
 
-The **regrid** dictionary is common to multiple MET tools and is described in :numref:`config_options`. It specifies how the input data should be regridded to cylindrical coordinates prior to compute diagnostics. It can be specified separately in each **data.field** array entry, described below. The default setting uses bilinear interpolation for all fields.
+The **regrid** dictionary is common to multiple MET tools and is described in :numref:`config_options`. It specifies how the input data should be regridded to cylindrical coordinates prior to computing diagnostics. It can be specified separately in each **data.field** array entry, described below. The default setting uses bilinear interpolation for all fields.
 
 Configuring Fields, Levels, and Domains
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -207,7 +207,7 @@ Configuring Vortex Removal Option
 
 .. code-block:: none
 
-  vortex_removel = FALSE;
+  vortex_removal = FALSE;
 
 The **vortex_removal** flag entry is a boolean specifying whether or not vortex removal logic should be applied.
 
@@ -233,7 +233,7 @@ If true, all input fields are read efficiently from each file in a single call. 
 These three flag entries are booleans specifying what output data types should be written. At least one of these flags must be set to true.
 
   - The **nc_cyl_grid_flag** entry controls the writing of a NetCDF file containing the cylindrical coordinate range-azimuth data used to compute the diagnostics. These files are written with a `_cyl_grid_{domain}.nc` suffix, where `{domain}` is the domain name specified in the configuration file. One output file is written for each combination of model track and domain.
-  - The **nc_diag_file** entry controls the writing of the computed diagnostics to a NetCDF file. These files are written with a `_diag.nc` suffix. One output file is written for each model track processed.
+  - The **nc_diag_flag** entry controls the writing of the computed diagnostics to a NetCDF file. These files are written with a `_diag.nc` suffix. One output file is written for each model track processed.
   - The **cira_diag_flag** entry controls the writing of the computed diagnostics to a formatted ASCII output file. These files are written with a `_diag.dat` suffix. One output file is written for each model track processed.
 
 .. code-block:: none
@@ -257,15 +257,15 @@ These output files contain tabular ASCII data with diagnostic values either extr
 
   - The **STORM DATA** section contains single diagnostic values either extracted from the ATCF track file or computed from the cylindrical grid for each forecast lead time. This section begins with a line named **TIME** defining the forecast lead time of each track point in hours. The following lines contain the requested storm diagnostics. For example, **MAXWIND** contains the maximum wind speed reported in the ATCF track file and **SST** contains the average sea surface temperature computed in the range/azimuth grid.
 
-  - The **SOUNDING DATA** section contains diagnostics computed separately for each vertical level. The vertical levels are typically the surface (e.g. **SURF**) followed by pressure levels (e.g. **0850**). This section begins with two lines named **NLEV** and **TIME** defining the number of vertical levels and their values and the forecast lead times for which diagnostics were computed, respectively. The level name is appended to each diagnostic name. For example, the **T_0850** contains the average temperature value within the range/azimuth grid at the 850 mb pressure level.
+  - The **SOUNDING DATA** section contains diagnostics computed separately for each vertical level. The vertical levels are typically the surface (e.g., **SURF**) followed by pressure levels (e.g., **0850**). This section begins with two lines named **NLEV** and **TIME** defining the number of vertical levels and their values and the forecast lead times for which diagnostics were computed, respectively. The level name is appended to each diagnostic name. For example, the **T_0850** contains the average temperature value within the range/azimuth grid at the 850 mb pressure level.
 
   - Each diagnostic output line contains:
 
-    - Diagnostic name (with or without the level) e.g. **SHR_MAG** for magnitude of wind shear
+    - Diagnostic name (with or without the level) e.g., **SHR_MAG** for magnitude of wind shear
 
-    - Units string enclosed in parenthesis e.g. **(KT)** for knots
+    - Units string enclosed in parentheses e.g., **(KT)** for knots
 
-    - The diagnostic values computed for each lead time e.g. **13 10 14 ...**
+    - The diagnostic values computed for each lead time e.g., **13 10 14 ...**
 
 **NetCDF Diagnostics Output**
 
@@ -340,11 +340,11 @@ When the **nc_diag_flag** configuration entry is set to true, a NetCDF output fi
 
 **NetCDF Range-Azimuth Output**
 
-When the **nc_rng_azi_flag** configuration entry is set to true, a NetCDF output file containing the cylindrical range-azimuth data is written for each combination of model track provided and domain specified. For example, if three model tracks are provided and data for both *parent* and *nest* domains are provided, six of these NetCDF output files will be written.
+When the **nc_cyl_grid_flag** configuration entry is set to true, a NetCDF output file containing the cylindrical range-azimuth data is written for each combination of model track provided and domain specified. For example, if three model tracks are provided and data for both *parent* and *nest* domains are provided, six of these NetCDF output files will be written.
 
 The NetCDF range-azimuth output is named using the **output_base_format**, described above, followed by **_cyl_grid_{DOMAIN}.nc**, where **{DOMAIN}** is specified by the **domain** string in each **domain_info** array entry.
 
-This NetCDF file contains a concatenation of the data from the temporary NetCDF files created for each track point. For each track point, TC-Diag creates a temporary NetCDF file and calls Python code to read the cylindrical grid data and compute diagnostics. By default, these temporary NetCDF files are deleted at the end of each run, but if the **nc_rng_azi_flag** is true, the data for each track point is concatenated into a single output file for each track.
+This NetCDF file contains a concatenation of the data from the temporary NetCDF files created for each track point. For each track point, TC-Diag creates a temporary NetCDF file and calls Python code to read the cylindrical grid data and compute diagnostics. By default, these temporary NetCDF files are deleted at the end of each run, but if the **nc_cyl_grid_flag** is true, the data for each track point is concatenated into a single output file for each track.
 
 .. note:: Setting the **MET_KEEP_TEMP_FILE** (:numref:`met_keep_temp_file`) environment variable retains the temporary NetCDF cylindrical grid files for development, testing, and debugging purposes.
 
@@ -455,12 +455,12 @@ The NetCDF range-azimuth file contains the dimensions and variables shown in :nu
     - Longitude in degrees east for each range-azimuth grid point
     - Double
   * - single level data
-      (e.g. TMP_Z2, PRMSL_L0)
+      (e.g., TMP_Z2, PRMSL_L0)
     - time, range, azimuth
     - Gridded range-azimuth data on a single level
     - Double
   * - pressure level data
-      (e.g. TMP, HGT)
+      (e.g., TMP, HGT)
     - time, pressure, range, azimuth
     - Gridded range-azimuth data on pressure levels
     - Double

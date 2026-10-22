@@ -34,7 +34,6 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-constexpr char def_user_config[] = "UGridConfig_user";
 constexpr char def_config_prefix[] = "UGridConfig_";
 constexpr char def_config_prefix2[] = "MET_BASE/config/UGridConfig_";
 constexpr double lat_epsilon = 0.00001;
@@ -47,9 +46,6 @@ const array<string, UG_META_VAR_COUNT> COORD_VAR_KEYS = {
       "time", "lat_face", "lon_face", "vert_face", "lat_edge",
       "lon_edge", "lat_node", "lon_node", "cell_id", "init_time"
 };
-
-static double get_nc_var_att_double(const NcVar *nc_var, const char *att_name,
-                                    bool is_required=true);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -551,7 +547,7 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     }
     lengths.add(length);
     dim_size = v->getDim(k).getSize();
-    if (dim_size < offsets[k]) {
+    if (dim_size < static_cast<size_t>(offsets[k])) {
       mlog << Error << "\n" << method_name
            << "offset (" << offsets[k] << ") at " << k
            << "th dimension (" << long(dim_size) << ") is too big for variable \""
@@ -722,7 +718,7 @@ void UGridFile::metadata_coord_variables() {
   // Variables at the coordinate file (could be the same as the data file)
   StringArray var_names;
   get_var_names(_ncMetaFile.get(), &var_names);
-  for (int j=0; j<COORD_VAR_KEYS.size(); j++) {
+  for (size_t j=0; j<COORD_VAR_KEYS.size(); j++) {
     string meta_name = find_metadata_name(COORD_VAR_KEYS[j], var_names);
     if (0 < meta_name.length()) {
       NcVar v = get_var(_ncMetaFile.get(), meta_name.c_str());
