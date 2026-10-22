@@ -121,12 +121,13 @@ void parse_grid_weight(const Grid &grid, const GridWeightType t,
    if((t == GridWeightType::Area || t == GridWeightType::Area_Cntr) &&
       grid.is_ugrid() && !grid.ugrid_has_face_area()) {
       mlog << Error << "\nparse_grid_weight() -> "
-           << "the \"" << conf_key_grid_weight_flag << " = "
+           << R"(the ")" << conf_key_grid_weight_flag << " = "
            << (t == GridWeightType::Area ? conf_val_area : conf_val_area_cntr)
-           << "\" option requires the face area of the unstructured grid. "
-           << "Define \"area_face\" in \"" << conf_key_ugrid_metadata_map
-           << "\" or choose another \"" << conf_key_grid_weight_flag
-           << "\" option.\n\n";
+           << R"(" option requires the face area of the unstructured grid. Define "area_face" in ")"
+           << conf_key_ugrid_metadata_map
+           << R"(" or choose another ")" << conf_key_grid_weight_flag
+           << R"(" option.)" << "\n\n";
+
       exit(1);
    }
 
