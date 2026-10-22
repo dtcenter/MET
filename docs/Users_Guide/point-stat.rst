@@ -132,6 +132,18 @@ observations with the Point-Stat tool or gridded analyses with the Grid-Stat too
 rotation process. While the logic to determine whether input winds are grid-relative varies by file type, specifying the **is_grid_relative = FALSE;** configuration option
 manually overrides that logic and prevents winds from being rotated.
 
+For NetCDF files following the CF conventions, the orientation of each wind component is determined from its **standard_name** attribute rather than being assumed. The
+CF conventions define the "x" and "y" component words as directions along the horizontal grid being used, which need not be true longitude and latitude, while the
+"eastward" and "northward" component words always indicate true earth directions. Therefore the standard names **x_wind**, **y_wind**, **grid_eastward_wind**, and
+**grid_northward_wind** are processed as grid-relative, while **eastward_wind** and **northward_wind** are processed as earth-relative. These component words are
+matched as underscore-delimited tokens, so related wind standard names, such as **x_wind_shear** and **surface_eastward_wind**, are handled in the same way. When the
+**standard_name** attribute is not set, or does not name a horizontal wind component, the winds are assumed to be earth-relative. Note that rotating a U/V pair requires
+that both components share the same orientation. When a file declares them inconsistently, such as pairing **x_wind** with **northward_wind**, MET prints a warning and
+leaves those winds unrotated.
+
+While **x_wind** and **y_wind** data are commonly found in rotated latitude/longitude model output, note that MET does not yet apply a grid-to-earth wind rotation for the
+rotated latitude/longitude projection.
+
 Wind fields which must be rotated include wind direction and both the U and V components of the wind vector. While wind direction can be rotated by itself, both U and V are
 required to rotate either component. When processing U-wind data, MET attempts to read corresponding V-wind data and vice-versa.
 
@@ -145,6 +157,10 @@ In addition to rotating winds, MET can also derive them. If U-wind and V-wind ar
 to derive wind direction, wind speed, and kinetic energy from the U and V components, respectively. If wind speed and direction are present in the input file, request field
 names of **UGRD** or **VGRD** for MET to derive the U and V components from them. Depending on the wind field naming conventions, the configuration options described in
 :numref:`config_wind_field_names` may be required to configure this derivation logic.
+
+When winds are derived or rotated, the wind components needed to compute the requested field are read from the input file as they are stored. The **convert**, **censor_thresh**,
+**censor_val**, **set_attr_\***, and **shift_right** options configured for the requested field are applied once, to the resulting derived or rotated field, rather than to each
+of the input components from which it is computed.
 
 .. _PS_HiRA_framework:
 
