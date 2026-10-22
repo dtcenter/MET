@@ -66,3 +66,6 @@ pb2nc_LDADD = -lvx_stat_out \
 
 EXTRA_DIST = readpb.prm \
 	pb2nc_conf_info.h
+
+# Automake does not track Fortran INCLUDE dependencies
+openpb.$(OBJEXT) closepb.$(OBJEXT) numpbmsg.$(OBJEXT) readpb.$(OBJEXT) dumppb.$(OBJEXT): readpb.prm

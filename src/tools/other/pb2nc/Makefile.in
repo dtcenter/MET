@@ -764,6 +764,9 @@ uninstall-am: uninstall-binPROGRAMS
 
 include ${top_srcdir}/Make-include
 
+# Automake does not track Fortran INCLUDE dependencies
+openpb.$(OBJEXT) closepb.$(OBJEXT) numpbmsg.$(OBJEXT) readpb.$(OBJEXT) dumppb.$(OBJEXT): readpb.prm
+
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
