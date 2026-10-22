@@ -255,6 +255,12 @@ MET Version 13.0.0 Upgrade Instructions
      for the next message type. Now the mass and wind subsets are combined into a single report,
      and each report is written to the dump file for its own message type.
 
+   * TC-Diag output changes when the files listed in the **-data** command line option do not
+     line up one-to-one with the track valid times. As described in MET
+     `#3475 <https://github.com/dtcenter/MET/issues/3475>`_, TC-Diag previously discarded the
+     gridded data it found for those valid times and reported the requested fields as missing.
+     It now uses that data, regardless of the order of the file list.
+
 .. dropdown:: Additional upgrade instructions
 
    Recommendations when upgrading to MET version 13.0.0:
