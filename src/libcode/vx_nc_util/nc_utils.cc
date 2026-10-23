@@ -9,7 +9,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <string.h>
-#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <sys/stat.h>
@@ -3583,44 +3582,75 @@ NcVar get_nc_var_time(const NcFile *nc) {
 //
 ////////////////////////////////////////////////////////////////////////
 
-//  Leaked on purpose: outlives every NcFile that deregisters from it
+namespace {
 
-static std::vector<NcFile *> &nc_file_list() {
-   static std::vector<NcFile *> *list = new std::vector<NcFile *>;
-   return *list;
-}
+class RegisteredNcFile;
+
+//  Head of an intrusive list of the open handles.  A plain pointer is
+//  constant initialized and has no destructor, so it stays valid however
+//  late a handle is released.
+
+RegisteredNcFile *nc_file_head = nullptr;
+
+//  Tracks the handles.  ~NcFile is virtual, so open_ncfile() can still
+//  return std::unique_ptr<NcFile>.
+
+class RegisteredNcFile : public NcFile {
+
+   public:
+
+      RegisteredNcFile(const char *path, FileMode mode) :
+         NcFile(path, mode) { add(); }
+
+      RegisteredNcFile(const char *path, FileMode mode, FileFormat fmt) :
+         NcFile(path, mode, fmt) { add(); }
+
+      ~RegisteredNcFile() override { remove(); }
+
+      RegisteredNcFile *next() const { return Next; }
+
+   private:
+
+      RegisteredNcFile *Prev = nullptr;
+      RegisteredNcFile *Next = nullptr;
+
+      void add();
+      void remove();
+};
+
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////
 
 static void close_nc_files() {
    const char *method_name = "close_nc_files() -> ";
 
-   std::vector<NcFile *> &list = nc_file_list();
-
-   //  Close in reverse order of opening.  This runs before static
-   //  destructors, so mlog is still usable, and a failed close means the
-   //  file may not have been flushed.  NcException derives from
-   //  std::exception, so nothing escapes into the atexit handler.
-   for(auto it = list.rbegin(); it != list.rend(); ++it) {
+   //  The head is the most recently opened, so this closes in reverse
+   //  order of opening.  Closing does not unlink, so the walk stays valid.
+   //  This runs before static destructors, so mlog is still usable, and a
+   //  close that fails means the file may not have been flushed.
+   for(RegisteredNcFile *f = nc_file_head; f; f = f->next()) {
       try {
-         (*it)->close();
+         f->close();
       }
-      catch(const std::exception &e) {
+      catch(const NcException &e) {
          mlog << Warning << "\n" << method_name
               << "trouble closing NetCDF file: " << e.what() << "\n\n";
       }
    }
-
-   list.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-static void register_nc_file(NcFile *nc) {
+namespace {
+
+void RegisteredNcFile::add() {
    static bool registered         = false;
    static bool registered_for_nc4 = false;
 
-   nc_file_list().push_back(nc);
+   Next = nc_file_head;
+   if(nc_file_head) nc_file_head->Prev = this;
+   nc_file_head = this;
 
    if(!registered) {
       std::atexit(close_nc_files);
@@ -3631,7 +3661,7 @@ static void register_nc_file(NcFile *nc) {
    //  one is seen; a classic file first would leave us below HDF5
    if(!registered_for_nc4) {
       int format = 0;
-      if(nc_inq_format(nc->getId(), &format) == NC_NOERR &&
+      if(nc_inq_format(getId(), &format) == NC_NOERR &&
          (format == NC_FORMAT_NETCDF4 || format == NC_FORMAT_NETCDF4_CLASSIC)) {
          std::atexit(close_nc_files);
          registered_for_nc4 = true;
@@ -3641,34 +3671,15 @@ static void register_nc_file(NcFile *nc) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void unregister_nc_file(NcFile *nc) {
+void RegisteredNcFile::remove() {
 
-   std::vector<NcFile *> &list = nc_file_list();
+   if(Prev) Prev->Next = Next;
+   else     nc_file_head = Next;
 
-   auto it = std::find(list.begin(), list.end(), nc);
+   if(Next) Next->Prev = Prev;
 
-   if(it != list.end()) list.erase(it);
+   Prev = Next = nullptr;
 }
-
-////////////////////////////////////////////////////////////////////////
-
-namespace {
-
-//  Tracks the handles.  ~NcFile is virtual, so open_ncfile() can still
-//  return std::unique_ptr<NcFile>.
-
-class RegisteredNcFile : public NcFile {
-
-   public:
-
-      RegisteredNcFile(const char *path, FileMode mode) :
-         NcFile(path, mode) { register_nc_file(this); }
-
-      RegisteredNcFile(const char *path, FileMode mode, FileFormat fmt) :
-         NcFile(path, mode, fmt) { register_nc_file(this); }
-
-      ~RegisteredNcFile() override { unregister_nc_file(this); }
-};
 
 }  // namespace
 
