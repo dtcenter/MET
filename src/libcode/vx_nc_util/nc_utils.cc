@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <string.h>
+#include <cstdlib>
 #include <cstring>
 #include <sys/stat.h>
 
@@ -3573,18 +3574,132 @@ NcVar get_nc_var_time(const NcFile *nc) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+//  HDF5 shuts down from an atexit() handler that runs before static
+//  destructors, so an NcFile closed that late prints "NetCDF: HDF error"
+//  and an HDF5 diagnostic stack.  Close them from our own atexit()
+//  handler instead, registered after HDF5's so it runs first.
+//
+////////////////////////////////////////////////////////////////////////
+
+namespace {
+
+class RegisteredNcFile;
+
+//  Head of an intrusive list of the open handles.  A pointer is constant
+//  initialized and has no destructor, so the head stays valid however late
+//  a handle is released.
+
+RegisteredNcFile *&nc_file_head() {
+   static RegisteredNcFile *head = nullptr;
+   return head;
+}
+
+//  Tracks the handles.  ~NcFile is virtual, so open_ncfile() can still
+//  return std::unique_ptr<NcFile>.
+
+class RegisteredNcFile : public NcFile {
+
+   public:
+
+      RegisteredNcFile(const char *path, FileMode mode) :
+         NcFile(path, mode) { add(); }
+
+      RegisteredNcFile(const char *path, FileMode mode, FileFormat fmt) :
+         NcFile(path, mode, fmt) { add(); }
+
+      ~RegisteredNcFile() override { remove(); }
+
+      RegisteredNcFile *next() const { return Next; }
+
+   private:
+
+      RegisteredNcFile *Prev = nullptr;
+      RegisteredNcFile *Next = nullptr;
+
+      void add();
+      void remove();
+};
+
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////
+
+static void close_nc_files() {
+   const char *method_name = "close_nc_files() -> ";
+
+   //  The head is the most recently opened, so this closes in reverse
+   //  order of opening.  Closing does not unlink, so the walk stays valid.
+   //  This runs before static destructors, so mlog is still usable, and a
+   //  close that fails means the file may not have been flushed.
+   for(RegisteredNcFile *f = nc_file_head(); f; f = f->next()) {
+      try {
+         f->close();
+      }
+      catch(const NcException &e) {
+         mlog << Warning << "\n" << method_name
+              << "trouble closing NetCDF file: " << e.what() << "\n\n";
+      }
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+namespace {
+
+void RegisteredNcFile::add() {
+   static bool registered         = false;
+   static bool registered_for_nc4 = false;
+
+   Next = nc_file_head();
+   if(Next) Next->Prev = this;
+   nc_file_head() = this;
+
+   if(!registered) {
+      std::atexit(close_nc_files);
+      registered = true;
+   }
+
+   //  HDF5 starts up on the first NetCDF-4 open, so register again once
+   //  one is seen; a classic file first would leave us below HDF5
+   if(!registered_for_nc4) {
+      int format = 0;
+      if(nc_inq_format(getId(), &format) == NC_NOERR &&
+         (format == NC_FORMAT_NETCDF4 || format == NC_FORMAT_NETCDF4_CLASSIC)) {
+         std::atexit(close_nc_files);
+         registered_for_nc4 = true;
+      }
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void RegisteredNcFile::remove() {
+
+   if(Prev) Prev->Next = Next;
+   else     nc_file_head() = Next;
+
+   if(Next) Next->Prev = Prev;
+
+   Prev = nullptr;
+   Next = nullptr;
+}
+
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////
 
 std::unique_ptr<NcFile> open_ncfile(const char * nc_name, bool write) {
    std::unique_ptr<NcFile> nc;
 
    try {
       if (write) {
-         nc = std::make_unique<NcFile>(nc_name, NcFile::replace, NcFile::nc4);
+         nc = std::make_unique<RegisteredNcFile>(nc_name, NcFile::replace, NcFile::nc4);
       }
       else {
          struct stat fileInfo;
          if (stat(nc_name, &fileInfo) == 0) {
-            nc = std::make_unique<NcFile>(nc_name, NcFile::read);
+            nc = std::make_unique<RegisteredNcFile>(nc_name, NcFile::read);
          }
       }
    }

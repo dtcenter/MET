@@ -1177,6 +1177,10 @@ void process_out_files(const TrackInfoArray& tracks) {
 
    } // end for i_trk
 
+   // Close the temp and output files
+   tmp_file_map.clear();
+   out_file_map.clear();
+
    return;
 }
 
@@ -2145,12 +2149,11 @@ void TmpFileInfo::clear() {
 
    domain.clear();
 
-   // Delete the temp file
-   if(tmp_out.get()) {
+   // Close and delete the temp file
+   close();
 
-      remove_temp_file(tmp_file);
+   if(!tmp_file.empty()) remove_temp_file(tmp_file);
 
-      }
    tmp_file.clear();
 
    return;
