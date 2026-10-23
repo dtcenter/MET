@@ -31,12 +31,6 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
 
   .. dropdown:: Bugfixes
 
-     * **Fix the wind rotation logic to determine the orientation of CF-compliant NetCDF winds from the "standard_name" variable attribute**
-       (`#1518 <https://github.com/dtcenter/MET/issues/1518>`_).
-     * **Fix the wind derivation and rotation logic to apply the "convert", "censor_thresh", "censor_val", "set_attr_\*", and "shift_right" options once, to the derived or rotated field**
-       (`#1518 <https://github.com/dtcenter/MET/issues/1518>`_).
-     * Fix the wind derivation and rotation logic to stop printing warning messages when a single search for a wind component finds no match
-       (`#1518 <https://github.com/dtcenter/MET/issues/1518>`_).
      * Fix failures and warnings when compiling with clang
        (`#3291 <https://github.com/dtcenter/MET/issues/3291>`_).
      * Fix NetCDF CF convention support to read Stage IV precipitation files
@@ -294,21 +288,6 @@ MET Version 13.0.0 Upgrade Instructions
 
    MET version 13.0.0 modifies existing output data values in the following ways:
 
-   * Derived and rotated wind fields change when the "convert", "censor_thresh", "censor_val",
-     "set_attr\_\*", or "shift_right" options are used. As described in MET
-     `#1518 <https://github.com/dtcenter/MET/issues/1518>`_, those options were previously applied
-     to each wind component read to compute the requested field and then again to the result. They
-     are now applied once, to the derived or rotated field. See
-     :numref:`PS_wind_rotation_derivation` for details.
-
-   * Wind fields read from CF-compliant NetCDF files change in two ways, as described in MET
-     `#1518 <https://github.com/dtcenter/MET/issues/1518>`_. First, the orientation of each wind
-     component is now determined from its "standard_name" variable attribute rather than always
-     being assumed to be earth-relative, so components declared as "x_wind" or "y_wind" are now
-     rotated. Second, reading the same CF wind field more than once, as the Ensemble-Stat,
-     Point-Stat, and Pair-Stat tools do, previously rotated it on the second and subsequent reads.
-     Those unintended rotations no longer occur.
-
    * Ranked probability statistics found in the RPS line type and written by Ensemble-Stat and the
      HiRA algorithm of Point-Stat are modified slightly. As described in MET
      `#3396 <https://github.com/dtcenter/MET/issues/3396>`_, improvements to the RPS computation
@@ -371,7 +350,7 @@ MET Version 13.0.0 Upgrade Instructions
    * Users reading winds from CF-compliant NetCDF files on projections for which rotation applies,
      such as Lambert conformal, polar stereographic, and Mercator, should check the "standard_name"
      attribute of their wind variables. Setting the "is_grid_relative" configuration option
-     continues to override the orientation determined from the file.
+     overrides the orientation determined from the file.
 
    * The "MET_OBS_ERROR_TABLE" environment variable is renamed to "MET_OBS_ERR_TABLE", and the
      default *share/met/table_files/obs_error_table.txt* file is renamed to *obs_err_table.txt*,
