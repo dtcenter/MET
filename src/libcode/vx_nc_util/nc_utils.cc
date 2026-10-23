@@ -3593,15 +3593,22 @@ static std::vector<NcFile *> &nc_file_list() {
 ////////////////////////////////////////////////////////////////////////
 
 static void close_nc_files() {
+   const char *method_name = "close_nc_files() -> ";
 
    std::vector<NcFile *> &list = nc_file_list();
 
-   //  Close in reverse order of opening
+   //  Close in reverse order of opening.  This runs before static
+   //  destructors, so mlog is still usable, and a failed close means the
+   //  file may not have been flushed.  NcException derives from
+   //  std::exception, so nothing escapes into the atexit handler.
    for(auto it = list.rbegin(); it != list.rend(); ++it) {
       try {
          (*it)->close();
       }
-      catch(...) {}  //  exiting, nowhere useful to report this
+      catch(const std::exception &e) {
+         mlog << Warning << "\n" << method_name
+              << "trouble closing NetCDF file: " << e.what() << "\n\n";
+      }
    }
 
    list.clear();
