@@ -684,7 +684,14 @@ LineDataFile::~LineDataFile()
 
 {
 
-close();
+try { close(); }
+catch(...) {
+   //  a destructor must not propagate exceptions.  fputs is used
+   //  rather than mlog or cerr because neither is guaranteed not
+   //  to throw, which would defeat the purpose of this catch.
+   fputs("\nWARNING: LineDataFile::~LineDataFile() -> "
+         "ignoring exception thrown during cleanup\n\n", stderr);
+}
 
 }
 
@@ -983,7 +990,14 @@ LineDataFiles::~LineDataFiles()
 
 {
 
-clear();
+try { clear(); }
+catch(...) {
+   //  a destructor must not propagate exceptions.  fputs is used
+   //  rather than mlog or cerr because neither is guaranteed not
+   //  to throw, which would defeat the purpose of this catch.
+   fputs("\nWARNING: LineDataFiles::~LineDataFiles() -> "
+         "ignoring exception thrown during cleanup\n\n", stderr);
+}
 
 }
 

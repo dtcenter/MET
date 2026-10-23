@@ -56,8 +56,8 @@ def field_at_times(track: pd.DataFrame,
         if time not in column.index:
             column.loc[time] = np.nan
 
-    column.sort_index(inplace=True)
-    column.interpolate(method=method, inplace=True)
+    column = column.sort_index()
+    column = column.interpolate(method=method)
 
     if not union_times:
         column = column.loc[times]

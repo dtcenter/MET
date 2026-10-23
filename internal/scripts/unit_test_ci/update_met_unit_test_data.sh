@@ -35,7 +35,7 @@ NEXT_RELEASE_DIR=${UNIT_TEST_DATA_DIR}/${NEXT_RELEASE}
 
 # exit if next release directory (e.g. v12.1) does not exist
 
-if [ ! -d "${NEXT_RELEASE_DIR}" ]; then
+if [[ ! -d "${NEXT_RELEASE_DIR}" ]]; then
     echo "Next release directory does not exist: ${NEXT_RELEASE_DIR}"
     echo "Exiting..."
     exit 0
@@ -45,7 +45,7 @@ fi
 # check if vX.Y/unit_test-all.tgz exists and exit if not
 
 UPDATE_DATA_TARFILE_PATH=${NEXT_RELEASE_DIR}/${INPUT_DATA_TARFILE_NAME}
-if [ ! -f "${UPDATE_DATA_TARFILE_PATH}" ]; then
+if [[ ! -f "${UPDATE_DATA_TARFILE_PATH}" ]]; then
     echo "ERROR: Tarfile must exist in ${NEXT_RELEASE} dir: ${UPDATE_DATA_TARFILE_PATH}"
     exit 1
 fi

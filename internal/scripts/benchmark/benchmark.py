@@ -291,7 +291,7 @@ def parse_config(path=None, data=None, tag='!ENV'):
     :param str tag: the tag to look for
     """
     # pattern for global vars: look for ${word}
-    pattern = re.compile(r'.*?\${(\w+)}.*?')
+    pattern = re.compile(r'.*?\${(\w+)}')
     loader = yaml.SafeLoader
 
     # the tag will be used to mark where to start searching for the pattern
@@ -602,7 +602,7 @@ def calc_means_for_metrics(input_df: pd.DataFrame) -> pd.DataFrame:
 
         # add this unique filename/function/line  dataframe to the final dataframe
         final_mean_df = pd.concat([final_mean_df, mean_df])
-        final_mean_df.drop(['new_index'], axis=1, inplace=True)
+        final_mean_df = final_mean_df.drop(['new_index'], axis=1)
 
     return final_mean_df
 
