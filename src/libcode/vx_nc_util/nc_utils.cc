@@ -9,6 +9,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <string.h>
+#include <algorithm>
+#include <cstdlib>
 #include <cstring>
 #include <sys/stat.h>
 
@@ -3573,18 +3575,109 @@ NcVar get_nc_var_time(const NcFile *nc) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+//  HDF5 shuts down from an atexit() handler that runs before static
+//  destructors, so an NcFile closed that late prints "NetCDF: HDF error"
+//  and an HDF5 diagnostic stack.  Close them from our own atexit()
+//  handler instead, registered after HDF5's so it runs first.
+//
+////////////////////////////////////////////////////////////////////////
+
+//  Leaked on purpose: outlives every NcFile that deregisters from it
+
+static std::vector<NcFile *> &nc_file_list() {
+   static std::vector<NcFile *> *list = new std::vector<NcFile *>;
+   return *list;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void close_nc_files() {
+
+   std::vector<NcFile *> &list = nc_file_list();
+
+   //  Close in reverse order of opening
+   for(auto it = list.rbegin(); it != list.rend(); ++it) {
+      try {
+         (*it)->close();
+      }
+      catch(...) {}  //  exiting, nowhere useful to report this
+   }
+
+   list.clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void register_nc_file(NcFile *nc) {
+   static bool registered         = false;
+   static bool registered_for_nc4 = false;
+
+   nc_file_list().push_back(nc);
+
+   if(!registered) {
+      std::atexit(close_nc_files);
+      registered = true;
+   }
+
+   //  HDF5 starts up on the first NetCDF-4 open, so register again once
+   //  one is seen; a classic file first would leave us below HDF5
+   if(!registered_for_nc4) {
+      int format = 0;
+      if(nc_inq_format(nc->getId(), &format) == NC_NOERR &&
+         (format == NC_FORMAT_NETCDF4 || format == NC_FORMAT_NETCDF4_CLASSIC)) {
+         std::atexit(close_nc_files);
+         registered_for_nc4 = true;
+      }
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void unregister_nc_file(NcFile *nc) {
+
+   std::vector<NcFile *> &list = nc_file_list();
+
+   auto it = std::find(list.begin(), list.end(), nc);
+
+   if(it != list.end()) list.erase(it);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+namespace {
+
+//  Tracks the handles.  ~NcFile is virtual, so open_ncfile() can still
+//  return std::unique_ptr<NcFile>.
+
+class RegisteredNcFile : public NcFile {
+
+   public:
+
+      RegisteredNcFile(const char *path, FileMode mode) :
+         NcFile(path, mode) { register_nc_file(this); }
+
+      RegisteredNcFile(const char *path, FileMode mode, FileFormat fmt) :
+         NcFile(path, mode, fmt) { register_nc_file(this); }
+
+      ~RegisteredNcFile() override { unregister_nc_file(this); }
+};
+
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////
 
 std::unique_ptr<NcFile> open_ncfile(const char * nc_name, bool write) {
    std::unique_ptr<NcFile> nc;
 
    try {
       if (write) {
-         nc = std::make_unique<NcFile>(nc_name, NcFile::replace, NcFile::nc4);
+         nc = std::make_unique<RegisteredNcFile>(nc_name, NcFile::replace, NcFile::nc4);
       }
       else {
          struct stat fileInfo;
          if (stat(nc_name, &fileInfo) == 0) {
-            nc = std::make_unique<NcFile>(nc_name, NcFile::read);
+            nc = std::make_unique<RegisteredNcFile>(nc_name, NcFile::read);
          }
       }
    }

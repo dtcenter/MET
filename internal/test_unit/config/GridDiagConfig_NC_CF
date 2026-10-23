@@ -1,0 +1,80 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Grid-Diag configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Data description 
+//
+desc = "NC_CF";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output grid
+//
+regrid = {
+   to_grid    = NONE;
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// May be set separately in each "field" entry
+//
+censor_thresh = [];
+censor_val    = [];
+
+//
+// Specify the handling of missing data for power spectra
+//
+power_spectrum = {
+   missing_flag  = NONE;
+   missing_value = 0.0;
+   vld_thresh    = 0.5;
+}
+
+//
+// Data fields
+//
+data = {
+   field = [
+      {
+         name   = "precipitation_amount";
+         level  = ["(*,*)"];
+         n_bins = 50;
+         range  = [0, 50];
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Geographic masking regions
+//
+mask = {
+   grid = [];
+   poly = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Diagnostic output types
+//
+output_flag = {
+   histogram_1d   = TRUE;
+   histogram_2d   = TRUE;
+   info_theory    = FALSE;
+   power_spectrum = FALSE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
