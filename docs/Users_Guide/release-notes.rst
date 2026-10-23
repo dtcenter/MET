@@ -347,6 +347,11 @@ MET Version 13.0.0 Upgrade Instructions
 
    Recommendations when upgrading to MET version 13.0.0:
 
+   * Users reading winds from CF-compliant NetCDF files on projections for which rotation applies,
+     such as Lambert conformal, polar stereographic, and Mercator, should check the "standard_name"
+     attribute of their wind variables. Setting the "is_grid_relative" configuration option
+     overrides the orientation determined from the file.
+
    * The "MET_OBS_ERROR_TABLE" environment variable is renamed to "MET_OBS_ERR_TABLE", and the
      default *share/met/table_files/obs_error_table.txt* file is renamed to *obs_err_table.txt*,
      as described in :numref:`met_obs_err_table`. The old environment variable name is still
