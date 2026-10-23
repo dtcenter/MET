@@ -200,12 +200,19 @@
   <!-- a coarser grid using AW_MEAN and AW_MEAN_CNTR. The 1.0 degree   -->
   <!-- input is an exact subsample of the 0.25 degree input.          -->
 
+  <!-- MET #3336: The first -field requests a GRIB2 field which does  -->
+  <!-- not exist. Regrid-Data-Plane should warn about it and continue -->
+  <!-- on to the remaining fields, leaving the output unchanged.      -->
+  <!-- Previously it segfaulted while determining the input grid, and -->
+  <!-- the input grid loop re-read the first -field on every pass.    -->
+
   <test name="regrid_data_plane_GFS_0P25_TO_1P00_NEAREST">
     <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f024.grib2 \
       'latlon 360 181 -90 0 1 1' \
       &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_0P25_TO_1P00_NEAREST.nc \
+      -field 'name="NO_SUCH_GRIB2_FIELD"; level="Z0";' \
       -field 'name="HGT"; level="P500";' \
       -field 'name="TMP"; level="Z2";' \
       -method NEAREST -width 1 \

@@ -258,7 +258,7 @@ void static process_data_file() {
 
    field_count = 0;
    for(int i=0; i<FieldSA.n_elements(); i++) {
-      config.read_string(FieldSA[0].c_str());
+      config.read_string(FieldSA[i].c_str());
       if (vinfo->set_dict(config, false)) {
          field_count++;
          break;
