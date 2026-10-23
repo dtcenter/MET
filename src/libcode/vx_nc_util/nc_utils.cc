@@ -3586,11 +3586,14 @@ namespace {
 
 class RegisteredNcFile;
 
-//  Head of an intrusive list of the open handles.  A plain pointer is
-//  constant initialized and has no destructor, so it stays valid however
-//  late a handle is released.
+//  Head of an intrusive list of the open handles.  A pointer is constant
+//  initialized and has no destructor, so the head stays valid however late
+//  a handle is released.
 
-RegisteredNcFile *nc_file_head = nullptr;
+RegisteredNcFile *&nc_file_head() {
+   static RegisteredNcFile *head = nullptr;
+   return head;
+}
 
 //  Tracks the handles.  ~NcFile is virtual, so open_ncfile() can still
 //  return std::unique_ptr<NcFile>.
@@ -3629,7 +3632,7 @@ static void close_nc_files() {
    //  order of opening.  Closing does not unlink, so the walk stays valid.
    //  This runs before static destructors, so mlog is still usable, and a
    //  close that fails means the file may not have been flushed.
-   for(RegisteredNcFile *f = nc_file_head; f; f = f->next()) {
+   for(RegisteredNcFile *f = nc_file_head(); f; f = f->next()) {
       try {
          f->close();
       }
@@ -3648,9 +3651,9 @@ void RegisteredNcFile::add() {
    static bool registered         = false;
    static bool registered_for_nc4 = false;
 
-   Next = nc_file_head;
-   if(nc_file_head) nc_file_head->Prev = this;
-   nc_file_head = this;
+   Next = nc_file_head();
+   if(Next) Next->Prev = this;
+   nc_file_head() = this;
 
    if(!registered) {
       std::atexit(close_nc_files);
@@ -3674,11 +3677,12 @@ void RegisteredNcFile::add() {
 void RegisteredNcFile::remove() {
 
    if(Prev) Prev->Next = Next;
-   else     nc_file_head = Next;
+   else     nc_file_head() = Next;
 
    if(Next) Next->Prev = Prev;
 
-   Prev = Next = nullptr;
+   Prev = nullptr;
+   Next = nullptr;
 }
 
 }  // namespace
