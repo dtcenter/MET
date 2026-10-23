@@ -50,7 +50,7 @@ data = {
          name   = "precipitation_amount";
          level  = ["(*,*)"];
          n_bins = 50;
-         range  = [0, 50];
+         range  = [0, 650];
       }
    ];
 }
