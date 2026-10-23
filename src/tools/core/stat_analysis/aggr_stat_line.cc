@@ -283,9 +283,12 @@ void aggr_summary_lines(LineDataFiles &f, STATAnalysisJob &job,
          //
          // Derive continuous statistics
          //
-         else if(do_cnt && (line.type() == STATLineType::sl1l2 ||
-                            line.type() == STATLineType::sal1l2)) {
+         else if(do_cnt && line.type() == STATLineType::sl1l2) {
             parse_sl1l2_line(line, sl1l2_info);
+            compute_cntinfo(sl1l2_info, cnt_info);
+         }
+         else if(do_cnt && line.type() == STATLineType::sal1l2) {
+            parse_sal1l2_line(line, sl1l2_info);
             compute_cntinfo(sl1l2_info, cnt_info);
          }
 
