@@ -283,7 +283,7 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
 
 bool VarInfoGrib::set_dict(Dictionary & dict, bool do_exit) {
 
-   VarInfo::set_dict(dict);
+   if(!VarInfo::set_dict(dict, do_exit)) return false;
 
    ConcatString field_name = dict.lookup_string(conf_key_name,            false);
    int field_ptv           = dict.lookup_int   (conf_key_GRIB1_ptv,       false);

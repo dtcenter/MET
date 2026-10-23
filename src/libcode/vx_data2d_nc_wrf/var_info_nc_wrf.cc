@@ -160,7 +160,7 @@ void VarInfoNcWrf::set_magic(const ConcatString &nstr, const ConcatString &lstr)
 
 bool VarInfoNcWrf::set_dict(Dictionary & dict, bool do_exit) {
 
-   bool status = VarInfo::set_dict(dict);
+   bool status = VarInfo::set_dict(dict, do_exit);
 
    set_magic(dict.lookup_string("name"),
              dict.lookup_string("level"));
