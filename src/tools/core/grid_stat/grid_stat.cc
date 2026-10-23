@@ -153,6 +153,10 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
+static void setup_ugrid(GrdFileType, GrdFileType);
+#ifdef WITH_UGRID
+static void open_ugrid_metadata(Met2dDataFile *, ConcatString &, const char *);
+#endif
 static void setup_first_pass    (const DataPlane &);
 
 static void setup_txt_files(unixtime, int);
@@ -192,6 +196,10 @@ static void finish_txt_files();
 
 static void clean_up();
 
+static int  ugrid_max_n_points();
+static void smooth_vx_field(const DataPlane &, DataPlane &, InterpMthd,
+                            const InterpInfo *, int);
+
 static void usage(int exit_code=1);
 static void set_outdir(const StringArray &);
 static void set_compress(const StringArray &);
@@ -230,7 +238,6 @@ void process_command_line(int argc, char **argv) {
    CommandLine cline;
    GrdFileType ftype, otype;
    ConcatString default_config_file;
-   const char *method_name = "process_command_line() -> ";
 
    // Set the default output directory
    out_dir = replace_path(default_out_dir);
@@ -304,48 +311,8 @@ void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(ftype, otype);
 
-   if (FileType_UGrid == ftype || FileType_UGrid == otype) {
-#ifdef WITH_UGRID
-      ConcatString ugrid_dataset = conf_info.ugrid_dataset;
-      if (0 < ugrid_dataset.length()) {
-         double max_distance_km = conf_info.ugrid_max_distance_km;
-         ConcatString ugrid_nc = conf_info.ugrid_nc;
-         ConcatString ugrid_map_config_filename = conf_info.ugrid_map_config;
-         if (FileType_UGrid == ftype) {
-            MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf.get();
-            ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
-                                           ugrid_map_config_filename);
-            if (0 == ugrid_nc.length() || ugrid_nc == "NA") {
-               ConcatString coordinate_file = ugrid_mtddf->coordinate_file();
-               ugrid_nc = (0 < coordinate_file.length()) ? coordinate_file : fcst_file;
-            }
-            ugrid_mtddf->open_metadata(ugrid_nc.c_str());
-            mlog << Debug(9) << method_name
-                 << "FCST: ugrid_coordinates_nc: " << ugrid_nc
-                 << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
-         }
-         if (FileType_UGrid == otype) {
-            MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)obs_mtddf.get();
-            ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
-                                           ugrid_map_config_filename);
-            if (0 == ugrid_nc.length() || ugrid_nc == "NA") {
-               ConcatString coordinate_file = ugrid_mtddf->coordinate_file();
-               ugrid_nc = (0 < coordinate_file.length()) ? coordinate_file : fcst_file;
-            }
-            ugrid_mtddf->open_metadata(ugrid_nc.c_str());
-            mlog << Debug(9) << method_name
-                 << "OBS: ugrid_coordinates_nc: " << ugrid_nc
-                 << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
-         }
-      }
-      else {
-         mlog << Error << "\n" << method_name
-              << conf_key_ugrid_dataset << " is not defined at the configuration file.\n\n";
-      }
-#else
-      ugrid_compile_error(method_name);
-#endif
-   }
+   // Read the unstructured grid metadata, if needed
+   setup_ugrid(ftype, otype);
 
    // Update the input grid, if needed
    update_mtddf_grid(fcst_mtddf.get(), conf_info.vx_opt[0].fcst_info.get());
@@ -354,6 +321,9 @@ void process_command_line(int argc, char **argv) {
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.vx_opt[0].fcst_info->regrid(),
                         &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
+
+   // Check the options which are not supported for the unstructured grid
+   if(grid.is_ugrid()) conf_info.check_ugrid();
 
    // Compute weight for each grid point
    parse_grid_weight(grid, conf_info.grid_weight_flag, wgt_dp);
@@ -377,6 +347,60 @@ void process_command_line(int argc, char **argv) {
 
    return;
 }
+
+////////////////////////////////////////////////////////////////////////
+//
+// For an unstructured grid, apply the UGRID configuration and read the
+// UGRID metadata (coordinates) of the forecast and observation files.
+//
+////////////////////////////////////////////////////////////////////////
+
+void setup_ugrid(GrdFileType ftype, GrdFileType otype) {
+   const char *method_name = "process_command_line() -> ";
+
+   if(FileType_UGrid != ftype && FileType_UGrid != otype) return;
+
+#ifdef WITH_UGRID
+   if(conf_info.ugrid_dataset.empty()) {
+      mlog << Error << "\n" << method_name
+           << conf_key_ugrid_dataset << " is not defined at the configuration file.\n\n";
+      return;
+   }
+
+   // The coordinates file found for the forecast is reused for the observation
+   ConcatString ugrid_nc = conf_info.ugrid_nc;
+   if(FileType_UGrid == ftype) open_ugrid_metadata(fcst_mtddf.get(), ugrid_nc, "FCST");
+   if(FileType_UGrid == otype) open_ugrid_metadata(obs_mtddf.get(),  ugrid_nc, "OBS");
+#else
+   ugrid_compile_error(method_name);
+#endif
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+#ifdef WITH_UGRID
+void open_ugrid_metadata(Met2dDataFile *mtddf, ConcatString &ugrid_nc,
+                         const char *label) {
+   auto ugrid_mtddf = static_cast<MetUGridDataFile *>(mtddf);
+
+   ugrid_mtddf->set_ugrid_configs(conf_info.ugrid_dataset,
+                                  conf_info.ugrid_max_distance_km,
+                                  conf_info.ugrid_map_config);
+
+   // Use the coordinates file of the data file, or the forecast file
+   if(ugrid_nc.empty() || ugrid_nc == "NA") {
+      ConcatString coordinate_file = ugrid_mtddf->coordinate_file();
+      ugrid_nc = (!coordinate_file.empty()) ? coordinate_file : fcst_file;
+   }
+   ugrid_mtddf->open_metadata(ugrid_nc.c_str());
+
+   mlog << Debug(9) << "process_command_line() -> "
+        << label << ": ugrid_coordinates_nc: " << ugrid_nc
+        << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
+}
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -855,9 +879,7 @@ void process_scores() {
          // If requested in the config file, smooth the forecast field
          if(interp->field == FieldType::Fcst ||
             interp->field == FieldType::Both) {
-            smooth_field(fcst_dp, fcst_dp_smooth, interp_mthd,
-                         interp->width[j], interp->shape, grid.wrap_lon(),
-                         interp->vld_thresh, interp->gaussian);
+            smooth_vx_field(fcst_dp, fcst_dp_smooth, interp_mthd, interp, j);
          }
          // Do not smooth the forecast field
          else {
@@ -867,9 +889,7 @@ void process_scores() {
          // If requested in the config file, smooth the observation field
          if(interp->field == FieldType::Obs ||
             interp->field == FieldType::Both) {
-            smooth_field(obs_dp, obs_dp_smooth, interp_mthd,
-                         interp->width[j], interp->shape, grid.wrap_lon(),
-                         interp->vld_thresh, interp->gaussian);
+            smooth_vx_field(obs_dp, obs_dp_smooth, interp_mthd, interp, j);
          }
          // Do not smooth the observation field
          else {
@@ -1065,9 +1085,7 @@ void process_scores() {
                // and climatology U-wind fields
                if(interp->field == FieldType::Fcst ||
                   interp->field == FieldType::Both) {
-                  smooth_field(fu_dp, fu_dp_smooth, interp_mthd,
-                               interp->width[j], interp->shape, grid.wrap_lon(),
-                               interp->vld_thresh, interp->gaussian);
+                  smooth_vx_field(fu_dp, fu_dp_smooth, interp_mthd, interp, j);
                }
                // Do not smooth the forecast field
                else {
@@ -1078,10 +1096,7 @@ void process_scores() {
                // U-wind field
                if(interp->field == FieldType::Obs ||
                   interp->field == FieldType::Both) {
-                  smooth_field(ou_dp, ou_dp_smooth,
-                               interp_mthd, interp->width[j],
-                               interp->shape,  grid.wrap_lon(),
-                               interp->vld_thresh, interp->gaussian);
+                  smooth_vx_field(ou_dp, ou_dp_smooth, interp_mthd, interp, j);
                }
                // Do not smooth the observation field
                else {
@@ -3213,6 +3228,59 @@ void finish_txt_files() {
             close_txt_file(txt_out[i], txt_file[i].c_str());
          }
       }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Largest number of the closest faces over all smoothing methods and
+// widths, so that the neighbor table of the unstructured grid is built
+// only once.
+//
+////////////////////////////////////////////////////////////////////////
+
+static int ugrid_max_n_points() {
+   static int n_max = 0;
+
+   if(n_max > 0) return n_max;
+
+   n_max = 1;
+   for(int i=0; i<conf_info.get_n_vx(); i++) {
+      const InterpInfo &info = conf_info.vx_opt[i].interp_info;
+      for(int j=0; j<info.n_interp; j++) {
+         n_max = max(n_max, ugrid_interp_n_points(info.width[j], info.shape));
+      }
+   }
+
+   return n_max;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Smooth the field on the verification grid. For an unstructured grid,
+// use the closest faces of each face instead of the grid template.
+//
+////////////////////////////////////////////////////////////////////////
+
+static void smooth_vx_field(const DataPlane &dp, DataPlane &smooth_dp,
+                            InterpMthd interp_mthd, const InterpInfo *interp, int j) {
+
+   // No smoothing for nearest neighbor (avoid building the neighbor table)
+   if(interp->width[j] == 1 && interp_mthd == InterpMthd::Nearest) {
+      smooth_dp = dp;
+   }
+   else if(grid.is_ugrid()) {
+      // Build the neighbor table once for the largest number of faces
+      smooth_field(dp, smooth_dp, interp_mthd,
+                   interp->width[j], interp->shape, interp->vld_thresh,
+                   *grid.ugrid_neighbor_table(ugrid_max_n_points()));
+   }
+   else {
+      smooth_field(dp, smooth_dp, interp_mthd,
+                   interp->width[j], interp->shape, grid.wrap_lon(),
+                   interp->vld_thresh, interp->gaussian);
    }
 
    return;

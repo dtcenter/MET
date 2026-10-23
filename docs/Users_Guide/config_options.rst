@@ -939,6 +939,10 @@ The "method" entry defines the regridding method to be used.
         behavior, noting that it also divides each input grid box weight by
         the overlap and so will not match exactly.
 
+      * AW_MEAN_CNTR is not supported to regrid from an unstructured grid
+        (UGRID). Use AW_MEAN, which requires the cell area ("area_face").
+        See :ref:`ugrid_limitations`.
+
     * LS_FIT       for a least-squares fit
 
     * BILIN        for bilinear interpolation (width = 2)
@@ -2353,6 +2357,14 @@ applied to the points in the box:
   "topo_mask.flag = FALSE") results in a warning message. Without input
   geography data, GEOG_MATCH produces the same result as NEAREST.
 
+.. note::
+
+  For unstructured grids (UGRIDs), the interpolation is computed from the
+  N closest grid cells, where N is the number of points defined by the
+  width and shape, rather than the N x N box of grid points. The AW_MEAN
+  method, weighted by the cell area, is also supported, and some methods
+  are not supported. See :ref:`ugrid_interpolation` for details.
+
 If multiple "method" and "width" options are specified, all possible
 permutations of their values are applied.
 
@@ -2821,6 +2833,11 @@ Four grid weighting options are currently supported:
    Prior to version 13.0.0, the AREA option computed centered grid box
    areas for Lambert Azimuthal Equal Area grids, unlike all other grid
    projections. Use AREA_CNTR to reproduce that behavior.
+
+.. note::
+   For unstructured grids (UGRIDs), AREA and AREA_CNTR are identical and
+   use the cell area from the "area_face" metadata variable, which is
+   required. See :ref:`ugrid_limitations`.
 
 If requested in the config file, the raw grid weights can be written to
 the NetCDF output from Grid-Stat and Ensemble-Stat.

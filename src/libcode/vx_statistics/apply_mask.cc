@@ -117,6 +117,20 @@ Grid parse_grid_string(const char *grid_str) {
 void parse_grid_weight(const Grid &grid, const GridWeightType t,
                        DataPlane &wgt_dp) {
 
+   // The area of an unstructured grid cell is the optional face area
+   if((t == GridWeightType::Area || t == GridWeightType::Area_Cntr) &&
+      grid.is_ugrid() && !grid.ugrid_has_face_area()) {
+      mlog << Error << "\nparse_grid_weight() -> "
+           << R"(the ")" << conf_key_grid_weight_flag << " = "
+           << (t == GridWeightType::Area ? conf_val_area : conf_val_area_cntr)
+           << R"(" option requires the face area of the unstructured grid. Define "area_face" in ")"
+           << conf_key_ugrid_metadata_map
+           << R"(" or choose another ")" << conf_key_grid_weight_flag
+           << R"(" option.)" << "\n\n";
+
+      exit(1);
+   }
+
    // Initialize
    wgt_dp.clear();
    wgt_dp.set_size(grid.nx(), grid.ny());
