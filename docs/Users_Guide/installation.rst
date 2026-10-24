@@ -175,134 +175,134 @@ directory.
 
 .. note:: Starting with MET-12.0.0, C++17 is the default C++ standard for MET due to the requirements of its dependent libraries. However, MET itself only makes use of C++11 features.
 
-    The ATLAS library (conditionally required for MET, if support for
-    unstructured grids is desired)
-    `versions 0.33.0 <https://github.com/ecmwf/atlas/releases/tag/0.33.0>`_
-    and later requires compiler support for the C++17 standard.
+  The ATLAS library (conditionally required for MET, if support for
+  unstructured grids is desired)
+  `versions 0.33.0 <https://github.com/ecmwf/atlas/releases/tag/0.33.0>`_
+  and later requires compiler support for the C++17 standard.
 
-    At this time, users with systems that do not yet support the C++17
-    standard, can still compile MET with an older C++ standard, using an
-    older version of ATLAS, by adding the MET_CXX_STANDARD variable to
-    the environment configuration file as described in the **OPTIONAL**
-    section below.
+  At this time, users with systems that do not yet support the C++17
+  standard, can still compile MET with an older C++ standard, using an
+  older version of ATLAS, by adding the MET_CXX_STANDARD variable to
+  the environment configuration file as described in the **OPTIONAL**
+  section below.
 
 Environment Variable Descriptions
 ---------------------------------
 
 .. dropdown:: REQUIRED
 
-    **TEST_BASE** – Format is */d1/met/13.0.0*. This is the MET
-    installation directory that was created
-    at the beginning of :numref:`compile_script_install` and contains the
-    **compile_MET_all.sh** script, **tar_files.tgz**,
-    and the *tar_files* directory from the untar command.
+  **TEST_BASE** – Format is */d1/met/13.0.0*. This is the MET
+  installation directory that was created
+  at the beginning of :numref:`compile_script_install` and contains the
+  **compile_MET_all.sh** script, **tar_files.tgz**,
+  and the *tar_files* directory from the untar command.
 
-    **COMPILER** – Format is *compiler_version* (e.g., gnu_8.3.0). For the GNU family of compilers,
-    use “gnu”; for the Intel family of compilers, use “intel”, "intel-classic",
-    “intel-oneapi”, “ics”, “ips”, or “PrgEnv-intel”,
-    depending on the system. If using an Intel compiler, users that have also
-    set the **USE_MODULES** environment variable to TRUE should review the additional
-    information below for proper configuration file setup. In the past, support was
-    provided for the PGI family of compilers through “pgi”. However, this compiler
-    option is no longer actively tested.
+  **COMPILER** – Format is *compiler_version* (e.g., gnu_8.3.0). For the GNU family of compilers,
+  use “gnu”; for the Intel family of compilers, use “intel”, "intel-classic",
+  “intel-oneapi”, “ics”, “ips”, or “PrgEnv-intel”,
+  depending on the system. If using an Intel compiler, users that have also
+  set the **USE_MODULES** environment variable to TRUE should review the additional
+  information below for proper configuration file setup. In the past, support was
+  provided for the PGI family of compilers through “pgi”. However, this compiler
+  option is no longer actively tested.
 
-    **MET_SUBDIR** – Format is */d1/met/13.0.0*. This is the location where the top-level MET
-    subdirectory will
-    be installed and is often set equivalent to **TEST_BASE** (e.g., ${TEST_BASE}).
+  **MET_SUBDIR** – Format is */d1/met/13.0.0*. This is the location where the top-level MET
+  subdirectory will
+  be installed and is often set equivalent to **TEST_BASE** (e.g., ${TEST_BASE}).
 
-    **MET_TARBALL** – Format is *v13.0.0.tar.gz*. This is the name of the downloaded MET tarball.
+  **MET_TARBALL** – Format is *v13.0.0.tar.gz*. This is the name of the downloaded MET tarball.
 
-    **USE_MODULES** – Format is *TRUE* or *FALSE*. Set to FALSE if using a machine that does not use
-    modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on
-    modulefiles, visit the `Wikipedia page <https://en.wikipedia.org/wiki/Environment_Modules_(software)>`_.
-    If the **USE_MODULES** setting is set to true and the compiler is an Intel compiler, please
-    review the additional information below for proper configuration file setup.
+  **USE_MODULES** – Format is *TRUE* or *FALSE*. Set to FALSE if using a machine that does not use
+  modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on
+  modulefiles, visit the `Wikipedia page <https://en.wikipedia.org/wiki/Environment_Modules_(software)>`_.
+  If the **USE_MODULES** setting is set to true and the compiler is an Intel compiler, please
+  review the additional information below for proper configuration file setup.
 
-    **PYTHON_MODULE** -  Format is *PythonModuleName_version* (e.g., python_3.10.4). This environment variable
-    is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load
-    followed by an underscore and version number. For example, setting
-    **PYTHON_MODULE** =python_3.10.4
-    will cause the script to run "module load python/3.10.4".
+  **PYTHON_MODULE** -  Format is *PythonModuleName_version* (e.g., python_3.10.4). This environment variable
+  is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load
+  followed by an underscore and version number. For example, setting
+  **PYTHON_MODULE** =python_3.10.4
+  will cause the script to run "module load python/3.10.4".
 
 .. dropdown:: ADDITIONAL SETTINGS FOR INTEL COMPILER USERS WITH THE USE_MODULES SETTING
 
-    It is necessary for the user to specify (in the install_met_env.<machine> config file) the
-    following environment variables if using the Intel compilers:
+  It is necessary for the user to specify (in the install_met_env.<machine> config file) the
+  following environment variables if using the Intel compilers:
 
-    | For non-oneAPI Intel compilers:
-    |
-    | export FC=ifort
-    | export F77=ifort
-    | export F90=ifort
-    | export CC=icc
-    | export CXX=icpc
+  | For non-oneAPI Intel compilers:
+  |
+  | export FC=ifort
+  | export F77=ifort
+  | export F90=ifort
+  | export CC=icc
+  | export CXX=icpc
 
 
-    | For oneAPI Intel compilers:
-    |
-    | export FC=ifx
-    | export F77=ifx
-    | export F90=ifx
-    | export CC=icx
-    | export CXX=icpx
+  | For oneAPI Intel compilers:
+  |
+  | export FC=ifx
+  | export F77=ifx
+  | export F90=ifx
+  | export CC=icx
+  | export CXX=icpx
 
-    This is due to the machines allowing users to load a module but not setting these environment
-    variables as expected, leading to failed installations. For user convenience, additional
-    generic configuration files have been created that include these settings. Users with a
-    classic Intel compiler are encouraged to use the install_met_env.generic_intel_classic
-    configuration file, and users with a oneAPI Intel compiler should use the
-    install_met_env.generic_intel_oneapi configuration file.
+  This is due to the machines allowing users to load a module but not setting these environment
+  variables as expected, leading to failed installations. For user convenience, additional
+  generic configuration files have been created that include these settings. Users with a
+  classic Intel compiler are encouraged to use the install_met_env.generic_intel_classic
+  configuration file, and users with a oneAPI Intel compiler should use the
+  install_met_env.generic_intel_oneapi configuration file.
 
 .. dropdown:: REQUIRED, IF COMPILING PYTHON EMBEDDING
 
-    **MET_PYTHON** – Format is */usr/local/python3*.
-    This is the location
-    containing the bin, include, lib, and share directories for Python.
+  **MET_PYTHON** – Format is */usr/local/python3*.
+  This is the location
+  containing the bin, include, lib, and share directories for Python.
 
-    **MET_PYTHON_CC** - Format is -I followed by the directory containing
-    the Python include files (e.g., -I/usr/local/python3/include/python3.10).
-    This information may be obtained by
-    running :code:`python3-config --cflags`;
-    however, this command can, on certain systems,
-    provide too much information.
+  **MET_PYTHON_CC** - Format is -I followed by the directory containing
+  the Python include files (e.g., -I/usr/local/python3/include/python3.10).
+  This information may be obtained by
+  running :code:`python3-config --cflags`;
+  however, this command can, on certain systems,
+  provide too much information.
 
-    **MET_PYTHON_LD** - Format is -L followed by the directory containing
-    the Python library
-    files then a space, then -l followed by the necessary Python
-    libraries to link to
-    (e.g., -L/usr/local/python3/lib/\\ -lpython3.10\\
-    -lpthread\\ -ldl\\ -lutil\\ -lm).
-    The backslashes are necessary in the example shown because of
-    the spaces, which will be
-    recognized as the end of the value unless preceded by the “\\”
-    character. Alternatively,
-    a user can provide the value in quotations
-    (e.g., export MET_PYTHON_LD="-L/usr/local/python3/lib/
-    -lpython3.10 -lpthread -ldl -lutil -lm").
-    This information may be obtained by running
-    :code:`python3-config --ldflags --embed`; however,
-    this command can, on certain systems, provide too much information.
+  **MET_PYTHON_LD** - Format is -L followed by the directory containing
+  the Python library
+  files then a space, then -l followed by the necessary Python
+  libraries to link to
+  (e.g., -L/usr/local/python3/lib/\\ -lpython3.10\\
+  -lpthread\\ -ldl\\ -lutil\\ -lm).
+  The backslashes are necessary in the example shown because of
+  the spaces, which will be
+  recognized as the end of the value unless preceded by the “\\”
+  character. Alternatively,
+  a user can provide the value in quotations
+  (e.g., export MET_PYTHON_LD="-L/usr/local/python3/lib/
+  -lpython3.10 -lpthread -ldl -lutil -lm").
+  This information may be obtained by running
+  :code:`python3-config --ldflags --embed`; however,
+  this command can, on certain systems, provide too much information.
 
 .. dropdown:: OPTIONAL
 
-    **export MAKE_ARGS="-j #"** – If there is a need to install external
-    libraries, or to attempt
-    to speed up the MET compilation process, this environmental
-    setting can be added to the
-    environment configuration file. Replace the # with the number
-    of cores to use
-    (as an integer) or simply specify "export MAKE_ARGS=-j"
-    with no integer argument to
-    start as many processes in parallel as possible. Note that Docker
-    has trouble compiling
-    without a specified value of cores to use.  The automated MET
-    testing scripts in the
-    Docker environment have been successful with a value of
-    5 (e.g., export MAKE_ARGS=”-j 5”).
+  **export MAKE_ARGS="-j #"** – If there is a need to install external
+  libraries, or to attempt
+  to speed up the MET compilation process, this environmental
+  setting can be added to the
+  environment configuration file. Replace the # with the number
+  of cores to use
+  (as an integer) or simply specify "export MAKE_ARGS=-j"
+  with no integer argument to
+  start as many processes in parallel as possible. Note that Docker
+  has trouble compiling
+  without a specified value of cores to use.  The automated MET
+  testing scripts in the
+  Docker environment have been successful with a value of
+  5 (e.g., export MAKE_ARGS=”-j 5”).
 
-    **export MET_CXX_STANDARD** - Specify the version of the supported
-    C++ standard. Values may be 11, 14, or 17. The default value is 17.
-    (e.g., export MET_CXX_STANDARD=11)
+  **export MET_CXX_STANDARD** - Specify the version of the supported
+  C++ standard. Values may be 11, 14, or 17. The default value is 17.
+  (e.g., export MET_CXX_STANDARD=11)
 
 
 External Library Handling in compile_MET_all.sh
@@ -310,94 +310,94 @@ External Library Handling in compile_MET_all.sh
 
 .. dropdown:: IF THE USER WANTS TO HAVE THE COMPILATION SCRIPT COMPILE THE LIBRARY DEPENDENCIES
 
-    The **compile_MET_all.sh** script will compile and install MET and its
-    :ref:`required_external_libraries_to_build_MET`, if needed.
-    Note that if these libraries are already installed somewhere on the system,
-    MET will call and use the libraries that were installed by the script.
+  The **compile_MET_all.sh** script will compile and install MET and its
+  :ref:`required_external_libraries_to_build_MET`, if needed.
+  Note that if these libraries are already installed somewhere on the system,
+  MET will call and use the libraries that were installed by the script.
 
 .. dropdown:: IF THE USER ALREADY HAS THE LIBRARY DEPENDENCIES INSTALLED
 
-    If the required external library dependencies have already been installed and don’t
-    need to be reinstalled, or if compiling MET on a machine that uses modulefiles and
-    the user would like to make use of the existing dependent libraries on that machine,
-    there are more environment variables that need to be set to let MET know where those
-    library and header files are. The following environment variables need to be added
-    to the environment configuration file:
+  If the required external library dependencies have already been installed and don’t
+  need to be reinstalled, or if compiling MET on a machine that uses modulefiles and
+  the user would like to make use of the existing dependent libraries on that machine,
+  there are more environment variables that need to be set to let MET know where those
+  library and header files are. The following environment variables need to be added
+  to the environment configuration file:
 
-    +-------------------+--------------------------------+------------------------------+
-    | **Feature**       | **Configuration Option**       | **Environment Variables**    |
-    +===================+================================+==============================+
-    | *Always*          |                                | MET_BUFRLIB,                 |
-    |                   |                                |                              |
-    | *Required*        |                                | BUFRLIB_NAME,                |
-    |                   |                                |                              |
-    |                   |                                | MET_PROJ,                    |
-    |                   |                                |                              |
-    |                   |                                | MET_HDF5,                    |
-    |                   |                                |                              |
-    |                   |                                | MET_NETCDF,                  |
-    |                   |                                |                              |
-    |                   |                                | MET_GSL                      |
-    +-------------------+--------------------------------+------------------------------+
-    | *Optional*        | :code:`--enable-all` or        | MET_GRIB2CLIB,               |
-    |                   |                                |                              |
-    | GRIB2             | :code:`--enable-grib2`         | MET_GRIB2CINC,               |
-    |                   |                                |                              |
-    | Support           |                                | GRIB2CLIB_NAME,              |
-    |                   |                                |                              |
-    |                   |                                | LIB_JASPER,                  |
-    |                   |                                |                              |
-    |                   |                                | LIB_PNG,                     |
-    |                   |                                |                              |
-    |                   |                                | LIB_AEC,                     |
-    |                   |                                |                              |
-    |                   |                                | LIB_Z                        |
-    +-------------------+--------------------------------+------------------------------+
-    | *Optional*        | :code:`--enable-all` or        | MET_PYTHON_BIN_EXE,          |
-    |                   |                                |                              |
-    | Python            | :code:`--enable-python`        | MET_PYTHON_CC,               |
-    |                   |                                |                              |
-    | Support           |                                | MET_PYTHON_LD                |
-    +-------------------+--------------------------------+------------------------------+
-    | *Optional*        | :code:`--enable-all` or        | MET_ATLAS,                   |
-    |                   |                                |                              |
-    | Unstructured Grid | :code:`--enable-ugrid`         | MET_ECKIT                    |
-    |                   |                                |                              |
-    | Support           |                                |                              |
-    +-------------------+--------------------------------+------------------------------+
-    | *Optional*        | :code:`--enable-all` or        | MET_HDF                      |
-    |                   |                                |                              |
-    | LIDAR2NC          | :code:`--enable-lidar2nc`      |                              |
-    |                   |                                |                              |
-    | Support           |                                |                              |
-    +-------------------+--------------------------------+------------------------------+
-    | *Optional*        | :code:`--enable-all` or        | MET_HDF,                     |
-    |                   |                                |                              |
-    | MODIS             | :code:`--enable-modis`         | MET_HDFEOS                   |
-    |                   |                                |                              |
-    | Support           |                                |                              |
-    +-------------------+--------------------------------+------------------------------+
-    | *Optional*        | :code:`--enable-profiler`      |                              |
-    |                   |                                |                              |
-    | Profiler          |                                |                              |
-    |                   |                                |                              |
-    | Support           |                                |                              |
-    +-------------------+--------------------------------+------------------------------+
+  +-------------------+--------------------------------+------------------------------+
+  | **Feature**       | **Configuration Option**       | **Environment Variables**    |
+  +===================+================================+==============================+
+  | *Always*          |                                | MET_BUFRLIB,                 |
+  |                   |                                |                              |
+  | *Required*        |                                | BUFRLIB_NAME,                |
+  |                   |                                |                              |
+  |                   |                                | MET_PROJ,                    |
+  |                   |                                |                              |
+  |                   |                                | MET_HDF5,                    |
+  |                   |                                |                              |
+  |                   |                                | MET_NETCDF,                  |
+  |                   |                                |                              |
+  |                   |                                | MET_GSL                      |
+  +-------------------+--------------------------------+------------------------------+
+  | *Optional*        | :code:`--enable-all` or        | MET_GRIB2CLIB,               |
+  |                   |                                |                              |
+  | GRIB2             | :code:`--enable-grib2`         | MET_GRIB2CINC,               |
+  |                   |                                |                              |
+  | Support           |                                | GRIB2CLIB_NAME,              |
+  |                   |                                |                              |
+  |                   |                                | LIB_JASPER,                  |
+  |                   |                                |                              |
+  |                   |                                | LIB_PNG,                     |
+  |                   |                                |                              |
+  |                   |                                | LIB_AEC,                     |
+  |                   |                                |                              |
+  |                   |                                | LIB_Z                        |
+  +-------------------+--------------------------------+------------------------------+
+  | *Optional*        | :code:`--enable-all` or        | MET_PYTHON_BIN_EXE,          |
+  |                   |                                |                              |
+  | Python            | :code:`--enable-python`        | MET_PYTHON_CC,               |
+  |                   |                                |                              |
+  | Support           |                                | MET_PYTHON_LD                |
+  +-------------------+--------------------------------+------------------------------+
+  | *Optional*        | :code:`--enable-all` or        | MET_ATLAS,                   |
+  |                   |                                |                              |
+  | Unstructured Grid | :code:`--enable-ugrid`         | MET_ECKIT                    |
+  |                   |                                |                              |
+  | Support           |                                |                              |
+  +-------------------+--------------------------------+------------------------------+
+  | *Optional*        | :code:`--enable-all` or        | MET_HDF                      |
+  |                   |                                |                              |
+  | LIDAR2NC          | :code:`--enable-lidar2nc`      |                              |
+  |                   |                                |                              |
+  | Support           |                                |                              |
+  +-------------------+--------------------------------+------------------------------+
+  | *Optional*        | :code:`--enable-all` or        | MET_HDF,                     |
+  |                   |                                |                              |
+  | MODIS             | :code:`--enable-modis`         | MET_HDFEOS                   |
+  |                   |                                |                              |
+  | Support           |                                |                              |
+  +-------------------+--------------------------------+------------------------------+
+  | *Optional*        | :code:`--enable-profiler`      |                              |
+  |                   |                                |                              |
+  | Profiler          |                                |                              |
+  |                   |                                |                              |
+  | Support           |                                |                              |
+  +-------------------+--------------------------------+------------------------------+
 
-    Generally speaking, for each library there is a set of three
-    environment variables that can
-    describe the locations:
-    **$MET_<lib>**, **$MET_<lib>INC** and **$MET_<lib>LIB**.
+  Generally speaking, for each library there is a set of three
+  environment variables that can
+  describe the locations:
+  **$MET_<lib>**, **$MET_<lib>INC** and **$MET_<lib>LIB**.
 
-    The $MET_<lib> environment variable can be used if the external library is
-    installed such that there is a main directory which has a subdirectory called
-    *lib* containing the library files and another subdirectory called *include*
-    containing the include files.
+  The $MET_<lib> environment variable can be used if the external library is
+  installed such that there is a main directory which has a subdirectory called
+  *lib* containing the library files and another subdirectory called *include*
+  containing the include files.
 
-    Alternatively, the $MET_<lib>INC and $MET_<lib>LIB environment variables are used if the
-    library and include files for an external library are installed in separate locations.
-    In this case, both environment variables must be specified and the associated
-    $MET_<lib> variable will be ignored.
+  Alternatively, the $MET_<lib>INC and $MET_<lib>LIB environment variables are used if the
+  library and include files for an external library are installed in separate locations.
+  In this case, both environment variables must be specified and the associated
+  $MET_<lib> variable will be ignored.
 
 Executing the compile_MET_all.sh script
 ---------------------------------------

@@ -34,10 +34,10 @@ Set the required environment variables needed to run.
 
 Example::
 
-    export MET_BASE=/path/to/install/MET/share/met
-    export MET_TEST_BASE=/path/to/src/MET/internal/test_unit
-    export MET_TEST_INPUT=/path/to/MET_unit_test
-    export MET_TEST_OUTPUT=/path/to/my/output_dir
+  export MET_BASE=/path/to/install/MET/share/met
+  export MET_TEST_BASE=/path/to/src/MET/internal/test_unit
+  export MET_TEST_INPUT=/path/to/MET_unit_test
+  export MET_TEST_OUTPUT=/path/to/my/output_dir
 
 Other environment variables required for some of the unit tests include:
 
@@ -48,27 +48,27 @@ Run the tests
 
 Navigate to the *internal/test_unit* directory of the MET repository::
 
-    cd ${MET_TEST_BASE}
+  cd ${MET_TEST_BASE}
 
 To run all of the unit tests, call the *bin/unit_test.sh* script::
 
-    ./bin/unit_test.sh
+  ./bin/unit_test.sh
 
 To run a single unit test group, call the *python/unit.py* script, passing it an XML test config file::
 
-    ./python/unit.py ./xml/unit_pcp_combine.xml
+  ./python/unit.py ./xml/unit_pcp_combine.xml
 
 To generate commands corresponding to a single unit test group, but not actually execute those commands, add the *-cmd* command line argument and redirect the output to a file::
 
-    ./python/unit.py ./xml/unit_pcp_combine.xml -cmd > unit_pcp_combine.sh
+  ./python/unit.py ./xml/unit_pcp_combine.xml -cmd > unit_pcp_combine.sh
 
 Extracting individual commands to be executed in this way can be convenient during the software development process.
 
 .. note::
 
-   Some unit tests depend on the output of other unit tests.
-   For example, *unit_plot_data_plane.xml* requires output from *unit_pcp_combine.xml*.
-   Those dependencies are generally noted in comments at the top of each unit test xml file.
+  Some unit tests depend on the output of other unit tests.
+  For example, *unit_plot_data_plane.xml* requires output from *unit_pcp_combine.xml*.
+  Those dependencies are generally noted in comments at the top of each unit test xml file.
 
 
 Input Data
@@ -87,7 +87,7 @@ Setting up a new web server
 
 .. note::
 
-   These instructions require access to run commands as the *met_test* user on the DTC web server.
+  These instructions require access to run commands as the *met_test* user on the DTC web server.
 
 The GitHub Actions custom action
 `metplus-action-data-update <https://github.com/dtcenter/metplus-action-data-update>`_
@@ -106,11 +106,11 @@ update the input data and set up the next release directory.
 This is not necessarily required, but makes it convenient to find and call the script.
 ::
 
-    runas met_test
-    cd ~/
-    git clone --branch develop https://github.com/dtcenter/MET
-    ln -s MET/internal/scripts/unit_test_ci/setup_met_next_release_data.sh
-    ln -s MET/internal/scripts/unit_test_ci/update_met_unit_test_data.sh
+  runas met_test
+  cd ~/
+  git clone --branch develop https://github.com/dtcenter/MET
+  ln -s MET/internal/scripts/unit_test_ci/setup_met_next_release_data.sh
+  ln -s MET/internal/scripts/unit_test_ci/update_met_unit_test_data.sh
 
 The unit test input data directory contains directories for *develop* and each *vX.Y* version that is supported.
 Each directory should contain a tarfile called **unit_test-all.tgz** and a file called **volume_mount_directories**.
@@ -130,7 +130,7 @@ Setup next development cycle
 
 .. note::
 
-   These instructions require access to run commands as the *met_test* user on the DTC web server.
+  These instructions require access to run commands as the *met_test* user on the DTC web server.
 
 Once the *main_vX.Y* branch for a release has been created, the *develop* branch will contain development
 towards the next release. At this time, a new set of test data should be created for the next
@@ -141,15 +141,15 @@ then a data directory to store data for *v13.0* (or similar) should be created.
 Pull changes from develop to ensure that the latest version of the script is used.
 ::
 
-    runas met_test
-    cd ~/MET
-    git checkout develop
-    git pull
+  runas met_test
+  cd ~/MET
+  git checkout develop
+  git pull
 
 Run the script, passing the *vX.Y* version of the next release as an argument.
 If the script is linked from the home directory, run::
 
-    ~/setup_met_next_release_data.sh v13.0
+  ~/setup_met_next_release_data.sh v13.0
 
 This will create the *v13.0* directory, copy the latest tarfile and volume mount files into *v13.0*,
 extract the tarfile contents into the *v13.0*, and update the symbolic links in the *develop* directory
@@ -160,7 +160,7 @@ Adding new test files
 
 .. note::
 
-   These instructions require access to run commands as the *met_test* user on the DTC web server.
+  These instructions require access to run commands as the *met_test* user on the DTC web server.
 
 Updates to the input data, e.g., adding new test files, are made on the DTC web server.
 The next time the MET CI unit tests are run,
@@ -176,14 +176,14 @@ First, add any new files to the *unit_test* directory so they will be available 
 
 Example::
 
-    cp /path/to/my/file.ext MET_unit_test/unit_test/DIRNAME/
+  cp /path/to/my/file.ext MET_unit_test/unit_test/DIRNAME/
 
 Next, add the new input files in the *unit_test* directory under the *vX.Y* directory that
 corresponds to the current development cycle.
 
 Example::
 
-    cp /path/to/my/file.ext MET_unit_test/v23.1/unit_test/DIRNAME/
+  cp /path/to/my/file.ext MET_unit_test/v23.1/unit_test/DIRNAME/
 
 If any of the files are very large, consider creating a subset of these files.
 For example, GRIB2 files can be subset with *wgrib2* and NetCDF files can be subset using NCO tools.
@@ -192,15 +192,15 @@ After the updates have been made, run the script to update the test data tarfile
 Pull changes from develop to ensure that the latest version of the script is used.
 ::
 
-    runas met_test
-    cd ~/MET
-    git checkout develop
-    git pull
+  runas met_test
+  cd ~/MET
+  git checkout develop
+  git pull
 
 Run the script, passing the *vX.Y* version of the next release as an argument.
 If the script is linked from the home directory, run::
 
-    ~/update_met_unit_test_data.sh v13.0
+  ~/update_met_unit_test_data.sh v13.0
 
 This will save a copy of the input data tarfile with the current date in YYYYMMDD format in case it needs to be recovered,
 then create the tarfile using the contents of the *unit_test* directory.
