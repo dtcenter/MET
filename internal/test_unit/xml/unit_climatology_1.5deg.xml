@@ -77,6 +77,38 @@
     </output>
   </test>
 
+  <test name="climatology_STAT_ANALYSIS_WMO_1.5DEG_SL1L2_SUMMARY_DERIVE">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/climatology_1.5deg</value></pair>
+    </env>
+    <param> \
+      -lookin &OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V.stat \
+      -job summary -line_type SL1L2 -column CNT:ME,CNT:MAE,CNT:RMSE,CNT:PR_CORR \
+      -derive -by FCST_VAR,FCST_LEV \
+      -boot_seed 1 -out &OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_SL1L2_SUMMARY_DERIVE.out
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_SL1L2_SUMMARY_DERIVE.out</exist>
+    </output>
+  </test>
+
+  <test name="climatology_STAT_ANALYSIS_WMO_1.5DEG_SAL1L2_SUMMARY_DERIVE">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/climatology_1.5deg</value></pair>
+    </env>
+    <param> \
+      -lookin &OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V.stat \
+      -job summary -line_type SAL1L2 -column CNT:ANOM_CORR,CNT:ANOM_CORR_UNCNTR,CNT:RMSFA,CNT:RMSOA \
+      -derive -by FCST_VAR,FCST_LEV \
+      -boot_seed 1 -out &OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_SAL1L2_SUMMARY_DERIVE.out
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_SAL1L2_SUMMARY_DERIVE.out</exist>
+    </output>
+  </test>
+
   <test name="climatology_STAT_ANALYSIS_WMO_1.5DEG_FILTER">
     <exec>&MET_BIN;/stat_analysis</exec>
     <env>

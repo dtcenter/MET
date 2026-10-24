@@ -9,6 +9,66 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 13.0.0-beta3 Release Notes (TBD)
+---------------------------------------------
+
+  .. dropdown:: Enhancements
+
+     * **Generalize support for automated derivation of wind speed and direction and rotation of winds from grid to earth-relative**
+       (`#1518 <https://github.com/dtcenter/MET/issues/1518>`_).
+     * **Enhance area-weighted regridding and grid weighting to support centered grid boxes**
+       (`#3178 <https://github.com/dtcenter/MET/issues/3178>`_).
+     * **Add power spectra calculation capability to the Grid-Diag tool in MET**
+       (`#3304 <https://github.com/dtcenter/MET/issues/3304>`_).
+     * Add lookup tables for data types of MET output
+       (`#3384 <https://github.com/dtcenter/MET/issues/3384>`_).
+     * Enhance ``@value`` NetCDF dimension lookup logic to support negative values
+       (`#3406 <https://github.com/dtcenter/MET/issues/3406>`_).
+     * Improve Ensemble-Stat to more efficiently apply observation error corrections and perturbations
+       (`#3426 <https://github.com/dtcenter/MET/issues/3426>`_).
+     * Rename MET configuration options to avoid names like ``warning`` and ``error``
+       (`#3455 <https://github.com/dtcenter/MET/issues/3455>`_).
+
+  .. dropdown:: Bugfixes
+
+     * Fix failures and warnings when compiling with clang
+       (`#3291 <https://github.com/dtcenter/MET/issues/3291>`_).
+     * Fix NetCDF CF convention support to read Stage IV precipitation files
+       (`#3358 <https://github.com/dtcenter/MET/issues/3358>`_).
+     * Fix MPAS UGRID support to correctly handle invalid latitude values
+       (`#3381 <https://github.com/dtcenter/MET/issues/3381>`_).
+     * Refine RPS library code to use centered probability bins
+       (`#3396 <https://github.com/dtcenter/MET/issues/3396>`_).
+     * Enable MPAS UGRID support to parse forecast lead time from diag files
+       (`#3410 <https://github.com/dtcenter/MET/issues/3410>`_).
+     * Fix Ensemble-Stat to skip observations when the observation error table lookup fails
+       (`#3429 <https://github.com/dtcenter/MET/issues/3429>`_).
+     * Fix PB2NC so that derived HPBL output does not depend on which other stations are processed
+       (`#3450 <https://github.com/dtcenter/MET/issues/3450>`_).
+     * Fix the PB2NC ``-dump`` segfault and reduce PB2NC compiler warnings
+       (`#3468 <https://github.com/dtcenter/MET/issues/3468>`_).
+     * Fix Stat-Analysis CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
+       (`#3478 <https://github.com/dtcenter/MET/issues/3478>`_).
+
+  .. dropdown:: Repository, build, and test
+
+     * Update the configuration files and modulefiles
+       (`#3393 <https://github.com/dtcenter/MET/issues/3393>`_).
+     * Remove R dependency from the MET unit test logic
+       (`#3395 <https://github.com/dtcenter/MET/issues/3395>`_).
+     * Upgrade MET to use METbaseimage version 3.5
+       (`#3407 <https://github.com/dtcenter/MET/issues/3407>`_).
+     * Enhance the documentation by correcting broken links and typos
+       (`#3416 <https://github.com/dtcenter/MET/issues/3416>`_).
+     * **Fix SonarQube findings for MET version 13.0.0**
+       (`#3443 <https://github.com/dtcenter/MET/issues/3443>`_).
+     * Update the SonarQube scanner so that the scan runs on Java 21 as required by the upgraded SonarQube server
+       (`#3470 <https://github.com/dtcenter/MET/issues/3470>`_).
+     * Automate link checking with Sphinx
+       (`METplus #3247 <https://github.com/dtcenter/METplus/issues/3247>`_).
+     * Resolve blockers from the AF SonarQube quality gate scanner
+       (METplus-Internal #68, `MET PR #3440 <https://github.com/dtcenter/MET/pull/3440>`_).
+
 MET Version 13.0.0-beta2 Release Notes (20260508)
 -------------------------------------------------
 
@@ -247,6 +307,41 @@ MET Version 13.0.0 Upgrade Instructions
      `#3178 <https://github.com/dtcenter/MET/issues/3178>`_, input grid points within half an
      output grid box of those edges were previously discarded rather than assigned to the
      nearest output grid box.
+
+   * Gridded data read from NetCDF files that follow the CF convention and use a polar
+     stereographic grid mapping may change. As described in MET
+     `#3358 <https://github.com/dtcenter/MET/issues/3358>`_, MET now reads data stored from
+     north to south (negative y spacing), such as the NOAA Stage IV NetCDF precipitation
+     files, and uses the "standard_parallel" attribute to define the grid's scale latitude.
+     Grids and output for affected files, such as their orientation, may differ from previous
+     versions.
+
+   * PBL heights (HPBL) derived by PB2NC may change. As described in MET
+     `#3450 <https://github.com/dtcenter/MET/issues/3450>`_, the PBL derived for a station
+     previously could depend on which other stations were processed in the same run, because
+     unused input records from one station's profile carried over into the next, and deep
+     profiles read past the levels actually stored. The PBL derived for each station now
+     depends only on that station's own observations.
+
+   * The contents of the ASCII files written by the PB2NC "-dump" command line option are
+     corrected. As described in MET `#3468 <https://github.com/dtcenter/MET/issues/3468>`_,
+     MET version 12.2.0 and earlier wrote the mass and wind subsets of each PrepBUFR station
+     report as separate reports and wrote the last report of each message type to the dump file
+     for the next message type. Now the mass and wind subsets are combined into a single report,
+     and each report is written to the dump file for its own message type.
+
+   * Stat-Analysis summary jobs that use the "-derive" option to compute CNT statistics from
+     SAL1L2 input lines now write output. As described in MET
+     `#3478 <https://github.com/dtcenter/MET/issues/3478>`_, the anomaly partial sums were
+     previously not read from SAL1L2 lines, so the derived anomaly statistics (e.g. ANOM_CORR,
+     ANOM_CORR_UNCNTR, RMSFA, and RMSOA) were always bad data and no output was written.
+
+   * The FOBAR and FOABAR columns of the SL1L2 and SAL1L2 output lines written by Point-Stat,
+     Grid-Stat, and Pair-Stat for the climatology bin means (VX_MASK ending in "_BIN_MEAN")
+     now contain the mean across bins. As described in MET
+     `#3478 <https://github.com/dtcenter/MET/issues/3478>`_, these columns were previously
+     always zero, so statistics derived from them, such as RMSE, PR_CORR, and ANOM_CORR,
+     were incorrect.
 
 .. dropdown:: Additional upgrade instructions
 

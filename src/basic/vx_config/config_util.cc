@@ -2662,13 +2662,10 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
    ConcatString tmp_dir_path;
 
    if(!get_env("MET_TMP_DIR", tmp_dir_path)) {
-      if(!dict) {
-         mlog << Error << "\nparse_conf_tmp_dir() -> "
-              << "empty dictionary!\n\n";
-         exit(1);
-      }
-      // Read the temporary directory
-      tmp_dir_path = dict->lookup_string(conf_key_tmp_dir);
+      // Read the temporary directory from the dictionary, when provided,
+      // and otherwise use the default
+      if(dict) tmp_dir_path = dict->lookup_string(conf_key_tmp_dir);
+      else     tmp_dir_path = default_tmp_dir;
    }
 
    // Make sure that it exists
