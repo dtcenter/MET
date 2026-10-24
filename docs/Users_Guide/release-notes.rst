@@ -293,55 +293,55 @@ MET Version 13.0.0 Upgrade Instructions
     `#3396 <https://github.com/dtcenter/MET/issues/3396>`_, improvements to the RPS computation
     algorithm result in minor changes to the statistics.
 
-   * Output regridded from Lambert Azimuthal Equal Area (LAEA) grids using the AW_MEAN
-     interpolation method, or masked using the "AREA" grid weight option, changes slightly.
-     As described in MET `#3178 <https://github.com/dtcenter/MET/issues/3178>`_, LAEA grid box
-     areas were previously computed from a grid box centered on each grid point, unlike all
-     other grid types, which used the grid box whose lower-left corner is that point. LAEA now
-     follows the same convention as the other grid types. See the additional upgrade
-     instructions below for details.
+  * Output regridded from Lambert Azimuthal Equal Area (LAEA) grids using the AW_MEAN
+    interpolation method, or masked using the "AREA" grid weight option, changes slightly.
+    As described in MET `#3178 <https://github.com/dtcenter/MET/issues/3178>`_, LAEA grid box
+    areas were previously computed from a grid box centered on each grid point, unlike all
+    other grid types, which used the grid box whose lower-left corner is that point. LAEA now
+    follows the same convention as the other grid types. See the additional upgrade
+    instructions below for details.
 
-   * Output regridded to lat/lon, rotated lat/lon, and Mercator grids using the AW_MEAN
-     interpolation method changes along the western edge of regional grids, the eastern edge
-     of Mercator grids, and the first column of global grids. As described in MET
-     `#3178 <https://github.com/dtcenter/MET/issues/3178>`_, input grid points within half an
-     output grid box of those edges were previously discarded rather than assigned to the
-     nearest output grid box.
+  * Output regridded to lat/lon, rotated lat/lon, and Mercator grids using the AW_MEAN
+    interpolation method changes along the western edge of regional grids, the eastern edge
+    of Mercator grids, and the first column of global grids. As described in MET
+    `#3178 <https://github.com/dtcenter/MET/issues/3178>`_, input grid points within half an
+    output grid box of those edges were previously discarded rather than assigned to the
+    nearest output grid box.
 
-   * Gridded data read from NetCDF files that follow the CF convention and use a polar
-     stereographic grid mapping may change. As described in MET
-     `#3358 <https://github.com/dtcenter/MET/issues/3358>`_, MET now reads data stored from
-     north to south (negative y spacing), such as the NOAA Stage IV NetCDF precipitation
-     files, and uses the "standard_parallel" attribute to define the grid's scale latitude.
-     Grids and output for affected files, such as their orientation, may differ from previous
-     versions.
+  * Gridded data read from NetCDF files that follow the CF convention and use a polar
+    stereographic grid mapping may change. As described in MET
+    `#3358 <https://github.com/dtcenter/MET/issues/3358>`_, MET now reads data stored from
+    north to south (negative y spacing), such as the NOAA Stage IV NetCDF precipitation
+    files, and uses the "standard_parallel" attribute to define the grid's scale latitude.
+    Grids and output for affected files, such as their orientation, may differ from previous
+    versions.
 
-   * PBL heights (HPBL) derived by PB2NC may change. As described in MET
-     `#3450 <https://github.com/dtcenter/MET/issues/3450>`_, the PBL derived for a station
-     previously could depend on which other stations were processed in the same run, because
-     unused input records from one station's profile carried over into the next, and deep
-     profiles read past the levels actually stored. The PBL derived for each station now
-     depends only on that station's own observations.
+  * PBL heights (HPBL) derived by PB2NC may change. As described in MET
+    `#3450 <https://github.com/dtcenter/MET/issues/3450>`_, the PBL derived for a station
+    previously could depend on which other stations were processed in the same run, because
+    unused input records from one station's profile carried over into the next, and deep
+    profiles read past the levels actually stored. The PBL derived for each station now
+    depends only on that station's own observations.
 
-   * The contents of the ASCII files written by the PB2NC "-dump" command line option are
-     corrected. As described in MET `#3468 <https://github.com/dtcenter/MET/issues/3468>`_,
-     MET version 12.2.0 and earlier wrote the mass and wind subsets of each PrepBUFR station
-     report as separate reports and wrote the last report of each message type to the dump file
-     for the next message type. Now the mass and wind subsets are combined into a single report,
-     and each report is written to the dump file for its own message type.
+  * The contents of the ASCII files written by the PB2NC "-dump" command line option are
+    corrected. As described in MET `#3468 <https://github.com/dtcenter/MET/issues/3468>`_,
+    MET version 12.2.0 and earlier wrote the mass and wind subsets of each PrepBUFR station
+    report as separate reports and wrote the last report of each message type to the dump file
+    for the next message type. Now the mass and wind subsets are combined into a single report,
+    and each report is written to the dump file for its own message type.
 
-   * Stat-Analysis summary jobs that use the "-derive" option to compute CNT statistics from
-     SAL1L2 input lines now write output. As described in MET
-     `#3478 <https://github.com/dtcenter/MET/issues/3478>`_, the anomaly partial sums were
-     previously not read from SAL1L2 lines, so the derived anomaly statistics (e.g. ANOM_CORR,
-     ANOM_CORR_UNCNTR, RMSFA, and RMSOA) were always bad data and no output was written.
+  * Stat-Analysis summary jobs that use the "-derive" option to compute CNT statistics from
+    SAL1L2 input lines now write output. As described in MET
+    `#3478 <https://github.com/dtcenter/MET/issues/3478>`_, the anomaly partial sums were
+    previously not read from SAL1L2 lines, so the derived anomaly statistics (e.g. ANOM_CORR,
+    ANOM_CORR_UNCNTR, RMSFA, and RMSOA) were always bad data and no output was written.
 
-   * The FOBAR and FOABAR columns of the SL1L2 and SAL1L2 output lines written by Point-Stat,
-     Grid-Stat, and Pair-Stat for the climatology bin means (VX_MASK ending in "_BIN_MEAN")
-     now contain the mean across bins. As described in MET
-     `#3478 <https://github.com/dtcenter/MET/issues/3478>`_, these columns were previously
-     always zero, so statistics derived from them, such as RMSE, PR_CORR, and ANOM_CORR,
-     were incorrect.
+  * The FOBAR and FOABAR columns of the SL1L2 and SAL1L2 output lines written by Point-Stat,
+    Grid-Stat, and Pair-Stat for the climatology bin means (VX_MASK ending in "_BIN_MEAN")
+    now contain the mean across bins. As described in MET
+    `#3478 <https://github.com/dtcenter/MET/issues/3478>`_, these columns were previously
+    always zero, so statistics derived from them, such as RMSE, PR_CORR, and ANOM_CORR,
+    were incorrect.
 
 .. dropdown:: Additional upgrade instructions
 
