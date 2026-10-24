@@ -500,7 +500,7 @@ defaults to a single thread. A log message invites users to set it:
 
   DEBUG 2: Defaulting unset OMP_NUM_THREADS to use 1 of 40 available threads.
            Recommend setting OMP_NUM_THREADS for faster runtimes.
-  DEBUG 2: OpenMP running on 1 thread(s). 
+  DEBUG 2: OpenMP running on 1 thread(s).
 
 There are choices when deciding how many threads to use. To perform a single run
 as fast as possible, it would likely be appropriate to use as many threads as
@@ -3541,7 +3541,6 @@ that this configuration file is processed differently than the other config
 files.
 
 
-
 Toggles
 ^^^^^^^
 The MODE line options described in this section are shown in pairs.
@@ -3549,7 +3548,6 @@ These toggles represent parameters that can have only one (or none) of two
 values. Any of these toggles may be left unspecified. However, if neither
 option for a toggle is indicated, the analysis will produce results that
 combine data from both toggles. This may produce unintended results.
-
 
 
 This toggle indicates whether forecast or observed lines should be used for

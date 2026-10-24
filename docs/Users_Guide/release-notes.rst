@@ -115,7 +115,7 @@ MET Version 13.0.0-beta2 Release Notes (20260508)
 .. note::
 
   When using the **compile_MET_all.sh** script with this developmental
-  release, download the appropriate dependency bundle, **tar_files.met-base-develop.tgz**, using 
+  release, download the appropriate dependency bundle, **tar_files.met-base-develop.tgz**, using
   *wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.met-base-develop.tgz*
   instead of **tar_files.tgz**. The standard **tar_files.tgz** is intended
   for stable releases and may not contain compatible versions of the
@@ -205,14 +205,14 @@ MET Version 13.0.0 Upgrade Instructions
 
   * Point2Grid adds a new "-default_value" command line option to override the default
     output grid value of bad data (NA or -9999).
-   
+
 .. dropdown:: Configuration file changes
 
   MET version 13.0.0 adds, modifies, or removes the following configuration options:
 
   * The PB2NC and IODA2NC "quality_mark_thresh" configuration file option can now be set as a
     threshold string or integer, as before.
-     
+
     * When processing GDAS surface observations with PB2NC, consider setting
       "quality_mark_thresh = <=2||==9;" to retain high quality surface observations
       (1 and 2) plus those ignored by the data assimilation system (9).

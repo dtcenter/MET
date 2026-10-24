@@ -92,4 +92,3 @@ The National Center for Atmospheric Research (NCAR) is sponsored by NSF. The DTC
   * :ref:`genindex`
   * :ref:`search`
 
-

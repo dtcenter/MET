@@ -284,7 +284,7 @@ _____________________
      frequency = TRUE;
      nep       = FALSE;
      nmep      = FALSE;
-     eas       = FALSE;    
+     eas       = FALSE;
      eas_width = FALSE;
      climo     = FALSE;
      climo_cdp = FALSE;

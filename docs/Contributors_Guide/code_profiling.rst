@@ -13,7 +13,6 @@ in easy-to-read, well-formatted tables.  The ctrack.hpp file has been modified t
 saving these tables to their respective text files (summary_output.txt and detail_output.txt).
 
 
-
 Overview
 ========
 
@@ -157,7 +156,6 @@ Overview of Steps for Performing Benchmarking
          tail -f make.log
 
 
-
      .. dropdown:: Verify that the expected code is being measured
 
        The summary and detail tables are generated during the MET build (when running the test target).
@@ -196,9 +194,6 @@ Overview of Steps for Performing Benchmarking
          +----------+-----------------+------+-------+-----------+------------+----------------+---------------+
          |  main.cc | do_post_process |  119 |     1 |     0.00% |      0.00% |      31.34 mcs |     31.34 mcs |
          +----------+-----------------+------+-------+-----------+------------+----------------+---------------+
-
-
-
 
 
 3. .. dropdown:: Edit the benchmark.yaml configuration file
@@ -375,7 +370,6 @@ Overview of Steps for Performing Benchmarking
          (based on the use case config filename).
 
 
-
 4. .. dropdown::  Invoke the Python script *benchmark.py* to collect the benchmarking metrics
 
      .. note::
@@ -446,7 +440,7 @@ Overview of Steps for Performing Benchmarking
      **Running the Python script**
 
      Run the following from the command line (from the location where the benchmark.py file is located):
-   
+
 
      .. note::
        An AssertionError message is printed to the terminal if the benchmark.py script is not run in the $BASE/MET/internal/scripts/benchmark
@@ -454,7 +448,7 @@ Overview of Steps for Performing Benchmarking
 
 
      .. code-block:: ini
-   
+
        cd $BASE/MET/internal/scripts/benchmark
        python benchmark.py
 
@@ -491,25 +485,8 @@ Overview of Steps for Performing Benchmarking
        *<timestamp>* is the timestamp of the benchmarking run.
 
 
-
-
-
 6. **Identify and implement any code changes to improve performance**
 7. **Repeat steps 2-5 until desired performance enhancements are achieved**
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 Keywords
@@ -522,6 +499,4 @@ Keywords
   - profiling
   - code profiler
   - code profiling
-
-
 

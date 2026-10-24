@@ -109,7 +109,7 @@ file. When a configuration file is provided, any filtering options
 specified are applied to all entries in the :code:`jobs` array.
 
 If Stat-Analysis is run with a configuration file that specifies
-more than one analysis job and the user defines top-level filtering 
+more than one analysis job and the user defines top-level filtering
 criteria common to all jobs, then Stat-Analysis writes a temporary
 file. Applying the common filters up front and writing the result
 to a temporary file may be more efficient than parsing all of the
