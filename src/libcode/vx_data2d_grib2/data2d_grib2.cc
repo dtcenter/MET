@@ -1492,9 +1492,7 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
       //  running out of records at the end of the file is the normal way to
       //  stop reading. only warn when bytes remain beyond the current offset,
       //  since that means a record was expected but could not be read.
-      long long n_bytes = file_size(Filename.c_str());
-
-      if(lskip < offset && offset < n_bytes) {
+      if(long long n_bytes = file_size(Filename.c_str()); lskip < offset && offset < n_bytes) {
 
          //  build the message in one piece. streaming an empty string to the
          //  logger prints "(nul)", so the cause is appended rather than
