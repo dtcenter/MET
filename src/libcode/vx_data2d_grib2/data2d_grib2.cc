@@ -1480,7 +1480,7 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
 
    //  g2c fields
    g2int lgrib;
-   g2int lskip;
+   g2int lskip = -1;  //  seekgb only writes lskip when it finds a record
    g2int numlocal;
    array<g2int,3> listsec0;
    array<g2int,13> listsec1;
@@ -1491,8 +1491,10 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
 
       //  running out of records at the end of the file is the normal way to
       //  stop reading. only warn when bytes remain beyond the current offset,
-      //  since that means a record was expected but could not be read.
-      if(long long n_bytes = file_size(Filename.c_str()); lskip < offset && offset < n_bytes) {
+      //  since that means a record was expected but could not be read. do not
+      //  test lskip here. seekgb leaves it untouched when it finds no record,
+      //  so reading it would make the warning depend on an indeterminate value.
+      if(long long n_bytes = file_size(Filename.c_str()); offset < n_bytes) {
 
          //  build the message in one piece. streaming an empty string to the
          //  logger prints "(nul)", so the cause is appended rather than
@@ -1505,7 +1507,7 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
 
          mlog << Warning << "\n" << method_name << msg << "\n";
          mlog << Warning << method_name
-              << "technical detail: seekgb offset=" << offset << ", lskip=" << lskip
+              << "technical detail: seekgb offset=" << offset
               << ", file size=" << n_bytes << ", sizeof(g2int)=" << sizeof(g2int)
               << "\n\n";
       }
