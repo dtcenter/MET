@@ -14,9 +14,9 @@ CMD_LOGFILE=${GITHUB_WORKSPACE}/sonarqube_build.log
 #   - Manual setting for workflow dispatch
 #   - Source branch for any pushes (e.g. develop)
 #
-if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
+if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
   export SONAR_REFERENCE_BRANCH=${GITHUB_BASE_REF}
-elif [ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]; then
+elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
   export SONAR_REFERENCE_BRANCH=${WD_REFERENCE_BRANCH}
 else
   export SONAR_REFERENCE_BRANCH=${SOURCE_BRANCH}
@@ -33,7 +33,7 @@ time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg SONAR_TOKEN \
     --build-arg SONAR_REFERENCE_BRANCH \
     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
-if [ $? != 0 ]; then
+if [[ $? != 0 ]]; then
   cat ${CMD_LOGFILE}
   exit 1
 fi

@@ -80,10 +80,10 @@ An example of the gen_ens_prod calling sequence is shown below:
 
 .. code-block:: none
 
-     gen_ens_prod \
-     -ens sample_fcst/2009123112/*gep*/d01_2009123112_02400.grib \
-     -out out/gen_ens_prod/gen_ens_prod_20100101_120000V_ens.nc \
-     -config config/GenEnsProdConfig -v 2
+  gen_ens_prod \
+  -ens sample_fcst/2009123112/*gep*/d01_2009123112_02400.grib \
+  -out out/gen_ens_prod/gen_ens_prod_20100101_120000V_ens.nc \
+  -config config/GenEnsProdConfig -v 2
 
 In this example, the Gen-Ens-Prod tool derives products from the input ensemble members listed on the command line.
 
@@ -284,7 +284,7 @@ _____________________
      frequency = TRUE;
      nep       = FALSE;
      nmep      = FALSE;
-     eas       = FALSE;    
+     eas       = FALSE;
      eas_width = FALSE;
      climo     = FALSE;
      climo_cdp = FALSE;

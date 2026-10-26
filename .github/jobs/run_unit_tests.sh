@@ -16,7 +16,7 @@ echo "Running MET unit tests with OMP_NUM_THREADS = ${OMP_NUM_THREADS} ..."
 for testname in $TESTS_TO_RUN; do
   CMD_LOGFILE=/met/logs/unit_${testname}.log
   time_command ${MET_TEST_BASE}/python/unit.py ${MET_TEST_BASE}/xml/unit_${testname}.xml
-  if [ $? != 0 ]; then
+  if [[ $? != 0 ]]; then
       echo "ERROR: Unit test ${testname} failed"
       cat /met/logs/unit_${testname}.log
       exit 1
