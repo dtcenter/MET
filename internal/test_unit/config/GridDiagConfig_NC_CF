@@ -72,7 +72,7 @@ mask = {
 //
 output_flag = {
    histogram_1d   = TRUE;
-   histogram_2d   = TRUE;
+   histogram_2d   = FALSE;
    info_theory    = FALSE;
    power_spectrum = FALSE;
 }

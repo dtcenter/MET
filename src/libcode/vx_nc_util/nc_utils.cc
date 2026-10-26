@@ -14,6 +14,7 @@
 #include <sys/stat.h>
 
 #include <netcdf>
+#include <netcdf.h>
 #include <vector>
 
 #include "vx_log.h"
