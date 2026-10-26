@@ -74,7 +74,9 @@ static const int char_class_alpha = 3;   //  includes underscore
 static const int char_class_space = 4;
 static const int char_class_sign  = 5;   //  '+' or '-'
 
-static int char_class[256];
+static const int n_char_class = 256;
+
+static int char_class[n_char_class];
 
 static const int eof  = EOF ;
 static const int skip = -2 ;
@@ -281,7 +283,7 @@ void init()
 
 int j;
 
-for (j=0; j<256; ++j)     char_class[j] = char_class_other;
+for (j=0; j<n_char_class; ++j)  char_class[j] = char_class_other;
 
 for (j='0'; j<='9'; ++j)  char_class[j] = char_class_digit;
 
@@ -323,6 +325,12 @@ return;
 bool char_ok(int c)
 
 {
+
+   //
+   //  reject EOF and anything outside the char_class table
+   //
+
+if ( (c < 0) || (c >= n_char_class) )  return false;
 
 const int k = char_class[c];
 

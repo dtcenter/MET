@@ -20,7 +20,7 @@
 #=======================================================================
 
 # Constants
-[ -z "$GIT_REPO_NAME" ] && GIT_REPO_NAME=MET
+[[ -z "$GIT_REPO_NAME" ]] && GIT_REPO_NAME=MET
 GIT_REPO="https://github.com/dtcenter/${GIT_REPO_NAME}"
 
 function usage {
@@ -34,11 +34,11 @@ function usage {
 if [[ $# -lt 1 ]]; then usage; exit; fi
 
 # Check that SONARQUBE_WRAPPER_BIN is defined
-if [ -z ${SONARQUBE_WRAPPER_BIN} ]; then
+if [[ -z ${SONARQUBE_WRAPPER_BIN} ]]; then
   SONAR_WRAPPER=$(which build-wrapper-linux-x86-64 2> /dev/null)
-  if [ $? -ne 0 ]; then
+  if [[ $? -ne 0 ]]; then
     SONAR_WRAPPER=$(which build-wrapper 2> /dev/null)
-    if [ $? -ne 0 ]; then
+    if [[ $? -ne 0 ]]; then
       echo "ERROR: SONARQUBE_WRAPPER_BIN must be set"
       exit 1
     fi
@@ -46,28 +46,28 @@ if [ -z ${SONARQUBE_WRAPPER_BIN} ]; then
 else
   SONAR_WRAPPER=${SONARQUBE_WRAPPER_BIN}/build-wrapper-linux-x86-64
 fi
-if [ ! -e ${SONAR_WRAPPER} ]; then
+if [[ ! -e ${SONAR_WRAPPER} ]]; then
   echo "ERROR: ${SONAR_WRAPPER} does not exist"
   exit 1
 fi
 
 # Check that SONARQUBE_SCANNER_BIN is defined
 SCANNER_NAME=sonar-scanner
-if [ -z ${SONARQUBE_SCANNER_BIN} ]; then
+if [[ -z ${SONARQUBE_SCANNER_BIN} ]]; then
   SONAR_SCANNER=$(which $SCANNER_NAME 2> /dev/null)
-  if [ $? -ne 0 ]; then
+  if [[ $? -ne 0 ]]; then
     echo "ERROR: SONARQUBE_SCANNER_BIN must be set"
     exit 1
   fi
 else
   SONAR_SCANNER=${SONARQUBE_SCANNER_BIN}/$SCANNER_NAME
 fi
-if [ ! -e $SONAR_SCANNER ]; then
+if [[ ! -e $SONAR_SCANNER ]]; then
   echo "ERROR: SONAR_SCANNER (${SONAR_SCANNER}) does not exist"
   exit 1
 fi
 
-if [ -z ${SONARQUBE_OUT_DIR} ]; then
+if [[ -z ${SONARQUBE_OUT_DIR} ]]; then
   export SONARQUBE_OUT_DIR=bw-outputs
 fi
 
@@ -97,7 +97,7 @@ if [[ ${0:0:1} != "/" ]]; then SCRIPT_DIR=$(pwd)/${SCRIPT_DIR}; fi
 # Clone repo into a sub-directory and checkout the requested version
 REPO_DIR="MET-${1}"
 
-if [ -e ${REPO_DIR} ]; then
+if [[ -e ${REPO_DIR} ]]; then
   run_command "rm -rf ${REPO_DIR}"
 fi
 run_command "git clone ${GIT_REPO} ${REPO_DIR}"
@@ -119,13 +119,13 @@ SONAR_PROJECT_VERSION=$(grep "^version" docs/conf.py | cut -d'=' -f2 | tr -d "\'
 SONAR_PROPERTIES=sonar-project.properties
 
 # Configure sonar-project.properties
-[ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-[ -z "$SONAR_HOST_URL" ] && SONAR_HOST_URL="http://localhost:9000"
-if [ -z "$SONAR_TOKEN" ]; then
+[[ -e $SONAR_PROPERTIES ]] && rm $SONAR_PROPERTIES
+[[ -z "$SONAR_HOST_URL" ]] && SONAR_HOST_URL="http://localhost:9000"
+if [[ -z "$SONAR_TOKEN" ]]; then
   echo "  == ERROR == SONAR_TOKEN is not defined"
   exit 1
 else
-  [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
+  [[ -e $SONAR_PROPERTIES ]] && rm $SONAR_PROPERTIES
   sed -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
       -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
       -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
@@ -141,5 +141,5 @@ else
   # Run SonarQube scan
   run_command "$SONAR_SCANNER"
 
-  [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
+  [[ -e $SONAR_PROPERTIES ]] && rm $SONAR_PROPERTIES
 fi
