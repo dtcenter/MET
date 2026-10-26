@@ -30,9 +30,9 @@ def positions_at_times(
     cos_lons = cos_lons.sort_index()
     interp_lats = interp_lats.sort_index()
 
-    sin_lons.interpolate(method=method, inplace=True)
-    cos_lons.interpolate(method=method, inplace=True)
-    interp_lats.interpolate(method=method, inplace=True)
+    sin_lons = sin_lons.interpolate(method=method)
+    cos_lons = cos_lons.interpolate(method=method)
+    interp_lats = interp_lats.interpolate(method=method)
 
     interp_lons = np.degrees(np.arctan2(sin_lons, cos_lons))
 

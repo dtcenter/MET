@@ -248,8 +248,8 @@ def consolidate_info(summary_df:pd.DataFrame, detail_df:pd.DataFrame) -> pd.Data
     # clean up column names (since summary and detail tables have
     # the same columns names for filen, function, line, etc.  pandas renames
     # the resulting merged columns with _x appended
-    merged.rename(columns={'filename_x': 'filename', 'function_x':'function',
-                           'line_x':'line', 'start_time_x':'start_time', 'end_time_x': 'end_time'}, inplace=True)
+    merged = merged.rename(columns={'filename_x': 'filename', 'function_x':'function',
+                                    'line_x':'line', 'start_time_x':'start_time', 'end_time_x': 'end_time'})
 
     return merged
 
