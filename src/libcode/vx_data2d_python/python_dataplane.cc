@@ -356,9 +356,9 @@ mlog << Debug(4) << "Reading temporary Python dataplane file: "
    //  import the python wrapper script as a module
    //
 
-path = get_short_name(validate_dataplane);
+ConcatString module_name = get_short_name(validate_dataplane);
 
-PyObject *module_obj = PyImport_ImportModule(path.text());
+PyObject *module_obj = PyImport_ImportModule(module_name.text());
 
    //
    //  if needed, reload the module
@@ -374,7 +374,7 @@ if ( PyErr_Occurred() )  {
 
    mlog << Warning << "\n" << method_name
         << "an error occurred importing module "
-        << '\"' << path << "\"\n\n";
+        << '\"' << module_name << "\"\n\n";
 
    return false;
 

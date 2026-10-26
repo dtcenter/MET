@@ -224,8 +224,8 @@ static bool user_python_tc_diag(const ConcatString &diag_script,
         << tmp_file_name << "\n";
 
    // Import the python wrapper script as a module
-   path = get_short_name(read_tmp_diag);
-   PyObject *module_obj = PyImport_ImportModule (path.text());
+   ConcatString module_name = get_short_name(read_tmp_diag);
+   PyObject *module_obj = PyImport_ImportModule (module_name.text());
 
    // If needed, reload the module
    if(do_reload) {
@@ -236,7 +236,7 @@ static bool user_python_tc_diag(const ConcatString &diag_script,
       PyErr_Print();
       mlog << Warning << "\n" << method_name
            << "an error occurred importing module "
-           << "\"" << path << "\"\n\n";
+           << "\"" << module_name << "\"\n\n";
       return false;
    }
 

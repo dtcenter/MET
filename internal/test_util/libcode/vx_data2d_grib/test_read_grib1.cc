@@ -78,8 +78,6 @@ cerr << "\n\n   usage:  " << program_name << " grib1_file\n\n";
 
 exit ( 1 );
 
-return;
-
 }
 
 
