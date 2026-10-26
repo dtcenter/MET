@@ -225,9 +225,12 @@ void process_data_file() {
    NcFile *nc_in = (NcFile *) nullptr;
    static const char *method_name = "process_data_file() ";
 
-   // Initialize configuration object
-   MetConfig config;
-   config.read(replace_path(config_const_filename).c_str());
+   // MetConfig parses into the existing dictionary rather than replacing it,
+   // so parse each field string into a fresh copy of the constants
+   MetConfig base_config;
+   base_config.read(replace_path(config_const_filename).c_str());
+
+   MetConfig config = base_config;
    config.read_string(FieldSA[0].c_str());
 
    // Note: The command line argument MUST processed before this
@@ -263,6 +266,7 @@ void process_data_file() {
            << "\"\n\n";
       exit(1);
    }
+   config = base_config;
    config.read_string(FieldSA[0].c_str());
    vinfo->set_dict(config);
 
@@ -296,6 +300,7 @@ void process_data_file() {
       vinfo->clear();
 
       // Populate the VarInfo object using the config string
+      config = base_config;
       config.read_string(FieldSA[i].c_str());
       vinfo->set_dict(config);
 

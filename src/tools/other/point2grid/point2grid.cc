@@ -343,6 +343,9 @@ static void process_command_line(int argc, char **argv) {
       for(int i=0; i<FieldSA.n(); i++) {
          vinfo->clear();
          // Populate the VarInfo object using the config string
+         // Reset first, since MetConfig parses into the existing
+         // dictionary rather than replacing it
+         config.clear();
          config.read_string(FieldSA[i].c_str());
          vinfo->set_dict(config);
          vname = vinfo->name();
@@ -611,6 +614,9 @@ static int get_obs_type(NcFile *nc) {
    for(int i=0; i<FieldSA.n(); i++) {
       vinfo->clear();
       // Populate the VarInfo object using the config string
+      // Reset first, since MetConfig parses into the existing
+      // dictionary rather than replacing it
+      config.clear();
       config.read_string(FieldSA[i].c_str());
       vinfo->set_dict(config);
       if (vinfo->grid_attr().is_set()) {
@@ -798,6 +804,10 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       vinfo->clear();
 
       // Populate the VarInfo object using the config string
+      // Reset first, since MetConfig parses into the existing
+      // dictionary rather than replacing it
+      config.clear();
+      config.read(replace_path(config_const_filename).c_str());
       config.read_string(FieldSA[i].c_str());
       vinfo->set_dict(config);
 
@@ -1301,6 +1311,10 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       // Initialize
       var_info.clear();
       // Populate the VarInfo object using the config string
+      // Reset first, since MetConfig parses into the existing
+      // dictionary rather than replacing it
+      config.clear();
+      config.read(replace_path(config_const_filename).c_str());
       config.read_string(FieldSA[0].c_str());
       var_info.set_dict(config);
       NcVar var_data = get_nc_var(nc_in, var_info.name().c_str());
@@ -1390,6 +1404,10 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       var_cell_mapping.clear();
 
       // Populate the VarInfo object using the config string
+      // Reset first, since MetConfig parses into the existing
+      // dictionary rather than replacing it
+      config.clear();
+      config.read(replace_path(config_const_filename).c_str());
       config.read_string(FieldSA[i].c_str());
       vinfo->set_dict(config);
 
@@ -1801,6 +1819,10 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       vinfo->clear();
 
       // Populate the VarInfo object using the config string
+      // Reset first, since MetConfig parses into the existing
+      // dictionary rather than replacing it
+      config.clear();
+      config.read(replace_path(config_const_filename).c_str());
       config.read_string(FieldSA[i].c_str());
       vinfo->set_dict(config);
 
