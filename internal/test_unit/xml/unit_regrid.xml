@@ -107,13 +107,18 @@
     </output>
   </test>
 
+  <!-- MET #3499: The first -field converts APCP from millimeters to   -->
+  <!-- inches. The four fields after it request no conversion and must  -->
+  <!-- not inherit one. Each -field string is parsed into its own copy  -->
+  <!-- of the configuration, so a setting on one cannot reach the next. -->
+
   <test name="regrid_data_plane_GFS_TO_HMT_NEAREST">
     <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
       &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
       &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_HMT_NEAREST.nc \
-      -field 'name="APCP"; level="A6";' \
+      -field 'name="APCP"; level="A6"; convert(x) = x / 25.4;' \
       -field 'name="TMP";  level="Z2";' \
       -field 'name="UGRD"; level="Z10";' \
       -field 'name="VGRD"; level="Z10";' \
