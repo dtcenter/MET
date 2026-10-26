@@ -110,10 +110,7 @@
     </output>
   </test>
 
-  <!-- MET #3499: The first -field censors TMP below freezing. RH       -->
-  <!-- requests no censoring and must not inherit it. Every RH value is -->
-  <!-- below the TMP threshold, so a leak would flatten RH to a single  -->
-  <!-- value rather than change it subtly.                              -->
+  <!-- MET #3499: no -field setting leaks -->
 
   <test name="point2grid_pb2nc_methods">
     <exec>&MET_BIN;/point2grid</exec>

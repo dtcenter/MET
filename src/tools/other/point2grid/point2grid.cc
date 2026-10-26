@@ -147,6 +147,7 @@ static const ConcatString att_name_meanings = "flag_meanings";
 
 static void process_command_line(int, char **);
 static void process_data_file();
+static void set_var_info(VarInfo &, MetConfig &, int);
 static void process_point_file(NcFile *nc_in, MetConfig &config,
                                VarInfo *, const Grid to_grid);
 #ifdef WITH_PYTHON
@@ -248,6 +249,22 @@ int met_main(int argc, char *argv[]) {
 
 string get_tool_name() {
    return "point2grid";
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Populate the VarInfo object using the i-th config string. MetConfig
+// parses into the existing dictionary rather than replacing it, so the
+// config must be cleared before each field string is parsed. The caller
+// clears its own VarInfo, since VarInfo::clear() is not virtual.
+static void set_var_info(VarInfo &vi, MetConfig &config, int i) {
+
+   config.clear();
+   config.read(replace_path(config_const_filename).c_str());
+   config.read_string(FieldSA[i].c_str());
+   vi.set_dict(config);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -366,12 +383,7 @@ static void process_command_line(int argc, char **argv) {
          vinfo->clear();
 
          // Populate the VarInfo object using the config string
-         // Clear first, since MetConfig parses into the existing
-         // dictionary rather than replacing it
-         config.clear();
-         config.read(replace_path(config_const_filename).c_str());
-         config.read_string(FieldSA[i].c_str());
-         vinfo->set_dict(config);
+         set_var_info(*vinfo, config, i);
 
          vname = vinfo->name();
          if (var_names.has(vname)) {
@@ -561,12 +573,7 @@ static int get_obs_type(NcFile *nc) {
       vinfo->clear();
 
       // Populate the VarInfo object using the config string
-      // Clear first, since MetConfig parses into the existing
-      // dictionary rather than replacing it
-      config.clear();
-      config.read(replace_path(config_const_filename).c_str());
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      set_var_info(*vinfo, config, i);
 
       if (vinfo->grid_attr().is_set()) {
          has_attr_grid = true;
@@ -749,12 +756,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       vinfo->clear();
 
       // Populate the VarInfo object using the config string
-      // Clear first, since MetConfig parses into the existing
-      // dictionary rather than replacing it
-      config.clear();
-      config.read(replace_path(config_const_filename).c_str());
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      set_var_info(*vinfo, config, i);
 
       // Check the variable name
       ConcatString error_msg;
@@ -1254,12 +1256,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       var_info.clear();
 
       // Populate the VarInfo object using the config string
-      // Clear first, since MetConfig parses into the existing
-      // dictionary rather than replacing it
-      config.clear();
-      config.read(replace_path(config_const_filename).c_str());
-      config.read_string(FieldSA[0].c_str());
-      var_info.set_dict(config);
+      set_var_info(var_info, config, 0);
 
       NcVar var_data = get_nc_var(nc_in, var_info.name().c_str());
       if (get_nc_att_value(&var_data, coordinates_att_name, coordinates_value)) {
@@ -1348,12 +1345,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       var_cell_mapping.clear();
 
       // Populate the VarInfo object using the config string
-      // Clear first, since MetConfig parses into the existing
-      // dictionary rather than replacing it
-      config.clear();
-      config.read(replace_path(config_const_filename).c_str());
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      set_var_info(*vinfo, config, i);
 
       NcVar var_data = get_nc_var(nc_in, vinfo->name().c_str());
       ConcatString coordinates_value;
@@ -1765,12 +1757,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       vinfo->clear();
 
       // Populate the VarInfo object using the config string
-      // Clear first, since MetConfig parses into the existing
-      // dictionary rather than replacing it
-      config.clear();
-      config.read(replace_path(config_const_filename).c_str());
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      set_var_info(*vinfo, config, i);
 
       to_dp.erase();
       to_dp.set_init(valid_time);
