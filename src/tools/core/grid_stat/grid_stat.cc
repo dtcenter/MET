@@ -234,7 +234,7 @@ const string get_tool_name()
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+static void process_command_line(int argc, char **argv) {
    CommandLine cline;
    GrdFileType ftype, otype;
    ConcatString default_config_file;
@@ -355,7 +355,7 @@ void process_command_line(int argc, char **argv) {
 //
 ////////////////////////////////////////////////////////////////////////
 
-void setup_ugrid(GrdFileType ftype, GrdFileType otype) {
+static void setup_ugrid(GrdFileType ftype, GrdFileType otype) {
    const char *method_name = "process_command_line() -> ";
 
    if(FileType_UGrid != ftype && FileType_UGrid != otype) return;
@@ -381,8 +381,8 @@ void setup_ugrid(GrdFileType ftype, GrdFileType otype) {
 ////////////////////////////////////////////////////////////////////////
 
 #ifdef WITH_UGRID
-void open_ugrid_metadata(Met2dDataFile *mtddf, ConcatString &ugrid_nc,
-                         const char *label) {
+static void open_ugrid_metadata(Met2dDataFile *mtddf, ConcatString &ugrid_nc,
+                                const char *label) {
    auto ugrid_mtddf = static_cast<MetUGridDataFile *>(mtddf);
 
    ugrid_mtddf->set_ugrid_configs(conf_info.ugrid_dataset,
@@ -404,7 +404,7 @@ void open_ugrid_metadata(Met2dDataFile *mtddf, ConcatString &ugrid_nc,
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_first_pass(const DataPlane &dp) {
+static void setup_first_pass(const DataPlane &dp) {
 
    // Unset the flag
    is_first_pass = false;
@@ -429,8 +429,8 @@ void setup_first_pass(const DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_txt_files(unixtime valid_ut, int lead_sec) {
-   int  i, max_col, max_prob_col, max_mctc_col, n_prob, n_cat, n_eclv;
+static void setup_txt_files(unixtime valid_ut, int lead_sec) {
+   int max_col;
    ConcatString base_name;
 
    // Create output file names for the stat file and optional text files
@@ -443,12 +443,12 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    /////////////////////////////////////////////////////////////////////
 
    // Get the maximum number of data columns
-   n_prob = conf_info.get_max_n_fprob_thresh();
-   n_cat  = conf_info.get_max_n_cat_thresh() + 1;
-   n_eclv = conf_info.get_max_n_eclv_points();
+   int n_prob = conf_info.get_max_n_fprob_thresh();
+   int n_cat  = conf_info.get_max_n_cat_thresh() + 1;
+   int n_eclv = conf_info.get_max_n_eclv_points();
 
-   max_prob_col = get_n_pjc_columns(n_prob);
-   max_mctc_col = get_n_mctc_columns(n_cat);
+   int max_prob_col = get_n_pjc_columns(n_prob);
+   int max_mctc_col = get_n_mctc_columns(n_cat);
 
    // Determine the maximum number of data columns
    max_col = ( max_prob_col > max_stat_col ? max_prob_col : max_stat_col );
@@ -484,7 +484,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    /////////////////////////////////////////////////////////////////////
 
    // Loop through output file type
-   for(i=0; i<n_txt; i++) {
+   for(int i=0; i<n_txt; i++) {
 
       // Only set it up if requested in the config file
       if(conf_info.output_flag[i] == STATOutputType::Both) {
@@ -578,7 +578,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_table(AsciiTable &at) {
+static void setup_table(AsciiTable &at) {
 
    // Justify the STAT AsciiTable objects
    justify_stat_cols(at);
@@ -600,8 +600,8 @@ void setup_table(AsciiTable &at) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file(const GridStatNcOutInfo & nc_info,
-                   unixtime valid_ut, int lead_sec) {
+static void setup_nc_file(const GridStatNcOutInfo & nc_info,
+                          unixtime valid_ut, int lead_sec) {
 
    // Create output NetCDF file name
    build_outfile_name(valid_ut, lead_sec, "_pairs.nc", out_nc_file);
@@ -642,8 +642,8 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void build_outfile_name(unixtime valid_ut, int lead_sec,
-                        const char *suffix, ConcatString &str) {
+static void build_outfile_name(unixtime valid_ut, int lead_sec,
+                               const char *suffix, ConcatString &str) {
 
    //
    // Create output file name
@@ -669,10 +669,9 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_scores() {
-   int i, j, k, m, n;
-   int n_cat, n_wind, n_cov;
-   double dmin, dmax;
+static void process_scores() {
+   double dmin;
+   double dmax;
    ConcatString cs;
 
    // Forecast and observation fields
@@ -716,9 +715,9 @@ void process_scores() {
    DMAPInfo    dmap_info;
 
    // Store the maximum number of each threshold type
-   n_cat  = conf_info.get_max_n_cat_thresh();
-   n_wind = conf_info.get_max_n_wind_thresh();
-   n_cov  = conf_info.get_max_n_cov_thresh();
+   int n_cat  = conf_info.get_max_n_cat_thresh();
+   int n_wind = conf_info.get_max_n_wind_thresh();
+   int n_cov  = conf_info.get_max_n_cov_thresh();
 
    // Allocate space for output statistics types
    vector<CTSInfo>    cts_info   (n_cat);
@@ -726,7 +725,7 @@ void process_scores() {
    vector<NBRCTSInfo> nbrcts_info(n_cov);
 
    // Compute scores for each verification task and write output_flag
-   for(i=0; i<conf_info.get_n_vx(); i++) {
+   for(int i=0; i<conf_info.get_n_vx(); i++) {
 
       // Read the gridded data from the input forecast file
       if(!read_data_plane(conf_info.vx_opt[i].fcst_info.get(),
@@ -863,7 +862,7 @@ void process_scores() {
       InterpInfo * interp = &conf_info.vx_opt[i].interp_info;
 
       // Loop through and apply each of the smoothing operations
-      for(j=0; j<conf_info.vx_opt[i].get_n_interp(); j++) {
+      for(int j=0; j<conf_info.vx_opt[i].get_n_interp(); j++) {
 
          // Current interpolation method
          InterpMthd interp_mthd = string_to_interpmthd(interp->method[j].c_str());
@@ -897,7 +896,7 @@ void process_scores() {
          }
 
          // Loop through the masks to be applied
-         for(k=0; k<conf_info.vx_opt[i].get_n_mask(); k++) {
+         for(int k=0; k<conf_info.vx_opt[i].get_n_mask(); k++) {
 
             // Store the current mask
             mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[k]];
@@ -944,13 +943,13 @@ void process_scores() {
                 conf_info.vx_opt[i].output_flag[i_eclv] != STATOutputType::None)) {
 
                // Initialize
-               for(m=0; m<n_cat; m++) cts_info[m].clear();
+               for(int m=0; m<n_cat; m++) cts_info[m].clear();
 
                // Compute CTS
                do_cts(cts_info.data(), i, &pd);
 
                // Loop through all of the thresholds
-               for(m=0; m<conf_info.vx_opt[i].fcat_ta.n(); m++) {
+               for(int m=0; m<conf_info.vx_opt[i].fcat_ta.n(); m++) {
 
                   if(cts_info[m].cts.n_pairs() == 0) continue;
 
@@ -1042,7 +1041,7 @@ void process_scores() {
                shc.set_obs_var(ugrd_vgrd_abbr_str);
 
                // Initialize
-               for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
+               for(int m=0; m<n_wind; m++) vl1l2_info[m].clear();
 
                // Index for UGRD
                int ui = conf_info.vx_opt[i].fcst_info->uv_index();
@@ -1114,7 +1113,7 @@ void process_scores() {
                do_vl1l2(vl1l2_info.data(), i, &pd_u, &pd);
 
                // Loop through all of the wind speed thresholds
-               for(m=0; m<conf_info.vx_opt[i].fwind_ta.n(); m++) {
+               for(int m=0; m<conf_info.vx_opt[i].fwind_ta.n(); m++) {
 
                   // Write out VL1L2
                   if(conf_info.vx_opt[i].output_flag[i_vl1l2] != STATOutputType::None &&
@@ -1303,7 +1302,7 @@ void process_scores() {
             pd_gy.extend(grid.nxy());
 
             // Loop over gradient Dx/Dy
-            for(k=0; k<conf_info.vx_opt[i].get_n_grad(); k++) {
+            for(int k=0; k<conf_info.vx_opt[i].get_n_grad(); k++) {
 
                int dx = conf_info.vx_opt[i].grad_dx[k];
                int dy = conf_info.vx_opt[i].grad_dy[k];
@@ -1315,7 +1314,7 @@ void process_scores() {
                ogy_dp = gradient(obs_dp_smooth,  1, dy);
 
                // Loop through the masks to be applied
-               for(m=0; m<conf_info.vx_opt[i].get_n_mask(); m++) {
+               for(int m=0; m<conf_info.vx_opt[i].get_n_mask(); m++) {
 
                   // Store the current mask
                   mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[m]];
@@ -1398,7 +1397,7 @@ void process_scores() {
             int n_good_data = obs_dp_mm.n_good_data();
 
             // Loop over the categorical thresholds
-            for(k=0; k<conf_info.vx_opt[i].fcat_ta.n(); k++) {
+            for(int k=0; k<conf_info.vx_opt[i].fcat_ta.n(); k++) {
 
                // Initialize
                dmap_info.clear();
@@ -1406,7 +1405,7 @@ void process_scores() {
                obs_dp_dmap.clear();
 
                // Loop through the masks to be applied
-               for(m=0; m<conf_info.vx_opt[i].get_n_mask(); m++) {
+               for(int m=0; m<conf_info.vx_opt[i].get_n_mask(); m++) {
 
                   // Set the mask name
                   shc.set_mask(conf_info.vx_opt[i].mask_name[m].c_str());
@@ -1525,16 +1524,16 @@ void process_scores() {
          NbrhdInfo * nbrhd = &conf_info.vx_opt[i].nbrhd_info;
 
          // Initialize
-         for(j=0; j<n_cov; j++) nbrcts_info[j].clear();
+         for(int j=0; j<n_cov; j++) nbrcts_info[j].clear();
 
          // Loop through and apply each of the neighborhood widths
-         for(j=0; j<nbrhd->width.n(); j++) {
+         for(int j=0; j<nbrhd->width.n(); j++) {
 
             shc.set_interp_mthd(InterpMthd::Nbrhd, nbrhd->shape);
             shc.set_interp_wdth(nbrhd->width[j]);
 
             // Loop through and apply each of the raw threshold values
-            for(k=0; k<conf_info.vx_opt[i].fcat_ta.n(); k++) {
+            for(int k=0; k<conf_info.vx_opt[i].fcat_ta.n(); k++) {
 
                // Initialize
                fcst_dp_smooth.clear();
@@ -1543,7 +1542,7 @@ void process_scores() {
                obs_dp_thresh.clear();
 
                // Loop through the masks to be applied
-               for(m=0; m<conf_info.vx_opt[i].get_n_mask(); m++) {
+               for(int m=0; m<conf_info.vx_opt[i].get_n_mask(); m++) {
 
                   // Set the mask name
                   shc.set_mask(conf_info.vx_opt[i].mask_name[m].c_str());
@@ -1702,14 +1701,14 @@ void process_scores() {
                      conf_info.vx_opt[i].output_flag[i_nbrcts] != STATOutputType::None) {
 
                      // Initialize
-                     for(n=0; n<conf_info.vx_opt[i].get_n_cov_thresh(); n++) {
+                     for(int n=0; n<conf_info.vx_opt[i].get_n_cov_thresh(); n++) {
                         nbrcts_info[n].clear();
                      }
 
                      do_nbrcts(nbrcts_info.data(), i, j, k, &pd);
 
                      // Loop through all of the thresholds
-                     for(n=0; n<conf_info.vx_opt[i].get_n_cov_thresh(); n++) {
+                     for(int n=0; n<conf_info.vx_opt[i].get_n_cov_thresh(); n++) {
 
                         // Only write out if n > 0
                         if(nbrcts_info[n].cts_info.cts.n_pairs() > 0) {
@@ -1775,7 +1774,7 @@ void process_scores() {
       } // end if
 
       // Loop through and apply each Fourier wave
-      for(j=0; j<conf_info.vx_opt[i].get_n_wave_1d(); j++) {
+      for(int j=0; j<conf_info.vx_opt[i].get_n_wave_1d(); j++) {
 
          // Apply Fourier decomposition
          fcst_dp_smooth  = fcst_dp;
@@ -1836,7 +1835,7 @@ void process_scores() {
          shc.set_interp_pnts(bad_data_int);
 
          // Loop through the masks to be applied
-         for(k=0; k<conf_info.vx_opt[i].get_n_mask(); k++) {
+         for(int k=0; k<conf_info.vx_opt[i].get_n_mask(); k++) {
 
             // Store the current mask
             mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[k]];
@@ -1892,7 +1891,7 @@ void process_scores() {
                shc.set_obs_var(ugrd_vgrd_abbr_str);
 
                // Initialize
-               for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
+               for(int m=0; m<n_wind; m++) vl1l2_info[m].clear();
 
                // Index for UGRD
                int ui = conf_info.vx_opt[i].fcst_info->uv_index();
@@ -1972,7 +1971,7 @@ void process_scores() {
                do_vl1l2(vl1l2_info.data(), i, &pd_u, &pd);
 
                // Loop through all of the wind speed thresholds
-               for(m=0; m<conf_info.vx_opt[i].fwind_ta.n(); m++) {
+               for(int m=0; m<conf_info.vx_opt[i].fwind_ta.n(); m++) {
 
                   // Write out VL1L2
                   if(conf_info.vx_opt[i].output_flag[i_vl1l2] != STATOutputType::None &&
@@ -2064,12 +2063,12 @@ void process_scores() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_mask_points(const GridStatVxOpt &vx_opt,
-                     const MaskPlane &mask_mp,
-                     const DataPlane *fcst_ptr, const DataPlane *obs_ptr,
-                     const DataPlane *fcmn_ptr, const DataPlane *fcsd_ptr,
-                     const DataPlane *ocmn_ptr, const DataPlane *ocsd_ptr,
-                     const DataPlane *wgt_ptr,  PairDataPoint &pd) {
+static void get_mask_points(const GridStatVxOpt &vx_opt,
+                            const MaskPlane &mask_mp,
+                            const DataPlane *fcst_ptr, const DataPlane *obs_ptr,
+                            const DataPlane *fcmn_ptr, const DataPlane *fcsd_ptr,
+                            const DataPlane *ocmn_ptr, const DataPlane *ocsd_ptr,
+                            const DataPlane *wgt_ptr,  PairDataPoint &pd) {
 
    // Initialize
    pd.erase();
@@ -2100,21 +2099,20 @@ void get_mask_points(const GridStatVxOpt &vx_opt,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cts(CTSInfo *cts_info, int i_vx,
-            const PairDataPoint *pd_ptr) {
-   int i, j, n_cts;
+static void do_cts(CTSInfo *cts_info, int i_vx,
+                   const PairDataPoint *pd_ptr) {
 
    //
    // Set up the CTSInfo thresholds and alpha values
    //
-   n_cts = conf_info.vx_opt[i_vx].fcat_ta.n();
-   for(i=0; i<n_cts; i++) {
+   int n_cts = conf_info.vx_opt[i_vx].fcat_ta.n();
+   for(int i=0; i<n_cts; i++) {
       cts_info[i].cts.set_ec_value(conf_info.vx_opt[i_vx].hss_ec_value);
       cts_info[i].fthresh = conf_info.vx_opt[i_vx].fcat_ta[i];
       cts_info[i].othresh = conf_info.vx_opt[i_vx].ocat_ta[i];
       cts_info[i].allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
 
-      for(j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
+      for(int j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
          cts_info[i].alpha[j] = conf_info.vx_opt[i_vx].ci_alpha[j];
       }
    }
@@ -2146,9 +2144,8 @@ void do_cts(CTSInfo *cts_info, int i_vx,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_mcts(MCTSInfo &mcts_info, int i_vx,
-             const PairDataPoint *pd_ptr) {
-   int i;
+static void do_mcts(MCTSInfo &mcts_info, int i_vx,
+                    const PairDataPoint *pd_ptr) {
 
    //
    // Set up the MCTSInfo size, thresholds, and alpha values
@@ -2159,7 +2156,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
    mcts_info.set_othresh(conf_info.vx_opt[i_vx].ocat_ta);
    mcts_info.allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
 
-   for(i=0; i<conf_info.vx_opt[i_vx].get_n_ci_alpha(); i++) {
+   for(int i=0; i<conf_info.vx_opt[i_vx].get_n_ci_alpha(); i++) {
       mcts_info.alpha[i] = conf_info.vx_opt[i_vx].ci_alpha[i];
    }
 
@@ -2195,17 +2192,17 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
-   int i, j, k, n_bin;
-   PairDataPoint pd_thr, pd;
+static void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
+   PairDataPoint pd;
+   PairDataPoint pd_thr;
 
    mlog << Debug(2)
         << "Computing Scalar Partial Sums and Continuous Statistics.\n";
 
    // Determine the number of observation climo CDF bins
-   n_bin = (pd_ptr->ocmn_na.n_valid() > 0 &&
-            pd_ptr->ocsd_na.n_valid() > 0 ?
-            vx_opt.get_n_cdf_bin() : 1);
+   int n_bin = (pd_ptr->ocmn_na.n_valid() > 0 &&
+                pd_ptr->ocsd_na.n_valid() > 0 ?
+                vx_opt.get_n_cdf_bin() : 1);
 
    if(n_bin > 1) {
       mlog << Debug(2)
@@ -2224,7 +2221,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    vector<SL1L2Info> sl1l2_info(n_bin);
 
    // Process each continuous filtering threshold
-   for(i=0; i<vx_opt.fcnt_ta.n(); i++) {
+   for(int i=0; i<vx_opt.fcnt_ta.n(); i++) {
 
       // Apply continuous filtering thresholds to subset pairs
       pd_thr = pd_ptr->subset_pairs_cnt_thresh(vx_opt.fcnt_ta[i],
@@ -2235,7 +2232,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
       if(pd_thr.n_obs == 0) continue;
 
       // Process the climo CDF bins
-      for(j=0; j<n_bin; j++) {
+      for(int j=0; j<n_bin; j++) {
 
          // Initialize
          if(do_sl1l2) sl1l2_info[j].clear();
@@ -2293,7 +2290,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
             // Setup the CNTInfo alpha values
             cnt_info[j].allocate_n_alpha(vx_opt.get_n_ci_alpha());
-            for(k=0; k<vx_opt.get_n_ci_alpha(); k++) {
+            for(int k=0; k<vx_opt.get_n_ci_alpha(); k++) {
                cnt_info[j].alpha[k] = vx_opt.ci_alpha[k];
             }
 
@@ -2381,10 +2378,9 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_vl1l2(VL1L2Info *v_info, int i_vx,
-              const PairDataPoint *pd_u_ptr,
-              const PairDataPoint *pd_v_ptr) {
-   int i, j;
+static void do_vl1l2(VL1L2Info *v_info, int i_vx,
+                     const PairDataPoint *pd_u_ptr,
+                     const PairDataPoint *pd_v_ptr) {
 
    mlog << Debug(2)
         << "Computing Vector Partial Sums and Continuous Vector Statistics.\n";
@@ -2401,7 +2397,7 @@ void do_vl1l2(VL1L2Info *v_info, int i_vx,
    //
    // Set all of the VL1L2Info objects
    //
-   for(i=0; i<conf_info.vx_opt[i_vx].fwind_ta.n(); i++) {
+   for(int i=0; i<conf_info.vx_opt[i_vx].fwind_ta.n(); i++) {
 
       //
       // Store thresholds
@@ -2412,7 +2408,7 @@ void do_vl1l2(VL1L2Info *v_info, int i_vx,
       v_info[i].logic   = conf_info.vx_opt[i_vx].wind_logic;
       v_info[i].allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
 
-      for(j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
+      for(int j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
          v_info[i].alpha[j] = conf_info.vx_opt[i_vx].ci_alpha[j];
       }
 
@@ -2429,16 +2425,15 @@ void do_vl1l2(VL1L2Info *v_info, int i_vx,
 ////////////////////////////////////////////////////////////////////////
 
 void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
-   int i, j, k, n_bin;
    PairDataPoint pd;
 
    mlog << Debug(2)
         << "Computing Probabilistic Statistics.\n";
 
    // Determine the number of observation climo CDF bins
-   n_bin = (pd_ptr->ocmn_na.n_valid() > 0 &&
-            pd_ptr->ocsd_na.n_valid() > 0 ?
-            vx_opt.get_n_cdf_bin() : 1);
+   int n_bin = (pd_ptr->ocmn_na.n_valid() > 0 &&
+                pd_ptr->ocsd_na.n_valid() > 0 ?
+                vx_opt.get_n_cdf_bin() : 1);
 
    if(n_bin > 1) {
       mlog << Debug(2)
@@ -2449,10 +2444,10 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    vector<PCTInfo> pct_info(n_bin);
 
    // Process each probabilistic observation threshold
-   for(i=0; i<vx_opt.ocat_ta.n(); i++) {
+   for(int i=0; i<vx_opt.ocat_ta.n(); i++) {
 
       // Process the climo CDF bins
-      for(j=0; j<n_bin; j++) {
+      for(int j=0; j<n_bin; j++) {
 
          // Initialize
          pct_info[j].clear();
@@ -2467,7 +2462,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          pct_info[j].othresh = vx_opt.ocat_ta[i];
          pct_info[j].allocate_n_alpha(vx_opt.get_n_ci_alpha());
 
-         for(k=0; k<vx_opt.get_n_ci_alpha(); k++) {
+         for(int k=0; k<vx_opt.get_n_ci_alpha(); k++) {
             pct_info[j].alpha[k] = vx_opt.ci_alpha[k];
          }
 
@@ -2547,17 +2542,16 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_nbrcts(NBRCTSInfo *nbrcts_info,
-               int i_vx, int i_wdth, int i_thresh,
-               const PairDataPoint *pd_ptr) {
-   int i, j, n_nbrcts;
+static void do_nbrcts(NBRCTSInfo *nbrcts_info,
+                      int i_vx, int i_wdth, int i_thresh,
+                      const PairDataPoint *pd_ptr) {
    FieldType field = conf_info.vx_opt[i_vx].nbrhd_info.field;
 
    //
    // Set up the NBRCTSInfo thresholds and alpha values
    //
-   n_nbrcts = conf_info.vx_opt[i_vx].get_n_cov_thresh();
-   for(i=0; i<n_nbrcts; i++) {
+   int n_nbrcts = conf_info.vx_opt[i_vx].get_n_cov_thresh();
+   for(int i=0; i<n_nbrcts; i++) {
 
       if(field == FieldType::Fcst || field == FieldType::Both) {
          nbrcts_info[i].fthresh =
@@ -2583,7 +2577,7 @@ void do_nbrcts(NBRCTSInfo *nbrcts_info,
          conf_info.vx_opt[i_vx].nbrhd_info.cov_ta[i];
       nbrcts_info[i].allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
 
-      for(j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
+      for(int j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
          nbrcts_info[i].cts_info.alpha[j] = conf_info.vx_opt[i_vx].ci_alpha[j];
       }
    }
@@ -2591,7 +2585,7 @@ void do_nbrcts(NBRCTSInfo *nbrcts_info,
    //
    // Keep track of the neighborhood width
    //
-   for(i=0; i<n_nbrcts; i++) {
+   for(int i=0; i<n_nbrcts; i++) {
       nbrcts_info[i].nbr_wdth = conf_info.vx_opt[i_vx].nbrhd_info.width[i_wdth];
    }
 
@@ -2622,11 +2616,10 @@ void do_nbrcts(NBRCTSInfo *nbrcts_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
-               int i_vx, int i_wdth, int i_thresh,
-               const PairDataPoint *pd_ptr,
-               const PairDataPoint *pd_thr_ptr) {
-   int i;
+static void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
+                      int i_vx, int i_wdth, int i_thresh,
+                      const PairDataPoint *pd_ptr,
+                      const PairDataPoint *pd_thr_ptr) {
    FieldType field = conf_info.vx_opt[i_vx].nbrhd_info.field;
 
    //
@@ -2647,7 +2640,7 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
    }
 
    nbrcnt_info.allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
-   for(i=0; i<conf_info.vx_opt[i_vx].get_n_ci_alpha(); i++) {
+   for(int i=0; i<conf_info.vx_opt[i_vx].get_n_ci_alpha(); i++) {
       nbrcnt_info.alpha[i] = conf_info.vx_opt[i_vx].ci_alpha[i];
    }
 
@@ -2683,9 +2676,9 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc(const ConcatString &field_name, const DataPlane &dp,
-              int i_vx, const ConcatString &interp_mthd,
-              int interp_pnts, FieldType field_type) {
+static void write_nc(const ConcatString &field_name, const DataPlane &dp,
+                     int i_vx, const ConcatString &interp_mthd,
+                     int interp_pnts, FieldType field_type) {
    ConcatString var_name;
    ConcatString long_att;
    ConcatString level_att;
@@ -3021,9 +3014,9 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
-                    int i_vx, const SingleThresh &fcst_st,
-                    const SingleThresh &obs_st, int i_mask, int wdth) {
+static void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
+                           int i_vx, const SingleThresh &fcst_st,
+                           const SingleThresh &obs_st, int i_mask, int wdth) {
    ConcatString fcst_name;
    ConcatString obs_name;
    ConcatString att_str;
@@ -3195,8 +3188,8 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att_local(NcVar *var, const char *att_name,
-                       const ConcatString att_value) {
+static void add_var_att_local(NcVar *var, const char *att_name,
+                              const ConcatString att_value) {
 
    if(att_value.nonempty()) add_att(var, att_name, att_value.c_str());
    else                     add_att(var, att_name, na_str);
@@ -3206,8 +3199,7 @@ void add_var_att_local(NcVar *var, const char *att_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void finish_txt_files() {
-   int i;
+static void finish_txt_files() {
 
    // Write out the contents of the STAT AsciiTable and
    // close the STAT output files
@@ -3217,7 +3209,7 @@ void finish_txt_files() {
    }
 
    // Finish up each of the optional text files
-   for(i=0; i<n_txt; i++) {
+   for(int i=0; i<n_txt; i++) {
 
       // Only write the table if requested in the config file
       if(conf_info.output_flag[i] == STATOutputType::Both) {
@@ -3288,7 +3280,7 @@ static void smooth_vx_field(const DataPlane &dp, DataPlane &smooth_dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void clean_up() {
+static void clean_up() {
 
    // Close the output text files that were open for writing
    finish_txt_files();
@@ -3364,7 +3356,7 @@ __attribute__((noreturn)) static void usage(int exit_code) {
 ////////////////////////////////////////////////////////////////////////
 
 #ifdef WITH_UGRID
-void set_ugrid_config(const StringArray & a)
+static void set_ugrid_config(const StringArray & a)
 {
    ugrid_config_files.add(a[0]);
 }
@@ -3372,20 +3364,20 @@ void set_ugrid_config(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_outdir(const StringArray & a) {
+static void set_outdir(const StringArray & a) {
    out_dir = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a) {
+static void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool read_data_plane(VarInfo *info, DataPlane &dp, Met2dDataFile *mtddf,
-                     const ConcatString &filename, const char *desc) {
+static bool read_data_plane(VarInfo *info, DataPlane &dp, Met2dDataFile *mtddf,
+                            const ConcatString &filename, const char *desc) {
 
    bool status = mtddf->data_plane(*info, dp);
 
