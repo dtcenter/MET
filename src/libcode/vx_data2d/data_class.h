@@ -91,6 +91,9 @@ class Met2dDataFile : public Met2dData {
                           const char *, const StringArray &,
                           DataPlaneArray &);
 
+      bool rotate_uv_winds(const VarInfo *, DataPlaneArray &,
+                           bool &, const char *);
+
       bool GridShifted;
 
          //
