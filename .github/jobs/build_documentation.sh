@@ -5,7 +5,7 @@
 
 DOCS_DIR=${GITHUB_WORKSPACE}/docs
 
-if [ ! -e ${DOCS_DIR} ]; then
+if [[ ! -e ${DOCS_DIR} ]]; then
     echo "Documentation directory does not exist: ${DOCS_DIR}"
     exit 1
 fi
@@ -23,7 +23,7 @@ cp -r ${DOCS_DIR}/_build/html/* artifact/documentation
 # Copy it into the artifact and documentation directories
 # so it will be available in the artifacts
 warning_file=${DOCS_DIR}/_build/warnings.log
-if [ -s $warning_file ]; then
+if [[ -s $warning_file ]]; then
     cp -r ${DOCS_DIR}/_build/warnings.log artifact/doc_warnings.log
     cp artifact/doc_warnings.log artifact/documentation
     exit 1
