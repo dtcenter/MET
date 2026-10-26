@@ -31,6 +31,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
 
   .. dropdown:: Bugfixes
 
+     * **Fix the Gaussian grid longitude spacing, which placed the last column on top of the first**
+       (`#1257 <https://github.com/dtcenter/MET/issues/1257>`_).
      * Fix failures and warnings when compiling with clang
        (`#3291 <https://github.com/dtcenter/MET/issues/3291>`_).
      * Fix NetCDF CF convention support to read Stage IV precipitation files
@@ -309,6 +311,16 @@ MET Version 13.0.0 Upgrade Instructions
     `#3178 <https://github.com/dtcenter/MET/issues/3178>`_, input grid points within half an
     output grid box of those edges were previously discarded rather than assigned to the
     nearest output grid box.
+
+  * Output for Gaussian grids changes. As described in MET
+    `#1257 <https://github.com/dtcenter/MET/issues/1257>`_, the longitude spacing was
+    computed as 360/(Nx-1) rather than 360/Nx, which spread the Nx columns across 360
+    degrees instead of Nx intervals. The last column was therefore placed on the same
+    meridian as the first, and every other column was displaced west of the prime meridian
+    by up to a full grid cell. For a 512 column grid the spacing changes from 0.704501 to
+    0.703125 degrees and the final column moves from 360.000000 to 359.296875. Any output
+    regridded to or from a Gaussian grid, and any grid box area computed for one, changes
+    accordingly.
 
   * Gridded data read from NetCDF files that follow the CF convention and use a polar
     stereographic grid mapping may change. As described in MET
