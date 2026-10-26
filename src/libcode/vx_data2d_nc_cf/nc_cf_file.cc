@@ -2776,7 +2776,7 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
   }
 
   // Store spacing in LatLon data structure
-  bool swap_to_north;
+  bool swap_to_north = false;
   LatLonData ll_data = get_data_from_lat_lon_vars(_yCoordVar, _xCoordVar,
                                                   lat_counts, lon_counts,
                                                   swap_to_north);
@@ -3325,7 +3325,7 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
                                           const long lat_counts, const long lon_counts) {
   static const string method_name = "NcCfFile::get_grid_from_lat_lon_vars()";
 
-  bool swap_to_north;
+  bool swap_to_north = false;
   LatLonData data = get_data_from_lat_lon_vars(lat_var, lon_var,
                                                lat_counts, lon_counts,
                                                swap_to_north);
@@ -3344,6 +3344,10 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
                                                 const long lat_counts, const long lon_counts,
                                                 bool &swap_to_north) {
   static const string method_name = "NcCfFile::get_data_from_lat_lon_vars()";
+
+  // Always define the output argument, including for the early returns below
+
+  swap_to_north = false;
 
   // Figure out the dlat/dlon values from the dimension variables
 

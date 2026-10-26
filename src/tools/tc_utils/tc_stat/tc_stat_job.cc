@@ -140,7 +140,14 @@ TCStatJob::TCStatJob() {
 
 TCStatJob::~TCStatJob() {
 
-   clear();
+   try { clear(); }
+   catch(...) {
+      //  a destructor must not propagate exceptions.  fputs is used
+      //  rather than mlog or cerr because neither is guaranteed not
+      //  to throw, which would defeat the purpose of this catch.
+      fputs("\nWARNING: TCStatJob::~TCStatJob() -> "
+            "ignoring exception thrown during cleanup\n\n", stderr);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1739,7 +1746,14 @@ TCStatJobFilter::TCStatJobFilter() {
 
 TCStatJobFilter::~TCStatJobFilter() {
 
-   clear();
+   try { clear(); }
+   catch(...) {
+      //  a destructor must not propagate exceptions.  fputs is used
+      //  rather than mlog or cerr because neither is guaranteed not
+      //  to throw, which would defeat the purpose of this catch.
+      fputs("\nWARNING: TCStatJobFilter::~TCStatJobFilter() -> "
+            "ignoring exception thrown during cleanup\n\n", stderr);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1958,7 +1972,14 @@ TCStatJobSummary::TCStatJobSummary() {
 
 TCStatJobSummary::~TCStatJobSummary() {
 
-   clear();
+   try { clear(); }
+   catch(...) {
+      //  a destructor must not propagate exceptions.  fputs is used
+      //  rather than mlog or cerr because neither is guaranteed not
+      //  to throw, which would defeat the purpose of this catch.
+      fputs("\nWARNING: TCStatJobSummary::~TCStatJobSummary() -> "
+            "ignoring exception thrown during cleanup\n\n", stderr);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2937,7 +2958,14 @@ TCStatJobRIRW::TCStatJobRIRW() {
 
 TCStatJobRIRW::~TCStatJobRIRW() {
 
-   clear();
+   try { clear(); }
+   catch(...) {
+      //  a destructor must not propagate exceptions.  fputs is used
+      //  rather than mlog or cerr because neither is guaranteed not
+      //  to throw, which would defeat the purpose of this catch.
+      fputs("\nWARNING: TCStatJobRIRW::~TCStatJobRIRW() -> "
+            "ignoring exception thrown during cleanup\n\n", stderr);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3960,7 +3988,14 @@ TCStatJobProbRIRW::TCStatJobProbRIRW() {
 
 TCStatJobProbRIRW::~TCStatJobProbRIRW() {
 
-   clear();
+   try { clear(); }
+   catch(...) {
+      //  a destructor must not propagate exceptions.  fputs is used
+      //  rather than mlog or cerr because neither is guaranteed not
+      //  to throw, which would defeat the purpose of this catch.
+      fputs("\nWARNING: TCStatJobProbRIRW::~TCStatJobProbRIRW() -> "
+            "ignoring exception thrown during cleanup\n\n", stderr);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////

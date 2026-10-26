@@ -33,13 +33,13 @@ This section describes the options for interpolation in the horizontal.
 
 .. figure:: figure/point_stat_fig1.png
 
-   Diagram illustrating matching and interpolation methods used in MET. See text for explanation.
+  Diagram illustrating matching and interpolation methods used in MET. See text for explanation.
 
 .. _point_stat_fig2:
 
 .. figure:: figure/point_stat_fig2.jpg
 
-   Illustration of some matching and interpolation methods used in MET. See text for explanation.
+  Illustration of some matching and interpolation methods used in MET. See text for explanation.
 
 ____________________
 
@@ -177,7 +177,7 @@ The HiRA framework provides a unique method for evaluating models in the neighbo
 
 .. figure:: figure/point_stat_fig3.png
 
-   Example showing how HiRA proportions are calculated.
+  Example showing how HiRA proportions are calculated.
 
 Often, the neighborhood size is chosen so that multiple models to be compared have approximately the same horizontal resolution. Then, standard metrics for probabilistic forecasts, such as Brier Score, can be used to compare those forecasts. HiRA was developed using surface observation stations so the neighborhood lies completely within the horizontal plane. With any type of upper air observation, the vertical neighborhood must also be defined.
 
@@ -734,7 +734,7 @@ The first set of header columns are common to all of the output files generated 
     - Double
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_PS_format_info_CTS:
 
@@ -845,7 +845,7 @@ The first set of header columns are common to all of the output files generated 
 
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_PS_format_info_CNT:
 
@@ -1008,7 +1008,7 @@ The first set of header columns are common to all of the output files generated 
 
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_PS_format_info_MCTS:
 
@@ -1098,7 +1098,7 @@ The first set of header columns are common to all of the output files generated 
 
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_PS_format_info_PSTD:
 

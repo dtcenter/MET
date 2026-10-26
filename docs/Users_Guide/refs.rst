@@ -43,7 +43,7 @@ References
 
 | Blake, B., J. Carley, T. Alcott, I. Jankov, M. Pyle, S. Perfater, and B. Albright, 2018:
 |   An Adaptive Approach for the Calculation of Ensemble Gridpoint Probabilities.
-|   *Weather and Forecasting*, 33 (4), 1063 - 1080. 
+|   *Weather and Forecasting*, 33 (4), 1063 - 1080.
 |   doi: https://doi.org/10.1175/WAF-D-18-0035.1
 |
 

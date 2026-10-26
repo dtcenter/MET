@@ -93,9 +93,9 @@ Where {LINE_TYPE} is :code:`cnt`, :code:`cts`, :code:`mcts`,
 :code:`nbrcnt`, or :code:`nbrcts`.
 
 .. note::
-   Consider whether or not it's realistic to hold the resampled
-   statistics in memory rather than writing them to temporary files.
-   If so, that would reduce the I/O.
+  Consider whether or not it's realistic to hold the resampled
+  statistics in memory rather than writing them to temporary files.
+  If so, that would reduce the I/O.
 
 .. _tmp_files_stat_analysis:
 
@@ -109,7 +109,7 @@ file. When a configuration file is provided, any filtering options
 specified are applied to all entries in the :code:`jobs` array.
 
 If Stat-Analysis is run with a configuration file that specifies
-more than one analysis job and the user defines top-level filtering 
+more than one analysis job and the user defines top-level filtering
 criteria common to all jobs, then Stat-Analysis writes a temporary
 file. Applying the common filters up front and writing the result
 to a temporary file may be more efficient than parsing all of the
@@ -122,10 +122,10 @@ input data for each job.
   criteria, and perform the requested operation.
 
 .. note::
-   Earlier versions of Stat-Analysis always wrote a temporary file
-   regardless of the number of jobs and filtering criteria. That
-   logic has been refined to only use temporary files when they may
-   increase efficiency.
+  Earlier versions of Stat-Analysis always wrote a temporary file
+  regardless of the number of jobs and filtering criteria. That
+  logic has been refined to only use temporary files when they may
+  increase efficiency.
 
 .. _tmp_files_python_embedding:
 

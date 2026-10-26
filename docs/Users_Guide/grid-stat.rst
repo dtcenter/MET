@@ -113,13 +113,13 @@ Because these methods rely on the distance map, it is helpful to understand prec
 
 .. figure:: figure/grid-stat_fig1.png
 
-   The above diagram depicts how a distance map is formed. From every grid point in the domain (depicted by the larger rectangle), the shortest distance from that grid to the nearest non-zero grid point (event; depicted by the gray rectangle labeled as A) is calculated (a sample of grid points with arrows indicate the path of the shortest distance with the length of the arrow equal to this distance). In a distance map, the value at each grid point is this distance. For example, grid points within the rectangle A will all have value zero in the distance map.
+  The above diagram depicts how a distance map is formed. From every grid point in the domain (depicted by the larger rectangle), the shortest distance from that grid to the nearest non-zero grid point (event; depicted by the gray rectangle labeled as A) is calculated (a sample of grid points with arrows indicate the path of the shortest distance with the length of the arrow equal to this distance). In a distance map, the value at each grid point is this distance. For example, grid points within the rectangle A will all have value zero in the distance map.
 
 .. _grid-stat_fig2:
 
 .. figure:: figure/grid-stat_fig2.png
 
-   Diagram depicting the shortest distances from one event area to another. The yellow bar indicates the part of the event area A to where all of the shortest distances from B are calculated. That is, the shortest distances from every point inside the set B to the set A all point to a point along the yellow bar.
+  Diagram depicting the shortest distances from one event area to another. The yellow bar indicates the part of the event area A to where all of the shortest distances from B are calculated. That is, the shortest distances from every point inside the set B to the set A all point to a point along the yellow bar.
 
 While :numref:`grid-stat_fig1` and :numref:`grid-stat_fig2` are helpful in illustrating the idea of a distance map, :numref:`grid-stat_fig3` shows an actual distance map calculated for binary fields consisting of circular event areas, where one field has two circular event areas labeled A, and the second has one circular event area labeled B. Notice that the values of the distance map inside the event areas are all zero (dark blue) and the distances grow larger in the pattern of concentric circles around these event areas as grid cells move further away. Finally, :numref:`grid-stat_fig4` depicts special situations from which the distance map measures to be discussed are calculated. In particular, the top left panel shows the absolute difference between the two distance maps presented in the bottom row of :numref:`grid-stat_fig3`. The top right panel shows the portion of the distance map for A that falls within the event area of B, and the bottom left depicts the portion of the distance map for B that falls within the event area A. That is, the first shows the shortest distances from every grid point in the set B to the nearest grid point in the event area A, and the latter shows the shortest distance from every grid point in A to the nearest grid point in B.
 
@@ -127,13 +127,13 @@ While :numref:`grid-stat_fig1` and :numref:`grid-stat_fig2` are helpful in illus
 
 .. figure:: figure/grid-stat_fig3.png
 
-   Binary fields (top) with event areas A (consisting of two circular event areas) and a second field with event area B (single circular area) with their respective distance maps (bottom).
+  Binary fields (top) with event areas A (consisting of two circular event areas) and a second field with event area B (single circular area) with their respective distance maps (bottom).
 
 .. _grid-stat_fig4:
 
 .. figure:: figure/grid-stat_fig4.png
 
-   The absolute difference between the distance maps in the bottom row of :numref:`grid-stat_fig3` (top left), the shortest distances from every grid point in B to the nearest grid point in A (top right), and the shortest distances from every grid point in A to the nearest grid points in B (bottom left). The latter two do not have axes in order to emphasize that the distances are now only considered from within the respective event sets. The top right graphic is the distance map of A conditioned on the presence of an event from B, and that in the bottom left is the distance map of B conditioned on the presence of an event from A.
+  The absolute difference between the distance maps in the bottom row of :numref:`grid-stat_fig3` (top left), the shortest distances from every grid point in B to the nearest grid point in A (top right), and the shortest distances from every grid point in A to the nearest grid points in B (bottom left). The latter two do not have axes in order to emphasize that the distances are now only considered from within the respective event sets. The top right graphic is the distance map of A conditioned on the presence of an event from B, and that in the bottom left is the distance map of B conditioned on the presence of an event from A.
 
 The statistics derived from these distance maps are described in :numref:`Appendix C, Section %s <App_C-distance_maps>`. To make fair comparisons, any grid point containing bad data in either the forecast or observation field is set to bad data in both fields. For each combination of input field and categorical threshold requested in the configuration file, Grid-Stat applies that threshold to define events in the forecast and observation fields and computes distance maps for those binary fields. Statistics for all requested masking regions are derived from those distance maps. Note that the distance maps are computed only once over the full verification domain, not separately for each masking region. Events occurring outside of a masking region can affect the distance map values inside that masking region and, therefore, can also affect the distance maps statistics for that region.
 
@@ -154,7 +154,7 @@ Whether or not the forecast from :numref:`grid-stat_fig6` is “good” or not d
 
 .. figure:: figure/grid-stat_fig6.png
 
-   Top left is an example of an  accumulated precipitation (mm/h)  forecast with the corresponding observed field on the top right. Bottom left shows the difference in binary fields, where the binary fields are created by setting all values in the original fields that fall above :math:`2.1 mmh^{-1}` to one and the rest to zero. Bottom right shows the results for :math:`G_\beta` calculated on the binary fields using the threshold of :math:`2.1 mmh^{-1}` over a range of choices for :math:`\beta`.
+  Top left is an example of an  accumulated precipitation (mm/h)  forecast with the corresponding observed field on the top right. Bottom left shows the difference in binary fields, where the binary fields are created by setting all values in the original fields that fall above :math:`2.1 mmh^{-1}` to one and the rest to zero. Bottom right shows the results for :math:`G_\beta` calculated on the binary fields using the threshold of :math:`2.1 mmh^{-1}` over a range of choices for :math:`\beta`.
 
 In some cases, a user may be interested in a much higher threshold than :math:`2.1 mmh^{-1}` of the above example. :ref:`Gilleland, 2021 (Fig. 4) <Gilleland-2021>`, for example, shows this same forecast using a threshold of :math:`40 mmh^{-1}`. Only a small area in Mississippi has such extreme rain predicted at this valid time; yet none was observed. Small spatial areas of extreme rain in the observed field, however, did occur in a location far away from Mississippi that was not predicted. Generally, for this type of verification, the Hausdorff metric is a good choice of measure. However, a small choice of :math:`\beta` will provide similar results as the Hausdorff distance (:ref:`Gilleland, 2021 <Gilleland-2021>`). The user should think about the average size of storm areas and multiply this value by the displacement distance  they are comfortable with in order to get a good initial choice for :math:`\beta`, and may have to increase or decrease its value by trial-and-error using one or two example cases from their verification set.
 
@@ -626,7 +626,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool is the same as the
     - Double
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_GS_format_info_NBRCTS:
 
@@ -729,7 +729,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool is the same as the
 
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_GS_format_info_NBRCNT:
 
@@ -975,7 +975,7 @@ The output NetCDF file contains the dimensions and variables shown in :numref:`t
 
 
 .. role:: raw-html(raw)
-    :format: html
+  :format: html
 
 .. _table_GS_var_NetCDF_matched_pair_out:
 

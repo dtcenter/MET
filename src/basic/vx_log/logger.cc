@@ -371,7 +371,14 @@ Logger::Logger()
 
 Logger::~Logger()
 {
-   clear();
+   try { clear(); }
+   catch(...) {
+      //  a destructor must not propagate exceptions.  fputs is used
+      //  rather than mlog or cerr because neither is guaranteed not
+      //  to throw, which would defeat the purpose of this catch.
+      fputs("\nWARNING: Logger::~Logger() -> "
+            "ignoring exception thrown during cleanup\n\n", stderr);
+   }
 
 }
 
