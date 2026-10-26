@@ -225,11 +225,8 @@ void process_data_file() {
    NcFile *nc_in = (NcFile *) nullptr;
    static const char *method_name = "process_data_file() ";
 
-   // Initialize the configuration object holding only the constants.
-   // MetConfig::read() and MetConfig::read_string() parse into the
-   // existing dictionary rather than replacing it. Each field string is
-   // therefore parsed into a fresh copy of this object, since sharing a
-   // single one lets settings from one -field option leak into the next.
+   // MetConfig parses into the existing dictionary rather than replacing it,
+   // so parse each field string into a fresh copy of the constants
    MetConfig base_config;
    base_config.read(replace_path(config_const_filename).c_str());
 
