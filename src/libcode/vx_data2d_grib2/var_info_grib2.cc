@@ -319,7 +319,7 @@ void VarInfoGrib2::set_ipdtmpl_val(const IntArray &v) {
 
 bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
 
-   VarInfo::set_dict(dict);
+   if(!VarInfo::set_dict(dict, do_exit)) return false;
 
    ConcatString field_name = dict.lookup_string(conf_key_name,            false);
    ConcatString ens_str    = dict.lookup_string(conf_key_GRIB_ens,        false);
@@ -354,7 +354,7 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
           << "\" entries (" << IPDTmplIndex.n()
           << ") must match the number of \"" << conf_key_GRIB2_ipdtmpl_val
           << "\" entries (" << IPDTmplVal.n() << ")!\n\n";
-      handle_config_error(msg, do_exit);
+      return handle_config_error(msg, do_exit);
    }
 
    vector<Grib2TableEntry> matches;
@@ -374,7 +374,7 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
          msg << "\nVarInfoGrib2::set_dict() -> "
              << "unrecognized GRIB2 field abbreviation '" << field_name
              << "'\n\n";
-         handle_config_error(msg, do_exit);
+         return handle_config_error(msg, do_exit);
       }
    }
 
@@ -389,7 +389,7 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
          msg << "\nVarInfoGrib2::set_dict() -> "
              << "either name or GRIB2_disc, GRIB2_parm_cat and GRIB2_parm "
              << "must be specified in field information\n\n";
-         handle_config_error(msg, do_exit);
+         return handle_config_error(msg, do_exit);
       }
 
       //  use the specified indexes to look up the field name
@@ -403,7 +403,7 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
              << "GRIB2_parm ("     << field_parm     << "). "
              << "Use the MET_GRIB_TABLES environment variable to "
              << "define custom GRIB tables.\n\n";
-         handle_config_error(msg, do_exit);
+         return handle_config_error(msg, do_exit);
       }
 
       //  use the first lookup parameter name
@@ -438,8 +438,7 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
       msg << "\nVarInfoGrib2::set_dict() -> "
           << "if the field name is set to \"PROB\", then a prob dictionary "
           << "must be defined\n\n";
-      handle_config_error(msg, do_exit);
-      return false;
+      return handle_config_error(msg, do_exit);
    }
 
    //  gather information from the prob dictionary
@@ -457,8 +456,7 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
       msg << "\nVarInfoGrib2::set_dict() -> "
           << "unrecognized GRIB2 probability field abbreviation '"
           << prob_name << "'\n\n";
-      handle_config_error(msg, do_exit);
-      return false;
+      return handle_config_error(msg, do_exit);
    }
 
    set_discipline ( matches[0].disc );
