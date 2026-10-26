@@ -438,8 +438,7 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
       msg << "\nVarInfoGrib2::set_dict() -> "
           << "if the field name is set to \"PROB\", then a prob dictionary "
           << "must be defined\n\n";
-      handle_config_error(msg, do_exit);
-      return false;
+      return handle_config_error(msg, do_exit);
    }
 
    //  gather information from the prob dictionary
@@ -457,8 +456,7 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
       msg << "\nVarInfoGrib2::set_dict() -> "
           << "unrecognized GRIB2 probability field abbreviation '"
           << prob_name << "'\n\n";
-      handle_config_error(msg, do_exit);
-      return false;
+      return handle_config_error(msg, do_exit);
    }
 
    set_discipline ( matches[0].disc );

@@ -258,6 +258,7 @@ void static process_data_file() {
 
    field_count = 0;
    for(int i=0; i<FieldSA.n_elements(); i++) {
+      vinfo->clear();
       config.read_string(FieldSA[i].c_str());
       if (vinfo->set_dict(config, false)) {
          field_count++;
@@ -347,7 +348,7 @@ void static process_data_file() {
 
    if (field_count == 0) {
       mlog << Warning << "\n" << method_name
-           << "\nNo available fileds\n\n";
+           << "\nNo available fields\n\n";
    }
    else if (field_count < FieldSA.n_elements()) {
       mlog << Debug(1) << method_name
