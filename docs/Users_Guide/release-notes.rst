@@ -43,6 +43,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3410 <https://github.com/dtcenter/MET/issues/3410>`_).
      * Fix Ensemble-Stat to skip observations when the observation error table lookup fails
        (`#3429 <https://github.com/dtcenter/MET/issues/3429>`_).
+     * Fix NetCDF CF support to use a deterministic grid orientation when the coordinate variable checks fail
+       (`#3443 <https://github.com/dtcenter/MET/issues/3443>`_).
      * Fix PB2NC so that derived HPBL output does not depend on which other stations are processed
        (`#3450 <https://github.com/dtcenter/MET/issues/3450>`_).
      * Fix the PB2NC ``-dump`` segfault and reduce PB2NC compiler warnings
@@ -315,6 +317,15 @@ MET Version 13.0.0 Upgrade Instructions
     files, and uses the "standard_parallel" attribute to define the grid's scale latitude.
     Grids and output for affected files, such as their orientation, may differ from previous
     versions.
+
+  * Gridded data read from NetCDF files that follow the CF convention may also change when the
+    latitude/longitude coordinate variables fail one of MET's checks. As described in MET
+    `#3443 <https://github.com/dtcenter/MET/issues/3443>`_, MET writes a warning and continues
+    when the coordinate variables do not match the dimension sizes, or when the latitudes or
+    longitudes are not evenly spaced. On those two paths MET previously tested an uninitialized
+    value when deciding whether to flip the grid from south to north, so the orientation was
+    undefined. It is now deterministic and the grid is not flipped. Well-formed input, which
+    produces neither warning, is unaffected.
 
   * PBL heights (HPBL) derived by PB2NC may change. As described in MET
     `#3450 <https://github.com/dtcenter/MET/issues/3450>`_, the PBL derived for a station

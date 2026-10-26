@@ -3345,6 +3345,10 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
                                                 bool &swap_to_north) {
   static const string method_name = "NcCfFile::get_data_from_lat_lon_vars()";
 
+  // Always define the output argument, including for the early returns below
+
+  swap_to_north = false;
+
   // Figure out the dlat/dlon values from the dimension variables
 
   LatLonData data;
