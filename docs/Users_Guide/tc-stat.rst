@@ -400,7 +400,7 @@ The output generated from the TC-Stat tool contains statistics produced by the a
 
 This job command finds and filters TCST lines down to those meeting the criteria selected by the filter's options. The filtered TCST lines are written to a file specified by the **-dump_row** option. The TCST output from this job follows the TCST output description in :numref:`tc-dland` and :numref:`tc-pairs`.
 
- The "-set_hdr" job command option can be used to override any of the output header strings (e.g., "-set_hdr DESC EVENT_EQUAL" sets the output DESC column to "EVENT_EQUAL").
+The "-set_hdr" job command option can be used to override any of the output header strings (e.g., "-set_hdr DESC EVENT_EQUAL" sets the output DESC column to "EVENT_EQUAL").
 
 **Job: Summary**
 

@@ -20,7 +20,7 @@ time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg MET_BASE_TAG \
     --build-arg MET_CONFIG_OPTS \
     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
-if [ $? != 0 ]; then
+if [[ $? != 0 ]]; then
   cat ${CMD_LOGFILE}
   exit 1
 fi

@@ -6,7 +6,7 @@ This chapter provides specific details about select topics within the
 MET code base. The list of topics is certainly not comprehensive.
 
 .. toctree::
-   :titlesonly:
+  :titlesonly:
 
-   tmp_file_use
-   static_data_files
+  tmp_file_use
+  static_data_files

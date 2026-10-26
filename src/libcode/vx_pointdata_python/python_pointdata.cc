@@ -637,9 +637,9 @@ static bool user_python_point_data(const char *user_script_name,
    //  import the python wrapper script as a module
    //
 
-   path = get_short_name(read_tmp_nc);
+   ConcatString module_name = get_short_name(read_tmp_nc);
 
-   PyObject *module_obj = PyImport_ImportModule (path.text());
+   PyObject *module_obj = PyImport_ImportModule (module_name.text());
 
    //
    //  if needed, reload the module
@@ -657,7 +657,7 @@ static bool user_python_point_data(const char *user_script_name,
 
       mlog << Warning << "\n" << method_name
            << "an error occurred importing module "
-           << '\"' << path << "\"\n\n";
+           << '\"' << module_name << "\"\n\n";
 
       return false;
 
