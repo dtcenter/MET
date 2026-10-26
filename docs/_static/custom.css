@@ -9,7 +9,7 @@
     position: fixed;
     /* width: 300px; */ /* Adjust width as needed */
     z-index: 1000;
-    padding-bottom: 5px; /* Add space below logo */    
+    padding-bottom: 5px; /* Add space below logo */
 }
 
 /* Prevent the ToC from being overlapped */
@@ -28,5 +28,4 @@
         display: none;  /* Hide logo + search bar when screen is small */
     }
 }
-
 
