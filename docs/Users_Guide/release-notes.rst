@@ -47,6 +47,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3443 <https://github.com/dtcenter/MET/issues/3443>`_).
      * Fix PB2NC so that derived HPBL output does not depend on which other stations are processed
        (`#3450 <https://github.com/dtcenter/MET/issues/3450>`_).
+     * Fix Point2Grid to write the default output value for fields with no observations
+       (`#3297 <https://github.com/dtcenter/MET/issues/3297>`_).
      * Fix the PB2NC ``-dump`` segfault and reduce PB2NC compiler warnings
        (`#3468 <https://github.com/dtcenter/MET/issues/3468>`_).
      * Fix Stat-Analysis CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
@@ -309,6 +311,16 @@ MET Version 13.0.0 Upgrade Instructions
     `#3178 <https://github.com/dtcenter/MET/issues/3178>`_, input grid points within half an
     output grid box of those edges were previously discarded rather than assigned to the
     nearest output grid box.
+
+  * Point2Grid output changes for any requested field that has no observations mapped to the
+    output grid. As described in MET `#3297 <https://github.com/dtcenter/MET/issues/3297>`_,
+    such a field was previously written using the data, count and mask values left over from
+    the previously processed field, or as all zeros when it was the first field requested.
+    Each field is now written using its own default output value, which is bad data unless
+    the ``-default_value`` command line option says otherwise, with its count and mask values
+    set to 0. Users who requested multiple ``-field`` options, and whose output contains a
+    field with no observations, should expect that field to change from plausible-looking but
+    incorrect values to the default value.
 
   * Gridded data read from NetCDF files that follow the CF convention and use a polar
     stereographic grid mapping may change. As described in MET
