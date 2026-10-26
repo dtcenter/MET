@@ -150,6 +150,12 @@ process_calipso_file(ncf.get(), cline[0].c_str());
 nc_point_obs.close();
 
    //
+   //  close the output file
+   //
+
+ncf.reset();
+
+   //
    //  done
    //
 
