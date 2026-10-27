@@ -1254,6 +1254,8 @@ GridInfo Grid::info() const
 {
 
 
+if ( !rep )  return GridInfo();
+
 return rep->info();
 
 }
@@ -1268,6 +1270,8 @@ double Grid::rot_grid_to_earth(int x, int y) const
 
 
 
+if ( !rep )  return 0.0;
+
 return rep->rot_grid_to_earth(x, y);
 
 }
@@ -1281,6 +1285,8 @@ bool Grid::wrap_lon() const
 {
 
 
+if ( !rep )  return false;
+
 return rep->wrap_lon();
 
 }
@@ -1293,6 +1299,8 @@ void Grid::shift_right(int N)
 
 {
 
+
+if ( !rep )  return;
 
 return rep->shift_right(N);
 

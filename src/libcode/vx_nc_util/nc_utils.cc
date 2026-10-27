@@ -251,7 +251,7 @@ void get_att_value_doubles(const NcAtt *att, NumArray &value) {
    value.erase();
    vector<double> values(att->getAttLength());
    att->getValues(values.data());
-   for(unsigned int i=0; i<=att->getAttLength(); i++) value.add(values[i]);
+   for(unsigned int i=0; i<att->getAttLength(); i++) value.add(values[i]);
    return;
 }
 
