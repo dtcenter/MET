@@ -9,7 +9,8 @@ import subprocess
 import sys
 import xml.etree.ElementTree as ET
 
-def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, callchk=False, log_overwrite=True):
+def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, callchk=False, log_overwrite=True,
+         verbose=False):
     """
     Parse a unit test xml file, run the associated tests, and display test results.
 
@@ -31,6 +32,10 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     log_overwrite : bool, default True
         when true, if file_log points to an existing file, that file will be overwritten.
         when false, new log records will be appended to the existing file.
+    verbose : bool, default False
+        if true, write the full output of each test command to the console, in
+        addition to the pass/fail summary. Without this, that output is written
+        only when file_log is set.
     """
   
     # initialize logger
@@ -39,7 +44,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
 
     # create/add console handler
     ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
+    ch.setLevel(logging.DEBUG if verbose else logging.INFO)
     logger.addHandler(ch)
 
     # create/add file handler
@@ -387,6 +392,8 @@ if __name__ == "__main__":
                         help='if present, activate valgrind with callcheck')
     parser.add_argument('-noexit', action='store_true',
                         help='if present, the unit tester will continue executing subsequent tests when a test fails')
+    parser.add_argument('-v', '-verbose', dest='verbose', action='store_true',
+                        help='if present, write the full output of each test command to the console')
     args = parser.parse_args()
 
     for i, xml in enumerate(args.test_xml):
@@ -395,6 +402,6 @@ if __name__ == "__main__":
         else:
             new_log = False
         unit(test_xml=xml, file_log=args.log, cmd_only=args.cmd, noexit=args.noexit, memchk=args.memchk, callchk=args.callchk,
-             log_overwrite=new_log)
+             log_overwrite=new_log, verbose=args.verbose)
 
 

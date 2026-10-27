@@ -22,6 +22,25 @@ These common workflows include:
 - `Release Docker Images (release-docker-images.yml) <https://metplus.readthedocs.io/en/latest/Contributors_Guide/continuous_integration.html#create-release-docker-images-release-docker-images-yml>`_ to routinely recreate Docker images for recent software releases to minimize vulnerabilities.
 - `Update Truth (update_truth.yml) <https://metplus.readthedocs.io/en/latest/Contributors_Guide/continuous_integration.html#update-reference-branch-update-reference-branch-yml>`_ to update the reference truth data used by the testing workflow.
 
+.. _cg-ci-testing:
+
+Testing (testing.yml)
+---------------------
+
+The Testing workflow is documented in the METplus Contributor's Guide, linked above.
+MET adds one input to it, which is available when the workflow is started manually
+from the **Run workflow** menu on the **Actions** tab:
+
+- **Capture the full MET tool output in the unit test logs** (*verbose_logs*),
+  which defaults to false.
+
+When enabled, the unit tests are run with the *-v* argument described in
+:ref:`cg-testing-ut-verbose`, so that the log files uploaded as workflow artifacts
+contain the output of each MET tool rather than just the pass or fail status of each test.
+Enable it when a change is expected to affect the log output, for example to count how many
+times a particular WARNING message is issued before and after a change.
+It is off by default because it makes the log artifacts considerably larger.
+
 .. _cg-ci-compilation_options:
 
 Compilation Options (compilation_options.yml)
