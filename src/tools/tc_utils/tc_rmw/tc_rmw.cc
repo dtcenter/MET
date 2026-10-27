@@ -100,6 +100,9 @@ int met_main(int argc, char *argv[]) {
     // Process gridded and track data
     process_rmw();
 
+    // Close the output file
+    nc_out.reset();
+
     return 0;
 }
 

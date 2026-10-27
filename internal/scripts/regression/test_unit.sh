@@ -27,7 +27,7 @@ function usage {
 }
 
 # Check for arguments
-if [ $# -lt 1 ]; then usage; exit 1; fi
+if [[ $# -lt 1 ]]; then usage; exit 1; fi
 
 # Sub-routine for running a command and checking return status
 function run_command() {
@@ -50,7 +50,7 @@ function run_command() {
 
 # Clone repo into a sub-directory and checkout the requested version
 REPO_DIR="MET-${1}"
-if [ -e ${REPO_DIR} ]; then
+if [[ -e ${REPO_DIR} ]]; then
   run_command "rm -rf ${REPO_DIR}"
 fi
 run_command "git clone ${GIT_REPO} ${REPO_DIR}"
@@ -73,7 +73,7 @@ run_command "./configure --prefix=`pwd` \
 run_command "make install"
 
 # Check that MET_TEST_INPUT is defined
-if [ -z ${MET_TEST_INPUT+x} ]; then
+if [[ -z ${MET_TEST_INPUT+x} ]]; then
   echo "ERROR: ${MET_TEST_INPUT} must be defined!"
   exit 1
 fi

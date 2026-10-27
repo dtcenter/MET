@@ -1177,6 +1177,10 @@ void process_out_files(const TrackInfoArray& tracks) {
 
    } // end for i_trk
 
+   // Close the temp and output files
+   tmp_file_map.clear();
+   out_file_map.clear();
+
    return;
 }
 
@@ -1347,7 +1351,14 @@ OutFileInfo::OutFileInfo() {
 ////////////////////////////////////////////////////////////////////////
 
 OutFileInfo::~OutFileInfo() {
-   clear();
+   try { clear(); }
+   catch(...) {
+      //  a destructor must not propagate exceptions.  fputs is used
+      //  rather than mlog or cerr because neither is guaranteed not
+      //  to throw, which would defeat the purpose of this catch.
+      fputs("\nWARNING: OutFileInfo::~OutFileInfo() -> "
+            "ignoring exception thrown during cleanup\n\n", stderr);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2145,12 +2156,11 @@ void TmpFileInfo::clear() {
 
    domain.clear();
 
-   // Delete the temp file
-   if(tmp_out.get()) {
+   // Close and delete the temp file
+   close();
 
-      remove_temp_file(tmp_file);
+   if(!tmp_file.empty()) remove_temp_file(tmp_file);
 
-      }
    tmp_file.clear();
 
    return;

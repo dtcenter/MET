@@ -82,8 +82,6 @@ cerr << "\n\n   usage:  " << program_name << " map_data_file_list\n\n";
 
 exit ( 1 );
 
-return;
-
 }
 
 

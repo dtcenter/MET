@@ -3,7 +3,7 @@
 # If pull request, use GitHub head ref and add -PR to end
 # Otherwise use GitHub ref
 
-if [ "${GITHUB_EVENT_NAME}" == "pull_request" ] ; then
+if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]] ; then
   branch_name=${GITHUB_HEAD_REF}-PR
 else
   branch_name=${GITHUB_REF}

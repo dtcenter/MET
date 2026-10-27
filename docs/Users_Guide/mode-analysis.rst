@@ -92,7 +92,6 @@ ____________________
 Specifies which columns in the MODE output files to generate statistics for. Fields may be indicated by name (case insensitive) or column number (beginning at one). This option can be repeated to specify multiple columns.
 
 
-
 MODE Command Line Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -134,7 +133,6 @@ ____________________
   -matched | -unmatched
 
 This toggle indicates whether matched or unmatched object lines should be used.
-
 
 
 Multiple-Set String Options
