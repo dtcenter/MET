@@ -60,6 +60,12 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
          int y;
          width_dp.one_to_two(i, x, y);
 
+         // Track the largest width which could be evaluated here, so that
+         // a point whose larger templates cannot be evaluated still falls
+         // back to a usable result rather than being discarded
+         double vld_prob  = bad_data_double;
+         double vld_width = bad_data_double;
+
          // Loop over candidate EAS widths
          for(int i_eas=0; i_eas<n_eas; i_eas++) {
 
@@ -69,26 +75,24 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
                                   eas_info.vld_thresh,
                                   x, y, frac_cov_mean);
 
-            bool use_cur_eas = false;
+            // A width which cannot be evaluated, typically because the
+            // template hangs off the grid near an edge, is skipped. Larger
+            // widths may still be evaluable, and smaller ones already
+            // evaluated remain usable as a fallback.
+            if(is_bad_data(dist_mean)) continue;
 
-            // Check for bad data
-            if(is_bad_data(dist_mean)) {
-               prob_dp.set(bad_data_double, x, y);
-               width_dp.set(bad_data_double, x, y);
-               use_cur_eas = true;
-            }
-            // Check for average distance less than alpha or the last width
-            else if(dist_mean <= eas_info.alpha ||
-                    i_eas+1 == n_eas) {
-               prob_dp.set(frac_cov_mean, x, y);
-               width_dp.set((double) eas_gt[i_eas]->getWidth(), x, y);
-               use_cur_eas = true;
-            }
+            vld_prob  = frac_cov_mean;
+            vld_width = (double) eas_gt[i_eas]->getWidth();
 
-            // Break out of the EAS loop
-            if(use_cur_eas) break;
+            // Accept the first width whose mean distance meets alpha
+            if(dist_mean <= eas_info.alpha) break;
 
          } // end for i_eas
+
+         // Store the accepted width, or the largest evaluable one when no
+         // width met alpha. Both remain bad data if none could be evaluated.
+         prob_dp.set(vld_prob, x, y);
+         width_dp.set(vld_width, x, y);
       } // end for i
 
       // Clean up

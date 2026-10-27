@@ -111,6 +111,12 @@ static std::vector<NumArray> thresh_cnt_na; // [n_thresh]
 static std::vector<std::vector<NumArray> > thresh_nbrhd_cnt_na; // [n_thresh][n_nbrhd]
 static std::vector<DataPlane> ens_eas_dp; // [n_ens]
 
+// Climatology planes matching each ens_eas_dp entry. With MET_ENS_MEMBER_ID
+// set, the climatology is re-read for each member, so thresholding every
+// member against a single plane would use the last member's climatology.
+static std::vector<DataPlane> ens_eas_cmn_dp; // [n_ens]
+static std::vector<DataPlane> ens_eas_csd_dp; // [n_ens]
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __GEN_ENS_PROD_H__
