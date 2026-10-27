@@ -35,7 +35,7 @@ function usage {
 }
 
 # Check for arguments
-if [ $# -lt 1 ]; then usage; fi
+if [[ $# -lt 1 ]]; then usage; fi
 
 # Store the full path to the scripts directory
 SCRIPT_DIR=`dirname $0`

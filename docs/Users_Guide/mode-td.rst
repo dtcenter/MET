@@ -16,7 +16,7 @@ MODE Time Domain (MTD) is an extension of the MODE object-based approach to veri
 
 .. figure:: figure/mtd-3d_color.png
 
-   MTD Spacetime Objects
+  MTD Spacetime Objects
 
 A plot of some MTD precipitation objects is shown over the United States in :numref:`mtd-3d_color`. The colors indicate longitude, with red in the east moving through the spectrum to blue in the west. Time increases vertically in this plot (and in most of the spacetime diagrams in this users' guide). A few things are worthy of note in this figure. First, the tendency of storm systems to move from west to east over time shows up clearly. Second, tracking of storm objects over time is easily done: if we want to know if a storm at one time is a later version of a storm at an earlier time, we need only see if they are part of the same 3D spacetime object. Lastly, storms splitting up or merging over time are handled easily by this method.
 
@@ -53,7 +53,7 @@ The most basic change is to use a square convolution filter rather than the circ
 
 .. figure:: figure/mtd-two_r_plus_one.png
 
-   Convolution Region
+  Convolution Region
 
 Another change is that we do not allow any bad data in the convolution square. In MODE, the user may specify what percentage of bad data in the convolution region is permissible, and it will rescale the value of the filter accordingly for each data point. For the sake of speed, MTD requires that there be no bad data in the convolution region. If any bad data exists in the region, the convolved value there is set to a bad data flag.
 
@@ -70,7 +70,7 @@ The vector **velocity** :math:`(v_x, v_y)` is obtained by fitting a line to a 3D
 
 .. figure:: figure/mtd-velocity.png
 
-   Velocity
+  Velocity
 
 The spatial orientation of an object (what traditional MODE calls the **axis angle** of an object) is gotten by fitting a plane to an object. As with the case of velocity, our optimization criterion is that the sum of the squares of the spatial distances from each point of the object to the plane be minimized.
 
@@ -80,7 +80,7 @@ The spatial orientation of an object (what traditional MODE calls the **axis ang
 
 .. figure:: figure/mtd-axis_3d.png
 
-   3D axis
+  3D axis
 
 A simple integer count of the number of grid squares in an object for all of its lifetime gives the **volume** of the object. Remember that while we're working in three dimensions, one of the dimensions is non-spatial, so one should not attempt to convert this to a volume in, e.g., :math:`\text{km}^3`.
 
@@ -121,7 +121,7 @@ Finally, the **total interest**  gives the result of the fuzzy-logic matching an
 
 .. figure:: figure/mtd-axis_diff.png
 
-   Axis Angle Difference
+  Axis Angle Difference
 
 
 2D Constant-Time Attributes
@@ -154,7 +154,7 @@ If we consider two distinct nodes in a graph to be related if there is a path co
 
 .. figure:: figure/mtd-basic_graph.png
 
-   Basic Graph Example
+  Basic Graph Example
 
 We have barely scratched the surface of the enormous subject of graph theory, but this will suffice for our purposes. How does MTD use graphs? Essentially the simple forecast and observed objects become nodes in a graph. Each pair of objects that have sufficiently high total interest (as determined by the fuzzy logic engine) generates an edge connecting the two corresponding nodes in the graph. The graph is then partitioned into equivalence classes using path connectivity (as explained above), and the resulting equivalence classes determine the matches and merges.
 
@@ -174,7 +174,7 @@ To summarize: Any forecast simple objects that find themselves in the same equiv
 
 .. figure:: figure/mtd-2d_example.png
 
-   Match & Merge Example
+  Match & Merge Example
 
 
 Practical Information

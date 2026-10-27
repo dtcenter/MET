@@ -42,26 +42,26 @@ latex_show_pagerefs = True
 latex_master_doc = 'Users_Guide/index'
 
 latex_elements = {
-   # The paper size ('letterpaper' or 'a4paper').
-   #
-   'papersize': 'letterpaper',
-   'releasename':"{version}",
-   'fncychap': '\\usepackage{fncychap}',
-   'fontpkg': '\\usepackage{amsmath,amsfonts,amssymb,amsthm,float}',
-   'inputenc': '\\usepackage[utf8]{inputenc}',
-   'fontenc': '\\usepackage[LGR,T1]{fontenc}',
-                                                     
-   'figure_align':'H',
-   'pointsize': '11pt',
-                                        
-   'preamble': r'''
-       \usepackage{charter}
-       \usepackage[defaultsans]{lato}
-       \usepackage{inconsolata}
-       \setcounter{secnumdepth}{4}
-       \setcounter{tocdepth}{4}
+    # The paper size ('letterpaper' or 'a4paper').
+    #
+    'papersize': 'letterpaper',
+    'releasename':"{version}",
+    'fncychap': '\\usepackage{fncychap}',
+    'fontpkg': '\\usepackage{amsmath,amsfonts,amssymb,amsthm,float}',
+    'inputenc': '\\usepackage[utf8]{inputenc}',
+    'fontenc': '\\usepackage[LGR,T1]{fontenc}',
+
+    'figure_align':'H',
+    'pointsize': '11pt',
+
+    'preamble': r'''
+        \usepackage{charter}
+        \usepackage[defaultsans]{lato}
+        \usepackage{inconsolata}
+        \setcounter{secnumdepth}{4}
+        \setcounter{tocdepth}{4}
     ''',
-                                                                            
+
     'sphinxsetup': \
         'hmargin={0.7in,0.7in}, vmargin={1in,1in}, \
         verbatimwithframe=true, \
@@ -69,22 +69,22 @@ latex_elements = {
         HeaderFamily=\\rmfamily\\bfseries, \
         InnerLinkColor={rgb}{0,0,1}, \
         OuterLinkColor={rgb}{0,0,1}',
-        'maketitle': '\\sphinxmaketitle',  
-#        'tableofcontents': ' ',
-        'printindex': ' '
+    'maketitle': '\\sphinxmaketitle',
+#   'tableofcontents': ' ',
+    'printindex': ' '
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (latex_master_doc, 
-     'users_guide.tex', 
+    (latex_master_doc,
+     'users_guide.tex',
      'MET User\'s Guide',
-     ' ', 
+     ' ',
      'manual')
 ]
-    
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 

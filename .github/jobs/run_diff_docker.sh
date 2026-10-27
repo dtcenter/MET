@@ -50,11 +50,11 @@ env_arg="-e MET_REPO_DIR=${DOCKER_REPO_DIR} -e VERSION_EXT"
 # run unit test script inside Docker, mount MET output and truth data
 cmd="\${MET_REPO_DIR}/.github/jobs/run_diff_tests.sh"
 time_command docker run ${volumes_from} ${mount_args} ${mount_args_repos} ${env_arg} ${DOCKERHUB_TAG} bash -c \"${cmd}\"
-if [ $? != 0 ]; then
+if [[ $? != 0 ]]; then
   exit 1
 fi
 
-if [ "$(ls -A ${LOCAL_DIFF_DIR})" ]; then
+if [[ "$(ls -A ${LOCAL_DIFF_DIR})" ]]; then
   cat ${LOCAL_LOG_DIR}/comp_dir.log
 
   echo "ERROR: Differences exist in the output"
@@ -62,7 +62,7 @@ if [ "$(ls -A ${LOCAL_DIFF_DIR})" ]; then
   # only exit non-zero (job fails) if not updating truth data
   # this makes difference output available when updating truth data
   # so it is easier to see what changed with the update
-  if [ "${RUN_UPDATE_TRUTH}" != "true" ]; then
+  if [[ "${RUN_UPDATE_TRUTH}" != "true" ]]; then
     exit 1
   fi
 
