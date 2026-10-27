@@ -180,4 +180,29 @@
     </output>
   </test>
 
+  <!-- MET #3304: Kinetic energy power spectrum with missing wind data.  -->
+  <!-- The first field censors low wind speeds to bad data. The missing  -->
+  <!-- values were previously replaced only in the scalar plane, while   -->
+  <!-- the transform ran on the unfilled u and v planes, so the kinetic  -->
+  <!-- energy spectrum was computed over -9999 and came back roughly a   -->
+  <!-- million times too large.                                          -->
+
+  <test name="grid_diag_KENG_missing_wind">
+    <exec>&MET_BIN;/grid_diag</exec>
+    <env>
+      <pair><name>FIELD1</name> <value>name = "KENG"; level = "Z10"; n_bins = 140; range = [0,140]; censor_thresh = [&lt;0.6]; censor_val = [-9999];</value></pair>
+      <pair><name>FIELD2</name> <value>name = "KENG"; level = "Z10"; n_bins = 140; range = [0,140];</value></pair>
+    </env>
+    <param> \
+      -data &OUTPUT_DIR;/grid_diag/keng_fcst_file_list \
+      -data &OUTPUT_DIR;/grid_diag/keng_anly_file_list \
+      -config &CONFIG_DIR;/GridDiagConfig_KENG_MISSING \
+      -out &OUTPUT_DIR;/grid_diag/grid_diag_KENG_Z10_missing.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_KENG_Z10_missing.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
