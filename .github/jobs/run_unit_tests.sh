@@ -14,7 +14,7 @@ source ${MET_REPO_DIR}/.github/jobs/test_env_vars.sh
 
 UNIT_OPTS=""
 if [[ "${UNIT_TEST_VERBOSE:-false}" == "true" ]]; then
-  UNIT_OPTS="-v"
+  UNIT_OPTS="-verbose"
   echo "Running unit tests verbosely; the log files will be much larger than usual."
 fi
 

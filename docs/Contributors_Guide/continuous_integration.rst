@@ -34,7 +34,7 @@ from the **Run workflow** menu on the **Actions** tab:
 - **Capture the full MET tool output in the unit test logs** (*verbose_logs*),
   which defaults to false.
 
-When enabled, the unit tests are run with the *-v* argument described in
+When enabled, the unit tests are run with the *-verbose* argument described in
 :ref:`cg-testing-ut-verbose`, so that the log files uploaded as workflow artifacts
 contain the output of each MET tool rather than just the pass or fail status of each test.
 Enable it when a change is expected to affect the log output, for example to count how many

@@ -380,7 +380,10 @@ def repl_env(string_with_ref):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Run a unit test.")
+    # allow_abbrev=False so that -v is not silently accepted as an
+    # abbreviation of -verbose. Every MET tool takes "-v level", so a
+    # stray -v here would otherwise swallow the level as a file name.
+    parser = argparse.ArgumentParser(description="Run a unit test.", allow_abbrev=False)
     parser.add_argument('test_xml', nargs='+')
     parser.add_argument('-log', metavar='log_file',
                         help='if present, write output from each test to log_file')
@@ -392,7 +395,7 @@ if __name__ == "__main__":
                         help='if present, activate valgrind with callcheck')
     parser.add_argument('-noexit', action='store_true',
                         help='if present, the unit tester will continue executing subsequent tests when a test fails')
-    parser.add_argument('-v', '-verbose', dest='verbose', action='store_true',
+    parser.add_argument('-verbose', dest='verbose', action='store_true',
                         help='if present, write the full output of each test command to the console')
     args = parser.parse_args()
 

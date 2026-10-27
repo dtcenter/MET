@@ -77,14 +77,14 @@ Capturing the full tool output
 
 By default, the unit tests report only the name and the pass or fail status of each test.
 The output written by the MET tools themselves, including all DEBUG and WARNING messages,
-is captured but not displayed. Add the *-v* command line argument to write that output as well::
+is captured but not displayed. Add the *-verbose* command line argument to write that output as well::
 
-  ./bin/unit_test.sh -v > unit_test.log 2>&1
+  ./bin/unit_test.sh -verbose > unit_test.log 2>&1
 
-The *-v* argument is also accepted by *python/unit.py* and can be combined with *-log*,
+The *-verbose* argument is also accepted by *python/unit.py* and can be combined with *-log*,
 which writes the same output to a file rather than to the console::
 
-  ./python/unit.py -v ./xml/unit_pcp_combine.xml
+  ./python/unit.py -verbose ./xml/unit_pcp_combine.xml
   ./python/unit.py -log unit_pcp_combine.log ./xml/unit_pcp_combine.xml
 
 This is useful when a change is expected to affect the log output rather than the output files,
