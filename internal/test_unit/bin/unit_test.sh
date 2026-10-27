@@ -26,6 +26,7 @@ UNIT_OPTS=""
 for arg in $@; do
   [[ $arg == "-memchk" || $arg == "memchk" ]] && UNIT_OPTS="$UNIT_OPTS -memchk"
   [[ $arg == "-callchk" || $arg == "callchk" ]] && UNIT_OPTS="$UNIT_OPTS -callchk"
+  [[ $arg == "-verbose" || $arg == "verbose" ]] && UNIT_OPTS="$UNIT_OPTS -verbose"
 done
 
 # Unit test script
