@@ -28,10 +28,11 @@ mkdir -p ${LOCAL_OUTPUT_DIR}
 mount_args="-v ${LOCAL_OUTPUT_DIR}:${DOCKER_OUTPUT_DIR} -v ${LOCAL_LOG_DIR}:${DOCKER_LOG_DIR}"
 
 export TESTS_TO_RUN=$TESTS
+export UNIT_TEST_VERBOSE=${UNIT_TEST_VERBOSE:-false}
 
 # run unit test script inside Docker, mount MET input and truth data
 cmd="\${MET_REPO_DIR}/.github/jobs/run_unit_tests.sh"
-time_command docker run -e TESTS_TO_RUN ${volumes_from} ${mount_args} ${DOCKERHUB_TAG} bash -c \"${cmd}\"
+time_command docker run -e TESTS_TO_RUN -e UNIT_TEST_VERBOSE ${volumes_from} ${mount_args} ${DOCKERHUB_TAG} bash -c \"${cmd}\"
 if [[ $? != 0 ]]; then
   exit 1
 fi
