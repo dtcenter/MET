@@ -283,7 +283,7 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
 
 bool VarInfoGrib::set_dict(Dictionary & dict, bool do_exit) {
 
-   VarInfo::set_dict(dict);
+   if(!VarInfo::set_dict(dict, do_exit)) return false;
 
    ConcatString field_name = dict.lookup_string(conf_key_name,            false);
    int field_ptv           = dict.lookup_int   (conf_key_GRIB1_ptv,       false);
@@ -338,8 +338,7 @@ bool VarInfoGrib::set_dict(Dictionary & dict, bool do_exit) {
       msg << "\nVarInfoGrib::set_dict() -> "
           << "unrecognized GRIB1 probability field abbreviation '"
           << prob_name << "'\n\n";
-      handle_config_error(msg, do_exit);
-      return false;
+      return handle_config_error(msg, do_exit);
    }
 
    set_p_flag        ( true );

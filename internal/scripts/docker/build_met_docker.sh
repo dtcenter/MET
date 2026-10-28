@@ -5,13 +5,13 @@ echo "Running script to build MET in Docker"
 source internal/scripts/environment/development.docker
 
 # Check whether MET_GIT_NAME is defined
-if [ -z ${MET_GIT_NAME+x} ]; then
+if [[ -z ${MET_GIT_NAME+x} ]]; then
   MET_GIT_NAME=`git name-rev --name-only HEAD | sed 's%/%_%g'`
   echo "Setting MET_GIT_NAME=${MET_GIT_NAME} based on the current revision."
 fi
 
 # Check whether MET_CONFIG_OPTS is defined
-if [ -z ${MET_CONFIG_OPTS+x} ]; then
+if [[ -z ${MET_CONFIG_OPTS+x} ]]; then
   MET_CONFIG_OPTS='--enable-all'
   echo "Setting MET_CONFIG_OPTS=${MET_CONFIG_OPTS} to compile all available options."
 fi
@@ -45,19 +45,19 @@ echo "Configuring MET ${MET_GIT_NAME} and appending to log file ${LOG_FILE}"
   ${MET_CONFIG_OPTS} \
   CPPFLAGS="-I/usr/local/include" \
   LIBS="-ltirpc" >> ${LOG_FILE} 2>&1
-if [ $? != 0 ]; then
+if [[ $? != 0 ]]; then
   cat ${LOG_FILE}
   exit 1
 fi
 
-if [ ! -z "${MAKE_ARGS}" ]; then
+if [[ ! -z "${MAKE_ARGS}" ]]; then
   echo Adding make arguments: ${MAKE_ARGS}
 fi
 
 LOG_FILE=/met/logs/MET-${MET_GIT_NAME}_make_install.log
 echo "Compiling MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}"
 make ${MAKE_ARGS} install > ${LOG_FILE} 2>&1
-if [ $? != 0 ]; then
+if [[ $? != 0 ]]; then
   cat ${LOG_FILE}
   exit 1
 fi
@@ -65,7 +65,7 @@ fi
 LOG_FILE=/met/logs/MET-${MET_GIT_NAME}_make_test.log
 echo "Testing MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}"
 make ${MAKE_ARGS} test > ${LOG_FILE} 2>&1
-if [ $? != 0 ]; then
+if [[ $? != 0 ]]; then
   cat ${LOG_FILE}
   exit 1
 fi

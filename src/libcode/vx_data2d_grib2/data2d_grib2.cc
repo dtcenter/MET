@@ -29,6 +29,7 @@
 #include "vx_data2d.h"
 #include "vx_math.h"
 #include "vx_log.h"
+#include "vx_util.h"
 
 extern "C" {
   #include "grib2.h"
@@ -331,6 +332,11 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
            << "found " << plane_array.n_planes()
            << " matching derived records for '"
            << vinfo_g2->magic_str() << "'\n\n";
+
+      //  post-process each derived data plane
+      for(int i=0; i<plane_array.n_planes(); i++) {
+         process_data_plane(vinfo_g2, plane_array.at(i));
+      }
 
       return plane_array.n_planes();
    }
@@ -1479,7 +1485,7 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
 
    //  g2c fields
    g2int lgrib;
-   g2int lskip;
+   g2int lskip = -1;  //  seekgb only writes lskip when it finds a record
    g2int numlocal;
    array<g2int,3> listsec0;
    array<g2int,13> listsec1;
@@ -1487,15 +1493,33 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
    //  find the next record and read the info, return -1 if fail
    seekgb(FileGrib2, offset, 32000, &lskip, &lgrib);
    if(lgrib == 0) {
-      if (lskip < offset) {
-         ConcatString cause_str = "";
-         if (sizeof(g2int) == 4) cause_str = " (input file size exceeds the 2 GB limit of the external library)";
-         mlog << Warning << "\n" << method_name
-              << "Stop reading GRIB records" << cause_str << "\n";
+
+      //  running out of records at the end of the file is the normal way to
+      //  stop reading. only warn when bytes remain beyond the current offset,
+      //  since that means a record was expected but could not be read. do not
+      //  test lskip here. seekgb leaves it untouched when it finds no record,
+      //  so reading it would make the warning depend on an indeterminate value.
+      if(long long n_bytes = file_size(Filename.c_str()); offset < n_bytes) {
+
+         //  build the message in one piece. streaming an empty string to the
+         //  logger prints "(nul)", so the cause is appended rather than
+         //  always being written out.
+         ConcatString msg;
+         msg << "Stop reading GRIB records";
+         if(sizeof(g2int) == 4) {
+            msg << " (input file size exceeds the 2 GB limit of the external library)";
+         }
+
+         mlog << Warning << "\n" << method_name << msg << "\n";
          mlog << Warning << method_name
-              << "technical detail: seekgb offset=" << offset << ", lskip=" << lskip
-              << ", sizeof(g2int)=" << sizeof(g2int)
+              << "technical detail: seekgb offset=" << offset
+              << ", file size=" << n_bytes << ", sizeof(g2int)=" << sizeof(g2int)
               << "\n\n";
+      }
+      else {
+         mlog << Debug(4) << method_name
+              << "finished reading GRIB records at offset " << offset
+              << " of " << n_bytes << " bytes\n";
       }
 
       //  reset to default out of memory handler

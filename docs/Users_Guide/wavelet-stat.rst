@@ -80,32 +80,31 @@ The Intensity-Scale (IS) skill score evaluates the forecast skill as a function 
 
 .. figure:: figure/wavelet-stat_NIMROD_3h_fcst.png
 
-   NIMROD 3h lead-time forecast and corresponding verifying analysis field (precipitation rate in mm/h, valid the 05/29/99 at 15:00 UTC); forecast and analysis binary fields obtained for a threshold of 1mm/h, the binary field difference has their corresponding Contingency Table Image (see :numref:`contingency_table_counts`). The forecast shows a storm of 160 km displaced almost its entire length.
+  NIMROD 3h lead-time forecast and corresponding verifying analysis field (precipitation rate in mm/h, valid the 05/29/99 at 15:00 UTC); forecast and analysis binary fields obtained for a threshold of 1mm/h, the binary field difference has their corresponding Contingency Table Image (see :numref:`contingency_table_counts`). The forecast shows a storm of 160 km displaced almost its entire length.
 
 .. _wavelet-stat_NIMROD_binary_fcst_and_obs:
 
 .. figure:: figure/wavelet-stat_NIMROD_binary_fcst_and_obs.png
 
-   NIMROD binary forecast (top) and binary analysis (bottom) spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scales 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refers to the largest father wavelet component (1280 km resolution).
+  NIMROD binary forecast (top) and binary analysis (bottom) spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scales 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refers to the largest father wavelet component (1280 km resolution).
 
 .. _wavelet-stat_NIMROD_diff:
 
 .. figure:: figure/wavelet-stat_NIMROD_diff.png
 
-   NIMROD binary field difference spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scales 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refers to the largest father wavelet component (1280 km resolution). Note the large error at the scale 6 = 160 km, due to the storm, 160 km displaced almost its entire length.
+  NIMROD binary field difference spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scales 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refers to the largest father wavelet component (1280 km resolution). Note the large error at the scale 6 = 160 km, due to the storm, 160 km displaced almost its entire length.
 
 .. _wavelet-stat_MSE_percent_NIMROD:
 
 .. figure:: figure/wavelet-stat_MSE_percent_NIMROD.png
 
-   MSE and MSE % for the NIMROD binary forecast and analysis spatial scale components. In the MSE%, note the large error associated with the scale 6 = 160 km, for the thresholds ½ to 4 mm/h, associated with the displaced storm.
+  MSE and MSE % for the NIMROD binary forecast and analysis spatial scale components. In the MSE%, note the large error associated with the scale 6 = 160 km, for the thresholds ½ to 4 mm/h, associated with the displaced storm.
 
 .. _wavelet-stat_Intensity_Scale_skill_score_NIMROD:
 
 .. figure:: figure/wavelet-stat_Intensity_Scale_skill_score_NIMROD.png
 
-   Intensity-Scale skill score for the NIMROD forecast and analysis shown in :numref:`wavelet-stat_NIMROD_3h_fcst`. The skill score is a function of the intensity of the precipitation rate and spatial scale of the error. Note the negative skill associated with the scale 6 = 160 km, for the thresholds ½ to 4 mm/h, associated with the displaced storm.
-
+  Intensity-Scale skill score for the NIMROD forecast and analysis shown in :numref:`wavelet-stat_NIMROD_3h_fcst`. The skill score is a function of the intensity of the precipitation rate and spatial scale of the error. Note the negative skill associated with the scale 6 = 160 km, for the thresholds ½ to 4 mm/h, associated with the displaced storm.
 
 
 In addition to the MSE and the SS, the energy squared is also evaluated, for each threshold and scale (:numref:`wavelet-stat_energy_squared_NIMROD`). The energy squared of a field X is the average of the squared values: :math:`{En2}(X)= \sum_i x_i^2`. The energy squared provides feedback on the amount of events present in the forecast and observation fields for each scale, for a given threshold. Usually, small thresholds are associated with a large energy, since many events exceed the threshold. Large thresholds are associated with a small energy, since few events exceed the threshold. Comparison of the forecast and observed squared energy provide feedback on the bias on different scales, for each threshold.
@@ -114,7 +113,7 @@ In addition to the MSE and the SS, the energy squared is also evaluated, for eac
 
 .. figure:: figure/wavelet-stat_energy_squared_NIMROD.png
 
-   Energy squared and energy squared percentages, for each threshold and scale, for the NIMROD forecast and analysis, and forecast and analysis En2 and En2% relative differences.
+  Energy squared and energy squared percentages, for each threshold and scale, for the NIMROD forecast and analysis, and forecast and analysis En2 and En2% relative differences.
 
 The En2 bias for each threshold and scale is assessed by the En2 relative difference, equal to the difference between forecast and observed squared energies normalized by their sum: :math:`[{En2}(F)- {En2}(O)]/[{En2}(F)+ {En2}(O)]`. Since defined in such a fashion, the En2 relative difference accounts for the difference between forecast and observation squared energies relative to their magnitude, and it is sensitive therefore to the ratio of the forecast and observed squared energies. The En2 relative difference ranges between -1 and 1, positive values indicate over-forecast and negative values indicate under-forecast. For the NIMROD case illustrated the forecast exhibits over-forecast for small thresholds, quite pronounced on the large scales, and under-forecast for high thresholds.
 
@@ -123,7 +122,6 @@ As for the MSE, the sum of the energy of the scale components is equal to the en
 For the NIMROD case illustrated, the scale structure is assessed again by the relative difference, but calculated of the squared energy percentages. For small thresholds the forecast overestimates the number of large scale events and underestimates the number of small scale events, in proportion to the total number of events. On the other hand, for larger thresholds the forecast underestimates the number of large scale events and overestimates the number of small scale events, again in proportion to the total number of events. Overall it appears that the forecast overestimates the percentage of events associated with high occurrence, and underestimates the percentage of events associated with low occurrence. The En2% for the 64 mm/h thresholds is homogeneously underestimated for all the scales, since the forecast does not have any event exceeding this threshold.
 
 Note that the energy squared of the observation binary field is identical to the sample climatology :math:`{Br}=(a+c)/n`. Similarly, the energy squared of the forecast binary field is equal to :math:`(a+b)/n`. The ratio of the squared energies of the forecast and observation binary fields is equal to the :math:`{FBI}=(a+b)/(a+c)`, for the contingency table (:numref:`contingency_table_counts`) obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields.
-
 
 
 The Spatial Domain Constraints

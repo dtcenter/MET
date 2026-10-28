@@ -54,19 +54,17 @@ ADECK_COLUMN_DEFINITIONS[ADECK_TECHNUM_COLUMN] = parsing.ColumnDefinition(
     "technum", parsing.text2int)
 
 
-def add_bdeck_time_index(df: pd.DataFrame) -> None:
+def add_bdeck_time_index(df: pd.DataFrame) -> pd.DataFrame:
     times = []
     for base_time, minute in zip(df["yyyymmddhh"], df["min"]):
         new_time = base_time + dt.timedelta(minutes=minute)
         times.append(new_time)
 
-    df["time"] = times
-    df.set_index("time", inplace=True)
+    return df.assign(time=times).set_index("time")
 
 
-def add_carq_time_index(df: pd.DataFrame) -> None:
-    df["time"] = df["yyyymmddhh"]
-    df.set_index("time", inplace=True)
+def add_carq_time_index(df: pd.DataFrame) -> pd.DataFrame:
+    return df.assign(time=df["yyyymmddhh"]).set_index("time")
 
 
 def make_lon_continuous(df: pd.DataFrame) -> None:
@@ -103,8 +101,7 @@ def remove_duplicate_times(df: pd.DataFrame) -> pd.DataFrame:
 
 def get_best_track(filepath_or_buffer: Union[str, TextIO]):
     df = parsing.get_dataframe(filepath_or_buffer, BDECK_COLUMN_DEFINITIONS)
-    add_bdeck_time_index(df)
-    return df
+    return add_bdeck_time_index(df)
 
 
 def get_carq_track(filepath_or_buffer: Union[str, TextIO]):
@@ -114,8 +111,7 @@ def get_carq_track(filepath_or_buffer: Union[str, TextIO]):
 def get_adeck_track(filepath_or_buffer: Union[str, TextIO], tech_id: str):
     filtered_buffer = parsing.get_filtered_buffer(filepath_or_buffer, tech_id)
     df = parsing.get_dataframe(filtered_buffer, ADECK_COLUMN_DEFINITIONS)
-    add_carq_time_index(df)
-    return df
+    return add_carq_time_index(df)
 
 
 def extrapolate(track: pd.DataFrame, column: str, t1: dt.datetime,

@@ -63,6 +63,9 @@ bool get_series_entry(int i_series, VarInfo* data_info,
 
    } // end for i
 
+   // Return an empty field if not found
+   if(!found) dp.clear();
+
    // Error out if not found and specified
    if(!found && error_out) {
       mlog << Error << "\nget_series_entry() -> "
@@ -112,8 +115,11 @@ bool get_series_entries(int i_series, const vector<std::unique_ptr<VarInfo>> &vi
    int i;
    bool found;
 
+   // Initialize
+   dp_list.clear();
+
    // Check for at least one field requested
-   if(vi_list.size() <= 0) return false;
+   if(vi_list.empty()) return false;
 
    // Save the log print warning state
    bool save_print_warning_state = mlog.print_warning();
@@ -125,13 +131,13 @@ bool get_series_entries(int i_series, const vector<std::unique_ptr<VarInfo>> &vi
         << "Processing series entry " << i_series + 1 << ": "
         << vi_list[0]->magic_time_str() << "\n";
 
-   // Initialize
-   dp_list.clear();
-
    // Search for data, beginning with the i_series index
    for(i=0,found=false; i<search_files.n(); i++) {
 
       int i_cur = (i_series + i) % search_files.n();
+
+      // MET #3475: Clear the list since read_all_entries() appends to it
+      dp_list.clear();
 
       found = read_all_entries(vi_list, search_files[i_cur],
                                type, dp_list, grid);
@@ -140,6 +146,12 @@ bool get_series_entries(int i_series, const vector<std::unique_ptr<VarInfo>> &vi
       if(found) break;
 
    } // end for i
+
+   // Return one empty field per requested field if not found
+   if(!found) {
+      dp_list.clear();
+      dp_list.resize(vi_list.size());
+   }
 
    // Error out if not found and specified
    if(!found && error_out) {
