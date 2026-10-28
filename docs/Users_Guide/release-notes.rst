@@ -20,6 +20,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3178 <https://github.com/dtcenter/MET/issues/3178>`_).
      * **Add power spectra calculation capability to the Grid-Diag tool in MET**
        (`#3304 <https://github.com/dtcenter/MET/issues/3304>`_).
+     * **Enhance the point_weight_flag option to support kernel density estimation weighting**
+       (`#3335 <https://github.com/dtcenter/MET/issues/3335>`_).
      * Add lookup tables for data types of MET output
        (`#3384 <https://github.com/dtcenter/MET/issues/3384>`_).
      * Enhance ``@value`` NetCDF dimension lookup logic to support negative values
@@ -47,6 +49,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3443 <https://github.com/dtcenter/MET/issues/3443>`_).
      * Fix PB2NC so that derived HPBL output does not depend on which other stations are processed
        (`#3450 <https://github.com/dtcenter/MET/issues/3450>`_).
+     * Fix the SEEPS category counts, marginal probabilities, and station density weighting
+       (`#3465 <https://github.com/dtcenter/MET/issues/3465>`_).
      * Fix the PB2NC ``-dump`` segfault and reduce PB2NC compiler warnings
        (`#3468 <https://github.com/dtcenter/MET/issues/3468>`_).
      * Fix Stat-Analysis CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
@@ -297,6 +301,16 @@ MET Version 13.0.0 Upgrade Instructions
     * Adds new output variables with names including "EAS" and "EAS_WIDTH" for the Ensemble
       Agreement Scale algorithm.
 
+  * Point-Stat, Ensemble-Stat, and Pair-Stat output format
+
+    * Setting "write_weights = TRUE" with "point_weight_flag" set to SID or KDE writes a new
+      ASCII output file for each verification task, listing the point weight applied to each
+      station. As described in MET
+      `#3335 <https://github.com/dtcenter/MET/issues/3335>`_, these files are named
+      "..._NAME_LEVEL_TYPE_point_weights.txt", where NAME and LEVEL are the forecast variable
+      name and level for that task and TYPE is SID or KDE. No point weight files are written
+      when "write_weights = FALSE", which is the default.
+
 .. dropdown:: Output data changes
 
   MET version 13.0.0 modifies existing output data values in the following ways:
@@ -365,11 +379,41 @@ MET Version 13.0.0 Upgrade Instructions
     always zero, so statistics derived from them, such as RMSE, PR_CORR, and ANOM_CORR,
     were incorrect.
 
-   * TC-Diag output changes when the files listed in the **-data** command line option do not
-     line up one-to-one with the track valid times. As described in MET
-     `#3475 <https://github.com/dtcenter/MET/issues/3475>`_, TC-Diag previously discarded the
-     gridded data it found for those valid times and reported the requested fields as missing.
-     It now uses that data, regardless of the order of the file list.
+  * TC-Diag output changes when the files listed in the **-data** command line option do not
+    line up one-to-one with the track valid times. As described in MET
+    `#3475 <https://github.com/dtcenter/MET/issues/3475>`_, TC-Diag previously discarded the
+    gridded data it found for those valid times and reported the requested fields as missing.
+    It now uses that data, regardless of the order of the file list.
+
+  * The ODFL, ODFH, OLFD, OLFH, OHFD, and OHFL columns of the SEEPS line type written by
+    Point-Stat, Grid-Stat, Pair-Stat, and Stat-Analysis now contain the number of matched
+    pairs, or grid points, in each off-diagonal forecast and observation category. As
+    described in MET `#3465 <https://github.com/dtcenter/MET/issues/3465>`_, these columns
+    previously contained weighted score sums that were always written as 0. The gridded
+    forecast and observation categories were also swapped, which was not visible while the
+    columns were always 0. These columns are informational only and are not used to compute
+    any of the other SEEPS columns.
+
+  * The PF1, PF2, PF3, PV1, PV2, PV3, MEAN_FCST, MEAN_OBS, and SEEPS columns of the SEEPS
+    line type written by Point-Stat, Pair-Stat, and Stat-Analysis change. As described in
+    MET `#3465 <https://github.com/dtcenter/MET/issues/3465>`_, the station density weights
+    of :ref:`Rodwell et al., 2010 <Rodwell-2010>` were computed with the wrong angle formula,
+    so every weight was 0 and the PF and PV columns were always written as 0. The weights are
+    now computed using the same kernel density estimator as "point_weight_flag = KDE", and the
+    MEAN_FCST, MEAN_OBS, and SEEPS columns report station density weighted means rather than
+    unweighted ones. The SEEPS_MPR line type is unchanged. See :numref:`PS_seeps_weighting`
+    for a description of which weights apply to each column.
+
+  * The PF1, PF2, PF3, PV1, PV2, PV3, and SEEPS columns of the SEEPS line type written by
+    Grid-Stat change when any grid point has missing data or no climatology. As described in
+    MET `#3465 <https://github.com/dtcenter/MET/issues/3465>`_, these columns were previously
+    normalized by the full grid size rather than by the number of grid points with a valid
+    SEEPS score. Output is unchanged when every grid point has a valid score.
+
+  * Stat-Analysis "aggregate" and "aggregate_stat" jobs that write the SEEPS line type change
+    accordingly. As described in MET
+    `#3465 <https://github.com/dtcenter/MET/issues/3465>`_, Stat-Analysis also read the
+    weighted MEAN_OBS value from the MEAN_FCST column when parsing SEEPS lines.
 
 .. dropdown:: Additional upgrade instructions
 
