@@ -18,7 +18,7 @@
 #=======================================================================
 
 # Check that this is being run from the top-level MET directory
-if [ ! -e internal/scripts/docker/build_met_sonarqube.sh ]; then
+if [[ ! -e internal/scripts/docker/build_met_sonarqube.sh ]]; then
   echo "ERROR: ${0} -> must be run from the top-level MET directory"
   exit 1
 fi
@@ -31,19 +31,19 @@ source internal/scripts/environment/development.docker
 source .github/jobs/bash_functions.sh
 
 # Check required environment variables
-if [ -z ${SONAR_HOST_URL+x} ]; then
+if [[ -z ${SONAR_HOST_URL+x} ]]; then
   echo "ERROR: ${0} -> \$SONAR_HOST_URL not defined!"
   exit 1
 fi
-if [ -z ${SONAR_TOKEN+x} ]; then
+if [[ -z ${SONAR_TOKEN+x} ]]; then
   echo "ERROR: ${0} -> \$SONAR_TOKEN not defined!"
   exit 1
 fi
-if [ -z ${MET_GIT_NAME+x} ]; then
+if [[ -z ${MET_GIT_NAME+x} ]]; then
   echo "ERROR: ${0} -> \$MET_GIT_NAME not defined!"
   exit 1
 fi
-if [ -z ${SONAR_REFERENCE_BRANCH+x} ]; then
+if [[ -z ${SONAR_REFERENCE_BRANCH+x} ]]; then
   echo "ERROR: ${0} -> \$SONAR_REFERENCE_BRANCH not defined!"
   exit 1
 fi
@@ -52,7 +52,7 @@ fi
 WRAPPER_NAME=build-wrapper-linux-x86-64
 SONAR_WRAPPER=$(which $WRAPPER_NAME 2> /dev/null)
 
-if [ ! -e $SONAR_WRAPPER ]; then
+if [[ ! -e $SONAR_WRAPPER ]]; then
   echo "ERROR: ${0} -> $WRAPPER_NAME not found in the path"
   exit 1
 else
@@ -63,7 +63,7 @@ fi
 SCANNER_NAME=sonar-scanner
 SONAR_SCANNER=$(which $SCANNER_NAME 2> /dev/null)
 
-if [ ! -e $SONAR_SCANNER ]; then
+if [[ ! -e $SONAR_SCANNER ]]; then
   echo "ERROR: ${0} -> $SCANNER_NAME not found in the path"
   exit 1
 else
@@ -71,7 +71,7 @@ else
 fi
 
 # Set output directory name
-if [ -z ${SONARQUBE_OUT_DIR} ]; then
+if [[ -z ${SONARQUBE_OUT_DIR} ]]; then
   export SONARQUBE_OUT_DIR=bw-outputs
 fi
 
@@ -83,7 +83,7 @@ SONAR_PROPERTIES_DIR=internal/scripts/sonarqube
 SONAR_PROPERTIES=sonar-project.properties
 
 # Configure the sonar-project.properties
-[ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
+[[ -e $SONAR_PROPERTIES ]] && rm $SONAR_PROPERTIES
 sed -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
     -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
     -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
@@ -91,7 +91,7 @@ sed -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
     $SONAR_PROPERTIES_DIR/$SONAR_PROPERTIES > $SONAR_PROPERTIES
 
 # The source and reference branches must differ to define new code
-if [ "$MET_GIT_NAME" != "$SONAR_REFERENCE_BRANCH" ]; then
+if [[ "$MET_GIT_NAME" != "$SONAR_REFERENCE_BRANCH" ]]; then
   echo "sonar.newCode.referenceBranch=${SONAR_REFERENCE_BRANCH}" >> $SONAR_PROPERTIES
 fi
 
@@ -148,4 +148,4 @@ fi
 mkdir -p /met/.scannerwork
 cp .scannerwork/report-task.txt /met/.scannerwork/report-task.txt
 
-[ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
+[[ -e $SONAR_PROPERTIES ]] && rm $SONAR_PROPERTIES

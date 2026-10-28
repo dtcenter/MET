@@ -43,8 +43,8 @@ void ModePsFile::do_cluster_page(ModeFuzzyEngine & eng, EngineType eng_type, con
 
    int i;
    double Htab_a, Htab_b;
-   double Htab, Vtab;
-   double dx, dy;
+   double Vtab;
+   double dy;
    const double Htab_cen = PageWidth/2.0;
    ConcatString label;
    ConcatString cs;
@@ -187,8 +187,6 @@ void ModePsFile::do_cluster_page(ModeFuzzyEngine & eng, EngineType eng_type, con
    //
    //
 
-   dx = 3.0*TextSep;
-
    dy = 2.0;
 
    for(i=0; i<eng.n_clus && Vtab >= Vmargin; i++) {
@@ -199,79 +197,65 @@ void ModePsFile::do_cluster_page(ModeFuzzyEngine & eng, EngineType eng_type, con
 
       if ( r >= t.nrows() )  break;
 
-      Htab = Hmargin;
-
       // Cluster ID
       cs.format("%d", i+1);
       t.write_xy1_to_cell(r, c++, 10.0, dy, 0.5, 0.0, cs.c_str());
       // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
-      Htab += dx;
 
       // Centroid Distance
       cs.format("%.2f", eng.pair_cluster[i].centroid_dist);
       t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
       // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
-      Htab += dx;
 
       // Angle Difference
       cs.format("%.2f", eng.pair_cluster[i].angle_diff);
       t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
       // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
-      Htab += dx;
 
       // Forecast Area
       cs.format("%i", nint(eng.pair_cluster[i].Fcst[0].area));
       t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
       // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
-      Htab += dx;
 
       // Observation Area
       cs.format("%i", nint(eng.pair_cluster[i].Obs[0].area));
       t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
       // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
-      Htab += dx;
 
       // Intersection Area
       cs.format("%i", nint(eng.pair_cluster[i].intersection_area));
       t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
       // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
-      Htab += dx;
 
       // Union Area
       cs.format("%i", nint(eng.pair_cluster[i].union_area));
       t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
       // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
-      Htab += dx;
 
       // Symmetric Difference
       cs.format("%i", nint(eng.pair_cluster[i].symmetric_diff));
       t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
       // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
-      Htab += dx;
 
       // Forecast median intensity
       cs.format("%.2f", eng.pair_cluster[i].Fcst[0].intensity_ptile.p50);
       t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
       // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
-      Htab += dx;
 
       // Observation median intensity
       cs.format("%.2f", eng.pair_cluster[i].Obs[0].intensity_ptile.p50);
       t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
       // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
-      Htab += dx;
 
       // Forecast 90th percentile of intensity
       cs.format("%.2f", eng.pair_cluster[i].Fcst[0].intensity_ptile.p90);
       t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
       // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
-      Htab += dx;
 
       // Observation median intensity
       cs.format("%.2f", eng.pair_cluster[i].Obs[0].intensity_ptile.p90);
       t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
       // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
-      Htab += dx;
 
       // Total Interest
       if(eng.info_clus[i].interest_value < 0) label = na_str;

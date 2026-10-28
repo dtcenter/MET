@@ -43,7 +43,7 @@ and analysis tools to provide the same primary functionality as the EMC VSDB
 system, and also included a spatial verification package called MODE.
 
 Over the years, MET and VSDB packages grew in complexity.  Verification
-capability at other NOAA laboratories, such as ESRL, were also under heavy
+capability at other NOAA laboratories, such as ESRL, was also under heavy
 development.  An effort to unify verification capability was first started
 under the HIWPP project and led by NOAA ESRL.  In 2015, the NGGPS
 Program Office started working groups to focus on several aspects of the
@@ -85,15 +85,15 @@ follows:
   components of METplus tools for statistical aggregation, event
   equalization, and other analysis needs
 * **METplotpy**  - suite of Python-based scripts to plot MET output,
-  and in come cases provide additional post-processing of output prior
+  and in some cases provide additional post-processing of output prior
   to plotting
-* **METdatadb**  - database to store MET output and to be used by both
+* **METdataio**  - database to store MET output and to be used by both
   METviewer and METexpress
 
 The umbrella repository will be brought together by using a software package
 called `manage_externals <https://github.com/ESMCI/manage_externals>`_
 developed by the Community Earth System Modeling (CESM) team, hosted at NCAR
-and NOAA Earth System's Research Laboratory.  The manage_externals paackage
+and NOAA Earth System Research Laboratory.  The manage_externals package
 was developed because CESM is comprised of a number of different components
 that are developed and managed independently. Each component also may have
 additional "external" dependencies that need to be maintained independently.
@@ -109,10 +109,10 @@ Acronyms
 * **VSDB** - Verification Statistics Data Base
 * **MODE** - Method for Object-Based Diagnostic Evaluation
 * **UFS** - Unified Forecast System
-* **SIMA** -System for Integrated Modeling of the Atmosphere
-* **ESRL** - Earth Systems Research Laboratory
-* **HIWPP** - High Impact Weather Predication Project
-* **NGGPS** - Next Generation Global Predicatio System
+* **SIMA** - System for Integrated Modeling of the Atmosphere
+* **ESRL** - Earth System Research Laboratory
+* **HIWPP** - High Impact Weather Prediction Project
+* **NGGPS** - Next Generation Global Prediction System
 * **GSD** - Global Systems Division
 
 Authors
@@ -155,68 +155,68 @@ To cite this documentation in publications, please refer to the MET User's Guide
 .. rubric:: Organization
 
 .. [#NCAR] `National Center for Atmospheric Research, Research
-       Applications Laboratory <https://ral.ucar.edu/>`_, `Developmental Testbed Center <https://dtcenter.org/>`_
+  Applications Laboratory <https://ral.ucar.edu/>`_, `Developmental Testbed Center <https://dtcenter.org/>`_
 .. [#CIRA] `Cooperative Institute for Research in the Atmosphere at
-       National Oceanic and Atmospheric Administration (NOAA) Earth
-       System Research Laboratory <https://www.esrl.noaa.gov/>`_
+  National Oceanic and Atmospheric Administration (NOAA) Earth
+  System Research Laboratory <https://www.esrl.noaa.gov/>`_
 
 .. toctree::
-   :hidden:
-   :caption: Training
+  :hidden:
+  :caption: Training
 
-   METplus Tutorial <https://metplus-training.readthedocs.io/en/latest/Tutorial/index.html>
-   Training Series <https://metplus-training.readthedocs.io/en/latest/Training_Series/index.html>
-   Featured Topics <https://metplus-training.readthedocs.io/en/latest/Featured_Topics/index.html>
-
-.. toctree::
-   :hidden:
-   :caption: METplus
-
-   User's Guide <https://metplus.readthedocs.io/en/latest/Users_Guide/index.html>
-   Contributor's Guide <https://metplus.readthedocs.io/en/latest/Contributors_Guide/index.html>
-   Verification Datasets Guide <https://metplus.readthedocs.io/en/latest/Verification_Datasets/index.html>
-   Release Guide <https://metplus.readthedocs.io/en/latest/Release_Guide/index.html>
+  METplus Tutorial <https://metplus-training.readthedocs.io/en/latest/Tutorial/index.html>
+  Training Series <https://metplus-training.readthedocs.io/en/latest/Training_Series/index.html>
+  Featured Topics <https://metplus-training.readthedocs.io/en/latest/Featured_Topics/index.html>
 
 .. toctree::
-   :hidden:
-   :caption: MET
+  :hidden:
+  :caption: METplus
 
-   Users_Guide/index
-   Contributors_Guide/index
-
-.. toctree::
-   :hidden:
-   :caption: METexpress
-
-   User's Guide <https://metplus.readthedocs.io/projects/metexpress/en/latest/index.html>
+  User's Guide <https://metplus.readthedocs.io/en/latest/Users_Guide/index.html>
+  Contributor's Guide <https://metplus.readthedocs.io/en/latest/Contributors_Guide/index.html>
+  Verification Datasets Guide <https://metplus.readthedocs.io/en/latest/Verification_Datasets/index.html>
+  Release Guide <https://metplus.readthedocs.io/en/latest/Release_Guide/index.html>
 
 .. toctree::
-   :hidden:
-   :caption: METviewer
+  :hidden:
+  :caption: MET
 
-   User's Guide <https://metplus.readthedocs.io/projects/metviewer/en/latest/Users_Guide/index.html>
-   Contributor's Guide <https://metplus.readthedocs.io/projects/metviewer/en/latest/Contributors_Guide/index.html>
-
-.. toctree::
-   :hidden:
-   :caption: METplotpy
-
-   User's Guide <https://metplus.readthedocs.io/projects/metplotpy/en/latest/Users_Guide/index.html>
-   Contributor's Guide <https://metplus.readthedocs.io/projects/metplotpy/en/latest/Contributors_Guide/index.html>
+  Users_Guide/index
+  Contributors_Guide/index
 
 .. toctree::
-   :hidden:
-   :caption: METcalcpy
+  :hidden:
+  :caption: METexpress
 
-   User's Guide <https://metplus.readthedocs.io/projects/metcalcpy/en/latest/Users_Guide/index.html>
-   Contributor's Guide <https://metplus.readthedocs.io/projects/metcalcpy/en/latest/Contributors_Guide/index.html>
+  User's Guide <https://metplus.readthedocs.io/projects/metexpress/en/latest/index.html>
 
 .. toctree::
-   :hidden:
-   :caption: METdataio
+  :hidden:
+  :caption: METviewer
 
-   User's Guide <https://metplus.readthedocs.io/projects/metdataio/en/latest/Users_Guide/index.html>
-   Contributor's Guide <https://metplus.readthedocs.io/projects/metdataio/en/latest/Contributors_Guide/index.html>
+  User's Guide <https://metplus.readthedocs.io/projects/metviewer/en/latest/Users_Guide/index.html>
+  Contributor's Guide <https://metplus.readthedocs.io/projects/metviewer/en/latest/Contributors_Guide/index.html>
+
+.. toctree::
+  :hidden:
+  :caption: METplotpy
+
+  User's Guide <https://metplus.readthedocs.io/projects/metplotpy/en/latest/Users_Guide/index.html>
+  Contributor's Guide <https://metplus.readthedocs.io/projects/metplotpy/en/latest/Contributors_Guide/index.html>
+
+.. toctree::
+  :hidden:
+  :caption: METcalcpy
+
+  User's Guide <https://metplus.readthedocs.io/projects/metcalcpy/en/latest/Users_Guide/index.html>
+  Contributor's Guide <https://metplus.readthedocs.io/projects/metcalcpy/en/latest/Contributors_Guide/index.html>
+
+.. toctree::
+  :hidden:
+  :caption: METdataio
+
+  User's Guide <https://metplus.readthedocs.io/projects/metdataio/en/latest/Users_Guide/index.html>
+  Contributor's Guide <https://metplus.readthedocs.io/projects/metdataio/en/latest/Contributors_Guide/index.html>
 
 
 Index

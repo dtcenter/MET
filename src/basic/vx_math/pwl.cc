@@ -226,7 +226,7 @@ double PiecewiseLinear::x(int k) const
 
 {
 
-if ( k < 0 || k >= X.size() )  {
+if ( k < 0 || k >= static_cast<int>(X.size()) )  {
 
    mlog << Error << "\nPiecewiseLinear::x(int) -> range check error\n\n";
 
@@ -246,7 +246,7 @@ double PiecewiseLinear::y(int k) const
 
 {
 
-if ( k < 0 || k >= Y.size() )  {
+if ( k < 0 || k >= static_cast<int>(Y.size()) )  {
 
    mlog << Error << "\nPiecewiseLinear::y(int) -> range check error\n\n";
 

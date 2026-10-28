@@ -110,8 +110,6 @@ cerr << "\n\n   usage:  " << program_name << " script_name variable_name\n\n";
 
 exit ( 1 );
 
-return;
-
 }
 
 

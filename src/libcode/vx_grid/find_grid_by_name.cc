@@ -296,7 +296,7 @@ int j;
 int Nx, Ny;
 double lat_ll, lon_ll, lon_orient, D_km, R_km, phi_1, phi_2;
 char H;
-const char * c = (const char *) nullptr;
+string c;
 
 j = 1;
 
@@ -320,9 +320,9 @@ phi_1      = atof(grid_strings[j].c_str()); j++;
 if ( N == 11 )  { phi_2 = atof(grid_strings[j].c_str()); j++; }
 else            { phi_2 = phi_1; }
 
-c          = grid_strings[j].c_str(); j++;
+c          = grid_strings[j]; j++;
 
-if ( m_strlen(c) != 1 )  {
+if ( c.length() != 1 )  {
 
    mlog << Error << "\nparse_lambert_grid() -> "
         << "bad hemisphere in grid spec\n\n";
@@ -331,7 +331,7 @@ if ( m_strlen(c) != 1 )  {
 
 }
 
-H = *c;
+H = c[0];
 
 if ( (H != 'N') && (H != 'S') )  {
 
@@ -412,7 +412,7 @@ int j;
 int Nx, Ny;
 double lat_ll, lon_ll, lon_orient, D_km, R_km, lat_scale;
 char H;
-const char * c = (const char *) nullptr;
+string c;
 
 
 j = 1;
@@ -435,9 +435,9 @@ R_km       = atof(grid_strings[j].c_str()); j++;
 
 lat_scale  = atof(grid_strings[j].c_str()); j++;
 
-c          = grid_strings[j].c_str(); j++;
+c          = grid_strings[j]; j++;
 
-if ( m_strlen(c) != 1 )  {
+if ( c.length() != 1 )  {
 
    mlog << Error << "\nparse_stereographic_grid() -> "
         << "bad hemisphere in grid spec\n\n";
@@ -446,7 +446,7 @@ if ( m_strlen(c) != 1 )  {
 
 }
 
-H = *c;
+H = c[0];
 
 if ( (H != 'N') && (H != 'S') )  {
 

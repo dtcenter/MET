@@ -143,7 +143,6 @@ void VarInfoNcWrf::set_default_levels(const ConcatString &lstr) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoNcWrf::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
-   const char *method_name = "VarInfoNcWrf::set_magic() -> ";
 
    // Store the magic string
    set_magic_pre(nstr, lstr);
@@ -161,7 +160,7 @@ void VarInfoNcWrf::set_magic(const ConcatString &nstr, const ConcatString &lstr)
 
 bool VarInfoNcWrf::set_dict(Dictionary & dict, bool do_exit) {
 
-   bool status = VarInfo::set_dict(dict);
+   bool status = VarInfo::set_dict(dict, do_exit);
 
    set_magic(dict.lookup_string("name"),
              dict.lookup_string("level"));

@@ -30,9 +30,9 @@ TODAY=`date +%Y%m%d`
 CUR_REV=`git rev-parse --short HEAD`
 
 # Check for 0 or 1 arguments
-if [ ${NARGS} -eq 0 ]; then
+if [[ ${NARGS} -eq 0 ]]; then
   VERSION="${CUR_REV}"
-elif [ ${NARGS} -eq 1 ]; then
+elif [[ ${NARGS} -eq 1 ]]; then
   VERSION="${1}"
 else
   echo

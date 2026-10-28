@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <cstdio>
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -62,7 +63,7 @@ ScopeStackElement::ScopeStackElement(const ScopeStackElement & e)
 
 {
 
-Name = (const char *) nullptr;
+Name.clear();
 
 assign(e);
 
@@ -188,7 +189,14 @@ ScopeStack::~ScopeStack()
 
 {
 
-clear();
+try { clear(); }
+catch(...) {
+   //  a destructor must not propagate exceptions.  fputs is used
+   //  rather than mlog or cerr because neither is guaranteed not
+   //  to throw, which would defeat the purpose of this catch.
+   fputs("\nWARNING: ScopeStack::~ScopeStack() -> "
+         "ignoring exception thrown during cleanup\n\n", stderr);
+}
 
 }
 

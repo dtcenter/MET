@@ -43,7 +43,7 @@ NEXT_RELEASE_DIR=${UNIT_TEST_DATA_DIR}/${NEXT_RELEASE}
 
 # exit if next release directory (e.g. v12.1) already exists
 
-if [ -d "${NEXT_RELEASE_DIR}" ]; then
+if [[ -d "${NEXT_RELEASE_DIR}" ]]; then
     echo "Next release directory already exists: ${NEXT_RELEASE_DIR}"
     echo "Exiting..."
     exit 0
@@ -57,11 +57,11 @@ mkdir -p "${NEXT_RELEASE_DIR}"
 
 INPUT_DATA_TARFILE_PATH=${DEVELOP_DIR}/${INPUT_DATA_TARFILE_NAME}
 volume_mount_path=${DEVELOP_DIR}/${VOLUME_MOUNT_FILE_NAME}
-if [ ! -f ${INPUT_DATA_TARFILE_PATH} ]; then
+if [[ ! -f ${INPUT_DATA_TARFILE_PATH} ]]; then
     echo "ERROR: Tarfile must exist in develop dir: ${INPUT_DATA_TARFILE_PATH}"
     exit 1
 fi
-if [ ! -f ${volume_mount_path} ]; then
+if [[ ! -f ${volume_mount_path} ]]; then
     echo "ERROR: ${VOLUME_MOUNT_FILE_NAME} must exist in develop dir: ${volume_mount_path}"
     exit 1
 fi
@@ -76,7 +76,7 @@ echo "Extracting tarfile into ${NEXT_RELEASE_DIR}"
 tar zxf "${NEXT_RELEASE_DIR}/${INPUT_DATA_TARFILE_NAME}" -C "${NEXT_RELEASE_DIR}"
 
 # if develop tarfile is a symbolic link, unlink it, otherwise save a copy
-if [ -h ${INPUT_DATA_TARFILE_PATH} ]; then
+if [[ -h ${INPUT_DATA_TARFILE_PATH} ]]; then
     echo Unlinking ${INPUT_DATA_TARFILE_PATH}
     unlink ${INPUT_DATA_TARFILE_PATH}
 else
@@ -96,7 +96,7 @@ ln -s "${tarfile_realpath}" ${INPUT_DATA_TARFILE_PATH}
 echo "Copying volume mount file ${volume_mount_path} into ${NEXT_RELEASE_DIR}"
 cp ${volume_mount_path} "${NEXT_RELEASE_DIR}"/
 
-if [ -h ${volume_mount_path} ]; then
+if [[ -h ${volume_mount_path} ]]; then
     echo Unlinking ${volume_mount_path}
     unlink ${volume_mount_path}
 else

@@ -117,8 +117,6 @@ static const char fcm = 'f';   //  function def mark
 
 static void do_op(char op);
 
-static Number do_integer_op(char op, const Number & a, const Number & b);
-
 static void do_negate();
 static void do_paren_exp();
 
@@ -515,47 +513,6 @@ L.add(cell);
 icvs.push(L);
 
 return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-Number do_integer_op(char op, const Number & a, const Number & b)
-
-{
-
-int A = a.i;
-int B = b.i;
-int C;
-
-switch ( op )  {
-
-   case '+':  C = A + B;  break;
-   case '-':  C = A - B;  break;
-   case '*':  C = A * B;  break;
-   case '/':
-      if ( B == 0 )  {
-         mlog << Error << "\ndo_integer_op() -> "
-              << "division by zero!\n\n";
-         exit ( 1 );
-      }
-      C = A / B;
-      break;
-
-   default:
-      mlog << Error << "\ndo_integer_op() -> "
-           << "bad operator ... \"" << op << "\"\n\n";
-      exit ( 1 );
-
-}
-
-Number c;
-
-set_int(c, C);
-
-return ( c );
 
 }
 

@@ -155,7 +155,7 @@ void VarInfoPython::set_file_type(const GrdFileType t) {
 
 bool VarInfoPython::set_dict(Dictionary & dict, bool do_exit) {
 
-   bool status = VarInfo::set_dict(dict);
+   bool status = VarInfo::set_dict(dict, do_exit);
 
    //
    //  the "name" entry is required and specifies the python command to be run

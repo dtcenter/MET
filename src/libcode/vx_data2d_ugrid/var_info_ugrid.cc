@@ -144,8 +144,6 @@ void VarInfoUGrid::set_default_levels(const ConcatString &lstr) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
-   const char *method_name = "VarInfoUGrid::set_magic() -> ";
-
    // Store the magic string
    set_magic_pre(nstr, lstr);
 
@@ -168,7 +166,7 @@ bool VarInfoUGrid::set_dict(Dictionary &dict, bool do_exit){
    ConcatString cfg_level = dict.lookup_string("level");
    const char * method_name = "VarInfoUGrid::set_dict() -> ";
 
-   bool status = VarInfo::set_dict(dict);
+   bool status = VarInfo::set_dict(dict, do_exit);
 
    if (!cfg_level.empty()) lvl_type = cfg_level.char_at(0);
    if (lvl_type == 'A' || lvl_type == 'Z' || lvl_type == 'P' ||

@@ -51,7 +51,7 @@ class CRC_Array {
 
       CRC_Array(const CRC_Array <T> & _a)  { init_from_scratch();  assign(_a); }
 
-      CRC_Array(CRC_Array <T> && _a) noexcept : e(move(_a.e)) {}
+      CRC_Array(CRC_Array <T> && _a) noexcept : e(std::move(_a.e)) {}
 
       CRC_Array & operator=(const CRC_Array <T> & _a)  {
 
@@ -67,7 +67,7 @@ class CRC_Array {
 
          if ( this == &_a )  return *this;
 
-         e = move(_a.e);
+         e = std::move(_a.e);
 
          return *this;
 

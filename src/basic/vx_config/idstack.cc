@@ -267,7 +267,7 @@ const string & IdentifierArray::operator[](int k) const
 
 {
 
-if ( (k < 0) || (k >= i.size()) )  {
+if ( (k < 0) || (k >= static_cast<int>(i.size())) )  {
 
    cerr << "\nIdentifierArray::operator[](int) -> "
         << "range check error!\n\n";
@@ -306,7 +306,7 @@ Indent prefix2(indent_depth + 1);
 
 out << prefix << "Nelements = " << i.size() << "\n";
 
-for (int j=0; j<i.size(); ++j)  {
+for (size_t j=0; j<i.size(); ++j)  {
 
    out << "Element # " << j << " ...\n";
 
@@ -348,7 +348,7 @@ bool IdentifierArray::has(const char * text, int & index) const
 
 index = -1;
 
-for (int j=0; j<i.size(); ++j)  {
+for (int j=0; j<static_cast<int>(i.size()); ++j)  {
 
    if ( i[j].compare(text) == 0 )  { index = j; return true; }
 

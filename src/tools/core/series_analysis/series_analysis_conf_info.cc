@@ -55,7 +55,6 @@ void SeriesAnalysisConfInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void SeriesAnalysisConfInfo::clear() {
-   int i;
 
    // Initialize values
    model.clear();

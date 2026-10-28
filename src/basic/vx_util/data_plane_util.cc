@@ -231,7 +231,6 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
    int n_vld = 0;
    int n_thr = 0;
    double v;
-   double bad = bad_data_double;
    bool use_climo = false;
 
    // Check that width is set to 1 or greater
@@ -287,7 +286,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 
 #pragma omp parallel default(none) \
    shared(mlog, dp, frac_dp, shape, width, wrap_lon, t) \
-   shared(use_climo, fcmn, fcsd, ocmn, ocsd, vld_t, bad) \
+   shared(use_climo, fcmn, fcsd, ocmn, ocsd, vld_t) \
    private(n_vld, n_thr, gp, v)
    {
 

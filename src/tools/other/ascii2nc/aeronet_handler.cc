@@ -38,7 +38,6 @@ const int AeronetHandler::NUM_OBS_COLS = 45;
 //const int NUM_OBS_COLS_V3 = 113;
 //const int NUM_OBS_COLS_V3_tot  = 57;
 //const int NUM_OBS_COLS_V3_oneill = 267;
-const int version_3_columns[7] = { 113, 81, 53, 33, 41, 259 };
 
 const string site_name_col = "AERONET_Site_Name";
 const string lat_col1      = "Site_Latitude";       // "Site_Latitude(Degrees)";
@@ -781,15 +780,15 @@ string AeronetHandler::make_var_name_from_header(string hdr_field) {
       var_name = WAVELENGTHS_INPUT_AOD_NAME;
     }
     // const string Input_AOD_NAME = "Input_AOD";  // 870nm_Input_AOD
-    else if ((int) string::npos != hdr_field.find(INPUT_AOD_NAME)) {
+    else if (string::npos != hdr_field.find(INPUT_AOD_NAME)) {
       var_name = INPUT_AOD_NAME;
     }
     // Exact_Wavelengths_of_AOD(um)_865nm
-    else if ((int) string::npos != hdr_field.find(WAVELENGTHS_AOD_NAME)) {
+    else if (string::npos != hdr_field.find(WAVELENGTHS_AOD_NAME)) {
       var_name = WAVELENGTHS_AOD_NAME;
     }
     // Exact_Wavelengths_of_PW(um)_935nm
-    else if ((int) string::npos != hdr_field.find(WAVELENGTHS_PW_NAME)) {
+    else if (string::npos != hdr_field.find(WAVELENGTHS_PW_NAME)) {
       var_name = WAVELENGTHS_PW_NAME;
     }
     else if (hdr_field == OPTICAL_AIR_MASS_NAME) {

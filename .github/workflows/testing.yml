@@ -43,6 +43,10 @@ on:
         description: 'Override the MET base tag'
         default: ''
         required: false
+      verbose_logs:
+        description: 'Capture the full MET tool output in the unit test logs'
+        default: false
+        type: boolean
 
 # Group by workflow name and branch/PR reference
 concurrency:
@@ -51,6 +55,7 @@ concurrency:
 
 env:
   DOCKERHUB_REPO: dtcenter/met-dev
+  UNIT_TEST_VERBOSE: ${{ github.event.inputs.verbose_logs || 'false' }}
 
 jobs:
 

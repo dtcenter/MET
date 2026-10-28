@@ -31,6 +31,14 @@ static StringArray swap_uv_name(const VarInfo *,
                                 const ConcatString &,
                                 const StringArray &);
 
+static bool wind_orientations_match(const VarInfo *,
+                                    const VarInfo *,
+                                    const char *);
+
+static void log_wind_rotation(const VarInfo *);
+
+static void log_wind_rotation(const VarInfo *, int);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -112,6 +120,7 @@ void Met2dDataFile::mtddf_init_from_scratch()
 
 ShiftRight = 0;
 GridShifted = false;
+ProcessPlanes = true;
 
 return;
 
@@ -132,6 +141,7 @@ Filename.clear();
 
 ShiftRight = 0;
 GridShifted = false;
+ProcessPlanes = true;
 
 return;
 
@@ -320,7 +330,7 @@ DataPlane cur_dp;
    // Loop over requested VarInfo objects
    //
 
-for(int i=0; i<vi_list.size(); i++) {
+for(size_t i=0; i<vi_list.size(); i++) {
 
    //
    // Initialize
@@ -688,12 +698,7 @@ if(!vinfo) return false;
 
 if(!vinfo->is_wind_rotation()) return true;
 
-if(vinfo->is_grid_relative()) {
-   mlog << Debug(3) << "Rotating wind field \""
-        << vinfo->magic_str()
-        << "\" from grid-relative to earth-relative.\n";
-}
-else {
+if(!vinfo->is_grid_relative()) {
    mlog << Debug(3) << "Identified wind field \""
         << vinfo->magic_str()
         << "\" as being earth-relative.\n";
@@ -701,6 +706,10 @@ else {
 }
 
 bool status = false;
+
+// Set when the U and V components disagree on their orientation, in which
+// case the data is returned unrotated rather than treated as a failure
+bool skip_rotation = false;
 
 // Create local copy
 auto vinfo_wind = vinfo->clone();
@@ -716,9 +725,14 @@ if(vinfo->is_u_wind()) {
                            conf_key_v_wind_field_name,
                            vinfo->wind_info().v_wind,
                            vwnd_dp);
-   if(status) status = rotate_uv_grid_to_earth(uwnd_dp, vwnd_dp,
-                                               *Raw_Grid,
-                                               dp, tmp_dp);
+   if(status) skip_rotation = !wind_orientations_match(vinfo,
+                                                       vinfo_wind.get(),
+                                                       method_name);
+   if(status && !skip_rotation) {
+      log_wind_rotation(vinfo);
+      status = rotate_uv_grid_to_earth(uwnd_dp, vwnd_dp, *Raw_Grid,
+                                       dp, tmp_dp);
+   }
 }
 // Rotate V-Wind
 else if(vinfo->is_v_wind()) {
@@ -727,16 +741,24 @@ else if(vinfo->is_v_wind()) {
                            conf_key_u_wind_field_name,
                            vinfo->wind_info().u_wind,
                            uwnd_dp);
-   if(status) status = rotate_uv_grid_to_earth(uwnd_dp, vwnd_dp,
-                                               *Raw_Grid,
-                                               tmp_dp, dp);
+   if(status) skip_rotation = !wind_orientations_match(vinfo,
+                                                       vinfo_wind.get(),
+                                                       method_name);
+   if(status && !skip_rotation) {
+      log_wind_rotation(vinfo);
+      status = rotate_uv_grid_to_earth(uwnd_dp, vwnd_dp, *Raw_Grid,
+                                       tmp_dp, dp);
+   }
 }
 // Rotate Wind Direction
 else if(vinfo->is_wind_direction()) {
+   log_wind_rotation(vinfo);
    tmp_dp = dp;
    rotate_wind_direction_grid_to_earth(tmp_dp, *Raw_Grid, dp);
    status = true;
 }
+
+if(skip_rotation) return true;
 
 if(!status) {
    mlog << Warning << "\n" << method_name
@@ -745,6 +767,86 @@ if(!status) {
 }
 
 return status;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////
+//
+// Rotate a U-wind or V-wind component array from grid-relative to
+// earth-relative. Reads the companion component, checks that the two agree
+// about their orientation and their levels, and rotates each pair of
+// planes. Sets skip_rotation when the components disagree, in which case
+// the data is left unrotated rather than treated as a failure.
+//
+////////////////////////////////////////////////////////////////////////
+
+
+bool Met2dDataFile::rotate_uv_winds(const VarInfo *vinfo, DataPlaneArray &dpa,
+                                    bool &skip_rotation,
+                                    const char *method_name)
+
+{
+
+// Create local copy
+auto vinfo_wind = vinfo->clone();
+
+DataPlaneArray uwnd_dpa;
+DataPlaneArray vwnd_dpa;
+DataPlaneArray tmp_dpa(dpa);
+DataPlaneArray *uwnd_out;
+DataPlaneArray *vwnd_out;
+bool status;
+
+// Read the companion component
+if(vinfo->is_u_wind()) {
+   uwnd_dpa = dpa;
+   uwnd_out = &dpa;
+   vwnd_out = &tmp_dpa;
+   status = read_wind_data(vinfo_wind.get(),
+                           conf_key_v_wind_field_name,
+                           vinfo->wind_info().v_wind,
+                           vwnd_dpa);
+}
+else {
+   vwnd_dpa = dpa;
+   uwnd_out = &tmp_dpa;
+   vwnd_out = &dpa;
+   status = read_wind_data(vinfo_wind.get(),
+                           conf_key_u_wind_field_name,
+                           vinfo->wind_info().u_wind,
+                           uwnd_dpa);
+}
+
+if(!status) return false;
+
+// Check that both components agree on their orientation
+skip_rotation = !wind_orientations_match(vinfo, vinfo_wind.get(),
+                                         method_name);
+
+if(skip_rotation) return true;
+
+// Check for matching levels
+if(!uwnd_dpa.levels_match(vwnd_dpa)) {
+   mlog << Warning << "\n" << method_name
+        << "The U-wind and V-wind levels do not match.\n\n";
+   return false;
+}
+
+// Rotate each plane
+log_wind_rotation(vinfo, uwnd_dpa.n_planes());
+
+for(int i=0; i<uwnd_dpa.n_planes(); i++) {
+   if(!rotate_uv_grid_to_earth(uwnd_dpa[i], vwnd_dpa[i], *Raw_Grid,
+                               uwnd_out->at(i), vwnd_out->at(i))) {
+      return false;
+   }
+}
+
+return true;
 
 }
 
@@ -762,12 +864,7 @@ if(!vinfo) return false;
 
 if(!vinfo->is_wind_rotation() || dpa.n_planes() == 0) return true;
 
-if(vinfo->is_grid_relative()) {
-   mlog << Debug(3) << "Rotating " << dpa.n_planes()
-        << " wind field(s) for \"" << vinfo->magic_str()
-        << "\" from grid-relative to earth-relative.\n";
-}
-else {
+if(!vinfo->is_grid_relative()) {
    mlog << Debug(3) << "Identified " << dpa.n_planes()
         << " wind field(s) for \"" << vinfo->magic_str()
         << "\" as being earth-relative.\n";
@@ -776,57 +873,18 @@ else {
 
 bool status = false;
 
-// Create local copy
-auto vinfo_wind = vinfo->clone();
-
-DataPlaneArray uwnd_dpa;
-DataPlaneArray vwnd_dpa;
-DataPlaneArray tmp_dpa(dpa);
-DataPlaneArray *uwnd_out;
-DataPlaneArray *vwnd_out;
+// Set when the U and V components disagree on their orientation, in which
+// case the data is returned unrotated rather than treated as a failure
+bool skip_rotation = false;
 
 // Rotate U-Wind and V-Wind
 if(vinfo->is_u_wind() || vinfo->is_v_wind()) {
-
-   if(vinfo->is_u_wind()) {
-      uwnd_dpa = dpa;
-      uwnd_out = &dpa;
-      vwnd_out = &tmp_dpa;
-      status = read_wind_data(vinfo_wind.get(),
-                              conf_key_v_wind_field_name,
-                              vinfo->wind_info().v_wind,
-                              vwnd_dpa);
-   }
-   else {
-      vwnd_dpa = dpa;
-      uwnd_out = &tmp_dpa;
-      vwnd_out = &dpa;
-      status = read_wind_data(vinfo_wind.get(),
-                              conf_key_u_wind_field_name,
-                              vinfo->wind_info().u_wind,
-                              uwnd_dpa);
-   }
-
-   // Check for matching levels
-   if(!uwnd_dpa.levels_match(vwnd_dpa)) {
-      mlog << Warning << "\n" << method_name
-           << "The U-wind and V-wind levels do not match.\n\n";
-      status = false;
-   }
-
-   // Rotate each plane
-   if(status) {
-      for(int i=0; i<uwnd_dpa.n_planes(); i++) {
-         status = rotate_uv_grid_to_earth(
-                     uwnd_dpa[i], vwnd_dpa[i],
-                     *Raw_Grid, uwnd_out->at(i), vwnd_out->at(i));
-         if(!status) break;
-      }
-   }
+   status = rotate_uv_winds(vinfo, dpa, skip_rotation, method_name);
 }
 // Rotate Wind Direction
 else if(vinfo->is_wind_direction()) {
-   tmp_dpa = dpa;
+   log_wind_rotation(vinfo, dpa.n_planes());
+   DataPlaneArray tmp_dpa(dpa);
 
    // Rotate each plane
    for(int i=0; i<dpa.n_planes(); i++) {
@@ -835,6 +893,8 @@ else if(vinfo->is_wind_direction()) {
    }
    status = true;
 }
+
+if(skip_rotation) return true;
 
 if(!status) {
    mlog << Warning << "\n" << method_name
@@ -867,6 +927,12 @@ bool status = false;
 
 StringArray search_names(swap_uv_name(vinfo, conf_key, names));
 
+    // Read this component raw, since the convert, censor, set_attr and
+    // shift settings of the requested field are applied to the result
+
+bool process_planes = ProcessPlanes;
+ProcessPlanes = false;
+
     // Try each of the possible names
 
 for(int i=0; i<search_names.n(); i++) {
@@ -881,12 +947,18 @@ for(int i=0; i<search_names.n(); i++) {
    }
 }
 
+ProcessPlanes = process_planes;
+
+   // A single lookup can miss without the overall request failing, for
+   // example when searching a list of files for climatology data. Report
+   // the miss here and let the caller warn if the derivation or rotation
+   // it is attempting ultimately fails.
+
 if(!status) {
-   mlog << Warning << "\n" << method_name
+   mlog << Debug(3) << method_name
         << "No matching wind field found for name(s) \""
-        << write_css(search_names) << "\".\n"
-        << "Set \"" << conf_key
-        << "\" to specify the matching variable name.\n\n";
+        << write_css(search_names) << "\". Set \"" << conf_key
+        << "\" to specify the matching variable name.\n";
 }
 
 return status;
@@ -914,6 +986,12 @@ bool status = false;
 
 StringArray search_names(swap_uv_name(vinfo, conf_key, names));
 
+    // Read these components raw, since the convert, censor, set_attr and
+    // shift settings of the requested field are applied to the result
+
+bool process_planes = ProcessPlanes;
+ProcessPlanes = false;
+
     // Try each of the possible names
 
 for(int i=0; i<search_names.n(); i++) {
@@ -928,12 +1006,18 @@ for(int i=0; i<search_names.n(); i++) {
    }
 }
 
+ProcessPlanes = process_planes;
+
+   // A single lookup can miss without the overall request failing, for
+   // example when searching a list of files for climatology data. Report
+   // the miss here and let the caller warn if the derivation or rotation
+   // it is attempting ultimately fails.
+
 if(!status) {
-   mlog << Warning << "\n" << method_name
+   mlog << Debug(3) << method_name
         << "No matching wind field(s) found for name(s) \""
-        << write_css(search_names) << "\".\n"
-        << "Set \"" << conf_key
-        << "\" to specify the matching variable name.\n\n";
+        << write_css(search_names) << "\". Set \"" << conf_key
+        << "\" to specify the matching variable name.\n";
 }
 
 return status;
@@ -949,6 +1033,13 @@ bool Met2dDataFile::process_data_plane(VarInfo *vinfo, DataPlane &dp)
 {
 
 if ( ! vinfo )  return false;
+
+   //
+   // Skip processing while reading a companion wind component, so that these
+   // settings are applied once, to the derived or rotated data plane
+   //
+
+if ( ! ProcessPlanes )  return true;
 
    //
    // Apply conversion logic
@@ -1076,6 +1167,82 @@ static StringArray swap_uv_name(const VarInfo *vinfo,
    }
 
    return sa;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static void log_wind_rotation(const VarInfo *vinfo)
+
+{
+
+   //
+   // Report a wind rotation that is about to be performed. This is logged
+   // once the companion component has been read and checked, rather than
+   // when the rotation is first requested, so that it is never printed for
+   // a rotation that does not actually happen.
+   //
+
+mlog << Debug(3) << "Rotating wind field \""
+     << vinfo->magic_str()
+     << "\" from grid-relative to earth-relative.\n";
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static void log_wind_rotation(const VarInfo *vinfo, int n_planes)
+
+{
+
+mlog << Debug(3) << "Rotating " << n_planes
+     << " wind field(s) for \"" << vinfo->magic_str()
+     << "\" from grid-relative to earth-relative.\n";
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static bool wind_orientations_match(const VarInfo *vinfo,
+                                    const VarInfo *vinfo_comp,
+                                    const char *method_name)
+
+{
+
+   //
+   // Check that a wind component and the companion component read to rotate
+   // it agree about whether they are grid-relative. A file can declare the
+   // two components differently, for example a CF file with one component
+   // named "x_wind" and the other "northward_wind". Rotating such a pair
+   // would mix grid-relative and earth-relative data, so warn and leave
+   // them alone.
+   //
+
+if(!vinfo || !vinfo_comp) return false;
+
+if(vinfo->is_grid_relative() == vinfo_comp->is_grid_relative()) return true;
+
+mlog << Warning << "\n" << method_name
+     << "The wind field \"" << vinfo->magic_str() << "\" is "
+     << (vinfo->is_grid_relative() ? "grid" : "earth")
+     << "-relative but the companion field \""
+     << vinfo_comp->magic_str() << "\" is "
+     << (vinfo_comp->is_grid_relative() ? "grid" : "earth")
+     << "-relative.\nBoth components must agree, so these winds are not "
+     << "being rotated. Set \"" << conf_key_is_grid_relative
+     << "\" to specify the orientation.\n\n";
+
+return false;
 
 }
 
