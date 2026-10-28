@@ -33,6 +33,8 @@ using namespace std;
 static void process_poly_mask(const ConcatString &, const Grid &,
                               DataPlane &, ConcatString&);
 
+static void error_grid_area_undefined(const GridWeightType);
+
 ////////////////////////////////////////////////////////////////////////
 
 Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) {
@@ -115,11 +117,25 @@ Grid parse_grid_string(const char *grid_str) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_grid_weight(const Grid &grid, const GridWeightType t,
-                       DataPlane &wgt_dp) {
+                       DataPlane &wgt_dp, DataPlane *area_dp) {
 
    // Initialize
+   if(area_dp) area_dp->clear();
    wgt_dp.clear();
    wgt_dp.set_size(grid.nx(), grid.ny());
+
+   bool do_area = (t == GridWeightType::Area ||
+                   t == GridWeightType::Area_Cntr);
+
+   // Probe the center point first since GoesImagerGrid::calc_area()
+   // logs an error on each call
+   if(do_area && grid.nx() > 0 && grid.ny() > 0) {
+
+      double area = grid.calc_area(grid.nx()/2, grid.ny()/2,
+                                   t == GridWeightType::Area_Cntr);
+
+      if(is_bad_data(area) || area <= 0.0) error_grid_area_undefined(t);
+   }
 
 #pragma omp parallel default(shared) \
    shared(grid, wgt_dp)
@@ -156,7 +172,48 @@ void parse_grid_weight(const Grid &grid, const GridWeightType t,
       } // end for x
    } // End omp parallel
 
+   // Normalize the AREA and AREA_CNTR weights to the range (0, 1]
+   if(do_area) {
+
+      const char *area_str = (t == GridWeightType::Area_Cntr ?
+                              conf_val_area_cntr : conf_val_area);
+
+      // Store the true grid box areas, if requested
+      if(area_dp) *area_dp = wgt_dp;
+
+      double area_min;
+      double area_max;
+      wgt_dp.data_range(area_min, area_max);
+
+      // Check for grids that do not define the grid box area
+      if(is_bad_data(area_max) || area_max <= 0.0) {
+         error_grid_area_undefined(t);
+      }
+
+      // Divide by the maximum grid box area
+      wgt_dp /= area_max;
+
+      mlog << Debug(3) << "Normalized the " << area_str
+           << " grid weights by the maximum grid box area of "
+           << area_max << " km^2.\n";
+   }
+
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void error_grid_area_undefined(const GridWeightType t) {
+
+   const char *area_str = (t == GridWeightType::Area_Cntr ?
+                           conf_val_area_cntr : conf_val_area);
+
+   mlog << Error << "\nparse_grid_weight() -> "
+        << "\"" << conf_key_grid_weight_flag << " = " << area_str
+        << "\" is not supported since the grid box area is not "
+        << "defined for this grid type.\n\n";
+
+   exit(1);
 }
 
 ////////////////////////////////////////////////////////////////////////
