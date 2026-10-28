@@ -361,6 +361,12 @@ MET Version 13.0.0 Upgrade Instructions
     always zero, so statistics derived from them, such as RMSE, PR_CORR, and ANOM_CORR,
     were incorrect.
 
+  * TC-Diag output changes when the files listed in the **-data** command line option do not
+    line up one-to-one with the track valid times. As described in MET
+    `#3475 <https://github.com/dtcenter/MET/issues/3475>`_, TC-Diag previously discarded the
+    gridded data it found for those valid times and reported the requested fields as missing.
+    It now uses that data, regardless of the order of the file list.
+
   * For "grid_weight_flag = AREA", Grid-Stat and Ensemble-Stat now normalize the grid box
     areas to the range (0, 1] by dividing by the maximum grid box area in the verification grid,
     as described in MET `#3448 <https://github.com/dtcenter/MET/issues/3448>`_. As a result, the
