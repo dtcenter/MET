@@ -512,17 +512,31 @@ const UGridNeighborTable &UnstructuredData::neighbor_table(int n) const {
    nbr_table.face_area =
       (face_area_km2.size() == static_cast<size_t>(n_face) ? &face_area_km2 : nullptr);
 
-   UGridNeighbors nbrs;
-   for (int i=0; i<n_face; i++) {
-      if (has_PointLatLon()) {
-         closest_faces(points_lonlat[i].y(), points_lonlat[i].x(), n, nbrs);
+   // The closest faces of each face are independent, so the sweep is
+   // parallelized the same way as the smoothing which consumes it. Each
+   // iteration writes its own slice of the index, so the table does not
+   // depend on the number of threads.
+   bool has_lonlat = has_PointLatLon();
+
+#pragma omp parallel default(none) \
+   shared(n, n_face, nbr_table, points_lonlat, points_XYZ, has_lonlat)
+   {
+
+      // The closest faces of the current face (one per thread)
+      UGridNeighbors nbrs;
+
+#pragma omp for schedule(static)
+      for (int i=0; i<n_face; i++) {
+         if (has_lonlat) {
+            closest_faces(points_lonlat[i].y(), points_lonlat[i].x(), n, nbrs);
+         }
+         else {
+            closest_faces(points_XYZ[i].y(), points_XYZ[i].x(), n, nbrs,
+                          points_XYZ[i].z());
+         }
+         std::copy(nbrs.index.begin(), nbrs.index.end(),
+                   nbr_table.index.begin() + static_cast<size_t>(i)*n);
       }
-      else {
-         closest_faces(points_XYZ[i].y(), points_XYZ[i].x(), n, nbrs,
-                       points_XYZ[i].z());
-      }
-      std::copy(nbrs.index.begin(), nbrs.index.end(),
-                nbr_table.index.begin() + static_cast<size_t>(i)*n);
    }
 
    return nbr_table;

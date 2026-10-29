@@ -1039,11 +1039,6 @@ void GridStatVxOpt::parse_nc_info(Dictionary &odict) {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Check the settings that would impact the number of matched pairs
-// when searching for U/V matches.
-//
-////////////////////////////////////////////////////////////////////////
-//
 // Exit for the Fourier decomposition and the neighborhood, gradient, and
 // distance map outputs, which rely on the regular grid structure and are
 // not meaningful for an unstructured grid.
@@ -1072,6 +1067,11 @@ void GridStatVxOpt::check_ugrid(const char *method_name) const {
    return;
 }
 
+////////////////////////////////////////////////////////////////////////
+//
+// Check the settings that would impact the number of matched pairs
+// when searching for U/V matches.
+//
 ////////////////////////////////////////////////////////////////////////
 
 bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {

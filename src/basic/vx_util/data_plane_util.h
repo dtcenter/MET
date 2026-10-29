@@ -32,8 +32,6 @@
 
 #include "GridTemplate.h"
 
-#include <vector>
-
 struct UGridNeighborTable;   // defined in interp_util.h
 
 ////////////////////////////////////////////////////////////////////////

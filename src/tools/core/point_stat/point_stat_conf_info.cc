@@ -524,8 +524,6 @@ void PointStatConfInfo::check_ugrid_sfc_interp(const PointStatVxOpt &p_vx_opt) c
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////
 //
 // The surface interpolation (land/sea and topography masks) uses the
 // grid template which supports only the nearest neighbor for the

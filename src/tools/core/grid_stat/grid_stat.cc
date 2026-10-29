@@ -357,7 +357,7 @@ static void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 static void setup_ugrid(GrdFileType ftype, GrdFileType otype) {
-   const char *method_name = "process_command_line() -> ";
+   const char *method_name = "setup_ugrid() -> ";
 
    if(FileType_UGrid != ftype && FileType_UGrid != otype) return;
 
@@ -365,7 +365,7 @@ static void setup_ugrid(GrdFileType ftype, GrdFileType otype) {
    if(conf_info.ugrid_dataset.empty()) {
       mlog << Error << "\n" << method_name
            << conf_key_ugrid_dataset << " is not defined at the configuration file.\n\n";
-      return;
+      exit(1);
    }
 
    // The coordinates file found for the forecast is reused for the observation
@@ -384,6 +384,7 @@ static void setup_ugrid(GrdFileType ftype, GrdFileType otype) {
 #ifdef WITH_UGRID
 static void open_ugrid_metadata(Met2dDataFile *mtddf, ConcatString &ugrid_nc,
                                 const char *label) {
+   const char *method_name = "open_ugrid_metadata() -> ";
    auto ugrid_mtddf = static_cast<MetUGridDataFile *>(mtddf);
 
    ugrid_mtddf->set_ugrid_configs(conf_info.ugrid_dataset,
@@ -397,7 +398,7 @@ static void open_ugrid_metadata(Met2dDataFile *mtddf, ConcatString &ugrid_nc,
    }
    ugrid_mtddf->open_metadata(ugrid_nc.c_str());
 
-   mlog << Debug(9) << "process_command_line() -> "
+   mlog << Debug(9) << method_name
         << label << ": ugrid_coordinates_nc: " << ugrid_nc
         << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
 }
@@ -2425,7 +2426,7 @@ static void do_vl1l2(VL1L2Info *v_info, int i_vx,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
+static void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    PairDataPoint pd;
 
    mlog << Debug(2)

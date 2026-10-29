@@ -2330,7 +2330,7 @@ applied to the points in the box:
 
   * NEAREST     for the nearest grid point (width = 1)
 
-  * BEST        for the value closest to the observation
+  * BEST        for the value closest to the observation value
 
   * UPPER_LEFT  for the upper left grid point (width = 1)
 

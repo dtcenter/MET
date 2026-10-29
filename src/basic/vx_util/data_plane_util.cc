@@ -262,7 +262,8 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
         << interpmthd_to_string(mthd) << "(" << n_points
         << ") closest faces interpolation method.\n";
 
-#pragma omp parallel default(shared)
+#pragma omp parallel default(none) \
+   shared(dp, smooth_dp, mthd, n_face, n_points, t, nbr_table)
    {
       // The closest faces of the current face (one per thread)
       UGridNeighbors nbrs;

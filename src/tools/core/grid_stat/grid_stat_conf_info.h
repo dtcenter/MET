@@ -233,10 +233,10 @@ class GridStatVxOpt {
       int get_n_nbrhd_wdth()   const;
       int get_n_cov_thresh()   const;
       int get_n_wave_1d()      const;
-
-      void check_ugrid(const char *) const;
       int get_n_grad()         const;
       int get_n_ci_alpha()     const;
+
+      void check_ugrid(const char *) const;
 };
 
 ////////////////////////////////////////////////////////////////////////

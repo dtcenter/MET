@@ -125,7 +125,7 @@ The number of cells, N, is the number of points defined by the **interp.type.wid
     - Yes
     - No
   * - BEST
-    - Value of the N closest cells closest to the observation value
+    - Value among the N closest cells that is closest to the observation value
     - Yes
     - No
   * - HiRA (NBRHD)

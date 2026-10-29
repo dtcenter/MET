@@ -333,8 +333,6 @@ static void aw_mean_lat_weights(const Grid &to_grid, double x_to,
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////
 //
 // The area-weighted regridding from an unstructured grid requires the
 // face area. AW_MEAN_CNTR is not supported since it finds the extent of
@@ -344,7 +342,7 @@ static void aw_mean_lat_weights(const Grid &to_grid, double x_to,
 ////////////////////////////////////////////////////////////////////////
 
 static void check_ugrid_area_weighted(const Grid & from_grid, const RegridInfo & info) {
-   const char *method_name = "met_regrid_area_weighted() -> ";
+   const char *method_name = "check_ugrid_area_weighted() -> ";
 
    if(!from_grid.is_ugrid()) return;
 

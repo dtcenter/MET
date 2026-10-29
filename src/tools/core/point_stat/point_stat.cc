@@ -343,6 +343,7 @@ static void process_command_line(int argc, char **argv) {
       else {
          mlog << Error << "\n" << method_name
               << conf_key_ugrid_dataset << " is not defined at the configuration file.\n\n";
+         exit(1);
       }
 #else
       ugrid_compile_error(method_name);
