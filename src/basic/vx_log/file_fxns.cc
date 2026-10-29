@@ -123,6 +123,12 @@ bool is_valid_path(const char *path, const char *caller) {
 // all open calls to a single file for ease in tracking Fortify
 // compliance.
 //
+// Where the named file or directory must already exist, the path is
+// also canonicalized with realpath(), which resolves "..", "." and
+// symbolic links before the call.  met_open(ofstream &) and
+// met_mkdir() cannot do this, because realpath() fails on a path that
+// does not exist yet, which is exactly what those two are given.
+//
 ////////////////////////////////////////////////////////////////////////
 
 int met_open(const char *path, int oflag) {
@@ -131,7 +137,11 @@ int met_open(const char *path, int oflag) {
       errno = EINVAL;
       return -1;
    }
-   return open(s.c_str(), oflag);
+
+   char real_path[PATH_MAX];
+   if(!realpath(s.c_str(), real_path)) return -1;
+
+   return open(real_path, oflag);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -142,7 +152,14 @@ void met_open(ifstream &in, const char *path) {
       in.setstate(ios::failbit);
       return;
    }
-   in.open(s.c_str());
+
+   char real_path[PATH_MAX];
+   if(!realpath(s.c_str(), real_path)) {
+      in.setstate(ios::failbit);
+      return;
+   }
+
+   in.open(real_path);
    return;
 }
 
@@ -167,15 +184,18 @@ FILE *met_fopen(const char *path, const char *mode) {
       return nullptr;
    }
 
+   if(!mode) {
+      mlog << Error << "\nmet_fopen() -> "
+           << "no file mode specified!\n\n";
+      errno = EINVAL;
+      return nullptr;
+   }
+
       //
-      // Probe for #3515: canonicalize before reading to find out
-      // whether the SonarQube cppsecurity:S2083 taint analysis accepts
-      // realpath() as a sanitizer.  Only a read mode can be
-      // canonicalized, since realpath() fails on a file that does not
-      // exist yet.  Revert this block if the finding does not clear.
+      // only a read mode names a file that must already exist
       //
 
-   if(mode && *mode == 'r') {
+   if(*mode == 'r') {
       char real_path[PATH_MAX];
       if(!realpath(s.c_str(), real_path)) return nullptr;
       return fopen(real_path, mode);
@@ -192,7 +212,11 @@ DIR *met_opendir(const char *path) {
       errno = EINVAL;
       return nullptr;
    }
-   return opendir(s.c_str());
+
+   char real_path[PATH_MAX];
+   if(!realpath(s.c_str(), real_path)) return nullptr;
+
+   return opendir(real_path);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -203,7 +227,16 @@ int met_remove(const char *path) {
       errno = EINVAL;
       return -1;
    }
-   return remove(s.c_str());
+      //
+      // realpath() resolves symbolic links, so this removes what a
+      // link points at rather than the link itself.  MET only removes
+      // files it created, never a link it was handed.
+      //
+
+   char real_path[PATH_MAX];
+   if(!realpath(s.c_str(), real_path)) return -1;
+
+   return remove(real_path);
 }
 
 ////////////////////////////////////////////////////////////////////////
