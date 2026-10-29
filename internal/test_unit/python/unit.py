@@ -321,9 +321,8 @@ def build_tests(test_root):
                 for env_el in el:
                     try:
                         env_name = env_el.find('name').text
-                        env_dict[env_name] = env_el.find('value').text
-                        if not env_dict[env_name]:
-                            env_dict[env_name] = ''
+                        env_value = env_el.find('value').text
+                        env_dict[env_name] = repl_env(env_value) if env_value else ''
                     except AttributeError:
                         logger.error(f"ERROR: env pair in test \\{test['name']}\\ missing name or value")
                         raise                
@@ -373,6 +372,7 @@ def repl_env(string_with_ref):
             envar = os.getenv(envar_name)
             if not envar:
                 logger.error(f"ERROR: environment variable {envar_name} not found")
+                continue
             string_with_ref = string_with_ref.replace(envar_ref, envar)
 
     return string_with_ref
