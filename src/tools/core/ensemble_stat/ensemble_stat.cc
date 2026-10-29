@@ -83,6 +83,7 @@
 //   050    01/27/26  Halley Gotway  MET #3298 Add the FULL grid, if needed.
 //   051    05/12/26  Halley Gotway  MET #3335 Add point_weight_flag = KDE option.
 //   052    09/04/26  Halley Gotway  MET #3426 and #3429 Observation error
+//   053    09/25/26  Halley Gotway  MET #3448 Normalize AREA grid weights.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -550,7 +551,7 @@ static void process_grid(const Grid &fcst_grid) {
    nxy  = grid.nx() * grid.ny();
 
    // Compute weight for each grid point
-   parse_grid_weight(grid, conf_info.grid_weight_flag, wgt_dp);
+   parse_grid_weight(grid, conf_info.grid_weight_flag, wgt_dp, &area_dp);
 
    return;
 }
@@ -1953,7 +1954,7 @@ static void setup_nc_file(const char *suffix) {
    // Add grid weight variable
    if(conf_info.nc_info.do_weight) {
       write_netcdf_grid_weight(nc_out.get(), &lat_dim, &lon_dim,
-                               conf_info.grid_weight_flag, wgt_dp);
+                               conf_info.grid_weight_flag, wgt_dp, &area_dp);
    }
 
    return;
