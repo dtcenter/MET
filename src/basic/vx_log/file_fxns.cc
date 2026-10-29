@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <climits>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
@@ -70,40 +71,134 @@ ConcatString replace_path(const char * path) {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Wrapper functions to expand instances of MET_BASE and then call the
-// requested open function.  This groups all open calls to a single
-// file for ease in tracking Fortify compliance.
+// Reject paths that cannot name a real file: at least PATH_MAX
+// characters long or containing a control character.  Neither can
+// appear in a legitimate MET file name, so this rejects nothing a user
+// would ask for.
+//
+// Embedded null bytes need no check here.  The path arrives as a C
+// string, so a null byte is its terminator rather than part of it, and
+// nothing upstream can deliver one: the configuration file scanner
+// truncates at the null when it builds a ConcatString from the lexeme,
+// and the command line and environment are C strings already.
+//
+////////////////////////////////////////////////////////////////////////
+
+bool is_valid_path(const char *path, const char *caller) {
+
+   if(!path) return false;
+
+   size_t len = strlen(path);
+
+      //
+      // PATH_MAX counts the terminating null, so a path of exactly
+      // PATH_MAX characters is already one too long
+      //
+
+   if(len >= PATH_MAX) {
+      mlog << Error << "\n" << caller
+           << "file name is " << (int) len << " characters, and the maximum is "
+           << PATH_MAX - 1 << "!\n\n";
+      return false;
+   }
+
+   for(size_t i=0; i<len; i++) {
+      unsigned char c = (unsigned char) path[i];
+      if(c < 0x20 || c == 0x7F) {
+         mlog << Error << "\n" << caller
+              << "file name contains control character " << (int) c
+              << " at position " << (int) i << "!\n\n";
+         return false;
+      }
+   }
+
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Wrapper functions to expand instances of MET_BASE, validate the
+// resulting path, and then call the requested function.  This groups
+// all open calls to a single file for ease in tracking Fortify
+// compliance.
 //
 ////////////////////////////////////////////////////////////////////////
 
 int met_open(const char *path, int oflag) {
-   return open(replace_path(path).c_str(), oflag);
+   ConcatString s = replace_path(path);
+   if(!is_valid_path(s.c_str(), "met_open(const char *, int) -> ")) {
+      errno = EINVAL;
+      return -1;
+   }
+   return open(s.c_str(), oflag);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void met_open(ifstream &in, const char *path) {
-   in.open(replace_path(path).c_str());
+   ConcatString s = replace_path(path);
+   if(!is_valid_path(s.c_str(), "met_open(ifstream &, const char *) -> ")) {
+      in.setstate(ios::failbit);
+      return;
+   }
+   in.open(s.c_str());
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void met_open(ofstream &out, const char *path) {
-   out.open(replace_path(path).c_str());
+   ConcatString s = replace_path(path);
+   if(!is_valid_path(s.c_str(), "met_open(ofstream &, const char *) -> ")) {
+      out.setstate(ios::failbit);
+      return;
+   }
+   out.open(s.c_str());
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 FILE *met_fopen(const char *path, const char *mode) {
-  return fopen(replace_path(path).c_str(), mode);
+   ConcatString s = replace_path(path);
+   if(!is_valid_path(s.c_str(), "met_fopen() -> ")) {
+      errno = EINVAL;
+      return nullptr;
+   }
+   return fopen(s.c_str(), mode);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 DIR *met_opendir(const char *path) {
-  return opendir(replace_path(path).c_str());
+   ConcatString s = replace_path(path);
+   if(!is_valid_path(s.c_str(), "met_opendir() -> ")) {
+      errno = EINVAL;
+      return nullptr;
+   }
+   return opendir(s.c_str());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int met_remove(const char *path) {
+   ConcatString s = replace_path(path);
+   if(!is_valid_path(s.c_str(), "met_remove() -> ")) {
+      errno = EINVAL;
+      return -1;
+   }
+   return remove(s.c_str());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int met_mkdir(const char *path, mode_t mode) {
+   ConcatString s = replace_path(path);
+   if(!is_valid_path(s.c_str(), "met_mkdir() -> ")) {
+      errno = EINVAL;
+      return -1;
+   }
+   return mkdir(s.c_str(), mode);
 }
 
 ////////////////////////////////////////////////////////////////////////

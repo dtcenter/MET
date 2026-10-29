@@ -16,6 +16,7 @@
 #include "vx_log.h"
 #include "vx_math.h"
 #include "python_line.h"
+#include "command_line.h"
 
 #include "vx_python3_utils.h"
 #include "python_handler.h"
@@ -320,7 +321,7 @@ bool PythonHandler::do_tmp_ascii()
 
 int j;
 const int N = user_script_args.n();
-ConcatString command;
+StringArray command;
 ConcatString path;
 ConcatString tmp_ascii_path;
 const char * tmp_dir = nullptr;
@@ -342,27 +343,26 @@ path << cs_erase
 tmp_ascii_path = make_temp_file_name(path.text(), nullptr);
 tmp_ascii_path << ".txt";
 
-command << cs_erase
-        << user_path_to_python                   << ' '    //  user's path to python
-        << replace_path(write_tmp_ascii_wrapper) << ' '    //  write_tmp_point.py
-        << tmp_ascii_path                        << ' '    //  temporary ascii output filename
-        << user_script_filename;                           //  user's script name
+command.add(user_path_to_python);                     //  user's path to python
+command.add(replace_path(write_tmp_ascii_wrapper));   //  write_tmp_point.py
+command.add(tmp_ascii_path);                          //  temporary ascii output filename
+command.add(user_script_filename);                    //  user's script name
 
 for (j=0; j<N; ++j)  {
 
-   command << ' ' << user_script_args[j];
+   command.add(user_script_args[j]);
 
 };
 
 mlog << Debug(4) << "Writing temporary Python ascii observation file:\n\t"
-     << command << "\n";
+     << command.serialize(" ") << "\n";
 
-status = system(command.text());
+status = spawn_command(command);
 
 if ( status )  {
 
    mlog << Error << "\nPythonHandler::do_tmp_ascii() -> "
-        << "command \"" << command.text() << "\" failed ... status = "
+        << "command \"" << command.serialize(" ") << "\" failed ... status = "
         << status << "\n\n";
 
    exit ( 1 );

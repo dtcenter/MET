@@ -18,6 +18,7 @@
 
 #include "global_python.h"
 #include "wchar_argv.h"
+#include "command_line.h"
 
 using namespace std;
 
@@ -177,22 +178,22 @@ static bool user_python_tc_diag(const ConcatString &diag_script,
 
    ConcatString tmp_file_name(make_temp_file_name(path.text(), nullptr));
 
-   // Construct the system command
-   ConcatString command;
-   command << user_ppath                   << ' ' // user's path to python
-           << replace_path(write_tmp_diag) << ' ' // write_tmp_diag.py
-           << tmp_file_name                << ' ' // temporary output filename
-           << diag_script                  << ' ' // python diagnostics script
-           << tmp_info.tmp_file;                  // cylindrical coordinates tmp nc filename
+   // Construct the command
+   StringArray command;
+   command.add(user_ppath);                     // user's path to python
+   command.add(replace_path(write_tmp_diag));   // write_tmp_diag.py
+   command.add(tmp_file_name);                  // temporary output filename
+   command.add(diag_script);                    // python diagnostics script
+   command.add(tmp_info.tmp_file);              // cylindrical coordinates tmp nc filename
 
    mlog << Debug(4) << "Writing temporary Python diagnostics file:\n\t"
-        << command << "\n";
+        << command.serialize(" ") << "\n";
 
-   int status = system(command.text());
+   int status = spawn_command(command);
 
    if(status) {
       mlog << Error << "\n" << method_name
-           << "command \"" << command.text() << "\" failed ... status = "
+           << "command \"" << command.serialize(" ") << "\" failed ... status = "
            << status << "\n\n";
       exit(1);
    }

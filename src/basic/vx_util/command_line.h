@@ -233,6 +233,17 @@ inline void CommandLine::allow_unrecognized_switches() { AllowUnrecognizedSwitch
 
 ////////////////////////////////////////////////////////////////////////
 
+   //
+   //  Run cmd[0] with cmd[1...] as its arguments, without a shell, and
+   //  wait for it to finish.  Returns the wait status, as system() does,
+   //  or -1 if the command could not be run.
+   //
+
+extern int spawn_command(const StringArray & cmd);
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 #endif   /*  __COMMAND_LINE_H__  */
 

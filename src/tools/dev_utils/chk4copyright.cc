@@ -59,6 +59,8 @@ static ConcatString copyright_notice_filename;
 
 static bool output_info = true;
 
+static const int copy_buf_size = 4096;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -72,6 +74,10 @@ static void set_quiet(const StringArray &);
 static void process_directory(const char *);
 
 static int get_line(int &, ConcatString &);
+
+static bool copy_file_contents(ofstream &, const ConcatString &);
+
+static bool add_copyright_notice(const ConcatString &, const ConcatString &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -218,7 +224,6 @@ void process_directory(const char * dir_name)
    ConcatString tmp_filename;
    ConcatString entry_name;
    ConcatString line;
-   ConcatString command;
    int fd;
    int pid;
    bool notice_found = false;
@@ -377,31 +382,13 @@ void process_directory(const char * dir_name)
                }
 
                   //
-                  // create the command to copy the copyright notice file
-                  // to a temporary file
+                  // write the copyright notice and then the file itself
+                  // into the temporary file and copy it back
                   //
-               command << cs_erase << "cp " << copyright_notice_filename << ' ' << tmp_filename;
-               system(command.c_str());
-
-                  //
-                  // create the command to append the .h or .cc file
-                  // to the temporary file
-                  //
-               command << cs_erase << "cat " << new_filename << " >> " << tmp_filename;
-               system(command.c_str());
-
-                  //
-                  // create the command to copy the temporary file
-                  // back to the name of the .h or .cc file
-                  //
-               command << cs_erase << "cp " << tmp_filename  << ' ' << new_filename;
-               system(command.c_str());
-
-                  //
-                  // remove the temporary file
-                  //
-               command << cs_erase << "rm " << tmp_filename;
-               system(command.c_str());
+               if (!add_copyright_notice(new_filename, tmp_filename))
+               {
+                  exit (1);
+               }
             }
 
          }  // end of if this is a .h or .cc file
@@ -415,6 +402,117 @@ void process_directory(const char * dir_name)
       //
    
    if(dir) met_closedir(dir);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   // write the contents of the named file onto the end of the output
+   // stream
+   //
+
+bool copy_file_contents(ofstream & out, const ConcatString & file_name)
+{
+   ifstream in;
+   char buf[copy_buf_size];
+
+   met_open(in, file_name.c_str());
+
+   if (!in)
+   {
+      mlog << Error << "\ncopy_file_contents() -> unable to open file \""
+           << file_name << "\"\n\n";
+      return false;
+   }
+
+      //
+      // read() sets failbit on the last, short read, so check the
+      // number of characters it actually delivered
+      //
+   while (in.read(buf, sizeof(buf)) || in.gcount() > 0)
+   {
+      out.write(buf, in.gcount());
+   }
+
+   in.close();
+
+   if (!out)
+   {
+      mlog << Error << "\ncopy_file_contents() -> error writing the contents of file \""
+           << file_name << "\"\n\n";
+      return false;
+   }
+
+   return true;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   // add the copyright notice to the named file by writing the notice
+   // and then the file itself into a temporary file and copying that
+   // back over the original, which leaves the original file's
+   // permissions alone
+   //
+
+bool add_copyright_notice(const ConcatString & file_name,
+                          const ConcatString & tmp_file_name)
+{
+   ofstream out;
+   bool status;
+
+   met_open(out, tmp_file_name.c_str());
+
+   if (!out)
+   {
+      mlog << Error << "\nadd_copyright_notice() -> unable to open temporary file \""
+           << tmp_file_name << "\"\n\n";
+      return false;
+   }
+
+   status = (copy_file_contents(out, copyright_notice_filename) &&
+             copy_file_contents(out, file_name));
+
+   out.close();
+
+      //
+      // copy the temporary file back over the original
+      //
+
+   if (status)
+   {
+      met_open(out, file_name.c_str());
+
+      if (!out)
+      {
+         mlog << Error << "\nadd_copyright_notice() -> unable to open file \""
+              << file_name << "\"\n\n";
+         status = false;
+      }
+      else
+      {
+         status = copy_file_contents(out, tmp_file_name);
+         out.close();
+      }
+   }
+
+      //
+      // remove the temporary file
+      //
+
+   if (met_remove(tmp_file_name.c_str()) != 0)
+   {
+      mlog << Warning << "\nadd_copyright_notice() -> can't delete temporary file \""
+           << tmp_file_name << "\"\n\n";
+   }
+
+   return status;
 
 }
 

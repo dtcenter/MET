@@ -22,6 +22,7 @@
 #include "python3_util.h"
 #include "global_python.h"
 #include "temp_file.h"
+#include "command_line.h"
 
 #include "python_line.h"
 
@@ -378,7 +379,7 @@ void PyLineDataFile::do_tmp_ascii()
 
 int j;
 const int N = UserScriptArgs.n();
-ConcatString command;
+StringArray command;
 ConcatString path;
 ConcatString tmp_ascii_path;
 const char * tmp_dir = nullptr;
@@ -399,27 +400,26 @@ path << cs_erase
 tmp_ascii_path = make_temp_file_name(path.text(), nullptr);
 tmp_ascii_path << ".txt";
 
-command << cs_erase
-        << UserPathToPython                    << ' '    //  user's path to python
-        << replace_path(write_tmp_mpr_wrapper) << ' '    //  write_tmp_mpr.py
-        << tmp_ascii_path                      << ' '    //  temporary ascii output filename
-        << UserScriptPath;                               //  user's script name
+command.add(UserPathToPython);                      //  user's path to python
+command.add(replace_path(write_tmp_mpr_wrapper));   //  write_tmp_mpr.py
+command.add(tmp_ascii_path);                        //  temporary ascii output filename
+command.add(UserScriptPath);                        //  user's script name
 
 for (j=0; j<N; ++j)  {
 
-   command << ' ' << UserScriptArgs[j];
+   command.add(UserScriptArgs[j]);
 
 };
 
 mlog << Debug(4) << "Writing temporary Python line data file:\n\t"
-     << command << "\n";
+     << command.serialize(" ") << "\n";
 
-status = system(command.text());
+status = spawn_command(command);
 
 if ( status )  {
 
    mlog << Error << "\nPyLineDataFile::do_tmp_ascii() -> "
-        << "command \"" << command.text() << "\" failed ... status = "
+        << "command \"" << command.serialize(" ") << "\" failed ... status = "
         << status << "\n\n";
 
    exit ( 1 );

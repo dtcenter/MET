@@ -566,25 +566,25 @@ static bool user_python_point_data(const char *user_script_name,
 
    ConcatString tmp_file_name(make_temp_file_name(path.text(), nullptr));
 
-   ConcatString command;
-   command << user_ppath                    << ' '    // user's path to python
-           << replace_path(write_tmp_nc)    << ' '    // write_tmp_nc.py
-           << tmp_file_name                 << ' '    // temporary output filename
-           << user_script_name;                       // user's script name
+   StringArray command;
+   command.add(user_ppath);                      // user's path to python
+   command.add(replace_path(write_tmp_nc));      // write_tmp_nc.py
+   command.add(tmp_file_name);                   // temporary output filename
+   command.add(user_script_name);                // user's script name
 
    for (int j=1; j<user_script_args.n(); ++j)  {   //  j starts at one, here
-      command << ' ' << user_script_args[j];
+      command.add(user_script_args[j]);
    }
 
    mlog << Debug(4) << "Writing temporary Python point data file:\n\t"
-        << command << "\n";
+        << command.serialize(" ") << "\n";
 
-   int status = system(command.text());
+   int status = spawn_command(command);
 
    if ( status )  {
 
       mlog << Error << "\n" << method_name
-           << "command \"" << command.text() << "\" failed ... status = "
+           << "command \"" << command.serialize(" ") << "\" failed ... status = "
            << status << "\n\n";
 
       exit ( 1 );
