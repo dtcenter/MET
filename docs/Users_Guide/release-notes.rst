@@ -313,6 +313,13 @@ MET Version 13.0.0 Upgrade Instructions
     * Adds new output variables with names including "EAS" and "EAS_WIDTH" for the Ensemble
       Agreement Scale algorithm.
 
+  * Grid-Stat and Ensemble-Stat NetCDF output format
+
+    * For "grid_weight_flag = AREA", the "grid_weight" variable now contains the normalized
+      weights in the range (0, 1] with units of "NA", rather than the grid box areas in km^2.
+      The true grid box areas are written to the new "grid_area" variable, as described in MET
+      `#3448 <https://github.com/dtcenter/MET/issues/3448>`_.
+
 .. dropdown:: Output data changes
 
   MET version 13.0.0 modifies existing output data values in the following ways:
@@ -342,7 +349,8 @@ MET Version 13.0.0 Upgrade Instructions
     `#3334 <https://github.com/dtcenter/MET/issues/3334>`_, these methods previously used the
     UGRID cells with neighboring indices rather than neighboring locations, and BILIN returned
     the value of the nearest cell. They now use the N closest cells. The "AREA" grid weight for
-    UGRIDs, previously 0 for every cell, is now the cell area.
+    UGRIDs, previously 0 for every cell, is now derived from the cell area, normalized as
+    described in MET `#3448 <https://github.com/dtcenter/MET/issues/3448>`_.
 
   * Gridded data read from NetCDF files that follow the CF convention and use a polar
     stereographic grid mapping may change. As described in MET
@@ -388,9 +396,29 @@ MET Version 13.0.0 Upgrade Instructions
     always zero, so statistics derived from them, such as RMSE, PR_CORR, and ANOM_CORR,
     were incorrect.
 
+  * TC-Diag output changes when the files listed in the **-data** command line option do not
+    line up one-to-one with the track valid times. As described in MET
+    `#3475 <https://github.com/dtcenter/MET/issues/3475>`_, TC-Diag previously discarded the
+    gridded data it found for those valid times and reported the requested fields as missing.
+    It now uses that data, regardless of the order of the file list.
+
+  * For "grid_weight_flag = AREA", Grid-Stat and Ensemble-Stat now normalize the grid box
+    areas to the range (0, 1] by dividing by the maximum grid box area in the verification grid,
+    as described in MET `#3448 <https://github.com/dtcenter/MET/issues/3448>`_. As a result, the
+    cell values in the CTC, MCTC, PCT, and NBRCTC line types change. The normal approximation
+    confidence intervals computed from those weighted cell values also change, including those
+    for HK, ODDS, LODDS, ORSS, EDS, SEDS, EDI, and SEDI in the CTS line type and for BRIER and
+    BRIERCL in the PSTD line type. Previously, the large grid box area weights resulted in
+    confidence intervals that were much too narrow. The statistics themselves are unchanged.
+
 .. dropdown:: Additional upgrade instructions
 
   Recommendations when upgrading to MET version 13.0.0:
+
+  * Users reading winds from CF-compliant NetCDF files on projections for which rotation applies,
+    such as Lambert conformal, polar stereographic, and Mercator, should check the "standard_name"
+    attribute of their wind variables. Setting the "is_grid_relative" configuration option
+    overrides the orientation determined from the file.
 
   * The "MET_OBS_ERROR_TABLE" environment variable is renamed to "MET_OBS_ERR_TABLE", and the
     default *share/met/table_files/obs_error_table.txt* file is renamed to *obs_err_table.txt*,

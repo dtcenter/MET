@@ -182,6 +182,9 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
       // Attempt to derive the data
       if(!status && do_winds) {
          status = derive_winds(&vinfo, plane);
+
+         // Process the derived data plane
+         if(status) status = process_data_plane(&vinfo, plane);
       }
    }
    else {

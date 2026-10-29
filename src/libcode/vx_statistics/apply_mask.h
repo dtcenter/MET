@@ -32,7 +32,7 @@ extern Grid parse_vx_grid(const RegridInfo, const Grid *, const Grid *);
 extern Grid parse_grid_string(const char *);
 
 extern void parse_grid_weight(const Grid &, const GridWeightType,
-                              DataPlane &);
+                              DataPlane &, DataPlane *area_dp = nullptr);
 
 extern void parse_grid_mask(const ConcatString &, const Grid &,
                             DataPlane &, ConcatString &);
