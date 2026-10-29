@@ -325,7 +325,6 @@ StringArray command;
 ConcatString path;
 ConcatString tmp_ascii_path;
 const char * tmp_dir = nullptr;
-int status;
 
 mlog << Debug(2)
      << "Running python script ("
@@ -354,20 +353,8 @@ for (j=0; j<N; ++j)  {
 
 };
 
-mlog << Debug(4) << "Writing temporary Python ascii observation file:\n\t"
-     << command.serialize(" ") << "\n";
-
-status = spawn_command(command);
-
-if ( status )  {
-
-   mlog << Error << "\nPythonHandler::do_tmp_ascii() -> "
-        << "command \"" << command.serialize(" ") << "\" failed ... status = "
-        << status << "\n\n";
-
-   exit ( 1 );
-
-}
+spawn_command_or_exit(command, "Writing temporary Python ascii observation file",
+                      "PythonHandler::do_tmp_ascii() -> ");
 
    //
    //  deliberately leaked: ~Python3_Script calls Py_Finalize(), and the

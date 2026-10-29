@@ -1203,3 +1203,30 @@ return status;
 
 ////////////////////////////////////////////////////////////////////////
 
+
+void spawn_command_or_exit(const StringArray & cmd, const char * description,
+                           const char * caller)
+
+{
+
+mlog << Debug(4) << description << ":\n\t" << cmd.serialize(" ") << "\n";
+
+int status = spawn_command(cmd);
+
+if ( status )  {
+
+   mlog << Error << "\n" << caller
+        << "command \"" << cmd.serialize(" ") << "\" failed ... status = "
+        << status << "\n\n";
+
+   exit ( 1 );
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+

@@ -244,6 +244,18 @@ extern int spawn_command(const StringArray & cmd);
 
 ////////////////////////////////////////////////////////////////////////
 
+   //
+   //  Log cmd at Debug(4) under the given description, run it with
+   //  spawn_command(), and exit if it fails.  Caller names the calling
+   //  function for the error message.
+   //
+
+extern void spawn_command_or_exit(const StringArray & cmd, const char * description,
+                                  const char * caller);
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 #endif   /*  __COMMAND_LINE_H__  */
 

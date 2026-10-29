@@ -298,17 +298,8 @@ for (int j=1; j<user_script_args.n(); ++j)  {   //  j starts at one, here
    command.add(user_script_args[j]);
 }
 
-mlog << Debug(4) << "Writing temporary Python dataplane file:\n\t"
-     << command.serialize(" ") << "\n";
-
-int status = spawn_command(command);
-
-if ( status )  {
-   mlog << Error << "\n" << method_name
-        << "command \"" << command.serialize(" ") << "\" failed ... status = "
-        << status << "\n\n";
-   exit ( 1 );
-}
+spawn_command_or_exit(command, "Writing temporary Python dataplane file",
+                      method_name);
 
    //
    //  if the global python object has already been initialized,

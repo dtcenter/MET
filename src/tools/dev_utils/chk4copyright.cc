@@ -29,6 +29,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <array>
 #include <fstream>
 #include <cstdio>
 #include <unistd.h>
@@ -59,7 +60,7 @@ static ConcatString copyright_notice_filename;
 
 static bool output_info = true;
 
-static const int copy_buf_size = 4096;
+static const size_t copy_buf_size = 4096;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -414,10 +415,10 @@ void process_directory(const char * dir_name)
    // stream
    //
 
-bool copy_file_contents(ofstream & out, const ConcatString & file_name)
+static bool copy_file_contents(ofstream & out, const ConcatString & file_name)
 {
    ifstream in;
-   char buf[copy_buf_size];
+   std::array<char, copy_buf_size> buf{};
 
    met_open(in, file_name.c_str());
 
@@ -432,9 +433,9 @@ bool copy_file_contents(ofstream & out, const ConcatString & file_name)
       // read() sets failbit on the last, short read, so check the
       // number of characters it actually delivered
       //
-   while (in.read(buf, sizeof(buf)) || in.gcount() > 0)
+   while (in.read(buf.data(), buf.size()) || in.gcount() > 0)
    {
-      out.write(buf, in.gcount());
+      out.write(buf.data(), in.gcount());
    }
 
    in.close();
@@ -461,8 +462,8 @@ bool copy_file_contents(ofstream & out, const ConcatString & file_name)
    // permissions alone
    //
 
-bool add_copyright_notice(const ConcatString & file_name,
-                          const ConcatString & tmp_file_name)
+static bool add_copyright_notice(const ConcatString & file_name,
+                                 const ConcatString & tmp_file_name)
 {
    ofstream out;
    bool status;

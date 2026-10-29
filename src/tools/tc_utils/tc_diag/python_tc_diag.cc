@@ -186,17 +186,8 @@ static bool user_python_tc_diag(const ConcatString &diag_script,
    command.add(diag_script);                    // python diagnostics script
    command.add(tmp_info.tmp_file);              // cylindrical coordinates tmp nc filename
 
-   mlog << Debug(4) << "Writing temporary Python diagnostics file:\n\t"
-        << command.serialize(" ") << "\n";
-
-   int status = spawn_command(command);
-
-   if(status) {
-      mlog << Error << "\n" << method_name
-           << "command \"" << command.serialize(" ") << "\" failed ... status = "
-           << status << "\n\n";
-      exit(1);
-   }
+   spawn_command_or_exit(command, "Writing temporary Python diagnostics file",
+                         method_name);
 
    // If the global python object has already been initialized,
    // we need to reload the module
@@ -248,7 +239,7 @@ static bool user_python_tc_diag(const ConcatString &diag_script,
    }
 
    // Parse the diagnostics from python
-   status = parse_python_diag_data(module_obj, tmp_info);
+   bool status = parse_python_diag_data(module_obj, tmp_info);
 
    // Cleanup
    remove_temp_file(tmp_file_name);

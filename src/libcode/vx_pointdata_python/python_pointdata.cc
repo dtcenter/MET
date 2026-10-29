@@ -576,20 +576,8 @@ static bool user_python_point_data(const char *user_script_name,
       command.add(user_script_args[j]);
    }
 
-   mlog << Debug(4) << "Writing temporary Python point data file:\n\t"
-        << command.serialize(" ") << "\n";
-
-   int status = spawn_command(command);
-
-   if ( status )  {
-
-      mlog << Error << "\n" << method_name
-           << "command \"" << command.serialize(" ") << "\" failed ... status = "
-           << status << "\n\n";
-
-      exit ( 1 );
-
-   }
+   spawn_command_or_exit(command, "Writing temporary Python point data file",
+                         method_name);
 
    //
    //  if the global python object has already been initialized,

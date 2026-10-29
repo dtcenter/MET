@@ -88,22 +88,23 @@ bool is_valid_path(const char *path, const char *caller) {
 
    if(!path) return false;
 
-   size_t len = strlen(path);
-
       //
       // PATH_MAX counts the terminating null, so a path of exactly
-      // PATH_MAX characters is already one too long
+      // PATH_MAX characters is already one too long.  strnlen() stops
+      // there rather than walking a string that may not be terminated.
       //
+
+   size_t len = strnlen(path, PATH_MAX);
 
    if(len >= PATH_MAX) {
       mlog << Error << "\n" << caller
-           << "file name is " << (int) len << " characters, and the maximum is "
-           << PATH_MAX - 1 << "!\n\n";
+           << "file name is " << PATH_MAX << " characters or longer, and the "
+           << "maximum is " << PATH_MAX - 1 << "!\n\n";
       return false;
    }
 
    for(size_t i=0; i<len; i++) {
-      unsigned char c = (unsigned char) path[i];
+      auto c = static_cast<unsigned char>(path[i]);
       if(c < 0x20 || c == 0x7F) {
          mlog << Error << "\n" << caller
               << "file name contains control character " << (int) c
