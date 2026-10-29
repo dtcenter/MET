@@ -166,6 +166,21 @@ FILE *met_fopen(const char *path, const char *mode) {
       errno = EINVAL;
       return nullptr;
    }
+
+      //
+      // Probe for #3515: canonicalize before reading to find out
+      // whether the SonarQube cppsecurity:S2083 taint analysis accepts
+      // realpath() as a sanitizer.  Only a read mode can be
+      // canonicalized, since realpath() fails on a file that does not
+      // exist yet.  Revert this block if the finding does not clear.
+      //
+
+   if(mode && *mode == 'r') {
+      char real_path[PATH_MAX];
+      if(!realpath(s.c_str(), real_path)) return nullptr;
+      return fopen(real_path, mode);
+   }
+
    return fopen(s.c_str(), mode);
 }
 

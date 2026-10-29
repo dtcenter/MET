@@ -1157,7 +1157,26 @@ if ( cmd.n() == 0 )  {
 }
 
    //
-   //  posix_spawnp() wants a null-terminated array of modifiable
+   //  posix_spawn() does not search PATH, so the executable has to be
+   //  named by a path.  MET_PYTHON_EXE is documented as the full path
+   //  to the Python executable (Users Guide, Appendix F), so this
+   //  costs nothing a user was told to rely on, and it keeps PATH out
+   //  of the decision about which binary runs.
+   //
+
+if ( !strchr(cmd[0].c_str(), '/') )  {
+
+   mlog << Error << "\n" << method_name
+        << "\"" << cmd[0] << "\" is not a path.  Give the full path to the "
+        << "executable, as described for MET_PYTHON_EXE in Appendix F of "
+        << "the MET User's Guide.\n\n";
+
+   return -1;
+
+}
+
+   //
+   //  posix_spawn() wants a null-terminated array of modifiable
    //  pointers, so keep the strings alive while it runs
    //
 
@@ -1173,8 +1192,8 @@ argv.push_back(nullptr);
 
 pid_t pid;
 
-int status = posix_spawnp(&pid, argv[0], nullptr, nullptr,
-                          argv.data(), environ);
+int status = posix_spawn(&pid, argv[0], nullptr, nullptr,
+                         argv.data(), environ);
 
 if ( status != 0 )  {
 
