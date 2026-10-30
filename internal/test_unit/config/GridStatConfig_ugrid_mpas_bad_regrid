@@ -1,0 +1,43 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Grid-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+// Negative test: the AW_MEAN_CNTR regridding method is not supported
+// from the unstructured grid. Grid-Stat should exit with an error when
+// regridding the forecast.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+model = "MPAS";
+
+regrid = {
+   to_grid = "G002";
+   method  = AW_MEAN_CNTR;
+   width   = 1;
+}
+
+fcst = {
+   field = [
+      { name = "temperature";  level = "P925"; }
+   ];
+}
+obs = {
+   field = [
+      { name = "theta";  level = "L3"; }
+   ];
+}
+
+output_flag = {
+   sl1l2 = STAT;
+}
+
+nc_pairs_flag = FALSE;
+
+output_prefix = "${OUTPUT_PREFIX}";
+
+ugrid_dataset = "mpas";
+ugrid_coordinates_file = "${MET_TEST_INPUT}/ugrid_data/mpas/static.40962_reduced.nc";
+
+////////////////////////////////////////////////////////////////////////////////
