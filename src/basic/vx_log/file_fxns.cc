@@ -94,6 +94,7 @@ bool is_valid_path(const char *path, const char *caller) {
 
    for(size_t i=0; i<len; i++) {
       auto c = static_cast<unsigned char>(path[i]);
+      // check for C0 controls (0x00-0x1F: NUL through US) plus DEL
       if(c < 0x20 || c == 0x7F) {
          mlog << Error << "\n" << caller
               << "file name contains control character " << (int) c
