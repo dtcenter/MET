@@ -939,6 +939,10 @@ The "method" entry defines the regridding method to be used.
         behavior, noting that it also divides each input grid box weight by
         the overlap and so will not match exactly.
 
+      * AW_MEAN_CNTR is not supported to regrid from an unstructured grid
+        (UGRID). Use AW_MEAN, which requires the cell area ("area_face").
+        See :ref:`ugrid_limitations`.
+
     * LS_FIT       for a least-squares fit
 
     * BILIN        for bilinear interpolation (width = 2)
@@ -2326,7 +2330,7 @@ applied to the points in the box:
 
   * NEAREST     for the nearest grid point (width = 1)
 
-  * BEST        for the value closest to the observation
+  * BEST        for the value closest to the observation value
 
   * UPPER_LEFT  for the upper left grid point (width = 1)
 
@@ -2352,6 +2356,14 @@ applied to the points in the box:
   land/sea mask (e.g., "land_mask.flag = FALSE") or topography data (e.g.,
   "topo_mask.flag = FALSE") results in a warning message. Without input
   geography data, GEOG_MATCH produces the same result as NEAREST.
+
+.. note::
+
+  For unstructured grids (UGRIDs), the interpolation is computed from the
+  N closest grid cells, where N is the number of points defined by the
+  width and shape, rather than the N x N box of grid points. The AW_MEAN
+  method, weighted by the cell area, is also supported, and some methods
+  are not supported. See :ref:`ugrid_interpolation` for details.
 
 If multiple "method" and "width" options are specified, all possible
 permutations of their values are applied.
@@ -2826,7 +2838,7 @@ Elsewhere they are larger, since they are normalized by the maximum grid box
 area while the COS_LAT weights are not normalized. The relative weights, which
 determine the statistics, are unaffected either way.
 
-The grid box area is not defined for the unstructured, semi-lat/lon, and GOES
+The grid box area is not defined for the semi-lat/lon and GOES
 (geostationary) grid types, so AREA and AREA_CNTR weighting are not supported
 for them. Note that this is a property of the grid projection rather than of
 the data source. Satellite data regridded to a supported projection, such as
@@ -2836,6 +2848,11 @@ Lat/Lon, Lambert Conformal, Polar Stereographic, or Mercator, is unaffected.
    Prior to version 13.0.0, the AREA option computed centered grid box
    areas for Lambert Azimuthal Equal Area grids, unlike all other grid
    projections. Use AREA_CNTR to reproduce that behavior.
+
+.. note::
+   For unstructured grids (UGRIDs), AREA and AREA_CNTR are identical and
+   use the cell area from the "area_face" metadata variable, which is
+   required. See :ref:`ugrid_limitations`.
 
 If requested in the config file, the grid weights applied can be written to
 the NetCDF output from Grid-Stat and Ensemble-Stat. For AREA and AREA_CNTR

@@ -32,6 +32,8 @@
 
 #include "GridTemplate.h"
 
+struct UGridNeighborTable;   // defined in interp_util.h
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Utility functions operating on a DataPlane
@@ -49,6 +51,12 @@ extern DataPlane smooth_field(const DataPlane &dp,
                     InterpMthd mthd, int width,
                     const GridTemplateFactory::GridTemplates shape,
                     bool wrap_lon, double t, const GaussianInfo &gaussian);
+
+// Unstructured grid version uses the closest faces of each face
+extern void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
+               InterpMthd mthd, int width,
+               const GridTemplateFactory::GridTemplates shape,
+               double t, const UGridNeighborTable &nbr_table);
 
 extern void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                int width, GridTemplateFactory::GridTemplates shape,
