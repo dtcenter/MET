@@ -1139,7 +1139,7 @@ int spawn_command(const StringArray & cmd)
 
 {
 
-extern char ** environ;   //  POSIX's, declared here rather than at file scope
+extern char ** environ;   //  POSIX's
 
 const char *method_name = "spawn_command() -> ";
 
