@@ -1135,15 +1135,11 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-extern char ** environ;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 int spawn_command(const StringArray & cmd)
 
 {
+
+extern char ** environ;   //  POSIX's, declared here rather than at file scope
 
 const char *method_name = "spawn_command() -> ";
 
@@ -1173,7 +1169,7 @@ for (int j=0; j<cmd.n(); ++j)  {
 
 vector<char *> argv;
 
-for (size_t j=0; j<args.size(); ++j)  argv.push_back(args[j].data());
+for (auto & a : args)  argv.push_back(a.data());
 
 argv.push_back(nullptr);
 
