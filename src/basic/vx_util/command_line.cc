@@ -1157,17 +1157,23 @@ if ( cmd.n() == 0 )  {
 }
 
    //
-   //  posix_spawnp() wants a null-terminated array of modifiable
-   //  pointers, so keep the strings alive while it runs
+   //  posix_spawnp() wants modifiable strings, so hand it copies that
+   //  stay alive while it runs
    //
 
-vector<string> args;
+vector<vector<char>> args;
 
-for (int j=0; j<cmd.n(); ++j)  args.push_back(cmd[j]);
+for (int j=0; j<cmd.n(); ++j)  {
+
+   const string s = cmd[j];
+
+   args.emplace_back(s.c_str(), s.c_str() + s.length() + 1);
+
+}
 
 vector<char *> argv;
 
-for (auto & a : args)  argv.push_back(const_cast<char *>(a.c_str()));
+for (size_t j=0; j<args.size(); ++j)  argv.push_back(args[j].data());
 
 argv.push_back(nullptr);
 
@@ -1179,7 +1185,7 @@ int status = posix_spawnp(&pid, argv[0], nullptr, nullptr,
 if ( status != 0 )  {
 
    mlog << Error << "\n" << method_name
-        << "unable to run \"" << args[0] << "\" ... "
+        << "unable to run \"" << cmd[0] << "\" ... "
         << strerror(status) << "\n\n";
 
    return -1;
@@ -1189,7 +1195,7 @@ if ( status != 0 )  {
 if ( waitpid(pid, &status, 0) != pid )  {
 
    mlog << Error << "\n" << method_name
-        << "unable to wait for \"" << args[0] << "\" ... "
+        << "unable to wait for \"" << cmd[0] << "\" ... "
         << strerror(errno) << "\n\n";
 
    return -1;
@@ -1211,9 +1217,7 @@ void spawn_command_or_exit(const StringArray & cmd, const char * description,
 
 mlog << Debug(4) << description << ":\n\t" << cmd.serialize(" ") << "\n";
 
-int status = spawn_command(cmd);
-
-if ( status )  {
+if ( int status = spawn_command(cmd); status )  {
 
    mlog << Error << "\n" << caller
         << "command \"" << cmd.serialize(" ") << "\" failed ... status = "
