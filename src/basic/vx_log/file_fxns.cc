@@ -72,16 +72,9 @@ ConcatString replace_path(const char * path) {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Reject paths that cannot name a real file: at least PATH_MAX
-// characters long or containing a control character.  Neither can
-// appear in a legitimate MET file name, so this rejects nothing a user
-// would ask for.
-//
-// Embedded null bytes need no check here.  The path arrives as a C
-// string, so a null byte is its terminator rather than part of it, and
-// nothing upstream can deliver one: the configuration file scanner
-// truncates at the null when it builds a ConcatString from the lexeme,
-// and the command line and environment are C strings already.
+// Reject control characters and over-long paths, neither of which can
+// appear in a legitimate MET file name.  Embedded nulls need no check:
+// the path is a C string, so a null is its terminator.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -89,12 +82,7 @@ bool is_valid_path(const char *path, const char *caller) {
 
    if(!path) return false;
 
-      //
-      // PATH_MAX counts the terminating null, so a path of exactly
-      // PATH_MAX characters is already one too long.  strnlen() stops
-      // there rather than walking a string that may not be terminated.
-      //
-
+   // PATH_MAX counts the terminating null
    size_t len = strnlen(path, PATH_MAX);
 
    if(len >= PATH_MAX) {
@@ -124,11 +112,9 @@ bool is_valid_path(const char *path, const char *caller) {
 // all open calls to a single file for ease in tracking Fortify
 // compliance.
 //
-// Where the named file or directory must already exist, the path is
-// also canonicalized with realpath(), which resolves "..", "." and
-// symbolic links before the call.  met_open(ofstream &) and
-// met_mkdir() cannot do this, because realpath() fails on a path that
-// does not exist yet, which is exactly what those two are given.
+// Wrappers naming a path that must already exist also canonicalize it
+// with realpath().  Those that create one cannot: realpath() fails on
+// a path that does not exist yet.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -192,10 +178,7 @@ FILE *met_fopen(const char *path, const char *mode) {
       return nullptr;
    }
 
-      //
-      // only a read mode names a file that must already exist
-      //
-
+   // only a read mode names a file that must already exist
    if(*mode == 'r') {
       std::array<char, PATH_MAX> real_path{};
       if(!realpath(s.c_str(), real_path.data())) return nullptr;
@@ -228,12 +211,8 @@ int met_remove(const char *path) {
       errno = EINVAL;
       return -1;
    }
-      //
-      // realpath() resolves symbolic links, so this removes what a
-      // link points at rather than the link itself.  MET only removes
-      // files it created, never a link it was handed.
-      //
-
+   // realpath() resolves links, so this removes the target, not the
+   // link.  MET only removes files it created.
    std::array<char, PATH_MAX> real_path{};
    if(!realpath(s.c_str(), real_path.data())) return -1;
 
