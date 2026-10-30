@@ -382,10 +382,6 @@ void process_directory(const char * dir_name)
                   mlog << Debug(1) << "    Adding copyright notice to file \"" << entry_name << "\"\n";
                }
 
-                  //
-                  // write the copyright notice and then the file itself
-                  // into the temporary file and copy it back
-                  //
                if (!add_copyright_notice(new_filename, tmp_filename))
                {
                   exit (1);
@@ -411,8 +407,7 @@ void process_directory(const char * dir_name)
 
 
    //
-   // write the contents of the named file onto the end of the output
-   // stream
+   // write the named file onto the end of the output stream
    //
 
 static bool copy_file_contents(ofstream & out, const ConcatString & file_name)
@@ -430,8 +425,7 @@ static bool copy_file_contents(ofstream & out, const ConcatString & file_name)
    }
 
       //
-      // read() sets failbit on the last, short read, so check the
-      // number of characters it actually delivered
+      // read() sets failbit on the last, short read
       //
    while (in.read(buf.data(), buf.size()) || in.gcount() > 0)
    {
@@ -456,10 +450,8 @@ static bool copy_file_contents(ofstream & out, const ConcatString & file_name)
 
 
    //
-   // add the copyright notice to the named file by writing the notice
-   // and then the file itself into a temporary file and copying that
-   // back over the original, which leaves the original file's
-   // permissions alone
+   // prepend the copyright notice to the named file, via a temporary
+   // file copied back over the original to keep its permissions
    //
 
 static bool add_copyright_notice(const ConcatString & file_name,
@@ -482,10 +474,6 @@ static bool add_copyright_notice(const ConcatString & file_name,
 
    out.close();
 
-      //
-      // copy the temporary file back over the original
-      //
-
    if (status)
    {
       met_open(out, file_name.c_str());
@@ -502,10 +490,6 @@ static bool add_copyright_notice(const ConcatString & file_name,
          out.close();
       }
    }
-
-      //
-      // remove the temporary file
-      //
 
    if (met_remove(tmp_file_name.c_str()) != 0)
    {
