@@ -7,6 +7,7 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ////////////////////////////////////////////////////////////////////////
 
+#include <array>
 #include <cstdio>
 #include <iostream>
 #include <fstream>
@@ -138,10 +139,10 @@ int met_open(const char *path, int oflag) {
       return -1;
    }
 
-   char real_path[PATH_MAX];
-   if(!realpath(s.c_str(), real_path)) return -1;
+   std::array<char, PATH_MAX> real_path{};
+   if(!realpath(s.c_str(), real_path.data())) return -1;
 
-   return open(real_path, oflag);
+   return open(real_path.data(), oflag);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -153,13 +154,13 @@ void met_open(ifstream &in, const char *path) {
       return;
    }
 
-   char real_path[PATH_MAX];
-   if(!realpath(s.c_str(), real_path)) {
+   std::array<char, PATH_MAX> real_path{};
+   if(!realpath(s.c_str(), real_path.data())) {
       in.setstate(ios::failbit);
       return;
    }
 
-   in.open(real_path);
+   in.open(real_path.data());
    return;
 }
 
@@ -196,9 +197,9 @@ FILE *met_fopen(const char *path, const char *mode) {
       //
 
    if(*mode == 'r') {
-      char real_path[PATH_MAX];
-      if(!realpath(s.c_str(), real_path)) return nullptr;
-      return fopen(real_path, mode);
+      std::array<char, PATH_MAX> real_path{};
+      if(!realpath(s.c_str(), real_path.data())) return nullptr;
+      return fopen(real_path.data(), mode);
    }
 
    return fopen(s.c_str(), mode);
@@ -213,10 +214,10 @@ DIR *met_opendir(const char *path) {
       return nullptr;
    }
 
-   char real_path[PATH_MAX];
-   if(!realpath(s.c_str(), real_path)) return nullptr;
+   std::array<char, PATH_MAX> real_path{};
+   if(!realpath(s.c_str(), real_path.data())) return nullptr;
 
-   return opendir(real_path);
+   return opendir(real_path.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -233,10 +234,10 @@ int met_remove(const char *path) {
       // files it created, never a link it was handed.
       //
 
-   char real_path[PATH_MAX];
-   if(!realpath(s.c_str(), real_path)) return -1;
+   std::array<char, PATH_MAX> real_path{};
+   if(!realpath(s.c_str(), real_path.data())) return -1;
 
-   return remove(real_path);
+   return remove(real_path.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
