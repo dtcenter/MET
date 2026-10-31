@@ -110,13 +110,15 @@
     </output>
   </test>
 
+  <!-- MET #3499: no -field setting leaks -->
+
   <test name="point2grid_pb2nc_methods">
     <exec>&MET_BIN;/point2grid</exec>
     <param> \
       &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
       G212 \
       &OUTPUT_DIR;/point2grid/pb2nc_TMP_RH.nc \
-      -field 'name="TMP"; level="*"; valid_time="20120409_120000";' \
+      -field 'name="TMP"; level="*"; valid_time="20120409_120000"; censor_thresh=[ &lt;273.15 ]; censor_val=[273.15];' \
       -field 'name="RH"; level="*"; valid_time="20120409_120000";' \
       -v 1
     </param>

@@ -222,9 +222,12 @@ void static process_data_file() {
    std::unique_ptr<netCDF::NcFile> nc_in;
    static const char *method_name = "process_data_file() -> ";
 
-   // Initialize configuration object
-   MetConfig config;
-   config.read(replace_path(config_const_filename).c_str());
+   // MetConfig parses into the existing dictionary rather than replacing it,
+   // so parse each field string into a fresh copy of the constants
+   MetConfig base_config;
+   base_config.read(replace_path(config_const_filename).c_str());
+
+   MetConfig config = base_config;
    config.read_string(FieldSA[0].c_str());
 
    // Note: The command line argument MUST processed before this
@@ -259,6 +262,7 @@ void static process_data_file() {
    field_count = 0;
    for(int i=0; i<FieldSA.n_elements(); i++) {
       vinfo->clear();
+      config = base_config;
       config.read_string(FieldSA[i].c_str());
       if (vinfo->set_dict(config, false)) {
          field_count++;
@@ -303,6 +307,7 @@ void static process_data_file() {
       vinfo->clear();
 
       // Populate the VarInfo object using the config string
+      config = base_config;
       config.read_string(FieldSA[i].c_str());
       if (!vinfo->set_dict(config, false)) continue;
 
