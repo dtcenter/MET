@@ -24,7 +24,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-const bool use_weighted_seeps = false;
+// MET #3465: Write the station density weighted SEEPS means and score
+const bool use_weighted_seeps = true;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -4200,12 +4201,12 @@ void write_seeps_cols(const SeepsAggScore *seeps,
 
    at.set_entry(r, c+0, seeps->n_obs);  // Total Number of Pairs
 
-   at.set_entry(r, c+1, seeps->s_odfl); // ODFL
-   at.set_entry(r, c+2, seeps->s_odfh); // ODFH
-   at.set_entry(r, c+3, seeps->s_olfd); // OLFD
-   at.set_entry(r, c+4, seeps->s_olfh); // OLFH
-   at.set_entry(r, c+5, seeps->s_ohfd); // OHFD
-   at.set_entry(r, c+6, seeps->s_ohfl); // OHFL
+   at.set_entry(r, c+1, seeps->c_odfl); // ODFL
+   at.set_entry(r, c+2, seeps->c_odfh); // ODFH
+   at.set_entry(r, c+3, seeps->c_olfd); // OLFD
+   at.set_entry(r, c+4, seeps->c_olfh); // OLFH
+   at.set_entry(r, c+5, seeps->c_ohfd); // OHFD
+   at.set_entry(r, c+6, seeps->c_ohfl); // OHFL
 
    at.set_entry(r, c+7, seeps->pf1);    // PF1
    at.set_entry(r, c+8, seeps->pf2);    // PF2
