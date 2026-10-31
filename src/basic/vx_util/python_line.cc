@@ -22,6 +22,7 @@
 #include "python3_util.h"
 #include "global_python.h"
 #include "temp_file.h"
+#include "command_line.h"
 
 #include "python_line.h"
 
@@ -46,19 +47,11 @@ static const char tmp_list_name          [] = "ascii_data";
 
 static const char tmp_base_name          [] = "tmp_mpr";
 
-static const char line_type              [] = "MPR";
-
 
 ////////////////////////////////////////////////////////////////////////
 
 
 static void get_cs     (PyObject * in, ConcatString & out);
-
-static void get_int    (PyObject * in, int & out);
-
-static void get_double (PyObject * in, double & out);
-
-static bool is_na      (PyObject *);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -386,11 +379,10 @@ void PyLineDataFile::do_tmp_ascii()
 
 int j;
 const int N = UserScriptArgs.n();
-ConcatString command;
+StringArray command;
 ConcatString path;
 ConcatString tmp_ascii_path;
 const char * tmp_dir = nullptr;
-int status;
 
 mlog << Debug(3) << "Calling " << UserPathToPython
      << " to run user's python script (" << UserScriptPath
@@ -407,32 +399,19 @@ path << cs_erase
 tmp_ascii_path = make_temp_file_name(path.text(), nullptr);
 tmp_ascii_path << ".txt";
 
-command << cs_erase
-        << UserPathToPython                    << ' '    //  user's path to python
-        << replace_path(write_tmp_mpr_wrapper) << ' '    //  write_tmp_mpr.py
-        << tmp_ascii_path                      << ' '    //  temporary ascii output filename
-        << UserScriptPath;                               //  user's script name
+command.add(UserPathToPython);                      //  user's path to python
+command.add(replace_path(write_tmp_mpr_wrapper));   //  write_tmp_mpr.py
+command.add(tmp_ascii_path);                        //  temporary ascii output filename
+command.add(UserScriptPath);                        //  user's script name
 
 for (j=0; j<N; ++j)  {
 
-   command << ' ' << UserScriptArgs[j];
+   command.add(UserScriptArgs[j]);
 
 };
 
-mlog << Debug(4) << "Writing temporary Python line data file:\n\t"
-     << command << "\n";
-
-status = system(command.text());
-
-if ( status )  {
-
-   mlog << Error << "\nPyLineDataFile::do_tmp_ascii() -> "
-        << "command \"" << command.text() << "\" failed ... status = "
-        << status << "\n\n";
-
-   exit ( 1 );
-
-}
+spawn_command_or_exit(command, "Writing temporary Python line data file",
+                      "PyLineDataFile::do_tmp_ascii() -> ");
 
 script = get_python3_script();
 
@@ -441,7 +420,7 @@ mlog << Debug(4) << "Reading temporary Python line data file: "
 
 script->import_read_tmp_ascii_py();
 
-PyObject * dobj = script->read_tmp_ascii(tmp_ascii_path.text());
+script->read_tmp_ascii(tmp_ascii_path.text());
 
 main_list = script->lookup_ascii(tmp_list_name);
 
@@ -527,51 +506,6 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void get_int    (PyObject * in, int & out)
-
-{
-
-if ( is_na(in) )  {
-
-   out = bad_data_int;
-
-   return;
-
-}
-
-out = pyobject_as_int(in);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void get_double (PyObject * in, double & out)
-
-{
-
-if ( is_na(in) )  {
-
-   out = bad_data_double;
-
-   return;
-
-}
-
-out = pyobject_as_double(in);
-
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
 std::unique_ptr<Python3_Script> get_python3_script()
 
 {
@@ -599,37 +533,6 @@ setenv(env_PYTHONPATH, python_path.c_str(),1);
 return std::make_unique<Python3_Script>(path.text());
 
 }
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  check that it's a string and that the string contents are "NA"
-   //
-
-
-bool is_na (PyObject * obj)
-
-{
-
-if ( ! PyUnicode_Check(obj) )  return false;
-
-   //
-   //  now we know it's a string, the value had better be "NA"
-   //
-
-ConcatString s = pyobject_as_concat_string(obj);
-
-if ( strcmp(s.text(), na_string.c_str()) == 0 )  return true;
-
-   //
-   //  done
-   //
-
-return false;   //  control flow should never get here
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 

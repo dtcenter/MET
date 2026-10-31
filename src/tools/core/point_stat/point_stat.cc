@@ -180,6 +180,9 @@ static void finish_txt_files();
 
 static void clean_up();
 
+static const UGridNeighbors *find_ugrid_nbrs(double, double, int, UGridNeighbors &);
+static HorzInterpInfo hira_horz_interp_info(int, int);
+
 static void usage(int exit_code=1);
 static void set_point_obs(const StringArray &);
 static void set_ncfile(const StringArray &);
@@ -340,6 +343,7 @@ static void process_command_line(int argc, char **argv) {
       else {
          mlog << Error << "\n" << method_name
               << conf_key_ugrid_dataset << " is not defined at the configuration file.\n\n";
+         exit(1);
       }
 #else
       ugrid_compile_error(method_name);
@@ -792,7 +796,7 @@ static void process_obs_file(int i_nc) {
 #ifdef WITH_PYTHON
    MetPythonPointDataFile met_point_file;
    if (use_python) {
-      int offset = python_command.find("=");
+      size_t offset = python_command.find("=");
       if (offset == std::string::npos) {
          mlog << Error << "\n" << method_name
               << "trouble parsing the python command " << python_command << ".\n\n";
@@ -1860,21 +1864,26 @@ static void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
 static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
    PairDataEnsemble hira_pd;
-   int lvl_abv;
-   int lvl_blw;
    NumArray f_ens;
 
    // Set flag for specific humidity
    bool spfh_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_specific_humidity() &&
                     conf_info.vx_opt[i_vx].vx_pd.obs_info->is_specific_humidity();
+   const LevelType lvl_typ = conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type();
 
    shc.set_interp_mthd(InterpMthd::Nbrhd,
                        conf_info.vx_opt[i_vx].hira_info.shape);
+
+   // Closest faces for an unstructured grid
+   UGridNeighbors ugrid_nbrs;
 
    // Loop over the HiRA widths
    for(int i=0; i<conf_info.vx_opt[i_vx].hira_info.width.n(); i++) {
 
       shc.set_interp_wdth(conf_info.vx_opt[i_vx].hira_info.width[i]);
+
+      // HiRA neighborhood interpolation options
+      HorzInterpInfo horz = hira_horz_interp_info(i_vx, conf_info.vx_opt[i_vx].hira_info.width[i]);
 
       // Determine the number of points in the area
       GridTemplateFactory gtf;
@@ -1897,18 +1906,16 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
       // Process each observation point
       for(int j=0; j<pd_ptr->n_obs; j++) {
 
-         // Determine the forecast level values
-         find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
-                       pd_ptr->lvl_na[j], lvl_blw, lvl_abv);
+         // For an unstructured grid, find the closest faces
+         horz.ugrid_nbrs = find_ugrid_nbrs(
+            pd_ptr->lat_na[j], pd_ptr->lon_na[j], gt->size(), ugrid_nbrs);
 
-         // Get the nearby forecast values
+         // Get the nearby forecast values at the observation level
          get_interp_points(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
-            pd_ptr->x_na[j], pd_ptr->y_na[j],
-            InterpMthd::Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[i],
-            conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
-            conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
-            conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
-            pd_ptr->lvl_na[j], lvl_blw, lvl_abv, f_ens);
+            pd_ptr->x_na[j], pd_ptr->y_na[j], horz,
+            make_vert_interp_info(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
+                                  spfh_flag, lvl_typ, pd_ptr->lvl_na[j]),
+            f_ens);
 
          // Check for values
          if(f_ens.n() == 0) continue;
@@ -2048,8 +2055,6 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
 static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
    PairDataPoint hira_pd;
-   int lvl_abv;
-   int lvl_blw;
    double f_cov;
    double ocmn_cov;
    NumArray ocmn_cov_na;
@@ -2061,9 +2066,13 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                     conf_info.vx_opt[i_vx].vx_pd.obs_info->is_specific_humidity();
    //bool precip_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_precipitation() &&
    //                   conf_info.vx_opt[i_vx].vx_pd.obs_info->is_precipitation();
+   const LevelType lvl_typ = conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type();
 
    shc.set_interp_mthd(InterpMthd::Nbrhd,
                        conf_info.vx_opt[i_vx].hira_info.shape);
+
+   // Closest faces for an unstructured grid
+   UGridNeighbors ugrid_nbrs;
 
    // Loop over categorical thresholds and HiRA widths
    for(int i=0; i<conf_info.vx_opt[i_vx].fcat_ta.n(); i++) {
@@ -2075,6 +2084,14 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
       for(int j=0; j<conf_info.vx_opt[i_vx].hira_info.width.n(); j++) {
 
          shc.set_interp_wdth(conf_info.vx_opt[i_vx].hira_info.width[j]);
+
+         // HiRA neighborhood interpolation options
+         HorzInterpInfo horz = hira_horz_interp_info(i_vx, conf_info.vx_opt[i_vx].hira_info.width[j]);
+         horz.cat_thresh = &cat_thresh;
+
+         // Number of closest faces for an unstructured grid
+         int ugrid_n = ugrid_interp_n_points(conf_info.vx_opt[i_vx].hira_info.width[j],
+                                             conf_info.vx_opt[i_vx].hira_info.shape);
 
          // Initialize
          hira_pd.clear();
@@ -2089,18 +2106,16 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
             ClimoPntInfo cpi(pd_ptr->fcmn_na[k], pd_ptr->fcsd_na[k],
                              pd_ptr->ocmn_na[k], pd_ptr->ocsd_na[k]);
 
+            // For an unstructured grid, find the closest faces
+            horz.ugrid_nbrs = find_ugrid_nbrs(
+               pd_ptr->lat_na[k], pd_ptr->lon_na[k], ugrid_n, ugrid_nbrs);
+
             // Compute the fractional coverage forecast value using the
             // observation level value
-            find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
-                          pd_ptr->lvl_na[k], lvl_blw, lvl_abv);
-
             f_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
-                       pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k], &cpi,
-                       InterpMthd::Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
-                       conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
-                       conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
-                       conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
-                       pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);
+                       pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k], &cpi, horz,
+                       make_vert_interp_info(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
+                                             spfh_flag, lvl_typ, pd_ptr->lvl_na[k]));
 
             // Check for bad data
             if(is_bad_data(f_cov)) continue;
@@ -2110,16 +2125,10 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
             if(conf_info.vx_opt[i_vx].vx_pd.ocmn_dpa.n_planes() > 0) {
 
                // Interpolate to the observation level
-               find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.ocmn_dpa,
-                             pd_ptr->lvl_na[k], lvl_blw, lvl_abv);
-
                ocmn_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.ocmn_dpa,
-                             pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k], &cpi,
-                             InterpMthd::Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
-                             conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
-                             conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
-                             conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
-                             pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);
+                             pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k], &cpi, horz,
+                             make_vert_interp_info(conf_info.vx_opt[i_vx].vx_pd.ocmn_dpa,
+                                                   spfh_flag, lvl_typ, pd_ptr->lvl_na[k]));
 
                // Check for bad data
                if(is_bad_data(ocmn_cov)) continue;
@@ -2256,6 +2265,36 @@ static void finish_txt_files() {
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// For an unstructured grid, find the n closest faces of the matched
+// pair location (lon in degrees east) and return a pointer to them.
+// Return nullptr for other grids, which use the grid template.
+//
+////////////////////////////////////////////////////////////////////////
+
+static const UGridNeighbors *find_ugrid_nbrs(double lat, double lon, int n,
+                                             UGridNeighbors &nbrs) {
+   return grid.ugrid_closest_faces(lat, -1.0*lon, n, nbrs) ? &nbrs : nullptr;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Horizontal interpolation options for the HiRA neighborhood of the
+// requested width.
+//
+////////////////////////////////////////////////////////////////////////
+
+static HorzInterpInfo hira_horz_interp_info(int i_vx, int width) {
+   HorzInterpInfo horz;
+   horz.method     = InterpMthd::Nbrhd;
+   horz.width      = width;
+   horz.shape      = conf_info.vx_opt[i_vx].hira_info.shape;
+   horz.wrap_lon   = grid.wrap_lon();
+   horz.vld_thresh = conf_info.vx_opt[i_vx].hira_info.vld_thresh;
+   return horz;
 }
 
 ////////////////////////////////////////////////////////////////////////

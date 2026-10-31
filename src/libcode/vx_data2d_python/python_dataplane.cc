@@ -18,6 +18,7 @@
 
 #include "global_python.h"
 #include "wchar_argv.h"
+#include "command_line.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -287,27 +288,18 @@ path << tmp_dir << '/'
 
 ConcatString tmp_file_name(make_temp_file_name(path.text(), nullptr));
 
-ConcatString command;
-command << user_ppath                    << ' '    //  user's path to python
-        << replace_path(write_tmp_py)    << ' '    //  write_tmp_nc.py
-        << tmp_file_name                 << ' '    //  temporary output filename
-        << user_script_name;                       //  user's script name
+StringArray command;
+command.add(user_ppath);                      //  user's path to python
+command.add(replace_path(write_tmp_py));      //  write_tmp_nc.py
+command.add(tmp_file_name);                   //  temporary output filename
+command.add(user_script_name);                //  user's script name
 
 for (int j=1; j<user_script_args.n(); ++j)  {   //  j starts at one, here
-   command << ' ' << user_script_args[j];
+   command.add(user_script_args[j]);
 }
 
-mlog << Debug(4) << "Writing temporary Python dataplane file:\n\t"
-     << command << "\n";
-
-int status = system(command.text());
-
-if ( status )  {
-   mlog << Error << "\n" << method_name
-        << "command \"" << command.text() << "\" failed ... status = "
-        << status << "\n\n";
-   exit ( 1 );
-}
+spawn_command_or_exit(command, "Writing temporary Python dataplane file",
+                      method_name);
 
    //
    //  if the global python object has already been initialized,
@@ -356,9 +348,9 @@ mlog << Debug(4) << "Reading temporary Python dataplane file: "
    //  import the python wrapper script as a module
    //
 
-path = get_short_name(validate_dataplane);
+ConcatString module_name = get_short_name(validate_dataplane);
 
-PyObject *module_obj = PyImport_ImportModule(path.text());
+PyObject *module_obj = PyImport_ImportModule(module_name.text());
 
    //
    //  if needed, reload the module
@@ -374,7 +366,7 @@ if ( PyErr_Occurred() )  {
 
    mlog << Warning << "\n" << method_name
         << "an error occurred importing module "
-        << '\"' << path << "\"\n\n";
+        << '\"' << module_name << "\"\n\n";
 
    return false;
 

@@ -684,7 +684,14 @@ LineDataFile::~LineDataFile()
 
 {
 
-close();
+try { close(); }
+catch(...) {
+   //  a destructor must not propagate exceptions.  fputs is used
+   //  rather than mlog or cerr because neither is guaranteed not
+   //  to throw, which would defeat the purpose of this catch.
+   fputs("\nWARNING: LineDataFile::~LineDataFile() -> "
+         "ignoring exception thrown during cleanup\n\n", stderr);
+}
 
 }
 
@@ -903,7 +910,7 @@ if ( ok() ) {
 
 }
 
-return 1;
+return status;
 
 }
 
@@ -983,7 +990,14 @@ LineDataFiles::~LineDataFiles()
 
 {
 
-clear();
+try { clear(); }
+catch(...) {
+   //  a destructor must not propagate exceptions.  fputs is used
+   //  rather than mlog or cerr because neither is guaranteed not
+   //  to throw, which would defeat the purpose of this catch.
+   fputs("\nWARNING: LineDataFiles::~LineDataFiles() -> "
+         "ignoring exception thrown during cleanup\n\n", stderr);
+}
 
 }
 
@@ -1207,7 +1221,7 @@ if ( !status && !CurLDF.ok() )  {
    CurFileNumber++;
 
    // Check for the last file
-   if ( CurFileNumber == Filenames.size() )  return 0;
+   if ( CurFileNumber == static_cast<int>(Filenames.size()) )  return 0;
 
    // Open the next file
    CurLDF.close();
@@ -1251,7 +1265,7 @@ ostream & operator<<(ostream & out, const DataLine & L)
 
 if ( L.n_items() == 0 )  return out;
 
-int j;
+size_t j;
 
 for (j = 0; j < L.Items.size(); j++) {
     out << L.Items[j];
@@ -1278,7 +1292,7 @@ Logger & operator<<(Logger & lgr, const DataLine & L)
 
 if ( L.n_items() == 0 )  return lgr;
 
-for (int j = 0; j < L.Items.size(); j++) {
+for (size_t j = 0; j < L.Items.size(); j++) {
     lgr << L.Items[j];
     if (j < (L.Items.size() - 1))
         lgr << ' ';

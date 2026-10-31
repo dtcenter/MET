@@ -32,7 +32,7 @@ function usage {
 }
 
 # Check for arguments
-if [ $# -lt 1 ]; then usage; exit 1; fi
+if [[ $# -lt 1 ]]; then usage; exit 1; fi
 
 # Store the full path to the scripts directory
 SCRIPT_DIR=`dirname $0`
@@ -67,8 +67,8 @@ ${SCRIPT_DIR}/run_sonarqube.sh ${1} > ${LOGFILE}
 if [[ $? -ne 0 ]]; then
   my_cmd="echo \$MET_CRON_EMAIL_LIST_${GIT_REPO_NAME}"
   _EMAIL_LIST="$(eval $my_cmd)"
-  [ -z "$_EMAIL_LIST" ] && _EMAIL_LIST="$MET_CRON_EMAIL_LIST"
-  [ -z "$_EMAIL_LIST" ] && _EMAIL_LIST="$EMAIL_LIST"
+  [[ -z "$_EMAIL_LIST" ]] && _EMAIL_LIST="$MET_CRON_EMAIL_LIST"
+  [[ -z "$_EMAIL_LIST" ]] && _EMAIL_LIST="$EMAIL_LIST"
   echo "$0: The nightly SonarQube scanning for $GIT_REPO_NAME FAILED in `basename ${RUN_DIR}`." >> ${LOGFILE}
   cat ${LOGFILE} | mail -s "$GIT_REPO_NAME SonarQube scanning failed for ${1} in `basename ${RUN_DIR}` (autogen msg)" ${_EMAIL_LIST}
   exit 1

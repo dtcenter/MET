@@ -333,11 +333,44 @@ static void aw_mean_lat_weights(const Grid &to_grid, double x_to,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// The area-weighted regridding from an unstructured grid requires the
+// face area. AW_MEAN_CNTR is not supported since it finds the extent of
+// each grid box from the neighboring grid indices, which are not the
+// neighboring faces of an unstructured grid.
+//
+////////////////////////////////////////////////////////////////////////
+
+static void check_ugrid_area_weighted(const Grid & from_grid, const RegridInfo & info) {
+   const char *method_name = "check_ugrid_area_weighted() -> ";
+
+   if(!from_grid.is_ugrid()) return;
+
+   if(info.method == InterpMthd::AW_Mean_Cntr) {
+      mlog << Error << "\n" << method_name
+           << "the \"" << interpmthd_aw_mean_cntr_str << "\" regridding method "
+           << "is not supported from the unstructured grid. Use \""
+           << interpmthd_aw_mean_str << "\" instead.\n\n";
+      exit(1);
+   }
+
+   if(!from_grid.ugrid_has_face_area()) {
+      mlog << Error << "\n" << method_name
+           << "the \"" << interpmthd_to_string(info.method) << "\" regridding "
+           << "method requires the face area of the unstructured grid. "
+           << "Define \"area_face\" in \"ugrid_metadata_map\".\n\n";
+      exit(1);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
 
 DataPlane met_regrid_area_weighted(const DataPlane & from_data,
                                    const Grid & from_grid,
                                    const Grid & to_grid,
                                    const RegridInfo & info) {
+
+   check_ugrid_area_weighted(from_grid, info);
 
    //
    //  The interpolation width and shape do not apply here.  The output
@@ -475,7 +508,7 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
 
       // Loop over the to grid to compute the area weighted average
 #pragma omp for schedule(static)
-      for(int n=0; n<to_data_sum.size(); n++) {
+      for(int n=0; n<static_cast<int>(to_data_sum.size()); n++) {
 
          int xt;
          int yt;

@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <limits.h>
+#include <algorithm>
 
 #include "config_util.h"
 #include "enum_as_int.hpp"
@@ -511,7 +512,6 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
    DictionaryEntry entry;
    StringArray lvl;
    int n_lvl;
-   int total;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_i_vx_dict() -> "
@@ -644,7 +644,7 @@ MaskSID parse_sid_mask(const ConcatString &mask_sid_str) {
 
       // Open the mask station id file specified
       ifstream in;
-      in.open(tmp_file.c_str());
+      met_open(in, tmp_file.c_str());
 
       if(!in) {
          mlog << Error << "\n" << method_name
@@ -1261,7 +1261,6 @@ map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 map<ConcatString,ConcatString> parse_conf_obs_name_map(Dictionary *dict) {
-   const char *method_name = "parse_conf_obs_name_map() -> ";
    return parse_conf_key_value_map(dict, conf_key_obs_name_map);
 }
 
@@ -1820,6 +1819,51 @@ void InterpInfo::validate() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//
+// The unstructured grid uses the N closest faces instead of the grid
+// template. Methods that need the regular grid structure (least-squares
+// fit, grid box corners, Gaussian filters, geography match) are not
+// supported. The bilinear interpolation fits a bilinear surface through
+// the width * width closest faces. The distance-weighted mean and the
+// bilinear interpolation are not supported for smoothing since each
+// face is its own closest face, and the best match since there is no
+// observation value.
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void InterpInfo::validate_ugrid(UGridInterpUse use, const char *caller) const {
+
+   static const vector point_methods = {
+      InterpMthd::Nearest, InterpMthd::Min,     InterpMthd::Max,
+      InterpMthd::Median,  InterpMthd::UW_Mean, InterpMthd::DW_Mean,
+      InterpMthd::AW_Mean, InterpMthd::Bilin,   InterpMthd::Best };
+   static const vector smoothing_methods = {
+      InterpMthd::Nearest, InterpMthd::Min,     InterpMthd::Max,
+      InterpMthd::Median,  InterpMthd::UW_Mean, InterpMthd::AW_Mean };
+
+   const auto &supported =
+      (use == UGridInterpUse::Smoothing ? smoothing_methods : point_methods);
+
+   for(int i=0; i<n_interp; i++) {
+
+      if(InterpMthd methodi = string_to_interpmthd(method[i].c_str());
+         std::find(supported.begin(), supported.end(), methodi) != supported.end()) continue;
+
+      ConcatString choices;
+      for(const auto &m : supported) {
+         if(!choices.empty()) choices << ", ";
+         choices << interpmthd_to_string(m);
+      }
+
+      mlog << Error << "\n" << caller
+           << "the \"" << method[i] << "\" interpolation method is not "
+           << "supported for the unstructured grid. Choose from "
+           << choices << ".\n\n";
+      exit(1);
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 InterpInfo & InterpInfo::operator=(const InterpInfo &a) noexcept {
    if(this != &a) {
@@ -2082,7 +2126,7 @@ ClimoCDFInfo &ClimoCDFInfo::operator=(ClimoCDFInfo &&a) noexcept {
       a.flag = false;
       n_bin = a.n_bin;
       a.n_bin = 0;
-      cdf_ta = move(a.cdf_ta);
+      cdf_ta = std::move(a.cdf_ta);
       write_bins = a.write_bins;
       a.write_bins = false;
       direct_prob = a.direct_prob;
@@ -2664,13 +2708,10 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
    ConcatString tmp_dir_path;
 
    if(!get_env("MET_TMP_DIR", tmp_dir_path)) {
-      if(!dict) {
-         mlog << Error << "\nparse_conf_tmp_dir() -> "
-              << "empty dictionary!\n\n";
-         exit(1);
-      }
-      // Read the temporary directory
-      tmp_dir_path = dict->lookup_string(conf_key_tmp_dir);
+      // Read the temporary directory from the dictionary, when provided,
+      // and otherwise use the default
+      if(dict) tmp_dir_path = dict->lookup_string(conf_key_tmp_dir);
+      else     tmp_dir_path = default_tmp_dir;
    }
 
    // Make sure that it exists
@@ -2885,7 +2926,6 @@ SurfaceInfo parse_conf_surface_info(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void parse_conf_topo_mask_interp(Dictionary *dict, SurfaceInfo &sfc_info) {
-   const char *method_name = "parse_conf_topo_mask_interp() -> ";
 
    // Conf: topo_mask.interp
    Dictionary *interp_dict = dict->lookup_dictionary(conf_key_topo_mask_interp);

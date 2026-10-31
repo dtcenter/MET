@@ -58,6 +58,13 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
+// Defined here rather than in tc_diag.h, which python_tc_diag.cc also
+// includes, so that file does not get its own unused copies
+static GrdFileType file_type = FileType_None;
+static unixtime    init_ut   = (unixtime) 0;
+
+////////////////////////////////////////////////////////////////////////
+
 static void usage(int exit_code=1);
 static void process_command_line(int, char**);
 static void get_file_type();
@@ -149,7 +156,7 @@ __attribute__((noreturn)) static void usage(int exit_code) {
         << ") ***\n\n"
         << "Usage: " << program_name << "\n"
         << "\t-data domain tech_id_list [ file_1 ... file_n | file_list ]\n"
-        << "\t-deck file\n"
+        << "\t-deck path\n"
         << "\t-config file\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
@@ -162,7 +169,7 @@ __attribute__((noreturn)) static void usage(int exit_code) {
         << "\t\t\ta list of files to be used.\n"
         << "\t\t\tSpecify \"-data\" once for each data source (required).\n"
 
-        << "\t\t\"-deck source\" is the ATCF format data source "
+        << "\t\t\"-deck path\" is the ATCF format data source "
         << "(required).\n"
 
         << "\t\t\"-config file\" is a TCDiagConfig file to be used "
@@ -370,16 +377,13 @@ void get_atcf_files(const StringArray& source,
 void process_track_files(const StringArray& files,
                          const StringArray& model_suffix,
                          TrackInfoArray& tracks) {
-   int i, cur_read, cur_add, tot_read, tot_add;
+   int i, cur_read, cur_add;
    LineDataFile f;
    ConcatString cs;
    ATCFTrackLine line;
 
    // Initialize
    tracks.clear();
-
-   // Initialize counts
-   tot_read = tot_add = 0;
 
    // Process input ATCF files
    for(i=0; i<files.n(); i++) {
@@ -401,7 +405,6 @@ void process_track_files(const StringArray& files,
 
           // Increment line counts
           cur_read++;
-          tot_read++;
 
           // Add model suffix, if specified
           if(model_suffix[i].length() > 0) {
@@ -415,7 +418,6 @@ void process_track_files(const StringArray& files,
           // Attempt to add current line to TrackInfoArray
           if(tracks.add(line, true, false)) {
              cur_add++;
-             tot_add++;
           }
        }
 
@@ -621,7 +623,7 @@ void set_outdir(const StringArray& a) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_out_files(const TrackInfoArray &tracks) {
-   int i, j;
+   int i;
 
    // Setup output files for each track
    for(i=0; i<tracks.n(); i++) {
@@ -906,7 +908,7 @@ void process_track_points(const TrackInfoArray& tracks) {
    for(i=0; i<valid_ta.n(); i++) {
 
       // Loop over the domains to be processed
-      for(j=0; j<conf_info.domain_info.size(); j++) {
+      for(j=0; j<(int) conf_info.domain_info.size(); j++) {
 
          mlog << Debug(3) << "Processing valid time "
               << unix_to_yyyymmddhh(valid_ta[i]) << " \""
@@ -950,7 +952,7 @@ void process_track_points(const TrackInfoArray& tracks) {
    for(i=0; i<valid_ta.n(); i++) {
 
       // Loop over the domains to be processed
-      for(j=0; j<conf_info.domain_info.size(); j++) {
+      for(j=0; j<(int) conf_info.domain_info.size(); j++) {
 
          // Process the gridded data for the current
          // domain and valid time
@@ -979,7 +981,7 @@ void process_fields(const TrackInfoArray &tracks,
    StringArray tmp_key_sa, fields_missing;
 
    // Create vector of VarInfo objects
-   for(i=0; i<di.var_info_ptr.size(); i++) {
+   for(i=0; i<(int) di.var_info_ptr.size(); i++) {
 
       // Make a local VarInfo copy to store the valid time
       auto vi = vi_factory.new_copy(di.var_info_ptr[i]);
@@ -991,17 +993,17 @@ void process_fields(const TrackInfoArray &tracks,
    if(conf_info.one_time_per_file_flag) {
 
       // Find all entries for this track point
-      bool status = get_series_entries(i_vld, vi_list,
-                       di.data_files, file_type,
-                       dp_list, grid_dp,
-                       false, false);
+      get_series_entries(i_vld, vi_list,
+                         di.data_files, file_type,
+                         dp_list, grid_dp,
+                         false, false);
 
    }
    // Otherwise, read data one field at a time
    else {
 
       // Loop over the VarInfo fields to be processed
-      for(i=0; i<vi_list.size(); i++) {
+      for(i=0; i<(int) vi_list.size(); i++) {
 
          // Find single entry for this track point
          bool status = get_series_entry(i_vld, vi_list[i].get(),
@@ -1019,7 +1021,7 @@ void process_fields(const TrackInfoArray &tracks,
    }
 
    // Check for missing data
-   for(i=0; i<vi_list.size(); i++) {
+   for(i=0; i<(int) vi_list.size(); i++) {
 
       if(dp_list[i].is_empty()) {
 
@@ -1033,7 +1035,7 @@ void process_fields(const TrackInfoArray &tracks,
    } // end for i
 
    // Loop over the VarInfo fields to be processed
-   for(i=0; i<vi_list.size(); i++) {
+   for(i=0; i<(int) vi_list.size(); i++) {
 
       // Do coordinate transformation for each track point
       for(j=0; j<tracks.n(); j++) {
@@ -1108,7 +1110,7 @@ void process_out_files(const TrackInfoArray& tracks) {
       }
 
       // Loop over domains
-      for(int i_dom=0; i_dom<conf_info.domain_info.size(); i_dom++) {
+      for(int i_dom=0; i_dom<(int) conf_info.domain_info.size(); i_dom++) {
 
          // Initialize list of domain-specific temp files
          domain_tmp_file_list.clear();
@@ -1175,6 +1177,10 @@ void process_out_files(const TrackInfoArray& tracks) {
 
    } // end for i_trk
 
+   // Close the temp and output files
+   tmp_file_map.clear();
+   out_file_map.clear();
+
    return;
 }
 
@@ -1184,7 +1190,7 @@ void merge_tmp_files(const vector<TmpFileInfo *> tmp_files) {
    std::unique_ptr<netCDF::NcFile> nc_out;
 
    // Loop over temp files
-   for(int i_tmp=0; i_tmp<tmp_files.size(); i_tmp++) {
+   for(int i_tmp=0; i_tmp<(int) tmp_files.size(); i_tmp++) {
 
       // Create the output NetCDF file
       if(!nc_out.get()) {
@@ -1345,7 +1351,14 @@ OutFileInfo::OutFileInfo() {
 ////////////////////////////////////////////////////////////////////////
 
 OutFileInfo::~OutFileInfo() {
-   clear();
+   try { clear(); }
+   catch(...) {
+      //  a destructor must not propagate exceptions.  fputs is used
+      //  rather than mlog or cerr because neither is guaranteed not
+      //  to throw, which would defeat the purpose of this catch.
+      fputs("\nWARNING: OutFileInfo::~OutFileInfo() -> "
+            "ignoring exception thrown during cleanup\n\n", stderr);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2143,12 +2156,11 @@ void TmpFileInfo::clear() {
 
    domain.clear();
 
-   // Delete the temp file
-   if(tmp_out.get()) {
+   // Close and delete the temp file
+   close();
 
-      remove_temp_file(tmp_file);
+   if(!tmp_file.empty()) remove_temp_file(tmp_file);
 
-      }
    tmp_file.clear();
 
    return;

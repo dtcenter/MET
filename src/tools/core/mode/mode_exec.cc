@@ -1291,8 +1291,8 @@ void ModeExecutive::process_output_multivar_intensity_compare(const MultiVarData
    double fmax = mvdf->_data_max;
    double omin = mvdo->_data_min;
    double omax = mvdo->_data_max;
-   double dmin;
-   double dmax;
+   double dmin = bad_data_double;
+   double dmax = bad_data_double;
    if     (!is_bad_data(fmin) && !is_bad_data(omin)) dmin = min(fmin, omin);
    else if(!is_bad_data(fmin) &&  is_bad_data(omin)) dmin = fmin;
    else if( is_bad_data(fmin) && !is_bad_data(omin)) dmin = omin;

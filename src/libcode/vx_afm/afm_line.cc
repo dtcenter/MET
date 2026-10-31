@@ -26,9 +26,6 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-
-static const int afm_line_size = 256;
-
 static const char delim [] = " ;\015\032";
 
 
@@ -181,7 +178,7 @@ int k;
 AfmToken tok;
 AfmKeyword key;
 
-if(LineItems.n() == 0 || item_index == LineItems.n()) {
+if(LineItems.n() == 0 || item_index == static_cast<unsigned int>(LineItems.n())) {
    tok.type = afm_token_endofline;
    return tok;
 }
@@ -252,7 +249,7 @@ AfmToken AfmLine::rest_as_string()
 
 AfmToken tok;
 
- if(item_index < LineItems.n()) {
+ if(item_index < static_cast<unsigned int>(LineItems.n())) {
    tok.set_string(LineItems[item_index]);
 }
 

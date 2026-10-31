@@ -65,7 +65,7 @@ class MetPythonDataFile : public Met2dDataFile {
          //  get stuff
          //
 
-      GrdFileType file_type() const;
+      GrdFileType file_type() const override;
 
       double operator () (int x, int y) const;
 
@@ -79,12 +79,12 @@ class MetPythonDataFile : public Met2dDataFile {
          //  do stuff
          //
 
-      bool open(const char * cur_command);
+      bool open(const char * cur_command) override;
 
-      void close();
+      void close() override;
 
 
-      void dump (std::ostream &, int depth = 0) const;
+      void dump (std::ostream &, int depth = 0) const override;
 
       bool data_plane(VarInfo &, DataPlane &, bool do_winds = true) override;
 

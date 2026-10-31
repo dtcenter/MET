@@ -1185,6 +1185,7 @@ void compute_sl1l2_mean(const SL1L2Info *sl1l2_info, int n,
          sl1l2_mean.scount += sl1l2_info[i].scount;
          sl1l2_mean.fbar   += sl1l2_info[i].fbar;
          sl1l2_mean.obar   += sl1l2_info[i].obar;
+         sl1l2_mean.fobar  += sl1l2_info[i].fobar;
          sl1l2_mean.ffbar  += sl1l2_info[i].ffbar;
          sl1l2_mean.oobar  += sl1l2_info[i].oobar;
          sl1l2_mean.smae   += sl1l2_info[i].smae;
@@ -1195,6 +1196,7 @@ void compute_sl1l2_mean(const SL1L2Info *sl1l2_info, int n,
          sl1l2_mean.sacount += sl1l2_info[i].sacount;
          sl1l2_mean.fabar   += sl1l2_info[i].fabar;
          sl1l2_mean.oabar   += sl1l2_info[i].oabar;
+         sl1l2_mean.foabar  += sl1l2_info[i].foabar;
          sl1l2_mean.ffabar  += sl1l2_info[i].ffabar;
          sl1l2_mean.ooabar  += sl1l2_info[i].ooabar;
          sl1l2_mean.samae   += sl1l2_info[i].samae;
@@ -1205,6 +1207,7 @@ void compute_sl1l2_mean(const SL1L2Info *sl1l2_info, int n,
    if(sl1l2_mean.scount > 0) {
       sl1l2_mean.fbar  /= n_sl1l2;
       sl1l2_mean.obar  /= n_sl1l2;
+      sl1l2_mean.fobar /= n_sl1l2;
       sl1l2_mean.ffbar /= n_sl1l2;
       sl1l2_mean.oobar /= n_sl1l2;
       sl1l2_mean.smae  /= n_sl1l2;
@@ -1212,6 +1215,7 @@ void compute_sl1l2_mean(const SL1L2Info *sl1l2_info, int n,
    if(sl1l2_mean.sacount > 0) {
       sl1l2_mean.fabar  /= n_sal1l2;
       sl1l2_mean.oabar  /= n_sal1l2;
+      sl1l2_mean.foabar /= n_sal1l2;
       sl1l2_mean.ffabar /= n_sal1l2;
       sl1l2_mean.ooabar /= n_sal1l2;
       sl1l2_mean.samae  /= n_sal1l2;
@@ -1521,7 +1525,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
    vector<SeepsScore *> seeps_mprs;
 
    for(int i=0; i<pd->n_obs; i++) {
-      if (i >= pd->seeps_mpr.size()) break;
+      if (i >= static_cast<int>(pd->seeps_mpr.size())) break;
       seeps_mpr = pd->seeps_mpr[i].get();
       if (!seeps_mpr || is_eq(seeps_mpr->score, bad_data_double)) continue;
 
@@ -1592,7 +1596,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
          for (int i=0; i<count; i++) weight[i] /= weight_sum;
 
          //IDL: for i=0l, n-1l do begin
-         for (int i=0; i<seeps_mprs.size(); i++) {
+         for (int i=0; i<static_cast<int>(seeps_mprs.size()); i++) {
             seeps_mpr = seeps_mprs[i];
             //IDL: s = s + c(4+cat(i) * w{i)
             if (i < density_cnt) {
@@ -1684,7 +1688,6 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
    int fcst_cat = bad_data_int;
    int obs_cat = bad_data_int;
    int seeps_count = 0;
-   int count_diagonal = 0;
    int nan_count = 0;
    int bad_count = 0;
    int c_odfl = 0;
@@ -1736,17 +1739,14 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
                if (fcst_cat == 0) {
                   if (obs_cat == 1) c_olfd++;
                   else if(obs_cat == 2) c_odfh++;
-                  else count_diagonal++;
                }
                else if (fcst_cat == 1) {
                   if (obs_cat == 0) c_odfl++;
                   else if(obs_cat == 2) c_ohfd++;
-                  else count_diagonal++;
                }
                else if (fcst_cat == 2) {
                   if (obs_cat == 0) c_odfh++;
                   else if (obs_cat == 1) c_olfh++;
-                  else count_diagonal++;
                }
                seeps_score = seeps_mpr->score;
                mlog << Debug(9) << method_name
@@ -1874,7 +1874,7 @@ void compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps,
    // Get lat/lon & convert them to radian and get sin/cos values
    seeps_idx = 0;
    for(int i=0; i<pd->n_obs; i++) {
-      if (i >= pd->seeps_mpr.size()) break;
+      if (i >= static_cast<int>(pd->seeps_mpr.size())) break;
       seeps_mpr = pd->seeps_mpr[i].get();
       mlog << Debug(9) << method_name
            << "seeps_idx, seeps_mpr => "

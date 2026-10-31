@@ -24,8 +24,9 @@ fi
 
 UNIT_OPTS=""
 for arg in $@; do
-  [ $arg == "-memchk" -o $arg == "memchk" ] && UNIT_OPTS="$UNIT_OPTS -memchk"
-  [ $arg == "-callchk" -o $arg == "callchk" ] && UNIT_OPTS="$UNIT_OPTS -callchk"
+  [[ $arg == "-memchk" || $arg == "memchk" ]] && UNIT_OPTS="$UNIT_OPTS -memchk"
+  [[ $arg == "-callchk" || $arg == "callchk" ]] && UNIT_OPTS="$UNIT_OPTS -callchk"
+  [[ $arg == "-verbose" || $arg == "verbose" ]] && UNIT_OPTS="$UNIT_OPTS -verbose"
 done
 
 # Unit test script
@@ -110,7 +111,7 @@ for CUR_XML in ${UNIT_XML}; do
   RET_VAL=$?
 
   # Fail on non-zero return status
-  if [ ${RET_VAL} != 0 ]; then
+  if [[ ${RET_VAL} != 0 ]]; then
     echo
     echo "ERROR: ${UNIT} ${CUR_XML} failed."
     echo

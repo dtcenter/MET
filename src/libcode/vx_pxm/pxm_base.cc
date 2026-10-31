@@ -112,7 +112,6 @@ return;
 void PxmBase::copy_common(const PxmBase & p)
 
 {
-const char *method_name = "PxmBase::copy_common() ";
 
 if ( this == &p )  return;
 
@@ -130,7 +129,6 @@ Name = p.Name;
 if ( p.Ncomments > 0 )  {
 
    int j;
-   char a_var_name[512+1];
 
    Ncomments = p.Ncomments;
 

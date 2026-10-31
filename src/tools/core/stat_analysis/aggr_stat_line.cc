@@ -283,9 +283,12 @@ void aggr_summary_lines(LineDataFiles &f, STATAnalysisJob &job,
          //
          // Derive continuous statistics
          //
-         else if(do_cnt && (line.type() == STATLineType::sl1l2 ||
-                            line.type() == STATLineType::sal1l2)) {
+         else if(do_cnt && line.type() == STATLineType::sl1l2) {
             parse_sl1l2_line(line, sl1l2_info);
+            compute_cntinfo(sl1l2_info, cnt_info);
+         }
+         else if(do_cnt && line.type() == STATLineType::sal1l2) {
+            parse_sal1l2_line(line, sl1l2_info);
             compute_cntinfo(sl1l2_info, cnt_info);
          }
 
@@ -1625,10 +1628,10 @@ void aggr_mpr_wind_lines(LineDataFiles &f, STATAnalysisJob &job,
          // For other output (e.g. VL1L1 and VCNT), use all vector pairs.
          //
          if(job.out_line_type.has(stat_wdir_str) &&
-            (is_eq(it->second.pd_u.f_na[i], 0.0) &&
-             is_eq(it->second.pd_v.f_na[i], 0.0)) ||
-            (is_eq(it->second.pd_u.o_na[i], 0.0) &&
-             is_eq(it->second.pd_v.o_na[i], 0.0))) {
+            ((is_eq(it->second.pd_u.f_na[i], 0.0) &&
+              is_eq(it->second.pd_v.f_na[i], 0.0)) ||
+             (is_eq(it->second.pd_u.o_na[i], 0.0) &&
+              is_eq(it->second.pd_v.o_na[i], 0.0)))) {
             mlog << Debug(4) << "aggr_mpr_wind_lines() -> "
                  << "for WDIR output, skip pair with angle not defined for zero forecast ("
                  << it->second.pd_u.f_na[i] << ", " << it->second.pd_v.f_na[i]
@@ -2184,12 +2187,12 @@ void aggr_ecnt_lines(LineDataFiles &f, STATAnalysisJob &job,
 
       // Compute aggregated empirical CRPSS
       it->second.ens_pd.crpss_emp =
-         (is_bad_data(crps_emp) || is_bad_data(crpscl_emp) && is_eq(crpscl_emp, 0.0) ?
+         (is_bad_data(crps_emp) || is_bad_data(crpscl_emp) || is_eq(crpscl_emp, 0.0) ?
          bad_data_double : (crpscl_emp - crps_emp)/crpscl_emp);
 
       // Compute aggregated Gaussian CRPSS
       it->second.ens_pd.crpss_gaus =
-         (is_bad_data(crps_gaus) || is_bad_data(crpscl_gaus) && is_eq(crpscl_gaus, 0.0) ?
+         (is_bad_data(crps_gaus) || is_bad_data(crpscl_gaus) || is_eq(crpscl_gaus, 0.0) ?
          bad_data_double : (crpscl_gaus - crps_gaus)/crpscl_gaus);
 
    } // end for it

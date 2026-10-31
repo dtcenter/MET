@@ -79,8 +79,6 @@ cerr << "\n\n   usage:  " << program_name << " nccf_file\n\n";
 
 exit ( 1 );
 
-return;
-
 }
 
 

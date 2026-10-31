@@ -146,8 +146,6 @@ void VarInfoNcCF::set_default_levels(const ConcatString &lstr) {
 
 ///////////////////////////////////////////////////////////////////////////////
 void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
-   const char *method_name = "VarInfoNcCF::set_magic() -> ";
-
    // Store the magic string
    set_magic_pre(nstr, lstr);
 

@@ -35,7 +35,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char python_str    [] = "python";
 static const char file_list_str [] = "file_list";
 static const char missing_str   [] = "MISSING";
 

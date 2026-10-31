@@ -8,50 +8,50 @@ run_update_truth=false
 input_data_version=develop
 truth_data_version=develop
 
-if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
+if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
     
   # only run diff logic if pull request INTO 
   # branches not ending with -ref
-  if [ "${GITHUB_BASE_REF: -4}" != "-ref" ]; then
+  if [[ "${GITHUB_BASE_REF: -4}" != "-ref" ]]; then
 
     run_diff=true
 
     # if pull request into main_vX.Y branch,
     # set truth data version to branch name and set input data version to X.Y
-    if [ "${GITHUB_BASE_REF:0:6}" == "main_v" ]; then
+    if [[ "${GITHUB_BASE_REF:0:6}" == "main_v" ]]; then
       truth_data_version=${GITHUB_BASE_REF}
       input_data_version=${GITHUB_BASE_REF:6}
     fi
 
   fi
 
-elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
+elif [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
 
   branch_name=`cut -d "/" -f3 <<< "${GITHUB_REF}"`
 
   # if branch ends with -ref, update truth data from unit tests
-  if [ "${branch_name: -4}" == -ref ]; then
+  if [[ "${branch_name: -4}" == -ref ]]; then
 
     run_update_truth=true
     run_diff=true
     truth_data_version=${branch_name:0: -4}
 
     # if main_vX.Y-ref branch, use X.Y input data
-    if [ "${branch_name:0:6}" == "main_v" ]; then
+    if [[ "${branch_name:0:6}" == "main_v" ]]; then
       input_data_version=${branch_name:6: -4}
     fi
 
   else
 
     # if develop or main_vX.Y branch, run diff tests using branch's truth data
-    if [ "$branch_name" == "develop" ] ||
-       [ "${branch_name:0:6}" == "main_v" ]; then
+    if [[ "$branch_name" == "develop" ]] ||
+       [[ "${branch_name:0:6}" == "main_v" ]]; then
 
       run_diff=true
       truth_data_version=${branch_name}
 
       # if main_vX.Y branch, use X.Y input data
-      if [ "${branch_name:0:6}" == "main_v" ]; then
+      if [[ "${branch_name:0:6}" == "main_v" ]]; then
         input_data_version=${branch_name:6}
       fi
 
@@ -89,7 +89,7 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
     
   fi
 
-elif [ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]; then
+elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
 
   branch_name=`cut -d "/" -f3 <<< "${GITHUB_REF}"`
 
@@ -101,7 +101,7 @@ elif [ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]; then
 
   fi
 
-  if [ "${force_tests}" == "true" ]; then
+  if [[ "${force_tests}" == "true" ]]; then
 
     run_diff=true
 
@@ -110,15 +110,15 @@ elif [ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]; then
 fi
 
 # if updating truth or running diff, run unit tests
-if [ "$run_update_truth" == "true" ] ||
-   [ "$run_diff" == "true" ]; then
+if [[ "$run_update_truth" == "true" ]] ||
+   [[ "$run_diff" == "true" ]]; then
 
   run_unit_tests=true
 
 fi
 
 # if running unit tests, push the image
-if [ "$run_unit_tests" == "true" ]; then
+if [[ "$run_unit_tests" == "true" ]]; then
 
   run_push=true
 
