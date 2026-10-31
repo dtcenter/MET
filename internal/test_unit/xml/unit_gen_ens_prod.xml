@@ -49,6 +49,29 @@
     </output>
   </test>
 
+  <!-- MET #3294: EAS with a non-zero eas_prob.vld_thresh, so that the  -->
+  <!-- larger candidate templates cannot be evaluated near a grid edge. -->
+  <!-- Those points were previously written as bad data, discarding the -->
+  <!-- smaller widths which were evaluable: 24 of 26026 points in       -->
+  <!-- UGRD_Z10_ENS_EAS_WIDTH_ltOCDP25, every one of them on the border.-->
+
+  <test name="gen_ens_prod_eas_vld_thresh">
+    <exec>&MET_BIN;/gen_ens_prod</exec>
+    <env>
+      <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790410</value></pair>
+      <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790410</value></pair>
+    </env>
+    <param> \
+      -ens    &OUTPUT_DIR;/gen_ens_prod/input_file_list \
+      -config &CONFIG_DIR;/GenEnsProdConfig_eas_vld_thresh \
+      -out    &OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_eas_vld_thresh_20120410_120000V.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_eas_vld_thresh_20120410_120000V.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="gen_ens_prod_WITH_CTRL">
     <exec>echo "&DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
                 &DATA_DIR_MODEL;/grib1/arw-sch-gep2/arw-sch-gep2_2012040912_F024.grib \

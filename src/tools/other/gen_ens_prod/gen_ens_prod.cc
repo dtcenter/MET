@@ -730,6 +730,8 @@ static void clear_counts() {
 
    // Store ensemble data for EAS
    ens_eas_dp.clear();
+   ens_eas_cmn_dp.clear();
+   ens_eas_csd_dp.clear();
 
    return;
 }
@@ -812,9 +814,12 @@ static void track_counts(const GenEnsProdVarInfo *ens_info,
       } // end for i
    } // end if do_nmep
 
-   // Store ensemble data for EAS
+   // Store ensemble data for EAS, along with this member's climatology,
+   // which is re-read per member when MET_ENS_MEMBER_ID is set
    if(ens_info->nc_info.do_eas || ens_info->nc_info.do_eas_width) {
       ens_eas_dp.emplace_back(ens_dp);
+      ens_eas_cmn_dp.emplace_back(cmn_dp);
+      ens_eas_csd_dp.emplace_back(csd_dp);
    }
 
    return;
@@ -1133,11 +1138,13 @@ static void write_eas_nc(GenEnsProdVarInfo *ens_info,
            << " candidate widths (" << write_css(conf_info.eas_prob.width)
            << ").\n";
 
-      // Apply threshold to convert to bitmap
+      // Apply threshold to convert to bitmap, using each member's own
+      // climatology rather than whichever one the member loop left behind
       vector<DataPlane> ens_thresh_dp;
-      for(const auto &x : ens_eas_dp) {
-         DataPlane dp(x);
-         dp.threshold(ens_info->cat_ta[i_thr], &cmn_dp, &csd_dp);
+      for(size_t i_mem=0; i_mem<ens_eas_dp.size(); i_mem++) {
+         DataPlane dp(ens_eas_dp[i_mem]);
+         dp.threshold(ens_info->cat_ta[i_thr],
+                      &ens_eas_cmn_dp[i_mem], &ens_eas_csd_dp[i_mem]);
          ens_thresh_dp.emplace_back(dp);
       }
 
@@ -1346,6 +1353,8 @@ static void clean_up() {
    thresh_cnt_na.clear();
    thresh_nbrhd_cnt_na.clear();
    ens_eas_dp.clear();
+   ens_eas_cmn_dp.clear();
+   ens_eas_csd_dp.clear();
 
    return;
 }
