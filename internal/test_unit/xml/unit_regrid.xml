@@ -257,6 +257,28 @@
     </output>
   </test>
 
+  <!-- MET #3178: Regrid to a Gaussian grid using AW_MEAN_CNTR.        -->
+  <!-- Gaussian rows are unevenly spaced, so the grid defines a        -->
+  <!-- latitude only at integer rows. AW_MEAN_CNTR asks for the row    -->
+  <!-- boundaries at y +/- 0.5, which previously exited with           -->
+  <!-- "GaussianGrid::xy_to_latlon() const -> x and y must be          -->
+  <!-- integers" and produced no output file at all.                   -->
+
+  <test name="regrid_data_plane_GFS_0P25_TO_GAUSSIAN_AW_MEAN_CNTR">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f024.grib2 \
+      &INPUT_DIR;/gaussian/grib1/gaussian.grib \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_0P25_TO_GAUSSIAN_AW_MEAN_CNTR.nc \
+      -field 'name="TMP"; level="Z2";' \
+      -method AW_MEAN_CNTR \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_0P25_TO_GAUSSIAN_AW_MEAN_CNTR.nc</grid_nc>
+    </output>
+  </test>
+
   <!-- MET #3178: Regrid a global grid to the regional, Lambert         -->
   <!-- Conformal G212 grid using AW_MEAN_CNTR. Input grid points which   -->
   <!-- fall outside the valid domain of the output projection produce    -->
