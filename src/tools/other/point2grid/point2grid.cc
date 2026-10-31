@@ -2820,7 +2820,7 @@ static void save_geostationary_data(const ConcatString geostationary_file,
    add_att(nc_file.get(), "Conventions", "CF-1.6");
 
    if (has_error) {
-      remove(geostationary_file.c_str());
+      met_remove(geostationary_file.c_str());
       mlog << Warning << "\nsave_geostationary_data() -> "
            << "The geostationary data file ("
            << geostationary_file << ") was not saved!\n";

@@ -91,7 +91,20 @@ class Met2dDataFile : public Met2dData {
                           const char *, const StringArray &,
                           DataPlaneArray &);
 
+      bool rotate_uv_winds(const VarInfo *, DataPlaneArray &,
+                           bool &, const char *);
+
       bool GridShifted;
+
+         //
+         //  Cleared while reading the companion wind components needed to
+         //  derive or rotate the requested field. Those components are read
+         //  raw so that the convert, censor, set_attr and shift settings of
+         //  the requested field are applied once, to the final data plane,
+         //  rather than to each component and then again to the result.
+         //
+
+      bool ProcessPlanes;
 
    protected:
 

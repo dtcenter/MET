@@ -74,6 +74,39 @@ struct station_values_t : station_value_base_t {
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Interpolation options
+//
+////////////////////////////////////////////////////////////////////////
+
+//
+// Horizontal interpolation options for compute_interp() and
+// get_interp_points()
+//
+
+struct HorzInterpInfo {
+   InterpMthd method   = InterpMthd::None;
+   int        width    = 1;
+   GridTemplateFactory::GridTemplates shape = GridTemplateFactory::GridTemplates::Square;
+   bool       wrap_lon = false;
+   double     vld_thresh = 1.0;                  // valid data threshold
+   const SingleThresh   *cat_thresh = nullptr;   // categorical threshold (NBRHD)
+   const UGridNeighbors *ugrid_nbrs = nullptr;   // closest faces (unstructured grid)
+};
+
+//
+// Vertical interpolation to the observation level
+//
+
+struct VertInterpInfo {
+   bool      spfh_flag = false;            // interpolate in the log of specific humidity
+   LevelType lvl_typ   = LevelType_None;   // pressure or height interpolation
+   double    to_lvl    = bad_data_double;  // observation level
+   int       i_blw     = 0;                // level index below the observation
+   int       i_abv     = 0;                // level index above the observation
+};
+
+////////////////////////////////////////////////////////////////////////
+//
 // Base class for matched pair data
 //
 ////////////////////////////////////////////////////////////////////////
@@ -312,6 +345,13 @@ class VxPairBase {
 
       //////////////////////////////////////////////////////////////////
 
+      // Unstructured grid: closest faces to the current observation
+      bool           use_ugrid_nbrs; // True for an unstructured grid
+      int            ugrid_n_max;    // Max number of faces for all interp methods
+      UGridNeighbors ugrid_nbrs;     // Closest faces, sorted by distance
+
+      //////////////////////////////////////////////////////////////////
+
       int n_msg_typ;             // Number of verifying message types
 
       int n_mask;                // Total number of masking regions
@@ -434,6 +474,8 @@ class VxPairBase {
                           double, double, double,
                           const ClimoPntInfo &, double &);
 
+      HorzInterpInfo horz_interp_info(const PairBase *, const Grid &) const;
+
       double compute_fcst_value(const PairBase *,
                                 const char *, const Grid &,
                                 double, double, double,
@@ -469,25 +511,22 @@ class VxPairBase {
 extern void find_vert_lvl(const DataPlaneArray &, const double,
                           int &, int &);
 
+// Find the levels below and above to_lvl
+extern VertInterpInfo make_vert_interp_info(const DataPlaneArray &dpa,
+                                            const bool spfh_flag,
+                                            const LevelType lvl_typ,
+                                            const double to_lvl);
+
 extern double compute_interp(const DataPlaneArray &dpa,
                              const double obs_x, const double obs_y,
                              const double obs_v, const ClimoPntInfo *cpi,
-                             const InterpMthd method, const int width,
-                             const GridTemplateFactory::GridTemplates shape,
-                             const bool wrap_lon,
-                             const double thresh,
-                             const bool spfh_flag, const LevelType lvl_typ,
-                             const double to_lvl, const int i_blw, const int i_abv,
-                             const SingleThresh *cat_thresh = nullptr);
+                             const HorzInterpInfo &horz,
+                             const VertInterpInfo &vert);
 
 extern void get_interp_points(const DataPlaneArray &dpa,
                               const double obs_x, const double obs_y,
-                              const InterpMthd method, const int width,
-                              const GridTemplateFactory::GridTemplates shape,
-                              const bool wrap_lon,
-                              const double thresh,
-                              const bool spfh_flag, const LevelType lvl_typ,
-                              const double to_lvl, const int i_blw, const int i_abv,
+                              const HorzInterpInfo &horz,
+                              const VertInterpInfo &vert,
                               NumArray &interp_points);
 
 extern bool set_climo_flag(const NumArray &, const NumArray &);
