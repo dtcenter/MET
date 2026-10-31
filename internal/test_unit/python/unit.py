@@ -9,7 +9,8 @@ import subprocess
 import sys
 import xml.etree.ElementTree as ET
 
-def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, callchk=False, log_overwrite=True):
+def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, callchk=False, log_overwrite=True,
+         verbose=False):
     """
     Parse a unit test xml file, run the associated tests, and display test results.
 
@@ -31,6 +32,10 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     log_overwrite : bool, default True
         when true, if file_log points to an existing file, that file will be overwritten.
         when false, new log records will be appended to the existing file.
+    verbose : bool, default False
+        if true, write the full output of each test command to the console, in
+        addition to the pass/fail summary. Without this, that output is written
+        only when file_log is set.
     """
   
     # initialize logger
@@ -39,7 +44,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
 
     # create/add console handler
     ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
+    ch.setLevel(logging.DEBUG if verbose else logging.INFO)
     logger.addHandler(ch)
 
     # create/add file handler
@@ -316,9 +321,8 @@ def build_tests(test_root):
                 for env_el in el:
                     try:
                         env_name = env_el.find('name').text
-                        env_dict[env_name] = env_el.find('value').text
-                        if not env_dict[env_name]:
-                            env_dict[env_name] = ''
+                        env_value = env_el.find('value').text
+                        env_dict[env_name] = repl_env(env_value) if env_value else ''
                     except AttributeError:
                         logger.error(f"ERROR: env pair in test \\{test['name']}\\ missing name or value")
                         raise                
@@ -368,6 +372,7 @@ def repl_env(string_with_ref):
             envar = os.getenv(envar_name)
             if not envar:
                 logger.error(f"ERROR: environment variable {envar_name} not found")
+                continue
             string_with_ref = string_with_ref.replace(envar_ref, envar)
 
     return string_with_ref
@@ -375,7 +380,10 @@ def repl_env(string_with_ref):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Run a unit test.")
+    # allow_abbrev=False so that -v is not silently accepted as an
+    # abbreviation of -verbose. Every MET tool takes "-v level", so a
+    # stray -v here would otherwise swallow the level as a file name.
+    parser = argparse.ArgumentParser(description="Run a unit test.", allow_abbrev=False)
     parser.add_argument('test_xml', nargs='+')
     parser.add_argument('-log', metavar='log_file',
                         help='if present, write output from each test to log_file')
@@ -387,6 +395,8 @@ if __name__ == "__main__":
                         help='if present, activate valgrind with callcheck')
     parser.add_argument('-noexit', action='store_true',
                         help='if present, the unit tester will continue executing subsequent tests when a test fails')
+    parser.add_argument('-verbose', dest='verbose', action='store_true',
+                        help='if present, write the full output of each test command to the console')
     args = parser.parse_args()
 
     for i, xml in enumerate(args.test_xml):
@@ -395,6 +405,6 @@ if __name__ == "__main__":
         else:
             new_log = False
         unit(test_xml=xml, file_log=args.log, cmd_only=args.cmd, noexit=args.noexit, memchk=args.memchk, callchk=args.callchk,
-             log_overwrite=new_log)
+             log_overwrite=new_log, verbose=args.verbose)
 
 

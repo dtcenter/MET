@@ -87,4 +87,88 @@
     </output>
   </test>
 
+  <!--                                                     -->
+  <!--  GRIB1 convert and censor settings applied once to  -->
+  <!--  the derived and rotated winds                      -->
+  <!--                                                     -->
+
+  <test name="pcp_combine_winds_convert_censor_GRIB1">
+    <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+      -add &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      -field 'name="TMP";  level="Z2";  set_attr_name="TMP_CTRL";' \
+      -field 'name="TMP";  level="Z2";  set_attr_name="TMP_X2";        convert(x)=2*x;' \
+      -field 'name="WIND"; level="Z10"; set_attr_name="D_WIND_CTRL";' \
+      -field 'name="WIND"; level="Z10"; set_attr_name="D_WIND_X2";     convert(x)=2*x;' \
+      -field 'name="WIND"; level="Z10"; set_attr_name="D_WIND_CENSOR"; censor_thresh=[ &lt;0 ]; censor_val=[0];' \
+      -field 'name="UGRD"; level="Z10"; set_attr_name="UWIND_CTRL";' \
+      -field 'name="UGRD"; level="Z10"; set_attr_name="UWIND_X2";      convert(x)=2*x;' \
+      -field 'name="UGRD"; level="Z10"; set_attr_name="UWIND_CENSOR";  censor_thresh=[ &lt;0 ]; censor_val=[0];' \
+      -field 'name="WDIR"; level="Z10"; set_attr_name="D_WDIR_X2";     convert(x)=2*x;' \
+      &OUTPUT_DIR;/winds/pcp_combine_nam_winds_convert_censor_GRIB1.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/winds/pcp_combine_nam_winds_convert_censor_GRIB1.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                     -->
+  <!--  GRIB2 convert and censor settings applied once to  -->
+  <!--  the U and V components derived from wind speed     -->
+  <!--  and direction                                      -->
+  <!--                                                     -->
+
+  <test name="pcp_combine_winds_convert_censor_GRIB2">
+    <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+      -add &DATA_DIR_MODEL;/grib2/nbm/blend.t13z.core.f119.co.grib2 \
+      -field 'name="UGRD"; level="Z10"; set_attr_name="D_UWIND_CTRL";' \
+      -field 'name="UGRD"; level="Z10"; set_attr_name="D_UWIND_X2";     convert(x)=2*x;' \
+      -field 'name="VGRD"; level="Z10"; set_attr_name="D_VWIND_CTRL";' \
+      -field 'name="VGRD"; level="Z10"; set_attr_name="D_VWIND_X2";     convert(x)=2*x;' \
+      -field 'name="WIND"; level="Z10"; set_attr_name="WIND_CENSOR";    censor_thresh=[ &gt;5 ]; censor_val=[5];' \
+      &OUTPUT_DIR;/winds/pcp_combine_nbm_winds_convert_censor_GRIB2.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/winds/pcp_combine_nbm_winds_convert_censor_GRIB2.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                           -->
+  <!--  NetCDF CF wind orientation from the standard_name        -->
+  <!--  attribute, including reading the same wind field         -->
+  <!--  more than once                                           -->
+  <!--                                                           -->
+  <!--  NOTE: cf_lambert_winds.nc contains synthetic wind        -->
+  <!--  data. It is an existing CF Lambert conformal file        -->
+  <!--  with constant U (10 m/s) and V (0 m/s) components        -->
+  <!--  added, declared both ways by their standard_name:        -->
+  <!--  UGRD/VGRD as "eastward_wind"/"northward_wind" and        -->
+  <!--  UGRD_X/VGRD_Y as "x_wind"/"y_wind". Constant values      -->
+  <!--  make the expected results easy to check, but this        -->
+  <!--  should be replaced with real model output containing     -->
+  <!--  CF-named wind components when such data is available.    -->
+  <!--                                                           -->
+
+  <test name="pcp_combine_winds_standard_name_NETCDF_CF">
+    <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+      -add &DATA_DIR_MODEL;/nccf/cf_lambert_winds.nc \
+      -field 'name="UGRD";   level="(0,0,0,*,*)"; set_attr_name="UWIND_EARTH_1";' \
+      -field 'name="UGRD";   level="(0,0,0,*,*)"; set_attr_name="UWIND_EARTH_2";' \
+      -field 'name="VGRD";   level="(0,0,0,*,*)"; set_attr_name="VWIND_EARTH";' \
+      -field 'name="UGRD_X"; level="(0,0,0,*,*)"; set_attr_name="UWIND_GRID"; is_u_wind=true; v_wind_field_name="VGRD_Y";' \
+      -field 'name="VGRD_Y"; level="(0,0,0,*,*)"; set_attr_name="VWIND_GRID"; is_v_wind=true; u_wind_field_name="UGRD_X";' \
+      -field 'name="UGRD_X"; level="(0,0,0,*,*)"; set_attr_name="UWIND_OVERRIDE"; is_u_wind=true; v_wind_field_name="VGRD_Y"; is_grid_relative=false;' \
+      -field 'name="UGRD_X"; level="(0,0,0,*,*)"; set_attr_name="UWIND_MISMATCH"; is_u_wind=true; v_wind_field_name="VGRD";' \
+      &OUTPUT_DIR;/winds/pcp_combine_winds_standard_name_NETCDF_CF.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/winds/pcp_combine_winds_standard_name_NETCDF_CF.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
