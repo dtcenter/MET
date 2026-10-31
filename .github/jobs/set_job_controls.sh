@@ -124,6 +124,19 @@ if [[ "$run_unit_tests" == "true" ]]; then
 
 fi
 
+# if pull request only changes documentation, skip all jobs
+# the jobs report as skipped so required status checks still pass
+if [ "${docs_only}" == "true" ]; then
+
+  echo "Pull request only changes documentation. Skipping all jobs."
+  run_compile=false
+  run_push=false
+  run_unit_tests=false
+  run_diff=false
+  run_update_truth=false
+
+fi
+
 echo "run_compile=${run_compile}" >> $GITHUB_OUTPUT
 echo "run_push=${run_push}" >> $GITHUB_OUTPUT
 echo "run_unit_tests=${run_unit_tests}" >> $GITHUB_OUTPUT
