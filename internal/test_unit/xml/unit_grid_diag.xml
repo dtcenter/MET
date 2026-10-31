@@ -31,6 +31,24 @@
     </output>
   </test>
 
+  <!-- Test NetCDF CF input to Grid-Diag -->
+
+  <test name="grid_diag_NC_CF">
+    <exec>echo "&DATA_DIR_MODEL;/seeps/gpm_2021120100_2021120200_trmmgrid.nc \
+                &DATA_DIR_MODEL;/seeps/prods_op_gl-mn_2021120100_f024_A24_trmmgrid.nc" \
+                > &OUTPUT_DIR;/grid_diag/nc_cf_file_list; \
+         &MET_BIN;/grid_diag</exec>
+    <param> \
+      -config &CONFIG_DIR;/GridDiagConfig_NC_CF \
+      -out &OUTPUT_DIR;/grid_diag/grid_diag_nc_cf.nc \
+      -data &OUTPUT_DIR;/grid_diag/nc_cf_file_list \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_nc_cf.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="grid_diag_TMP">
     <exec>echo "&MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_00.tm00_G212 \
                 &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_03.tm00_G212 \

@@ -1606,6 +1606,9 @@ static void clean_up(void) {
       nc_out.reset();
     }
 
+   // Close the input file
+   data_mtddf.reset();
+
    return;
 }
 

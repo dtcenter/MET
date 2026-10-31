@@ -15,6 +15,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <cmath>
+#include <cerrno>
+#include <spawn.h>
+#include <string>
+#include <sys/wait.h>
+#include <vector>
 
 #include "vx_log.h"
 #include "string_fxns.h"
@@ -821,7 +826,7 @@ version_file = replace_path("MET_BASE/version.txt");
  if ( file_exists(version_file.c_str()) )  {
 
    ifstream in;
-   in.open(version_file.c_str());
+   met_open(in, version_file.c_str());
    string line;
 
    if ( !in )  {
@@ -1127,6 +1132,101 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
+////////////////////////////////////////////////////////////////////////
 
 
+int spawn_command(const StringArray & cmd)
+
+{
+
+extern char ** environ;   //  POSIX's
+
+const char *method_name = "spawn_command() -> ";
+
+if ( cmd.n() == 0 )  {
+
+   mlog << Error << "\n" << method_name
+        << "no command specified!\n\n";
+
+   return -1;
+
+}
+
+   //
+   //  posix_spawnp() wants modifiable strings, so hand it copies that
+   //  stay alive while it runs
+   //
+
+vector<vector<char>> args;
+
+for (int j=0; j<cmd.n(); ++j)  {
+
+   const string s = cmd[j];
+
+   args.emplace_back(s.c_str(), s.c_str() + s.length() + 1);
+
+}
+
+vector<char *> argv;
+
+for (auto & a : args)  argv.push_back(a.data());
+
+argv.push_back(nullptr);
+
+pid_t pid;
+
+int status = posix_spawnp(&pid, argv[0], nullptr, nullptr,
+                          argv.data(), environ);
+
+if ( status != 0 )  {
+
+   mlog << Error << "\n" << method_name
+        << "unable to run \"" << cmd[0] << "\" ... "
+        << strerror(status) << "\n\n";
+
+   return -1;
+
+}
+
+if ( waitpid(pid, &status, 0) != pid )  {
+
+   mlog << Error << "\n" << method_name
+        << "unable to wait for \"" << cmd[0] << "\" ... "
+        << strerror(errno) << "\n\n";
+
+   return -1;
+
+}
+
+return status;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void spawn_command_or_exit(const StringArray & cmd, const char * description,
+                           const char * caller)
+
+{
+
+mlog << Debug(4) << description << ":\n\t" << cmd.serialize(" ") << "\n";
+
+if ( int status = spawn_command(cmd); status )  {
+
+   mlog << Error << "\n" << caller
+        << "command \"" << cmd.serialize(" ") << "\" failed ... status = "
+        << status << "\n\n";
+
+   exit ( 1 );
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
 
