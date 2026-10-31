@@ -20,6 +20,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3178 <https://github.com/dtcenter/MET/issues/3178>`_).
      * **Add power spectra calculation capability to the Grid-Diag tool in MET**
        (`#3304 <https://github.com/dtcenter/MET/issues/3304>`_).
+     * **Enhance Point-Stat and Grid-Stat to support interpolation and smoothing methods other than NEAREST for unstructured grids (UGRIDs) using the N closest grid cells, including the distance-weighted, area-weighted, and bilinear methods**
+       (`#3334 <https://github.com/dtcenter/MET/issues/3334>`_).
      * Add lookup tables for data types of MET output
        (`#3384 <https://github.com/dtcenter/MET/issues/3384>`_).
      * Enhance ``@value`` NetCDF dimension lookup logic to support negative values
@@ -257,6 +259,31 @@ MET Version 13.0.0 Upgrade Instructions
       be replaced. This applies both to the top-level entry and to entries set separately
       in each "obs.field" entry.
 
+  * UGRID configuration files
+
+    * The new optional "area_face" entry of "ugrid_metadata_map" specifies the variable name
+      for the area of each UGRID cell. It is set to "areaCell" in the default MPAS configuration
+      (UGridConfig_mpas) and is used by the AW_MEAN interpolation and regridding methods and the
+      AREA and AREA_CNTR grid weighting. See :numref:`table_ugrid_metadata`.
+
+  * Point-Stat and Grid-Stat configuration files
+
+    * For UGRIDs, the "interp" methods other than NEAREST are now supported using the N closest
+      grid cells, where N is the number of points defined by "width" and "shape" (the
+      width x width closest cells for BILIN). Point-Stat supports MIN, MAX, MEDIAN, UW_MEAN,
+      DW_MEAN, AW_MEAN, BILIN, BEST, and HiRA, and Grid-Stat supports MIN, MAX, MEDIAN, UW_MEAN,
+      and AW_MEAN for smoothing. Setting "ugrid_max_distance_km" is recommended to limit the
+      closest cells. See :ref:`ugrid_interpolation`.
+
+    * For UGRIDs, the following settings, which were previously accepted, now result in an error
+      when the configuration is processed: unsupported "interp" methods (for example, LS_FIT,
+      GAUSSIAN, and the grid box corners), "topo_mask.interp" methods other than NEAREST, and,
+      when Grid-Stat verifies directly on a UGRID, the NetCDF matched pairs output
+      ("nc_pairs_flag", enabled by default), the Fourier decomposition ("fourier"), and the
+      NBRCTC, NBRCTS, NBRCNT, GRAD, and DMAP output. The AREA and AREA_CNTR grid weighting and the
+      AW_MEAN regridding method from a UGRID require "area_face", and the AW_MEAN_CNTR regridding
+      method from a UGRID is not supported. See :ref:`ugrid_limitations`.
+
   * ConfigConstants configuration file
 
     * The "u_wind_field_name", "v_wind_field_name", "wind_speed_field_name", and "wind_direction_field_name"
@@ -288,6 +315,13 @@ MET Version 13.0.0 Upgrade Instructions
     * Adds new output variables with names including "EAS" and "EAS_WIDTH" for the Ensemble
       Agreement Scale algorithm.
 
+  * Grid-Stat and Ensemble-Stat NetCDF output format
+
+    * For "grid_weight_flag = AREA", the "grid_weight" variable now contains the normalized
+      weights in the range (0, 1] with units of "NA", rather than the grid box areas in km^2.
+      The true grid box areas are written to the new "grid_area" variable, as described in MET
+      `#3448 <https://github.com/dtcenter/MET/issues/3448>`_.
+
 .. dropdown:: Output data changes
 
   MET version 13.0.0 modifies existing output data values in the following ways:
@@ -311,6 +345,14 @@ MET Version 13.0.0 Upgrade Instructions
     `#3178 <https://github.com/dtcenter/MET/issues/3178>`_, input grid points within half an
     output grid box of those edges were previously discarded rather than assigned to the
     nearest output grid box.
+
+  * Point-Stat and Grid-Stat output for unstructured grids (UGRIDs) using interpolation or
+    smoothing methods other than NEAREST changes. As described in MET
+    `#3334 <https://github.com/dtcenter/MET/issues/3334>`_, these methods previously used the
+    UGRID cells with neighboring indices rather than neighboring locations, and BILIN returned
+    the value of the nearest cell. They now use the N closest cells. The "AREA" grid weight for
+    UGRIDs, previously 0 for every cell, is now derived from the cell area, normalized as
+    described in MET `#3448 <https://github.com/dtcenter/MET/issues/3448>`_.
 
   * Gridded data read from NetCDF files that follow the CF convention and use a polar
     stereographic grid mapping may change. As described in MET
@@ -356,9 +398,29 @@ MET Version 13.0.0 Upgrade Instructions
     always zero, so statistics derived from them, such as RMSE, PR_CORR, and ANOM_CORR,
     were incorrect.
 
+  * TC-Diag output changes when the files listed in the **-data** command line option do not
+    line up one-to-one with the track valid times. As described in MET
+    `#3475 <https://github.com/dtcenter/MET/issues/3475>`_, TC-Diag previously discarded the
+    gridded data it found for those valid times and reported the requested fields as missing.
+    It now uses that data, regardless of the order of the file list.
+
+  * For "grid_weight_flag = AREA", Grid-Stat and Ensemble-Stat now normalize the grid box
+    areas to the range (0, 1] by dividing by the maximum grid box area in the verification grid,
+    as described in MET `#3448 <https://github.com/dtcenter/MET/issues/3448>`_. As a result, the
+    cell values in the CTC, MCTC, PCT, and NBRCTC line types change. The normal approximation
+    confidence intervals computed from those weighted cell values also change, including those
+    for HK, ODDS, LODDS, ORSS, EDS, SEDS, EDI, and SEDI in the CTS line type and for BRIER and
+    BRIERCL in the PSTD line type. Previously, the large grid box area weights resulted in
+    confidence intervals that were much too narrow. The statistics themselves are unchanged.
+
 .. dropdown:: Additional upgrade instructions
 
   Recommendations when upgrading to MET version 13.0.0:
+
+  * Users reading winds from CF-compliant NetCDF files on projections for which rotation applies,
+    such as Lambert conformal, polar stereographic, and Mercator, should check the "standard_name"
+    attribute of their wind variables. Setting the "is_grid_relative" configuration option
+    overrides the orientation determined from the file.
 
   * The "MET_OBS_ERROR_TABLE" environment variable is renamed to "MET_OBS_ERR_TABLE", and the
     default *share/met/table_files/obs_error_table.txt* file is renamed to *obs_err_table.txt*,

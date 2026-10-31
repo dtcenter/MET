@@ -77,7 +77,16 @@ void remove_temp_file(const ConcatString file_name) {
       return;
    }
 
-   if((errno = remove(file_name.c_str())) != 0) {
+   //
+   // Nothing to do if the file was never created
+   //
+   if(!file_exists(file_name.c_str())) {
+      mlog << Debug(4) << "The temporary file ("
+           << file_name << ") does not exist.\n";
+      return;
+   }
+
+   if(met_remove(file_name.c_str()) != 0) {
       mlog << Error << "\nremove_temp_file() -> "
            << "can't delete temporary file: \""
            << file_name << "\" ("

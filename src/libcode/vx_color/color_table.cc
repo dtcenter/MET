@@ -521,7 +521,7 @@ clear();
 
 input_filename = filename;
 
-if ( (colorin = fopen(input_filename, "r")) == nullptr )  {
+if ( (colorin = met_fopen(input_filename, "r")) == nullptr )  {
 
    colorin = (FILE *) nullptr;
 

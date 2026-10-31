@@ -1894,6 +1894,10 @@ static void close_out_files() {
       ps_out.reset();
    }
 
+   // Close the input files
+   fcst_mtddf.reset();
+   obs_mtddf.reset();
+
    return;
 }
 
