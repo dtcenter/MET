@@ -44,7 +44,8 @@ const array<string, UG_DIM_COUNT> DIM_KEYS = {
 
 const array<string, UG_META_VAR_COUNT> COORD_VAR_KEYS = {
       "time", "lat_face", "lon_face", "vert_face", "lat_edge",
-      "lon_edge", "lat_node", "lon_node", "cell_id", "init_time"
+      "lon_edge", "lat_node", "lon_node", "cell_id", "init_time",
+      "area_face"
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -94,6 +95,7 @@ void UGridFile::init_from_scratch()
   _zVar = (NcVar *)nullptr;
   _tVar = (NcVar *)nullptr;
   _init_time_var = (NcVar *)nullptr;
+  _areaVar = (NcVar *)nullptr;
 
   // Close any existing file
 
@@ -697,6 +699,7 @@ void UGridFile::metadata_coord_variables() {
   StringArray lon_names = get_metadata_names(COORD_VAR_KEYS[2]);
   StringArray z_names = get_metadata_names(COORD_VAR_KEYS[3]);
   StringArray init_time_names = get_metadata_names(COORD_VAR_KEYS[9]);
+  StringArray area_names = get_metadata_names(COORD_VAR_KEYS[10]);
   for (int j=0; j<Nvars; ++j) {
     if (time_names.has(Var[j].name)) {
       _tVar = Var[j].var.get();
@@ -713,6 +716,7 @@ void UGridFile::metadata_coord_variables() {
            << "found _init_time_var (" << GET_NC_NAME_P(_init_time_var)
            << ") from data file\n";
     }
+    else if (area_names.has(Var[j].name)) _areaVar = Var[j].var.get();
   }
 
   // Variables at the coordinate file (could be the same as the data file)
@@ -746,6 +750,7 @@ void UGridFile::metadata_coord_variables() {
              << "found _init_time_var (" << GET_NC_NAME_P(_init_time_var)
              << ") from data file\n";
       }
+      else if (10 == j && nullptr == _areaVar) _areaVar = MetaVar[j].var.get();
     }
   }   //  for j
 }
@@ -945,6 +950,7 @@ void UGridFile::read_netcdf_grid()
 
   grid_data.set_points(face_count, _lon.data(), _lat.data());
   grid_data.max_distance_km = max_distance_km;
+  read_face_area(grid_data.face_area_km2);
 
   grid.set(grid_data);
 
@@ -953,6 +959,44 @@ void UGridFile::read_netcdf_grid()
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+// Read the optional face area (area_face) and convert it to km^2.
+// The area is used as the weight for the area-weighted mean (AW_MEAN).
+
+void UGridFile::read_face_area(vector<double> &area_km2) const
+{
+  const char *method_name = "UGridFile::read_face_area() -> ";
+
+  area_km2.clear();
+  if (IS_INVALID_NC_P(_areaVar)) {
+    mlog << Debug(4) << method_name << "the face area is not available\n";
+    return;
+  }
+
+  vector<double> area(face_count);
+  if (!get_nc_data(_areaVar, area.data())) {
+    mlog << Warning << "\n" << method_name << "fail to read the face area from "
+         << GET_NC_NAME_P(_areaVar) << ". The face area is ignored.\n\n";
+    return;
+  }
+
+  // Default unit is m^2
+  double scale = 1.0e-6;
+  if (ConcatString units_value; get_var_units(_areaVar, units_value)) {
+    if (units_value == "km^2" || units_value == "km2" || units_value == "km**2") scale = 1.0;
+    else if (units_value != "m^2" && units_value != "m2" && units_value != "m**2") {
+      mlog << Debug(4) << method_name << "assume m^2 for the units \""
+           << units_value << "\" of " << GET_NC_NAME_P(_areaVar) << "\n";
+    }
+  }
+
+  for (auto &a : area) a = (a > 0.0 ? a * scale : bad_data_double);
+  area_km2 = std::move(area);
+
+  mlog << Debug(4) << method_name << "read the face area from "
+       << GET_NC_NAME_P(_areaVar) << "\n";
+}
 
 ////////////////////////////////////////////////////////////////////////
 

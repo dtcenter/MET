@@ -283,6 +283,15 @@ struct BootInfo {
 // Struct to store interpolation information
 //
 
+//
+// Use of the interpolation methods for the unstructured grid
+//
+
+enum class UGridInterpUse {
+   Point,     // Interpolation to the point observations (Point-Stat)
+   Smoothing  // Smoothing of the gridded fields (Grid-Stat)
+};
+
 struct InterpInfo {
    FieldType   field;      // How to apply interpolation options
    double      vld_thresh; // Valid data interpolation threshold
@@ -298,6 +307,9 @@ struct InterpInfo {
    InterpInfo &operator=(const InterpInfo &a) noexcept; // SonarQube findings
    void clear();
    void validate(); // Ensure that width and method are accordant
+
+   // Exit for methods not supported on an unstructured grid
+   void validate_ugrid(UGridInterpUse use, const char *caller) const;
 
    friend bool operator==(const InterpInfo &lhs, const InterpInfo &rhs) {
       return(lhs.field      == rhs.field      &&

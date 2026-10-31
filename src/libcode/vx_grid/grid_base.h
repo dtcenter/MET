@@ -278,6 +278,21 @@ class Grid : public GridInterface {
       void shift_right(int);
 
          //
+         //  unstructured grid
+         //
+
+      bool is_ugrid() const;
+
+         //  true if the face area of an unstructured grid is available
+      bool ugrid_has_face_area() const;
+
+         //  n closest faces to (lat, lon), lon is degrees west (same as latlon_to_xy)
+      bool ugrid_closest_faces(double lat, double lon, int n, UGridNeighbors &nbrs) const;
+
+         //  n closest faces for every face (cached), nullptr if not an unstructured grid
+      const UGridNeighborTable *ugrid_neighbor_table(int n) const;
+
+         //
          //  subsetting the grid
          //
 
