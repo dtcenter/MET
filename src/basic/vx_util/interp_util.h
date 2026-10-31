@@ -7,7 +7,7 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 //
 //   Filename:   interp_util.h
 //
@@ -19,12 +19,14 @@
 //   000    11-17-08  Halley Gotway
 //   001    09-07-21  Halley Gotway   Add wrap_lon.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 #ifndef  __INTERP_UTIL_H__
 #define  __INTERP_UTIL_H__
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+
+#include <vector>
 
 #include "data_plane.h"
 #include "field_type.h"
@@ -32,7 +34,7 @@
 #include "GridTemplate.h"
 #include "config_gaussian.h"
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 // Exponent used in distance weighted mean calculations
 static const int dw_mean_pow = 2;
@@ -83,11 +85,83 @@ struct SurfaceInfo {
    bool need_topo() const;
 };
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+
+//
+// Neighboring faces of an unstructured grid (UGRID), sorted by distance
+// from the closest to the farthest. The x index into the DataPlane is the
+// face index and y is always 0.
+//
+
+struct UGridNeighbors {
+
+   std::vector<int>    index;    // Face index
+   std::vector<double> dist_km;  // Distance from the target point (km), empty if not needed
+   std::vector<double> x_km;     // Local east offset from the target point (km)
+   std::vector<double> y_km;     // Local north offset from the target point (km)
+
+   // Area (km^2) of every face, indexed by the face index (not allocated),
+   // nullptr if unknown
+   const std::vector<double> *face_area = nullptr;
+
+   void clear();
+   int  n() const;
+};
+
+inline void UGridNeighbors::clear() {
+   index.clear();
+   dist_km.clear();
+   x_km.clear();
+   y_km.clear();
+   face_area = nullptr;
+}
+
+inline int UGridNeighbors::n() const { return static_cast<int>(index.size()); }
+
+//
+// Closest faces of every face for smoothing the unstructured grid. Only
+// the face indices are stored, n_max per face sorted by distance, with -1
+// after the last face within the maximum distance. The first n faces of
+// a row are the n closest faces, so the table serves any n <= n_max.
+//
+
+struct UGridNeighborTable {
+
+   int              n_face = 0;
+   int              n_max  = 0;
+   std::vector<int> index;       // [n_face * n_max]
+
+   // Area (km^2) of every face (not allocated), nullptr if unknown
+   const std::vector<double> *face_area = nullptr;
+
+   void clear();
+   void get(int face, int n, UGridNeighbors &nbrs) const;
+};
+
+inline void UGridNeighborTable::clear() {
+   n_face = 0;
+   n_max = 0;
+   std::vector<int>().swap(index);   // release the memory
+   face_area = nullptr;
+}
+
+//
+// Point information for the unstructured grid interpolation: the
+// observation value (BEST) and the categorical threshold and
+// climatology (NBRHD).
+//
+
+struct UGridPointInfo {
+   double              obs_v      = bad_data_double;
+   const ClimoPntInfo *cpi        = nullptr;
+   const SingleThresh *cat_thresh = nullptr;
+};
+
+////////////////////////////////////////////////////////////////////////
 //
 // Utility functions for horizontal interpolation on a DataPlane
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 // Round x_dbl and y_dbl to nearest integer
 extern NumArray interp_points  (const DataPlane &dp, const GridTemplate &gt, double x_dbl, double y_dbl);
@@ -122,11 +196,19 @@ extern double   interp_best    (const DataPlane &dp, const GridTemplate &gt, int
 
 extern void     get_xy_ll      (double x, double y, int w, int h, int &x_ll, int &y_ll);
 
-///////////////////////////////////////////////////////////////////////////////
+// Unstructured grid version uses the N closest faces
+extern int      ugrid_interp_n_points(const int width, const GridTemplateFactory::GridTemplates shape,
+                                      const InterpMthd mthd = InterpMthd::None);
+extern NumArray interp_ugrid_points  (const DataPlane &dp, const UGridNeighbors &nbrs, int n_points);
+extern double   interp_ugrid         (const DataPlane &dp, const UGridNeighbors &nbrs,
+                                      const InterpMthd mthd, int n_points, double t,
+                                      const UGridPointInfo &pnt = UGridPointInfo());
+
+////////////////////////////////////////////////////////////////////////
 //
 // Utility functions for horizontal and vertical interpolation
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 extern double compute_sfc_interp(const DataPlane &dp,
                                  double obs_x,   double obs_y,
@@ -158,17 +240,17 @@ extern double compute_horz_interp(const DataPlane &dp,
 extern double compute_vert_pinterp(double, double, double, double, double);
 extern double compute_vert_zinterp(double, double, double, double, double);
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 //
 // Interpolate two fields in time
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 extern DataPlane valid_time_interp(const DataPlane &, const DataPlane &,
                                    const unixtime, InterpMthd);
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 #endif   //  __INTERP_UTIL_H__
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////

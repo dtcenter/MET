@@ -1108,6 +1108,10 @@ void VxPairBase::clear() {
 
    sfc_info.clear();
 
+   use_ugrid_nbrs = false;
+   ugrid_n_max    = -1;
+   ugrid_nbrs.clear();
+
    n_msg_typ = 0;
    n_mask    = 0;
    n_interp  = 0;
@@ -1410,6 +1414,9 @@ void VxPairBase::set_size(int types, int masks, int interps) {
    // Resize the PairBase pointer vector
    pb_ptr.resize(n_vx);
 
+   // Recompute the number of unstructured grid faces
+   ugrid_n_max = -1;
+
    // Initialize 3-D rejection count vectors
    vector<int> rej_counts(n_vx, 0);
    rej_typ  = rej_counts;
@@ -1516,6 +1523,9 @@ void VxPairBase::set_interp(int i_interp,
       }
    }
 
+   // Recompute the number of unstructured grid faces
+   ugrid_n_max = -1;
+
    return;
 }
 
@@ -1533,6 +1543,9 @@ void VxPairBase::set_interp(int i_interp,
          pb_ptr[n]->set_interp_shape(shape);
       }
    }
+
+   // Recompute the number of unstructured grid faces
+   ugrid_n_max = -1;
 
    return;
 }
@@ -1879,6 +1892,26 @@ bool VxPairBase::is_keeper_grd(
       keep = false;
    }
 
+   // For an unstructured grid, find the closest faces once for all
+   // interpolation methods. Each method uses the first N faces.
+   use_ugrid_nbrs = keep && gr.is_ugrid();
+   if(use_ugrid_nbrs) {
+      if(ugrid_n_max < 0) {
+         ugrid_n_max = 1;
+         for(int i_interp=0; i_interp<n_interp; i_interp++) {
+            const PairBase *pb = pb_ptr[three_to_one(0, 0, i_interp)];
+            ugrid_n_max = max(ugrid_n_max,
+                              ugrid_interp_n_points(pb->interp_wdth,
+                                                    pb->interp_shape,
+                                                    pb->interp_mthd));
+         }
+      }
+      gr.ugrid_closest_faces(hdr_lat, -1.0*hdr_lon, ugrid_n_max, ugrid_nbrs);
+   }
+   else {
+      ugrid_nbrs.clear();
+   }
+
    return keep;
 }
 
@@ -2215,6 +2248,20 @@ bool VxPairBase::is_keeper_fcst(
 
 ////////////////////////////////////////////////////////////////////////
 
+HorzInterpInfo VxPairBase::horz_interp_info(const PairBase *pb,
+                                            const Grid &gr) const {
+   HorzInterpInfo horz;
+   horz.method     = pb->interp_mthd;
+   horz.width      = pb->interp_wdth;
+   horz.shape      = pb->interp_shape;
+   horz.wrap_lon   = gr.wrap_lon();
+   horz.vld_thresh = interp_thresh;
+   horz.ugrid_nbrs = (use_ugrid_nbrs ? &ugrid_nbrs : nullptr);
+   return horz;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 double VxPairBase::compute_fcst_value(
           const PairBase *pb, const char *hdr_typ_str, const Grid &gr,
           double obs_x, double obs_y, double hdr_elv,
@@ -2256,17 +2303,10 @@ double VxPairBase::compute_fcst_value(
       double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                        obs_lvl : obs_hgt);
 
-      int lvl_blw;
-      int lvl_abv;
-      find_vert_lvl(fcst_dpa, to_lvl, lvl_blw, lvl_abv);
-
-      fcst_v = compute_interp(fcst_dpa,
-                  obs_x, obs_y, obs_v, &cpi,
-                  pb->interp_mthd, pb->interp_wdth,
-                  pb->interp_shape, gr.wrap_lon(),
-                  interp_thresh, spfh_flag,
-                  fcst_info->level().type(),
-                  to_lvl, lvl_blw, lvl_abv);
+      fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v, &cpi,
+                  horz_interp_info(pb, gr),
+                  make_vert_interp_info(fcst_dpa, spfh_flag,
+                                        fcst_info->level().type(), to_lvl));
    }
 
    return fcst_v;
@@ -2443,33 +2483,21 @@ ClimoPntInfo VxPairBase::get_climo_pnt_info(
    // observation pressure level or height
    double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                     obs_lvl : obs_hgt);
-   int lvl_blw;
-   int lvl_abv;
+   const LevelType lvl_typ = fcst_info->level().type();
+   const HorzInterpInfo horz = horz_interp_info(pb, gr);
 
    // Forecast climatology mean
    if(fcmn_dpa.n_planes() > 0) {
 
-      find_vert_lvl(fcmn_dpa, to_lvl, lvl_blw, lvl_abv);
-
-      cpi.fcmn = compute_interp(fcmn_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb->interp_mthd, pb->interp_wdth,
-                    pb->interp_shape, gr.wrap_lon(),
-                    interp_thresh, spfh_flag,
-                    fcst_info->level().type(),
-                    to_lvl, lvl_blw, lvl_abv);
+      cpi.fcmn = compute_interp(fcmn_dpa, obs_x, obs_y, obs_v, nullptr, horz,
+                    make_vert_interp_info(fcmn_dpa, spfh_flag, lvl_typ, to_lvl));
    }
 
    // Observation climatology mean
    if(ocmn_dpa.n_planes() > 0) {
 
-      find_vert_lvl(ocmn_dpa, to_lvl, lvl_blw, lvl_abv);
-
-      cpi.ocmn = compute_interp(ocmn_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb->interp_mthd, pb->interp_wdth,
-                    pb->interp_shape, gr.wrap_lon(),
-                    interp_thresh, spfh_flag,
-                    fcst_info->level().type(),
-                    to_lvl, lvl_blw, lvl_abv);
+      cpi.ocmn = compute_interp(ocmn_dpa, obs_x, obs_y, obs_v, nullptr, horz,
+                    make_vert_interp_info(ocmn_dpa, spfh_flag, lvl_typ, to_lvl));
    }
 
    // Check for valid interpolation options
@@ -2488,27 +2516,15 @@ ClimoPntInfo VxPairBase::get_climo_pnt_info(
    // Forecast climatology spread
    if(fcsd_dpa.n_planes() > 0) {
 
-      find_vert_lvl(fcsd_dpa, to_lvl, lvl_blw, lvl_abv);
-
-      cpi.fcsd = compute_interp(fcsd_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb->interp_mthd, pb->interp_wdth,
-                    pb->interp_shape, gr.wrap_lon(),
-                    interp_thresh, spfh_flag,
-                    fcst_info->level().type(),
-                    to_lvl, lvl_blw, lvl_abv);
+      cpi.fcsd = compute_interp(fcsd_dpa, obs_x, obs_y, obs_v, nullptr, horz,
+                    make_vert_interp_info(fcsd_dpa, spfh_flag, lvl_typ, to_lvl));
    }
 
    // Observation climatology spread
    if(ocsd_dpa.n_planes() > 0) {
 
-      find_vert_lvl(ocsd_dpa, to_lvl, lvl_blw, lvl_abv);
-
-      cpi.ocsd = compute_interp(ocsd_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb->interp_mthd, pb->interp_wdth,
-                    pb->interp_shape, gr.wrap_lon(),
-                    interp_thresh, spfh_flag,
-                    fcst_info->level().type(),
-                    to_lvl, lvl_blw, lvl_abv);
+      cpi.ocsd = compute_interp(ocsd_dpa, obs_x, obs_y, obs_v, nullptr, horz,
+                    make_vert_interp_info(ocsd_dpa, spfh_flag, lvl_typ, to_lvl));
    }
 
    return cpi;
@@ -2611,32 +2627,59 @@ void find_vert_lvl(const DataPlaneArray &dpa, const double obs_lvl,
 
 ////////////////////////////////////////////////////////////////////////
 
+VertInterpInfo make_vert_interp_info(const DataPlaneArray &dpa,
+                                     const bool spfh_flag,
+                                     const LevelType lvl_typ,
+                                     const double to_lvl) {
+   VertInterpInfo vert;
+   vert.spfh_flag = spfh_flag;
+   vert.lvl_typ   = lvl_typ;
+   vert.to_lvl    = to_lvl;
+   find_vert_lvl(dpa, to_lvl, vert.i_blw, vert.i_abv);
+   return vert;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 double compute_interp(const DataPlaneArray &dpa,
                       const double obs_x, const double obs_y,
                       const double obs_v, const ClimoPntInfo *cpi,
-                      const InterpMthd method, const int width,
-                      const GridTemplateFactory::GridTemplates shape,
-                      const bool wrap_lon,
-                      const double thresh,
-                      const bool spfh_flag, const LevelType lvl_typ,
-                      const double to_lvl, const int i_blw, const int i_abv,
-                      const SingleThresh *cat_thresh) {
+                      const HorzInterpInfo &horz,
+                      const VertInterpInfo &vert) {
+   const InterpMthd method = horz.method;
+   const int width = horz.width;
+   const auto shape = horz.shape;
+   const double thresh = horz.vld_thresh;
+   const SingleThresh *cat_thresh = horz.cat_thresh;
+   const UGridNeighbors *ugrid_nbrs = horz.ugrid_nbrs;
+   const int i_blw = vert.i_blw;
+   const int i_abv = vert.i_abv;
+   const double to_lvl = vert.to_lvl;
    double v, v_blw, v_abv, t;
 
    // Check for no data
    if(dpa.n_planes() == 0) return bad_data_double;
 
-   v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v, cpi,
-                               method, width, shape, wrap_lon,
-                               thresh, cat_thresh);
+   // Horizontal interpolation: the closest N faces for an unstructured
+   // grid, the grid template otherwise
+   int n_points = (ugrid_nbrs ? ugrid_interp_n_points(width, shape, method) : 0);
+   auto horz_interp = [&](const DataPlane &dp) {
+      if(ugrid_nbrs) {
+         return interp_ugrid(dp, *ugrid_nbrs, method, n_points, thresh,
+                             UGridPointInfo{ obs_v, cpi, cat_thresh });
+      }
+      return compute_horz_interp(dp, obs_x, obs_y, obs_v, cpi,
+                                 method, width, shape, horz.wrap_lon,
+                                 thresh, cat_thresh);
+   };
+
+   v_blw = horz_interp(dpa[i_blw]);
 
    if(i_blw == i_abv) {
       v = v_blw;
    }
    else {
-      v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v, cpi,
-                                  method, width, shape, wrap_lon,
-                                  thresh, cat_thresh);
+      v_abv = horz_interp(dpa[i_abv]);
 
       // Check for bad data prior to vertical interpolation
       if(is_bad_data(v_blw) || is_bad_data(v_abv)) {
@@ -2645,14 +2688,14 @@ double compute_interp(const DataPlaneArray &dpa,
 
       // If verifying specific humidity, do vertical interpolation in
       // the natural log of q
-      if(spfh_flag) {
+      if(vert.spfh_flag) {
          t = compute_vert_pinterp(log(v_blw), dpa.lower(i_blw),
                                   log(v_abv), dpa.lower(i_abv),
                                   to_lvl);
          v = exp(t);
       }
       // Vertically interpolate to the observation pressure level
-      else if(lvl_typ == LevelType_Pres) {
+      else if(vert.lvl_typ == LevelType_Pres) {
          v = compute_vert_pinterp(v_blw, dpa.lower(i_blw),
                                   v_abv, dpa.lower(i_abv),
                                   to_lvl);
@@ -2673,13 +2716,13 @@ double compute_interp(const DataPlaneArray &dpa,
 
 void get_interp_points(const DataPlaneArray &dpa,
                        const double obs_x, const double obs_y,
-                       const InterpMthd method, const int width,
-                       const GridTemplateFactory::GridTemplates shape,
-                       const bool wrap_lon,
-                       const double thresh, const bool spfh_flag,
-                       const LevelType lvl_typ, const double to_lvl,
-                       const int i_blw, const int i_abv,
+                       const HorzInterpInfo &horz,
+                       const VertInterpInfo &vert,
                        NumArray &interp_pnts) {
+   const UGridNeighbors *ugrid_nbrs = horz.ugrid_nbrs;
+   const int i_blw = vert.i_blw;
+   const int i_abv = vert.i_abv;
+   const double to_lvl = vert.to_lvl;
 
    // Initialize
    interp_pnts.erase();
@@ -2691,14 +2734,21 @@ void get_interp_points(const DataPlaneArray &dpa,
    int i, n_vld;
    NumArray pts_blw, pts_abv;
    GridTemplateFactory gtf;
-   const auto gt = gtf.buildGT(shape, width, wrap_lon);
+   const auto gt = gtf.buildGT(horz.shape, horz.width, horz.wrap_lon);
+
+   // Closest N faces for an unstructured grid, the grid template otherwise
+   int n_points = (ugrid_nbrs ? ugrid_interp_n_points(horz.width, horz.shape) : gt->size());
+   auto get_points = [&](const DataPlane &dp) {
+      return (ugrid_nbrs ? interp_ugrid_points(dp, *ugrid_nbrs, n_points)
+                         : interp_points(dp, *gt, obs_x, obs_y));
+   };
 
    // Get interpolation points below the observation
-   pts_blw = interp_points(dpa[i_blw], *gt, obs_x, obs_y);
+   pts_blw = get_points(dpa[i_blw]);
 
    // For multiple levels, get interpolation points above
    if(i_blw != i_abv) {
-      pts_abv = interp_points(dpa[i_abv], *gt, obs_x, obs_y);
+      pts_abv = get_points(dpa[i_abv]);
 
       if(pts_abv.n() != pts_blw.n()) {
          mlog << Error << "\nget_interp_points() -> "
@@ -2717,13 +2767,13 @@ void get_interp_points(const DataPlaneArray &dpa,
          v = pts_blw[i];
       }
       // For specific humidity, interpolate in the natural log of q
-      else if(spfh_flag) {
+      else if(vert.spfh_flag) {
          v = exp(compute_vert_pinterp(log(pts_blw[i]), dpa.lower(i_blw),
                                       log(pts_abv[i]), dpa.lower(i_abv),
                                       to_lvl));
       }
       // Vertically interpolate to the observation pressure level
-      else if(lvl_typ == LevelType_Pres) {
+      else if(vert.lvl_typ == LevelType_Pres) {
          v = compute_vert_pinterp(pts_blw[i], dpa.lower(i_blw),
                                   pts_abv[i], dpa.lower(i_abv), to_lvl);
       }
@@ -2742,7 +2792,7 @@ void get_interp_points(const DataPlaneArray &dpa,
    } // end for i
 
    // Check for enough valid data
-   if(((double) n_vld)/((double) gt->size()) < thresh) {
+   if(((double) n_vld)/((double) n_points) < horz.vld_thresh) {
       interp_pnts.erase();
    }
 

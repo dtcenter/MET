@@ -1415,13 +1415,16 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, const Grid &gr) {
             else {
                // Note that land_mask and topo_mask settings do not
 	       // impact the HiRA neighborhood values selected
-               get_interp_points(fcst_dpa,
-                  it->x_na[i_obs], it->y_na[i_obs],
-                  it->interp_mthd, it->interp_wdth, it->interp_shape,
-                  gr.wrap_lon(), 0, spfh_flag,
-                  fcst_info->level().type(),
-                  to_lvl, lvl_blw, lvl_abv,
-                  fcst_na);
+               HorzInterpInfo horz;
+               horz.method     = it->interp_mthd;
+               horz.width      = it->interp_wdth;
+               horz.shape      = it->interp_shape;
+               horz.wrap_lon   = gr.wrap_lon();
+               horz.vld_thresh = 0;
+               const VertInterpInfo vert = { spfh_flag, fcst_info->level().type(),
+                                             to_lvl, lvl_blw, lvl_abv };
+               get_interp_points(fcst_dpa, it->x_na[i_obs], it->y_na[i_obs],
+                                 horz, vert, fcst_na);
             }
          }
          // Otherwise, get a single interpolated ensemble value
