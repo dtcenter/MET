@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <limits.h>
+#include <algorithm>
 
 #include "config_util.h"
 #include "enum_as_int.hpp"
@@ -643,7 +644,7 @@ MaskSID parse_sid_mask(const ConcatString &mask_sid_str) {
 
       // Open the mask station id file specified
       ifstream in;
-      in.open(tmp_file.c_str());
+      met_open(in, tmp_file.c_str());
 
       if(!in) {
          mlog << Error << "\n" << method_name
@@ -1814,6 +1815,51 @@ void InterpInfo::validate() {
             exit(1);
          }
       }
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// The unstructured grid uses the N closest faces instead of the grid
+// template. Methods that need the regular grid structure (least-squares
+// fit, grid box corners, Gaussian filters, geography match) are not
+// supported. The bilinear interpolation fits a bilinear surface through
+// the width * width closest faces. The distance-weighted mean and the
+// bilinear interpolation are not supported for smoothing since each
+// face is its own closest face, and the best match since there is no
+// observation value.
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void InterpInfo::validate_ugrid(UGridInterpUse use, const char *caller) const {
+
+   static const vector point_methods = {
+      InterpMthd::Nearest, InterpMthd::Min,     InterpMthd::Max,
+      InterpMthd::Median,  InterpMthd::UW_Mean, InterpMthd::DW_Mean,
+      InterpMthd::AW_Mean, InterpMthd::Bilin,   InterpMthd::Best };
+   static const vector smoothing_methods = {
+      InterpMthd::Nearest, InterpMthd::Min,     InterpMthd::Max,
+      InterpMthd::Median,  InterpMthd::UW_Mean, InterpMthd::AW_Mean };
+
+   const auto &supported =
+      (use == UGridInterpUse::Smoothing ? smoothing_methods : point_methods);
+
+   for(int i=0; i<n_interp; i++) {
+
+      if(InterpMthd methodi = string_to_interpmthd(method[i].c_str());
+         std::find(supported.begin(), supported.end(), methodi) != supported.end()) continue;
+
+      ConcatString choices;
+      for(const auto &m : supported) {
+         if(!choices.empty()) choices << ", ";
+         choices << interpmthd_to_string(m);
+      }
+
+      mlog << Error << "\n" << caller
+           << "the \"" << method[i] << "\" interpolation method is not "
+           << "supported for the unstructured grid. Choose from "
+           << choices << ".\n\n";
+      exit(1);
    }
 }
 
