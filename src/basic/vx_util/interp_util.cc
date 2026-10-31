@@ -8,6 +8,9 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <algorithm>
+#include <array>
+#include <atomic>
 #include <cstdlib>
 #include <iostream>
 #include <limits>
@@ -912,6 +915,382 @@ void get_xy_ll(double x, double y, int w, int h, int &x_ll, int &y_ll) {
    else         y_ll = nint(floor(y) - (h/2 - 1));
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Number of closest faces to be used for the unstructured grid. It
+// matches the number of points in the GridTemplate so the width and
+// shape in the interpolation options keep the same meaning.
+//
+////////////////////////////////////////////////////////////////////////
+
+int ugrid_interp_n_points(const int width,
+                          const GridTemplateFactory::GridTemplates shape,
+                          const InterpMthd mthd) {
+
+   // Bilinear interpolation uses the width * width closest faces
+   if(mthd == InterpMthd::Bilin) return std::max(1, width*width);
+
+   GridTemplateFactory gtf;
+   const auto gt = gtf.buildGT(shape, width, false);
+   return std::max(1, gt->size());
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Values at the closest n_points faces, bad data if not available.
+//
+////////////////////////////////////////////////////////////////////////
+
+NumArray interp_ugrid_points(const DataPlane &dp, const UGridNeighbors &nbrs,
+                             int n_points) {
+   NumArray points;
+   points.extend(n_points);
+
+   for(int i=0; i<n_points; i++) {
+      if(i < nbrs.n() && nbrs.index[i] >= 0 && nbrs.index[i] < dp.nx()) {
+         points.add(dp.get(nbrs.index[i], 0));
+      }
+      else {
+         points.add(bad_data_double);
+      }
+   }
+
+   return points;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Least-squares fit for the bilinear interpolation of the unstructured
+// grid. The normal equations M * c = r are solved by the Gaussian
+// elimination with partial pivoting.
+//
+////////////////////////////////////////////////////////////////////////
+
+using UGridMatrix = std::array<std::array<double, 4>, 4>;
+using UGridVector = std::array<double, 4>;
+
+// Largest absolute coordinate, used to scale the coordinates to O(1)
+static double ugrid_coord_scale(const vector<double> &x, const vector<double> &y, int n) {
+   double scale = 0.0;
+   for(int i=0; i<n; i++) scale = std::max(scale, std::max(fabs(x[i]), fabs(y[i])));
+   return scale;
+}
+
+// Normal equations of the fit with the columns 1, x, y, x*y
+static void ugrid_normal_equations(const vector<double> &x, const vector<double> &y,
+                                   const NumArray &v, int n_coef, double scale,
+                                   UGridMatrix &M, UGridVector &r) {
+   for(int i=0; i<v.n(); i++) {
+      double xs = x[i]/scale;
+      double ys = y[i]/scale;
+      const UGridVector col = { 1.0, xs, ys, xs*ys };
+      for(int j=0; j<n_coef; j++) {
+         r[j] += col[j]*v[i];
+         for(int k=0; k<n_coef; k++) M[j][k] += col[j]*col[k];
+      }
+   }
+}
+
+// Row with the largest absolute value in column j, at or below row j
+static int ugrid_pivot_row(const UGridMatrix &M, int j, int n_coef) {
+   int p = j;
+   for(int k=j+1; k<n_coef; k++) {
+      if(fabs(M[k][j]) > fabs(M[p][j])) p = k;
+   }
+   return p;
+}
+
+// Eliminate column j from the rows below row j
+static void ugrid_eliminate_below(UGridMatrix &M, UGridVector &r, int j, int n_coef) {
+   for(int k=j+1; k<n_coef; k++) {
+      double f = M[k][j]/M[j][j];
+      for(int m=j; m<n_coef; m++) M[k][m] -= f*M[j][m];
+      r[k] -= f*r[j];
+   }
+}
+
+// Forward elimination, return false if singular
+static bool ugrid_forward_eliminate(UGridMatrix &M, UGridVector &r, int n_coef) {
+   double max_diag = 0.0;
+   for(int j=0; j<n_coef; j++) max_diag = std::max(max_diag, fabs(M[j][j]));
+
+   for(int j=0; j<n_coef; j++) {
+      int p = ugrid_pivot_row(M, j, n_coef);
+      if(fabs(M[p][j]) <= 1.0e-10*max_diag) return false;
+      if(p != j) {
+         std::swap(M[j], M[p]);
+         std::swap(r[j], r[p]);
+      }
+      ugrid_eliminate_below(M, r, j, n_coef);
+   }
+   return true;
+}
+
+// Back substitution, return the first coefficient (the value at the origin)
+static double ugrid_back_substitute(const UGridMatrix &M, const UGridVector &r, int n_coef) {
+   UGridVector c{};
+   for(int j=n_coef-1; j>=0; j--) {
+      double sum = r[j];
+      for(int k=j+1; k<n_coef; k++) sum -= M[j][k]*c[k];
+      c[j] = sum/M[j][j];
+   }
+   return c[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Least-squares fit of v = a + b*x + c*y (n_coef = 3) or
+// v = a + b*x + c*y + d*x*y (n_coef = 4) and return a, the value at the
+// origin (the target point). The coordinates are scaled to O(1) to keep
+// the normal equations well conditioned. Return false if singular.
+//
+////////////////////////////////////////////////////////////////////////
+
+static bool ugrid_fit_at_origin(const vector<double> &x, const vector<double> &y,
+                                const NumArray &v, int n_coef, double &a) {
+
+   int n = v.n();
+   if(n < n_coef) return false;
+
+   double scale = ugrid_coord_scale(x, y, n);
+   if(scale <= 0.0) return false;
+
+   UGridMatrix M{};
+   UGridVector r{};
+   ugrid_normal_equations(x, y, v, n_coef, scale, M, r);
+   if(!ugrid_forward_eliminate(M, r, n_coef)) return false;
+
+   a = ugrid_back_substitute(M, r, n_coef);
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Valid data values of the closest faces of an unstructured grid and
+// their distance (km), area (km^2), and local offsets (km).
+//
+////////////////////////////////////////////////////////////////////////
+
+struct UGridValues {
+   NumArray       values;
+   vector<double> dists;
+   vector<double> areas;
+   vector<double> xs;
+   vector<double> ys;
+   bool           has_dist = false;
+   bool           has_area = false;
+   bool           has_xy = false;
+};
+
+static UGridValues collect_ugrid_values(const DataPlane &dp, const UGridNeighbors &nbrs,
+                                        int n_points) {
+   UGridValues u;
+   u.has_dist = (static_cast<int>(nbrs.dist_km.size()) == nbrs.n());
+   u.has_area = (nbrs.face_area != nullptr &&
+                 static_cast<int>(nbrs.face_area->size()) == dp.nx());
+   u.has_xy = (static_cast<int>(nbrs.x_km.size()) == nbrs.n() &&
+               static_cast<int>(nbrs.y_km.size()) == nbrs.n());
+
+   int n_use = std::min(n_points, nbrs.n());
+   for(int i=0; i<n_use; i++) {
+      int idx = nbrs.index[i];
+      if(idx < 0 || idx >= dp.nx()) continue;
+      double v = dp.get(idx, 0);
+      if(is_bad_data(v)) continue;
+      u.values.add(v);
+      if(u.has_dist) u.dists.push_back(nbrs.dist_km[i]);
+      if(u.has_area) u.areas.push_back((*nbrs.face_area)[idx]);
+      if(u.has_xy) {
+         u.xs.push_back(nbrs.x_km[i]);
+         u.ys.push_back(nbrs.y_km[i]);
+      }
+   }
+   return u;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Copy the first n closest faces of a face from the neighbor table.
+//
+////////////////////////////////////////////////////////////////////////
+
+void UGridNeighborTable::get(int face, int n, UGridNeighbors &nbrs) const {
+   nbrs.clear();
+   nbrs.face_area = face_area;
+   if(face < 0 || face >= n_face) return;
+
+   const int *row = index.data() + static_cast<size_t>(face)*n_max;
+   int m = std::min(n, n_max);
+   for(int k=0; k<m && row[k] >= 0; k++) nbrs.index.push_back(row[k]);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Interpolation methods for the unstructured grid
+//
+////////////////////////////////////////////////////////////////////////
+
+// Value of the closest face
+static double ugrid_nearest(const DataPlane &dp, const UGridNeighbors &nbrs) {
+   if(nbrs.n() == 0 || nbrs.index[0] < 0 || nbrs.index[0] >= dp.nx()) {
+      return bad_data_double;
+   }
+   return dp.get(nbrs.index[0], 0);
+}
+
+// Distance-weighted mean, the value at the face within 1 meter
+static double ugrid_dw_mean(const UGridValues &u) {
+   if(!u.has_dist) {
+      mlog << Error << "\ninterp_ugrid() -> "
+           << "the face distances are required for "
+           << interpmthd_dw_mean_str << ".\n\n";
+      exit(1);
+   }
+
+   double wght_sum = 0.0;
+   double numerator = 0.0;
+   for(int i=0; i<u.values.n(); i++) {
+      if(u.dists[i] <= 0.001) return u.values[i];
+      double weight = pow(u.dists[i], -1*dw_mean_pow);
+      wght_sum  += weight;
+      numerator += weight * u.values[i];
+   }
+   return numerator/wght_sum;
+}
+
+// Area-weighted mean, equal weights if the face area is not available
+static double ugrid_aw_mean(const UGridValues &u) {
+   static std::atomic warned_no_area(false);
+
+   if(!u.has_area) {
+      if(!warned_no_area.exchange(true)) {
+         mlog << Warning << "\ninterp_ugrid() -> "
+              << "the face area is not available. "
+              << interpmthd_aw_mean_str << " is computed with "
+              << "equal weights (same as "
+              << interpmthd_uw_mean_str << ").\n\n";
+      }
+      return u.values.mean();
+   }
+
+   double wght_sum = 0.0;
+   double numerator = 0.0;
+   for(int i=0; i<u.values.n(); i++) {
+      if(is_bad_data(u.areas[i]) || u.areas[i] <= 0.0) continue;
+      wght_sum  += u.areas[i];
+      numerator += u.areas[i] * u.values[i];
+   }
+   return (wght_sum > 0.0 ? numerator/wght_sum : bad_data_double);
+}
+
+// Neighborhood fractional coverage
+static double ugrid_nbrhd(const UGridValues &u, const UGridPointInfo &pnt) {
+   if(!pnt.cat_thresh) {
+      mlog << Error << "\ninterp_ugrid() -> "
+           << "the categorical threshold is required for "
+           << interpmthd_nbrhd_str << ".\n\n";
+      exit(1);
+   }
+   int count_thr = 0;
+   for(int i=0; i<u.values.n(); i++) {
+      if(pnt.cat_thresh->check(u.values[i], pnt.cpi)) count_thr++;
+   }
+   return (double) count_thr/u.values.n();
+}
+
+// Value closest to the observation
+static double ugrid_best(const UGridValues &u, double obs_v) {
+   double v = bad_data_double;
+   double min_d = bad_data_double;
+   for(int i=0; i<u.values.n(); i++) {
+      if(is_bad_data(min_d) || fabs(u.values[i] - obs_v) < min_d) {
+         min_d = fabs(u.values[i] - obs_v);
+         v = u.values[i];
+      }
+   }
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Bilinear interpolation for the unstructured grid. Fit the bilinear
+// surface v = a + b*x + c*y + d*x*y through the closest faces in the
+// local tangent plane (km) and evaluate it at the target point. For the
+// 4 corners of a regular grid box, this is the standard bilinear
+// interpolation. If the cross term can not be determined (for example,
+// only 3 faces), fit a plane instead which is the barycentric
+// interpolation for 3 faces. The result is limited to the range of the
+// face values, as the bilinear interpolation of the regular grid is.
+//
+////////////////////////////////////////////////////////////////////////
+
+static double ugrid_bilin(const UGridValues &u) {
+
+   if(!u.has_xy || !u.has_dist) {
+      mlog << Error << "\ninterp_ugrid() -> "
+           << "the face locations are required for "
+           << interpmthd_bilin_str << ".\n\n";
+      exit(1);
+   }
+
+   // If the target point is at a face (1 meter), use the value at the face
+   for(int i=0; i<u.values.n(); i++) {
+      if(u.dists[i] <= 0.001) return u.values[i];
+   }
+
+   double a;
+   if(!ugrid_fit_at_origin(u.xs, u.ys, u.values, 4, a) &&
+      !ugrid_fit_at_origin(u.xs, u.ys, u.values, 3, a)) {
+      return bad_data_double;
+   }
+
+   return std::min(std::max(a, u.values.min()), u.values.max());
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Interpolate using the closest n_points faces of an unstructured grid.
+// The faces beyond the maximum distance are not included in nbrs and
+// count as missing data for the valid data threshold.
+//
+////////////////////////////////////////////////////////////////////////
+
+double interp_ugrid(const DataPlane &dp, const UGridNeighbors &nbrs,
+                    const InterpMthd mthd, int n_points, double t,
+                    const UGridPointInfo &pnt) {
+
+   if(n_points < 1) n_points = 1;
+
+   // Nearest neighbor uses the closest face only
+   if(mthd == InterpMthd::Nearest) return ugrid_nearest(dp, nbrs);
+
+   // Check whether enough valid faces were found
+   UGridValues u = collect_ugrid_values(dp, nbrs, n_points);
+   if(int count = u.values.n(); count == 0 || ((double) count)/n_points < t) {
+      return bad_data_double;
+   }
+
+   double v = bad_data_double;
+   switch(mthd) {
+      case InterpMthd::Min:     v = u.values.min();                  break;
+      case InterpMthd::Max:     v = u.values.max();                  break;
+      case InterpMthd::Median:  v = u.values.percentile_array(0.50); break;
+      case InterpMthd::UW_Mean: v = u.values.mean();                 break;
+      case InterpMthd::DW_Mean: v = ugrid_dw_mean(u);                break;
+      case InterpMthd::AW_Mean: v = ugrid_aw_mean(u);                break;
+      case InterpMthd::Nbrhd:   v = ugrid_nbrhd(u, pnt);             break;
+      case InterpMthd::Bilin:   v = ugrid_bilin(u);                  break;
+      case InterpMthd::Best:    v = ugrid_best(u, pnt.obs_v);        break;
+      default:
+         mlog << Error << "\ninterp_ugrid() -> "
+              << "unsupported interpolation method for the unstructured grid: "
+              << interpmthd_to_string(mthd) << "(" << enum_class_as_int(mthd) << ")\n\n";
+         exit(1);
+   }
+
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////

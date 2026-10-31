@@ -40,6 +40,21 @@ static const int nc_cf_debug_level              =   7;
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Wind orientation determined from a CF standard_name attribute.
+//
+////////////////////////////////////////////////////////////////////////
+
+enum class NcCFWindOrientation {
+   unknown,         // not a horizontal wind component
+   earth_relative,  // eastward_wind, northward_wind
+   grid_relative    // x_wind, y_wind, grid_eastward_wind, grid_northward_wind
+};
+
+static NcCFWindOrientation parse_nc_cf_wind_orientation(const ConcatString &);
+static void set_nc_cf_wind_orientation(VarInfo &, const NcVarInfo *);
+
+////////////////////////////////////////////////////////////////////////
+//
 // Code for class MetNcCFDataFile
 //
 ////////////////////////////////////////////////////////////////////////
@@ -313,20 +328,27 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane,
       get_real_dimension(vinfo, data_var, dimension);
    }
    else if (!do_winds) {
-      mlog << Error << "\n" << method_name
-           << "\"" << vinfo.req_name() << "\" variable does not exist\n\n";
+
+      // Wind processing is disabled only while reading a companion wind
+      // component, which is a speculative lookup that is allowed to miss
+      mlog << Debug(3) << method_name
+           << "\"" << vinfo.req_name() << "\" variable does not exist.\n";
       return false;
    }
+
+   // Determine the wind orientation before reading, since the rotation
+   // decision is made while the data is read
+   set_nc_cf_wind_orientation(vinfo, data_var);
 
    // Read the data
    bool status = read_data_plane(vinfo, plane, dimension, do_winds);
 
-   // Assume that CF-compliant NetCDF winds are earth-relative
-   vinfo_nc->set_grid_relative_flag(false);
-
    // Attempt to derive the data
    if(!status && do_winds) {
       status = derive_winds(vinfo_nc, plane);
+
+      // Process the derived data plane
+      if(status) status = process_data_plane(vinfo_nc, plane);
    }
 
    return status;
@@ -432,6 +454,11 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
    auto vinfo_nc = (VarInfoNcCF *)&vinfo;
    NcVarInfo *data_var = get_data_var(vinfo);
    if (nullptr == data_var) return 0;
+
+   // Determine the wind orientation before reading, since the rotation
+   // decision is made while the data is read
+   set_nc_cf_wind_orientation(vinfo, data_var);
+
    int t_dim_slot = data_var->t_slot;
    int z_dim_slot = data_var->z_slot;
    LongArray dimension = vinfo_nc->dimension();
@@ -453,12 +480,15 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
       n_rec++;
    }
 
-   // Assume that CF-compliant NetCDF winds are earth-relative
-   vinfo_nc->set_grid_relative_flag(true);
-
    // Attempt to derive the data
-   if(n_rec == 0 && do_winds) {
-      derive_winds(vinfo_nc, plane_array);
+   if(n_rec == 0 && do_winds && derive_winds(vinfo_nc, plane_array)) {
+
+      // Process each derived data plane
+      for(int i=0; i<plane_array.n_planes(); i++) {
+         process_data_plane(vinfo_nc, plane_array.at(i));
+      }
+
+      n_rec = plane_array.n_planes();
    }
 
    return n_rec;
@@ -1198,3 +1228,110 @@ int MetNcCFDataFile::index(VarInfo &vinfo){
 }
 
 /////////////////////////////////////////////////////////////////////////
+//
+// Determine the orientation of a horizontal wind component from its CF
+// standard_name attribute. CF does not require winds to be earth-relative.
+// The "x" and "y" component words indicate directions along the horizontal
+// grid when it is not true longitude and latitude, while "eastward" and
+// "northward" are always true earth directions:
+//
+//    x_wind, y_wind                          -> grid-relative
+//    grid_eastward_wind, grid_northward_wind -> grid-relative
+//    eastward_wind, northward_wind           -> earth-relative
+//
+// The same component words apply to other wind quantities, such as
+// "x_wind_shear" and "surface_eastward_wind", so match the component word
+// as an underscore-delimited token rather than the exact name. Names
+// carrying both an x/eastward and a y/northward token, such as
+// "product_of_eastward_wind_and_northward_wind", describe neither single
+// component and are reported as unknown.
+//
+////////////////////////////////////////////////////////////////////////
+
+static NcCFWindOrientation parse_nc_cf_wind_orientation(const ConcatString &standard_name) {
+
+   if(standard_name.empty()) return NcCFWindOrientation::unknown;
+
+   // Split the standard_name into underscore-delimited tokens
+   StringArray tokens;
+   tokens.parse_delim(standard_name.c_str(), "_");
+
+   // Look for the component words, tracking the "x"/"y" axis names and the
+   // "grid_" qualifier that make a component name grid-relative
+   bool x_token = false;
+   bool y_token = false;
+   bool axis_token = false;
+   bool grid_qualifier = false;
+
+   for(int i=0; i<tokens.n(); i++) {
+      const string tok = tokens[i];
+      if(     tok == "x")         { x_token = true; axis_token = true; }
+      else if(tok == "y")         { y_token = true; axis_token = true; }
+      else if(tok == "eastward")    x_token = true;
+      else if(tok == "northward")   y_token = true;
+      else if(tok == "grid")        grid_qualifier = true;
+   }
+
+   // Both or neither component word present, so this is not a single
+   // horizontal wind component
+   if(x_token == y_token) return NcCFWindOrientation::unknown;
+
+   return (axis_token || grid_qualifier ?
+           NcCFWindOrientation::grid_relative :
+           NcCFWindOrientation::earth_relative);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Set the grid-relative flag for a variable from its CF standard_name,
+// defaulting to earth-relative when the standard_name is absent or does not
+// name a horizontal wind component. Only the GridRelativeFlag is set, so the
+// "is_grid_relative" configuration option continues to override this logic.
+//
+////////////////////////////////////////////////////////////////////////
+
+static void set_nc_cf_wind_orientation(VarInfo &vinfo, const NcVarInfo *data_var) {
+
+   NcCFWindOrientation orientation = NcCFWindOrientation::unknown;
+   ConcatString standard_name;
+
+   if(data_var && data_var->var &&
+      get_var_standard_name(data_var->var.get(), standard_name)) {
+      orientation = parse_nc_cf_wind_orientation(standard_name);
+   }
+
+   bool grid_relative = (orientation == NcCFWindOrientation::grid_relative);
+
+   vinfo.set_grid_relative_flag(grid_relative);
+
+   // Report the basis for the decision for fields that may be rotated
+   if(vinfo.is_wind_rotation()) {
+
+      if(orientation == NcCFWindOrientation::unknown) {
+         ConcatString att_cs;
+         if(standard_name.empty()) att_cs << "is not set";
+         else                      att_cs << "= \"" << standard_name
+                                          << "\" is not a wind component";
+         mlog << Debug(3) << "For wind field \"" << vinfo.req_name()
+              << "\", standard_name " << att_cs
+              << ", so assuming the CF default of earth-relative.\n";
+      }
+      else {
+         mlog << Debug(3) << "For wind field \"" << vinfo.req_name()
+              << "\", standard_name = \"" << standard_name
+              << "\", so treating it as "
+              << (grid_relative ? "grid-relative" : "earth-relative") << ".\n";
+      }
+
+      // Note when the configuration overrides what the file declares
+      if(vinfo.is_grid_relative() != grid_relative) {
+         mlog << Debug(3) << "For wind field \"" << vinfo.req_name()
+              << "\", the \"" << conf_key_is_grid_relative
+              << "\" configuration option overrides that, so treating it as "
+              << (vinfo.is_grid_relative() ? "grid-relative" : "earth-relative")
+              << ".\n";
+      }
+   }
+}
+
+////////////////////////////////////////////////////////////////////////

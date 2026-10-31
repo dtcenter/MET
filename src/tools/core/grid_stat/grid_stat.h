@@ -162,6 +162,9 @@ static bool is_first_pass = true;
 // Weight for each grid point
 static DataPlane wgt_dp;
 
+// True grid box area for grid_weight_flag = AREA
+static DataPlane area_dp;
+
 // Data file factory and input files
 static std::unique_ptr<Met2dDataFile> fcst_mtddf;
 static std::unique_ptr<Met2dDataFile> obs_mtddf;
