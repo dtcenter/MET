@@ -1,0 +1,38 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Unstructured grid configuration file.
+//
+// UGridConfig_mpas in the current working directory overrides the settings
+// here for reading data from the MPAS modeling system.
+// For additional or updated information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Dimensions and variables mapping for MPAS dataset
+//
+//
+// MPAS metadata map without the face area (area_face) for the negative test
+// of grid_weight_flag = AREA.
+//
+ugrid_metadata_map = [
+   { key = "dim_face";  val = "nCells"; },
+   { key = "dim_time";  val = "Time"; },
+   { key = "dim_vert";  val = "nVertLevels"; }, // optional
+   { key = "lat_face";  val = "latCell"; },
+   { key = "lon_face";  val = "lonCell"; },
+   { key = "vert_face"; val = "zCell"; },       // optional
+   { key = "time";      val = "xtime"; },
+   { key = "init_time"; val = "initial_time"; }  // optional
+];
+
+//
+// Unstructured grid maximum search distance
+//
+ugrid_max_distance_km = NA;
+
+////////////////////////////////////////////////////////////////////////////////
+
+version = "V13.0.0";
+
+////////////////////////////////////////////////////////////////////////////////

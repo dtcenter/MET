@@ -2748,7 +2748,7 @@ static void parse_long_names() {
         << "Reading stat column descriptions: " << file_name << "\n";
 
    // Open the data file
-   f_in.open(file_name.c_str());
+   met_open(f_in, file_name.c_str());
    if(!f_in) {
       mlog << Error << "\nparse_long_names() -> "
            << R"(can't open the ASCII file ") << file_name
