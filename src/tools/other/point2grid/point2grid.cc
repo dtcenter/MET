@@ -928,6 +928,20 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 
       cellMapping.clear();
       cellMapping.resize(nx * ny);
+
+      // Initialize counter and output fields for this field before checking
+      // the grid mapping. The output fields are written whether or not any
+      // observations are found, so initializing them inside the success
+      // branch below would leave a field with no observations holding the
+      // previous field's data, or zeros for the first field.
+      to_dp.set_constant(DefaultValueNA[i]);
+      cnt_dp.set_constant(0);
+      mask_dp.set_constant(0);
+      if (has_prob_thresh || do_gaussian_filter) {
+         prob_dp.set_constant(0);
+         prob_mask_dp.set_constant(0);
+      }
+
       if( get_grid_mapping(to_grid, cellMapping.data(), var_index_array,
                            obs_data->obs_hids.data(),
                            hdr_lats.data(), hdr_lons.data()) ) {
@@ -939,15 +953,6 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          double data_value;
          double from_min_value =  10e10;
          double from_max_value = -10e10;
-
-         // Initialize counter and output fields
-         to_dp.set_constant(DefaultValueNA[i]);
-         cnt_dp.set_constant(0);
-         mask_dp.set_constant(0);
-         if (has_prob_thresh || do_gaussian_filter) {
-            prob_dp.set_constant(0);
-            prob_mask_dp.set_constant(0);
-         }
 
          for (int x_idx = 0; x_idx<nx; x_idx++) {
             for (int y_idx = 0; y_idx<ny; y_idx++) {
@@ -1020,6 +1025,14 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
                }
             }
          }
+      }
+      else {
+         ConcatString default_cs;
+         if(is_bad_data(DefaultValueNA[i])) default_cs << na_str;
+         else                               default_cs << DefaultValueNA[i];
+         mlog << Debug(2) << method_name
+              << "no " << vname << " observations were mapped to the output grid, "
+              << "writing the default value (" << default_cs << ") for every grid point.\n";
       }
 
       // Write the regridded data

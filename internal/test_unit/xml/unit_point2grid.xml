@@ -65,6 +65,22 @@
     </output>
   </test>
 
+  <test name="point2grid_pb2nc_no_obs_default_value">
+    <exec>&MET_BIN;/point2grid</exec>
+    <param> \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      "latlon 2 2 48 -88 1 1" \
+      &OUTPUT_DIR;/point2grid/pb2nc_no_obs_default_value.nc \
+      -field 'name="TMP"; level="*";' \
+      -field 'name="TP24"; level="*";' \
+      -default_value NA,0 \
+      -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/pb2nc_no_obs_default_value.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="point2grid_pb2nc_TMP">
     <exec>&MET_BIN;/point2grid</exec>
     <param> \
