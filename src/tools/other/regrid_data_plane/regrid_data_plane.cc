@@ -26,6 +26,7 @@
 //   006    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   007    09-29-22  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
 //   008    12-08-25  Halley Gotway  MET #3293 Fix set_attr_grid.
+//   009    11-03-26  Halley Gotway  MET #3499 Parse multiple -field options.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -93,6 +94,7 @@ static void write_nc(const DataPlane &dp,
                      const VarInfo *vinfo, const char *vname);
 static void close_nc();
 static void usage(int exit_code=1);
+static bool set_field_var_info(VarInfo &, int);
 static void set_field(const StringArray &);
 static void set_method(const StringArray &);
 static void set_shape(const StringArray &);
@@ -222,12 +224,9 @@ void static process_data_file() {
    std::unique_ptr<netCDF::NcFile> nc_in;
    static const char *method_name = "process_data_file() -> ";
 
-   // MetConfig parses into the existing dictionary rather than replacing it,
-   // so parse each field string into a fresh copy of the constants
-   MetConfig base_config;
-   base_config.read(replace_path(config_const_filename).c_str());
-
-   MetConfig config = base_config;
+   // Initialize configuration object
+   MetConfig config;
+   config.read(replace_path(config_const_filename).c_str());
    config.read_string(FieldSA[0].c_str());
 
    // Note: The command line argument MUST processed before this
@@ -262,9 +261,9 @@ void static process_data_file() {
    field_count = 0;
    for(int i=0; i<FieldSA.n_elements(); i++) {
       vinfo->clear();
-      config = base_config;
-      config.read_string(FieldSA[i].c_str());
-      if (vinfo->set_dict(config, false)) {
+
+      // Populate the VarInfo object using the -field config string
+      if (set_field_var_info(*vinfo, i)) {
          field_count++;
          break;
       }
@@ -306,10 +305,8 @@ void static process_data_file() {
       // Initialize
       vinfo->clear();
 
-      // Populate the VarInfo object using the config string
-      config = base_config;
-      config.read_string(FieldSA[i].c_str());
-      if (!vinfo->set_dict(config, false)) continue;
+      // Populate the VarInfo object using the -field config string
+      if (!set_field_var_info(*vinfo, i)) continue;
 
       // Get the data plane from the file for this VarInfo object
       if(!fr_mtddf->data_plane(*vinfo, fr_dp)) {
@@ -529,6 +526,18 @@ __attribute__((noreturn)) static void usage(int exit_code) {
         << "NetCDF variable (optional).\n\n" << flush;
 
    exit(exit_code);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static bool set_field_var_info(VarInfo &vinfo, int i) {
+   MetConfig config;
+
+   // Populate the VarInfo object using the i-th -field config string
+   config.read(replace_path(config_const_filename).c_str());
+   config.read_string(FieldSA[i].c_str());
+
+   return vinfo.set_dict(config, false);
 }
 
 ////////////////////////////////////////////////////////////////////////
