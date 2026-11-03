@@ -25,6 +25,7 @@
 //   005    06-24-24  Halley Gotway  MET #2880 Filter obs_quality.
 //   006    10-21-24  Halley Gotway  MET #3000 Reduce warnings.
 //   007    05/07-25  Halley Gotway  MET #3145 Add OpenMP.
+//   008    11-03-26  Halley Gotway  MET #3499 Parse multiple -field options.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -189,6 +190,7 @@ static bool keep_message_type(const int mt_index);
 
 static bool has_lat_lon_vars(const NcFile *nc_in);
 static void set_adp_gc_values(NcVar var_adp_qc);
+static void set_field_var_info(VarInfo &, int);
 
 ////////////////////////////////////////////////////////////////////////
 // for GOES 16
@@ -336,18 +338,13 @@ static void process_command_line(int argc, char **argv) {
 
    // Check that same variable is required multiple times without -name argument
    if(VarNameSA.n() == 0) {
-      MetConfig config;
       ConcatString vname;
       StringArray var_names;
       VarInfo *vinfo = VarInfoFactory::new_var_info(FileType_NcMet);
       for(int i=0; i<FieldSA.n(); i++) {
          vinfo->clear();
-         // Populate the VarInfo object using the config string
-         // Reset first, since MetConfig parses into the existing
-         // dictionary rather than replacing it
-         config.clear();
-         config.read_string(FieldSA[i].c_str());
-         vinfo->set_dict(config);
+         // Populate the VarInfo object using the -field config string
+         set_field_var_info(*vinfo, i);
          vname = vinfo->name();
          if (var_names.has(vname)) {
             mlog << Error << "\n" << method_name
@@ -603,7 +600,6 @@ bool get_nc_data_string_array(NcFile *nc, const char *var_name,
 
 static int get_obs_type(NcFile *nc) {
    int obs_type = TYPE_UNKNOWN;
-   MetConfig config;
    ConcatString att_val_scene_id;
    ConcatString att_val_project;
    ConcatString input_type;
@@ -613,12 +609,8 @@ static int get_obs_type(NcFile *nc) {
    auto vinfo = VarInfoFactory::new_var_info(FileType_NcCF);
    for(int i=0; i<FieldSA.n(); i++) {
       vinfo->clear();
-      // Populate the VarInfo object using the config string
-      // Reset first, since MetConfig parses into the existing
-      // dictionary rather than replacing it
-      config.clear();
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      // Populate the VarInfo object using the -field config string
+      set_field_var_info(*vinfo, i);
       if (vinfo->grid_attr().is_set()) {
          has_attr_grid = true;
          break;
@@ -803,13 +795,8 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       // Initialize
       vinfo->clear();
 
-      // Populate the VarInfo object using the config string
-      // Reset first, since MetConfig parses into the existing
-      // dictionary rather than replacing it
-      config.clear();
-      config.read(replace_path(config_const_filename).c_str());
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      // Populate the VarInfo object using the -field config string
+      set_field_var_info(*vinfo, i);
 
       // Check the variable name
       ConcatString error_msg;
@@ -1310,13 +1297,8 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       auto var_info = VarInfoNcCF(*(VarInfoNcCF *)vinfo);
       // Initialize
       var_info.clear();
-      // Populate the VarInfo object using the config string
-      // Reset first, since MetConfig parses into the existing
-      // dictionary rather than replacing it
-      config.clear();
-      config.read(replace_path(config_const_filename).c_str());
-      config.read_string(FieldSA[0].c_str());
-      var_info.set_dict(config);
+      // Populate the VarInfo object using the -field config string
+      set_field_var_info(var_info, 0);
       NcVar var_data = get_nc_var(nc_in, var_info.name().c_str());
       if (get_nc_att_value(&var_data, coordinates_att_name, coordinates_value)) {
          StringArray sa = coordinates_value.split(" ");
@@ -1403,13 +1385,8 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       vinfo->clear();
       var_cell_mapping.clear();
 
-      // Populate the VarInfo object using the config string
-      // Reset first, since MetConfig parses into the existing
-      // dictionary rather than replacing it
-      config.clear();
-      config.read(replace_path(config_const_filename).c_str());
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      // Populate the VarInfo object using the -field config string
+      set_field_var_info(*vinfo, i);
 
       NcVar var_data = get_nc_var(nc_in, vinfo->name().c_str());
       ConcatString coordinates_value;
@@ -1818,13 +1795,8 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       // Initialize
       vinfo->clear();
 
-      // Populate the VarInfo object using the config string
-      // Reset first, since MetConfig parses into the existing
-      // dictionary rather than replacing it
-      config.clear();
-      config.read(replace_path(config_const_filename).c_str());
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      // Populate the VarInfo object using the -field config string
+      set_field_var_info(*vinfo, i);
 
       to_dp.erase();
       to_dp.set_init(valid_time);
@@ -3054,6 +3026,19 @@ static void set_adp_gc_values(NcVar var_adp_qc) {
            << ", medium_confidence = " << adp_qc_medium
            << ", low_confidence = " << adp_qc_low << "\n";
    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void set_field_var_info(VarInfo &vinfo, int i) {
+   MetConfig config;
+
+   // Populate the VarInfo object using the i-th -field config string
+   config.read(replace_path(config_const_filename).c_str());
+   config.read_string(FieldSA[i].c_str());
+   vinfo.set_dict(config);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
