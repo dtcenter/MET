@@ -148,14 +148,14 @@ static const ConcatString att_name_meanings = "flag_meanings";
 
 static void process_command_line(int, char **);
 static void process_data_file();
-static void process_point_file(NcFile *nc_in, MetConfig &config,
-                               VarInfo *, const Grid to_grid);
+static void process_point_file(NcFile *nc_in, VarInfo *,
+                               const Grid to_grid);
 #ifdef WITH_PYTHON
-static void process_point_python(const string python_command, MetConfig &config,
-                                 VarInfo *vinfo, const Grid to_grid, bool use_xarray);
+static void process_point_python(const string python_command, VarInfo *vinfo,
+                                 const Grid to_grid, bool use_xarray);
 #endif
-static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
-                                    VarInfo *, Met2dDataFile *fr_mtddf,
+static void process_point_nccf_file(NcFile *nc_in, VarInfo *,
+                                    Met2dDataFile *fr_mtddf,
                                     const Grid to_grid);
 static void open_nc(const Grid &grid, const ConcatString run_cs);
 static void write_nc(const DataPlane &dp, const Grid &grid,
@@ -213,7 +213,7 @@ static IntArray qc_flags;
 static void process_goes_file(NcFile *nc_in, MetConfig &config,
             VarInfo *, const Grid fr_grid, const Grid to_grid);
 static unixtime find_valid_time(NcVar time_var);
-static ConcatString get_goes_grid_input(MetConfig config, const Grid fr_grid);
+static ConcatString get_goes_grid_input(MetConfig &config, const Grid fr_grid);
 static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid,
                              IntArray *cellMapping, const ConcatString &geostationary_file);
 static int  get_lat_count(const NcFile *);
@@ -411,11 +411,6 @@ static void process_data_file() {
    std::unique_ptr<netCDF::NcFile> nc_in;
    static const char *method_name = "process_data_file() -> ";
 
-   // Initialize configuration object
-   MetConfig config;
-   config.read(replace_path(config_const_filename).c_str());
-   config.read_string(FieldSA[0].c_str());
-
    // Note: The command line argument MUST processed before this
    if (compress_level < 0) compress_level = conf_info.conf.nc_compression();
 
@@ -497,7 +492,13 @@ static void process_data_file() {
    // Build the run command string
    run_cs << "Point obs (" << fr_grid.serialize() << ") to " << to_grid.serialize();
 
+   // Initialize the configuration object used by the GOES logic
+   MetConfig config;
+
    if (goes_data) {
+      config.read(replace_path(config_const_filename).c_str());
+      config.read_string(FieldSA[0].c_str());
+
       mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
       ConcatString grid_string = get_goes_grid_input(config, fr_grid);
       if (!grid_string.empty()) run_cs << " with " << grid_string;
@@ -511,15 +512,15 @@ static void process_data_file() {
       process_goes_file(nc_in.get(), config, vinfo.get(), fr_grid, to_grid);
    }
    else if (TYPE_OBS == obs_type) {
-      process_point_file(nc_in.get(), config, vinfo.get(), to_grid);
+      process_point_file(nc_in.get(), vinfo.get(), to_grid);
    }
    else if (TYPE_NCCF == obs_type) {
-      process_point_nccf_file(nc_in.get(), config, vinfo.get(), fr_mtddf.get(), to_grid);
+      process_point_nccf_file(nc_in.get(), vinfo.get(), fr_mtddf.get(), to_grid);
       unsetenv(nc_att_met_point_nccf);
    }
 #ifdef WITH_PYTHON
    else if (TYPE_PYTHON == obs_type) {
-      process_point_python(python_command, config, vinfo.get(), to_grid, use_xarray);
+      process_point_python(python_command, vinfo.get(), to_grid, use_xarray);
    }
 #endif
    else {
@@ -660,7 +661,7 @@ std::set<GOES_QC> prepare_qoes_qc_array() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarInfo *vinfo,
+void process_point_met_data(MetPointData *met_point_obs, VarInfo *vinfo,
                             const Grid &to_grid) {
    int hdr_idx;
    int var_idx_or_gc;
@@ -1118,7 +1119,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
+static void process_point_file(NcFile *nc_in, VarInfo *vinfo,
                                const Grid to_grid) {
    ConcatString vname;
    clock_t start_clock =  clock();
@@ -1139,7 +1140,7 @@ static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    nc_point_obs.check_nc(GET_NC_NAME_P(nc_in).c_str(), method_name_s);   // exit if missing dims/vars
    // Read all obs data to compute the cell mapping
    nc_point_obs.read_obs_data();
-   process_point_met_data(&nc_point_obs, config, vinfo, to_grid);
+   process_point_met_data(&nc_point_obs, vinfo, to_grid);
 
    nc_point_obs.close();
 
@@ -1152,7 +1153,7 @@ static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
 #ifdef WITH_PYTHON
 
-static void process_point_python(const string python_command, MetConfig &config,
+static void process_point_python(const string python_command,
                                  VarInfo *vinfo, const Grid to_grid, bool use_xarray) {
    clock_t start_clock =  clock();
    static const char *method_name = "process_point_python() -> ";
@@ -1176,7 +1177,7 @@ static void process_point_python(const string python_command, MetConfig &config,
    }
 
    MetPointData *met_point_obs = met_point_file.get_met_point_data();
-   process_point_met_data(met_point_obs, config, vinfo, to_grid);
+   process_point_met_data(met_point_obs, vinfo, to_grid);
 
    met_point_file.close();
 
@@ -1189,7 +1190,7 @@ static void process_point_python(const string python_command, MetConfig &config,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
+static void process_point_nccf_file(NcFile *nc_in,
                                     VarInfo *vinfo, Met2dDataFile *fr_mtddf,
                                     const Grid to_grid) {
    ConcatString vname;
@@ -2181,7 +2182,7 @@ static unixtime find_valid_time(NcVar time_var) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static ConcatString get_goes_grid_input(MetConfig config, const Grid fr_grid) {
+static ConcatString get_goes_grid_input(MetConfig &config, const Grid fr_grid) {
    ConcatString run_string;
    ConcatString env_coord_name;
    ConcatString tmp_dir = config.get_tmp_dir();
