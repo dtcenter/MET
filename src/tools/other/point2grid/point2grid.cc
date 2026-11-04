@@ -157,7 +157,7 @@ static void process_point_python(const string &python_command, VarInfo *vinfo,
 static void process_point_nccf_file(NcFile *nc_in, VarInfo *,
                                     Met2dDataFile *fr_mtddf,
                                     const Grid &to_grid);
-static void open_nc(const Grid &grid, const ConcatString run_cs);
+static void open_nc(const Grid &grid, const ConcatString &run_cs);
 static void write_nc(const DataPlane &dp, const Grid &grid,
                      const VarInfo *vinfo, const char *vname,
                      bool add_gaussian_atts = false,
@@ -181,14 +181,14 @@ static void set_gaussian_radius(const StringArray &);
 
 static unixtime compute_unixtime(NcVar *time_var, unixtime var_value);
 static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping,
-                             NcVar var_lat, NcVar var_lon, vector<bool> skip_times);
+                             NcVar var_lat, NcVar var_lon, const vector<bool> &skip_times);
 static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
                              const IntArray obs_index_array, const int *obs_hids,
                              const float *hdr_lats, const float *hdr_lons);
 static int  get_obs_type(NcFile *nc_in);
 static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                                VarInfo *vinfo, DataPlane &fr_dp, DataPlane &to_dp,
-                               const Grid &to_grid, IntArray *cellMapping);
+                               const Grid &to_grid, const IntArray *cellMapping);
 
 static bool keep_message_type(const int mt_index);
 
@@ -220,12 +220,12 @@ static int  get_lat_count(const NcFile *);
 static int  get_lon_count(const NcFile *);
 static NcVar get_goes_nc_var(NcFile *nc, const ConcatString &var_name,
                              bool exit_if_error=true);
-static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp);
+static bool is_time_mismatch(const NcFile *nc_in, const NcFile *nc_adp);
 static ConcatString make_geostationary_filename(const Grid &fr_grid);
 static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
             DataPlane &fr_dp, DataPlane &to_dp,
-            const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping, NcFile *nc_adp);
-static void save_geostationary_data(const ConcatString geostationary_file,
+            const Grid &fr_grid, const Grid &to_grid, const IntArray *cellMapping, NcFile *nc_adp);
+static void save_geostationary_data(const ConcatString &geostationary_file,
             const float *latitudes, const float *longitudes,
             const GoesImagerData &grid_data);
 static void set_goes_qc_flags(const StringArray &);
@@ -1450,7 +1450,7 @@ static void process_point_nccf_file(NcFile *nc_in,
 
 static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                                VarInfo *vinfo, DataPlane &fr_dp, DataPlane &to_dp,
-                               const Grid &to_grid, IntArray *cellMapping) {
+                               const Grid &to_grid, const IntArray *cellMapping) {
 
    int to_cell_cnt = 0;
    clock_t start_clock = clock();
@@ -1589,7 +1589,7 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void open_nc(const Grid &grid, ConcatString run_cs) {
+static void open_nc(const Grid &grid, const ConcatString &run_cs) {
 
    // Create output file
    nc_out = open_ncfile(OutputFilename.c_str(), true);
@@ -1834,7 +1834,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
 ////////////////////////////////////////////////////////////////////////
 
-void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
+void check_lat_lon(int data_size, const float *latitudes, const float *longitudes) {
    int cnt_printed = 0;
    int cnt_missing_lat = 0;
    int cnt_missing_lon = 0;
@@ -1976,8 +1976,8 @@ static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
 ////////////////////////////////////////////////////////////////////////
 
 static void get_grid_mapping_latlon(
-      DataPlane from_dp, DataPlane to_dp, const Grid &to_grid,
-      IntArray *cellMapping, float *latitudes, float *longitudes,
+      const DataPlane &from_dp, const DataPlane &to_dp, const Grid &to_grid,
+      IntArray *cellMapping, const float *latitudes, const float *longitudes,
       int from_lat_count, int from_lon_count, vector<bool> skip_times, bool to_north, bool is_2d) {
    double x;
    double y;
@@ -2078,7 +2078,7 @@ static void get_grid_mapping_latlon(
 ////////////////////////////////////////////////////////////////////////
 
 static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping,
-                             NcVar var_lat, NcVar var_lon, vector<bool> skip_times) {
+                             NcVar var_lat, NcVar var_lon, const vector<bool> &skip_times) {
    bool status = false;
    DataPlane from_dp;
    DataPlane to_dp;
@@ -2436,7 +2436,7 @@ static ConcatString make_geostationary_filename(const Grid &fr_grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp) {
+static bool is_time_mismatch(const NcFile *nc_in, const NcFile *nc_adp) {
    // Verify the coverage start and end times
    bool time_mismatch = false;
    ConcatString aod_start_time, aod_end_time;
@@ -2470,7 +2470,7 @@ static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp) {
 
 static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
       DataPlane &fr_dp, DataPlane &to_dp,
-      const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping, NcFile *nc_adp) {
+      const Grid &fr_grid, const Grid &to_grid, const IntArray *cellMapping, NcFile *nc_adp) {
 
    bool has_qc_var = false;
    bool has_adp_qc_var = false;
@@ -2753,7 +2753,7 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void save_geostationary_data(const ConcatString geostationary_file,
+static void save_geostationary_data(const ConcatString &geostationary_file,
       const float *latitudes, const float *longitudes,
       const GoesImagerData &grid_data) {
    bool has_error = false;
