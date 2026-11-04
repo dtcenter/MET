@@ -65,9 +65,11 @@ static void setup_diag_info(void);
 static void process_series(void);
 static void process_hist1d(const vector<InputDataInfo> &);
 static void process_hist2d(const vector<InputDataInfo> &);
-static void prepare_power_spectrum_data(vector<InputDataInfo> &);
-static void process_power_spectrum(const vector<InputDataInfo> &);
-static void process_error_power_spectrum(const vector<InputDataInfo> &);
+static std::vector<bool> prepare_power_spectrum_data(vector<InputDataInfo> &);
+static void process_power_spectrum(const vector<InputDataInfo> &,
+                                   const std::vector<bool> &);
+static void process_error_power_spectrum(const vector<InputDataInfo> &,
+                                         const std::vector<bool> &);
 static std::vector<double> radial_spectral_variance(const DataPlane &);
 static void sum_spectral_variance(vector<double> &, const vector<double> &);
 static DataPlane dct_typeII(const DataPlane &);
@@ -445,13 +447,13 @@ static void process_series(void) {
       if(conf_info.nc_info.do_power_spectrum) {
 
          // Prepare power spectrum data
-         prepare_power_spectrum_data(in_data);
+         const std::vector<bool> skip = prepare_power_spectrum_data(in_data);
 
          // Process the power spectrum
-         process_power_spectrum(in_data);
+         process_power_spectrum(in_data, skip);
 
          // Process the error power spectrum
-         if(multiple_data_sources) process_error_power_spectrum(in_data);
+         if(multiple_data_sources) process_error_power_spectrum(in_data, skip);
       }
 
    } // end for i_series
@@ -553,30 +555,26 @@ static void process_hist2d(const vector<InputDataInfo> &in_data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void prepare_power_spectrum_data(vector<InputDataInfo> &in_data) {
+static std::vector<bool> prepare_power_spectrum_data(vector<InputDataInfo> &in_data) {
+
+   // Skip decisions apply to this series entry only
+   std::vector<bool> skip(conf_info.get_n_data(), false);
 
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      PowerSpectrumInfo *ps_ptr = &conf_info.ps_info[i_var];
+      const PowerSpectrumInfo *ps_ptr = &conf_info.ps_info[i_var];
 
-      // Reset the skip flag for each series. It is a decision about the
-      // current time step, not a permanent property of the variable.
-      ps_ptr->skip = false;
-
-      // Check the planes this entry actually transforms. A wind entry is
-      // transformed from u_dp and v_dp, so checking and filling dp would
-      // leave the kinetic energy spectrum running over missing data.
+      // Check each plane this entry may be transformed from:
+      // u_dp and v_dp for kinetic energy, dp when paired with a scalar
       vector<DataPlane *> dp_list;
+      dp_list.push_back(&in_data[i_var].dp);
       if(in_data[i_var].uv_flag) {
          dp_list.push_back(&in_data[i_var].u_dp);
          dp_list.push_back(&in_data[i_var].v_dp);
       }
-      else {
-         dp_list.push_back(&in_data[i_var].dp);
-      }
 
       // Skip the entry if any of its planes falls below the threshold
-      for(auto *cur_dp : dp_list) {
+      for(const auto *cur_dp : dp_list) {
 
          int nxy = cur_dp->nxy();
          int n_vld = cur_dp->n_good_data();
@@ -591,12 +589,12 @@ static void prepare_power_spectrum_data(vector<InputDataInfo> &in_data) {
                  << conf_info.data_info[i_var]->magic_str_attr()
                  << " power spectrum for this time due to missing data ("
                  << n_vld << " of " << nxy << " valid).\n\n";
-            ps_ptr->skip = true;
+            skip[i_var] = true;
             break;
          }
       }
 
-      if(ps_ptr->skip) continue;
+      if(skip[i_var]) continue;
 
       // Replace missing data in each plane, using that plane's own mean
       for(auto *cur_dp : dp_list) {
@@ -625,17 +623,20 @@ static void prepare_power_spectrum_data(vector<InputDataInfo> &in_data) {
          cur_dp->replace_bad_data(fill);
       }
    } // end for i_var
+
+   return skip;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_power_spectrum(const vector<InputDataInfo> &in_data) {
+static void process_power_spectrum(const vector<InputDataInfo> &in_data,
+                                   const std::vector<bool> &skip) {
 
    // Process the power spectrum for the full input domain
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       // Check skip
-      if(conf_info.ps_info[i_var].skip) continue;
+      if(skip[i_var]) continue;
 
       // Process U/V for kinetic energy
       if(in_data[i_var].uv_flag) {
@@ -678,18 +679,19 @@ static void process_power_spectrum(const vector<InputDataInfo> &in_data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_error_power_spectrum(const vector<InputDataInfo> &in_data) {
+static void process_error_power_spectrum(const vector<InputDataInfo> &in_data,
+                                         const std::vector<bool> &skip) {
 
    // Process the power spectrum for the full input domain
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       // Check skip
-      if(conf_info.ps_info[i_var].skip) continue;
+      if(skip[i_var]) continue;
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
          // Check skip
-         if(conf_info.ps_info[j_var].skip) continue;
+         if(skip[j_var]) continue;
 
          // Process U/V for kinetic energy
          if(in_data[i_var].uv_flag && in_data[j_var].uv_flag) {
@@ -1456,9 +1458,7 @@ static void write_power_spectrum(void) {
    // Define and write the power spectrum
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      // Skip only a variable which contributed no series at all. The
-      // per-series skip flag describes the last time processed, not the
-      // series as a whole.
+      // Skip only a variable which contributed no series at all
       if(power_info[i_var].n_power == 0) {
          mlog << Warning << "\nwrite_power_spectrum() -> "
               << "Omitting the "
