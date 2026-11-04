@@ -929,11 +929,8 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       cellMapping.clear();
       cellMapping.resize(nx * ny);
 
-      // Initialize counter and output fields for this field before checking
-      // the grid mapping. The output fields are written whether or not any
-      // observations are found, so initializing them inside the success
-      // branch below would leave a field with no observations holding the
-      // previous field's data, or zeros for the first field.
+      // Initialize the output fields before checking the grid mapping since
+      // they are written whether or not any observations are found.
       to_dp.set_constant(DefaultValueNA[i]);
       cnt_dp.set_constant(0);
       mask_dp.set_constant(0);

@@ -354,15 +354,12 @@ MET Version 13.0.0 Upgrade Instructions
     UGRIDs, previously 0 for every cell, is now derived from the cell area, normalized as
     described in MET `#3448 <https://github.com/dtcenter/MET/issues/3448>`_.
 
-  * Point2Grid output changes for any requested field that has no observations mapped to the
-    output grid. As described in MET `#3297 <https://github.com/dtcenter/MET/issues/3297>`_,
-    such a field was previously written using the data, count and mask values left over from
-    the previously processed field, or as all zeros when it was the first field requested.
-    Each field is now written using its own default output value, which is bad data unless
-    the ``-default_value`` command line option says otherwise, with its count and mask values
-    set to 0. Users who requested multiple ``-field`` options, and whose output contains a
-    field with no observations, should expect that field to change from plausible-looking but
-    incorrect values to the default value.
+  * Point2Grid output changes for any requested field with no observations mapped to the
+    output grid that follows a field that had them. As described in MET
+    `#3297 <https://github.com/dtcenter/MET/issues/3297>`_, such a field was previously
+    written using the preceding field's data, count, and mask values. It is now written
+    using its own default output value, bad data unless the ``-default_value`` option says
+    otherwise, with its count and mask values set to 0.
 
   * Gridded data read from NetCDF files that follow the CF convention and use a polar
     stereographic grid mapping may change. As described in MET
