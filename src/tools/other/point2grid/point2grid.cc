@@ -158,12 +158,12 @@ static void process_point_nccf_file(NcFile *nc_in, VarInfo *,
                                     Met2dDataFile *fr_mtddf,
                                     const Grid &to_grid);
 static void open_nc(const Grid &grid, const ConcatString &run_cs);
-static void write_nc(const DataPlane &dp, const Grid &grid,
+static void write_nc(const DataPlane &dp,
                      const VarInfo *vinfo, const char *vname,
                      bool add_gaussian_atts = false,
                      NcFile *in_goes_nc = nullptr,
                      NcVar *in_var_nc = nullptr);
-static void write_nc_int(const DataPlane &dp, const Grid &grid,
+static void write_nc_int(const DataPlane &dp,
                          const VarInfo *vinfo, const char *vname);
 static void close_nc();
 static void usage(int exit_code=1);
@@ -1018,7 +1018,7 @@ void process_point_met_data(MetPointData *met_point_obs, VarInfo *vinfo,
       }
 
       // Write the regridded data
-      write_nc(to_dp, to_grid, vinfo, vname.c_str());
+      write_nc(to_dp, vinfo, vname.c_str());
 
       ConcatString vname_cnt = vname;
       vname_cnt << "_cnt";
@@ -1031,12 +1031,12 @@ void process_point_met_data(MetPointData *met_point_obs, VarInfo *vinfo,
       ConcatString tmp_long_name = vname_cnt;
       tmp_long_name << dim_string;
       vinfo->set_long_name(tmp_long_name.c_str());
-      write_nc_int(cnt_dp, to_grid, vinfo, vname_cnt.c_str());
+      write_nc_int(cnt_dp, vinfo, vname_cnt.c_str());
 
       tmp_long_name = vname_mask;
       tmp_long_name << dim_string;
       vinfo->set_long_name(tmp_long_name.c_str());
-      write_nc_int(mask_dp, to_grid, vinfo, vname_mask.c_str());
+      write_nc_int(mask_dp, vinfo, vname_mask.c_str());
 
       if (has_prob_thresh || do_gaussian_filter) {
          ConcatString vname_prob = vname;
@@ -1051,13 +1051,13 @@ void process_point_met_data(MetPointData *met_point_obs, VarInfo *vinfo,
          vinfo->set_long_name(tmp_long_name.c_str());
 
          // Write the probability data
-         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str(),
+         write_nc(prob_dp, vinfo, vname_prob.c_str(),
                   do_gaussian_filter);
 
          tmp_long_name = vname_prob_mask;
          tmp_long_name << dim_string;
          vinfo->set_long_name(tmp_long_name.c_str());
-         write_nc_int(prob_mask_dp, to_grid, vinfo, vname_prob_mask.c_str());
+         write_nc_int(prob_mask_dp, vinfo, vname_prob_mask.c_str());
       }
       vinfo->set_long_name(var_long_name.c_str());
 
@@ -1393,7 +1393,7 @@ static void process_point_nccf_file(NcFile *nc_in,
       }
 
       // Write the regridded data
-      write_nc(to_dp, to_grid, vinfo, vname.c_str());
+      write_nc(to_dp, vinfo, vname.c_str());
 
       bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
       if (has_prob_thresh || do_gaussian_filter) {
@@ -1428,7 +1428,7 @@ static void process_point_nccf_file(NcFile *nc_in,
          }
 
          // Write the probability data
-         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str(),
+         write_nc(prob_dp, vinfo, vname_prob.c_str(),
                   do_gaussian_filter);
       }
 
@@ -1618,7 +1618,7 @@ static void open_nc(const Grid &grid, const ConcatString &run_cs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void write_nc(const DataPlane &dp, const Grid &grid,
+static void write_nc(const DataPlane &dp,
                      const VarInfo *vinfo, const char *vname,
                      bool add_gaussian_atts,
                      NcFile *in_goes_nc,
@@ -1671,7 +1671,7 @@ static void write_nc(const DataPlane &dp, const Grid &grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void write_nc_int(const DataPlane &dp, const Grid &grid,
+static void write_nc_int(const DataPlane &dp,
                          const VarInfo *vinfo, const char *vname) {
 
    int deflate_level = compress_level;
@@ -1775,7 +1775,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       NcVar in_goes_var = get_goes_nc_var(nc_in, vinfo->name());
 
       // Write the regridded data
-      write_nc(to_dp, to_grid, vinfo, vname.c_str(),
+      write_nc(to_dp, vinfo, vname.c_str(),
                false, nc_in, &in_goes_var);
 
       bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
@@ -1811,7 +1811,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          }
 
          // Write the probability data
-         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str(),
+         write_nc(prob_dp, vinfo, vname_prob.c_str(),
                   do_gaussian_filter);
       }
 
