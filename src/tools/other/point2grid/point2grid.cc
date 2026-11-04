@@ -149,14 +149,14 @@ static const ConcatString att_name_meanings = "flag_meanings";
 static void process_command_line(int, char **);
 static void process_data_file();
 static void process_point_file(NcFile *nc_in, VarInfo *,
-                               const Grid to_grid);
+                               const Grid &to_grid);
 #ifdef WITH_PYTHON
 static void process_point_python(const string &python_command, VarInfo *vinfo,
-                                 const Grid to_grid, bool use_xarray);
+                                 const Grid &to_grid, bool use_xarray);
 #endif
 static void process_point_nccf_file(NcFile *nc_in, VarInfo *,
                                     Met2dDataFile *fr_mtddf,
-                                    const Grid to_grid);
+                                    const Grid &to_grid);
 static void open_nc(const Grid &grid, const ConcatString run_cs);
 static void write_nc(const DataPlane &dp, const Grid &grid,
                      const VarInfo *vinfo, const char *vname,
@@ -188,7 +188,7 @@ static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
 static int  get_obs_type(NcFile *nc_in);
 static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                                VarInfo *vinfo, DataPlane &fr_dp, DataPlane &to_dp,
-                               Grid to_grid, IntArray *cellMapping);
+                               const Grid &to_grid, IntArray *cellMapping);
 
 static bool keep_message_type(const int mt_index);
 
@@ -211,7 +211,7 @@ static const ConcatString vname_smoke("Smoke");
 static IntArray qc_flags;
 
 static void process_goes_file(NcFile *nc_in, MetConfig &config,
-            VarInfo *, const Grid fr_grid, const Grid to_grid);
+            VarInfo *, const Grid &fr_grid, const Grid &to_grid);
 static unixtime find_valid_time(NcVar time_var);
 static ConcatString get_goes_grid_input(MetConfig &config, const Grid &fr_grid);
 static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid,
@@ -221,10 +221,10 @@ static int  get_lon_count(const NcFile *);
 static NcVar get_goes_nc_var(NcFile *nc, const ConcatString &var_name,
                              bool exit_if_error=true);
 static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp);
-static ConcatString make_geostationary_filename(Grid fr_grid);
+static ConcatString make_geostationary_filename(const Grid &fr_grid);
 static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
             DataPlane &fr_dp, DataPlane &to_dp,
-            Grid fr_grid, Grid to_grid, IntArray *cellMapping, NcFile *nc_adp);
+            const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping, NcFile *nc_adp);
 static void save_geostationary_data(const ConcatString geostationary_file,
             const float *latitudes, const float *longitudes,
             const GoesImagerData &grid_data);
@@ -1120,7 +1120,7 @@ void process_point_met_data(MetPointData *met_point_obs, VarInfo *vinfo,
 ////////////////////////////////////////////////////////////////////////
 
 static void process_point_file(NcFile *nc_in, VarInfo *vinfo,
-                               const Grid to_grid) {
+                               const Grid &to_grid) {
    ConcatString vname;
    clock_t start_clock =  clock();
    static const char *method_name = "process_point_file() -> ";
@@ -1154,7 +1154,7 @@ static void process_point_file(NcFile *nc_in, VarInfo *vinfo,
 #ifdef WITH_PYTHON
 
 static void process_point_python(const string &python_command,
-                                 VarInfo *vinfo, const Grid to_grid, bool use_xarray) {
+                                 VarInfo *vinfo, const Grid &to_grid, bool use_xarray) {
    clock_t start_clock =  clock();
    static const char *method_name = "process_point_python() -> ";
 
@@ -1192,7 +1192,7 @@ static void process_point_python(const string &python_command,
 
 static void process_point_nccf_file(NcFile *nc_in,
                                     VarInfo *vinfo, Met2dDataFile *fr_mtddf,
-                                    const Grid to_grid) {
+                                    const Grid &to_grid) {
    ConcatString vname;
    DataPlane fr_dp, to_dp;
    DataPlane cnt_dp, mask_dp;
@@ -1450,7 +1450,7 @@ static void process_point_nccf_file(NcFile *nc_in,
 
 static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                                VarInfo *vinfo, DataPlane &fr_dp, DataPlane &to_dp,
-                               Grid to_grid, IntArray *cellMapping) {
+                               const Grid &to_grid, IntArray *cellMapping) {
 
    int to_cell_cnt = 0;
    clock_t start_clock = clock();
@@ -1703,7 +1703,7 @@ static void write_nc_int(const DataPlane &dp, const Grid &grid,
 ////////////////////////////////////////////////////////////////////////
 
 static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
-                              const Grid fr_grid, const Grid to_grid) {
+                              const Grid &fr_grid, const Grid &to_grid) {
    DataPlane fr_dp, to_dp;
    ConcatString vname;
    clock_t start_clock =  clock();
@@ -1976,7 +1976,7 @@ static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
 ////////////////////////////////////////////////////////////////////////
 
 static void get_grid_mapping_latlon(
-      DataPlane from_dp, DataPlane to_dp, Grid to_grid,
+      DataPlane from_dp, DataPlane to_dp, const Grid &to_grid,
       IntArray *cellMapping, float *latitudes, float *longitudes,
       int from_lat_count, int from_lon_count, vector<bool> skip_times, bool to_north, bool is_2d) {
    double x;
@@ -2408,7 +2408,7 @@ static NcVar get_goes_nc_var(NcFile *nc, const ConcatString &var_name,
 ////////////////////////////////////////////////////////////////////////
 
 
-static ConcatString make_geostationary_filename(Grid fr_grid) {
+static ConcatString make_geostationary_filename(const Grid &fr_grid) {
    ConcatString geo_data_filename;
    GridInfo info = fr_grid.info();
 
@@ -2470,7 +2470,7 @@ static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp) {
 
 static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
       DataPlane &fr_dp, DataPlane &to_dp,
-      Grid fr_grid, Grid to_grid, IntArray *cellMapping, NcFile *nc_adp) {
+      const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping, NcFile *nc_adp) {
 
    bool has_qc_var = false;
    bool has_adp_qc_var = false;
