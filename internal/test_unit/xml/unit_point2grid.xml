@@ -63,6 +63,7 @@
     </output>
   </test>
 
+  <!-- Request a second field with no observations, written as all bad data -->
   <test name="point2grid_pb2nc_no_obs">
     <exec>&MET_BIN;/point2grid</exec>
     <param> \
@@ -74,9 +75,6 @@
       -v 2
     </param>
     <output>
-      <!-- TP24 is correctly written as all bad data, which the grid_nc check
-           in R_test/mgnc.R rejects, so check only that the file was written.
-           The comp_dir.py truth comparison catches the regression. -->
       <exist>&OUTPUT_DIR;/point2grid/pb2nc_no_obs.nc</exist>
     </output>
   </test>
