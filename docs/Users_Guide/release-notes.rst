@@ -20,6 +20,8 @@ MET Version 12.2.3 Release Notes (TBD)
        (`#3450 <https://github.com/dtcenter/MET/issues/3450>`_).
      * Fix Stat-Analysis CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
        (`#3478 <https://github.com/dtcenter/MET/issues/3478>`_).
+     * **Fix Regrid-Data-Plane and Point2Grid to parse each -field command line option independently**
+       (`#3499 <https://github.com/dtcenter/MET/issues/3499>`_).
 
   .. dropdown:: Repository, build, and test
 
@@ -181,6 +183,16 @@ MET Version 12.2.3 Upgrade Instructions
      `#3478 <https://github.com/dtcenter/MET/issues/3478>`_, these columns were previously
      always zero, so statistics derived from them, such as RMSE, PR_CORR, and ANOM_CORR,
      were incorrect.
+
+   * Output from Regrid-Data-Plane and Point2Grid runs that pass multiple "-field" command
+     line options may change. As described in MET
+     `#3499 <https://github.com/dtcenter/MET/issues/3499>`_, these tools parsed every "-field"
+     string into a single shared configuration object that was never reset between fields, so
+     any setting omitted from a later "-field" silently inherited the value given for an
+     earlier one. Settings such as "convert", "censor_thresh", "censor_val", "set_attr_name",
+     and the "GRIB2_*" record filters were affected. Each "-field" option is now parsed
+     independently. Runs where at least one "-field" set a per-field option that the others
+     did not should be reviewed, since their previous output may have been silently incorrect.
 
 MET Version 12.2.0 Upgrade Instructions
 ---------------------------------------
