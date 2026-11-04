@@ -63,6 +63,24 @@
     </output>
   </test>
 
+  <test name="point2grid_pb2nc_no_obs">
+    <exec>&MET_BIN;/point2grid</exec>
+    <param> \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      "latlon 2 2 48 -88 1 1" \
+      &OUTPUT_DIR;/point2grid/pb2nc_no_obs.nc \
+      -field 'name="TMP"; level="*";' \
+      -field 'name="TP24"; level="*";' \
+      -v 2
+    </param>
+    <output>
+      <!-- TP24 is correctly written as all bad data, which the grid_nc check
+           in R_test/mgnc.R rejects, so check only that the file was written.
+           The comp_dir.py truth comparison catches the regression. -->
+      <exist>&OUTPUT_DIR;/point2grid/pb2nc_no_obs.nc</exist>
+    </output>
+  </test>
+
   <test name="point2grid_pb2nc_TMP">
     <exec>&MET_BIN;/point2grid</exec>
     <param> \

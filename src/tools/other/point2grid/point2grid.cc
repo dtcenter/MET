@@ -984,6 +984,17 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 
       cellMapping.clear();
       cellMapping.resize(nx * ny);
+
+      // Initialize the output fields before checking the grid mapping since
+      // they are written whether or not any observations are found.
+      to_dp.set_constant(bad_data_double);
+      cnt_dp.set_constant(0);
+      mask_dp.set_constant(0);
+      if (has_prob_thresh || do_gaussian_filter) {
+         prob_dp.set_constant(0);
+         prob_mask_dp.set_constant(0);
+      }
+
       if( get_grid_mapping(to_grid, cellMapping.data(), var_index_array,
                            obs_data->obs_hids.data(),
                            hdr_lats.data(), hdr_lons.data()) ) {
@@ -996,15 +1007,6 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          double data_value;
          double from_min_value =  10e10;
          double from_max_value = -10e10;
-
-         // Initialize counter and output fields
-         to_dp.set_constant(bad_data_double);
-         cnt_dp.set_constant(0);
-         mask_dp.set_constant(0);
-         if (has_prob_thresh || do_gaussian_filter) {
-            prob_dp.set_constant(0);
-            prob_mask_dp.set_constant(0);
-         }
 
          for (int x_idx = 0; x_idx<nx; x_idx++) {
             for (int y_idx = 0; y_idx<ny; y_idx++) {
@@ -1078,6 +1080,11 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
                }
             }
          }
+      }
+      else {
+         mlog << Debug(2) << method_name
+              << "no " << vname << " observations were mapped to the output grid, "
+              << "writing the default value (" << na_str << ") for every grid point.\n";
       }
 
       // Write the regridded data

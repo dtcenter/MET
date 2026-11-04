@@ -20,6 +20,8 @@ MET Version 12.2.3 Release Notes (TBD)
        (`#3450 <https://github.com/dtcenter/MET/issues/3450>`_).
      * Fix Stat-Analysis CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
        (`#3478 <https://github.com/dtcenter/MET/issues/3478>`_).
+     * Fix Point2Grid to write the default output value for a field with no observations
+       (`#3519 <https://github.com/dtcenter/MET/issues/3519>`_).
 
   .. dropdown:: Repository, build, and test
 
@@ -181,6 +183,12 @@ MET Version 12.2.3 Upgrade Instructions
      `#3478 <https://github.com/dtcenter/MET/issues/3478>`_, these columns were previously
      always zero, so statistics derived from them, such as RMSE, PR_CORR, and ANOM_CORR,
      were incorrect.
+
+   * Point2Grid output changes for any requested field with no observations mapped to the
+     output grid that follows a field that had them. As described in MET
+     `#3519 <https://github.com/dtcenter/MET/issues/3519>`_, such a field was previously
+     written using the preceding field's data, count, and mask values. It is now written
+     using the default output value of bad data, with its count and mask values set to 0.
 
 MET Version 12.2.0 Upgrade Instructions
 ---------------------------------------
