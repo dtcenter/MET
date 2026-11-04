@@ -25,7 +25,7 @@
 //   005    06-24-24  Halley Gotway  MET #2880 Filter obs_quality.
 //   006    10-21-24  Halley Gotway  MET #3000 Reduce warnings.
 //   007    05/07-25  Halley Gotway  MET #3145 Add OpenMP.
-//   008    11-03-26  Halley Gotway  MET #3499 Parse multiple -field options.
+//   008    11-03-26  Halley Gotway  MET #3499 Fix -field parsing.
 //
 ////////////////////////////////////////////////////////////////////////
 
