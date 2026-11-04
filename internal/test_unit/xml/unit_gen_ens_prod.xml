@@ -49,11 +49,7 @@
     </output>
   </test>
 
-  <!-- MET #3294: EAS with a non-zero eas_prob.vld_thresh, so that the  -->
-  <!-- larger candidate templates cannot be evaluated near a grid edge. -->
-  <!-- Those points were previously written as bad data, discarding the -->
-  <!-- smaller widths which were evaluable: 24 of 26026 points in       -->
-  <!-- UGRD_Z10_ENS_EAS_WIDTH_ltOCDP25, every one of them on the border.-->
+  <!-- MET #3294: EAS with a non-zero eas_prob.vld_thresh -->
 
   <test name="gen_ens_prod_eas_vld_thresh">
     <exec>&MET_BIN;/gen_ens_prod</exec>

@@ -814,8 +814,7 @@ static void track_counts(const GenEnsProdVarInfo *ens_info,
       } // end for i
    } // end if do_nmep
 
-   // Store ensemble data for EAS, along with this member's climatology,
-   // which is re-read per member when MET_ENS_MEMBER_ID is set
+   // Store ensemble data and climatology for EAS
    if(ens_info->nc_info.do_eas || ens_info->nc_info.do_eas_width) {
       ens_eas_dp.emplace_back(ens_dp);
       ens_eas_cmn_dp.emplace_back(cmn_dp);
@@ -1138,8 +1137,7 @@ static void write_eas_nc(GenEnsProdVarInfo *ens_info,
            << " candidate widths (" << write_css(conf_info.eas_prob.width)
            << ").\n";
 
-      // Apply threshold to convert to bitmap, using each member's own
-      // climatology rather than whichever one the member loop left behind
+      // Apply threshold to convert to bitmap using each member's climatology
       vector<DataPlane> ens_thresh_dp;
       for(size_t i_mem=0; i_mem<ens_eas_dp.size(); i_mem++) {
          DataPlane dp(ens_eas_dp[i_mem]);

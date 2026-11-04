@@ -60,9 +60,7 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
          int y;
          width_dp.one_to_two(i, x, y);
 
-         // Track the largest width which could be evaluated here, so that
-         // a point whose larger templates cannot be evaluated still falls
-         // back to a usable result rather than being discarded
+         // Track the largest evaluable width as a fallback
          double vld_prob  = bad_data_double;
          double vld_width = bad_data_double;
 
@@ -75,10 +73,7 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
                                   eas_info.vld_thresh,
                                   x, y, frac_cov_mean);
 
-            // A width which cannot be evaluated, typically because the
-            // template hangs off the grid near an edge, is skipped. Larger
-            // widths may still be evaluable, and smaller ones already
-            // evaluated remain usable as a fallback.
+            // Skip widths which cannot be evaluated, e.g. near an edge
             if(is_bad_data(dist_mean)) continue;
 
             vld_prob  = frac_cov_mean;
@@ -89,8 +84,7 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
 
          } // end for i_eas
 
-         // Store the accepted width, or the largest evaluable one when no
-         // width met alpha. Both remain bad data if none could be evaluated.
+         // Store the accepted or largest evaluable width, if any
          prob_dp.set(vld_prob, x, y);
          width_dp.set(vld_width, x, y);
       } // end for i
