@@ -22,6 +22,8 @@ MET Version 12.2.3 Release Notes (TBD)
        (`#3478 <https://github.com/dtcenter/MET/issues/3478>`_).
      * **Fix Regrid-Data-Plane and Point2Grid to parse each -field command line option independently**
        (`#3499 <https://github.com/dtcenter/MET/issues/3499>`_).
+     * Fix Point2Grid to write the default output value for a field with no observations
+       (`#3519 <https://github.com/dtcenter/MET/issues/3519>`_).
 
   .. dropdown:: Repository, build, and test
 
@@ -193,6 +195,12 @@ MET Version 12.2.3 Upgrade Instructions
      and the "GRIB2_*" record filters were affected. Each "-field" option is now parsed
      independently. Runs where at least one "-field" set a per-field option that the others
      did not should be reviewed, since their previous output may have been silently incorrect.
+
+   * Point2Grid output changes for any requested field with no observations mapped to the
+     output grid that follows a field that had them. As described in MET
+     `#3519 <https://github.com/dtcenter/MET/issues/3519>`_, such a field was previously
+     written using the preceding field's data, count, and mask values. It is now written
+     using the default output value of bad data, with its count and mask values set to 0.
 
 MET Version 12.2.0 Upgrade Instructions
 ---------------------------------------
