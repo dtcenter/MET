@@ -53,6 +53,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3468 <https://github.com/dtcenter/MET/issues/3468>`_).
      * Fix Stat-Analysis CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
        (`#3478 <https://github.com/dtcenter/MET/issues/3478>`_).
+     * **Fix Regrid-Data-Plane and Point2Grid to parse each -field command line option independently**
+       (`#3499 <https://github.com/dtcenter/MET/issues/3499>`_).
 
   .. dropdown:: Repository, build, and test
 
@@ -419,6 +421,15 @@ MET Version 13.0.0 Upgrade Instructions
     such as Lambert conformal, polar stereographic, and Mercator, should check the "standard_name"
     attribute of their wind variables. Setting the "is_grid_relative" configuration option
     overrides the orientation determined from the file.
+
+  * Regrid-Data-Plane and Point2Grid now parse each "-field" command line option independently.
+    Previously these tools parsed every "-field" string into a single shared configuration object,
+    which was never reset between fields, so any setting omitted from a later "-field" silently
+    inherited the value given for an earlier one. Settings such as "convert", "censor_thresh",
+    "censor_val", "set_attr_name", and the "GRIB2_*" record filters were affected. Users who
+    passed multiple "-field" options to either tool, where at least one of them set a per-field
+    option that the others did not, should expect their output to change, and should review any
+    previously generated output for values that silently inherited a neighboring field's settings.
 
   * The "MET_OBS_ERROR_TABLE" environment variable is renamed to "MET_OBS_ERR_TABLE", and the
     default *share/met/table_files/obs_error_table.txt* file is renamed to *obs_err_table.txt*,
