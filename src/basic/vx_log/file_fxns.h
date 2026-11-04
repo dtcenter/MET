@@ -49,6 +49,12 @@ extern DIR *        met_opendir(const char *path);
 
 extern void         met_closedir(DIR * &);
 
+extern int          met_remove(const char *path);
+
+extern int          met_mkdir(const char *path, mode_t mode);
+
+extern bool         is_valid_path(const char *path, const char *caller);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __FILE_FXNS_H__

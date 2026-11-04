@@ -644,7 +644,7 @@ MaskSID parse_sid_mask(const ConcatString &mask_sid_str) {
 
       // Open the mask station id file specified
       ifstream in;
-      in.open(tmp_file.c_str());
+      met_open(in, tmp_file.c_str());
 
       if(!in) {
          mlog << Error << "\n" << method_name

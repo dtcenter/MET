@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include "multivar_frontend.h"
+#include "file_fxns.h"
 #include "mode_usage.h"
 
 #ifdef WITH_PYTHON
@@ -449,7 +450,7 @@ int MultivarFrontEnd::_mkdir(const char *dir) const
          *p = 0;
          string s = tmp;
          if (s != "." &&
-             mkdir(tmp, dir_creation_mode) < 0) {
+             met_mkdir(tmp, dir_creation_mode) < 0) {
             mlog << Error << "\nMultivarFrontEnd::_mkdir() -> "
                  << "Error making " << tmp << "\n";
             return -1;
@@ -457,7 +458,7 @@ int MultivarFrontEnd::_mkdir(const char *dir) const
          *p = '/';
       }
 
-   return mkdir(tmp, dir_creation_mode);
+   return met_mkdir(tmp, dir_creation_mode);
 }
 
 ////////////////////////////////////////////////////////////////////////

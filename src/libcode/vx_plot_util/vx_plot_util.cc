@@ -106,7 +106,7 @@ void draw_map_data(const Grid &gr, const Box &gr_bb, PSfile &p,
    MapRegion r;
 
   
-   in.open(map_data_file);
+   met_open(in, map_data_file);
 
    if(!in) {
       mlog << Error << "\ndraw_map_data() -> unable to open map data file \""

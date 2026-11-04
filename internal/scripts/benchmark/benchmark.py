@@ -291,7 +291,20 @@ def parse_config(path=None, data=None, tag='!ENV'):
     :param str tag: the tag to look for
     """
     # pattern for global vars: look for ${word}
-    pattern = re.compile(r'.*?\${(\w+)}')
+    # PyYAML only calls match(), so map it onto search() rather than
+    # prefixing the pattern with a backtracking ".*?"
+    class SearchPattern:
+
+        def __init__(self, regex):
+            self._regex = regex
+
+        def match(self, value):
+            return self._regex.search(value)
+
+        def findall(self, value):
+            return self._regex.findall(value)
+
+    pattern = SearchPattern(re.compile(r'\$\{(\w+)\}'))
     loader = yaml.SafeLoader
 
     # the tag will be used to mark where to start searching for the pattern
