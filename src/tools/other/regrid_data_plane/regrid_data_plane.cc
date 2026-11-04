@@ -26,7 +26,7 @@
 //   006    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   007    09-29-22  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
 //   008    12-08-25  Halley Gotway  MET #3293 Fix set_attr_grid.
-//   009    11-03-26  Halley Gotway  MET #3499 Parse multiple -field options.
+//   009    11-03-26  Halley Gotway  MET #3499 Fix -field parsing.
 //
 ////////////////////////////////////////////////////////////////////////
 

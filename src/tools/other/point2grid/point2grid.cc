@@ -26,7 +26,7 @@
 //   006    10-21-24  Halley Gotway  MET #3000 Reduce warnings.
 //   007    05-07-25  Halley Gotway  MET #3145 Add OpenMP.
 //   008    12-16-25  Halley Gotway  MET #3297 Add -default_value.
-//   009    11-03-26  Halley Gotway  MET #3499 Parse multiple -field options.
+//   009    11-03-26  Halley Gotway  MET #3499 Fix -field parsing.
 //
 ////////////////////////////////////////////////////////////////////////
 
