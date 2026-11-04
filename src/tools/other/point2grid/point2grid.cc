@@ -25,6 +25,7 @@
 //   005    06-24-24  Halley Gotway  MET #2880 Filter obs_quality.
 //   006    10-21-24  Halley Gotway  MET #3000 Reduce warnings.
 //   007    05/07-25  Halley Gotway  MET #3145 Add OpenMP.
+//   008    11-03-26  Halley Gotway  MET #3499 Fix -field parsing.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -144,14 +145,14 @@ static const ConcatString att_name_meanings = "flag_meanings";
 
 static void process_command_line(int, char **);
 static void process_data_file();
-static void process_point_file(NcFile *nc_in, MetConfig &config,
-                               VarInfo *, const Grid to_grid);
+static void process_point_file(NcFile *nc_in, VarInfo *,
+                               const Grid to_grid);
 #ifdef WITH_PYTHON
-static void process_point_python(const string python_command, MetConfig &config,
-                                 VarInfo *vinfo, const Grid to_grid, bool use_xarray);
+static void process_point_python(const string python_command, VarInfo *vinfo,
+                                 const Grid to_grid, bool use_xarray);
 #endif
-static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
-                                    VarInfo *, Met2dDataFile *fr_mtddf,
+static void process_point_nccf_file(NcFile *nc_in, VarInfo *,
+                                    Met2dDataFile *fr_mtddf,
                                     const Grid to_grid);
 static void open_nc(const Grid &grid, const ConcatString run_cs);
 static void write_nc(const DataPlane &dp, const Grid &grid,
@@ -189,6 +190,7 @@ static bool keep_message_type(const int mt_index);
 
 static bool has_lat_lon_vars(const NcFile *nc_in);
 static void set_adp_gc_values(NcVar var_adp_qc);
+static void set_field_var_info(VarInfo &, int);
 
 ////////////////////////////////////////////////////////////////////////
 // for GOES 16
@@ -207,7 +209,7 @@ static IntArray qc_flags;
 static void process_goes_file(NcFile *nc_in, MetConfig &config,
             VarInfo *, const Grid fr_grid, const Grid to_grid);
 static unixtime find_valid_time(NcVar time_var);
-static ConcatString get_goes_grid_input(MetConfig config, const Grid fr_grid);
+static ConcatString get_goes_grid_input(MetConfig &config, const Grid fr_grid);
 static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid,
                              IntArray *cellMapping, const ConcatString &geostationary_file);
 static int  get_lat_count(const NcFile *);
@@ -336,15 +338,13 @@ static void process_command_line(int argc, char **argv) {
 
    // Check that same variable is required multiple times without -name argument
    if(VarNameSA.n() == 0) {
-      MetConfig config;
       ConcatString vname;
       StringArray var_names;
       VarInfo *vinfo = VarInfoFactory::new_var_info(FileType_NcMet);
       for(int i=0; i<FieldSA.n(); i++) {
          vinfo->clear();
-         // Populate the VarInfo object using the config string
-         config.read_string(FieldSA[i].c_str());
-         vinfo->set_dict(config);
+         // Populate the VarInfo object using the -field config string
+         set_field_var_info(*vinfo, i);
          vname = vinfo->name();
          if (var_names.has(vname)) {
             mlog << Error << "\n" << method_name
@@ -387,11 +387,6 @@ static void process_data_file() {
    ConcatString run_cs;
    auto nc_in = (NcFile *) nullptr;
    static const char *method_name = "process_data_file() -> ";
-
-   // Initialize configuration object
-   MetConfig config;
-   config.read(replace_path(config_const_filename).c_str());
-   config.read_string(FieldSA[0].c_str());
 
    // Note: The command line argument MUST processed before this
    if (compress_level < 0) compress_level = conf_info.conf.nc_compression();
@@ -474,7 +469,13 @@ static void process_data_file() {
    // Build the run command string
    run_cs << "Point obs (" << fr_grid.serialize() << ") to " << to_grid.serialize();
 
+   // Initialize the configuration object used by the GOES logic
+   MetConfig config;
+
    if (goes_data) {
+      config.read(replace_path(config_const_filename).c_str());
+      config.read_string(FieldSA[0].c_str());
+
       mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
       ConcatString grid_string = get_goes_grid_input(config, fr_grid);
       if (!grid_string.empty()) run_cs << " with " << grid_string;
@@ -488,15 +489,15 @@ static void process_data_file() {
       process_goes_file(nc_in, config, vinfo, fr_grid, to_grid);
    }
    else if (TYPE_OBS == obs_type) {
-      process_point_file(nc_in, config, vinfo, to_grid);
+      process_point_file(nc_in, vinfo, to_grid);
    }
    else if (TYPE_NCCF == obs_type) {
-      process_point_nccf_file(nc_in, config, vinfo, fr_mtddf, to_grid);
+      process_point_nccf_file(nc_in, vinfo, fr_mtddf, to_grid);
       unsetenv(nc_att_met_point_nccf);
    }
 #ifdef WITH_PYTHON
    else if (TYPE_PYTHON == obs_type) {
-      process_point_python(python_command, config, vinfo, to_grid, use_xarray);
+      process_point_python(python_command, vinfo, to_grid, use_xarray);
    }
 #endif
    else {
@@ -600,7 +601,6 @@ bool get_nc_data_string_array(NcFile *nc, const char *var_name,
 
 static int get_obs_type(NcFile *nc) {
    int obs_type = TYPE_UNKNOWN;
-   MetConfig config;
    ConcatString att_val_scene_id;
    ConcatString att_val_project;
    ConcatString input_type;
@@ -610,9 +610,8 @@ static int get_obs_type(NcFile *nc) {
    auto vinfo = VarInfoFactory::new_var_info(FileType_NcCF);
    for(int i=0; i<FieldSA.n(); i++) {
       vinfo->clear();
-      // Populate the VarInfo object using the config string
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      // Populate the VarInfo object using the -field config string
+      set_field_var_info(*vinfo, i);
       if (vinfo->grid_attr().is_set()) {
          has_attr_grid = true;
          break;
@@ -716,7 +715,7 @@ std::set<GOES_QC> prepare_qoes_qc_array() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarInfo *vinfo,
+void process_point_met_data(MetPointData *met_point_obs, VarInfo *vinfo,
                             const Grid &to_grid) {
    int hdr_idx;
    int var_idx_or_gc;
@@ -797,9 +796,8 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       // Initialize
       vinfo->clear();
 
-      // Populate the VarInfo object using the config string
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      // Populate the VarInfo object using the -field config string
+      set_field_var_info(*vinfo, i);
 
       // Check the variable name
       ConcatString error_msg;
@@ -1189,7 +1187,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
+static void process_point_file(NcFile *nc_in, VarInfo *vinfo,
                                const Grid to_grid) {
    ConcatString vname;
    clock_t start_clock =  clock();
@@ -1210,7 +1208,7 @@ static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    nc_point_obs.check_nc(GET_NC_NAME_P(nc_in).c_str(), method_name_s);   // exit if missing dims/vars
    // Read all obs data to compute the cell mapping
    nc_point_obs.read_obs_data();
-   process_point_met_data(&nc_point_obs, config, vinfo, to_grid);
+   process_point_met_data(&nc_point_obs, vinfo, to_grid);
 
    nc_point_obs.close();
 
@@ -1223,7 +1221,7 @@ static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
 #ifdef WITH_PYTHON
 
-static void process_point_python(const string python_command, MetConfig &config,
+static void process_point_python(const string python_command,
                                  VarInfo *vinfo, const Grid to_grid, bool use_xarray) {
    clock_t start_clock =  clock();
    static const char *method_name = "process_point_python() -> ";
@@ -1247,7 +1245,7 @@ static void process_point_python(const string python_command, MetConfig &config,
    }
 
    MetPointData *met_point_obs = met_point_file.get_met_point_data();
-   process_point_met_data(met_point_obs, config, vinfo, to_grid);
+   process_point_met_data(met_point_obs, vinfo, to_grid);
 
    met_point_file.close();
 
@@ -1260,7 +1258,7 @@ static void process_point_python(const string python_command, MetConfig &config,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
+static void process_point_nccf_file(NcFile *nc_in,
                                     VarInfo *vinfo, Met2dDataFile *fr_mtddf,
                                     const Grid to_grid) {
    ConcatString vname;
@@ -1307,9 +1305,8 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       auto var_info = VarInfoNcCF(*(VarInfoNcCF *)vinfo);
       // Initialize
       var_info.clear();
-      // Populate the VarInfo object using the config string
-      config.read_string(FieldSA[0].c_str());
-      var_info.set_dict(config);
+      // Populate the VarInfo object using the -field config string
+      set_field_var_info(var_info, 0);
       NcVar var_data = get_nc_var(nc_in, var_info.name().c_str());
       if (get_nc_att_value(&var_data, coordinates_att_name, coordinates_value)) {
          StringArray sa = coordinates_value.split(" ");
@@ -1396,9 +1393,8 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       vinfo->clear();
       var_cell_mapping.clear();
 
-      // Populate the VarInfo object using the config string
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      // Populate the VarInfo object using the -field config string
+      set_field_var_info(*vinfo, i);
 
       NcVar var_data = get_nc_var(nc_in, vinfo->name().c_str());
       ConcatString coordinates_value;
@@ -1807,9 +1803,8 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       // Initialize
       vinfo->clear();
 
-      // Populate the VarInfo object using the config string
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      // Populate the VarInfo object using the -field config string
+      set_field_var_info(*vinfo, i);
 
       to_dp.erase();
       to_dp.set_init(valid_time);
@@ -2245,7 +2240,7 @@ static unixtime find_valid_time(NcVar time_var) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static ConcatString get_goes_grid_input(MetConfig config, const Grid fr_grid) {
+static ConcatString get_goes_grid_input(MetConfig &config, const Grid fr_grid) {
    ConcatString run_string;
    ConcatString env_coord_name;
    ConcatString tmp_dir = config.get_tmp_dir();
@@ -3039,6 +3034,19 @@ static void set_adp_gc_values(NcVar var_adp_qc) {
            << ", medium_confidence = " << adp_qc_medium
            << ", low_confidence = " << adp_qc_low << "\n";
    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void set_field_var_info(VarInfo &vinfo, int i) {
+   MetConfig config;
+
+   // Populate the VarInfo object using the i-th -field config string
+   config.read(replace_path(config_const_filename).c_str());
+   config.read_string(FieldSA[i].c_str());
+   vinfo.set_dict(config);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
