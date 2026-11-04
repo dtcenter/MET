@@ -1311,7 +1311,7 @@ static void process_point_nccf_file(NcFile *nc_in,
                else skip_times[i] = false;
                if (max_time < valid_times[i]) max_time = valid_times[i];
             }
-            valid_time = compute_unixtime(&time_var, max_time);
+            valid_time = compute_unixtime(&time_var, static_cast<unixtime>(max_time));
          }
       }
       else valid_time = find_valid_time(time_var);
@@ -1484,7 +1484,7 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
       for (int yIdx=0; yIdx<from_lat_count; yIdx++) {
          int offset = fr_dp.two_to_one(xIdx,yIdx,is_to_north);
-         from_data[offset] = fr_dp.get(xIdx,yIdx);
+         from_data[offset] = static_cast<float>(fr_dp.get(xIdx,yIdx));
       }
    }
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
@@ -2161,7 +2161,7 @@ static unixtime find_valid_time(NcVar time_var) {
 
       vector<double> time_values(time_count + 2);
       if (get_nc_data(&time_var, time_values.data())) {
-         valid_time = compute_unixtime(&time_var, time_values[0]);
+         valid_time = compute_unixtime(&time_var, static_cast<unixtime>(time_values[0]));
       }
       else {
          mlog << Error << "\n" << method_name
@@ -2571,10 +2571,10 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
    int non_missing_count = 0;
    int qc_filtered_count = 0;
    int adp_qc_filtered_count = 0;
-   float from_min_value =  10e10;
-   float from_max_value = -10e10;
-   float qc_min_value =  10e10;
-   float qc_max_value = -10e10;
+   float from_min_value =  10e10f;
+   float from_max_value = -10e10f;
+   float qc_min_value =  10e10f;
+   float qc_max_value = -10e10f;
    IntArray cellArray;
    NumArray dataArray;
    bool has_qc_flags = (qc_flags.n() > 0);
@@ -2621,7 +2621,7 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
                for(int i=0; i<vinfo->censor_thresh().n(); i++) {
                   // Break out after the first match.
                   if(vinfo->censor_thresh()[i].check(data_value)) {
-                     data_value = vinfo->censor_val()[i];
+                     data_value = static_cast<float>(vinfo->censor_val()[i]);
                      break;
                   }
                }
