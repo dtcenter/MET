@@ -38,7 +38,7 @@ censor_val    = [];
 power_spectrum = {
    missing_flag  = MEAN;
    missing_value = 0.0;
-   vld_thresh    = 0.40;
+   vld_thresh    = 0.38;
 }
 
 //
