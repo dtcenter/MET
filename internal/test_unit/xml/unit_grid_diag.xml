@@ -198,28 +198,79 @@
     </output>
   </test>
 
-  <!-- MET #3304: Kinetic energy power spectrum with missing wind data.  -->
-  <!-- The first field censors low wind speeds to bad data. The missing  -->
-  <!-- values were previously replaced only in the scalar plane, while   -->
-  <!-- the transform ran on the unfilled u and v planes, so the kinetic  -->
-  <!-- energy spectrum was computed over -9999 and came back roughly a   -->
-  <!-- million times too large.                                          -->
+  <!-- MET #3304: Kinetic energy power spectrum with missing data.       -->
+  <!-- The first field sets a censor threshold which is applied to the    -->
+  <!-- kinetic energy field and, because it is carried into the component -->
+  <!-- lookup, to the U and V winds as well. Missing values were          -->
+  <!-- previously replaced only in the scalar plane while the transform   -->
+  <!-- ran on the unfilled U and V planes, so the kinetic energy spectrum -->
+  <!-- was computed over -9999 and came back roughly a million times too  -->
+  <!-- large. This case uses missing_flag = VALUE.                        -->
 
   <test name="grid_diag_KENG_missing_wind">
-    <exec>&MET_BIN;/grid_diag</exec>
+    <exec>echo "&DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F006.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F018.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2" \
+                > &OUTPUT_DIR;/grid_diag/keng_missing_fcst_file_list; \
+          echo "&DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_0600_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1800_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2" \
+                > &OUTPUT_DIR;/grid_diag/keng_missing_anly_file_list; \
+         &MET_BIN;/grid_diag</exec>
     <env>
       <pair><name>FIELD1</name> <value>name = "KENG"; level = "Z10"; n_bins = 140; range = [0,140]; censor_thresh = [&lt;0.6]; censor_val = [-9999];</value></pair>
       <pair><name>FIELD2</name> <value>name = "KENG"; level = "Z10"; n_bins = 140; range = [0,140];</value></pair>
     </env>
     <param> \
-      -data &OUTPUT_DIR;/grid_diag/keng_fcst_file_list \
-      -data &OUTPUT_DIR;/grid_diag/keng_anly_file_list \
+      -data &OUTPUT_DIR;/grid_diag/keng_missing_fcst_file_list \
+      -data &OUTPUT_DIR;/grid_diag/keng_missing_anly_file_list \
       -config &CONFIG_DIR;/GridDiagConfig_KENG_MISSING \
       -out &OUTPUT_DIR;/grid_diag/grid_diag_KENG_Z10_missing.nc \
       -v 3
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_KENG_Z10_missing.nc</grid_nc>
+    </output>
+  </test>
+
+  <!-- MET #3304: Kinetic energy power spectrum with missing data, where  -->
+  <!-- the valid data ratio clears vld_thresh at some times but not       -->
+  <!-- others. The threshold of 0.40 sits between the U component valid   -->
+  <!-- ratios of the four times (0.4061, 0.3901, 0.3889, 0.3889), so the  -->
+  <!-- first field contributes one time of four. It exercises the three   -->
+  <!-- behaviours a sticky skip flag used to hide: the variable is still  -->
+  <!-- written, the mean divides by the contributing count rather than    -->
+  <!-- the series length, and n_series_used records the count. This case  -->
+  <!-- uses missing_flag = MEAN, so each plane is filled with its own     -->
+  <!-- mean.                                                              -->
+
+  <test name="grid_diag_KENG_partial_skip">
+    <exec>echo "&DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F006.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F018.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2" \
+                > &OUTPUT_DIR;/grid_diag/keng_skip_fcst_file_list; \
+          echo "&DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_0600_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1800_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2" \
+                > &OUTPUT_DIR;/grid_diag/keng_skip_anly_file_list; \
+         &MET_BIN;/grid_diag</exec>
+    <env>
+      <pair><name>FIELD1</name> <value>name = "KENG"; level = "Z10"; n_bins = 140; range = [0,140]; censor_thresh = [&lt;0.6]; censor_val = [-9999];</value></pair>
+      <pair><name>FIELD2</name> <value>name = "KENG"; level = "Z10"; n_bins = 140; range = [0,140];</value></pair>
+    </env>
+    <param> \
+      -data &OUTPUT_DIR;/grid_diag/keng_skip_fcst_file_list \
+      -data &OUTPUT_DIR;/grid_diag/keng_skip_anly_file_list \
+      -config &CONFIG_DIR;/GridDiagConfig_KENG_SKIP \
+      -out &OUTPUT_DIR;/grid_diag/grid_diag_KENG_Z10_skip.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_KENG_Z10_skip.nc</grid_nc>
     </output>
   </test>
 

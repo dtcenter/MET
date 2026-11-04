@@ -563,32 +563,45 @@ static std::vector<bool> prepare_power_spectrum_data(vector<InputDataInfo> &in_d
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       const PowerSpectrumInfo *ps_ptr = &conf_info.ps_info[i_var];
+      const ConcatString magic_cs(conf_info.data_info[i_var]->magic_str_attr());
 
       // Check each plane this entry may be transformed from:
       // u_dp and v_dp for kinetic energy, dp when paired with a scalar
       vector<DataPlane *> dp_list;
+      vector<ConcatString> dp_name;
       dp_list.push_back(&in_data[i_var].dp);
+      dp_name.push_back(magic_cs);
       if(in_data[i_var].uv_flag) {
+         ConcatString u_cs(magic_cs);
+         ConcatString v_cs(magic_cs);
+         u_cs << " U";
+         v_cs << " V";
          dp_list.push_back(&in_data[i_var].u_dp);
+         dp_name.push_back(u_cs);
          dp_list.push_back(&in_data[i_var].v_dp);
+         dp_name.push_back(v_cs);
       }
 
-      // Skip the entry if any of its planes falls below the threshold
-      for(const auto *cur_dp : dp_list) {
+      // Count valid data once per plane
+      vector<int> n_vld_list;
+      for(const auto *cur_dp : dp_list) n_vld_list.push_back(cur_dp->n_good_data());
 
-         int nxy = cur_dp->nxy();
-         int n_vld = cur_dp->n_good_data();
+      // Skip the entry if any of its planes falls below the threshold
+      for(size_t i=0; i<dp_list.size(); i++) {
+
+         int nxy = dp_list[i]->nxy();
+         int n_vld = n_vld_list[i];
 
          if(n_vld == nxy) continue;
 
          if(ps_ptr->missing_flag == MissingDataType::None ||
             (double) n_vld/nxy < ps_ptr->vld_thresh) {
 
-            mlog << Warning << "\nprepare_power_spectrum_data() -> "
-                 << "Skipping the "
-                 << conf_info.data_info[i_var]->magic_str_attr()
-                 << " power spectrum for this time due to missing data ("
-                 << n_vld << " of " << nxy << " valid).\n\n";
+            mlog << Debug(3) << "Skipping " << dp_name[i]
+                 << " power spectrum for "
+                 << unix_to_yyyymmdd_hhmmss(dp_list[i]->valid())
+                 << " due to missing data (" << n_vld << " of "
+                 << nxy << " valid).\n";
             skip[i_var] = true;
             break;
          }
@@ -597,9 +610,9 @@ static std::vector<bool> prepare_power_spectrum_data(vector<InputDataInfo> &in_d
       if(skip[i_var]) continue;
 
       // Replace missing data in each plane, using that plane's own mean
-      for(auto *cur_dp : dp_list) {
+      for(size_t i=0; i<dp_list.size(); i++) {
 
-         if(cur_dp->n_good_data() == cur_dp->nxy()) continue;
+         if(n_vld_list[i] == dp_list[i]->nxy()) continue;
 
          // Initialize to the config file value
          double fill;
@@ -607,7 +620,7 @@ static std::vector<bool> prepare_power_spectrum_data(vector<InputDataInfo> &in_d
 
          // Replace with the mean of the field
          if(ps_ptr->missing_flag == MissingDataType::Mean) {
-            fill = cur_dp->mean();
+            fill = dp_list[i]->mean();
             desc = "mean";
          }
          // Use config file value
@@ -616,11 +629,10 @@ static std::vector<bool> prepare_power_spectrum_data(vector<InputDataInfo> &in_d
             desc = "constant";
          }
 
-         mlog << Debug(3) << "Replacing "
-              << conf_info.data_info[i_var]->magic_str_attr()
+         mlog << Debug(3) << "Replacing " << dp_name[i]
               << " power spectrum missing data with a " << desc
               << " value of " << fill << ".\n";
-         cur_dp->replace_bad_data(fill);
+         dp_list[i]->replace_bad_data(fill);
       }
    } // end for i_var
 
@@ -1458,19 +1470,29 @@ static void write_power_spectrum(void) {
    // Define and write the power spectrum
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      // Skip only a variable which contributed no series at all
-      if(power_info[i_var].n_power == 0) {
-         mlog << Warning << "\nwrite_power_spectrum() -> "
-              << "Omitting the "
-              << conf_info.data_info[i_var]->magic_str_attr()
-              << " power spectrum because every time was skipped.\n\n";
-         continue;
-      }
-
+      const int n_used = power_info[i_var].n_power;
       const VarInfo *i_vinfo = conf_info.data_info[i_var].get();
 
       // Define NetCDF variable name
       ConcatString var_str(get_nc_var_str(i_vinfo, i_var+1));
+
+      // Skip only a variable which contributed no series at all
+      if(n_used == 0) {
+         mlog << Warning << "\nwrite_power_spectrum() -> "
+              << "Omitting the " << var_str << " power spectrum because all "
+              << n_series << " times were skipped due to missing data.\n\n";
+         continue;
+      }
+
+      // Report a mean which covers fewer times than the series length
+      if(n_used < n_series) {
+         mlog << Warning << "\nwrite_power_spectrum() -> "
+              << "The " << var_str << " power spectrum is a mean over "
+              << n_used << " of " << n_series << " times; "
+              << n_series - n_used
+              << " were skipped due to missing data.\n\n";
+      }
+
       ConcatString var_name("power_spectrum_");
       var_name << var_str;
 
@@ -1485,13 +1507,13 @@ static void write_power_spectrum(void) {
       units_cs << i_vinfo->units_attr() << ")^2";
       add_var_data_atts(&var, cs, i_vinfo->level_attr(), units_cs);
       add_var_att_local(&var, "mask", full_domain_str);
+      add_att(&var, "n_series_used", n_used);
 
       // Write power spectrum
       PowerInfo *p_diag = &power_info[i_var];
 
-      // Divide sums by the number of series which contributed, which is
-      // not the series length when the variable was skipped for some times
-      for(auto &x : p_diag->power) x /= p_diag->n_power;
+      // Divide sums by the number of series which contributed
+      for(auto &x : p_diag->power) x /= n_used;
 
       // Write the mean power data
       var.putVar(p_diag->power.data());
@@ -1510,14 +1532,32 @@ static void write_error_power_spectrum(void) {
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-         // Skip only a pair which contributed no series at all
-         if(power_info[i_var].n_error_power[j_var] == 0) continue;
+         const int n_used = power_info[i_var].n_error_power[j_var];
 
          const VarInfo *j_vinfo = conf_info.data_info[j_var].get();
 
          // Define NetCDF variable name
          ConcatString i_var_str(get_nc_var_str(i_vinfo, i_var+1));
          ConcatString j_var_str(get_nc_var_str(j_vinfo, j_var+1));
+
+         // Skip only a pair which contributed no series at all
+         if(n_used == 0) {
+            mlog << Warning << "\nwrite_error_power_spectrum() -> "
+                 << "Omitting the " << i_var_str << " and " << j_var_str
+                 << " error power spectrum because all " << n_series
+                 << " times were skipped due to missing data.\n\n";
+            continue;
+         }
+
+         // Report a mean which covers fewer times than the series length
+         if(n_used < n_series) {
+            mlog << Warning << "\nwrite_error_power_spectrum() -> "
+                 << "The " << i_var_str << " and " << j_var_str
+                 << " error power spectrum is a mean over " << n_used
+                 << " of " << n_series << " times; " << n_series - n_used
+                 << " were skipped due to missing data.\n\n";
+         }
+
          ConcatString var_name("error_power_spectrum_");
          var_name << i_var_str << "_" << j_var_str;
 
@@ -1539,12 +1579,13 @@ static void write_error_power_spectrum(void) {
          cs << i_var_str << " minus " << j_var_str;
          add_var_data_atts(&var, cs, level_cs, units_cs);
          add_var_att_local(&var, "mask", full_domain_str);
+         add_att(&var, "n_series_used", n_used);
 
          // Write power spectrum
          PowerInfo *p_diag = &power_info[i_var];
 
-         // Divide sums by the series length
-         for(auto &x : p_diag->error_power[j_var]) x /= p_diag->n_error_power[j_var];
+         // Divide sums by the number of series which contributed
+         for(auto &x : p_diag->error_power[j_var]) x /= n_used;
 
          // Write the mean error power
          var.putVar(p_diag->error_power[j_var].data());
