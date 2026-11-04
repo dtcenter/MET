@@ -151,7 +151,7 @@ static void process_data_file();
 static void process_point_file(NcFile *nc_in, VarInfo *,
                                const Grid to_grid);
 #ifdef WITH_PYTHON
-static void process_point_python(const string python_command, VarInfo *vinfo,
+static void process_point_python(const string &python_command, VarInfo *vinfo,
                                  const Grid to_grid, bool use_xarray);
 #endif
 static void process_point_nccf_file(NcFile *nc_in, VarInfo *,
@@ -213,7 +213,7 @@ static IntArray qc_flags;
 static void process_goes_file(NcFile *nc_in, MetConfig &config,
             VarInfo *, const Grid fr_grid, const Grid to_grid);
 static unixtime find_valid_time(NcVar time_var);
-static ConcatString get_goes_grid_input(MetConfig &config, const Grid fr_grid);
+static ConcatString get_goes_grid_input(MetConfig &config, const Grid &fr_grid);
 static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid,
                              IntArray *cellMapping, const ConcatString &geostationary_file);
 static int  get_lat_count(const NcFile *);
@@ -1153,7 +1153,7 @@ static void process_point_file(NcFile *nc_in, VarInfo *vinfo,
 
 #ifdef WITH_PYTHON
 
-static void process_point_python(const string python_command,
+static void process_point_python(const string &python_command,
                                  VarInfo *vinfo, const Grid to_grid, bool use_xarray) {
    clock_t start_clock =  clock();
    static const char *method_name = "process_point_python() -> ";
@@ -2182,7 +2182,7 @@ static unixtime find_valid_time(NcVar time_var) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static ConcatString get_goes_grid_input(MetConfig &config, const Grid fr_grid) {
+static ConcatString get_goes_grid_input(MetConfig &config, const Grid &fr_grid) {
    ConcatString run_string;
    ConcatString env_coord_name;
    ConcatString tmp_dir = config.get_tmp_dir();
