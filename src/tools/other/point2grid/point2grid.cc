@@ -1367,7 +1367,7 @@ static void process_point_nccf_file(NcFile *nc_in,
       to_dp.set_valid(valid_time);
       to_dp.set_constant(DefaultValueNA[i]);
       regrid_nc_variable(nc_in, fr_mtddf, vinfo, fr_dp, to_dp, to_grid,
-                         (var_cell_mapping.size() > 0 ?
+                         (!var_cell_mapping.empty() ?
                           var_cell_mapping.data() :
                           cellMapping.data()));
 
@@ -2006,7 +2006,7 @@ static void get_grid_mapping_latlon(
          int coord_offset = from_dp.two_to_one(xIdx, yIdx, to_north);
          if (is_2d) {
             lon_offset = lat_offset = coord_offset;
-            if( skip_times.size() > 0 && skip_times[coord_offset] ) continue;
+            if( !skip_times.empty() && skip_times[coord_offset] ) continue;
          }
          float lat = latitudes[lat_offset];
          float lon = longitudes[lon_offset];
