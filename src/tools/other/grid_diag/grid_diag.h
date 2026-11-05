@@ -148,9 +148,7 @@ struct PowerInfo {
    std::vector<double> power;
    std::map<int, std::vector<double> > error_power;
 
-   // Number of series which contributed to each sum. A variable can be
-   // skipped for some times and not others, so the mean must divide by
-   // the number actually accumulated rather than the series length.
+   // Number of series which contributed to each sum
    int n_power = 0;
    std::map<int, int> n_error_power;
 };

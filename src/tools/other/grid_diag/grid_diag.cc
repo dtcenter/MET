@@ -1523,7 +1523,9 @@ static void write_power_spectrum(void) {
       PowerInfo *p_diag = &power_info[i_var];
 
       // Divide by the contributing count
-      for(auto &x : p_diag->power) x /= n_used;
+      for(auto &x : p_diag->power) {
+         if(!is_bad_data(x)) x /= n_used;
+      }
 
       // Write the mean power data
       var.putVar(p_diag->power.data());
@@ -1594,7 +1596,9 @@ static void write_error_power_spectrum(void) {
          PowerInfo *p_diag = &power_info[i_var];
 
          // Divide by the contributing count
-         for(auto &x : p_diag->error_power[j_var]) x /= n_used;
+         for(auto &x : p_diag->error_power[j_var]) {
+            if(!is_bad_data(x)) x /= n_used;
+         }
 
          // Write the mean error power
          var.putVar(p_diag->error_power[j_var].data());
