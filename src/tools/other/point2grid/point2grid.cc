@@ -26,6 +26,7 @@
 //   006    10-21-24  Halley Gotway  MET #3000 Reduce warnings.
 //   007    05-07-25  Halley Gotway  MET #3145 Add OpenMP.
 //   008    12-16-25  Halley Gotway  MET #3297 Add -default_value.
+//   009    11-03-26  Halley Gotway  MET #3499 Fix -field parsing.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -147,22 +148,22 @@ static const ConcatString att_name_meanings = "flag_meanings";
 
 static void process_command_line(int, char **);
 static void process_data_file();
-static void process_point_file(NcFile *nc_in, MetConfig &config,
-                               VarInfo *, const Grid to_grid);
+static void process_point_file(NcFile *nc_in, VarInfo *,
+                               const Grid &to_grid);
 #ifdef WITH_PYTHON
-static void process_point_python(const string python_command, MetConfig &config,
-                                 VarInfo *vinfo, const Grid to_grid, bool use_xarray);
+static void process_point_python(const string &python_command, VarInfo *vinfo,
+                                 const Grid &to_grid, bool use_xarray);
 #endif
-static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
-                                    VarInfo *, Met2dDataFile *fr_mtddf,
-                                    const Grid to_grid);
-static void open_nc(const Grid &grid, const ConcatString run_cs);
-static void write_nc(const DataPlane &dp, const Grid &grid,
+static void process_point_nccf_file(NcFile *nc_in, VarInfo *,
+                                    Met2dDataFile *fr_mtddf,
+                                    const Grid &to_grid);
+static void open_nc(const Grid &grid, const ConcatString &run_cs);
+static void write_nc(const DataPlane &dp,
                      const VarInfo *vinfo, const char *vname,
                      bool add_gaussian_atts = false,
                      NcFile *in_goes_nc = nullptr,
                      NcVar *in_var_nc = nullptr);
-static void write_nc_int(const DataPlane &dp, const Grid &grid,
+static void write_nc_int(const DataPlane &dp,
                          const VarInfo *vinfo, const char *vname);
 static void close_nc();
 static void usage(int exit_code=1);
@@ -180,19 +181,20 @@ static void set_gaussian_radius(const StringArray &);
 
 static unixtime compute_unixtime(NcVar *time_var, unixtime var_value);
 static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping,
-                             NcVar var_lat, NcVar var_lon, vector<bool> skip_times);
+                             NcVar var_lat, NcVar var_lon, const vector<bool> &skip_times);
 static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
                              const IntArray obs_index_array, const int *obs_hids,
                              const float *hdr_lats, const float *hdr_lons);
 static int  get_obs_type(NcFile *nc_in);
 static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                                VarInfo *vinfo, DataPlane &fr_dp, DataPlane &to_dp,
-                               Grid to_grid, IntArray *cellMapping);
+                               const Grid &to_grid, const IntArray *cellMapping);
 
 static bool keep_message_type(const int mt_index);
 
 static bool has_lat_lon_vars(const NcFile *nc_in);
 static void set_adp_gc_values(NcVar var_adp_qc);
+static void set_field_var_info(VarInfo &, int);
 
 ////////////////////////////////////////////////////////////////////////
 // for GOES 16
@@ -209,21 +211,21 @@ static const ConcatString vname_smoke("Smoke");
 static IntArray qc_flags;
 
 static void process_goes_file(NcFile *nc_in, MetConfig &config,
-            VarInfo *, const Grid fr_grid, const Grid to_grid);
+            VarInfo *, const Grid &fr_grid, const Grid &to_grid);
 static unixtime find_valid_time(NcVar time_var);
-static ConcatString get_goes_grid_input(MetConfig config, const Grid fr_grid);
+static ConcatString get_goes_grid_input(MetConfig &config, const Grid &fr_grid);
 static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid,
                              IntArray *cellMapping, const ConcatString &geostationary_file);
 static int  get_lat_count(const NcFile *);
 static int  get_lon_count(const NcFile *);
 static NcVar get_goes_nc_var(NcFile *nc, const ConcatString &var_name,
                              bool exit_if_error=true);
-static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp);
-static ConcatString make_geostationary_filename(Grid fr_grid);
+static bool is_time_mismatch(const NcFile *nc_in, const NcFile *nc_adp);
+static ConcatString make_geostationary_filename(const Grid &fr_grid);
 static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
             DataPlane &fr_dp, DataPlane &to_dp,
-            Grid fr_grid, Grid to_grid, IntArray *cellMapping, NcFile *nc_adp);
-static void save_geostationary_data(const ConcatString geostationary_file,
+            const Grid &fr_grid, const Grid &to_grid, const IntArray *cellMapping, NcFile *nc_adp);
+static void save_geostationary_data(const ConcatString &geostationary_file,
             const float *latitudes, const float *longitudes,
             const GoesImagerData &grid_data);
 static void set_goes_qc_flags(const StringArray &);
@@ -356,7 +358,6 @@ static void process_command_line(int argc, char **argv) {
 
    // Check that same variable is required multiple times without -name argument
    if(VarNameSA.n() == 0) {
-      MetConfig config;
       ConcatString vname;
       StringArray var_names;
       auto vinfo = VarInfoFactory::new_var_info(FileType_NcMet);
@@ -365,10 +366,8 @@ static void process_command_line(int argc, char **argv) {
          // Initialize
          vinfo->clear();
 
-         // Populate the VarInfo object using the config string
-         config.read(replace_path(config_const_filename).c_str());
-         config.read_string(FieldSA[i].c_str());
-         vinfo->set_dict(config);
+         // Populate the VarInfo object using the -field config string
+         set_field_var_info(*vinfo, i);
 
          vname = vinfo->name();
          if (var_names.has(vname)) {
@@ -411,11 +410,6 @@ static void process_data_file() {
    ConcatString run_cs;
    std::unique_ptr<netCDF::NcFile> nc_in;
    static const char *method_name = "process_data_file() -> ";
-
-   // Initialize configuration object
-   MetConfig config;
-   config.read(replace_path(config_const_filename).c_str());
-   config.read_string(FieldSA[0].c_str());
 
    // Note: The command line argument MUST processed before this
    if (compress_level < 0) compress_level = conf_info.conf.nc_compression();
@@ -498,7 +492,13 @@ static void process_data_file() {
    // Build the run command string
    run_cs << "Point obs (" << fr_grid.serialize() << ") to " << to_grid.serialize();
 
+   // Initialize the configuration object used by the GOES logic
+   MetConfig config;
+
    if (goes_data) {
+      config.read(replace_path(config_const_filename).c_str());
+      config.read_string(FieldSA[0].c_str());
+
       mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
       ConcatString grid_string = get_goes_grid_input(config, fr_grid);
       if (!grid_string.empty()) run_cs << " with " << grid_string;
@@ -512,15 +512,15 @@ static void process_data_file() {
       process_goes_file(nc_in.get(), config, vinfo.get(), fr_grid, to_grid);
    }
    else if (TYPE_OBS == obs_type) {
-      process_point_file(nc_in.get(), config, vinfo.get(), to_grid);
+      process_point_file(nc_in.get(), vinfo.get(), to_grid);
    }
    else if (TYPE_NCCF == obs_type) {
-      process_point_nccf_file(nc_in.get(), config, vinfo.get(), fr_mtddf.get(), to_grid);
+      process_point_nccf_file(nc_in.get(), vinfo.get(), fr_mtddf.get(), to_grid);
       unsetenv(nc_att_met_point_nccf);
    }
 #ifdef WITH_PYTHON
    else if (TYPE_PYTHON == obs_type) {
-      process_point_python(python_command, config, vinfo.get(), to_grid, use_xarray);
+      process_point_python(python_command, vinfo.get(), to_grid, use_xarray);
    }
 #endif
    else {
@@ -544,7 +544,6 @@ static void process_data_file() {
 
 static int get_obs_type(NcFile *nc) {
    int obs_type = TYPE_UNKNOWN;
-   MetConfig config;
    ConcatString att_val_scene_id;
    ConcatString att_val_project;
    ConcatString input_type;
@@ -557,10 +556,8 @@ static int get_obs_type(NcFile *nc) {
       // Initialize
       vinfo->clear();
 
-      // Populate the VarInfo object using the config string
-      config.read(replace_path(config_const_filename).c_str());
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      // Populate the VarInfo object using the -field config string
+      set_field_var_info(*vinfo, i);
 
       if (vinfo->grid_attr().is_set()) {
          has_attr_grid = true;
@@ -664,7 +661,7 @@ std::set<GOES_QC> prepare_qoes_qc_array() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarInfo *vinfo,
+void process_point_met_data(MetPointData *met_point_obs, VarInfo *vinfo,
                             const Grid &to_grid) {
    int hdr_idx;
    int var_idx_or_gc;
@@ -742,10 +739,8 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       // Initialize
       vinfo->clear();
 
-      // Populate the VarInfo object using the config string
-      config.read(replace_path(config_const_filename).c_str());
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      // Populate the VarInfo object using the -field config string
+      set_field_var_info(*vinfo, i);
 
       // Check the variable name
       ConcatString error_msg;
@@ -1023,7 +1018,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       }
 
       // Write the regridded data
-      write_nc(to_dp, to_grid, vinfo, vname.c_str());
+      write_nc(to_dp, vinfo, vname.c_str());
 
       ConcatString vname_cnt = vname;
       vname_cnt << "_cnt";
@@ -1036,12 +1031,12 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       ConcatString tmp_long_name = vname_cnt;
       tmp_long_name << dim_string;
       vinfo->set_long_name(tmp_long_name.c_str());
-      write_nc_int(cnt_dp, to_grid, vinfo, vname_cnt.c_str());
+      write_nc_int(cnt_dp, vinfo, vname_cnt.c_str());
 
       tmp_long_name = vname_mask;
       tmp_long_name << dim_string;
       vinfo->set_long_name(tmp_long_name.c_str());
-      write_nc_int(mask_dp, to_grid, vinfo, vname_mask.c_str());
+      write_nc_int(mask_dp, vinfo, vname_mask.c_str());
 
       if (has_prob_thresh || do_gaussian_filter) {
          ConcatString vname_prob = vname;
@@ -1056,13 +1051,13 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          vinfo->set_long_name(tmp_long_name.c_str());
 
          // Write the probability data
-         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str(),
+         write_nc(prob_dp, vinfo, vname_prob.c_str(),
                   do_gaussian_filter);
 
          tmp_long_name = vname_prob_mask;
          tmp_long_name << dim_string;
          vinfo->set_long_name(tmp_long_name.c_str());
-         write_nc_int(prob_mask_dp, to_grid, vinfo, vname_prob_mask.c_str());
+         write_nc_int(prob_mask_dp, vinfo, vname_prob_mask.c_str());
       }
       vinfo->set_long_name(var_long_name.c_str());
 
@@ -1124,8 +1119,8 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
-                               const Grid to_grid) {
+static void process_point_file(NcFile *nc_in, VarInfo *vinfo,
+                               const Grid &to_grid) {
    ConcatString vname;
    clock_t start_clock =  clock();
    static const char *method_name = "process_point_file() -> ";
@@ -1145,7 +1140,7 @@ static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    nc_point_obs.check_nc(GET_NC_NAME_P(nc_in).c_str(), method_name_s);   // exit if missing dims/vars
    // Read all obs data to compute the cell mapping
    nc_point_obs.read_obs_data();
-   process_point_met_data(&nc_point_obs, config, vinfo, to_grid);
+   process_point_met_data(&nc_point_obs, vinfo, to_grid);
 
    nc_point_obs.close();
 
@@ -1158,8 +1153,8 @@ static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
 #ifdef WITH_PYTHON
 
-static void process_point_python(const string python_command, MetConfig &config,
-                                 VarInfo *vinfo, const Grid to_grid, bool use_xarray) {
+static void process_point_python(const string &python_command,
+                                 VarInfo *vinfo, const Grid &to_grid, bool use_xarray) {
    clock_t start_clock =  clock();
    static const char *method_name = "process_point_python() -> ";
 
@@ -1182,7 +1177,7 @@ static void process_point_python(const string python_command, MetConfig &config,
    }
 
    MetPointData *met_point_obs = met_point_file.get_met_point_data();
-   process_point_met_data(met_point_obs, config, vinfo, to_grid);
+   process_point_met_data(met_point_obs, vinfo, to_grid);
 
    met_point_file.close();
 
@@ -1195,9 +1190,9 @@ static void process_point_python(const string python_command, MetConfig &config,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
+static void process_point_nccf_file(NcFile *nc_in,
                                     VarInfo *vinfo, Met2dDataFile *fr_mtddf,
-                                    const Grid to_grid) {
+                                    const Grid &to_grid) {
    ConcatString vname;
    DataPlane fr_dp, to_dp;
    DataPlane cnt_dp, mask_dp;
@@ -1244,10 +1239,8 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       // Initialize
       var_info.clear();
 
-      // Populate the VarInfo object using the config string
-      config.read(replace_path(config_const_filename).c_str());
-      config.read_string(FieldSA[0].c_str());
-      var_info.set_dict(config);
+      // Populate the VarInfo object using the -field config string
+      set_field_var_info(var_info, 0);
 
       NcVar var_data = get_nc_var(nc_in, var_info.name().c_str());
       if (get_nc_att_value(&var_data, coordinates_att_name, coordinates_value)) {
@@ -1318,7 +1311,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
                else skip_times[i] = false;
                if (max_time < valid_times[i]) max_time = valid_times[i];
             }
-            valid_time = compute_unixtime(&time_var, max_time);
+            valid_time = compute_unixtime(&time_var, static_cast<unixtime>(max_time));
          }
       }
       else valid_time = find_valid_time(time_var);
@@ -1335,10 +1328,8 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       vinfo->clear();
       var_cell_mapping.clear();
 
-      // Populate the VarInfo object using the config string
-      config.read(replace_path(config_const_filename).c_str());
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      // Populate the VarInfo object using the -field config string
+      set_field_var_info(*vinfo, i);
 
       NcVar var_data = get_nc_var(nc_in, vinfo->name().c_str());
       ConcatString coordinates_value;
@@ -1376,7 +1367,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       to_dp.set_valid(valid_time);
       to_dp.set_constant(DefaultValueNA[i]);
       regrid_nc_variable(nc_in, fr_mtddf, vinfo, fr_dp, to_dp, to_grid,
-                         (var_cell_mapping.size() > 0 ?
+                         (!var_cell_mapping.empty() ?
                           var_cell_mapping.data() :
                           cellMapping.data()));
 
@@ -1402,7 +1393,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       }
 
       // Write the regridded data
-      write_nc(to_dp, to_grid, vinfo, vname.c_str());
+      write_nc(to_dp, vinfo, vname.c_str());
 
       bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
       if (has_prob_thresh || do_gaussian_filter) {
@@ -1437,7 +1428,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
          }
 
          // Write the probability data
-         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str(),
+         write_nc(prob_dp, vinfo, vname_prob.c_str(),
                   do_gaussian_filter);
       }
 
@@ -1459,7 +1450,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
 
 static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                                VarInfo *vinfo, DataPlane &fr_dp, DataPlane &to_dp,
-                               Grid to_grid, IntArray *cellMapping) {
+                               const Grid &to_grid, const IntArray *cellMapping) {
 
    int to_cell_cnt = 0;
    clock_t start_clock = clock();
@@ -1493,7 +1484,7 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
       for (int yIdx=0; yIdx<from_lat_count; yIdx++) {
          int offset = fr_dp.two_to_one(xIdx,yIdx,is_to_north);
-         from_data[offset] = fr_dp.get(xIdx,yIdx);
+         from_data[offset] = static_cast<float>(fr_dp.get(xIdx,yIdx));
       }
    }
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
@@ -1598,7 +1589,7 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void open_nc(const Grid &grid, ConcatString run_cs) {
+static void open_nc(const Grid &grid, const ConcatString &run_cs) {
 
    // Create output file
    nc_out = open_ncfile(OutputFilename.c_str(), true);
@@ -1627,7 +1618,7 @@ static void open_nc(const Grid &grid, ConcatString run_cs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void write_nc(const DataPlane &dp, const Grid &grid,
+static void write_nc(const DataPlane &dp,
                      const VarInfo *vinfo, const char *vname,
                      bool add_gaussian_atts,
                      NcFile *in_goes_nc,
@@ -1680,7 +1671,7 @@ static void write_nc(const DataPlane &dp, const Grid &grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void write_nc_int(const DataPlane &dp, const Grid &grid,
+static void write_nc_int(const DataPlane &dp,
                          const VarInfo *vinfo, const char *vname) {
 
    int deflate_level = compress_level;
@@ -1712,7 +1703,7 @@ static void write_nc_int(const DataPlane &dp, const Grid &grid,
 ////////////////////////////////////////////////////////////////////////
 
 static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
-                              const Grid fr_grid, const Grid to_grid) {
+                              const Grid &fr_grid, const Grid &to_grid) {
    DataPlane fr_dp, to_dp;
    ConcatString vname;
    clock_t start_clock =  clock();
@@ -1749,10 +1740,8 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       // Initialize
       vinfo->clear();
 
-      // Populate the VarInfo object using the config string
-      config.read(replace_path(config_const_filename).c_str());
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      // Populate the VarInfo object using the -field config string
+      set_field_var_info(*vinfo, i);
 
       to_dp.erase();
       to_dp.set_init(valid_time);
@@ -1786,7 +1775,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       NcVar in_goes_var = get_goes_nc_var(nc_in, vinfo->name());
 
       // Write the regridded data
-      write_nc(to_dp, to_grid, vinfo, vname.c_str(),
+      write_nc(to_dp, vinfo, vname.c_str(),
                false, nc_in, &in_goes_var);
 
       bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
@@ -1822,7 +1811,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          }
 
          // Write the probability data
-         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str(),
+         write_nc(prob_dp, vinfo, vname_prob.c_str(),
                   do_gaussian_filter);
       }
 
@@ -1845,7 +1834,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
 ////////////////////////////////////////////////////////////////////////
 
-void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
+void check_lat_lon(int data_size, const float *latitudes, const float *longitudes) {
    int cnt_printed = 0;
    int cnt_missing_lat = 0;
    int cnt_missing_lon = 0;
@@ -1987,8 +1976,8 @@ static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
 ////////////////////////////////////////////////////////////////////////
 
 static void get_grid_mapping_latlon(
-      DataPlane from_dp, DataPlane to_dp, Grid to_grid,
-      IntArray *cellMapping, float *latitudes, float *longitudes,
+      const DataPlane &from_dp, const DataPlane &to_dp, const Grid &to_grid,
+      IntArray *cellMapping, const float *latitudes, const float *longitudes,
       int from_lat_count, int from_lon_count, vector<bool> skip_times, bool to_north, bool is_2d) {
    double x;
    double y;
@@ -2017,7 +2006,7 @@ static void get_grid_mapping_latlon(
          int coord_offset = from_dp.two_to_one(xIdx, yIdx, to_north);
          if (is_2d) {
             lon_offset = lat_offset = coord_offset;
-            if( skip_times.size() > 0 && skip_times[coord_offset] ) continue;
+            if( !skip_times.empty() && skip_times[coord_offset] ) continue;
          }
          float lat = latitudes[lat_offset];
          float lon = longitudes[lon_offset];
@@ -2089,7 +2078,7 @@ static void get_grid_mapping_latlon(
 ////////////////////////////////////////////////////////////////////////
 
 static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping,
-                             NcVar var_lat, NcVar var_lon, vector<bool> skip_times) {
+                             NcVar var_lat, NcVar var_lon, const vector<bool> &skip_times) {
    bool status = false;
    DataPlane from_dp;
    DataPlane to_dp;
@@ -2172,7 +2161,7 @@ static unixtime find_valid_time(NcVar time_var) {
 
       vector<double> time_values(time_count + 2);
       if (get_nc_data(&time_var, time_values.data())) {
-         valid_time = compute_unixtime(&time_var, time_values[0]);
+         valid_time = compute_unixtime(&time_var, static_cast<unixtime>(time_values[0]));
       }
       else {
          mlog << Error << "\n" << method_name
@@ -2193,7 +2182,7 @@ static unixtime find_valid_time(NcVar time_var) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static ConcatString get_goes_grid_input(MetConfig config, const Grid fr_grid) {
+static ConcatString get_goes_grid_input(MetConfig &config, const Grid &fr_grid) {
    ConcatString run_string;
    ConcatString env_coord_name;
    ConcatString tmp_dir = config.get_tmp_dir();
@@ -2419,7 +2408,7 @@ static NcVar get_goes_nc_var(NcFile *nc, const ConcatString &var_name,
 ////////////////////////////////////////////////////////////////////////
 
 
-static ConcatString make_geostationary_filename(Grid fr_grid) {
+static ConcatString make_geostationary_filename(const Grid &fr_grid) {
    ConcatString geo_data_filename;
    GridInfo info = fr_grid.info();
 
@@ -2447,7 +2436,7 @@ static ConcatString make_geostationary_filename(Grid fr_grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp) {
+static bool is_time_mismatch(const NcFile *nc_in, const NcFile *nc_adp) {
    // Verify the coverage start and end times
    bool time_mismatch = false;
    ConcatString aod_start_time, aod_end_time;
@@ -2481,7 +2470,7 @@ static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp) {
 
 static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
       DataPlane &fr_dp, DataPlane &to_dp,
-      Grid fr_grid, Grid to_grid, IntArray *cellMapping, NcFile *nc_adp) {
+      const Grid &fr_grid, const Grid &to_grid, const IntArray *cellMapping, NcFile *nc_adp) {
 
    bool has_qc_var = false;
    bool has_adp_qc_var = false;
@@ -2582,10 +2571,10 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
    int non_missing_count = 0;
    int qc_filtered_count = 0;
    int adp_qc_filtered_count = 0;
-   float from_min_value =  10e10;
-   float from_max_value = -10e10;
-   float qc_min_value =  10e10;
-   float qc_max_value = -10e10;
+   float from_min_value =  10e10f;
+   float from_max_value = -10e10f;
+   float qc_min_value =  10e10f;
+   float qc_max_value = -10e10f;
    IntArray cellArray;
    NumArray dataArray;
    bool has_qc_flags = (qc_flags.n() > 0);
@@ -2632,7 +2621,7 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
                for(int i=0; i<vinfo->censor_thresh().n(); i++) {
                   // Break out after the first match.
                   if(vinfo->censor_thresh()[i].check(data_value)) {
-                     data_value = vinfo->censor_val()[i];
+                     data_value = static_cast<float>(vinfo->censor_val()[i]);
                      break;
                   }
                }
@@ -2764,7 +2753,7 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void save_geostationary_data(const ConcatString geostationary_file,
+static void save_geostationary_data(const ConcatString &geostationary_file,
       const float *latitudes, const float *longitudes,
       const GoesImagerData &grid_data) {
    bool has_error = false;
@@ -2985,6 +2974,19 @@ static void set_adp_gc_values(NcVar var_adp_qc) {
            << ", medium_confidence = " << adp_qc_medium
            << ", low_confidence = " << adp_qc_low << "\n";
    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void set_field_var_info(VarInfo &vinfo, int i) {
+   MetConfig config;
+
+   // Populate the VarInfo object using the i-th -field config string
+   config.read(replace_path(config_const_filename).c_str());
+   config.read_string(FieldSA[i].c_str());
+   vinfo.set_dict(config);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
