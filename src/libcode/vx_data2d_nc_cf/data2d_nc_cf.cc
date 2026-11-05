@@ -1126,9 +1126,7 @@ long MetNcCFDataFile::find_generic_offset(VarInfo &vinfo, const NcVarInfo *data_
    long offset = vinfo_nc->dimension(index);
    string dim_name = get_dim_name(data_var, index);
 
-   // Take the length from the dimension itself rather than from a
-   // coordinate variable. A dimension is not required to have one, and
-   // the length is what an integer offset must be checked against.
+   // A dimension is not required to have a coordinate variable
    int dim_size = get_dim_size(data_var->var.get(), index);
 
    if (offset == range_flag) {
@@ -1137,8 +1135,7 @@ long MetNcCFDataFile::find_generic_offset(VarInfo &vinfo, const NcVarInfo *data_
    }
    else if (!vinfo_nc->is_offset(index)) {
 
-      // Only a request by value needs the coordinate variable. Looking it
-      // up unconditionally crashed for a dimension which has none.
+      // Only a request by value needs the coordinate variable
       NcVarInfo* dim_var_info = _file->find_var_by_dim_name(dim_name.c_str());
 
       if (nullptr == dim_var_info || !IS_VALID_NC_P(dim_var_info->var.get())) {
