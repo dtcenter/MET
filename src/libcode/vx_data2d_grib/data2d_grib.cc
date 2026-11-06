@@ -310,12 +310,8 @@ exit ( 1 );
 GF->seek_record(n);
 
    //
-   // read it into rec
+   // read it into rec; operator>> returns 1 on success, so test for that
    //
-   //
-   //  operator>> returns 1 on success, so test for that rather than for zero
-   //
-
 if ( 1 != ( (*GF) >> CurrentRecord) )  {
 
 mlog << Error << "\nMetGrib1DataFile::read_record() -> "

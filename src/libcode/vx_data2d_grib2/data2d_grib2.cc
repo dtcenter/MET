@@ -1636,8 +1636,8 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
 //
 ////////////////////////////////////////////////////////////////////////
 
-int grib2_template_num(const unsigned char *cgrib, long n_byte, int sec_num,
-                       int sec_offset) {
+static int grib2_template_num(const unsigned char *cgrib, long n_byte,
+                              int sec_num, int sec_offset) {
 
    //  each section after the 16 byte Section 0 leads with its length
    for(long pos = 16; pos + 5 <= n_byte; ) {
@@ -1648,9 +1648,10 @@ int grib2_template_num(const unsigned char *cgrib, long n_byte, int sec_num,
       //  stop at Section 8, "7777", which carries no length
       if(len <= 0 || pos + len > n_byte) break;
 
+      //  the template number, when it falls inside the record
       if(sec_num == (int) cgrib[pos+4]) {
-         if(pos + sec_offset + 2 > n_byte) break;
-         return ((int) cgrib[pos+sec_offset] << 8) | (int) cgrib[pos+sec_offset+1];
+         return (pos + sec_offset + 2 > n_byte ? bad_data_int :
+                 ((int) cgrib[pos+sec_offset] << 8) | (int) cgrib[pos+sec_offset+1]);
       }
 
       pos += len;
