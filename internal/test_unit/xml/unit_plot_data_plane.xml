@@ -116,7 +116,6 @@
     </output>
   </test>
 
-
   <test name="plot_data_plane_GRIB2_ENS">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
@@ -564,7 +563,6 @@
     </output>
   </test>
 
-
   <test name="plot_data_plane_NCCF_POLAR_STEREO">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
@@ -824,7 +822,6 @@
   </test>
 
   <!-- Report an undefined Data Representation Template, not segfault -->
-
   <test name="plot_data_plane_GRIB2_UNDEFINED_DRT">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <retval>1</retval>
@@ -840,7 +837,6 @@
   </test>
 
   <!-- Report an undefined Grid Definition Template, not segfault -->
-
   <test name="plot_data_plane_GRIB2_UNDEFINED_GDT">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <retval>1</retval>
