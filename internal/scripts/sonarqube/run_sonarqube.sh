@@ -129,8 +129,10 @@ else
   sed -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
       -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
       -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
-      -e "s|SONAR_BRANCH_NAME|${1}|" \
       $SCRIPT_DIR/$SONAR_PROPERTIES > $SONAR_PROPERTIES
+
+  # This path scans a branch, tag or hash, never a pull request
+  echo "sonar.branch.name=${1}" >> $SONAR_PROPERTIES
 
   # Run SonarQube clean
   run_command "make clean"
