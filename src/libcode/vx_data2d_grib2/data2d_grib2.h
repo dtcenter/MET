@@ -110,13 +110,11 @@ class MetGrib2DataFile : public Met2dDataFile {
       long read_grib2_record(long offset, g2int unpack, g2int ifld,
                              gribfield* &gfld, g2int &numfields);
 
-      //  report a record that could not be decoded, stopping when the data
-      //  pass cannot continue without it
+      //  report a record that could not be decoded
 
       void report_decode_error(const ConcatString &msg, g2int unpack);
 
-      //  check gfld holds a full grid of values before they are copied,
-      //  setting msg to the reason when it does not
+      //  check gfld holds a full grid of values, setting msg when it does not
 
       bool is_decoded_data(const gribfield *gfld, ConcatString &msg) const;
 

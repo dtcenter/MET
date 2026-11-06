@@ -313,8 +313,7 @@ GF->seek_record(n);
    // read it into rec
    //
    //
-   //  operator>> returns 1 on success, 0 at the end of the file and -1 on a
-   //  header error, so test for success rather than for a zero value
+   //  operator>> returns 1 on success, so test for that rather than for zero
    //
 
 if ( 1 != ( (*GF) >> CurrentRecord) )  {

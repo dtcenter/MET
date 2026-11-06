@@ -46,8 +46,7 @@ static int    parse_int4(g2int);
 static int    grib2_template_num(const unsigned char *cgrib, long n_byte,
                                  int sec_num, int sec_offset);
 
-//  number of undecodable records reported individually before the rest are
-//  left to the summary written by read_grib2_record_list()
+//  undecodable records reported individually before the rest are summarized
 static const int max_decode_report = 3;
 
 ////////////////////////////////////////////////////////////////////////
@@ -888,8 +887,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
          g2_free(gfld);
          gfld = nullptr;
 
-         //  if there are more fields in the current record, read the next one.
-         //  test before the call, which may update numfields.
+         //  test before the call, which may update numfields
          bool more_fields = ( i < numfields );
          if( more_fields ) read_grib2_record(offset, 0, i+1, gfld, numfields);
 
@@ -1589,9 +1587,7 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
 
    if(0 != status) {
 
-      //  g2c 2.x frees the field on most failures and leaves this pointer
-      //  dangling, while 1.x leaves it for the caller to free, and 2.x does
-      //  the same on one path. Neither dereference nor free it.
+      //  the field may already have been freed, so do not touch it
       gfld = nullptr;
 
       ConcatString msg;
@@ -1600,9 +1596,7 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
           << ", of GRIB2 file '" << Filename
           << "' (g2_getfld status = " << (int) status << ")";
 
-      //  name the template the library could not handle, read from the
-      //  record rather than from the field. the status codes are the same
-      //  in g2c 1.x and 2.x.
+      //  name the template the library could not handle
       if(10 == status) {
          int tmpl = grib2_template_num(cgrib.data(), lgrib, 3, 12);
          if(!is_bad_data(tmpl)) {
@@ -1638,17 +1632,14 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Read a two octet template number out of the raw GRIB2 record. The
-//  gribfield cannot be trusted once g2_getfld() has failed, so the number
-//  is taken from the message itself. Returns bad data when not found.
+//  Read a two octet template number out of the raw GRIB2 record.
 //
 ////////////////////////////////////////////////////////////////////////
 
 int grib2_template_num(const unsigned char *cgrib, long n_byte, int sec_num,
                        int sec_offset) {
 
-   //  Sections 1 through 7 follow the 16 byte Section 0, each led by a
-   //  4 octet length and a 1 octet section number
+   //  each section after the 16 byte Section 0 leads with its length
    for(long pos = 16; pos + 5 <= n_byte; ) {
 
       long len = ((long) cgrib[pos  ] << 24) | ((long) cgrib[pos+1] << 16) |
@@ -1670,9 +1661,7 @@ int grib2_template_num(const unsigned char *cgrib, long n_byte, int sec_num,
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Report a record the external library could not decode. The record list
-//  pass skips it and carries on, while the data pass cannot deliver the
-//  field that was asked for, so only that one stops.
+//  Report a record the external library could not decode.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1686,17 +1675,14 @@ void MetGrib2DataFile::report_decode_error(const ConcatString &msg,
       exit(1);
    }
 
-   //  report the first few skipped records only, since a file whose packing
-   //  is wholly unsupported fails on every one of them
+   //  report the first few skipped records only
    mlog << (++NumDecodeErr <= max_decode_report ? Debug(2) : Debug(4))
         << "MetGrib2DataFile::read_grib2_record() -> " << msg << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Check that gfld holds a full grid of values before anything is
-//  dereferenced. A failed g2_getfld() leaves fld and bmap null and ibmap
-//  indeterminate.
+//  Check that gfld holds a full grid of values before anything is read.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1729,8 +1715,7 @@ bool MetGrib2DataFile::is_decoded_data(const gribfield *gfld,
           << (Raw_Grid ? Raw_Grid->ny() : 0);
    }
 
-   //  g2_getfld() expands fld[] from ndpts to ngrdpts when a bitmap
-   //  applies; otherwise fld[] holds ndpts values
+   //  fld[] holds ngrdpts values when a bitmap applies, else ndpts
    else {
       g2int n_data = (0 != gfld->expanded && 255 != gfld->ibmap &&
                       nullptr != gfld->bmap ? gfld->ngrdpts : gfld->ndpts);
