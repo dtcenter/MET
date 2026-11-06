@@ -43,6 +43,8 @@ using namespace std;
 static bool is_grid_relative(const Grib2Record *);
 static double scaled2dbl(int scale_factor, int scale_value);
 static int    parse_int4(g2int);
+static int    grib2_template_num(const unsigned char *cgrib, long n_byte,
+                                 int sec_num, int sec_offset);
 
 //  number of undecodable records reported individually before the rest are
 //  left to the summary written by read_grib2_record_list()
@@ -886,13 +888,13 @@ void MetGrib2DataFile::read_grib2_record_list() {
          g2_free(gfld);
          gfld = nullptr;
 
-         //  if there are more fields in the current record, read the next one
-         if( i < numfields ) {
-            read_grib2_record(offset, 0, i+1, gfld, numfields);
+         //  if there are more fields in the current record, read the next one.
+         //  test before the call, which may update numfields.
+         bool more_fields = ( i < numfields );
+         if( more_fields ) read_grib2_record(offset, 0, i+1, gfld, numfields);
 
-            //  stop on a field that could not be decoded, already reported above
-            if( nullptr == gfld ) { n_skip++; break; }
-         }
+         //  stop on a field that could not be decoded, already reported above
+         if( more_fields && nullptr == gfld ) { n_skip++; break; }
 
       }  //  END:  for(int i=1; i <= numfields; i++)
 
@@ -1409,8 +1411,7 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
    int n_y = Raw_Grid->ny();
 
    //  confirm the data is there before dereferencing it
-   ConcatString err_msg;
-   if( !is_decoded_data(gfld, err_msg) ) {
+   if( ConcatString err_msg; !is_decoded_data(gfld, err_msg) ) {
       mlog << Error << "\nMetGrib2DataFile::read_grib2_record_data_plane() -> "
            << "cannot read the data for record at offset " << rec->ByteOffset
            << ", field number " << rec->FieldNum << ", of GRIB2 file '"
@@ -1586,74 +1587,109 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
    //  reset to default out of memory handler
    set_new_handler(oom);
 
-   //  g2_getfld() allocates gfld first thing, so null means it never ran
-   if(nullptr == gfld) {
-      ConcatString msg;
-      msg << "the external GRIB2 library returned no field for record at offset "
-          << (long long) lskip << ", field number " << (int) ifld
-          << ", of GRIB2 file '" << Filename << "'.";
-
-      //  the data pass cannot continue without the field, while the record
-      //  list pass just skips the record
-      if(0 != unpack) {
-         mlog << Error << "\n" << method_name << msg << "\n\n";
-         exit(1);
-      }
-
-      mlog << (++NumDecodeErr <= max_decode_report ? Debug(2) : Debug(4))
-           << method_name << msg << "\n";
-      return lskip + lgrib;
-   }
-
-   //  the record list pass (unpack = 0) needs only Sections 1-4, so a later
-   //  failure still leaves a listable record. the data pass needs everything.
-   bool keep_gfld = (0 == status);
-   if(0 != status && 0 == unpack) {
-      keep_gfld = (nullptr != gfld->igdtmpl && nullptr != gfld->ipdtmpl);
-   }
-
    if(0 != status) {
 
-      //  idrtnum is only set once Section 5 has been read, so only report it
-      //  for the Section 5 (12) and Section 7 (14) unpacking failures. the
-      //  library prints the reason for the failure to the console itself.
+      //  g2c 2.x frees the field on most failures and leaves this pointer
+      //  dangling, while 1.x leaves it for the caller to free, and 2.x does
+      //  the same on one path. Neither dereference nor free it.
+      gfld = nullptr;
+
       ConcatString msg;
       msg << "the external GRIB2 library failed to decode record at offset "
           << (long long) lskip << ", field number " << (int) ifld
           << ", of GRIB2 file '" << Filename
           << "' (g2_getfld status = " << (int) status << ")";
-      if(12 == status || 14 == status) {
-         msg << ", packed with Data Representation Template 5."
-             << (int) gfld->idrtnum
-             << " which this MET build's GRIB2 library cannot unpack";
+
+      //  name the template the library could not handle, read from the
+      //  record rather than from the field. the status codes are the same
+      //  in g2c 1.x and 2.x.
+      if(10 == status) {
+         int tmpl = grib2_template_num(cgrib.data(), lgrib, 3, 12);
+         if(!is_bad_data(tmpl)) {
+            msg << ", on Grid Definition Template 3." << tmpl;
+         }
+      }
+      else if(12 == status || 14 == status) {
+         int tmpl = grib2_template_num(cgrib.data(), lgrib, 5, 9);
+         if(!is_bad_data(tmpl)) {
+            msg << ", packed with Data Representation Template 5." << tmpl
+                << " which this MET build's GRIB2 library cannot unpack";
+         }
       }
       msg << ".";
 
-      //  the data pass cannot deliver the field the caller asked for, so stop
-      if(0 != unpack) {
-         mlog << Error << "\n" << method_name << msg << "\n\n";
-         exit(1);
-      }
+      report_decode_error(msg, unpack);
+      return lskip + lgrib;
+   }
 
-      //  a record that can still be listed only matters if its data is
-      //  requested later, so just note it
-      if(keep_gfld) {
-         mlog << Debug(3) << method_name << msg << "\n";
-      }
-
-      //  the record is skipped. report the first few only, since a file whose
-      //  packing is wholly unsupported fails on every one of them, and
-      //  read_grib2_record_list() summarizes the total.
-      else {
-         mlog << (++NumDecodeErr <= max_decode_report ? Debug(2) : Debug(4))
-              << method_name << msg << "\n";
-         g2_free(gfld);
-         gfld = nullptr;
-      }
+   //  g2_getfld() reports success, so the field should be there
+   if(nullptr == gfld) {
+      ConcatString msg;
+      msg << "the external GRIB2 library returned no field for record at offset "
+          << (long long) lskip << ", field number " << (int) ifld
+          << ", of GRIB2 file '" << Filename << "'.";
+      report_decode_error(msg, unpack);
+      return lskip + lgrib;
    }
 
    //  return the offset of the next record
    return lskip + lgrib;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Read a two octet template number out of the raw GRIB2 record. The
+//  gribfield cannot be trusted once g2_getfld() has failed, so the number
+//  is taken from the message itself. Returns bad data when not found.
+//
+////////////////////////////////////////////////////////////////////////
+
+int grib2_template_num(const unsigned char *cgrib, long n_byte, int sec_num,
+                       int sec_offset) {
+
+   //  Sections 1 through 7 follow the 16 byte Section 0, each led by a
+   //  4 octet length and a 1 octet section number
+   for(long pos = 16; pos + 5 <= n_byte; ) {
+
+      long len = ((long) cgrib[pos  ] << 24) | ((long) cgrib[pos+1] << 16) |
+                 ((long) cgrib[pos+2] <<  8) |  (long) cgrib[pos+3];
+
+      //  stop at Section 8, "7777", which carries no length
+      if(len <= 0 || pos + len > n_byte) break;
+
+      if(sec_num == (int) cgrib[pos+4]) {
+         if(pos + sec_offset + 2 > n_byte) break;
+         return ((int) cgrib[pos+sec_offset] << 8) | (int) cgrib[pos+sec_offset+1];
+      }
+
+      pos += len;
+   }
+
+   return bad_data_int;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Report a record the external library could not decode. The record list
+//  pass skips it and carries on, while the data pass cannot deliver the
+//  field that was asked for, so only that one stops.
+//
+////////////////////////////////////////////////////////////////////////
+
+void MetGrib2DataFile::report_decode_error(const ConcatString &msg,
+                                           g2int unpack) {
+
+   //  the data pass cannot deliver the field the caller asked for, so stop
+   if(0 != unpack) {
+      mlog << Error << "\nMetGrib2DataFile::read_grib2_record() -> "
+           << msg << "\n\n";
+      exit(1);
+   }
+
+   //  report the first few skipped records only, since a file whose packing
+   //  is wholly unsupported fails on every one of them
+   mlog << (++NumDecodeErr <= max_decode_report ? Debug(2) : Debug(4))
+        << "MetGrib2DataFile::read_grib2_record() -> " << msg << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
