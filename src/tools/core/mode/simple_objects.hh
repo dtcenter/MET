@@ -35,7 +35,7 @@ class SimpleObjects {
       //  The destructor is defaulted for the same reason: a user-declared one
       //  suppresses the implicit move constructor.
       //
-      //  noexcept is omitted deliberately; it breaks icpc 19.x.  See #3443.
+      //  MET #3443 noexcept is omitted deliberately; it breaks icpc 19.x.
       //
 
    SimpleObjects(SimpleObjects &&) = default;

@@ -140,7 +140,7 @@ class GridStatVxOpt {
 
       GridStatVxOpt();
      ~GridStatVxOpt();
-      //  noexcept is omitted deliberately; it breaks icpc 19.x.  See #3443.
+      //  MET #3443 noexcept is omitted deliberately; it breaks icpc 19.x.
       GridStatVxOpt(GridStatVxOpt &&) = default;
       GridStatVxOpt & operator=(GridStatVxOpt &&) = default;
 

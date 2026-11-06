@@ -119,7 +119,7 @@ class TmpFileInfo {
          //  RngAziGrid whose copy constructor is deleted by GridRep's being
          //  inaccessible.
          //
-         //  noexcept is omitted deliberately; it breaks icpc 19.x.  See #3443.
+         //  MET #3443 noexcept is omitted deliberately; it breaks icpc 19.x.
          //
 
       TmpFileInfo & operator=(TmpFileInfo &&) = default;
