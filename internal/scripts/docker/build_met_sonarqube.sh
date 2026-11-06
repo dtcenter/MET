@@ -87,12 +87,23 @@ SONAR_PROPERTIES=sonar-project.properties
 sed -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
     -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
     -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
-    -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME|" \
     $SONAR_PROPERTIES_DIR/$SONAR_PROPERTIES > $SONAR_PROPERTIES
 
-# The source and reference branches must differ to define new code
-if [[ "$MET_GIT_NAME" != "$SONAR_REFERENCE_BRANCH" ]]; then
-  echo "sonar.newCode.referenceBranch=${SONAR_REFERENCE_BRANCH}" >> $SONAR_PROPERTIES
+# Scan a pull request as a pull request when its number is known, so that new
+# code is the diff against the base and issue statuses transfer on merge.
+if [[ -n "${SONAR_PULLREQUEST_KEY}" ]]; then
+  echo "Scanning pull request ${SONAR_PULLREQUEST_KEY}: ${MET_GIT_NAME} into ${SONAR_REFERENCE_BRANCH}"
+  echo "sonar.pullrequest.key=${SONAR_PULLREQUEST_KEY}" >> $SONAR_PROPERTIES
+  echo "sonar.pullrequest.branch=${MET_GIT_NAME}"       >> $SONAR_PROPERTIES
+  echo "sonar.pullrequest.base=${SONAR_REFERENCE_BRANCH}" >> $SONAR_PROPERTIES
+else
+  echo "Scanning branch ${MET_GIT_NAME}"
+  echo "sonar.branch.name=${MET_GIT_NAME}" >> $SONAR_PROPERTIES
+
+  # The source and reference branches must differ to define new code
+  if [[ "$MET_GIT_NAME" != "$SONAR_REFERENCE_BRANCH" ]]; then
+    echo "sonar.newCode.referenceBranch=${SONAR_REFERENCE_BRANCH}" >> $SONAR_PROPERTIES
+  fi
 fi
 
 # Enable development mode.  src/basic/enum_to_string, src/tools/dev_utils and

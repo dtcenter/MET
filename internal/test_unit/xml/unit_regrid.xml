@@ -536,6 +536,24 @@
     </output>
   </test>
 
+  <!-- Regrid a dimension with no coordinate variable -->
+
+  <test name="regrid_data_plane_NC_DIM_NO_COORD_VAR">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &INPUT_DIR;/climatology_data/seeps/PPT24_seepsweights_grid.nc \
+      "latlon 72 20 -47.5 2.5 5.0 5.0" \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_NC_DIM_NO_COORD_VAR.nc \
+      -field 'name="p1_00"; level="(0,*,*)";' \
+      -field 'name="p1_00"; level="(11,*,*)";' \
+      -name p1_00_month00,p1_00_month11 \
+      -method NEAREST
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_NC_DIM_NO_COORD_VAR.nc</grid_nc>
+    </output>
+  </test>
+
   <!-- Regrid rotated lat/lon NetCDF data -->
 
   <test name="regrid_data_plane_NC_ROT_LAT_LON">
