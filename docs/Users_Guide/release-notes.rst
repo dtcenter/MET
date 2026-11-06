@@ -30,6 +30,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3426 <https://github.com/dtcenter/MET/issues/3426>`_).
      * Rename MET configuration options to avoid names like ``warning`` and ``error``
        (`#3455 <https://github.com/dtcenter/MET/issues/3455>`_).
+     * Enhance the GRIB2 library code to report unsupported GRIB2 data packing rather than segfaulting
+       (`#3525 <https://github.com/dtcenter/MET/issues/3525>`_).
 
   .. dropdown:: Bugfixes
 
