@@ -22,6 +22,8 @@ MET Version 12.2.3 Release Notes (TBD)
        (`#3478 <https://github.com/dtcenter/MET/issues/3478>`_).
      * **Fix Regrid-Data-Plane and Point2Grid to parse each -field command line option independently**
        (`#3499 <https://github.com/dtcenter/MET/issues/3499>`_).
+     * Fix the NetCDF CF reader segfault when a dimension has no coordinate variable
+       (`#3506 <https://github.com/dtcenter/MET/issues/3506>`_).
 
   .. dropdown:: Repository, build, and test
 
