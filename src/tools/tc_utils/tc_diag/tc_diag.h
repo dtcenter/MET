@@ -119,16 +119,25 @@ class TmpFileInfo {
          //  RngAziGrid whose copy constructor is deleted by GridRep's being
          //  inaccessible.
          //
-         //  noexcept is declared rather than deduced.  The deduced
-         //  specification is potentially throwing, because assigning ra_grid
-         //  falls back to RngAziGrid's copy assignment and grid_out is a Grid,
-         //  which deep copies its GridRep; both allocate.  The only exception
-         //  that can produce is std::bad_alloc, which no MET tool can ever
-         //  observe: met_main() calls set_handlers(), whose
+         //  The move assignment is defaulted without an explicit noexcept.
+         //  The deduced specification is potentially throwing, because
+         //  assigning ra_grid falls back to RngAziGrid's copy assignment and
+         //  grid_out is a Grid, which deep copies its GridRep; both allocate.
+         //  The only exception that can produce is std::bad_alloc, which no
+         //  MET tool can ever observe: met_main() calls set_handlers(), whose
          //  set_new_handler(oom) exits the process before operator new throws.
          //
+         //  Declaring noexcept on that basis is still not portable, because
+         //  the rule the compiler applies is static and never consults the
+         //  new-handler.  The classic Intel compiler (icpc 19.x) applies CWG
+         //  1778 and defines a function explicitly defaulted on its first
+         //  declaration with an incompatible exception specification as
+         //  deleted, which would break the tmp_file_map[key] = std::move(info)
+         //  above.  P1286R2 removed the rule, so clang, current GCC and Intel
+         //  oneAPI accept the keyword.  See #3443.
+         //
 
-      TmpFileInfo & operator=(TmpFileInfo &&) noexcept = default;
+      TmpFileInfo & operator=(TmpFileInfo &&) = default;
 
       //////////////////////////////////////////////////////////////////
 
