@@ -140,29 +140,7 @@ class GridStatVxOpt {
 
       GridStatVxOpt();
      ~GridStatVxOpt();
-
-         //
-         //  fcst_info and obs_info own their VarInfo, so these objects move
-         //  rather than copy.
-         //
-         //  The move operations are defaulted without an explicit noexcept.
-         //  The deduced specification is not noexcept with every standard
-         //  library.  It is noexcept with libc++, but not with the libstdc++ 7
-         //  headers icpc 19.x compiles against; std::map's move constructor,
-         //  and so mpr_thr_inc_map, is the likely reason.  Declaring noexcept
-         //  unconditionally breaks the classic Intel compiler (icpc 19.x),
-         //  which still applies CWG 1778 and so defines a function explicitly
-         //  defaulted on its first declaration with an incompatible exception
-         //  specification as deleted.  The move constructor is then gone and
-         //  vector::resize() falls back to the copy constructor, which the
-         //  unique_ptr members delete.  P1286R2 removed that rule, so clang,
-         //  current GCC and Intel oneAPI all accept the keyword.  See #3443.
-         //
-         //  Nothing is lost by dropping it: vector::resize() routes through
-         //  std::move_if_noexcept, which yields an rvalue whenever the type is
-         //  not copy constructible, and this one is not.
-         //
-
+      //  noexcept is omitted deliberately; it breaks icpc 19.x.  See #3443.
       GridStatVxOpt(GridStatVxOpt &&) = default;
       GridStatVxOpt & operator=(GridStatVxOpt &&) = default;
 

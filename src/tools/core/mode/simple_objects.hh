@@ -35,21 +35,7 @@ class SimpleObjects {
       //  The destructor is defaulted for the same reason: a user-declared one
       //  suppresses the implicit move constructor.
       //
-      //  The move operations are defaulted without an explicit noexcept.  The
-      //  deduced specification is potentially throwing, because _super has no
-      //  move of its own - ShapeData and BoolPlane declare destructors and so
-      //  suppress theirs - and copying it allocates.  The only exception that
-      //  can produce is std::bad_alloc, which no MET tool can ever observe:
-      //  met_main() calls set_handlers(), whose set_new_handler(oom) exits the
-      //  process before operator new can throw.
-      //
-      //  Declaring noexcept on that basis is still not portable, because the
-      //  rule the compiler applies is static and never consults the
-      //  new-handler.  The classic Intel compiler (icpc 19.x) applies CWG 1778
-      //  and defines a function explicitly defaulted on its first declaration
-      //  with an incompatible exception specification as deleted, leaving only
-      //  the copy operations, which _mvd deletes.  P1286R2 removed the rule,
-      //  so clang, current GCC and Intel oneAPI accept the keyword.  See #3443.
+      //  noexcept is omitted deliberately; it breaks icpc 19.x.  See #3443.
       //
 
    SimpleObjects(SimpleObjects &&) = default;
