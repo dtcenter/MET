@@ -9,6 +9,14 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.0.5 Release Notes (TBD)
+--------------------------------------
+
+  .. dropdown:: Bugfixes
+
+     * Fix PB2NC so that derived HPBL output does not depend on which other stations are processed
+       (`#3450 <https://github.com/dtcenter/MET/issues/3450>`_).
+
 MET Version 12.0.4 Release Notes (20250929)
 -------------------------------------------
 
@@ -321,6 +329,20 @@ MET Version 12.0.0 Release Notes (20241218)
 
 MET Upgrade Instructions
 ========================
+
+MET Version 12.0.5 Upgrade Instructions
+---------------------------------------
+
+.. dropdown:: Output data changes
+
+   MET version 12.0.5 modifies existing output data values in the following way:
+
+   * PBL heights (HPBL) derived by PB2NC may change. As described in MET
+     `#3450 <https://github.com/dtcenter/MET/issues/3450>`_, the PBL derived for a station
+     previously could depend on which other stations were processed in the same run, because
+     unused input records from one station's profile carried over into the next, and deep
+     profiles read past the levels actually stored. The PBL derived for each station now
+     depends only on that station's own observations.
 
 MET Version 12.0.0 Upgrade Instructions
 ---------------------------------------
