@@ -168,7 +168,21 @@ Filename = _filename;
 
 GF->seek_record(0);
 
-(*GF) >> CurrentRecord;
+   //
+   //  a failed read leaves the record empty, so check before dereferencing it
+   //
+
+if ( 1 != ( (*GF) >> CurrentRecord ) || ! CurrentRecord.gds )  {
+
+   mlog << Error << "\nMetGrib1DataFile::open(const char *) -> "
+        << "unable to read the first record and its grid definition section "
+        << "from grib1 file \"" << _filename << "\"\n\n";
+
+   close();
+
+   return false;
+
+}
 
 Raw_Grid = std::make_unique<Grid>();
 
@@ -298,7 +312,12 @@ GF->seek_record(n);
    //
    // read it into rec
    //
-if ( ! ( (*GF) >> CurrentRecord) )  {
+   //
+   //  operator>> returns 1 on success, 0 at the end of the file and -1 on a
+   //  header error, so test for success rather than for a zero value
+   //
+
+if ( 1 != ( (*GF) >> CurrentRecord) )  {
 
 mlog << Error << "\nMetGrib1DataFile::read_record() -> "
      << "trouble reading record number " << n << "\n\n";

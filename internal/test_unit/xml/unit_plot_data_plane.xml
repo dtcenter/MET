@@ -823,4 +823,38 @@
     </output>
   </test>
 
+  <!-- Report an undefined Data Representation Template, found when the -->
+  <!-- record data is read, rather than segfaulting (#3525)             -->
+
+  <test name="plot_data_plane_GRIB2_UNDEFINED_DRT">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <retval>1</retval>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/undecodable/undefined_drt.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/undefined_drt_TMP_P500.ps \
+      'name = "TMP"; level = "P500";' \
+      -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/plot_data_plane/undefined_drt_TMP_P500.ps</not_exist>
+    </output>
+  </test>
+
+  <!-- Report an undefined Grid Definition Template, found when the -->
+  <!-- records are listed, rather than segfaulting (#3525)          -->
+
+  <test name="plot_data_plane_GRIB2_UNDEFINED_GDT">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <retval>1</retval>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/undecodable/undefined_gdt.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/undefined_gdt_TMP_P500.ps \
+      'name = "TMP"; level = "P500";' \
+      -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/plot_data_plane/undefined_gdt_TMP_P500.ps</not_exist>
+    </output>
+  </test>
+
 </met_test>
