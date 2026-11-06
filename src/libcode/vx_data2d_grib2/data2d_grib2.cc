@@ -903,10 +903,10 @@ void MetGrib2DataFile::read_grib2_record_list() {
         << Filename << "\n";
 
    if( n_skip > 0 ) {
-      mlog << Warning << "\nMetGrib2DataFile::read_grib2_record_list() -> "
+      mlog << Debug(2) << "MetGrib2DataFile::read_grib2_record_list() - "
            << "skipped " << n_skip << " of " << rec_num - 1
-           << " GRIB2 record(s) that could not be decoded in file '"
-           << Filename << "'. Run with -v 4 to list them all.\n\n";
+           << " GRIB2 record(s) that could not be decoded in file: "
+           << Filename << ". Run with -v 4 to list them all.\n";
    }
 
    return;
