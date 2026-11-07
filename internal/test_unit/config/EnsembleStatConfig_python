@@ -231,6 +231,10 @@ rng = {
 
 grid_weight_flag  = NONE;
 point_weight_flag = NONE;
+kde_ref_angle     = 0.75;
+write_weights     = FALSE;
+
+////////////////////////////////////////////////////////////////////////////////
 
 output_prefix = "${OUTPUT_PREFIX}";
 

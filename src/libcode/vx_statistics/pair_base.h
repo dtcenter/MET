@@ -247,7 +247,7 @@ class PairBase {
 
       void calc_obs_summary();
 
-      void set_point_weight(const PointWeightType);
+      void set_point_weight(PointWeightInfo &);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -447,7 +447,7 @@ class VxPairBase {
 
       void print_obs_summary() const;
       void calc_obs_summary();
-      void set_point_weight(const PointWeightType);
+      void set_point_weight(PointWeightInfo &);
 
       bool is_keeper_sid(const char *, const char *);
       bool is_keeper_var(const char *, const char *, int);

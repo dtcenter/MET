@@ -76,7 +76,7 @@ void EnsembleStatConfInfo::clear() {
    mask_area_map.clear();
    mask_sid_map.clear();
    grid_weight_flag = GridWeightType::None;
-   point_weight_flag = PointWeightType::None;
+   point_weight_info.clear();
    output_prefix.clear();
    version.clear();
 
@@ -158,8 +158,8 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Conf: grid_weight_flag
    grid_weight_flag = parse_conf_grid_weight_flag(&conf);
 
-   // Conf: point_weight_flag
-   point_weight_flag = parse_conf_point_weight_flag(&conf);
+   // Conf: point_weight_info
+   point_weight_info = parse_conf_point_weight(&conf);
 
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
@@ -275,6 +275,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       vx_opt[i].process_config(etype, i_fdict, otype, i_odict,
                                rng_ptr, point_vx, ens_member_ids,
                                ens_files, use_ctrl, control_id);
+
+      // Store the point weighting settings for this verification task
+      vx_opt[i].point_weight_info = point_weight_info;
 
       // For no point verification, store obtype as the message type
       if(!point_vx) {
@@ -696,6 +699,7 @@ void EnsembleStatVxOpt::clear() {
 
    // Initialize values
    vx_pd.clear();
+   point_weight_info.clear();
    var_str.clear();
    beg_ds = end_ds = bad_data_int;
 
