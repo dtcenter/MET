@@ -53,6 +53,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3443 <https://github.com/dtcenter/MET/issues/3443>`_).
      * Fix PB2NC so that derived HPBL output does not depend on which other stations are processed
        (`#3450 <https://github.com/dtcenter/MET/issues/3450>`_).
+     * Fix Point2Grid to write the default output value for fields with no observations
+       (`#3297 <https://github.com/dtcenter/MET/issues/3297>`_).
      * Fix the PB2NC ``-dump`` segfault and reduce PB2NC compiler warnings
        (`#3468 <https://github.com/dtcenter/MET/issues/3468>`_).
      * Fix Stat-Analysis CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
@@ -359,6 +361,13 @@ MET Version 13.0.0 Upgrade Instructions
     the value of the nearest cell. They now use the N closest cells. The "AREA" grid weight for
     UGRIDs, previously 0 for every cell, is now derived from the cell area, normalized as
     described in MET `#3448 <https://github.com/dtcenter/MET/issues/3448>`_.
+
+  * Point2Grid output changes for any requested field with no observations mapped to the
+    output grid that follows a field that had them. As described in MET
+    `#3297 <https://github.com/dtcenter/MET/issues/3297>`_, such a field was previously
+    written using the preceding field's data, count, and mask values. It is now written
+    using its own default output value, bad data unless the ``-default_value`` option says
+    otherwise, with its count and mask values set to 0.
 
   * Gridded data read from NetCDF files that follow the CF convention and use a polar
     stereographic grid mapping may change. As described in MET
