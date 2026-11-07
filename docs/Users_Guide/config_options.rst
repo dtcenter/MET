@@ -3305,7 +3305,12 @@ number between 0 and 1 specifying the required ratio of valid data in the
 neighborhood for an output value to be computed. The alpha entry is a number
 between 0 and 1 specifying the EAS distance criteria. For each grid point,
 the smallest width for which the distance criteria is satisfied is used.
-If the distance criteria is never satisfied, the largest width is used.
+If the distance criteria is never satisfied, the largest width that can
+be evaluated is used. A width cannot be evaluated when the ratio of valid
+data in its neighborhood is less than vld_thresh, which occurs for the
+larger widths near the edges of the domain, where the neighborhood
+extends beyond the grid. Those widths are skipped, and the output is set
+to bad data only when none of the candidate widths can be evaluated.
 
 The gaussian_dx and gaussian_radius entries define the Gaussian smoother
 which is applied to the raw EAS probabilities.
