@@ -192,6 +192,10 @@ void STATAnalysisJob::clear() {
    close_dump_row_file();
    close_stat_file();
 
+   // Closing the files does not clear the paths. Leaving them set meant a
+   // cleared job still carried the previous job's output file names.
+   dump_row.clear();
+   stat_file.clear();
 
    stat_row = 0;
 
