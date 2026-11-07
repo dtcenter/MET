@@ -15,6 +15,7 @@ ARG SONAR_HOST_URL
 ARG SONAR_TOKEN
 ARG SOURCE_BRANCH
 ARG SONAR_REFERENCE_BRANCH
+ARG SONAR_PULLREQUEST_KEY
 
 #
 # SONAR_HOST_URL is required.
@@ -51,6 +52,9 @@ RUN if [ "x${SONAR_REFERENCE_BRANCH}" = "x" ]; then \
     else \
       echo "Build Argument SONAR_REFERENCE_BRANCH=${SONAR_REFERENCE_BRANCH}"; \
     fi
+
+# Empty for a branch scan, the pull request number for a pull request scan
+ENV SONAR_PULLREQUEST_KEY=${SONAR_PULLREQUEST_KEY}
 
 ENV MET_GIT_NAME=${SOURCE_BRANCH}
 ENV MET_REPO_DIR=/met/MET-${MET_GIT_NAME}

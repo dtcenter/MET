@@ -88,6 +88,10 @@ class MetGrib2DataFile : public Met2dDataFile {
 
       int ScanMode;
 
+      //  number of records in this file that failed to decode
+
+      int NumDecodeErr;
+
       //
       //  utilities to read a GRIB2 information
       //
@@ -101,8 +105,18 @@ class MetGrib2DataFile : public Met2dDataFile {
 
       void read_grib2_grid(gribfield *gfld);
 
+      //  gfld is null unless the record decoded, so callers must test it
+
       long read_grib2_record(long offset, g2int unpack, g2int ifld,
                              gribfield* &gfld, g2int &numfields);
+
+      //  report a record that could not be decoded
+
+      void report_decode_error(const ConcatString &msg, g2int unpack);
+
+      //  check gfld holds a full grid of values, setting msg when it does not
+
+      bool is_decoded_data(const gribfield *gfld, ConcatString &msg) const;
 
       void read_grib2_record_list();
 
