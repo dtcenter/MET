@@ -1450,7 +1450,7 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
          case 64:  /* 0100 0000 */ idx_data =             y*n_x + x;               break;
          case 192: /* 1100 0000 */ idx_data =             y*n_x + (n_x - x - 1);   break;
          case 32:  /* 0010 0000 */ idx_data =             x*n_y + (n_y - y - 1);   break;
-         case 160: /* 1010 0000 */ idx_data = (n_x - x - 1)*n_y + (n_x - x - 1);   break;
+         case 160: /* 1010 0000 */ idx_data = (n_x - x - 1)*n_y + (n_y - y - 1);   break;
          case 96:  /* 0110 0000 */ idx_data =             x*n_y + y;               break;
          case 224: /* 1110 0000 */ idx_data = (n_x - x - 1)*n_y + y;               break;
          case 80:  /* 0101 0000 */ idx_data = ( y % 2 == 0 ?
