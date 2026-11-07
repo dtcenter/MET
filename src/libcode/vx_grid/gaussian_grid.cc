@@ -114,7 +114,11 @@ Nx = data.nx;
 
 Ny = data.ny;
 
-Delta_Lon = -360.0/(Nx - 1.0);
+// A Gaussian grid has Nx evenly spaced longitudes spanning the full
+// 360 degrees, so the spacing is 360/Nx. Dividing by Nx - 1 spreads the
+// columns across 360 degrees rather than Nx intervals, which places the
+// last column on top of the first.
+Delta_Lon = -360.0/Nx;
 
    //
    //  check that Ny is even
