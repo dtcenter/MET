@@ -30,6 +30,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3426 <https://github.com/dtcenter/MET/issues/3426>`_).
      * Rename MET configuration options to avoid names like ``warning`` and ``error``
        (`#3455 <https://github.com/dtcenter/MET/issues/3455>`_).
+     * Enhance the GRIB2 library code to report unsupported GRIB2 data packing rather than segfaulting
+       (`#3525 <https://github.com/dtcenter/MET/issues/3525>`_).
 
   .. dropdown:: Bugfixes
 
@@ -72,6 +74,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3443 <https://github.com/dtcenter/MET/issues/3443>`_).
      * Update the SonarQube scanner so that the scan runs on Java 21 as required by the upgraded SonarQube server
        (`#3470 <https://github.com/dtcenter/MET/issues/3470>`_).
+     * Fix the GRIB2 library code to compute the correct data index for scanning mode 160
+       (`#3535 <https://github.com/dtcenter/MET/issues/3535>`_).
      * Automate link checking with Sphinx
        (`METplus #3247 <https://github.com/dtcenter/METplus/issues/3247>`_).
      * Resolve blockers from the AF SonarQube quality gate scanner

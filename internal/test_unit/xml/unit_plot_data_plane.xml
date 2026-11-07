@@ -116,7 +116,6 @@
     </output>
   </test>
 
-
   <test name="plot_data_plane_GRIB2_ENS">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
@@ -564,7 +563,6 @@
     </output>
   </test>
 
-
   <test name="plot_data_plane_NCCF_POLAR_STEREO">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
@@ -820,6 +818,51 @@
     </param>
     <output>
       <ps>&OUTPUT_DIR;/plot_data_plane/nws_precip_1day_20260410_ak.ps</ps>
+    </output>
+  </test>
+
+  <!-- Report an undefined Data Representation Template, not segfault -->
+  <test name="plot_data_plane_GRIB2_UNDEFINED_DRT">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <retval>1</retval>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/undecodable/undefined_drt.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/undefined_drt_TMP_P500.ps \
+      'name = "TMP"; level = "P500";' \
+      -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/plot_data_plane/undefined_drt_TMP_P500.ps</not_exist>
+    </output>
+  </test>
+
+  <!-- Report an undefined Grid Definition Template, not segfault -->
+  <test name="plot_data_plane_GRIB2_UNDEFINED_GDT">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <retval>1</retval>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/undecodable/undefined_gdt.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/undefined_gdt_TMP_P500.ps \
+      'name = "TMP"; level = "P500";' \
+      -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/plot_data_plane/undefined_gdt_TMP_P500.ps</not_exist>
+    </output>
+  </test>
+
+  <!-- Read a GRIB2 record stored in scanning mode 160 -->
+  <test name="plot_data_plane_GRIB2_SCAN_MODE_160">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/scan_mode/scan_mode_160.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/scan_mode_160_TMP_P500.ps \
+      'name = "TMP"; level = "P500";' \
+      -title "GRIB2 Scanning Mode 160 TMP P500" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/scan_mode_160_TMP_P500.ps</ps>
     </output>
   </test>
 
