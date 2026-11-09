@@ -28,13 +28,7 @@
     </output>
   </test>
 
-  <!-- MET #1257: Regrid to a Gaussian grid and write NetCDF, so that  -->
-  <!-- the truth comparison pins the grid's longitude values.          -->
-  <!-- GaussianGrid computed Delta_Lon as 360/(Nx-1) rather than       -->
-  <!-- 360/Nx, which placed the last column on top of the first:       -->
-  <!-- for this 512 column grid, column 511 landed on 360.000000       -->
-  <!-- instead of 359.296875, and every column west of the prime       -->
-  <!-- meridian was displaced by up to a full grid cell.               -->
+  <!-- MET #1257: Regrid to a Gaussian grid and write NetCDF so the truth comparison pins the longitude values -->
 
   <test name="Gaussian_regrid_lon_spacing">
     <exec>&MET_BIN;/regrid_data_plane</exec>
