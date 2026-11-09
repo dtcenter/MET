@@ -98,6 +98,27 @@
     </output>
   </test>
 
+  <!-- MET #3541: LAEA grid box areas are already in km^2, so grid_area must not be scaled by the earth radius again -->
+
+  <test name="grid_weight_GRID_STAT_AREA_LAEA">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>AREA_WEIGHT_LAEA</value></pair>
+      <pair><name>DESC</name>            <value>AREA_WEIGHT_LAEA</value></pair>
+      <pair><name>GRID_WEIGHT</name>     <value>AREA</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/ukv/ukv_agl_temperature_1.5_12.grib2 \
+      &DATA_DIR_MODEL;/grib2/ukv/ukv_agl_temperature_1.5_12.grib2 \
+      &CONFIG_DIR;/GridStatConfig_laea_area \
+      -outdir &OUTPUT_DIR;/grid_weight -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_weight/grid_stat_AREA_WEIGHT_LAEA_240000L_20210121_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_weight/grid_stat_AREA_WEIGHT_LAEA_240000L_20210121_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="grid_weight_ENSEMBLE_STAT_NONE">
     <exec>&MET_BIN;/ensemble_stat</exec>
     <env>
