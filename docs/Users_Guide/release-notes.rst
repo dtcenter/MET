@@ -30,6 +30,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3426 <https://github.com/dtcenter/MET/issues/3426>`_).
      * Rename MET configuration options to avoid names like ``warning`` and ``error``
        (`#3455 <https://github.com/dtcenter/MET/issues/3455>`_).
+     * Enhance the GRIB2 library code to report unsupported GRIB2 data packing rather than segfaulting
+       (`#3525 <https://github.com/dtcenter/MET/issues/3525>`_).
 
   .. dropdown:: Bugfixes
 
@@ -37,6 +39,10 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#1257 <https://github.com/dtcenter/MET/issues/1257>`_).
      * Fix failures and warnings when compiling with clang
        (`#3291 <https://github.com/dtcenter/MET/issues/3291>`_).
+     * Fix the NetCDF CF reader segfault when a dimension has no coordinate variable
+       (`#3506 <https://github.com/dtcenter/MET/issues/3506>`_).
+     * Fix six defects introduced by the SonarQube and static analysis cleanup commits
+       (`#3509 <https://github.com/dtcenter/MET/issues/3509>`_).
      * Fix NetCDF CF convention support to read Stage IV precipitation files
        (`#3358 <https://github.com/dtcenter/MET/issues/3358>`_).
      * Fix MPAS UGRID support to correctly handle invalid latitude values
@@ -55,6 +61,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3468 <https://github.com/dtcenter/MET/issues/3468>`_).
      * Fix Stat-Analysis CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
        (`#3478 <https://github.com/dtcenter/MET/issues/3478>`_).
+     * **Fix Regrid-Data-Plane and Point2Grid to parse each -field command line option independently**
+       (`#3499 <https://github.com/dtcenter/MET/issues/3499>`_).
 
   .. dropdown:: Repository, build, and test
 
@@ -70,6 +78,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3443 <https://github.com/dtcenter/MET/issues/3443>`_).
      * Update the SonarQube scanner so that the scan runs on Java 21 as required by the upgraded SonarQube server
        (`#3470 <https://github.com/dtcenter/MET/issues/3470>`_).
+     * Fix the GRIB2 library code to compute the correct data index for scanning mode 160
+       (`#3535 <https://github.com/dtcenter/MET/issues/3535>`_).
      * Automate link checking with Sphinx
        (`METplus #3247 <https://github.com/dtcenter/METplus/issues/3247>`_).
      * Resolve blockers from the AF SonarQube quality gate scanner
@@ -431,6 +441,15 @@ MET Version 13.0.0 Upgrade Instructions
     such as Lambert conformal, polar stereographic, and Mercator, should check the "standard_name"
     attribute of their wind variables. Setting the "is_grid_relative" configuration option
     overrides the orientation determined from the file.
+
+  * Regrid-Data-Plane and Point2Grid now parse each "-field" command line option independently.
+    Previously these tools parsed every "-field" string into a single shared configuration object,
+    which was never reset between fields, so any setting omitted from a later "-field" silently
+    inherited the value given for an earlier one. Settings such as "convert", "censor_thresh",
+    "censor_val", "set_attr_name", and the "GRIB2_*" record filters were affected. Users who
+    passed multiple "-field" options to either tool, where at least one of them set a per-field
+    option that the others did not, should expect their output to change, and should review any
+    previously generated output for values that silently inherited a neighboring field's settings.
 
   * The "MET_OBS_ERROR_TABLE" environment variable is renamed to "MET_OBS_ERR_TABLE", and the
     default *share/met/table_files/obs_error_table.txt* file is renamed to *obs_err_table.txt*,

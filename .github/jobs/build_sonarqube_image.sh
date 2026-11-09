@@ -16,6 +16,8 @@ CMD_LOGFILE=${GITHUB_WORKSPACE}/sonarqube_build.log
 #
 if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
   export SONAR_REFERENCE_BRANCH=${GITHUB_BASE_REF}
+  # Setting this switches the scan from branch mode to pull request mode
+  export SONAR_PULLREQUEST_KEY=${PULL_REQUEST_NUMBER}
 elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
   export SONAR_REFERENCE_BRANCH=${WD_REFERENCE_BRANCH}
 else
@@ -23,6 +25,7 @@ else
 fi
 
 echo SONAR_REFERENCE_BRANCH=${SONAR_REFERENCE_BRANCH}
+echo SONAR_PULLREQUEST_KEY=${SONAR_PULLREQUEST_KEY}
 
 time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg MET_BASE_REPO \
@@ -32,6 +35,7 @@ time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg SONAR_HOST_URL \
     --build-arg SONAR_TOKEN \
     --build-arg SONAR_REFERENCE_BRANCH \
+    --build-arg SONAR_PULLREQUEST_KEY \
     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
 if [[ $? != 0 ]]; then
   cat ${CMD_LOGFILE}
