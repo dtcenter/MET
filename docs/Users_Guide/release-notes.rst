@@ -18,6 +18,8 @@ MET Version 12.1.3 Release Notes (TBD)
        (`#3450 <https://github.com/dtcenter/MET/issues/3450>`_).
      * Fix Stat-Analysis CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
        (`#3478 <https://github.com/dtcenter/MET/issues/3478>`_).
+     * **Fix the Gaussian grid longitude spacing, which placed the last column on top of the first**
+       (`#1257 <https://github.com/dtcenter/MET/issues/1257>`_).
 
 MET Version 12.1.2 Release Notes (20260227)
 -------------------------------------------
@@ -505,6 +507,16 @@ MET Version 12.1.3 Upgrade Instructions
 .. dropdown:: Output data changes
 
    MET version 12.1.3 modifies existing output data values in the following ways:
+
+   * Output for Gaussian grids changes. As described in MET
+     `#1257 <https://github.com/dtcenter/MET/issues/1257>`_, the longitude spacing was
+     computed as 360/(Nx-1) rather than 360/Nx, which spread the Nx columns across Nx-1
+     intervals instead of Nx. Each column was therefore placed east of its correct longitude
+     by an amount growing to a full grid cell at the last column, which landed on the same
+     meridian as the first. For a 512 column grid the spacing changes from 0.704501 to
+     0.703125 degrees and the final column moves from 360.000000 to 359.296875. Any output
+     regridded to or from a Gaussian grid changes accordingly, as does any grid box area
+     computed for one, which previously overstated the global area by a factor of Nx/(Nx-1).
 
    * PBL heights (HPBL) derived by PB2NC may change. As described in MET
      `#3450 <https://github.com/dtcenter/MET/issues/3450>`_, the PBL derived for a station
