@@ -999,9 +999,9 @@ void TrackPairInfoArray::assign(const TrackPairInfoArray &t) {
 
    if(t.n_pairs() == 0) return;
 
-   extend(t.n_pairs());
-
-   for(int i=0; i<t.n_pairs(); i++) Pair[i] = t.Pair[i];
+   // Assign the vector directly. extend() only reserves capacity, so
+   // indexing Pair[i] after clear() wrote outside the vector's size.
+   Pair = t.Pair;
 
    return;
 }
