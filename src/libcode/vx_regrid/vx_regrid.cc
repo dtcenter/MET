@@ -307,7 +307,7 @@ static double y_to_sin_lat(const Grid &grid, bool gaussian,
    double lat;
    double lon;
 
-   // Gaussian rows exist only at integer y, so interpolate the latitude between adjacent rows, matching the centered boxes of GaussianGrid::calc_area()
+   // Gaussian rows exist only at integer y, so interpolate the latitude between adjacent rows
    if(gaussian) {
       double ny = grid.ny();
 
