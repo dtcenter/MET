@@ -366,13 +366,13 @@ MET Version 13.0.0 Upgrade Instructions
 
   * Output for Gaussian grids changes. As described in MET
     `#1257 <https://github.com/dtcenter/MET/issues/1257>`_, the longitude spacing was
-    computed as 360/(Nx-1) rather than 360/Nx, which spread the Nx columns across 360
-    degrees instead of Nx intervals. The last column was therefore placed on the same
-    meridian as the first, and every other column was displaced west of the prime meridian
-    by up to a full grid cell. For a 512 column grid the spacing changes from 0.704501 to
+    computed as 360/(Nx-1) rather than 360/Nx, which spread the Nx columns across Nx-1
+    intervals instead of Nx. Each column was therefore placed east of its correct longitude
+    by an amount growing to a full grid cell at the last column, which landed on the same
+    meridian as the first. For a 512 column grid the spacing changes from 0.704501 to
     0.703125 degrees and the final column moves from 360.000000 to 359.296875. Any output
-    regridded to or from a Gaussian grid, and any grid box area computed for one, changes
-    accordingly.
+    regridded to or from a Gaussian grid changes accordingly, as does any grid box area
+    computed for one, which previously overstated the global area by a factor of Nx/(Nx-1).
 
   * Gridded data read from NetCDF files that follow the CF convention and use a polar
     stereographic grid mapping may change. As described in MET
