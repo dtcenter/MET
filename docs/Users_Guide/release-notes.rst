@@ -39,6 +39,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3291 <https://github.com/dtcenter/MET/issues/3291>`_).
      * Fix the NetCDF CF reader segfault when a dimension has no coordinate variable
        (`#3506 <https://github.com/dtcenter/MET/issues/3506>`_).
+     * Fix six defects introduced by the SonarQube and static analysis cleanup commits
+       (`#3509 <https://github.com/dtcenter/MET/issues/3509>`_).
      * Fix NetCDF CF convention support to read Stage IV precipitation files
        (`#3358 <https://github.com/dtcenter/MET/issues/3358>`_).
      * Fix MPAS UGRID support to correctly handle invalid latitude values
