@@ -245,6 +245,72 @@
     </output>
   </test>
 
+  <!--  MET #3545 table rows filtering on STATION_ID and HGT_RANGE.  -->
+
+  <test name="ensemble_stat_OBSERR_TABLE_FILTER">
+    <exec>echo "OBS_VAR MESSAGE_TYPE PB_REPORT_TYPE IN_REPORT_TYPE INSTRUMENT_TYPE STATION_ID HGT_RANGE PRS_RANGE VAL_RANGE INST_BIAS_SCALE INST_BIAS_OFFSET DIST_TYPE DIST_PARM MIN MAX" \
+          > &OUTPUT_DIR;/ensemble_stat/obs_error_table_filter.txt; \
+          echo "APCP_[0-9]* ALL ALL ALL ALL AAT,AATC1,ACLN2,ACMC1,ACV ALL ALL ALL NA NA NORMAL 0.1 0 NA" \
+          >> &OUTPUT_DIR;/ensemble_stat/obs_error_table_filter.txt; \
+          echo "APCP_[0-9]* ALL ALL ALL ALL ALL 0,100 ALL ALL NA NA NORMAL 1.0 0 NA" \
+          >> &OUTPUT_DIR;/ensemble_stat/obs_error_table_filter.txt; \
+          echo "APCP_[0-9]* ALL ALL ALL ALL ALL ALL ALL ALL NA NA NORMAL 5.0 0 NA" \
+          >> &OUTPUT_DIR;/ensemble_stat/obs_error_table_filter.txt; \
+          &MET_BIN;/ensemble_stat</exec>
+    <env>
+      <pair><name>DESC</name>                  <value>OBSERR</value></pair>
+      <pair><name>OBS_ERROR_FLAG</name>        <value>TRUE</value></pair>
+      <pair><name>MET_OBS_ERROR_TABLE</name>   <value>&OUTPUT_DIR;/ensemble_stat/obs_error_table_filter.txt</value></pair>
+      <pair><name>SKIP_CONST</name>            <value>TRUE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>         <value>OBSERR_TABLE_FILTER</value></pair>
+      <pair><name>OMP_NUM_THREADS</name>       <value>1</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/ensemble_stat/input_file_list \
+      &CONFIG_DIR;/EnsembleStatConfig \
+      -grid_obs &DATA_DIR_OBS;/laps/laps_2012041012_F000.grib \
+      -point_obs &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
+      -outdir &OUTPUT_DIR;/ensemble_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_TABLE_FILTER_20120410_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_TABLE_FILTER_20120410_120000V_ecnt.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_TABLE_FILTER_20120410_120000V_rhist.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_TABLE_FILTER_20120410_120000V_phist.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_TABLE_FILTER_20120410_120000V_orank.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_TABLE_FILTER_20120410_120000V_ssvar.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_TABLE_FILTER_20120410_120000V_orank.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--  MET #3545 config file min and max bounds on the perturbed values.  -->
+
+  <test name="ensemble_stat_OBSERR_BOUNDS">
+    <exec>&MET_BIN;/ensemble_stat</exec>
+    <env>
+      <pair><name>DESC</name>                  <value>OBSERR</value></pair>
+      <pair><name>SKIP_CONST</name>            <value>TRUE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>         <value>OBSERR_BOUNDS</value></pair>
+      <pair><name>OMP_NUM_THREADS</name>       <value>1</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/ensemble_stat/input_file_list \
+      &CONFIG_DIR;/EnsembleStatConfig_obs_error_bounds \
+      -grid_obs &DATA_DIR_OBS;/laps/laps_2012041012_F000.grib \
+      -point_obs &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
+      -outdir &OUTPUT_DIR;/ensemble_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_BOUNDS_20120410_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_BOUNDS_20120410_120000V_ecnt.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_BOUNDS_20120410_120000V_rhist.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_BOUNDS_20120410_120000V_phist.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_BOUNDS_20120410_120000V_orank.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_BOUNDS_20120410_120000V_ssvar.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBSERR_BOUNDS_20120410_120000V_orank.nc</grid_nc>
+    </output>
+  </test>
+
   <!--  Single NetCDF input file with all ensembles - no control member.  -->
 
   <test name="ensemble_stat_SINGLE_FILE_NC_NO_CTRL">

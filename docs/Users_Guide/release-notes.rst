@@ -29,6 +29,8 @@ MET Version 12.2.3 Release Notes (TBD)
 
      * Update the SonarQube scanner so that the scan runs on Java 21 as required by the upgraded SonarQube server
        (`#3470 <https://github.com/dtcenter/MET/issues/3470>`_).
+     * **Fix three observation error table defects: shifted filter columns, dropped MIN and MAX bounds, and swapped height and pressure**
+       (`#3545 <https://github.com/dtcenter/MET/issues/3545>`_).
 
 MET Version 12.2.2 Release Notes (20260828)
 -------------------------------------------
@@ -157,6 +159,19 @@ MET Version 12.2.3 Upgrade Instructions
 .. dropdown:: Output data changes
 
    MET version 12.2.3 modifies existing output data values in the following ways:
+
+   * Ensemble-Stat output changes for users of the observation error logic. As described in MET
+     `#3545 <https://github.com/dtcenter/MET/issues/3545>`_, three defects are fixed. An
+     observation error table row filtering on the STATION_ID, PB_REPORT_TYPE, IN_REPORT_TYPE, or
+     INSTRUMENT_TYPE column previously matched on the contents of a different column, so such
+     rows did not filter as written. The HGT_RANGE column was compared against the observation
+     level value and the PRS_RANGE column against the observation height, rather than the other
+     way around. And the valid range of perturbed values was discarded whenever an entry was
+     copied, which happens both as each row of a table file is read and as the configuration
+     file settings are stored, so neither the MIN and MAX columns of the table nor the "min"
+     and "max" entries of the "obs_error" dictionary had any effect. Statistics computed with
+     observation error enabled therefore change for every user of the default table, which
+     sets MIN to 0 for its WIND, HGT, and APCP rows.
 
    * Gridded data read from NetCDF files that follow the CF convention and use a polar
      stereographic grid mapping may change. As described in MET
