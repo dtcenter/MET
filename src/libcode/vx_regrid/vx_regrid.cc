@@ -309,13 +309,13 @@ static double y_to_sin_lat(const Grid &grid, bool gaussian,
 
    // Gaussian rows exist only at integer y, so interpolate the latitude between adjacent rows, matching the centered boxes of GaussianGrid::calc_area()
    if(gaussian) {
-      double ny = (double) grid.ny();
+      double ny = grid.ny();
 
       // Beyond the outermost row boundary, which is the pole
       if(y <= -0.5)     return -1.0;
       if(y >= ny - 0.5) return  1.0;
 
-      double xi = (double) nint(x);
+      double xi = nint(x);
 
       // Inside the outer half row, interpolate between the outermost row and the pole
       if(y < 0.0 || y > ny - 1.0) {
@@ -350,12 +350,14 @@ static double y_to_sin_lat(const Grid &grid, bool gaussian,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void aw_mean_lat_weights(const Grid &to_grid, bool to_gaussian,
-                                double x_to,
+static void aw_mean_lat_weights(const Grid &to_grid, double x_to,
                                 double y_min, double y_max,
                                 int n, const vector<int> &i,
                                 vector<double> &w) {
    static const double min_width = 1.0e-10;
+
+   // Gaussian row boundaries are handled separately
+   bool to_gaussian = (to_grid.info().g != nullptr);
 
    double s1 = y_to_sin_lat(to_grid, to_gaussian, x_to, y_min);
    double s2 = y_to_sin_lat(to_grid, to_gaussian, x_to, y_max);
@@ -427,9 +429,6 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
    // Split y overlaps by true area when rows follow constant latitude
    bool lat_rows = is_lat_row_grid(from_grid) && is_lat_row_grid(to_grid);
 
-   // Gaussian row boundaries are handled separately, set once here since Grid::info() deep copies a GridInfo
-   bool to_gaussian = (to_grid.info().g != nullptr);
-
    // Longitude period of the to_grid x coordinate, if any
    double x_period = x_lon_period(to_grid);
    double x_center = 0.5*(to_grid.nx() - 1);
@@ -447,7 +446,7 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
 
 #pragma omp parallel default(none) \
    shared(from_data, from_grid, to_grid, info, to_data) \
-   shared(to_data_sum, wt_data_sum, lat_rows, to_gaussian, x_period, x_center)
+   shared(to_data_sum, wt_data_sum, lat_rows, x_period, x_center)
    { 
 
 #pragma omp single
@@ -519,7 +518,7 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
                n_xt = aw_mean_overlap(x_min, x_max, to_grid.nx(), xt, xw);
                n_yt = aw_mean_overlap(y_min, y_max, to_grid.ny(), yt, yw);
                if(lat_rows && n_yt > 1) {
-                  aw_mean_lat_weights(to_grid, to_gaussian, x_to, y_min, y_max,
+                  aw_mean_lat_weights(to_grid, x_to, y_min, y_max,
                                       n_yt, yt, yw);
                }
             }
