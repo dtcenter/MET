@@ -24,6 +24,8 @@ MET Version 12.2.3 Release Notes (TBD)
        (`#3499 <https://github.com/dtcenter/MET/issues/3499>`_).
      * Fix the NetCDF CF reader segfault when a dimension has no coordinate variable
        (`#3506 <https://github.com/dtcenter/MET/issues/3506>`_).
+     * **Fix the Gaussian grid longitude spacing, which placed the last column on top of the first**
+       (`#1257 <https://github.com/dtcenter/MET/issues/1257>`_).
 
   .. dropdown:: Repository, build, and test
 
@@ -157,6 +159,16 @@ MET Version 12.2.3 Upgrade Instructions
 .. dropdown:: Output data changes
 
    MET version 12.2.3 modifies existing output data values in the following ways:
+
+   * Output for Gaussian grids changes. As described in MET
+     `#1257 <https://github.com/dtcenter/MET/issues/1257>`_, the longitude spacing was
+     computed as 360/(Nx-1) rather than 360/Nx, which spread the Nx columns across Nx-1
+     intervals instead of Nx. Each column was therefore placed east of its correct longitude
+     by an amount growing to a full grid cell at the last column, which landed on the same
+     meridian as the first. For a 512 column grid the spacing changes from 0.704501 to
+     0.703125 degrees and the final column moves from 360.000000 to 359.296875. Any output
+     regridded to or from a Gaussian grid changes accordingly, as does any grid box area
+     computed for one, which previously overstated the global area by a factor of Nx/(Nx-1).
 
    * Gridded data read from NetCDF files that follow the CF convention and use a polar
      stereographic grid mapping may change. As described in MET
