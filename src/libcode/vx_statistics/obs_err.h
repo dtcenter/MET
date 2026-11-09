@@ -115,10 +115,6 @@ class ObsErrTable {
       // table on every lookup() call for a given variable name
       std::map<std::string, std::vector<int>, std::less<>> VarSubsetCache;
 
-      // Index of the most recently matched table row which is checked
-      // first since consecutive lookups often produce the same match
-      int LastMatchIndex = -1;
-
       const std::vector<int> & var_subset(const char *cur_var_name);
 
    public:
