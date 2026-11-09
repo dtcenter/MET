@@ -304,44 +304,44 @@ static bool is_lat_row_grid(const Grid &grid) {
 
 static double y_to_sin_lat(const Grid &grid, bool gaussian,
                            double x, double y) {
-   double lat, lon;
+   double lat;
+   double lon;
 
-   // Gaussian rows are not evenly spaced, so the grid defines a latitude
-   // only at integer rows and GaussianGrid::xy_to_latlon() exits for a
-   // non-integer coordinate. The callers below ask for row boundaries at
-   // y +/- 0.5, so interpolate the sine of the latitude between the two
-   // adjacent rows. Gaussian latitude does not depend on x, and the
-   // integer x keeps xy_to_latlon() from rejecting the request.
-   //
-   // The caller passes the grid type in rather than letting this function
-   // call Grid::info(), which deep copies a GridInfo. This runs in the
-   // inner loop of met_regrid_area_weighted().
+   // Gaussian rows exist only at integer y, so interpolate the latitude between adjacent rows, matching the centered boxes of GaussianGrid::calc_area()
    if(gaussian) {
-      int ny = grid.ny();
+      double ny = (double) grid.ny();
 
-      if(ny < 2) {
-         grid.xy_to_latlon((double) nint(x), 0.0, lat, lon);
+      // Beyond the outermost row boundary, which is the pole
+      if(y <= -0.5)     return -1.0;
+      if(y >= ny - 0.5) return  1.0;
+
+      double xi = (double) nint(x);
+
+      // Inside the outer half row, interpolate between the outermost row and the pole
+      if(y < 0.0 || y > ny - 1.0) {
+         double y_row    = (y < 0.0 ?   0.0 : ny - 1.0);
+         double lat_pole = (y < 0.0 ? -90.0 : 90.0);
+         double f        = 2.0*fabs(y - y_row);
+
+         grid.xy_to_latlon(xi, y_row, lat, lon);
+         lat = (1.0 - f)*lat + f*lat_pole;
+
          return sind(max(-90.0, min(90.0, lat)));
       }
 
-      int y0 = (int) floor(y);
-      int y1 = y0 + 1;
+      // Between two rows, so interpolate the latitude
+      double y0 = floor(y);
+      double y1 = min(y0 + 1.0, ny - 1.0);
+      double f  = y - y0;
 
-      // Clamp the row pair into range and let the fraction carry the
-      // extrapolation, which is at most half a row beyond the first or
-      // last Gaussian latitude
-      if(y0 < 0)         { y0 = 0;      y1 = 1;      }
-      else if(y1 > ny-1) { y0 = ny - 2; y1 = ny - 1; }
+      double lat0;
+      double lat1;
+      grid.xy_to_latlon(xi, y0, lat0, lon);
+      grid.xy_to_latlon(xi, y1, lat1, lon);
 
-      double f = y - (double) y0;
+      lat = (1.0 - f)*lat0 + f*lat1;
 
-      double lat0, lat1;
-      grid.xy_to_latlon((double) nint(x), (double) y0, lat0, lon);
-      grid.xy_to_latlon((double) nint(x), (double) y1, lat1, lon);
-
-      double s = (1.0 - f)*sind(lat0) + f*sind(lat1);
-
-      return max(-1.0, min(1.0, s));
+      return sind(max(-90.0, min(90.0, lat)));
    }
 
    grid.xy_to_latlon(x, y, lat, lon);
@@ -427,9 +427,7 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
    // Split y overlaps by true area when rows follow constant latitude
    bool lat_rows = is_lat_row_grid(from_grid) && is_lat_row_grid(to_grid);
 
-   // Gaussian rows are unevenly spaced and defined only at integer y, so
-   // their row boundaries are handled separately. Determined once here
-   // rather than per call inside the loop below.
+   // Gaussian row boundaries are handled separately, set once here since Grid::info() deep copies a GridInfo
    bool to_gaussian = (to_grid.info().g != nullptr);
 
    // Longitude period of the to_grid x coordinate, if any

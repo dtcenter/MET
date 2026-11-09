@@ -257,12 +257,7 @@
     </output>
   </test>
 
-  <!-- MET #3178: Regrid to a Gaussian grid using AW_MEAN_CNTR.        -->
-  <!-- Gaussian rows are unevenly spaced, so the grid defines a        -->
-  <!-- latitude only at integer rows. AW_MEAN_CNTR asks for the row    -->
-  <!-- boundaries at y +/- 0.5, which previously exited with           -->
-  <!-- "GaussianGrid::xy_to_latlon() const -> x and y must be          -->
-  <!-- integers" and produced no output file at all.                   -->
+  <!-- MET #3178: Regrid to a Gaussian grid using AW_MEAN_CNTR, whose row boundaries at y +/- 0.5 previously exited since the grid defines a latitude only at integer rows -->
 
   <test name="regrid_data_plane_GFS_0P25_TO_GAUSSIAN_AW_MEAN_CNTR">
     <exec>&MET_BIN;/regrid_data_plane</exec>
