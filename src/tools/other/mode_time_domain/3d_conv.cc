@@ -216,10 +216,6 @@ const int trp1 = 2*spatial_R + 1;
 const double scale = 1.0/(trp1*trp1);
 
 
-file_id = 1;   //  This is declared static in the netCDF library header file ncGroup.h,
-               //  so we have to do **something** with this or the compiler complains
-               //  about an unused variable
-
 spatial_conv_radius = spatial_R;
 
 const int Nxy = Nx*Ny;
