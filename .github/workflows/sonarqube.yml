@@ -76,6 +76,8 @@ jobs:
           MET_BASE_TAG: ${{ steps.get_met_base_image.outputs.met_base_tag }}
           SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
           WD_REFERENCE_BRANCH: ${{ github.event.inputs.reference_branch }}
+          # Empty unless this run was triggered by a pull request
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
