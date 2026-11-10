@@ -29,7 +29,7 @@ MET Version 12.2.3 Release Notes (TBD)
 
      * Update the SonarQube scanner so that the scan runs on Java 21 as required by the upgraded SonarQube server
        (`#3470 <https://github.com/dtcenter/MET/issues/3470>`_).
-     * **Fix three observation error table defects: shifted filter columns, dropped MIN and MAX bounds, and swapped height and pressure**
+     * **Fix observation error table parsing and lookup logic for Ensemble-Stat**
        (`#3545 <https://github.com/dtcenter/MET/issues/3545>`_).
 
 MET Version 12.2.2 Release Notes (20260828)
