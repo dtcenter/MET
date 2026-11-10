@@ -343,7 +343,7 @@ xy_to_uv(x - 0.5, y + 0.5, u[3], v[3]);  //  upper left
 
 sum = uv_closedpolyline_area(u, v, 4);
 
-sum *= earth_radius_km*earth_radius_km;
+// MET #3541 the LAEA affine is built from dx_km and dy_km, so this is already km^2
 
 return sum;
 
