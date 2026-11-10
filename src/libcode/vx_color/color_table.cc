@@ -833,7 +833,7 @@ double ColorTable::data_min() const
 
 {
 
-if ( Entry.empty() == 0 )  return 0.0;
+if ( Entry.empty() )  return 0.0;
 
 return Entry[0].value_low();
 

@@ -35,10 +35,14 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
 
   .. dropdown:: Bugfixes
 
+     * **Fix the Gaussian grid longitude spacing, which placed the last column on top of the first**
+       (`#1257 <https://github.com/dtcenter/MET/issues/1257>`_).
      * Fix failures and warnings when compiling with clang
        (`#3291 <https://github.com/dtcenter/MET/issues/3291>`_).
      * Fix the NetCDF CF reader segfault when a dimension has no coordinate variable
        (`#3506 <https://github.com/dtcenter/MET/issues/3506>`_).
+     * Fix six defects introduced by the SonarQube and static analysis cleanup commits
+       (`#3509 <https://github.com/dtcenter/MET/issues/3509>`_).
      * Fix NetCDF CF convention support to read Stage IV precipitation files
        (`#3358 <https://github.com/dtcenter/MET/issues/3358>`_).
      * Fix MPAS UGRID support to correctly handle invalid latitude values
@@ -359,6 +363,16 @@ MET Version 13.0.0 Upgrade Instructions
     the value of the nearest cell. They now use the N closest cells. The "AREA" grid weight for
     UGRIDs, previously 0 for every cell, is now derived from the cell area, normalized as
     described in MET `#3448 <https://github.com/dtcenter/MET/issues/3448>`_.
+
+  * Output for Gaussian grids changes. As described in MET
+    `#1257 <https://github.com/dtcenter/MET/issues/1257>`_, the longitude spacing was
+    computed as 360/(Nx-1) rather than 360/Nx, which spread the Nx columns across Nx-1
+    intervals instead of Nx. Each column was therefore placed east of its correct longitude
+    by an amount growing to a full grid cell at the last column, which landed on the same
+    meridian as the first. For a 512 column grid the spacing changes from 0.704501 to
+    0.703125 degrees and the final column moves from 360.000000 to 359.296875. Any output
+    regridded to or from a Gaussian grid changes accordingly, as does any grid box area
+    computed for one, which previously overstated the global area by a factor of Nx/(Nx-1).
 
   * Gridded data read from NetCDF files that follow the CF convention and use a polar
     stereographic grid mapping may change. As described in MET

@@ -79,7 +79,8 @@ ConcatString::ConcatString(ConcatString && c) noexcept
      FloatFormat(std::move(c.FloatFormat)),
      s(std::move(c.s))
 {
-   init_from_scratch();
+   // Do not call init_from_scratch() here. It resets Precision and
+   // FloatFormat to their defaults, discarding the values just moved in.
 }
 
 
