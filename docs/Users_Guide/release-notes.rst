@@ -24,6 +24,8 @@ MET Version 12.2.3 Release Notes (TBD)
        (`#3499 <https://github.com/dtcenter/MET/issues/3499>`_).
      * Fix the NetCDF CF reader segfault when a dimension has no coordinate variable
        (`#3506 <https://github.com/dtcenter/MET/issues/3506>`_).
+     * **Fix the Lambert Azimuthal Equal Area grid box area, which was scaled by the earth radius twice**
+       (`#3541 <https://github.com/dtcenter/MET/issues/3541>`_).
 
   .. dropdown:: Repository, build, and test
 
@@ -157,6 +159,16 @@ MET Version 12.2.3 Upgrade Instructions
 .. dropdown:: Output data changes
 
    MET version 12.2.3 modifies existing output data values in the following ways:
+
+   * Output for Lambert Azimuthal Equal Area (LAEA) grids verified with
+     "grid_weight_flag = AREA" or "AREA_CNTR" changes. As described in MET
+     `#3541 <https://github.com/dtcenter/MET/issues/3541>`_, the LAEA grid box area was
+     scaled by the earth radius squared a second time, making every area 40,680,675 times
+     too large: a 2 km by 2 km grid box was reported as 1.627227e+08 square kilometers,
+     roughly a third of the surface area of the Earth. Because the weights are applied
+     uniformly, the weighted contingency table counts FY_OY, FY_ON, FN_OY and FN_ON in the
+     CTC output line change by that same factor. Statistics derived from them as ratios are
+     unaffected, so the CTS, CNT and SL1L2 output lines, and the TOTAL column, do not change.
 
    * Gridded data read from NetCDF files that follow the CF convention and use a polar
      stereographic grid mapping may change. As described in MET
