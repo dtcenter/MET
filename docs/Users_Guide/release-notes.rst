@@ -33,6 +33,8 @@ MET Version 12.2.3 Release Notes (TBD)
 
      * Update the SonarQube scanner so that the scan runs on Java 21 as required by the upgraded SonarQube server
        (`#3470 <https://github.com/dtcenter/MET/issues/3470>`_).
+     * Fix MODE-TD compilation against netcdf-cxx4 version 4.3.2
+       (`#3550 <https://github.com/dtcenter/MET/issues/3550>`_).
 
 MET Version 12.2.2 Release Notes (20260828)
 -------------------------------------------
