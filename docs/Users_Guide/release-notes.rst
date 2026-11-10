@@ -18,7 +18,7 @@ MET Version 12.1.3 Release Notes (TBD)
        (`#3450 <https://github.com/dtcenter/MET/issues/3450>`_).
      * Fix Stat-Analysis CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
        (`#3478 <https://github.com/dtcenter/MET/issues/3478>`_).
-     * **Fix three observation error table defects: shifted filter columns, dropped MIN and MAX bounds, and swapped height and pressure**
+     * **Fix observation error table parsing and lookup logic for Ensemble-Stat**
        (`#3545 <https://github.com/dtcenter/MET/issues/3545>`_).
 
 MET Version 12.1.2 Release Notes (20260227)
