@@ -250,14 +250,14 @@ bool ObsErrEntry::parse_line(const DataLine &dl) {
    }
 
    // Filtering parameters
-   if(strcasecmp(dl[1], wildcard_str) != 0)  msg_type.parse_css(dl[1]);
+   if(strcasecmp(dl[1], wildcard_str) != 0) msg_type.parse_css(dl[1]);
    if(strcasecmp(dl[2], wildcard_str) != 0) pb_rpt_type.add_css(dl[2]);
    if(strcasecmp(dl[3], wildcard_str) != 0) in_rpt_type.add_css(dl[3]);
-   if(strcasecmp(dl[4], wildcard_str) != 0)   inst_type.add_css(dl[4]);
-   if(strcasecmp(dl[5], wildcard_str) != 0)         sid.parse_css(dl[5]);
-   if(strcasecmp(dl[6], wildcard_str) != 0)   hgt_range.add_css(dl[6]);
-   if(strcasecmp(dl[7], wildcard_str) != 0)   prs_range.add_css(dl[7]);
-   if(strcasecmp(dl[8], wildcard_str) != 0)   val_range.add_css(dl[8]);
+   if(strcasecmp(dl[4], wildcard_str) != 0) inst_type.add_css(dl[4]);
+   if(strcasecmp(dl[5], wildcard_str) != 0) sid.parse_css(dl[5]);
+   if(strcasecmp(dl[6], wildcard_str) != 0) hgt_range.add_css(dl[6]);
+   if(strcasecmp(dl[7], wildcard_str) != 0) prs_range.add_css(dl[7]);
+   if(strcasecmp(dl[8], wildcard_str) != 0) val_range.add_css(dl[8]);
 
    // Observation error adjustments
    bias_scale = (strcmp(dl[9], na_str) == 0 ?

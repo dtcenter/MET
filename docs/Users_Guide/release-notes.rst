@@ -61,7 +61,7 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3478 <https://github.com/dtcenter/MET/issues/3478>`_).
      * **Fix Regrid-Data-Plane and Point2Grid to parse each -field command line option independently**
        (`#3499 <https://github.com/dtcenter/MET/issues/3499>`_).
-     * **Fix three observation error table defects: shifted filter columns, dropped MIN and MAX bounds, and swapped height and pressure**
+     * **Fix observation error table parsing and lookup logic for Ensemble-Stat**
        (`#3545 <https://github.com/dtcenter/MET/issues/3545>`_).
 
   .. dropdown:: Repository, build, and test
