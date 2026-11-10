@@ -14,6 +14,8 @@ MET Version 12.2.3 Release Notes (TBD)
 
   .. dropdown:: Bugfixes
 
+     * **Fix the Gaussian grid longitude spacing, which placed the last column on top of the first**
+       (`#1257 <https://github.com/dtcenter/MET/issues/1257>`_).
      * Fix NetCDF CF convention support to read Stage IV precipitation files
        (`#3358 <https://github.com/dtcenter/MET/issues/3358>`_).
      * Fix PB2NC so that derived HPBL output does not depend on which other stations are processed
@@ -24,6 +26,8 @@ MET Version 12.2.3 Release Notes (TBD)
        (`#3499 <https://github.com/dtcenter/MET/issues/3499>`_).
      * Fix the NetCDF CF reader segfault when a dimension has no coordinate variable
        (`#3506 <https://github.com/dtcenter/MET/issues/3506>`_).
+     * **Fix the Lambert Azimuthal Equal Area grid box area, which was scaled by the earth radius twice**
+       (`#3541 <https://github.com/dtcenter/MET/issues/3541>`_).
 
   .. dropdown:: Repository, build, and test
 
@@ -159,6 +163,26 @@ MET Version 12.2.3 Upgrade Instructions
 .. dropdown:: Output data changes
 
    MET version 12.2.3 modifies existing output data values in the following ways:
+
+   * Output for Gaussian grids changes. As described in MET
+     `#1257 <https://github.com/dtcenter/MET/issues/1257>`_, the longitude spacing was
+     computed as 360/(Nx-1) rather than 360/Nx, which spread the Nx columns across Nx-1
+     intervals instead of Nx. Each column was therefore placed east of its correct longitude
+     by an amount growing to a full grid cell at the last column, which landed on the same
+     meridian as the first. For a 512 column grid the spacing changes from 0.704501 to
+     0.703125 degrees and the final column moves from 360.000000 to 359.296875. Any output
+     regridded to or from a Gaussian grid changes accordingly, as does any grid box area
+     computed for one, which previously overstated the global area by a factor of Nx/(Nx-1).
+
+   * Output for Lambert Azimuthal Equal Area (LAEA) grids verified with
+     "grid_weight_flag = AREA" or "AREA_CNTR" changes. As described in MET
+     `#3541 <https://github.com/dtcenter/MET/issues/3541>`_, the LAEA grid box area was
+     scaled by the earth radius squared a second time, making every area 40,680,675 times
+     too large: a 2 km by 2 km grid box was reported as 1.627227e+08 square kilometers,
+     roughly a third of the surface area of the Earth. Because the weights are applied
+     uniformly, the weighted contingency table counts FY_OY, FY_ON, FN_OY and FN_ON in the
+     CTC output line change by that same factor. Statistics derived from them as ratios are
+     unaffected, so the CTS, CNT and SL1L2 output lines, and the TOTAL column, do not change.
 
    * Ensemble-Stat output changes for users of the observation error logic. As described in MET
      `#3545 <https://github.com/dtcenter/MET/issues/3545>`_, three defects are fixed. An
