@@ -1064,21 +1064,36 @@ long MetNcCFDataFile::find_generic_offset(VarInfo &vinfo, const NcVarInfo *data_
    auto vinfo_nc = (VarInfoNcCF *)&vinfo;
    long offset = vinfo_nc->dimension(index);
    string dim_name = get_dim_name(data_var, index);
-   NcVarInfo* dim_var_info = _file->find_var_by_dim_name(dim_name.c_str());
 
-   int dim_size = get_data_size(dim_var_info->var);
-   vector<double> values(dim_size);
-
-   if( !get_nc_data(dim_var_info->var, values.data()) ) {
-      mlog << Error << "\n" << method_name << "failed to get data from " << dim_name << "\n\n";
-      exit(1);
-   }
+   // A dimension is not required to have a coordinate variable
+   int dim_size = get_dim_size(data_var->var, index);
 
    if (offset == range_flag) {
       mlog << Warning << "\n" << method_name << "range is not supported for "
            << offset << " dimension for generic \"" << vinfo.req_name() << "\" variable\n\n";
    }
    else if (!vinfo_nc->is_offset(index)) {
+
+      // Only a request by value needs the coordinate variable
+      NcVarInfo* dim_var_info = _file->find_var_by_dim_name(dim_name.c_str());
+
+      if (nullptr == dim_var_info || !IS_VALID_NC_P(dim_var_info->var)) {
+         mlog << Error << "\n" << method_name << "the \"" << dim_name
+              << "\" dimension of the \"" << vinfo.req_name()
+              << "\" variable has no coordinate variable, so the requested "
+              << "value cannot be looked up. Specify an integer offset "
+              << "between 0 and " << (dim_size-1) << " instead.\n\n";
+         exit(1);
+      }
+
+      int n_values = get_data_size(dim_var_info->var);
+      vector<double> values(n_values);
+
+      if( !get_nc_data(dim_var_info->var, values.data()) ) {
+         mlog << Error << "\n" << method_name << "failed to get data from " << dim_name << "\n\n";
+         exit(1);
+      }
+
       double value = vinfo_nc->dim_value(index);
       offset = convert_generic_to_offset(value, dim_name, values);
       if (offset < 0) {
