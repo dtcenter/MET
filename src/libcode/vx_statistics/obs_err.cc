@@ -390,11 +390,9 @@ ObsErrTable::ObsErrTable(const ObsErrTable &f) {
 
 ObsErrTable::ObsErrTable(ObsErrTable &&f) noexcept :
    e(std::move(f.e)), IsSet(f.IsSet),
-   VarSubsetCache(std::move(f.VarSubsetCache)),
-   LastMatchIndex(f.LastMatchIndex) {
+   VarSubsetCache(std::move(f.VarSubsetCache)) {
 
    f.IsSet = false;
-   f.LastMatchIndex = -1;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -406,7 +404,6 @@ void ObsErrTable::clear() {
    IsSet = false;
 
    VarSubsetCache.clear();
-   LastMatchIndex = -1;
 
    return;
 }
@@ -460,10 +457,8 @@ ObsErrTable & ObsErrTable::operator=(ObsErrTable &&f) noexcept {
    e = std::move(f.e);
    IsSet = f.IsSet;
    VarSubsetCache = std::move(f.VarSubsetCache);
-   LastMatchIndex = f.LastMatchIndex;
 
    f.IsSet = false;
-   f.LastMatchIndex = -1;
 
    return *this;
 }
@@ -601,27 +596,14 @@ const ObsErrEntry *ObsErrTable::lookup(
    double cur_hgt,           double cur_prs,           double cur_val) {
    const ObsErrEntry * e_match = nullptr;
 
-   // Check the most recently matched entry first since consecutive
-   // lookups often resolve to the same table row
-   if(LastMatchIndex >= 0 && LastMatchIndex < n() &&
-      e[LastMatchIndex].is_match(cur_var_name, cur_msg_type, cur_sid,
-                                 cur_pb_rpt,   cur_in_rpt,   cur_inst,
-                                 cur_hgt,      cur_prs,      cur_val)) {
-      e_match = &e[LastMatchIndex];
-   }
-   else {
-
-      // Otherwise, scan only the rows whose var_name criteria could
-      // match, skipping the (already-verified) var_name regex check
-      const vector<int> &subset = var_subset(cur_var_name);
-      for(int idx : subset) {
-         if(e[idx].is_match(cur_var_name, cur_msg_type, cur_sid,
-                            cur_pb_rpt,   cur_in_rpt,   cur_inst,
-                            cur_hgt,      cur_prs,      cur_val, true)) {
-            e_match = &e[idx];
-            LastMatchIndex = idx;
-            break;
-         }
+   // Scan the var_name subset in table order: the first matching row wins
+   const vector<int> &subset = var_subset(cur_var_name);
+   for(int idx : subset) {
+      if(e[idx].is_match(cur_var_name, cur_msg_type, cur_sid,
+                         cur_pb_rpt,   cur_in_rpt,   cur_inst,
+                         cur_hgt,      cur_prs,      cur_val, true)) {
+         e_match = &e[idx];
+         break;
       }
    }
 
@@ -649,28 +631,14 @@ const ObsErrEntry *ObsErrTable::lookup(
    const char *cur_var_name, const char *cur_msg_type, double cur_val) {
    const ObsErrEntry * e_match = nullptr;
 
-   // Check the most recently matched entry first since consecutive
-   // lookups (e.g. adjacent grid points) often resolve to the same
-   // table row
-   if(LastMatchIndex >= 0 && LastMatchIndex < n() &&
-      e[LastMatchIndex].is_match(   cur_var_name,    cur_msg_type, bad_data_str,
-                                    bad_data_int,    bad_data_int, bad_data_int,
-                                 bad_data_double, bad_data_double, cur_val)) {
-      e_match = &e[LastMatchIndex];
-   }
-   else {
-
-      // Otherwise, scan only the rows whose var_name criteria could
-      // match, skipping the (already-verified) var_name regex check
-      const vector<int> &subset = var_subset(cur_var_name);
-      for(int idx : subset) {
-         if(e[idx].is_match(   cur_var_name,    cur_msg_type, bad_data_str,
-                               bad_data_int,    bad_data_int, bad_data_int,
-                            bad_data_double, bad_data_double, cur_val, true)) {
-            e_match = &e[idx];
-            LastMatchIndex = idx;
-            break;
-         }
+   // Scan the var_name subset in table order: the first matching row wins
+   const vector<int> &subset = var_subset(cur_var_name);
+   for(int idx : subset) {
+      if(e[idx].is_match(   cur_var_name,    cur_msg_type, bad_data_str,
+                            bad_data_int,    bad_data_int, bad_data_int,
+                         bad_data_double, bad_data_double, cur_val, true)) {
+         e_match = &e[idx];
+         break;
       }
    }
 
