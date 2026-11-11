@@ -455,7 +455,7 @@ MET Version 13.0.0 Upgrade Instructions
   * Users compiling MET with the *compile_MET_all.sh* script on a system whose C compiler
     defaults to the C23 standard, such as one providing GCC version 15 or later, should be
     aware that the script now compiles the external libraries with "-std=gnu17". Several of
-    those libraries predate C23 and do not compile in the newer mode. The "MET_LIB_CSTD"
+    those libraries predate C23 and do not compile in the newer mode. The "MET_LIB_C_STANDARD"
     environment variable described in :numref:`Install_Required-libraries-and` requests a
     different standard, or disables this behavior entirely when set to "none". The script
     also sets "CMAKE_POLICY_VERSION_MINIMUM" so that the libraries built with CMake, which

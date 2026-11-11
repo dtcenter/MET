@@ -372,21 +372,23 @@ echo
 
 # Several of the external libraries predate the C23 standard that GCC 15 and
 # later select by default, and no longer compile in that mode. Fall back to
-# gnu17 when the compiler default is newer than C17. Set MET_LIB_CSTD to
-# request a specific standard, or to "none" to disable this logic.
-if [[ -z ${MET_LIB_CSTD} ]]; then
+# C17 when the compiler default is newer. Set MET_LIB_C_STANDARD to request a
+# specific standard, or to "none" to disable this logic.
+if [[ -z ${MET_LIB_C_STANDARD} ]]; then
   default_cstd=$(echo __STDC_VERSION__ | ${CC} -E -xc - 2>/dev/null | tail -1 | tr -cd '0-9')
   if [[ ${default_cstd} =~ ^[0-9]+$ ]] && [[ ${default_cstd} -gt 201710 ]]; then
-    MET_LIB_CSTD="gnu17"
+    MET_LIB_C_STANDARD=17
     echo "The C compiler defaults to __STDC_VERSION__ = ${default_cstd}, which is newer than C17."
   fi
 fi
 
-if [[ ! -z ${MET_LIB_CSTD} && ${MET_LIB_CSTD} != "none" ]]; then
-  echo "Compiling the external libraries with -std=${MET_LIB_CSTD}"
+if [[ ! -z ${MET_LIB_C_STANDARD} && ${MET_LIB_C_STANDARD} != "none" ]]; then
+  # Use the GNU dialect, which is what these libraries were written against
+  # and what the C compiler selected by default through GCC 14.
+  echo "Compiling the external libraries with -std=gnu${MET_LIB_C_STANDARD}"
   # A configure script applies "-g -O2" of its own only while CFLAGS is unset.
   if [[ -z ${CFLAGS} ]]; then CFLAGS="-g -O2"; fi
-  CFLAGS="-std=${MET_LIB_CSTD} ${CFLAGS}"
+  CFLAGS="-std=gnu${MET_LIB_C_STANDARD} ${CFLAGS}"
 fi
 
 # Export these so the external library builds inherit them, which they
