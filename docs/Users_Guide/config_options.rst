@@ -362,25 +362,27 @@ to a directory, all files in it whose names begin with "obs_err" and end with
           files whose names begin with "obs_error" are still read.
 
 When processing point and gridded observations, Ensemble-Stat searches the table
-to find the entry defining the observation error information. The table
-consists of 15 columns and includes a header row defining each column. The
-special string ALL is interpreted as a wildcard in these files. The first 6
-columns (OBS_VAR, MESSAGE_TYPE, PB_REPORT_TYPE, IN_REPORT_TYPE, INSTRUMENT_TYPE,
-and STATION_ID) may be set to a comma-separated list of strings to be matched.
-In addition, the strings in the OBS_VAR column are interpreted as regular
-expressions when searching for a match. For example, setting the OBS_VAR column
-to 'APCP_[0-9]+' would match observations for both APCP_03 and APCP_24. The
-HGT_RANGE, VAL_RANGE, and PRS_RANGE columns should either be set to ALL or
-BEG,END where BEG and END specify the range of values to be used. The
-INST_BIAS_SCALE and INST_BIAS_OFFSET columns define instrument bias adjustments
-which are applied to the observation values. The DIST_TYPE and DIST_PARM
-columns define the distribution from which random perturbations should be drawn
-and applied to the ensemble member values. See the obs_err description below
-for details on the supported error distributions. The last two columns, MIN and
-MAX, define the bounds for the valid range of the bias-corrected observation
-values and randomly perturbed ensemble member values. Values less than MIN are
-reset to the minimum value and values greater than MAX are reset to the maximum
-value. A value of NA indicates that the variable is unbounded.
+to find the entry defining the observation error information. The rows are
+checked in the order in which they appear in the file and the first matching row
+is used, so rows with more specific matching criteria should be listed above
+more general ones. The table consists of 15 columns and includes a header row
+defining each column. The special string ALL is interpreted as a wildcard in
+these files. The first 6 columns (OBS_VAR, MESSAGE_TYPE, PB_REPORT_TYPE,
+IN_REPORT_TYPE, INSTRUMENT_TYPE, and STATION_ID) may be set to a comma-separated
+list of strings to be matched. In addition, the strings in the OBS_VAR column
+are interpreted as regular expressions when searching for a match. For example,
+setting the OBS_VAR column to 'APCP_[0-9]+' would match observations for both
+APCP_03 and APCP_24. The HGT_RANGE, VAL_RANGE, and PRS_RANGE columns should
+either be set to ALL or BEG,END where BEG and END specify the range of values to
+be used. The INST_BIAS_SCALE and INST_BIAS_OFFSET columns define instrument bias
+adjustments which are applied to the observation values. The DIST_TYPE and
+DIST_PARM columns define the distribution from which random perturbations should
+be drawn and applied to the ensemble member values. See the obs_err description
+below for details on the supported error distributions. The last two columns,
+MIN and MAX, define the bounds for the valid range of the bias-corrected
+observation values and randomly perturbed ensemble member values. Values less
+than MIN are reset to the minimum value and values greater than MAX are reset to
+the maximum value. A value of NA indicates that the variable is unbounded.
 
 If the observation error table contains no entries for the variable being
 evaluated, MET prints a warning message and disables the observation error
@@ -3305,7 +3307,12 @@ number between 0 and 1 specifying the required ratio of valid data in the
 neighborhood for an output value to be computed. The alpha entry is a number
 between 0 and 1 specifying the EAS distance criteria. For each grid point,
 the smallest width for which the distance criteria is satisfied is used.
-If the distance criteria is never satisfied, the largest width is used.
+If the distance criteria is never satisfied, the largest width that can
+be evaluated is used. A width cannot be evaluated when the ratio of valid
+data in its neighborhood is less than vld_thresh, which occurs for the
+larger widths near the edges of the domain, where the neighborhood
+extends beyond the grid. Those widths are skipped, and the output is set
+to bad data only when none of the candidate widths can be evaluated.
 
 The gaussian_dx and gaussian_radius entries define the Gaussian smoother
 which is applied to the raw EAS probabilities.
