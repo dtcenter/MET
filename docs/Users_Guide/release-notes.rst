@@ -28,11 +28,17 @@ MET Version 12.2.3 Release Notes (TBD)
        (`#3506 <https://github.com/dtcenter/MET/issues/3506>`_).
      * **Fix the Lambert Azimuthal Equal Area grid box area, which was scaled by the earth radius twice**
        (`#3541 <https://github.com/dtcenter/MET/issues/3541>`_).
+     * Fix Point2Grid to write the default output value for a field with no observations
+       (`#3519 <https://github.com/dtcenter/MET/issues/3519>`_).
 
   .. dropdown:: Repository, build, and test
 
      * Update the SonarQube scanner so that the scan runs on Java 21 as required by the upgraded SonarQube server
        (`#3470 <https://github.com/dtcenter/MET/issues/3470>`_).
+     * Fix MODE-TD compilation against netcdf-cxx4 version 4.3.2
+       (`#3550 <https://github.com/dtcenter/MET/issues/3550>`_).
+     * **Fix observation error table parsing and lookup logic for Ensemble-Stat**
+       (`#3545 <https://github.com/dtcenter/MET/issues/3545>`_).
 
 MET Version 12.2.2 Release Notes (20260828)
 -------------------------------------------
@@ -182,6 +188,19 @@ MET Version 12.2.3 Upgrade Instructions
      CTC output line change by that same factor. Statistics derived from them as ratios are
      unaffected, so the CTS, CNT and SL1L2 output lines, and the TOTAL column, do not change.
 
+   * Ensemble-Stat output changes for users of the observation error logic. As described in MET
+     `#3545 <https://github.com/dtcenter/MET/issues/3545>`_, three defects are fixed. An
+     observation error table row filtering on the STATION_ID, PB_REPORT_TYPE, IN_REPORT_TYPE, or
+     INSTRUMENT_TYPE column previously matched on the contents of a different column, so such
+     rows did not filter as written. The HGT_RANGE column was compared against the observation
+     level value and the PRS_RANGE column against the observation height, rather than the other
+     way around. And the valid range of perturbed values was discarded whenever an entry was
+     copied, which happens both as each row of a table file is read and as the configuration
+     file settings are stored, so neither the MIN and MAX columns of the table nor the "min"
+     and "max" entries of the "obs_error" dictionary had any effect. Statistics computed with
+     observation error enabled therefore change for every user of the default table, which
+     sets MIN to 0 for its WIND, HGT, and APCP rows.
+
    * Gridded data read from NetCDF files that follow the CF convention and use a polar
      stereographic grid mapping may change. As described in MET
      `#3358 <https://github.com/dtcenter/MET/issues/3358>`_, MET now reads data stored from
@@ -219,6 +238,12 @@ MET Version 12.2.3 Upgrade Instructions
      and the "GRIB2_*" record filters were affected. Each "-field" option is now parsed
      independently. Runs where at least one "-field" set a per-field option that the others
      did not should be reviewed, since their previous output may have been silently incorrect.
+
+   * Point2Grid output changes for any requested field with no observations mapped to the
+     output grid that follows a field that had them. As described in MET
+     `#3519 <https://github.com/dtcenter/MET/issues/3519>`_, such a field was previously
+     written using the preceding field's data, count, and mask values. It is now written
+     using the default output value of bad data, with its count and mask values set to 0.
 
 MET Version 12.2.0 Upgrade Instructions
 ---------------------------------------
