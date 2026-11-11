@@ -57,6 +57,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3443 <https://github.com/dtcenter/MET/issues/3443>`_).
      * Fix PB2NC so that derived HPBL output does not depend on which other stations are processed
        (`#3450 <https://github.com/dtcenter/MET/issues/3450>`_).
+     * Fix Point2Grid to write the default output value for fields with no observations
+       (`#3297 <https://github.com/dtcenter/MET/issues/3297>`_).
      * Fix the PB2NC ``-dump`` segfault and reduce PB2NC compiler warnings
        (`#3468 <https://github.com/dtcenter/MET/issues/3468>`_).
      * Fix Stat-Analysis CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
@@ -80,6 +82,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3470 <https://github.com/dtcenter/MET/issues/3470>`_).
      * Fix the GRIB2 library code to compute the correct data index for scanning mode 160
        (`#3535 <https://github.com/dtcenter/MET/issues/3535>`_).
+     * Fix MODE-TD compilation against netcdf-cxx4 version 4.3.2
+       (`#3550 <https://github.com/dtcenter/MET/issues/3550>`_).
      * **Fix the compilation of the external libraries with the GNU 15 compilers, which select the C23 standard by default**
        (`#3306 <https://github.com/dtcenter/MET/issues/3306>`_).
      * **Fix the compilation of the PROJ and JASPER external libraries with CMake 4**
@@ -377,6 +381,13 @@ MET Version 13.0.0 Upgrade Instructions
     0.703125 degrees and the final column moves from 360.000000 to 359.296875. Any output
     regridded to or from a Gaussian grid changes accordingly, as does any grid box area
     computed for one, which previously overstated the global area by a factor of Nx/(Nx-1).
+
+  * Point2Grid output changes for any requested field with no observations mapped to the
+    output grid that follows a field that had them. As described in MET
+    `#3297 <https://github.com/dtcenter/MET/issues/3297>`_, such a field was previously
+    written using the preceding field's data, count, and mask values. It is now written
+    using its own default output value, bad data unless the ``-default_value`` option says
+    otherwise, with its count and mask values set to 0.
 
   * Gridded data read from NetCDF files that follow the CF convention and use a polar
     stereographic grid mapping may change. As described in MET
