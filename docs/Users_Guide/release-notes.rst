@@ -65,6 +65,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3478 <https://github.com/dtcenter/MET/issues/3478>`_).
      * **Fix Regrid-Data-Plane and Point2Grid to parse each -field command line option independently**
        (`#3499 <https://github.com/dtcenter/MET/issues/3499>`_).
+     * **Fix observation error table parsing and lookup logic for Ensemble-Stat**
+       (`#3545 <https://github.com/dtcenter/MET/issues/3545>`_).
 
   .. dropdown:: Repository, build, and test
 
@@ -384,6 +386,19 @@ MET Version 13.0.0 Upgrade Instructions
     written using the preceding field's data, count, and mask values. It is now written
     using its own default output value, bad data unless the ``-default_value`` option says
     otherwise, with its count and mask values set to 0.
+
+  * Ensemble-Stat output changes for users of the observation error logic. As described in MET
+    `#3545 <https://github.com/dtcenter/MET/issues/3545>`_, three defects are fixed. An
+    observation error table row filtering on the STATION_ID, PB_REPORT_TYPE, IN_REPORT_TYPE, or
+    INSTRUMENT_TYPE column previously matched on the contents of a different column, so such
+    rows did not filter as written. The HGT_RANGE column was compared against the observation
+    level value and the PRS_RANGE column against the observation height, rather than the other
+    way around. And the valid range of perturbed values was discarded whenever an entry was
+    copied, which happens both as each row of a table file is read and as the configuration
+    file settings are stored, so neither the MIN and MAX columns of the table nor the "min"
+    and "max" entries of the "obs_err" dictionary had any effect. Statistics computed with
+    observation error enabled therefore change for every user of the default table, which
+    sets MIN to 0 for its WIND, HGT, and APCP rows.
 
   * Gridded data read from NetCDF files that follow the CF convention and use a polar
     stereographic grid mapping may change. As described in MET
