@@ -198,4 +198,69 @@
     </output>
   </test>
 
+  <!-- MET #3304: KE power spectrum with missing data. The censor        -->
+  <!-- threshold reaches the U/V lookup. Only dp was filled before,      -->
+  <!-- so the transform ran over -9999. Uses missing_flag = VALUE.       -->
+
+  <test name="grid_diag_KENG_missing_wind">
+    <exec>echo "&DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F036.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F048.grib2" \
+                > &OUTPUT_DIR;/grid_diag/keng_missing_fcst_file_list; \
+          echo "&DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_1200_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120411_0000_000.grb2" \
+                > &OUTPUT_DIR;/grid_diag/keng_missing_anly_file_list; \
+         &MET_BIN;/grid_diag</exec>
+    <env>
+      <pair><name>FIELD1</name> <value>name = "KENG"; level = "Z10"; n_bins = 140; range = [0,140]; censor_thresh = [&lt;0.6]; censor_val = [-9999];</value></pair>
+      <pair><name>FIELD2</name> <value>name = "KENG"; level = "Z10"; n_bins = 140; range = [0,140];</value></pair>
+    </env>
+    <param> \
+      -data &OUTPUT_DIR;/grid_diag/keng_missing_fcst_file_list \
+      -data &OUTPUT_DIR;/grid_diag/keng_missing_anly_file_list \
+      -config &CONFIG_DIR;/GridDiagConfig_KENG_MISSING \
+      -out &OUTPUT_DIR;/grid_diag/grid_diag_KENG_Z10_missing.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_KENG_Z10_missing.nc</grid_nc>
+    </output>
+  </test>
+
+  <!-- MET #3304: vld_thresh = 0.38 falls between the U valid ratios     -->
+  <!-- of the four times (0.4061, 0.3901, 0.3889, 0.3770), so field 1    -->
+  <!-- contributes 3 of 4. Covers the partial skip, the mean over the    -->
+  <!-- contributing count, n_series_used and the per-plane MEAN fill.    -->
+
+  <test name="grid_diag_KENG_partial_skip">
+    <exec>echo "&DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F036.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F048.grib2" \
+                > &OUTPUT_DIR;/grid_diag/keng_skip_fcst_file_list; \
+          echo "&DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_1200_000.grb2 \
+                &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120411_0000_000.grb2" \
+                > &OUTPUT_DIR;/grid_diag/keng_skip_anly_file_list; \
+         &MET_BIN;/grid_diag</exec>
+    <env>
+      <pair><name>FIELD1</name> <value>name = "KENG"; level = "Z10"; n_bins = 140; range = [0,140]; censor_thresh = [&lt;0.6]; censor_val = [-9999];</value></pair>
+      <pair><name>FIELD2</name> <value>name = "KENG"; level = "Z10"; n_bins = 140; range = [0,140];</value></pair>
+    </env>
+    <param> \
+      -data &OUTPUT_DIR;/grid_diag/keng_skip_fcst_file_list \
+      -data &OUTPUT_DIR;/grid_diag/keng_skip_anly_file_list \
+      -config &CONFIG_DIR;/GridDiagConfig_KENG_SKIP \
+      -out &OUTPUT_DIR;/grid_diag/grid_diag_KENG_Z10_skip.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_KENG_Z10_skip.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
