@@ -37,6 +37,8 @@ MET Version 12.2.3 Release Notes (TBD)
        (`#3470 <https://github.com/dtcenter/MET/issues/3470>`_).
      * Fix MODE-TD compilation against netcdf-cxx4 version 4.3.2
        (`#3550 <https://github.com/dtcenter/MET/issues/3550>`_).
+     * **Fix observation error table parsing and lookup logic for Ensemble-Stat**
+       (`#3545 <https://github.com/dtcenter/MET/issues/3545>`_).
 
 MET Version 12.2.2 Release Notes (20260828)
 -------------------------------------------
@@ -185,6 +187,19 @@ MET Version 12.2.3 Upgrade Instructions
      uniformly, the weighted contingency table counts FY_OY, FY_ON, FN_OY and FN_ON in the
      CTC output line change by that same factor. Statistics derived from them as ratios are
      unaffected, so the CTS, CNT and SL1L2 output lines, and the TOTAL column, do not change.
+
+   * Ensemble-Stat output changes for users of the observation error logic. As described in MET
+     `#3545 <https://github.com/dtcenter/MET/issues/3545>`_, three defects are fixed. An
+     observation error table row filtering on the STATION_ID, PB_REPORT_TYPE, IN_REPORT_TYPE, or
+     INSTRUMENT_TYPE column previously matched on the contents of a different column, so such
+     rows did not filter as written. The HGT_RANGE column was compared against the observation
+     level value and the PRS_RANGE column against the observation height, rather than the other
+     way around. And the valid range of perturbed values was discarded whenever an entry was
+     copied, which happens both as each row of a table file is read and as the configuration
+     file settings are stored, so neither the MIN and MAX columns of the table nor the "min"
+     and "max" entries of the "obs_error" dictionary had any effect. Statistics computed with
+     observation error enabled therefore change for every user of the default table, which
+     sets MIN to 0 for its WIND, HGT, and APCP rows.
 
    * Gridded data read from NetCDF files that follow the CF convention and use a polar
      stereographic grid mapping may change. As described in MET
