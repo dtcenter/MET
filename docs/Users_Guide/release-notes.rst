@@ -57,6 +57,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3443 <https://github.com/dtcenter/MET/issues/3443>`_).
      * Fix PB2NC so that derived HPBL output does not depend on which other stations are processed
        (`#3450 <https://github.com/dtcenter/MET/issues/3450>`_).
+     * Fix Point2Grid to write the default output value for fields with no observations
+       (`#3297 <https://github.com/dtcenter/MET/issues/3297>`_).
      * Fix the PB2NC ``-dump`` segfault and reduce PB2NC compiler warnings
        (`#3468 <https://github.com/dtcenter/MET/issues/3468>`_).
      * Fix Stat-Analysis CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
@@ -82,6 +84,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3470 <https://github.com/dtcenter/MET/issues/3470>`_).
      * Fix the GRIB2 library code to compute the correct data index for scanning mode 160
        (`#3535 <https://github.com/dtcenter/MET/issues/3535>`_).
+     * Fix MODE-TD compilation against netcdf-cxx4 version 4.3.2
+       (`#3550 <https://github.com/dtcenter/MET/issues/3550>`_).
      * Automate link checking with Sphinx
        (`METplus #3247 <https://github.com/dtcenter/METplus/issues/3247>`_).
      * Resolve blockers from the AF SonarQube quality gate scanner
@@ -375,6 +379,13 @@ MET Version 13.0.0 Upgrade Instructions
     0.703125 degrees and the final column moves from 360.000000 to 359.296875. Any output
     regridded to or from a Gaussian grid changes accordingly, as does any grid box area
     computed for one, which previously overstated the global area by a factor of Nx/(Nx-1).
+
+  * Point2Grid output changes for any requested field with no observations mapped to the
+    output grid that follows a field that had them. As described in MET
+    `#3297 <https://github.com/dtcenter/MET/issues/3297>`_, such a field was previously
+    written using the preceding field's data, count, and mask values. It is now written
+    using its own default output value, bad data unless the ``-default_value`` option says
+    otherwise, with its count and mask values set to 0.
 
   * Ensemble-Stat output changes for users of the observation error logic. As described in MET
     `#3545 <https://github.com/dtcenter/MET/issues/3545>`_, three defects are fixed. An
