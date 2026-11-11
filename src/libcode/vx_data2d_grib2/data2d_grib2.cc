@@ -17,7 +17,6 @@
 #include <time.h>
 #include <cmath>
 
-#include <array>
 #include <string>
 #include <map>
 #include <utility>
