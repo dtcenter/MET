@@ -80,6 +80,10 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3470 <https://github.com/dtcenter/MET/issues/3470>`_).
      * Fix the GRIB2 library code to compute the correct data index for scanning mode 160
        (`#3535 <https://github.com/dtcenter/MET/issues/3535>`_).
+     * **Fix the compilation of the external libraries with the GNU 15 compilers, which select the C23 standard by default**
+       (`#3306 <https://github.com/dtcenter/MET/issues/3306>`_).
+     * **Fix the compilation of the PROJ and JASPER external libraries with CMake 4**
+       (`#3518 <https://github.com/dtcenter/MET/issues/3518>`_).
      * Automate link checking with Sphinx
        (`METplus #3247 <https://github.com/dtcenter/METplus/issues/3247>`_).
      * Resolve blockers from the AF SonarQube quality gate scanner
@@ -436,6 +440,15 @@ MET Version 13.0.0 Upgrade Instructions
 .. dropdown:: Additional upgrade instructions
 
   Recommendations when upgrading to MET version 13.0.0:
+
+  * Users compiling MET with the *compile_MET_all.sh* script on a system whose C compiler
+    defaults to the C23 standard, such as one providing GCC version 15 or later, should be
+    aware that the script now compiles the external libraries with "-std=gnu17". Several of
+    those libraries predate C23 and do not compile in the newer mode. The "MET_LIB_CSTD"
+    environment variable described in :numref:`Install_Required-libraries-and` requests a
+    different standard, or disables this behavior entirely when set to "none". The script
+    also sets "CMAKE_POLICY_VERSION_MINIMUM" so that the libraries built with CMake, which
+    request compatibility with CMake versions older than 3.5, still configure with CMake 4.
 
   * Users reading winds from CF-compliant NetCDF files on projections for which rotation applies,
     such as Lambert conformal, polar stereographic, and Mercator, should check the "standard_name"
