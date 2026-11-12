@@ -114,7 +114,8 @@ Nx = data.nx;
 
 Ny = data.ny;
 
-Delta_Lon = -360.0/(Nx - 1.0);
+// MET #1257 Nx evenly spaced longitudes span the full 360 degrees
+Delta_Lon = -360.0/Nx;
 
    //
    //  check that Ny is even

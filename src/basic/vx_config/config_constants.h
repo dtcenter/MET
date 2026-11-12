@@ -635,7 +635,6 @@ struct PowerSpectrumInfo {
    MissingDataType missing_flag;
    double          missing_value;
    double          vld_thresh;
-   bool            skip;
 
    PowerSpectrumInfo() { clear(); }
    ~PowerSpectrumInfo() { clear(); }

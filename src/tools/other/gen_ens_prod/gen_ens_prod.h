@@ -111,6 +111,10 @@ static std::vector<NumArray> thresh_cnt_na; // [n_thresh]
 static std::vector<std::vector<NumArray> > thresh_nbrhd_cnt_na; // [n_thresh][n_nbrhd]
 static std::vector<DataPlane> ens_eas_dp; // [n_ens]
 
+// Climatology planes for each ens_eas_dp entry
+static std::vector<DataPlane> ens_eas_cmn_dp; // [n_ens]
+static std::vector<DataPlane> ens_eas_csd_dp; // [n_ens]
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __GEN_ENS_PROD_H__
