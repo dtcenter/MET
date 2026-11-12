@@ -222,37 +222,6 @@ void PairDataPoint::set_seeps_score(SeepsScore *seeps, int index) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataPoint::set_point_pair(int i_obs,
-                                   const char *typ, const char *sid,
-                                   double lat, double lon, double elv,
-                                   double x, double y,
-                                   int sec, unixtime ut,
-                                   double lvl, double hgt,
-                                   double f, double o, const char *qc,
-                                   const ClimoPntInfo &cpi,
-                                   double wgt, const SeepsScore *seeps) {
-
-   if(i_obs < 0 || i_obs >= n_obs) {
-      mlog << Error << "\nPairDataPoint::set_point_pair() -> "
-           << "range check error: " << i_obs << " not in (0, "
-           << n_obs << ").\n\n";
-      exit(1);
-   }
-
-   set_point_obs(i_obs, typ, sid, lat, lon, elv,
-                 x, y, ut, lvl, hgt,
-                 o, qc, cpi, wgt);
-
-   f_na.set(i_obs, f);
-   f_lead_na.set(i_obs, sec);
-   if(seeps) seeps_mpr[i_obs] = std::make_unique<SeepsScore>(*seeps);
-   else      seeps_mpr[i_obs].reset();
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 bool PairDataPoint::add_grid_pair(double f, double o,
                                   const ClimoPntInfo &cpi,
                                   double wgt) {
