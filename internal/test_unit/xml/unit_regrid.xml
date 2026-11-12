@@ -198,15 +198,7 @@
     </output>
   </test>
 
-  <!-- MET #3178: Compare GFS 1.0 and 0.25 degree data regridded to  -->
-  <!-- a coarser grid using AW_MEAN and AW_MEAN_CNTR. The 1.0 degree   -->
-  <!-- input is an exact subsample of the 0.25 degree input.          -->
-
-  <!-- MET #3336: The first -field requests a GRIB2 field which does  -->
-  <!-- not exist. Regrid-Data-Plane should warn about it and continue -->
-  <!-- on to the remaining fields, leaving the output unchanged.      -->
-  <!-- Previously it segfaulted while determining the input grid, and -->
-  <!-- the input grid loop re-read the first -field on every pass.    -->
+  <!-- MET #3336: the first -field does not exist and should be skipped with a warning -->
 
   <test name="regrid_data_plane_GFS_0P25_TO_1P00_NEAREST">
     <exec>&MET_BIN;/regrid_data_plane</exec>
@@ -224,6 +216,8 @@
       <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_0P25_TO_1P00_NEAREST.nc</grid_nc>
     </output>
   </test>
+
+  <!-- MET #3178: AW_MEAN and AW_MEAN_CNTR with 1.0 degree input exactly subsampled from 0.25 -->
 
   <test name="regrid_grid_stat_GFS_1P00_VS_0P25_AW_MEAN">
     <exec>&MET_BIN;/grid_stat</exec>
@@ -259,7 +253,7 @@
     </output>
   </test>
 
-  <!-- MET #3178: Regrid to a Gaussian grid using AW_MEAN_CNTR, whose row boundaries at y +/- 0.5 previously exited since the grid defines a latitude only at integer rows -->
+  <!-- MET #3178: AW_MEAN_CNTR to a Gaussian grid, whose rows are defined only at integer y -->
 
   <test name="regrid_data_plane_GFS_0P25_TO_GAUSSIAN_AW_MEAN_CNTR">
     <exec>&MET_BIN;/regrid_data_plane</exec>
@@ -276,11 +270,7 @@
     </output>
   </test>
 
-  <!-- MET #3178: Regrid a global grid to the regional, Lambert         -->
-  <!-- Conformal G212 grid using AW_MEAN_CNTR. Input grid points which   -->
-  <!-- fall outside the valid domain of the output projection produce    -->
-  <!-- non-finite grid coordinates, which previously ran the overlap     -->
-  <!-- computation past the end of its fixed-size arrays and crashed.    -->
+  <!-- MET #3178: AW_MEAN_CNTR to G212, with input points outside the output projection -->
 
   <test name="regrid_data_plane_GFS_0P25_TO_G212_AW_MEAN_CNTR">
     <exec>&MET_BIN;/regrid_data_plane</exec>
@@ -298,13 +288,7 @@
     </output>
   </test>
 
-  <!-- MET #3178: Regrid from low to high resolution using AW_MEAN_CNTR. -->
-  <!-- Each input grid box spans many output grid boxes, which the       -->
-  <!-- overlap computation previously refused to divide the weight       -->
-  <!-- among, assigning each input grid box to a single output grid box  -->
-  <!-- and leaving the rest of the output grid unset. All 160000 output  -->
-  <!-- grid boxes should be filled, including those along the western    -->
-  <!-- edge, which input grid boxes straddling the edge must reach.      -->
+  <!-- MET #3178: AW_MEAN_CNTR from low to high resolution, splitting each input box -->
 
   <test name="regrid_data_plane_GFS_1P00_TO_0P05_AW_MEAN_CNTR">
     <exec>&MET_BIN;/regrid_data_plane</exec>
@@ -321,11 +305,7 @@
     </output>
   </test>
 
-  <!-- MET #3178: Regrid from high to low resolution to a regional      -->
-  <!-- lat/lon grid using AW_MEAN and AW_MEAN_CNTR. Input grid points    -->
-  <!-- just west of the western edge previously mapped to x near 360     -->
-  <!-- degrees rather than just below 0, biasing the first column of     -->
-  <!-- output grid boxes.                                                -->
+  <!-- MET #3178: AW_MEAN and AW_MEAN_CNTR to a regional grid, testing its western edge -->
 
   <test name="regrid_data_plane_GFS_0P25_TO_REGIONAL_1P00_AW_MEAN">
     <exec>&MET_BIN;/regrid_data_plane</exec>
