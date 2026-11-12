@@ -58,6 +58,17 @@ include compiling MET with:
 This workflow confirms that MET compiles successfully with a variety of configurations
 but does not run any unit tests or compare output against a truth dataset.
 
+This workflow is run automatically on a schedule, weekly at 07:00 UTC on Sunday, and
+whenever a tag is pushed. As with any scheduled workflow, the weekly run is driven by
+the copy of the workflow file on the default branch, **develop**, and compiles that
+branch. It can also be started manually from the **Run workflow** menu on the
+**Actions** tab to check any other branch.
+
+Running it manually is worth considering for a change that affects the build. Every
+other MET workflow compiles with "--enable-all", so a defect that only appears for
+some other combination of options, such as a header that is included transitively by
+an optional dependency, is invisible to them and is caught here instead.
+
 .. _cg-ci-claude:
 
 Claude Code (claude.yml and claude-code-review.yml)
