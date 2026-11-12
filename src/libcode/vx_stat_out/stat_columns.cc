@@ -24,11 +24,6 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-// MET #3465: Write the station density weighted SEEPS means and score
-const bool use_weighted_seeps = true;
-
-////////////////////////////////////////////////////////////////////////
-
 void parse_row_col(const char *col_name, int &r, int &c) {
    const char *ptr = (const char *) nullptr;
 
@@ -4216,15 +4211,10 @@ void write_seeps_cols(const SeepsAggScore *seeps,
    at.set_entry(r, c+11, seeps->pv2);   // PV2
    at.set_entry(r, c+12, seeps->pv3);   // PV3
 
-   at.set_entry(r, c+13, (use_weighted_seeps ?
-                          seeps->mean_fcst_wgt :
-                          seeps->mean_fcst)); // MEAN_FCST
-   at.set_entry(r, c+14, (use_weighted_seeps ?
-                          seeps->mean_obs_wgt :
-                          seeps->mean_obs));  // MEAN_OBS
-   at.set_entry(r, c+15, (use_weighted_seeps ?
-                          seeps->score_wgt:
-                          seeps->score));     // SEEPS
+   // MET #3465: Write the station density weighted means and score
+   at.set_entry(r, c+13, seeps->mean_fcst_wgt); // MEAN_FCST
+   at.set_entry(r, c+14, seeps->mean_obs_wgt);  // MEAN_OBS
+   at.set_entry(r, c+15, seeps->score_wgt);     // SEEPS
 
    return;
 }
