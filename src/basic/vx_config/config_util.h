@@ -121,7 +121,6 @@ extern NbrhdInfo       parse_conf_nbrhd(Dictionary *dict, const char *);
 extern EASProbInfo     parse_conf_eas_prob(Dictionary *dict);
 extern HiRAInfo        parse_conf_hira(Dictionary *dict);
 extern GridWeightType  parse_conf_grid_weight_flag(Dictionary *dict);
-extern PointWeightType parse_conf_point_weight_flag(Dictionary *dict);
 extern DuplicateType   parse_conf_duplicate_flag(Dictionary *dict);
 extern ObsSummary      parse_conf_obs_summary(Dictionary *dict);
 extern ConcatString    parse_conf_tmp_dir(Dictionary *dict);
