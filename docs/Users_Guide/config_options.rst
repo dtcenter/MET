@@ -2916,6 +2916,11 @@ methods are planned for future versions:
   located at the first location encountered for that station within each
   verification task.
 
+  The station set for each task is the union of the stations used across all of
+  that task's masking regions, and each station's weight is applied in every
+  masking region. Adding a masking region to a task therefore changes the
+  weights applied within that task's other masking regions.
+
 .. code-block:: none
 
   point_weight_flag = NONE;
