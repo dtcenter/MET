@@ -6,6 +6,7 @@
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
 
   <!ENTITY DATA_DIR_GAUSS "&INPUT_DIR;/gaussian">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
 ]>
 
 <!-- Requires: None -->
@@ -24,6 +25,23 @@
     </param>
     <output>
       <exist>&OUTPUT_DIR;/gaussian/gaussian_grib1.ps</exist>
+    </output>
+  </test>
+
+  <!-- MET #1257: Regrid to a Gaussian grid and write NetCDF so the truth comparison pins the longitude values -->
+
+  <test name="Gaussian_regrid_lon_spacing">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f024.grib2 \
+      &DATA_DIR_GAUSS;/grib1/gaussian.grib \
+      &OUTPUT_DIR;/gaussian/gaussian_regrid_lon_spacing.nc \
+      -field 'name="TMP"; level="Z2";' \
+      -method NEAREST -width 1 \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gaussian/gaussian_regrid_lon_spacing.nc</grid_nc>
     </output>
   </test>
 
