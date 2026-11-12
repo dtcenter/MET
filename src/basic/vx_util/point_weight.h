@@ -12,6 +12,8 @@
 
 #include "vx_util.h"
 
+#include <map>
+
 #include "config_constants.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -52,6 +54,9 @@ class PointWeightInfo {
 
    // Mapping of SID name to location and weight values
    std::vector<SIDWeight> SIDWeights;
+
+   // Map each SID name to its index in SIDWeights for fast lookups
+   std::map<std::string,int> SIDIndex;
 
    // Keep track of whether the weights have already been computed
    bool WeightsComputed;

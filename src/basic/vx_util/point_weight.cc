@@ -38,6 +38,7 @@ void PointWeightInfo::clear() {
    Type = PointWeightType::None;
    KDERefAngle = bad_data_double;
    SIDWeights.clear();
+   SIDIndex.clear();
    WeightsComputed = false;
    WriteWeights = false;
    WeightFilePrefix.clear();
@@ -48,7 +49,7 @@ void PointWeightInfo::clear() {
 void PointWeightInfo::add_sid(const string &sid, double lat, double lon) {
 
    // Add unique station id locations with which to compute weights
-   if(!has_sid(sid)) {
+   if(SIDIndex.insert({sid, (int) SIDWeights.size()}).second) {
       SIDWeight e = {sid, lat, lon, bad_data_double};
       SIDWeights.emplace_back(e);
       WeightsComputed = false;
@@ -60,7 +61,7 @@ void PointWeightInfo::add_sid(const string &sid, double lat, double lon) {
 void PointWeightInfo::add_wgt(const string &sid, double wgt) {
 
    // Add pre-computed weights for unique station ids
-   if(!has_sid(sid)) {
+   if(SIDIndex.insert({sid, (int) SIDWeights.size()}).second) {
       SIDWeight e = {sid, bad_data_double, bad_data_double, wgt};
       SIDWeights.emplace_back(e);
       WeightsComputed = true;
@@ -70,17 +71,9 @@ void PointWeightInfo::add_wgt(const string &sid, double wgt) {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool PointWeightInfo::has_sid(const string &sid) const {
-   bool found = false;
 
    // Search for a matching entry
-   for(const auto &e : SIDWeights) {
-      if(e.SID == sid) {
-         found = true;
-         break;
-      }
-   }
-
-   return found;
+   return SIDIndex.count(sid) > 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,12 +89,10 @@ bool PointWeightInfo::has_sid(const string &sid, double &wgt) const {
    }
 
    // Search for a matching entry
-   for(const auto &e : SIDWeights) {
-      if(e.SID == sid) {
-         found = true;
-         wgt = e.Wgt;
-         break;
-      }
+   const auto it = SIDIndex.find(sid);
+   if(it != SIDIndex.end()) {
+      found = true;
+      wgt = SIDWeights[it->second].Wgt;
    }
 
    // Return bad data for no match
@@ -142,9 +133,6 @@ void PointWeightInfo::compute_kde_weights() {
    // Store sums for the weights, initialized to 1.0 for the l = k term
    vector<double> p_sum(n_stn(), 1.0);
 
-   // Define e constant
-   const double e = exp(1.0);
-
 #pragma omp declare reduction(vec_double_plus : vector<double> :          \
                               transform(omp_out.begin(), omp_out.end(),   \
                                          omp_in.begin(), omp_out.begin(), \
@@ -152,7 +140,7 @@ void PointWeightInfo::compute_kde_weights() {
                     initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
 
 #pragma omp parallel default (none) \
-   shared(SIDWeights, KDERefAngle, p_sum, e)
+   shared(SIDWeights, KDERefAngle, p_sum)
    {
 
       // Compute the sums of the pairwise distances
@@ -162,8 +150,8 @@ void PointWeightInfo::compute_kde_weights() {
          for(int j=i+1; j<n_stn(); j++) {
             double ang  = gc_angle(SIDWeights[i].Lat, SIDWeights[i].Lon,
                                    SIDWeights[j].Lat, SIDWeights[j].Lon);
-            double exp  = ang/KDERefAngle;
-            double p    = pow(e, -exp*exp);
+            double z    = ang/KDERefAngle;
+            double p    = exp(-z*z);
 
             // Sum of the terms
             p_sum[i]   += p;
