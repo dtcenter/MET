@@ -1266,7 +1266,7 @@ bool VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
             oerr_ptr = obs_err_table.lookup(
                obs_info->name().c_str(), hdr_typ_str, hdr_sid_str,
                hdr_typ_arr[0], hdr_typ_arr[1], hdr_typ_arr[2],
-               obs_lvl, obs_hgt, obs_v);
+               obs_hgt, obs_lvl, obs_v);
 
             // MET #3429: Skip observation if the table lookup fails
             if(!oerr_ptr) { n_fail_obs_err++; return obs_used; }

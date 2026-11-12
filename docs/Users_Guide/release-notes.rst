@@ -32,11 +32,19 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3426 <https://github.com/dtcenter/MET/issues/3426>`_).
      * Rename MET configuration options to avoid names like ``warning`` and ``error``
        (`#3455 <https://github.com/dtcenter/MET/issues/3455>`_).
+     * Enhance the GRIB2 library code to report unsupported GRIB2 data packing rather than segfaulting
+       (`#3525 <https://github.com/dtcenter/MET/issues/3525>`_).
 
   .. dropdown:: Bugfixes
 
+     * **Fix the Gaussian grid longitude spacing, which placed the last column on top of the first**
+       (`#1257 <https://github.com/dtcenter/MET/issues/1257>`_).
      * Fix failures and warnings when compiling with clang
        (`#3291 <https://github.com/dtcenter/MET/issues/3291>`_).
+     * Fix the NetCDF CF reader segfault when a dimension has no coordinate variable
+       (`#3506 <https://github.com/dtcenter/MET/issues/3506>`_).
+     * Fix six defects introduced by the SonarQube and static analysis cleanup commits
+       (`#3509 <https://github.com/dtcenter/MET/issues/3509>`_).
      * Fix NetCDF CF convention support to read Stage IV precipitation files
        (`#3358 <https://github.com/dtcenter/MET/issues/3358>`_).
      * Fix MPAS UGRID support to correctly handle invalid latitude values
@@ -51,12 +59,18 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3443 <https://github.com/dtcenter/MET/issues/3443>`_).
      * Fix PB2NC so that derived HPBL output does not depend on which other stations are processed
        (`#3450 <https://github.com/dtcenter/MET/issues/3450>`_).
+     * Fix Point2Grid to write the default output value for fields with no observations
+       (`#3297 <https://github.com/dtcenter/MET/issues/3297>`_).
      * Fix the SEEPS category counts, marginal probabilities, and station density weighting
        (`#3465 <https://github.com/dtcenter/MET/issues/3465>`_).
      * Fix the PB2NC ``-dump`` segfault and reduce PB2NC compiler warnings
        (`#3468 <https://github.com/dtcenter/MET/issues/3468>`_).
      * Fix Stat-Analysis CNT statistics derived from SAL1L2 lines and from climatology bin mean partial sums
        (`#3478 <https://github.com/dtcenter/MET/issues/3478>`_).
+     * **Fix Regrid-Data-Plane and Point2Grid to parse each -field command line option independently**
+       (`#3499 <https://github.com/dtcenter/MET/issues/3499>`_).
+     * **Fix observation error table parsing and lookup logic for Ensemble-Stat**
+       (`#3545 <https://github.com/dtcenter/MET/issues/3545>`_).
 
   .. dropdown:: Repository, build, and test
 
@@ -72,6 +86,10 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3443 <https://github.com/dtcenter/MET/issues/3443>`_).
      * Update the SonarQube scanner so that the scan runs on Java 21 as required by the upgraded SonarQube server
        (`#3470 <https://github.com/dtcenter/MET/issues/3470>`_).
+     * Fix the GRIB2 library code to compute the correct data index for scanning mode 160
+       (`#3535 <https://github.com/dtcenter/MET/issues/3535>`_).
+     * Fix MODE-TD compilation against netcdf-cxx4 version 4.3.2
+       (`#3550 <https://github.com/dtcenter/MET/issues/3550>`_).
      * Automate link checking with Sphinx
        (`METplus #3247 <https://github.com/dtcenter/METplus/issues/3247>`_).
      * Resolve blockers from the AF SonarQube quality gate scanner
@@ -377,6 +395,36 @@ MET Version 13.0.0 Upgrade Instructions
     UGRIDs, previously 0 for every cell, is now derived from the cell area, normalized as
     described in MET `#3448 <https://github.com/dtcenter/MET/issues/3448>`_.
 
+  * Output for Gaussian grids changes. As described in MET
+    `#1257 <https://github.com/dtcenter/MET/issues/1257>`_, the longitude spacing was
+    computed as 360/(Nx-1) rather than 360/Nx, which spread the Nx columns across Nx-1
+    intervals instead of Nx. Each column was therefore placed east of its correct longitude
+    by an amount growing to a full grid cell at the last column, which landed on the same
+    meridian as the first. For a 512 column grid the spacing changes from 0.704501 to
+    0.703125 degrees and the final column moves from 360.000000 to 359.296875. Any output
+    regridded to or from a Gaussian grid changes accordingly, as does any grid box area
+    computed for one, which previously overstated the global area by a factor of Nx/(Nx-1).
+
+  * Point2Grid output changes for any requested field with no observations mapped to the
+    output grid that follows a field that had them. As described in MET
+    `#3297 <https://github.com/dtcenter/MET/issues/3297>`_, such a field was previously
+    written using the preceding field's data, count, and mask values. It is now written
+    using its own default output value, bad data unless the ``-default_value`` option says
+    otherwise, with its count and mask values set to 0.
+
+  * Ensemble-Stat output changes for users of the observation error logic. As described in MET
+    `#3545 <https://github.com/dtcenter/MET/issues/3545>`_, three defects are fixed. An
+    observation error table row filtering on the STATION_ID, PB_REPORT_TYPE, IN_REPORT_TYPE, or
+    INSTRUMENT_TYPE column previously matched on the contents of a different column, so such
+    rows did not filter as written. The HGT_RANGE column was compared against the observation
+    level value and the PRS_RANGE column against the observation height, rather than the other
+    way around. And the valid range of perturbed values was discarded whenever an entry was
+    copied, which happens both as each row of a table file is read and as the configuration
+    file settings are stored, so neither the MIN and MAX columns of the table nor the "min"
+    and "max" entries of the "obs_err" dictionary had any effect. Statistics computed with
+    observation error enabled therefore change for every user of the default table, which
+    sets MIN to 0 for its WIND, HGT, and APCP rows.
+
   * Gridded data read from NetCDF files that follow the CF convention and use a polar
     stereographic grid mapping may change. As described in MET
     `#3358 <https://github.com/dtcenter/MET/issues/3358>`_, MET now reads data stored from
@@ -474,6 +522,15 @@ MET Version 13.0.0 Upgrade Instructions
     such as Lambert conformal, polar stereographic, and Mercator, should check the "standard_name"
     attribute of their wind variables. Setting the "is_grid_relative" configuration option
     overrides the orientation determined from the file.
+
+  * Regrid-Data-Plane and Point2Grid now parse each "-field" command line option independently.
+    Previously these tools parsed every "-field" string into a single shared configuration object,
+    which was never reset between fields, so any setting omitted from a later "-field" silently
+    inherited the value given for an earlier one. Settings such as "convert", "censor_thresh",
+    "censor_val", "set_attr_name", and the "GRIB2_*" record filters were affected. Users who
+    passed multiple "-field" options to either tool, where at least one of them set a per-field
+    option that the others did not, should expect their output to change, and should review any
+    previously generated output for values that silently inherited a neighboring field's settings.
 
   * The "MET_OBS_ERROR_TABLE" environment variable is renamed to "MET_OBS_ERR_TABLE", and the
     default *share/met/table_files/obs_error_table.txt* file is renamed to *obs_err_table.txt*,

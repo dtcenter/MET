@@ -17,6 +17,7 @@
 #include <time.h>
 #include <cmath>
 
+#include <array>
 #include <string>
 #include <map>
 #include <utility>
@@ -43,6 +44,11 @@ using namespace std;
 static bool is_grid_relative(const Grib2Record *);
 static double scaled2dbl(int scale_factor, int scale_value);
 static int    parse_int4(g2int);
+static int    grib2_template_num(const unsigned char *cgrib, long n_byte,
+                                 int sec_num, int sec_offset);
+
+//  undecodable records reported individually before the rest are summarized
+static const int max_decode_report = 3;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -85,6 +91,7 @@ MetGrib2DataFile & MetGrib2DataFile::operator=(const MetGrib2DataFile &) {
 
 void MetGrib2DataFile::grib2_init_from_scratch() {
    ScanMode = -1;
+   NumDecodeErr = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -595,15 +602,24 @@ void MetGrib2DataFile::find_record_matches(const VarInfoGrib2* vinfo,
 ////////////////////////////////////////////////////////////////////////
 
 void MetGrib2DataFile::read_grib2_record_list() {
-   gribfield  *gfld;
+   gribfield  *gfld = nullptr;
    long offset = 0;
    long offset_next;
-   g2int numfields;
+   g2int numfields = 0;
    int idx = 0;
    int rec_num = 1;
+   int n_skip = 0;
 
    //  read all the records into the record list, pulling grid information from the first
    while( 0 <= (offset_next = read_grib2_record(offset, 0, 1, gfld, numfields)) ){
+
+      //  skip records that could not be decoded, already reported above
+      if( nullptr == gfld ) {
+         n_skip++;
+         rec_num++;
+         offset = offset_next;
+         continue;
+      }
 
       //  read the grid information, if necessary
       if( !Raw_Grid || 1 > Raw_Grid->nx() || 1 > Raw_Grid->ny() ) read_grib2_grid(gfld);
@@ -870,9 +886,14 @@ void MetGrib2DataFile::read_grib2_record_list() {
          RecList.emplace_back(std::move(rec));
 
          g2_free(gfld);
+         gfld = nullptr;
 
-         //  if there are more fields in the current record, read the next one
-         if( i < numfields ) read_grib2_record(offset, 0, i+1, gfld, numfields);
+         //  test before the call, which may update numfields
+         bool more_fields = ( i < numfields );
+         if( more_fields ) read_grib2_record(offset, 0, i+1, gfld, numfields);
+
+         //  stop on a field that could not be decoded, already reported above
+         if( more_fields && nullptr == gfld ) { n_skip++; break; }
 
       }  //  END:  for(int i=1; i <= numfields; i++)
 
@@ -885,6 +906,13 @@ void MetGrib2DataFile::read_grib2_record_list() {
    mlog << Debug(4) << "MetGrib2DataFile::read_grib2_record_list() - "
         << "processed " << rec_num - 1 << " records from GRIB2 file: "
         << Filename << "\n";
+
+   if( n_skip > 0 ) {
+      mlog << Debug(2) << "MetGrib2DataFile::read_grib2_record_list() - "
+           << "skipped " << n_skip << " of " << rec_num - 1
+           << " GRIB2 record(s) that could not be decoded in file: "
+           << Filename << ". Run with -v 4 to list them all.\n";
+   }
 
    return;
 }
@@ -1359,18 +1387,18 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
                                                     DataPlane &plane) {
 
    //  attempt to read the record
-   gribfield *gfld;
-   g2int numfields;
+   gribfield *gfld = nullptr;
+   g2int numfields = 0;
    const int max_miss = 2;
    float v;
    array<float,max_miss> v_miss;
    int n_miss;
    if( -1 == read_grib2_record(rec->ByteOffset, 1, rec->FieldNum, gfld,
-                               numfields) ){
-      mlog << Error
-           << "\nMetGrib2DataFile::read_grib2_record_data_plane() -> "
+                               numfields) || nullptr == gfld ){
+      mlog << Error << "\nMetGrib2DataFile::read_grib2_record_data_plane() -> "
            << "failed to read record at offset " << rec->ByteOffset
-           << " and field number " << rec->FieldNum << "\n\n";
+           << " and field number " << rec->FieldNum << " of GRIB2 file '"
+           << Filename << "'\n\n";
       exit(1);
    }
 
@@ -1380,6 +1408,16 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
    }
    int n_x = Raw_Grid->nx();
    int n_y = Raw_Grid->ny();
+
+   //  confirm the data is there before dereferencing it
+   if( ConcatString err_msg; !is_decoded_data(gfld, err_msg) ) {
+      mlog << Error << "\nMetGrib2DataFile::read_grib2_record_data_plane() -> "
+           << "cannot read the data for record at offset " << rec->ByteOffset
+           << ", field number " << rec->FieldNum << ", of GRIB2 file '"
+           << Filename << "' because " << err_msg << ".\n\n";
+      g2_free(gfld);
+      exit(1);
+   }
 
    //  determine whether or not the data bitmap applies
    bool apply_bmap = ( 0 == gfld->ibmap || 254 == gfld->ibmap );
@@ -1413,7 +1451,7 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
          case 64:  /* 0100 0000 */ idx_data =             y*n_x + x;               break;
          case 192: /* 1100 0000 */ idx_data =             y*n_x + (n_x - x - 1);   break;
          case 32:  /* 0010 0000 */ idx_data =             x*n_y + (n_y - y - 1);   break;
-         case 160: /* 1010 0000 */ idx_data = (n_x - x - 1)*n_y + (n_x - x - 1);   break;
+         case 160: /* 1010 0000 */ idx_data = (n_x - x - 1)*n_y + (n_y - y - 1);   break;
          case 96:  /* 0110 0000 */ idx_data =             x*n_y + y;               break;
          case 224: /* 1110 0000 */ idx_data = (n_x - x - 1)*n_y + y;               break;
          case 80:  /* 0101 0000 */ idx_data = ( y % 2 == 0 ?
@@ -1542,15 +1580,155 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
    }
 
    //  read the specified field in the record
-   g2_getfld(cgrib.data(), ifld, unpack, 1, &gfld);
-
-   //  cleanup
+   gfld = nullptr;
+   g2int status = g2_getfld(cgrib.data(), ifld, unpack, 1, &gfld);
 
    //  reset to default out of memory handler
    set_new_handler(oom);
 
+   if(0 != status) {
+
+      //  the field may already have been freed, so do not touch it
+      gfld = nullptr;
+
+      ConcatString msg;
+      msg << "the external GRIB2 library failed to decode record at offset "
+          << (long long) lskip << ", field number " << (int) ifld
+          << ", of GRIB2 file '" << Filename
+          << "' (g2_getfld status = " << (int) status << ")";
+
+      //  name the template the library could not handle
+      if(10 == status) {
+         int tmpl = grib2_template_num(cgrib.data(), lgrib, 3, 12);
+         if(!is_bad_data(tmpl)) {
+            msg << ", on Grid Definition Template 3." << tmpl;
+         }
+      }
+      else if(12 == status || 14 == status) {
+         int tmpl = grib2_template_num(cgrib.data(), lgrib, 5, 9);
+         if(!is_bad_data(tmpl)) {
+            msg << ", packed with Data Representation Template 5." << tmpl
+                << " which this MET build's GRIB2 library cannot unpack";
+         }
+      }
+      msg << ".";
+
+      report_decode_error(msg, unpack);
+      return lskip + lgrib;
+   }
+
+   //  g2_getfld() reports success, so the field should be there
+   if(nullptr == gfld) {
+      ConcatString msg;
+      msg << "the external GRIB2 library returned no field for record at offset "
+          << (long long) lskip << ", field number " << (int) ifld
+          << ", of GRIB2 file '" << Filename << "'.";
+      report_decode_error(msg, unpack);
+      return lskip + lgrib;
+   }
+
    //  return the offset of the next record
    return lskip + lgrib;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Read a two octet template number out of the raw GRIB2 record.
+//
+////////////////////////////////////////////////////////////////////////
+
+static int grib2_template_num(const unsigned char *cgrib, long n_byte,
+                              int sec_num, int sec_offset) {
+
+   //  each section after the 16 byte Section 0 leads with its length
+   for(long pos = 16; pos + 5 <= n_byte; ) {
+
+      long len = ((long) cgrib[pos  ] << 24) | ((long) cgrib[pos+1] << 16) |
+                 ((long) cgrib[pos+2] <<  8) |  (long) cgrib[pos+3];
+
+      //  stop at Section 8, "7777", which carries no length
+      if(len <= 0 || pos + len > n_byte) break;
+
+      //  the template number, when it falls inside the record
+      if(sec_num == (int) cgrib[pos+4]) {
+         return (pos + sec_offset + 2 > n_byte ? bad_data_int :
+                 ((int) cgrib[pos+sec_offset] << 8) | (int) cgrib[pos+sec_offset+1]);
+      }
+
+      pos += len;
+   }
+
+   return bad_data_int;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Report a record the external library could not decode.
+//
+////////////////////////////////////////////////////////////////////////
+
+void MetGrib2DataFile::report_decode_error(const ConcatString &msg,
+                                           g2int unpack) {
+
+   //  the data pass cannot deliver the field the caller asked for, so stop
+   if(0 != unpack) {
+      mlog << Error << "\nMetGrib2DataFile::read_grib2_record() -> "
+           << msg << "\n\n";
+      exit(1);
+   }
+
+   //  report the first few skipped records only
+   mlog << (++NumDecodeErr <= max_decode_report ? Debug(2) : Debug(4))
+        << "MetGrib2DataFile::read_grib2_record() -> " << msg << "\n";
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Check that gfld holds a full grid of values before anything is read.
+//
+////////////////////////////////////////////////////////////////////////
+
+bool MetGrib2DataFile::is_decoded_data(const gribfield *gfld,
+                                       ConcatString &msg) const {
+
+   msg.erase();
+
+   if(nullptr == gfld) {
+      msg << "no field was decoded";
+      return false;
+   }
+
+   //  the data values themselves
+   if(nullptr == gfld->fld) {
+      msg << "no data values were decoded";
+   }
+
+   //  the bitmap, when the bitmap indicator says one applies
+   else if((0 == gfld->ibmap || 254 == gfld->ibmap) && nullptr == gfld->bmap) {
+      msg << "the bitmap indicator is " << (int) gfld->ibmap
+          << " but no bitmap was decoded";
+   }
+
+   //  grid points in the record versus the grid MET built
+   else if(!Raw_Grid || gfld->ngrdpts != (g2int) Raw_Grid->nx() * Raw_Grid->ny()) {
+      msg << "the record contains " << (long long) gfld->ngrdpts
+          << " grid points but the grid is "
+          << (Raw_Grid ? Raw_Grid->nx() : 0) << " x "
+          << (Raw_Grid ? Raw_Grid->ny() : 0);
+   }
+
+   //  fld[] holds ngrdpts values when a bitmap applies, else ndpts
+   else {
+      g2int n_data = (0 != gfld->expanded && 255 != gfld->ibmap &&
+                      nullptr != gfld->bmap ? gfld->ngrdpts : gfld->ndpts);
+      if(n_data < gfld->ngrdpts) {
+         msg << "the record contains " << (long long) n_data
+             << " data values for " << (long long) gfld->ngrdpts
+             << " grid points";
+      }
+   }
+
+   return msg.empty();
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -17,6 +17,7 @@
 #include <cstdio>
 #include <cmath>
 #include <ctime>
+#include <array>
 #include <string>
 #include <time.h>
 

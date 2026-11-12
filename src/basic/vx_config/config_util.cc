@@ -4044,7 +4044,6 @@ void PowerSpectrumInfo::clear() {
    missing_flag = MissingDataType::None;
    missing_value = bad_data_double;
    vld_thresh = bad_data_double;
-   skip = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -4054,7 +4053,6 @@ PowerSpectrumInfo &PowerSpectrumInfo::operator=(const PowerSpectrumInfo &a) noex
       missing_flag = a.missing_flag;
       missing_value = a.missing_value;
       vld_thresh = a.vld_thresh;
-      skip = a.skip;
    }
    return *this;
 }

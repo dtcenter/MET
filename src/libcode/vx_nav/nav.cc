@@ -27,6 +27,8 @@ struct Vector3D {
    double x, y, z;
 };
 
+static double gc_arc_radians(double lat1, double lon1, double lat2, double lon2);
+
 static Vector3D latlon_to_xyz(double lat, double lon);
 static void xyz_to_latlon(Vector3D v, double &lat, double &lon);
 static Vector3D cross_product(Vector3D v1, Vector3D v2);
@@ -52,17 +54,7 @@ double gc_dist(double lat1, double lon1, double lat2, double lon2)
 
 {
 
-double lat1_radians = lat1 * rad_per_deg;
-double lat2_radians = lat2 * rad_per_deg;
-double lon1_radians = lon1 * rad_per_deg;
-double lon2_radians = lon2 * rad_per_deg;
-
-double dp = (lat1_radians - lat2_radians);
-double dl = (lon1_radians - lon2_radians);
-
-double x = haversine(dp) + cos(lat1_radians)*cos(lat2_radians)*haversine(dl);
-
-return earth_radius_km*ahaversine(x);
+return earth_radius_km*gc_arc_radians(lat1, lon1, lat2, lon2);
 
 }
 
@@ -87,6 +79,32 @@ double gc_angle(double lat1, double lon1, double lat2, double lon2)
 
 {
 
+return deg_per_rad*gc_arc_radians(lat1, lon1, lat2, lon2);
+
+}
+
+
+//////////////////////////////////////////////////////////////////
+
+
+   //
+   //  gc_arc_radians
+   //
+   //  Calculates the great circle arc, in radians,
+   //     between the points (lat1, lon1),
+   //     (lat2, lon2) (in degrees). Shared by
+   //     gc_dist() and gc_angle(), which differ
+   //     only in how they scale this result.
+   //
+
+
+//////////////////////////////////////////////////////////////////
+
+
+double gc_arc_radians(double lat1, double lon1, double lat2, double lon2)
+
+{
+
 double lat1_radians = lat1 * rad_per_deg;
 double lat2_radians = lat2 * rad_per_deg;
 double lon1_radians = lon1 * rad_per_deg;
@@ -97,7 +115,7 @@ double dl = (lon1_radians - lon2_radians);
 
 double x = haversine(dp) + cos(lat1_radians)*cos(lat2_radians)*haversine(dl);
 
-return deg_per_rad*ahaversine(x);
+return ahaversine(x);
 
 }
 
