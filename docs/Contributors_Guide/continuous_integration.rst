@@ -90,9 +90,11 @@ Claude Code Review (claude-code-review.yml)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This workflow is an automated reviewer. It runs a fixed code review prompt against the
-changes in a pull request and is restricted to posting inline review comments, so its
-output is a set of comments anchored to specific lines of the diff rather than a single
-prose summary.
+changes in a pull request. Its output is a set of review comments anchored to specific
+lines of the diff, followed by one top-level comment in the pull request conversation
+that summarizes what the review flagged. When the review finds nothing, that summary
+comment is the only comment it posts, so a review that found no issues reads differently
+from one that never ran.
 
 A review is performed:
 
@@ -124,6 +126,18 @@ from both workflows counts against that person's account rather than being bille
 organization. Anyone changing how often these workflows run should be aware of whose
 account is paying for them.
 
-Both workflows request read-only repository scopes and do not write to the MET
-repository. Each sets a job timeout, and the review workflow additionally limits the
-number of turns Claude may take and cancels any superseded run for the same pull request.
+The assistant workflow requests read-only repository scopes. The review workflow
+additionally requests :code:`pull-requests: write`, which is what allows it to post its
+inline comments and its summary comment. Neither workflow writes to the contents of the
+repository.
+
+The review workflow also names the tools Claude is allowed to use, which are the ones the
+code review plugin needs: the inline comment tool, the read-only :code:`gh` commands that
+read the pull request, and :code:`gh pr comment` for the summary. Note that the action
+runs in its auto permission mode, in which that list is an allow rule rather than a hard
+restriction. A tool call the list does not cover is decided by the action's own safety
+review rather than refused outright, so the list should be read as what the review is
+expected to need rather than as a boundary it cannot cross.
+
+Each workflow sets a job timeout, and the review workflow additionally limits the number
+of turns Claude may take and cancels any superseded run for the same pull request.
