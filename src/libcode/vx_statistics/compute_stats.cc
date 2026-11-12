@@ -1600,8 +1600,9 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg,
             fcst_sum_wgt  += pd->f_na[j] * weight[i];
 
             //IDL: pvf(cat{i)) = pvf(cat{i)) + w{i)
-            int s_idx = (seeps_mpr->fcst_cat*3) + seeps_mpr->obs_cat;
-            if (s_idx >= 0 && s_idx < SEEPS_MATRIX_SIZE) pvf[s_idx] += weight[i];
+            if (seeps_mpr->s_idx >= 0 && seeps_mpr->s_idx < SEEPS_MATRIX_SIZE) {
+               pvf[seeps_mpr->s_idx] += weight[i];
+            }
          }
       }
 
@@ -1719,7 +1720,9 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
                   //IDL: s = s + c(4+cat(i) * w{i)  <-- this is done by summing scores
                   //IDL: pvf(cat{i)) = pvf(cat{i)) + w{i)
                   //pvf[seeps_mpr->s_idx] += weight;
-                  pvf_cnt[seeps_mpr->s_idx] += 1;
+                  if (seeps_mpr->s_idx >= 0 && seeps_mpr->s_idx < SEEPS_MATRIX_SIZE) {
+                     pvf_cnt[seeps_mpr->s_idx] += 1;
+                  }
                   mlog << Debug(9) << method_name
                        << "obs_sum, fcst_sum, seeps_score_partial_sum, category: "
                        << obs_sum << " " << fcst_sum << " "
