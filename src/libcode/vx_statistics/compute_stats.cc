@@ -1519,7 +1519,6 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg,
    double fcst_sum_wgt = 0.0;
    double obs_sum = 0.0;
    double fcst_sum = 0.0;
-   vector<SeepsScore *> seeps_mprs;
    vector<int> pair_idx;
 
    seeps_agg->clear();
@@ -1537,7 +1536,6 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg,
       // MET #3465: Count the pairs in each off-diagonal category
       if (!seeps_agg->inc_category(seeps_mpr->fcst_cat,
                                    seeps_mpr->obs_cat)) count_diagonal++;
-      seeps_mprs.emplace_back(seeps_mpr);
       pair_idx.emplace_back(i);
    }
    if (count > 0) {
@@ -1563,17 +1561,17 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg,
       double score_sum_wgt = 0.0;
       vector<double> pvf(SEEPS_MATRIX_SIZE, 0.0);
 
-      // Station density weights, one entry per element of seeps_mprs
+      // Station density weights, one entry per element of pair_idx
       //IDL: w = 1/d
       vector<double> weight;
       compute_seeps_point_weights(pd, kde_ref_angle, weight);
 
-      if (weight.size() != seeps_mprs.size() ||
+      if (weight.size() != pair_idx.size() ||
           std::any_of(weight.begin(), weight.end(),
                       [](double w) { return is_bad_data(w); })) {
          mlog << Warning << "\n" << method_name
               << "unable to compute station density weights for "
-              << seeps_mprs.size() << " SEEPS pairs! "
+              << pair_idx.size() << " SEEPS pairs! "
               << "Using unweighted means.\n\n";
          score_sum_wgt = seeps_agg->score;
          fcst_sum_wgt  = seeps_agg->mean_fcst;
@@ -1587,8 +1585,8 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg,
 
          //IDL: for i=0l, n-1l do begin
          for (int i=0; i<count; i++) {
-            seeps_mpr = seeps_mprs[i];
             int j = pair_idx[i];
+            seeps_mpr = pd->seeps_mpr[j].get();
             mlog << Debug(9) << method_name
                  << "i, weight, seeps, s_idx => "
                  << i << " " << weight[i] << " "
