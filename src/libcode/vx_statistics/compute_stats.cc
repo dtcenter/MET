@@ -1566,7 +1566,10 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg,
       vector<double> weight;
       compute_seeps_point_weights(pd, kde_ref_angle, weight);
 
-      if (weight.size() != pair_idx.size() ||
+      // KDE weights are positive, so a non-positive sum means they are unusable
+      double weight_sum = std::accumulate(weight.begin(), weight.end(), 0.0);
+
+      if (weight.size() != pair_idx.size() || weight_sum <= 0.0 ||
           std::any_of(weight.begin(), weight.end(),
                       [](double w) { return is_bad_data(w); })) {
          mlog << Warning << "\n" << method_name
@@ -1580,7 +1583,6 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg,
       else {
 
          //IDL: w = w/sum(w)
-         double weight_sum = std::accumulate(weight.begin(), weight.end(), 0.0);
          for (int i=0; i<count; i++) weight[i] /= weight_sum;
 
          //IDL: for i=0l, n-1l do begin
