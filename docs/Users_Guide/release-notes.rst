@@ -86,6 +86,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3535 <https://github.com/dtcenter/MET/issues/3535>`_).
      * Fix MODE-TD compilation against netcdf-cxx4 version 4.3.2
        (`#3550 <https://github.com/dtcenter/MET/issues/3550>`_).
+     * Enhance the release Docker image workflow to push ``X.Y`` tags in addition to ``X.Y-latest``
+       (`#3563 <https://github.com/dtcenter/MET/issues/3563>`_).
      * Automate link checking with Sphinx
        (`METplus #3247 <https://github.com/dtcenter/METplus/issues/3247>`_).
      * Resolve blockers from the AF SonarQube quality gate scanner
