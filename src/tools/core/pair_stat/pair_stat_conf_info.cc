@@ -208,6 +208,16 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
    // Summarize output flags across all verification tasks
    process_flags();
 
+   // MET #3465: SEEPS always uses "kde_ref_angle", ignoring "point_weight_flag".
+   if(output_flag[i_seeps] != STATOutputType::None &&
+      point_weight_info.get_kde_ref_angle() <= 0.0) {
+      mlog << Error << "\nPairStatConfInfo::process_config() -> "
+           << "The \"" << conf_key_kde_ref_angle << "\" value ("
+           << point_weight_info.get_kde_ref_angle() << ") must be greater "
+           << "than 0 when the SEEPS line type is requested.\n\n";
+      exit(1);
+   }
+
    // If VL1L2, VAL1L2, or VCNT is requested, set the uv_index.
    // When processing vectors, need to make sure the message types,
    // masking regions, and interpolation methods are consistent.
