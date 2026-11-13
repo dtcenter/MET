@@ -803,7 +803,8 @@ static void process_scores() {
 
          // Write out the SEEPS lines
          if(vx.output_flag[i_seeps] != STATOutputType::None) {
-            compute_aggregated_seeps(pd_ptr, &pd_ptr->seeps_agg);
+            compute_aggregated_seeps(pd_ptr, &pd_ptr->seeps_agg,
+               vx.point_weight_info.get_kde_ref_angle());
             write_seeps_row(shc, &pd_ptr->seeps_agg,
                vx.output_flag[i_seeps],
                stat_at, i_stat_row,

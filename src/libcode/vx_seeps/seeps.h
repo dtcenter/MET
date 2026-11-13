@@ -59,8 +59,9 @@ constexpr char def_seeps_grid_filename[] =
 
 //density_radius = 0.75 degrees (83km; this is described as “the smallest possible
 // value that ensures approximately equal representation of all subregions of Europe”.)
+// MET #3465: Default reference angle for the SEEPS station density weights
+// when no "kde_ref_angle" configuration option is available.
 constexpr double density_radius = 0.75;
-const double density_radius_rad = density_radius * rad_per_deg;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -80,6 +81,7 @@ struct SeepsScore { // For SEEPS_MPR
 struct SeepsAggScore {  // For SEEPS
    void clear();
    SeepsAggScore & operator+=(const SeepsAggScore &);
+   bool inc_category(int fcst_cat, int obs_cat);
 
    int    n_obs;
    int    c_odfl;
@@ -88,12 +90,6 @@ struct SeepsAggScore {  // For SEEPS
    int    c_olfh;
    int    c_ohfd;
    int    c_ohfl;
-   double s_odfl;
-   double s_odfh;
-   double s_olfd;
-   double s_olfh;
-   double s_ohfd;
-   double s_ohfl;
    double pv1;   // marginal probabilities of the observed values
    double pv2;
    double pv3;
