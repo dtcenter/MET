@@ -144,15 +144,15 @@ class SeepsClimoBase {
 
    protected:
 
-      bool is_seeps_ready() { return seeps_ready; };
+      bool is_seeps_ready() const { return seeps_ready; };
       void increase_filtered_count() { filtered_count++; };
-      bool check_seeps_p1_thresh(double p1) { return seeps_p1_thresh.check(p1); };
+      bool check_seeps_p1_thresh(double p1) const { return seeps_p1_thresh.check(p1); };
       ConcatString get_climo_filename(const ConcatString &env_climo_name,
                                       const char *def_climo_name);
 
       virtual void clear();
       virtual ConcatString get_env_climo_name() { return "not defined"; };
-      virtual char *get_def_climo_name() { return nullptr; };
+      virtual const char *get_def_climo_name() { return nullptr; };
       virtual void read_seeps_climo_grid(const ConcatString &filename) = 0;
       void set_seeps_ready(bool _seeps_ready) { seeps_ready = _seeps_ready; };
 
@@ -177,15 +177,16 @@ class SeepsClimo : public SeepsClimoBase {
 
       std::unique_ptr<SeepsClimoRecord> create_climo_record(
                                             int sid, double lat, double lon, double elv,
-                                            double *p1, double *p2, double *t1, double *t2,
-                                            double *scores);
-      void print_record(SeepsClimoRecord *record, bool with_header=false);
+                                            const double *p1, const double *p2,
+                                            const double *t1, const double *t2,
+                                            const double *scores);
+      void print_record(const SeepsClimoRecord *record, bool with_header=false) const;
       void read_records(const ConcatString &filename);
 
    protected:
       void clear() override;
       ConcatString get_env_climo_name() override { return MET_ENV_SEEPS_POINT_CLIMO_NAME; };
-      char *get_def_climo_name() override { return (char *)def_seeps_point_filename; };
+      const char *get_def_climo_name() override { return def_seeps_point_filename; };
       void read_seeps_climo_grid(const ConcatString &filename) override;
 
    public:
@@ -200,7 +201,7 @@ class SeepsClimo : public SeepsClimoBase {
                                   int month, int hour);
 
       void print_all();
-      void print_record(SeepsRecord *record, bool with_header=false);
+      void print_record(const SeepsRecord *record, bool with_header=false) const;
 
       //
       //
@@ -233,7 +234,7 @@ class SeepsClimoGrid : public SeepsClimoBase {
    protected:
       void clear() override;
       ConcatString get_env_climo_name() override { return MET_ENV_SEEPS_GRID_CLIMO_NAME; };
-      char *get_def_climo_name() override { return (char *)def_seeps_grid_filename; };
+      const char *get_def_climo_name() override { return def_seeps_grid_filename; };
       void read_seeps_climo_grid(const ConcatString &filename) override;
 
    public:

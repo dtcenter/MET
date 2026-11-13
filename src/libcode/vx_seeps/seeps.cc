@@ -98,11 +98,27 @@ void SeepsAggScore::clear() {
    // f{d|l|h} : fcsts in {dry(0)|light(1)|heavy(2)} category
 
    n_obs = 0;
-   c_odfl = c_odfh = c_olfd = c_olfh = c_ohfd = c_ohfl = 0;
-   pv1 = pv2 = pv3 = 0.0;
-   pf1 = pf2 = pf3 = 0.0;
-   mean_fcst = mean_obs = bad_data_double;
-   score     = score_wgt = bad_data_double;
+
+   c_odfl = 0;
+   c_odfh = 0;
+   c_olfd = 0;
+   c_olfh = 0;
+   c_ohfd = 0;
+   c_ohfl = 0;
+
+   pv1 = 0.0;
+   pv2 = 0.0;
+   pv3 = 0.0;
+
+   pf1 = 0.0;
+   pf2 = 0.0;
+   pf3 = 0.0;
+
+   mean_fcst = bad_data_double;
+   mean_obs  = bad_data_double;
+
+   score     = bad_data_double;
+   score_wgt = bad_data_double;
 
 }
 
@@ -173,10 +189,10 @@ bool SeepsAggScore::inc_category(int fcst_cat, int obs_cat) {
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsClimoBase::SeepsClimoBase(const ConcatString &seeps_climo_name) : climo_file_name{seeps_climo_name} {
+SeepsClimoBase::SeepsClimoBase(const ConcatString &seeps_climo_name) :
+   seeps_ready{false}, climo_file_name{seeps_climo_name} {
 
    SeepsClimoBase::clear();
-   seeps_ready = false;
 
 }
 
@@ -276,7 +292,8 @@ void SeepsClimo::clear() {
 
 std::unique_ptr<SeepsClimoRecord> SeepsClimo::create_climo_record(
       int sid, double lat, double lon, double elv,
-      double *p1, double *p2, double *t1, double *t2, double *scores) {
+      const double *p1, const double *p2, const double *t1, const double *t2,
+      const double *scores) {
    int offset;
    auto record = std::make_unique<SeepsClimoRecord>();
    const char *method_name = "SeepsClimo::create_climo_record() -> ";
@@ -324,7 +341,7 @@ std::unique_ptr<SeepsRecord> SeepsClimo::get_record(int sid, int month, int hour
    const char *method_name = "SeepsClimo::get_record() -> ";
 
    if (is_seeps_ready()) {
-      SeepsClimoRecord *climo_record = nullptr;
+      const SeepsClimoRecord *climo_record = nullptr;
       std::map<int,std::unique_ptr<SeepsClimoRecord>>::iterator it;
       if (hour < 6 || hour >= 18) {
          it = seeps_score_00_map.find(sid);
@@ -466,7 +483,7 @@ void SeepsClimo::print_all() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void SeepsClimo::print_record(SeepsClimoRecord *record, bool with_header) {
+void SeepsClimo::print_record(const SeepsClimoRecord *record, bool with_header) const {
    if (with_header) {
       cout << "  sid\tlat\tlon\telv\n";
       cout << "\tmonth\tp1\tp2\tt1\tt2\tscores (3 by 3 matrix)\n";
@@ -476,8 +493,8 @@ void SeepsClimo::print_record(SeepsClimoRecord *record, bool with_header) {
    for (int idx=0; idx<SEEPS_MONTH; idx++) {
       cout << "\t" << (idx+1) << "\t" << record->p1[idx] << "\t" << record->p2[idx]
            << "\t" << record->t1[idx] << "\t" << record->t2[idx];
-      for (int idx2=0; idx2<SEEPS_MATRIX_SIZE; idx2++) {
-         cout << "\t" << record->scores[idx][idx2];
+      for (double month_score : record->scores[idx]) {
+         cout << "\t" << month_score;
       }
       cout << "\n";
    }
@@ -485,14 +502,14 @@ void SeepsClimo::print_record(SeepsClimoRecord *record, bool with_header) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void SeepsClimo::print_record(SeepsRecord *record, bool with_header) {
+void SeepsClimo::print_record(const SeepsRecord *record, bool with_header) const {
    if (with_header) cout << "  sid\tlat\tlon\telv\tp1\tp2\tt1\tt2\tscores (3 by 3 matrix)\n";
 
    cout << "  " << record->sid << "\t" << record->lat << "\t" << record->lon
         << "\t" << record->elv << "\t" << record->p1 << "\t" << record->p2
         << "\t" << record->t1 << "\t" << record->t2;
-   for (int idx=0; idx<SEEPS_MATRIX_SIZE; idx++) {
-      cout << "\t" << record->scores[idx];
+   for (double matrix_score : record->scores) {
+      cout << "\t" << matrix_score;
    }
    cout << " for month " << record->month << "\n";
 }
@@ -802,7 +819,8 @@ void SeepsClimoGrid::read_seeps_climo_grid(const ConcatString &filename) {
 
    try {
       std::unique_ptr<netCDF::NcFile> nc_file = open_ncfile(filename.c_str());
-      // dimensions: month = 12;
+
+      // Require the latitude and longitude dimensions
       if (!has_dim(nc_file.get(), dim_name_lat) || !has_dim(nc_file.get(), dim_name_lon)) {
          mlog << Error << "\n" << method_name
               << "\"" << filename << "\" is not valid SEEPS climo file\n\n";
@@ -834,8 +852,8 @@ void SeepsClimoGrid::read_seeps_climo_grid(const ConcatString &filename) {
       s_ohfd_buf.resize(nx*ny);
       s_ohfl_buf.resize(nx*ny);
 
-      LongArray curs;   // = { month-1, 0, 0 };
-      LongArray dims;   // = { 1, ny, nx };
+      LongArray curs;
+      LongArray dims;
       NcVar var_p1_00  = get_nc_var(nc_file.get(), var_name_p1_00);
       NcVar var_p2_00  = get_nc_var(nc_file.get(), var_name_p2_00);
       NcVar var_t1_00  = get_nc_var(nc_file.get(), var_name_t1_00);
