@@ -34,7 +34,7 @@ jobs:
         github.event.label.name == 'claude-review'))
 
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     permissions:
       contents: read
       # Write access is required to post the review: the inline comments on
@@ -48,7 +48,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          # Full history so the reviewer can diff against the base branch and
+          # read the history of the files the pull request touches.
+          fetch-depth: 0
           ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/pull/{0}/head', inputs.pr_number) || '' }}
 
       - name: Run Claude Code Review
@@ -59,24 +61,51 @@ jobs:
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'
           prompt: |
-            /code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.pull_request.number || inputs.pr_number }}
+            /code-review:code-review high --comment ${{ github.repository }}/pull/${{ github.event.pull_request.number || inputs.pr_number }} --max-findings all
+
+            The effort level above is the first argument to the review skill
+            and controls how much it reports: "low" returns only a few
+            high-confidence findings, while "high" returns more, including
+            some the reviewer is less certain about. Raise it to "xhigh" for
+            a release branch if a deeper pass is wanted.
 
             Always finish by posting exactly one top-level summary comment on
             the pull request with `gh pr comment`, whether or not any issues
-            were found. When issues were found, post it after the inline
-            comments and have it list each one on a single line, naming the
-            file and line the inline comment was posted on, so the pull request
-            conversation shows at a glance what the review flagged. When no
-            issues were found, that summary comment is the only comment posted.
+            were found, and post it after any inline comments. That comment
+            contains these sections, in this order:
+
+            1. Two or three sentences describing what this pull request
+               changes, in your own words rather than quoting the description.
+            2. The findings, one per line, each naming the file and line the
+               inline comment was posted on, so the conversation shows at a
+               glance what the review flagged. Say so plainly when there are
+               none.
+            3. "Project conventions", judging the pull request against
+               CLAUDE.md in the root of this repository: whether the release
+               notes carry an entry for this issue under the current version,
+               whether the upgrade instructions needed updating, whether the
+               documentation changed when user-visible behavior did, whether
+               the unit tests were updated, and the files this pull request
+               adds, renames, or removes.
+            4. "Questions for the author", listing anything the diff alone
+               could not settle. Leave the section out when there is nothing
+               to ask.
+
+            Report only what the diff and the repository support. Do not pad
+            the summary to fill a section.
           # The allowed tools are the ones the code-review plugin declares it
           # needs: the inline comment tool, plus the read-only gh commands it
           # uses to read the pull request and `gh pr comment` for the summary.
+          # Read, Grep, and Glob let the reviewer read the checked-out source
+          # rather than working from the diff alone, which is what lets it
+          # judge a change against the code calling it. The read-only git
+          # commands give it the history of the files in the diff.
           # Note that the action runs in auto permission mode, where this list
           # is an allow rule rather than a strict whitelist; other tool calls
           # are decided by the action's own safety review.
           claude_args: >-
             --allowedTools
-            "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr list:*),Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh search:*)"
-            --max-turns 50
+            "mcp__github_inline_comment__create_inline_comment,Read,Grep,Glob,Bash(gh pr comment:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr list:*),Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh search:*),Bash(git log:*),Bash(git diff:*),Bash(git show:*)"
+            --max-turns 80
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
