@@ -98,7 +98,7 @@ void PairDataPoint::erase() {
 
    f_na.erase();
    f_lead_na.erase();
-   for (auto &s : seeps_mpr) s.reset();
+   seeps_mpr.clear();
 
    return;
 }
@@ -111,9 +111,7 @@ void PairDataPoint::extend(int n) {
 
    f_na.extend(n);
    f_lead_na.extend(n);
-   for (auto idx = (int) seeps_mpr.size(); idx<n; idx++) {
-      seeps_mpr.emplace_back(nullptr);
-   }
+   seeps_mpr.reserve(n);
 
    return;
 }
@@ -155,7 +153,8 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
                pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
                cpi, pd.wgt_na[i]) &&
             i < static_cast<int>(pd.seeps_mpr.size())) {
-            set_seeps_score(seeps_mpr[i].get(), i);
+            // Store the score for the pair just added
+            set_seeps_score(pd.seeps_mpr[i].get());
          }
       }
    }
@@ -209,7 +208,7 @@ void PairDataPoint::set_seeps_score(SeepsScore *seeps, int index) {
    if (seeps) {
       auto seeps_count = (int) seeps_mpr.size();
       if(index < 0) index = seeps_count - 1;
-      if(index < seeps_count) {
+      if(index >= 0 && index < seeps_count) {
          if (!seeps_mpr[index]) seeps_mpr[index] = std::make_unique<SeepsScore>();
          *seeps_mpr[index] = *seeps;
       }
@@ -219,36 +218,6 @@ void PairDataPoint::set_seeps_score(SeepsScore *seeps, int index) {
       }
    }
 
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairDataPoint::set_point_pair(int i_obs,
-                                   const char *typ, const char *sid,
-                                   double lat, double lon, double elv,
-                                   double x, double y,
-                                   int sec, unixtime ut,
-                                   double lvl, double hgt,
-                                   double f, double o, const char *qc,
-                                   const ClimoPntInfo &cpi,
-                                   double wgt, const SeepsScore *seeps) {
-
-   if(i_obs < 0 || i_obs >= n_obs) {
-      mlog << Error << "\nPairDataPoint::set_point_pair() -> "
-           << "range check error: " << i_obs << " not in (0, "
-           << n_obs << ").\n\n";
-      exit(1);
-   }
-
-   set_point_obs(i_obs, typ, sid, lat, lon, elv,
-                 x, y, ut, lvl, hgt,
-                 o, qc, cpi, wgt);
-
-   f_na.set(i_obs, f);
-   f_lead_na.set(i_obs, sec);
-   *seeps_mpr[i_obs] = *seeps;
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -292,6 +261,7 @@ bool PairDataPoint::add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
    wgt_na.add(wgt_in);
 
    for(int i=0; i<o_in.n(); i++) {
+      seeps_mpr.emplace_back(nullptr);
       ClimoPntInfo cpi(fcmn_in[i], fcsd_in[i], ocmn_in[i], ocsd_in[i]);
       add_climo(o_in[i], cpi);
    }
@@ -383,8 +353,10 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
                          nint(f_lead_na[i]), vld_ta[i],
                          lvl_na[i], hgt_na[i],
                          f_na[i], o_na[i], o_qc_sa[i].c_str(),
-                         cpi, wgt_na[i])) {
-               out_pd.set_seeps_score(seeps_mpr[i].get(), i);
+                         cpi, wgt_na[i]) &&
+               i < (int) seeps_mpr.size()) {
+               // Store the score for the pair just added
+               out_pd.set_seeps_score(seeps_mpr[i].get());
             }
          }
          // Handle gridded data
@@ -510,7 +482,7 @@ void VxPairDataPoint::set_size(int types, int masks, int interps) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::add_point_obs(const float *hdr_arr,
+bool VxPairDataPoint::add_point_obs(const float *hdr_arr,
                                     const char *hdr_typ_str,
                                     const char *hdr_sid_str,
                                     unixtime hdr_ut,
@@ -518,6 +490,7 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
                                     const float *obs_arr,
                                     const Grid &gr,
                                     const char *var_name) {
+   bool obs_used = false;
 
    // Increment the number of tries count
    n_try++;
@@ -530,38 +503,38 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
    }
 
    // Check the station ID
-   if(!is_keeper_sid(pnt_obs_str.c_str(), hdr_sid_str)) return;
+   if(!is_keeper_sid(pnt_obs_str.c_str(), hdr_sid_str)) return obs_used;
 
    // Check observation variable
-   if(!is_keeper_var(pnt_obs_str.c_str(), var_name, nint(obs_arr[1]))) return;
+   if(!is_keeper_var(pnt_obs_str.c_str(), var_name, nint(obs_arr[1]))) return obs_used;
 
    // Check observation quality
-   if(!is_keeper_qty(pnt_obs_str.c_str(), obs_qty)) return;
+   if(!is_keeper_qty(pnt_obs_str.c_str(), obs_qty)) return obs_used;
 
    // Check valid time
-   if(!is_keeper_vld(pnt_obs_str.c_str(), hdr_ut)) return;
+   if(!is_keeper_vld(pnt_obs_str.c_str(), hdr_ut)) return obs_used;
 
    // Check observation value
    double orig_obs_v = obs_arr[4];
-   if(!is_keeper_obs(pnt_obs_str.c_str(), orig_obs_v)) return;
+   if(!is_keeper_obs(pnt_obs_str.c_str(), orig_obs_v)) return obs_used;
 
    // Check location
    double hdr_lat = hdr_arr[0];
    double hdr_lon = hdr_arr[1];
    double obs_x;
    double obs_y;
-   if(!is_keeper_grd(pnt_obs_str.c_str(), gr, hdr_lat, hdr_lon, obs_x, obs_y)) return;
+   if(!is_keeper_grd(pnt_obs_str.c_str(), gr, hdr_lat, hdr_lon, obs_x, obs_y)) return obs_used;
 
    // Check topo
    double hdr_elv = hdr_arr[2];
    double topo_elv = bad_data_double;
    if(!is_keeper_topo(pnt_obs_str.c_str(), gr, obs_x, obs_y,
-                      hdr_typ_str, hdr_elv, topo_elv)) return;
+                      hdr_typ_str, hdr_elv, topo_elv)) return obs_used;
 
    // Check level
    double obs_lvl = obs_arr[2];
    double obs_hgt = obs_arr[3];
-   if(!is_keeper_lvl(pnt_obs_str.c_str(), hdr_typ_str, obs_lvl, obs_hgt)) return;
+   if(!is_keeper_lvl(pnt_obs_str.c_str(), hdr_typ_str, obs_lvl, obs_hgt)) return obs_used;
 
    // Set flags
    bool precip_flag = fcst_info->is_precipitation() &&
@@ -657,14 +630,16 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
             // Add the forecast, climatological, and observation data
             // Weight is from the nearest grid point
             int n = three_to_one(i_msg_typ, i_mask, i_interp);
-            if(!pd[n].add_point_pair(hdr_typ_str, hdr_sid_str,
-                         hdr_lat, hdr_lon, hdr_elv,
-                         obs_x, obs_y,
-                         bad_data_int, hdr_ut,
-                         obs_lvl, obs_hgt,
-                         fcst_v, obs_v, obs_qty,
-                         cpi, default_weight)) {
-
+            if(pd[n].add_point_pair(hdr_typ_str, hdr_sid_str,
+                        hdr_lat, hdr_lon, hdr_elv,
+                        obs_x, obs_y,
+                        bad_data_int, hdr_ut,
+                        obs_lvl, obs_hgt,
+                        fcst_v, obs_v, obs_qty,
+                        cpi, default_weight)) {
+               obs_used = true;
+            }
+            else {
                if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                   mlog << Debug(REJECT_DEBUG_LEVEL)
                        << "For " << fcst_info->magic_str() << " versus "
@@ -702,7 +677,7 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
       } // end for i_mask
    } // end for i_msg_typ
 
-   return;
+   return obs_used;
 }
 
 ////////////////////////////////////////////////////////////////////////

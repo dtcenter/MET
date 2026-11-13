@@ -107,13 +107,15 @@
     </output>
   </test>
 
+  <!-- MET #3499: no -field setting leaks -->
+
   <test name="regrid_data_plane_GFS_TO_HMT_NEAREST">
     <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
       &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
       &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_HMT_NEAREST.nc \
-      -field 'name="APCP"; level="A6";' \
+      -field 'name="APCP"; level="A6"; convert(x) = x / 25.4; set_attr_units = "in";' \
       -field 'name="TMP";  level="Z2";' \
       -field 'name="UGRD"; level="Z10";' \
       -field 'name="VGRD"; level="Z10";' \
@@ -196,15 +198,7 @@
     </output>
   </test>
 
-  <!-- MET #3178: Compare GFS 1.0 and 0.25 degree data regridded to  -->
-  <!-- a coarser grid using AW_MEAN and AW_MEAN_CNTR. The 1.0 degree   -->
-  <!-- input is an exact subsample of the 0.25 degree input.          -->
-
-  <!-- MET #3336: The first -field requests a GRIB2 field which does  -->
-  <!-- not exist. Regrid-Data-Plane should warn about it and continue -->
-  <!-- on to the remaining fields, leaving the output unchanged.      -->
-  <!-- Previously it segfaulted while determining the input grid, and -->
-  <!-- the input grid loop re-read the first -field on every pass.    -->
+  <!-- MET #3336: the first -field does not exist and should be skipped with a warning -->
 
   <test name="regrid_data_plane_GFS_0P25_TO_1P00_NEAREST">
     <exec>&MET_BIN;/regrid_data_plane</exec>
@@ -222,6 +216,8 @@
       <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_0P25_TO_1P00_NEAREST.nc</grid_nc>
     </output>
   </test>
+
+  <!-- MET #3178: AW_MEAN and AW_MEAN_CNTR with 1.0 degree input exactly subsampled from 0.25 -->
 
   <test name="regrid_grid_stat_GFS_1P00_VS_0P25_AW_MEAN">
     <exec>&MET_BIN;/grid_stat</exec>
@@ -257,11 +253,24 @@
     </output>
   </test>
 
-  <!-- MET #3178: Regrid a global grid to the regional, Lambert         -->
-  <!-- Conformal G212 grid using AW_MEAN_CNTR. Input grid points which   -->
-  <!-- fall outside the valid domain of the output projection produce    -->
-  <!-- non-finite grid coordinates, which previously ran the overlap     -->
-  <!-- computation past the end of its fixed-size arrays and crashed.    -->
+  <!-- MET #3178: AW_MEAN_CNTR to a Gaussian grid, whose rows are defined only at integer y -->
+
+  <test name="regrid_data_plane_GFS_0P25_TO_GAUSSIAN_AW_MEAN_CNTR">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f024.grib2 \
+      &INPUT_DIR;/gaussian/grib1/gaussian.grib \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_0P25_TO_GAUSSIAN_AW_MEAN_CNTR.nc \
+      -field 'name="TMP"; level="Z2";' \
+      -method AW_MEAN_CNTR \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_0P25_TO_GAUSSIAN_AW_MEAN_CNTR.nc</grid_nc>
+    </output>
+  </test>
+
+  <!-- MET #3178: AW_MEAN_CNTR to G212, with input points outside the output projection -->
 
   <test name="regrid_data_plane_GFS_0P25_TO_G212_AW_MEAN_CNTR">
     <exec>&MET_BIN;/regrid_data_plane</exec>
@@ -279,13 +288,7 @@
     </output>
   </test>
 
-  <!-- MET #3178: Regrid from low to high resolution using AW_MEAN_CNTR. -->
-  <!-- Each input grid box spans many output grid boxes, which the       -->
-  <!-- overlap computation previously refused to divide the weight       -->
-  <!-- among, assigning each input grid box to a single output grid box  -->
-  <!-- and leaving the rest of the output grid unset. All 160000 output  -->
-  <!-- grid boxes should be filled, including those along the western    -->
-  <!-- edge, which input grid boxes straddling the edge must reach.      -->
+  <!-- MET #3178: AW_MEAN_CNTR from low to high resolution, splitting each input box -->
 
   <test name="regrid_data_plane_GFS_1P00_TO_0P05_AW_MEAN_CNTR">
     <exec>&MET_BIN;/regrid_data_plane</exec>
@@ -302,11 +305,7 @@
     </output>
   </test>
 
-  <!-- MET #3178: Regrid from high to low resolution to a regional      -->
-  <!-- lat/lon grid using AW_MEAN and AW_MEAN_CNTR. Input grid points    -->
-  <!-- just west of the western edge previously mapped to x near 360     -->
-  <!-- degrees rather than just below 0, biasing the first column of     -->
-  <!-- output grid boxes.                                                -->
+  <!-- MET #3178: AW_MEAN and AW_MEAN_CNTR to a regional grid, testing its western edge -->
 
   <test name="regrid_data_plane_GFS_0P25_TO_REGIONAL_1P00_AW_MEAN">
     <exec>&MET_BIN;/regrid_data_plane</exec>
@@ -531,6 +530,24 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_WRAP_LON.nc</grid_nc>
+    </output>
+  </test>
+
+  <!-- Regrid a dimension with no coordinate variable -->
+
+  <test name="regrid_data_plane_NC_DIM_NO_COORD_VAR">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &INPUT_DIR;/climatology_data/seeps/PPT24_seepsweights_grid.nc \
+      "latlon 72 20 -47.5 2.5 5.0 5.0" \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_NC_DIM_NO_COORD_VAR.nc \
+      -field 'name="p1_00"; level="(0,*,*)";' \
+      -field 'name="p1_00"; level="(11,*,*)";' \
+      -name p1_00_month00,p1_00_month11 \
+      -method NEAREST
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_NC_DIM_NO_COORD_VAR.nc</grid_nc>
     </output>
   </test>
 

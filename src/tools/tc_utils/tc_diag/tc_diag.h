@@ -119,16 +119,10 @@ class TmpFileInfo {
          //  RngAziGrid whose copy constructor is deleted by GridRep's being
          //  inaccessible.
          //
-         //  noexcept is declared rather than deduced.  The deduced
-         //  specification is potentially throwing, because assigning ra_grid
-         //  falls back to RngAziGrid's copy assignment and grid_out is a Grid,
-         //  which deep copies its GridRep; both allocate.  The only exception
-         //  that can produce is std::bad_alloc, which no MET tool can ever
-         //  observe: met_main() calls set_handlers(), whose
-         //  set_new_handler(oom) exits the process before operator new throws.
+         //  MET #3443 noexcept is omitted deliberately; it breaks icpc 19.x.
          //
 
-      TmpFileInfo & operator=(TmpFileInfo &&) noexcept = default;
+      TmpFileInfo & operator=(TmpFileInfo &&) = default;
 
       //////////////////////////////////////////////////////////////////
 

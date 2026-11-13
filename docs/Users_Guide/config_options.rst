@@ -362,25 +362,27 @@ to a directory, all files in it whose names begin with "obs_err" and end with
           files whose names begin with "obs_error" are still read.
 
 When processing point and gridded observations, Ensemble-Stat searches the table
-to find the entry defining the observation error information. The table
-consists of 15 columns and includes a header row defining each column. The
-special string ALL is interpreted as a wildcard in these files. The first 6
-columns (OBS_VAR, MESSAGE_TYPE, PB_REPORT_TYPE, IN_REPORT_TYPE, INSTRUMENT_TYPE,
-and STATION_ID) may be set to a comma-separated list of strings to be matched.
-In addition, the strings in the OBS_VAR column are interpreted as regular
-expressions when searching for a match. For example, setting the OBS_VAR column
-to 'APCP_[0-9]+' would match observations for both APCP_03 and APCP_24. The
-HGT_RANGE, VAL_RANGE, and PRS_RANGE columns should either be set to ALL or
-BEG,END where BEG and END specify the range of values to be used. The
-INST_BIAS_SCALE and INST_BIAS_OFFSET columns define instrument bias adjustments
-which are applied to the observation values. The DIST_TYPE and DIST_PARM
-columns define the distribution from which random perturbations should be drawn
-and applied to the ensemble member values. See the obs_err description below
-for details on the supported error distributions. The last two columns, MIN and
-MAX, define the bounds for the valid range of the bias-corrected observation
-values and randomly perturbed ensemble member values. Values less than MIN are
-reset to the minimum value and values greater than MAX are reset to the maximum
-value. A value of NA indicates that the variable is unbounded.
+to find the entry defining the observation error information. The rows are
+checked in the order in which they appear in the file and the first matching row
+is used, so rows with more specific matching criteria should be listed above
+more general ones. The table consists of 15 columns and includes a header row
+defining each column. The special string ALL is interpreted as a wildcard in
+these files. The first 6 columns (OBS_VAR, MESSAGE_TYPE, PB_REPORT_TYPE,
+IN_REPORT_TYPE, INSTRUMENT_TYPE, and STATION_ID) may be set to a comma-separated
+list of strings to be matched. In addition, the strings in the OBS_VAR column
+are interpreted as regular expressions when searching for a match. For example,
+setting the OBS_VAR column to 'APCP_[0-9]+' would match observations for both
+APCP_03 and APCP_24. The HGT_RANGE, VAL_RANGE, and PRS_RANGE columns should
+either be set to ALL or BEG,END where BEG and END specify the range of values to
+be used. The INST_BIAS_SCALE and INST_BIAS_OFFSET columns define instrument bias
+adjustments which are applied to the observation values. The DIST_TYPE and
+DIST_PARM columns define the distribution from which random perturbations should
+be drawn and applied to the ensemble member values. See the obs_err description
+below for details on the supported error distributions. The last two columns,
+MIN and MAX, define the bounds for the valid range of the bias-corrected
+observation values and randomly perturbed ensemble member values. Values less
+than MIN are reset to the minimum value and values greater than MAX are reset to
+the maximum value. A value of NA indicates that the variable is unbounded.
 
 If the observation error table contains no entries for the variable being
 evaluated, MET prints a warning message and disables the observation error
@@ -2809,6 +2811,7 @@ The "grid_weight_flag" specifies how grid weighting should be applied
 during the computation of contingency tables (CTC, MCTC, PCT, and
 NBRCTC), partial sums (SL1L2, SAL1L2, VL1L2, and VAL1L2), and statistics
 (CNT, CTS, MCTS, PSTD, PRC, PJC, ECLV, NBRCNT, and NBRCTS).
+It is not applied to the SEEPS line type (see :numref:`PS_seeps_weighting`).
 It is meant to account for grid box area distortion and is often applied
 to global Lat/Lon grids. It is only applied for grid-to-grid verification
 in Grid-Stat and Ensemble-Stat and is not applied for grid-to-point
@@ -2885,7 +2888,7 @@ point_weight_flag
 -----------------
 
 The "point_weight_flag" is similar to the "grid_weight_flag", described above,
-but applies to grid-to-point verification in Point-Stat and Ensemble-Stat.
+but applies to point verification in Point-Stat, Ensemble-Stat, and Pair-Stat.
 It is not applied for grid-to-grid verification which is controlled by the
 "grid_weight_flag" option. It can only be defined once at the highest level
 of config file context and applies to all verification tasks for that run.
@@ -2898,9 +2901,78 @@ methods are planned for future versions:
 * SID to use the weights defined by the station ID masking configuration option,
   "mask.sid".
 
+* KDE to apply a kernel density estimator to compute weights based on observation
+  density to avoid the impact of oversampling from data rich regions, as described
+  in :ref:`Rodwell et al., 2010 <Rodwell-2010>` and
+  :ref:`Haiden et al., 2012 <Haiden-2012>`. The weight for each station is the
+  inverse of its station density, computed as the sum of
+  exp(-(angle / kde_ref_angle)^2) over all stations, including itself, where
+  angle is the great circle angle between the two stations. KDE weights are in
+  the range (0, 1], where a weight of 1 indicates an isolated station.
+
+  KDE weights are computed separately for each verification task, using only the
+  stations whose observations are used by that task. As a result, adding or
+  removing a verification task does not change the weights for any other task.
+  Each unique station ID is treated as a single point in the density calculation,
+  located at the first location encountered for that station within each
+  verification task.
+
+  The station set for each task is the union of the stations used across all of
+  that task's masking regions, and each station's weight is applied in every
+  masking region. Adding a masking region to a task therefore changes the
+  weights applied within that task's other masking regions.
+
+  The SEEPS line type applies its own station density weighting, computed the
+  same way and using the same "kde_ref_angle" option, regardless of the
+  "point_weight_flag" setting. The "point_weight_flag" weights are not applied to
+  the SEEPS line type. See :numref:`PS_seeps_weighting` for details.
+
 .. code-block:: none
 
   point_weight_flag = NONE;
+
+kde_ref_angle
+-------------
+
+The "kde_ref_angle" entry defines the reference angle used when computing the
+weights for "point_weight_flag = KDE". It also defines the reference angle for the
+station density weights that are always applied to the SEEPS line type, regardless
+of the "point_weight_flag" setting, as described in :numref:`PS_seeps_weighting`.
+This reference angle is defined in degrees
+with a default value of 0.75. As described in :ref:`Haiden et al., 2012 <Haiden-2012>`,
+an increase of this parameter increases the weights of data-sparse regions in global
+or continental-scale averages. The value must be greater than 0 when
+"point_weight_flag = KDE" or when the SEEPS line type is requested.
+
+.. code-block:: none
+
+  kde_ref_angle = 0.75;
+
+write_weights
+-------------
+
+Point weights are either pre-defined ("point_weight_flag = SID") or computed based
+on the station location density ("point_weight_flag = KDE"). The "write_weights"
+entry is a boolean that can be set to TRUE or FALSE (default). If TRUE, the weights
+for each verification task are written to a separate output ASCII file. The file
+names end in "_NAME_LEVEL_TYPE_point_weights.txt", where NAME and LEVEL are the
+forecast variable name and level for that task, and TYPE is SID or KDE. Characters
+other than letters, digits, "-", and "." in the NAME and LEVEL strings are replaced
+with "_". If multiple verification tasks have the same NAME and LEVEL, the 1-based
+task index is appended (e.g. "_TMP_Z2_vx4") to make the file names unique. These
+files can be used to define the "mask.sid" station ID masking file in future runs.
+The station density weights that are always applied to the SEEPS line type are
+not written to these files.
+
+Note that "mask.sid" can be specified separately for each verification task, and,
+technically, the same station could be assigned different weights for different
+masking regions within a single verification task. If the same station name
+appears in multiple "mask.sid" lists for a task, only the first weight encountered
+for each station is written to the output.
+
+.. code-block:: none
+
+  write_weights = FALSE;
 
 hss_ec_value
 ------------
@@ -3305,7 +3377,12 @@ number between 0 and 1 specifying the required ratio of valid data in the
 neighborhood for an output value to be computed. The alpha entry is a number
 between 0 and 1 specifying the EAS distance criteria. For each grid point,
 the smallest width for which the distance criteria is satisfied is used.
-If the distance criteria is never satisfied, the largest width is used.
+If the distance criteria is never satisfied, the largest width that can
+be evaluated is used. A width cannot be evaluated when the ratio of valid
+data in its neighborhood is less than vld_thresh, which occurs for the
+larger widths near the edges of the domain, where the neighborhood
+extends beyond the grid. Those widths are skipped, and the output is set
+to bad data only when none of the candidate widths can be evaluated.
 
 The gaussian_dx and gaussian_radius entries define the Gaussian smoother
 which is applied to the raw EAS probabilities.
