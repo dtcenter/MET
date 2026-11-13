@@ -137,8 +137,6 @@ struct SeepsClimoRecord {
 //
 // One station's monthly climatology values, as read from the point
 // climatology file and handed to SeepsClimo::create_climo_record().
-// They travel together and are grouped so that the function takes five
-// parameters rather than nine.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -179,12 +177,7 @@ class SeepsClimoBase {
       explicit SeepsClimoBase(const ConcatString &seeps_climo_name);
       virtual ~SeepsClimoBase();
 
-      //
-      // This hierarchy is polymorphic, is always reached through a
-      // pointer, and is never copied or moved. Deleting the copy and
-      // move operations says so and rules out slicing through a base
-      // reference.
-      //
+      // Polymorphic and never copied; deleting these rules out slicing
       SeepsClimoBase(const SeepsClimoBase &) = delete;
       SeepsClimoBase & operator=(const SeepsClimoBase &) = delete;
       SeepsClimoBase(SeepsClimoBase &&) = delete;
