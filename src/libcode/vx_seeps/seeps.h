@@ -96,12 +96,10 @@ struct SeepsAggScore {  // For SEEPS
    double pf1;   // marginal probabilities of the forecast values
    double pf2;
    double pf3;
-   double mean_fcst;
-   double mean_fcst_wgt;
+   double mean_fcst;   // unweighted means, written to MEAN_FCST and MEAN_OBS
    double mean_obs;
-   double mean_obs_wgt;
-   double score;
-   double score_wgt;
+   double score;       // unweighted mean score, used by the weighting fallback
+   double score_wgt;   // station density weighted score, written to SEEPS
 };
 
 ////////////////////////////////////////////////////////////////////////

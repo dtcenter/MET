@@ -1515,8 +1515,6 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg,
    int count = 0;
    int count_diagonal = 0;
    double score_sum = 0.0;
-   double obs_sum_wgt = 0.0;
-   double fcst_sum_wgt = 0.0;
    double obs_sum = 0.0;
    double fcst_sum = 0.0;
    vector<int> pair_idx;
@@ -1575,10 +1573,8 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg,
          mlog << Warning << "\n" << method_name
               << "unable to compute station density weights for "
               << pair_idx.size() << " SEEPS pairs! "
-              << "Using unweighted means.\n\n";
+              << "Using the unweighted SEEPS score.\n\n";
          score_sum_wgt = seeps_agg->score;
-         fcst_sum_wgt  = seeps_agg->mean_fcst;
-         obs_sum_wgt   = seeps_agg->mean_obs;
       }
       else {
 
@@ -1596,8 +1592,6 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg,
 
             //IDL: s = s + c(4+cat(i) * w{i)
             score_sum_wgt += seeps_mpr->score * weight[i];
-            obs_sum_wgt   += pd->o_na[j] * weight[i];
-            fcst_sum_wgt  += pd->f_na[j] * weight[i];
 
             //IDL: pvf(cat{i)) = pvf(cat{i)) + w{i)
             if (seeps_mpr->s_idx >= 0 && seeps_mpr->s_idx < SEEPS_MATRIX_SIZE) {
@@ -1612,9 +1606,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg,
       seeps_agg->pf1 = pvf[0] + pvf[1] + pvf[2];    // sum by row for forecast
       seeps_agg->pf2 = pvf[3] + pvf[4] + pvf[5];    // sum by row for forecast
       seeps_agg->pf3 = pvf[6] + pvf[7] + pvf[8];    // sum by row for forecast
-      seeps_agg->mean_fcst_wgt = fcst_sum_wgt;
-      seeps_agg->mean_obs_wgt  = obs_sum_wgt;
-      seeps_agg->score_wgt     = score_sum_wgt;
+      seeps_agg->score_wgt = score_sum_wgt;
 
       mlog << Debug(7) << method_name
            << "SEEPS score=" << seeps_agg->score << " score_wgt=" << seeps_agg->score_wgt
@@ -1764,10 +1756,6 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
       seeps_agg->mean_fcst = fcst_sum / seeps_count;
       seeps_agg->mean_obs  = obs_sum / seeps_count;
       seeps_agg->score     = seeps_score_sum / seeps_count;
-
-      // Grid points are weighted equally
-      seeps_agg->mean_fcst_wgt = seeps_agg->mean_fcst;
-      seeps_agg->mean_obs_wgt  = seeps_agg->mean_obs;
    }
 
    mlog << Debug(6) << method_name

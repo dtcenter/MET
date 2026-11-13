@@ -4211,10 +4211,11 @@ void write_seeps_cols(const SeepsAggScore *seeps,
    at.set_entry(r, c+11, seeps->pv2);   // PV2
    at.set_entry(r, c+12, seeps->pv3);   // PV3
 
-   // MET #3465: Write the station density weighted means and score
-   at.set_entry(r, c+13, seeps->mean_fcst_wgt); // MEAN_FCST
-   at.set_entry(r, c+14, seeps->mean_obs_wgt);  // MEAN_OBS
-   at.set_entry(r, c+15, seeps->score_wgt);     // SEEPS
+   // MET #3465: Write the unweighted means and the station density
+   // weighted score, as requested by the UK Met Office
+   at.set_entry(r, c+13, seeps->mean_fcst);   // MEAN_FCST
+   at.set_entry(r, c+14, seeps->mean_obs);    // MEAN_OBS
+   at.set_entry(r, c+15, seeps->score_wgt);   // SEEPS
 
    return;
 }
