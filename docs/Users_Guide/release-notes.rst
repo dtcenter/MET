@@ -532,6 +532,9 @@ MET Version 13.0.0 Upgrade Instructions
     different standard, or disables this behavior entirely when set to "none". The script
     also sets "CMAKE_POLICY_VERSION_MINIMUM" so that the libraries built with CMake, which
     request compatibility with CMake versions older than 3.5, still configure with CMake 4.
+    PROJ is now configured with its test suite, its curl support, and the "projsync" tool
+    disabled, none of which MET uses, so building it no longer requires the libcurl
+    development files and no longer installs the "projsync" executable.
 
   * Users reading winds from CF-compliant NetCDF files on projections for which rotation applies,
     such as Lambert conformal, polar stereographic, and Mercator, should check the "standard_name"

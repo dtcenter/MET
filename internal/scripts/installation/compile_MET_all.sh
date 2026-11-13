@@ -370,10 +370,7 @@ echo "export F77=${F77}"
 echo "export F90=${F90}"
 echo
 
-# Several of the external libraries predate the C23 standard that GCC 15 and
-# later select by default, and no longer compile in that mode. Fall back to
-# C17 when the compiler default is newer. Set MET_LIB_C_STANDARD to request a
-# specific standard, or to "none" to disable this logic.
+# Fall back to C17, since several external libraries predate the C23 default of GCC 15 and later.
 if [[ -z ${MET_LIB_C_STANDARD} ]]; then
   default_cstd=$(echo __STDC_VERSION__ | ${CC} -E -xc - 2>/dev/null | tail -1 | tr -cd '0-9')
   if [[ ${default_cstd} =~ ^[0-9]+$ ]] && [[ ${default_cstd} -gt 201710 ]]; then
@@ -383,25 +380,19 @@ if [[ -z ${MET_LIB_C_STANDARD} ]]; then
 fi
 
 if [[ ! -z ${MET_LIB_C_STANDARD} && ${MET_LIB_C_STANDARD} != "none" ]]; then
-  # Use the GNU dialect, which is what these libraries were written against
-  # and what the C compiler selected by default through GCC 14.
+  # Use the GNU dialect, which the C compiler selected by default through GCC 14.
   echo "Compiling the external libraries with -std=gnu${MET_LIB_C_STANDARD}"
   # A configure script applies "-g -O2" of its own only while CFLAGS is unset.
   if [[ -z ${CFLAGS} ]]; then CFLAGS="-g -O2"; fi
   CFLAGS="-std=gnu${MET_LIB_C_STANDARD} ${CFLAGS}"
 fi
 
-# Export these so the external library builds inherit them, which they
-# otherwise do not. Only export the ones that have a value, since exporting an
-# empty one suppresses the "-g -O2" that configure would otherwise apply.
+# Export so the library builds inherit them, but only when set, since empty suppresses "-g -O2".
 if [[ ! -z ${CFLAGS} ]];   then export CFLAGS;   fi
 if [[ ! -z ${CXXFLAGS} ]]; then export CXXFLAGS; fi
 if [[ ! -z ${FFLAGS} ]];   then export FFLAGS;   fi
 
-# CMake 4.0 removed support for projects requesting compatibility with CMake
-# versions older than 3.5, which several of these libraries still do. Set it
-# in the environment, not on each command line, so that it also reaches nested
-# CMake calls, such as the GoogleTest step PROJ runs from inside its build.
+# CMake 4.0 dropped minimums older than 3.5; set in the environment so nested calls see it.
 if [[ -z ${CMAKE_POLICY_VERSION_MINIMUM} ]]; then
   export CMAKE_POLICY_VERSION_MINIMUM=3.5
 fi
@@ -514,10 +505,8 @@ if [[ $COMPILE_PROJ -eq 1 ]]; then
     tiff_arg+=" -DTIFF_LIBRARY=${TIFF_LIB_DIR}/libtiff.${dynamic_lib_ext}"
   fi
 
-  # MET does not run the PROJ test suite. Turning it off skips the bundled
-  # GoogleTest, which declares a CMake minimum of 2.8.2 and is downloaded at
-  # configure time.
-  cmd="cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DBUILD_TESTING=OFF -DCMAKE_CXX_FLAGS='-include cstdint' -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.${dynamic_lib_ext} ${tiff_arg} .. > $(pwd)/proj.cmake.log 2>&1"
+  # MET runs no PROJ tests and makes no PROJ calls, so skip GoogleTest, curl, and projsync.
+  cmd="cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DBUILD_TESTING=OFF -DENABLE_CURL=OFF -DBUILD_PROJSYNC=OFF -DCMAKE_CXX_FLAGS='-include cstdint' -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.${dynamic_lib_ext} ${tiff_arg} .. > $(pwd)/proj.cmake.log 2>&1"
   run_cmd ${cmd}
   run_cmd "cmake --build . > $(pwd)/proj.cmake_build.log 2>&1"
   run_cmd "cmake --build . --target install > $(pwd)/proj.cmake_install.log 2>&1"
@@ -636,8 +625,7 @@ if [[ $COMPILE_JASPER -eq 1 ]]; then
   export BUILD_DIR=$SOURCE_DIR/build
   status=0
   run_cmd "mkdir ${BUILD_DIR}; cd ${BUILD_DIR}"
-  # Run the cmake and make steps separately so that a configuration failure is
-  # reported on its own rather than as "No rule to make target 'clean'."
+  # Run cmake and make separately so a configure failure is not reported as a missing target.
   run_cmd "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DJAS_ENABLE_DOC=false > $(pwd)/jasper.cmake.log 2>&1"
   run_cmd "cd ${BUILD_DIR}"
   run_cmd_no_exit "make clean all > $(pwd)/jasper.make.log 2>&1"
