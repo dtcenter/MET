@@ -304,6 +304,19 @@ Environment Variable Descriptions
   C++ standard. Values may be 11, 14, or 17. The default value is 17.
   (e.g., export MET_CXX_STANDARD=11)
 
+  **export MET_LIB_C_STANDARD** - Specify the version of the C standard used to
+  compile the external libraries, in the GNU dialect (e.g., export
+  MET_LIB_C_STANDARD=17 compiles them with :code:`-std=gnu17`). Several of the
+  external libraries predate the C23 standard that GCC 15 and later select
+  by default, and they do not compile in that mode. When this variable is
+  unset, the script asks the C compiler which standard it uses by default
+  and falls back to 17 whenever that default is newer than C17. Set this
+  variable to request a different standard, or set it to "none" to compile
+  the external libraries with whatever the compiler selects by default.
+  Unlike **MET_CXX_STANDARD**, which applies to the compilation of MET
+  itself, this variable applies only to the external libraries. MET contains
+  no C source code of its own.
+
 
 External Library Handling in compile_MET_all.sh
 -----------------------------------------------

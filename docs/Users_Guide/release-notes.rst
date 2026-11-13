@@ -90,8 +90,14 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3535 <https://github.com/dtcenter/MET/issues/3535>`_).
      * Fix MODE-TD compilation against netcdf-cxx4 version 4.3.2
        (`#3550 <https://github.com/dtcenter/MET/issues/3550>`_).
+     * **Fix the compilation of the external libraries with the GNU 15 compilers, which select the C23 standard by default**
+       (`#3306 <https://github.com/dtcenter/MET/issues/3306>`_).
+     * **Fix the compilation of the PROJ and JASPER external libraries with CMake 4**
+       (`#3518 <https://github.com/dtcenter/MET/issues/3518>`_).
      * Enhance the release Docker image workflow to push ``X.Y`` tags in addition to ``X.Y-latest``
        (`#3563 <https://github.com/dtcenter/MET/issues/3563>`_).
+     * Enhance the Claude Code review workflow to provide more useful feedback and add a repository CLAUDE.md
+       (`#3566 <https://github.com/dtcenter/MET/issues/3566>`_).
      * Automate link checking with Sphinx
        (`METplus #3247 <https://github.com/dtcenter/METplus/issues/3247>`_).
      * Resolve blockers from the AF SonarQube quality gate scanner
@@ -495,14 +501,15 @@ MET Version 13.0.0 Upgrade Instructions
     columns were always 0. These columns are informational only and are not used to compute
     any of the other SEEPS columns.
 
-  * The PF1, PF2, PF3, PV1, PV2, PV3, MEAN_FCST, MEAN_OBS, and SEEPS columns of the SEEPS
-    line type written by Point-Stat, Pair-Stat, and Stat-Analysis change. As described in
-    MET `#3465 <https://github.com/dtcenter/MET/issues/3465>`_, the station density weights
+  * The PF1, PF2, PF3, PV1, PV2, PV3, and SEEPS columns of the SEEPS line type written by
+    Point-Stat, Pair-Stat, and Stat-Analysis change. As described in MET
+    `#3465 <https://github.com/dtcenter/MET/issues/3465>`_, the station density weights
     of :ref:`Rodwell et al., 2010 <Rodwell-2010>` were computed with the wrong angle formula,
     so every weight was 0 and the PF and PV columns were always written as 0. The weights are
     now computed using the same kernel density estimator as "point_weight_flag = KDE", and the
-    MEAN_FCST, MEAN_OBS, and SEEPS columns report station density weighted means rather than
-    unweighted ones. The SEEPS_MPR line type is unchanged. See :numref:`PS_seeps_weighting`
+    SEEPS column reports the station density weighted mean score rather than the unweighted
+    one. The MEAN_FCST and MEAN_OBS columns continue to report unweighted means and are
+    unchanged, and the SEEPS_MPR line type is unchanged. See :numref:`PS_seeps_weighting`
     for a description of which weights apply to each column.
 
   * The PF1, PF2, PF3, PV1, PV2, PV3, and SEEPS columns of the SEEPS line type written by
@@ -519,6 +526,18 @@ MET Version 13.0.0 Upgrade Instructions
 .. dropdown:: Additional upgrade instructions
 
   Recommendations when upgrading to MET version 13.0.0:
+
+  * Users compiling MET with the *compile_MET_all.sh* script on a system whose C compiler
+    defaults to the C23 standard, such as one providing GCC version 15 or later, should be
+    aware that the script now compiles the external libraries with "-std=gnu17". Several of
+    those libraries predate C23 and do not compile in the newer mode. The "MET_LIB_C_STANDARD"
+    environment variable described in :numref:`Install_Required-libraries-and` requests a
+    different standard, or disables this behavior entirely when set to "none". The script
+    also sets "CMAKE_POLICY_VERSION_MINIMUM" so that the libraries built with CMake, which
+    request compatibility with CMake versions older than 3.5, still configure with CMake 4.
+    PROJ is now configured with its test suite, its curl support, and the "projsync" tool
+    disabled, none of which MET uses, so building it no longer requires the libcurl
+    development files and no longer installs the "projsync" executable.
 
   * Users reading winds from CF-compliant NetCDF files on projections for which rotation applies,
     such as Lambert conformal, polar stereographic, and Mercator, should check the "standard_name"

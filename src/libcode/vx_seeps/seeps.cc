@@ -101,9 +101,8 @@ void SeepsAggScore::clear() {
    c_odfl = c_odfh = c_olfd = c_olfh = c_ohfd = c_ohfl = 0;
    pv1 = pv2 = pv3 = 0.0;
    pf1 = pf2 = pf3 = 0.0;
-   mean_fcst = mean_fcst_wgt = bad_data_double;
-   mean_obs  = mean_obs_wgt  = bad_data_double;
-   score     = score_wgt     = bad_data_double;
+   mean_fcst = mean_obs = bad_data_double;
+   score     = score_wgt = bad_data_double;
 
 }
 
@@ -141,11 +140,8 @@ SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
    pf2 = weighted_average(pf2, w1, c.pf2, w2);
    pf3 = weighted_average(pf3, w1, c.pf3, w2);
 
-   mean_fcst     = weighted_average(mean_fcst,     w1, c.mean_fcst,     w2);
-   mean_fcst_wgt = weighted_average(mean_fcst_wgt, w1, c.mean_fcst_wgt, w2);
-
-   mean_obs     = weighted_average(mean_obs,     w1, c.mean_obs,     w2);
-   mean_obs_wgt = weighted_average(mean_obs_wgt, w1, c.mean_obs_wgt, w2);
+   mean_fcst = weighted_average(mean_fcst, w1, c.mean_fcst, w2);
+   mean_obs  = weighted_average(mean_obs,  w1, c.mean_obs,  w2);
 
    score     = weighted_average(score,     w1, c.score,     w2);
    score_wgt = weighted_average(score_wgt, w1, c.score_wgt, w2);
