@@ -224,11 +224,6 @@ class PairBase {
                          unixtime, double, double, double, const char *,
                          const ClimoPntInfo &, double);
 
-      void set_point_obs(int, const char *, const char *,
-                         double, double, double, double, double,
-                         unixtime, double, double, double,
-                         const char *, const ClimoPntInfo &, double);
-
       void add_grid_obs(double,
                         const ClimoPntInfo &, double);
       
@@ -236,8 +231,6 @@ class PairBase {
                         const ClimoPntInfo &, double);
 
       void add_climo(double, const ClimoPntInfo &);
-
-      void set_climo(int, double, const ClimoPntInfo &);
 
       void compute_climo_cdf();
 

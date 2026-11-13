@@ -385,21 +385,6 @@ void PairBase::add_climo(double obs,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_climo(int i_obs, double obs,
-                         const ClimoPntInfo &cpi) {
-
-   // Compute and store the climatology information
-   fcmn_na.set(i_obs, cpi.fcmn);
-   fcsd_na.set(i_obs, cpi.fcsd);
-   ocmn_na.set(i_obs, cpi.ocmn);
-   ocsd_na.set(i_obs, cpi.ocsd);
-   ocdf_na.set(i_obs, normal_cdf(obs, cpi.ocmn, cpi.ocsd));
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void PairBase::compute_climo_cdf() {
    int i;
 
@@ -520,41 +505,6 @@ bool PairBase::add_point_obs(const char *typ, const char *sid,
    }
 
    return ret;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairBase::set_point_obs(int i_obs, const char *typ, const char *sid,
-                             double lat, double lon, double elv,
-                             double x, double y,
-                             unixtime ut, double lvl, double hgt,
-                             double o, const char *qc,
-                             const ClimoPntInfo &cpi,
-                             double wgt) {
-
-   if(i_obs < 0 || i_obs >= n_obs) {
-      mlog << Error << "\nPairBase::set_point_obs() -> "
-           << "range check error: " << i_obs << " not in (0, "
-           << n_obs << ").\n\n";
-      exit(1);
-   }
-
-   typ_sa.set(i_obs, typ);
-   sid_sa.set(i_obs, sid);
-   lat_na.set(i_obs, lat);
-   lon_na.set(i_obs, lon);
-   elv_na.set(i_obs, elv);
-   x_na.set(i_obs, x);
-   y_na.set(i_obs, y);
-   wgt_na.set(i_obs, wgt);
-   vld_ta.set(i_obs, ut);
-   lvl_na.set(i_obs, lvl);
-   hgt_na.set(i_obs, hgt);
-   o_na.set(i_obs, o);
-   o_qc_sa.set(i_obs, qc);
-   set_climo(i_obs, o, cpi);
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
