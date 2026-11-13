@@ -97,6 +97,22 @@ double weighted_average(double v1, double w1, double v2, double w2) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Map a precipitation amount to its SEEPS category using the
+// climatological light and heavy thresholds:
+//   0 = dry, 1 = light, 2 = heavy
+//
+// The two comparisons are summed rather than chained so that the result
+// is identical to the previous expression for every input, including any
+// case where t1 and t2 are not in ascending order.
+//
+////////////////////////////////////////////////////////////////////////
+
+static int seeps_category(double p, double t1, double t2) {
+   return (p > t1 ? 1 : 0) + (p > t2 ? 1 : 0);
+}
+
+////////////////////////////////////////////////////////////////////////
 
 void SeepsAggScore::clear() {
 
@@ -418,8 +434,8 @@ double SeepsClimo::get_seeps_category(int sid, double p_fcst, double p_obs,
 
    if (nullptr != record) {
       // Determine location in contingency table
-      int ic = (p_obs>record->t1)+(p_obs>record->t2);
-      int jc = (p_fcst>record->t1)+(p_fcst>record->t2);
+      int ic = seeps_category(p_obs,  record->t1, record->t2);
+      int jc = seeps_category(p_fcst, record->t1, record->t2);
 
       score = record->scores[(jc*3)+ic];
       mlog << Debug(9) << method_name
@@ -451,8 +467,8 @@ std::unique_ptr<SeepsScore> SeepsClimo::get_seeps_score(int sid, double p_fcst, 
            << score->t1 << " " << score->t2
            << "\n";
       
-      score->obs_cat = (p_obs>record->t1)+(p_obs>record->t2);
-      score->fcst_cat = (p_fcst>record->t1)+(p_fcst>record->t2);
+      score->obs_cat  = seeps_category(p_obs,  record->t1, record->t2);
+      score->fcst_cat = seeps_category(p_fcst, record->t1, record->t2);
       score->s_idx = (score->fcst_cat*3)+score->obs_cat;
       score->score = record->scores[score->s_idx];
       mlog << Debug(9) << method_name
@@ -758,8 +774,8 @@ std::unique_ptr<SeepsScore> SeepsClimoGrid::get_record(int ix, int iy,
 
       if (check_seeps_p1_thresh(p1)) {
          // Determine location in contingency table
-         int ic = (p_obs>t1_buf[offset])+(p_obs>t2_buf[offset]);
-         int jc = (p_fcst>t1_buf[offset])+(p_fcst>t2_buf[offset]);
+         int ic = seeps_category(p_obs,  t1_buf[offset], t2_buf[offset]);
+         int jc = seeps_category(p_fcst, t1_buf[offset], t2_buf[offset]);
          double score = get_seeps_score(offset, ic, jc);
 
          seeps_record = std::make_unique<SeepsScore>();
