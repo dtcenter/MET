@@ -315,8 +315,7 @@ void SeepsClimo::clear() {
 
 std::unique_ptr<SeepsClimoRecord> SeepsClimo::create_climo_record(
       int sid, double lat, double lon, double elv,
-      const double *p1, const double *p2, const double *t1, const double *t2,
-      const double *scores) {
+      const SeepsClimoBuffers &buf) {
    int offset;
    auto record = std::make_unique<SeepsClimoRecord>();
    const char *method_name = "SeepsClimo::create_climo_record() -> ";
@@ -332,10 +331,10 @@ std::unique_ptr<SeepsClimoRecord> SeepsClimo::create_climo_record(
            << "\n";
    }
    for (int idx=0; idx<SEEPS_MONTH; idx++) {
-      record->p1[idx] = p1[idx];
-      record->p2[idx] = p2[idx];
-      record->t1[idx] = t1[idx];
-      record->t2[idx] = t2[idx];
+      record->p1[idx] = buf.p1[idx];
+      record->p2[idx] = buf.p2[idx];
+      record->t1[idx] = buf.t1[idx];
+      record->t2[idx] = buf.t2[idx];
 
       if (standalone_debug_seeps && SAMPLE_STATION_ID == sid) {
          cout << method_name
@@ -345,7 +344,7 @@ std::unique_ptr<SeepsClimoRecord> SeepsClimo::create_climo_record(
       }
       for (int idx_m=0; idx_m<SEEPS_MATRIX_SIZE; idx_m++) {
          offset = idx*SEEPS_MATRIX_SIZE + idx_m;
-         record->scores[idx][idx_m] = scores[offset];
+         record->scores[idx][idx_m] = buf.scores[offset];
          if (standalone_debug_seeps && SAMPLE_STATION_ID == sid) {
             cout << method_name
                  << str_format(" %.3f", record->scores[idx][idx_m]);
@@ -689,11 +688,11 @@ void SeepsClimo::read_seeps_climo_grid(const ConcatString &filename) {
             }
          }
          rec_00 = create_climo_record(sid, lat_array[idx], lon_array[idx], elv_array[idx],
-                                      p1_00_buf.data(), p2_00_buf.data(), t1_00_buf.data(),
-                                      t2_00_buf.data(), matrix_00_buf.data());
+                                      {p1_00_buf.data(), p2_00_buf.data(), t1_00_buf.data(),
+                                       t2_00_buf.data(), matrix_00_buf.data()});
          rec_12 = create_climo_record(sid, lat_array[idx], lon_array[idx], elv_array[idx],
-                                      p1_12_buf.data(), p2_12_buf.data(), t1_12_buf.data(),
-                                      t2_12_buf.data(), matrix_12_buf.data());
+                                      {p1_12_buf.data(), p2_12_buf.data(), t1_12_buf.data(),
+                                       t2_12_buf.data(), matrix_12_buf.data()});
          seeps_score_00_map[sid] = std::move(rec_00);
          seeps_score_12_map[sid] = std::move(rec_12);
       }

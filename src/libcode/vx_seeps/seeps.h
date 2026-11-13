@@ -134,6 +134,23 @@ struct SeepsClimoRecord {
 };
 
 ////////////////////////////////////////////////////////////////////////
+//
+// One station's monthly climatology values, as read from the point
+// climatology file and handed to SeepsClimo::create_climo_record().
+// They travel together and are grouped so that the function takes five
+// parameters rather than nine.
+//
+////////////////////////////////////////////////////////////////////////
+
+struct SeepsClimoBuffers {
+   const double *p1;      // SEEPS_MONTH values
+   const double *p2;      // SEEPS_MONTH values
+   const double *t1;      // SEEPS_MONTH values
+   const double *t2;      // SEEPS_MONTH values
+   const double *scores;  // SEEPS_MONTH * SEEPS_MATRIX_SIZE values
+};
+
+////////////////////////////////////////////////////////////////////////
 
 class SeepsClimoBase {
 
@@ -190,9 +207,7 @@ class SeepsClimo : public SeepsClimoBase {
 
       std::unique_ptr<SeepsClimoRecord> create_climo_record(
                                             int sid, double lat, double lon, double elv,
-                                            const double *p1, const double *p2,
-                                            const double *t1, const double *t2,
-                                            const double *scores);
+                                            const SeepsClimoBuffers &buf);
       void print_record(const SeepsClimoRecord *record, bool with_header=false) const;
       void read_records(const ConcatString &filename);
 
