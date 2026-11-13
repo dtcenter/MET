@@ -493,14 +493,15 @@ MET Version 13.0.0 Upgrade Instructions
     columns were always 0. These columns are informational only and are not used to compute
     any of the other SEEPS columns.
 
-  * The PF1, PF2, PF3, PV1, PV2, PV3, MEAN_FCST, MEAN_OBS, and SEEPS columns of the SEEPS
-    line type written by Point-Stat, Pair-Stat, and Stat-Analysis change. As described in
-    MET `#3465 <https://github.com/dtcenter/MET/issues/3465>`_, the station density weights
+  * The PF1, PF2, PF3, PV1, PV2, PV3, and SEEPS columns of the SEEPS line type written by
+    Point-Stat, Pair-Stat, and Stat-Analysis change. As described in MET
+    `#3465 <https://github.com/dtcenter/MET/issues/3465>`_, the station density weights
     of :ref:`Rodwell et al., 2010 <Rodwell-2010>` were computed with the wrong angle formula,
     so every weight was 0 and the PF and PV columns were always written as 0. The weights are
     now computed using the same kernel density estimator as "point_weight_flag = KDE", and the
-    MEAN_FCST, MEAN_OBS, and SEEPS columns report station density weighted means rather than
-    unweighted ones. The SEEPS_MPR line type is unchanged. See :numref:`PS_seeps_weighting`
+    SEEPS column reports the station density weighted mean score rather than the unweighted
+    one. The MEAN_FCST and MEAN_OBS columns continue to report unweighted means and are
+    unchanged, and the SEEPS_MPR line type is unchanged. See :numref:`PS_seeps_weighting`
     for a description of which weights apply to each column.
 
   * The PF1, PF2, PF3, PV1, PV2, PV3, and SEEPS columns of the SEEPS line type written by
