@@ -71,6 +71,8 @@ MET Version 13.0.0-rc1 Release Notes (20261116)
        (`#3499 <https://github.com/dtcenter/MET/issues/3499>`_).
      * **Fix observation error table parsing and lookup logic for Ensemble-Stat**
        (`#3545 <https://github.com/dtcenter/MET/issues/3545>`_).
+     * **Fix TC-Diag to use the gridded data found when the -data file list does not line up with the track valid times**
+       (`#3475 <https://github.com/dtcenter/MET/issues/3475>`_).
 
   .. dropdown:: Repository, build, and test
 
@@ -98,6 +100,8 @@ MET Version 13.0.0-rc1 Release Notes (20261116)
        (`#3563 <https://github.com/dtcenter/MET/issues/3563>`_).
      * Enhance the Claude Code review workflow to provide more useful feedback and add a repository CLAUDE.md
        (`#3566 <https://github.com/dtcenter/MET/issues/3566>`_).
+     * Sanitize paths and replace ``system()`` calls for SonarQube S2076, S2083, and S8786
+       (`#3515 <https://github.com/dtcenter/MET/issues/3515>`_).
      * Automate link checking with Sphinx
        (`METplus #3247 <https://github.com/dtcenter/METplus/issues/3247>`_).
      * Resolve blockers from the AF SonarQube quality gate scanner
