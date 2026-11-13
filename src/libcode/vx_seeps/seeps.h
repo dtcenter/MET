@@ -239,7 +239,7 @@ class SeepsClimoGrid : public SeepsClimoBase {
 
    public:
 
-      SeepsClimoGrid(int month, int hour, const ConcatString &seeps_climo_name);
+      SeepsClimoGrid(int month, const ConcatString &seeps_climo_name);
      ~SeepsClimoGrid();
 
       std::unique_ptr<SeepsScore> get_record(int ix, int iy, double p_fcst, double p_obs);
@@ -260,7 +260,7 @@ inline int SeepsClimoBase::get_filtered_count() const { return filtered_count; }
 ////////////////////////////////////////////////////////////////////////
 
 extern SeepsClimo *get_seeps_climo(const ConcatString &seeps_point_climo_name);
-extern SeepsClimoGrid *get_seeps_climo_grid(int month, const ConcatString &seeps_grid_climo_name, int hour=0);
+extern SeepsClimoGrid *get_seeps_climo_grid(int month, const ConcatString &seeps_grid_climo_name);
 
 extern void release_seeps_climo();
 extern void release_seeps_climo_grid();

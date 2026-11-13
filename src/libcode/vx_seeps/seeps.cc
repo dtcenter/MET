@@ -64,11 +64,18 @@ void release_seeps_climo() {
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsClimoGrid *get_seeps_climo_grid(int month, const ConcatString &seeps_grid_climo_name, int hour) {
+//
+// Unlike the point climatology, which holds both 00 and 12 UTC records and
+// selects between them by hour, the gridded climatology file defines only the
+// 00 UTC fields. There is therefore no hour to select, and the cache below is
+// keyed by month alone.
+//
+
+SeepsClimoGrid *get_seeps_climo_grid(int month, const ConcatString &seeps_grid_climo_name) {
 
    if (seeps_climo_grid_map_00.count(month) == 0) {
       seeps_climo_grid_map_00[month] =
-         std::make_unique<SeepsClimoGrid>(month, hour, seeps_grid_climo_name);
+         std::make_unique<SeepsClimoGrid>(month, seeps_grid_climo_name);
    }
 
    return seeps_climo_grid_map_00[month].get();
@@ -76,9 +83,9 @@ SeepsClimoGrid *get_seeps_climo_grid(int month, const ConcatString &seeps_grid_c
 
 ////////////////////////////////////////////////////////////////////////
 
-void release_seeps_climo_grid(int month, int hour) {
+void release_seeps_climo_grid() {
 
-   seeps_climo_grid_map_00.erase(month);
+   seeps_climo_grid_map_00.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -696,7 +703,7 @@ void SeepsClimo::read_seeps_climo_grid(const ConcatString &filename) {
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsClimoGrid::SeepsClimoGrid(int month, int hour, const ConcatString &seeps_climo_name)
+SeepsClimoGrid::SeepsClimoGrid(int month, const ConcatString &seeps_climo_name)
    : SeepsClimoBase{seeps_climo_name}, month{month}
 {
    SeepsClimoGrid::clear();
