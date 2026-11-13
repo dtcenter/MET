@@ -213,7 +213,7 @@ bool SeepsAggScore::inc_category(int fcst_cat, int obs_cat) {
 ////////////////////////////////////////////////////////////////////////
 
 SeepsClimoBase::SeepsClimoBase(const ConcatString &seeps_climo_name) :
-   seeps_ready{false}, climo_file_name{seeps_climo_name} {
+   climo_file_name{seeps_climo_name} {
 
    SeepsClimoBase::clear();
 

@@ -138,7 +138,7 @@ struct SeepsClimoRecord {
 class SeepsClimoBase {
 
    private:
-      bool seeps_ready;
+      bool seeps_ready {false};
       int filtered_count;
       SingleThresh seeps_p1_thresh;      // Range of SEEPS p1 (probability of being dry)
       ConcatString climo_file_name;
