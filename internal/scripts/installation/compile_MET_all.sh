@@ -370,6 +370,39 @@ echo "export F77=${F77}"
 echo "export F90=${F90}"
 echo
 
+# Fall back to C17, since several external libraries predate the C23 default of GCC 15 and later.
+if [[ -z ${MET_LIB_C_STANDARD} ]]; then
+  default_cstd=$(echo __STDC_VERSION__ | ${CC} -E -xc - 2>/dev/null | tail -1 | tr -cd '0-9')
+  if [[ ${default_cstd} =~ ^[0-9]+$ ]] && [[ ${default_cstd} -gt 201710 ]]; then
+    MET_LIB_C_STANDARD=17
+    echo "The C compiler defaults to __STDC_VERSION__ = ${default_cstd}, which is newer than C17."
+  fi
+fi
+
+if [[ ! -z ${MET_LIB_C_STANDARD} && ${MET_LIB_C_STANDARD} != "none" ]]; then
+  # Use the GNU dialect, which the C compiler selected by default through GCC 14.
+  echo "Compiling the external libraries with -std=gnu${MET_LIB_C_STANDARD}"
+  # A configure script applies "-g -O2" of its own only while CFLAGS is unset.
+  if [[ -z ${CFLAGS} ]]; then CFLAGS="-g -O2"; fi
+  CFLAGS="-std=gnu${MET_LIB_C_STANDARD} ${CFLAGS}"
+fi
+
+# Export so the library builds inherit them, but only when set, since empty suppresses "-g -O2".
+if [[ ! -z ${CFLAGS} ]];   then export CFLAGS;   fi
+if [[ ! -z ${CXXFLAGS} ]]; then export CXXFLAGS; fi
+if [[ ! -z ${FFLAGS} ]];   then export FFLAGS;   fi
+
+# CMake 4.0 dropped minimums older than 3.5; set in the environment so nested calls see it.
+if [[ -z ${CMAKE_POLICY_VERSION_MINIMUM} ]]; then
+  export CMAKE_POLICY_VERSION_MINIMUM=3.5
+fi
+
+echo "CFLAGS = ${CFLAGS}"
+echo "CXXFLAGS = ${CXXFLAGS}"
+echo "FFLAGS = ${FFLAGS}"
+echo "CMAKE_POLICY_VERSION_MINIMUM = ${CMAKE_POLICY_VERSION_MINIMUM}"
+echo
+
 # Figure out what kind of OS is being used
 unameOut="$(uname -s)"
 case "${unameOut}" in
@@ -472,7 +505,8 @@ if [[ $COMPILE_PROJ -eq 1 ]]; then
     tiff_arg+=" -DTIFF_LIBRARY=${TIFF_LIB_DIR}/libtiff.${dynamic_lib_ext}"
   fi
 
-  cmd="cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_CXX_FLAGS='-include cstdint' -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.${dynamic_lib_ext} ${tiff_arg} .. > $(pwd)/proj.cmake.log 2>&1"
+  # MET runs no PROJ tests and makes no PROJ calls, so skip GoogleTest, curl, and projsync.
+  cmd="cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DBUILD_TESTING=OFF -DENABLE_CURL=OFF -DBUILD_PROJSYNC=OFF -DCMAKE_CXX_FLAGS='-include cstdint' -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.${dynamic_lib_ext} ${tiff_arg} .. > $(pwd)/proj.cmake.log 2>&1"
   run_cmd ${cmd}
   run_cmd "cmake --build . > $(pwd)/proj.cmake_build.log 2>&1"
   run_cmd "cmake --build . --target install > $(pwd)/proj.cmake_install.log 2>&1"
@@ -591,8 +625,12 @@ if [[ $COMPILE_JASPER -eq 1 ]]; then
   export BUILD_DIR=$SOURCE_DIR/build
   status=0
   run_cmd "mkdir ${BUILD_DIR}; cd ${BUILD_DIR}"
-  run_cmd_no_exit "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DJAS_ENABLE_DOC=false > $(pwd)/jasper.cmake.log 2>&1; cd ${BUILD_DIR}; make clean all > $(pwd)/jasper.make.log 2>&1"
+  # Run cmake and make separately so a configure failure is not reported as a missing target.
+  run_cmd "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DJAS_ENABLE_DOC=false > $(pwd)/jasper.cmake.log 2>&1"
+  run_cmd "cd ${BUILD_DIR}"
+  run_cmd_no_exit "make clean all > $(pwd)/jasper.make.log 2>&1"
   status=$?
+  # Retry linking against GLUT explicitly, which the jiv viewer may need.
   if [[ "$status" -ne 0 ]]; then
     run_cmd "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DJAS_ENABLE_DOC=false -DCMAKE_EXE_LINKER_FLAGS=\"-lglut\" > $(pwd)/jasper.cmake.log 2>&1" 
     run_cmd "cd ${BUILD_DIR}"
@@ -766,7 +804,7 @@ if [[ $COMPILE_NETCDF -eq 1 ]]; then
   export SOURCE_DIR=${dir[0]}
   cd $SOURCE_DIR
   echo "cd $SOURCE_DIR"
-  run_cmd "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} --enable-hl --enable-shared CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > $(pwd)/hdf5.configure.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} --enable-hl --enable-shared CFLAGS=\"-fPIC ${CFLAGS}\" CXXFLAGS=\"-fPIC ${CXXFLAGS}\" FFLAGS=\"-fPIC ${FFLAGS}\" LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > $(pwd)/hdf5.configure.log 2>&1"
   run_cmd "make ${MAKE_ARGS} install > $(pwd)/hdf5.make_install.log 2>&1"
 
   echo
@@ -781,9 +819,9 @@ if [[ $COMPILE_NETCDF -eq 1 ]]; then
   export F90=''
   echo "cd $SOURCE_DIR"
   if [[ ${COMPILER_FAMILY} == *intel* ]] && [[ ${CC} == *icx* ]]; then
-      run_cmd "./configure --prefix=${LIB_DIR} --enable-netcdf-4 --enable-shared --disable-dap --disable-libxml2 CFLAGS=\"-fPIC -fp-model=precise -fno-fast-math\" LDFLAGS=\"-L${LIB_DIR}/lib -Wl,-rpath,${LIB_DIR}/lib\" CPPFLAGS=-I${LIB_DIR}/include --enable-logging LIBS=\"-lhdf5_hl -lhdf5 -lz\" > $(pwd)/netcdf-c.configure.log 2>&1"
+      run_cmd "./configure --prefix=${LIB_DIR} --enable-netcdf-4 --enable-shared --disable-dap --disable-libxml2 CFLAGS=\"-fPIC -fp-model=precise -fno-fast-math ${CFLAGS}\" LDFLAGS=\"-L${LIB_DIR}/lib -Wl,-rpath,${LIB_DIR}/lib\" CPPFLAGS=-I${LIB_DIR}/include --enable-logging LIBS=\"-lhdf5_hl -lhdf5 -lz\" > $(pwd)/netcdf-c.configure.log 2>&1"
   else
-      run_cmd "./configure --prefix=${LIB_DIR} --enable-netcdf-4 --enable-shared --disable-dap --disable-libxml2 CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include --enable-logging LIBS=\"-lhdf5_hl -lhdf5 -lz\" > $(pwd)/netcdf-c.configure.log 2>&1"
+      run_cmd "./configure --prefix=${LIB_DIR} --enable-netcdf-4 --enable-shared --disable-dap --disable-libxml2 CFLAGS=\"-fPIC ${CFLAGS}\" CXXFLAGS=\"-fPIC ${CXXFLAGS}\" LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include --enable-logging LIBS=\"-lhdf5_hl -lhdf5 -lz\" > $(pwd)/netcdf-c.configure.log 2>&1"
   fi
   run_cmd "make ${MAKE_ARGS} install > $(pwd)/netcdf-c.make_install.log 2>&1"
   
