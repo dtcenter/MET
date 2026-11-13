@@ -30,6 +30,8 @@ MET Version 13.0.0-rc1 Release Notes (20261116)
        (`#3406 <https://github.com/dtcenter/MET/issues/3406>`_).
      * Improve Ensemble-Stat to more efficiently apply observation error corrections and perturbations
        (`#3426 <https://github.com/dtcenter/MET/issues/3426>`_).
+     * **Enhance Grid-Stat and Ensemble-Stat to normalize the grid_weight_flag = AREA weights to the range (0, 1]**
+       (`#3448 <https://github.com/dtcenter/MET/issues/3448>`_).
      * Rename MET configuration options to avoid names like ``warning`` and ``error``
        (`#3455 <https://github.com/dtcenter/MET/issues/3455>`_).
      * Enhance the GRIB2 library code to report unsupported GRIB2 data packing rather than segfaulting
