@@ -106,6 +106,8 @@ MET Version 13.0.0-rc1 Release Notes (20261116)
        (`#3566 <https://github.com/dtcenter/MET/issues/3566>`_).
      * Sanitize paths and replace ``system()`` calls for SonarQube S2076, S2083, and S8786
        (`#3515 <https://github.com/dtcenter/MET/issues/3515>`_).
+     * Fix the SonarQube findings in the SEEPS library code
+       (`#3569 <https://github.com/dtcenter/MET/issues/3569>`_).
      * Automate link checking with Sphinx
        (`METplus #3247 <https://github.com/dtcenter/METplus/issues/3247>`_).
      * Resolve blockers from the AF SonarQube quality gate scanner
