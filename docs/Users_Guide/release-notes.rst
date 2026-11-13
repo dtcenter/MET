@@ -73,6 +73,8 @@ MET Version 13.0.0-rc1 Release Notes (20261116)
        (`#3545 <https://github.com/dtcenter/MET/issues/3545>`_).
      * **Fix TC-Diag to use the gridded data found when the -data file list does not line up with the track valid times**
        (`#3475 <https://github.com/dtcenter/MET/issues/3475>`_).
+     * **Fix the Lambert Azimuthal Equal Area grid box area, which is scaled by the earth radius twice**
+       (`#3541 <https://github.com/dtcenter/MET/issues/3541>`_).
 
   .. dropdown:: Repository, build, and test
 
@@ -80,7 +82,7 @@ MET Version 13.0.0-rc1 Release Notes (20261116)
        (`#3393 <https://github.com/dtcenter/MET/issues/3393>`_).
      * Remove R dependency from the MET unit test logic
        (`#3395 <https://github.com/dtcenter/MET/issues/3395>`_).
-     * Upgrade MET to use METbaseimage version 3.5
+     * Upgrade MET to use METbaseimage version 13.0
        (`#3407 <https://github.com/dtcenter/MET/issues/3407>`_).
      * Enhance the documentation by correcting broken links and typos
        (`#3416 <https://github.com/dtcenter/MET/issues/3416>`_).
