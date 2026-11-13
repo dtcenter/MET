@@ -161,6 +161,18 @@ class SeepsClimoBase {
 
       explicit SeepsClimoBase(const ConcatString &seeps_climo_name);
       virtual ~SeepsClimoBase();
+
+      //
+      // This hierarchy is polymorphic, is always reached through a
+      // pointer, and is never copied or moved. Deleting the copy and
+      // move operations says so and rules out slicing through a base
+      // reference.
+      //
+      SeepsClimoBase(const SeepsClimoBase &) = delete;
+      SeepsClimoBase & operator=(const SeepsClimoBase &) = delete;
+      SeepsClimoBase(SeepsClimoBase &&) = delete;
+      SeepsClimoBase & operator=(SeepsClimoBase &&) = delete;
+
       void set_p1_thresh(const SingleThresh &p1_thresh);
       int get_filtered_count() const;
 
@@ -193,7 +205,12 @@ class SeepsClimo : public SeepsClimoBase {
    public:
 
       explicit SeepsClimo(const ConcatString &seeps_climo_name);
-     ~SeepsClimo();
+     ~SeepsClimo() override;
+
+      SeepsClimo(const SeepsClimo &) = delete;
+      SeepsClimo & operator=(const SeepsClimo &) = delete;
+      SeepsClimo(SeepsClimo &&) = delete;
+      SeepsClimo & operator=(SeepsClimo &&) = delete;
 
       std::unique_ptr<SeepsRecord> get_record(int sid, int month, int hour);
       double get_seeps_category(int sid, double p_fcst, double p_obs,
@@ -241,7 +258,12 @@ class SeepsClimoGrid : public SeepsClimoBase {
    public:
 
       SeepsClimoGrid(int month, const ConcatString &seeps_climo_name);
-     ~SeepsClimoGrid();
+     ~SeepsClimoGrid() override;
+
+      SeepsClimoGrid(const SeepsClimoGrid &) = delete;
+      SeepsClimoGrid & operator=(const SeepsClimoGrid &) = delete;
+      SeepsClimoGrid(SeepsClimoGrid &&) = delete;
+      SeepsClimoGrid & operator=(SeepsClimoGrid &&) = delete;
 
       std::unique_ptr<SeepsScore> get_record(int ix, int iy, double p_fcst, double p_obs);
       double get_seeps_score(int offset, int obs_cat, int fcst_cat);
