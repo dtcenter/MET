@@ -302,8 +302,48 @@ static bool is_lat_row_grid(const Grid &grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static double y_to_sin_lat(const Grid &grid, double x, double y) {
-   double lat, lon;
+static double y_to_sin_lat(const Grid &grid, bool gaussian,
+                           double x, double y) {
+   double lat;
+   double lon;
+
+   // Gaussian rows exist only at integer y, so interpolate the latitude between adjacent rows
+   if(gaussian) {
+      double ny = grid.ny();
+
+      // Beyond the outermost row boundary, which is the pole
+      if(y <= -0.5)     return -1.0;
+      if(y >= ny - 0.5) return  1.0;
+
+      double xi = nint(x);
+
+      // Inside the outer half row, interpolate between the outermost row and the pole
+      if(y < 0.0 || y > ny - 1.0) {
+         double y_row    = (y < 0.0 ?   0.0 : ny - 1.0);
+         double lat_pole = (y < 0.0 ? -90.0 : 90.0);
+         double f        = 2.0*fabs(y - y_row);
+
+         grid.xy_to_latlon(xi, y_row, lat, lon);
+         lat = (1.0 - f)*lat + f*lat_pole;
+
+         return sind(max(-90.0, min(90.0, lat)));
+      }
+
+      // Between two rows, so interpolate the latitude
+      double y0 = floor(y);
+      double y1 = min(y0 + 1.0, ny - 1.0);
+      double f  = y - y0;
+
+      double lat0;
+      double lat1;
+      grid.xy_to_latlon(xi, y0, lat0, lon);
+      grid.xy_to_latlon(xi, y1, lat1, lon);
+
+      lat = (1.0 - f)*lat0 + f*lat1;
+
+      return sind(max(-90.0, min(90.0, lat)));
+   }
+
    grid.xy_to_latlon(x, y, lat, lon);
    return sind(max(-90.0, min(90.0, lat)));
 }
@@ -316,8 +356,11 @@ static void aw_mean_lat_weights(const Grid &to_grid, double x_to,
                                 vector<double> &w) {
    static const double min_width = 1.0e-10;
 
-   double s1 = y_to_sin_lat(to_grid, x_to, y_min);
-   double s2 = y_to_sin_lat(to_grid, x_to, y_max);
+   // Gaussian row boundaries are handled separately
+   bool to_gaussian = (to_grid.info().g != nullptr);
+
+   double s1 = y_to_sin_lat(to_grid, to_gaussian, x_to, y_min);
+   double s2 = y_to_sin_lat(to_grid, to_gaussian, x_to, y_max);
    double s_lo = min(s1, s2);
    double s_hi = max(s1, s2);
 
@@ -325,8 +368,8 @@ static void aw_mean_lat_weights(const Grid &to_grid, double x_to,
    if(s_hi - s_lo < min_width) return;
 
    for(int k=0; k<n; k++) {
-      double b1 = y_to_sin_lat(to_grid, x_to, i[k] - 0.5);
-      double b2 = y_to_sin_lat(to_grid, x_to, i[k] + 0.5);
+      double b1 = y_to_sin_lat(to_grid, to_gaussian, x_to, i[k] - 0.5);
+      double b2 = y_to_sin_lat(to_grid, to_gaussian, x_to, i[k] + 0.5);
       double overlap = min(s_hi, max(b1, b2)) - max(s_lo, min(b1, b2));
       w[k] = max(0.0, overlap) / (s_hi - s_lo);
    }
@@ -475,7 +518,8 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
                n_xt = aw_mean_overlap(x_min, x_max, to_grid.nx(), xt, xw);
                n_yt = aw_mean_overlap(y_min, y_max, to_grid.ny(), yt, yw);
                if(lat_rows && n_yt > 1) {
-                  aw_mean_lat_weights(to_grid, x_to, y_min, y_max, n_yt, yt, yw);
+                  aw_mean_lat_weights(to_grid, x_to, y_min, y_max,
+                                      n_yt, yt, yw);
                }
             }
 
