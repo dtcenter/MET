@@ -40,6 +40,8 @@ duplicate_flag = NONE;
 obs_summary    = ${OBS_SUMMARY};
 obs_perc_value = 75;
 eclv_points = 0.05;
+hss_ec_value = NA;
+rank_corr_flag = FALSE;
 
 //
 // Forecast and observation fields to be verified
@@ -118,6 +120,13 @@ interp = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Threshold for SEEPS p1 (Probability of being dry)
+//
+seeps_p1_thresh = NA;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Statistical output types
 //
 output_flag = {
@@ -146,15 +155,12 @@ output_flag = {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Threshold for SEEPS p1 (Probability of being dry)
-
-seeps_p1_thresh = NA;
-
-////////////////////////////////////////////////////////////////////////////////
-
-rank_corr_flag = FALSE;
 
 point_weight_flag = NONE;
+kde_ref_angle     = 0.75;
+write_weights     = FALSE;
+
+////////////////////////////////////////////////////////////////////////////////
 
 tmp_dir       = "/tmp";
 output_prefix = "${OUTPUT_PREFIX}";

@@ -12,11 +12,21 @@ fi
 
 echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
 
-time_command docker push ${DOCKERHUB_TAG}
+if ! time_command docker push ${DOCKERHUB_TAG}; then
+    exit 1
+fi
 
-# For the release-docker-images.yml workflow, push X.Y-latest for vX.Y.Z versions
+# For the release-docker-images.yml workflow, push X.Y and X.Y-latest for vX.Y.Z versions
+# NOTE: eventually remove X.Y-latest tags in favor of just X.Y
+#       keep -latest until all references to it have been replaced with X.Y
 if [[ "${UPDATE_LATEST}" == "true" && "${SOURCE_BRANCH}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    LATEST_TAG=$(echo ${SOURCE_BRANCH} | sed 's/^v//g' | cut -f1,2 -d'.')-latest
-    time_command docker tag ${DOCKERHUB_TAG} ${DOCKERHUB_REPO}:${LATEST_TAG}
-    time_command docker push ${DOCKERHUB_REPO}:${LATEST_TAG}
+    XY_VERSION=$(echo ${SOURCE_BRANCH} | sed 's/^v//g' | cut -f1,2 -d'.')
+    for tag in "${XY_VERSION}" "${XY_VERSION}-latest"; do
+        if ! time_command docker tag ${DOCKERHUB_TAG} ${DOCKERHUB_REPO}:${tag}; then
+            exit 1
+        fi
+        if ! time_command docker push ${DOCKERHUB_REPO}:${tag}; then
+            exit 1
+        fi
+    done
 fi
