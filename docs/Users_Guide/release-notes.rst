@@ -96,6 +96,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3518 <https://github.com/dtcenter/MET/issues/3518>`_).
      * Enhance the release Docker image workflow to push ``X.Y`` tags in addition to ``X.Y-latest``
        (`#3563 <https://github.com/dtcenter/MET/issues/3563>`_).
+     * Enhance the Claude Code review workflow to provide more useful feedback and add a repository CLAUDE.md
+       (`#3566 <https://github.com/dtcenter/MET/issues/3566>`_).
      * Automate link checking with Sphinx
        (`METplus #3247 <https://github.com/dtcenter/METplus/issues/3247>`_).
      * Resolve blockers from the AF SonarQube quality gate scanner
