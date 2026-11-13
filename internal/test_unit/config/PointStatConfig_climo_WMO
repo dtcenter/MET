@@ -45,6 +45,9 @@ sid_exc      = [];
 obs_quality_inc = [];
 obs_quality_exc = [];
 
+duplicate_flag = NONE;
+rank_corr_flag = TRUE;
+
 //
 // Forecast and observation fields to be verified
 //
@@ -194,6 +197,13 @@ hira = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Threshold for SEEPS p1 (Probability of being dry)
+//
+seeps_p1_thresh = NA;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Statistical output types
 //
 output_flag = {
@@ -222,16 +232,12 @@ output_flag = {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Threshold for SEEPS p1 (Probability of being dry)
-
-seeps_p1_thresh = NA;
-
-////////////////////////////////////////////////////////////////////////////////
-
-duplicate_flag = NONE;
-rank_corr_flag = TRUE;
 
 point_weight_flag = NONE;
+kde_ref_angle     = 0.75;
+write_weights     = FALSE;
+
+////////////////////////////////////////////////////////////////////////////////
 
 tmp_dir       = "/tmp";
 output_prefix = "${OUTPUT_PREFIX}";

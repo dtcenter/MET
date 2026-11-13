@@ -147,6 +147,10 @@ struct PowerInfo {
    // Power spectrum
    std::vector<double> power;
    std::map<int, std::vector<double> > error_power;
+
+   // Number of series which contributed to each sum
+   int n_power = 0;
+   std::map<int, int> n_error_power;
 };
 
 // PowerInfo objects, sized as n_data

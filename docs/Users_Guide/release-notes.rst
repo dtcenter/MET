@@ -65,6 +65,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3478 <https://github.com/dtcenter/MET/issues/3478>`_).
      * **Fix Regrid-Data-Plane and Point2Grid to parse each -field command line option independently**
        (`#3499 <https://github.com/dtcenter/MET/issues/3499>`_).
+     * **Fix observation error table parsing and lookup logic for Ensemble-Stat**
+       (`#3545 <https://github.com/dtcenter/MET/issues/3545>`_).
 
   .. dropdown:: Repository, build, and test
 
@@ -88,6 +90,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3306 <https://github.com/dtcenter/MET/issues/3306>`_).
      * **Fix the compilation of the PROJ and JASPER external libraries with CMake 4**
        (`#3518 <https://github.com/dtcenter/MET/issues/3518>`_).
+     * Enhance the release Docker image workflow to push ``X.Y`` tags in addition to ``X.Y-latest``
+       (`#3563 <https://github.com/dtcenter/MET/issues/3563>`_).
      * Automate link checking with Sphinx
        (`METplus #3247 <https://github.com/dtcenter/METplus/issues/3247>`_).
      * Resolve blockers from the AF SonarQube quality gate scanner
@@ -252,6 +256,17 @@ MET Version 13.0.0 Upgrade Instructions
     However, if no spatial masking region is requested in the configuration file, then the
     "FULL" grid will automatically be added, as noted in :numref:`config_options-mask`.
 
+  * Point-Stat, Ensemble-Stat, and Pair-Stat configuration files
+
+    * The existing "point_weight_flag" entry can now be set to "KDE" to request kernel density
+      estimation weighting.
+
+    * The "kde_ref_angle" numeric entry defines a reference angle when computing KDE weights.
+
+    * The "write_weights" boolean entry instructs the tools to write output text files,
+      one per verification task, containing the point weight values applied based on the
+      "point_weight_flag" setting.
+
   * Grid-Diag configuration file
 
     * The "mask.grid" and "mask.poly" entries have changed from strings to arrays of strings
@@ -388,6 +403,19 @@ MET Version 13.0.0 Upgrade Instructions
     written using the preceding field's data, count, and mask values. It is now written
     using its own default output value, bad data unless the ``-default_value`` option says
     otherwise, with its count and mask values set to 0.
+
+  * Ensemble-Stat output changes for users of the observation error logic. As described in MET
+    `#3545 <https://github.com/dtcenter/MET/issues/3545>`_, three defects are fixed. An
+    observation error table row filtering on the STATION_ID, PB_REPORT_TYPE, IN_REPORT_TYPE, or
+    INSTRUMENT_TYPE column previously matched on the contents of a different column, so such
+    rows did not filter as written. The HGT_RANGE column was compared against the observation
+    level value and the PRS_RANGE column against the observation height, rather than the other
+    way around. And the valid range of perturbed values was discarded whenever an entry was
+    copied, which happens both as each row of a table file is read and as the configuration
+    file settings are stored, so neither the MIN and MAX columns of the table nor the "min"
+    and "max" entries of the "obs_err" dictionary had any effect. Statistics computed with
+    observation error enabled therefore change for every user of the default table, which
+    sets MIN to 0 for its WIND, HGT, and APCP rows.
 
   * Gridded data read from NetCDF files that follow the CF convention and use a polar
     stereographic grid mapping may change. As described in MET

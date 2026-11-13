@@ -2581,35 +2581,6 @@ GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-PointWeightType parse_conf_point_weight_flag(Dictionary *dict) {
-   PointWeightType t = PointWeightType::None;
-   int v;
-   const char *method_name = "parse_conf_point_weight_flag() -> ";
-
-   if(!dict) {
-      mlog << Error << "\n" << method_name
-           << "empty dictionary!\n\n";
-      exit(1);
-   }
-
-   // Get the integer flag value for the current entry
-   v = dict->lookup_int(conf_key_point_weight_flag);
-
-   // Convert integer to enumerated GridWeightType
-        if(v == conf_const.lookup_int(conf_val_none)) t = PointWeightType::None;
-   else if(v == conf_const.lookup_int(conf_val_sid))  t = PointWeightType::SID;
-   else {
-      mlog << Error << "\n" << method_name
-           << "Unexpected config file value of " << v << " for \""
-           << conf_key_point_weight_flag << "\".\n\n";
-      exit(1);
-   }
-
-   return t;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
    DuplicateType t = DuplicateType::None;
    int v;
@@ -4073,7 +4044,6 @@ void PowerSpectrumInfo::clear() {
    missing_flag = MissingDataType::None;
    missing_value = bad_data_double;
    vld_thresh = bad_data_double;
-   skip = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -4083,7 +4053,6 @@ PowerSpectrumInfo &PowerSpectrumInfo::operator=(const PowerSpectrumInfo &a) noex
       missing_flag = a.missing_flag;
       missing_value = a.missing_value;
       vld_thresh = a.vld_thresh;
-      skip = a.skip;
    }
    return *this;
 }
