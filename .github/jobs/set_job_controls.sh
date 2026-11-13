@@ -126,7 +126,7 @@ fi
 
 # if pull request only changes documentation, skip all jobs
 # the jobs report as skipped so required status checks still pass
-if [ "${docs_only}" == "true" ]; then
+if [[ "${docs_only}" == "true" ]]; then
 
   echo "Pull request only changes documentation. Skipping all jobs."
   run_compile=false
