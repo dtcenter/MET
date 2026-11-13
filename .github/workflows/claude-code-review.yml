@@ -46,7 +46,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           # Full history so the reviewer can diff against the base branch and
           # read the history of the files the pull request touches.
