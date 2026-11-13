@@ -90,6 +90,10 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3535 <https://github.com/dtcenter/MET/issues/3535>`_).
      * Fix MODE-TD compilation against netcdf-cxx4 version 4.3.2
        (`#3550 <https://github.com/dtcenter/MET/issues/3550>`_).
+     * **Fix the compilation of the external libraries with the GNU 15 compilers, which select the C23 standard by default**
+       (`#3306 <https://github.com/dtcenter/MET/issues/3306>`_).
+     * **Fix the compilation of the PROJ and JASPER external libraries with CMake 4**
+       (`#3518 <https://github.com/dtcenter/MET/issues/3518>`_).
      * Enhance the release Docker image workflow to push ``X.Y`` tags in addition to ``X.Y-latest``
        (`#3563 <https://github.com/dtcenter/MET/issues/3563>`_).
      * Enhance the Claude Code review workflow to provide more useful feedback and add a repository CLAUDE.md
@@ -522,6 +526,18 @@ MET Version 13.0.0 Upgrade Instructions
 .. dropdown:: Additional upgrade instructions
 
   Recommendations when upgrading to MET version 13.0.0:
+
+  * Users compiling MET with the *compile_MET_all.sh* script on a system whose C compiler
+    defaults to the C23 standard, such as one providing GCC version 15 or later, should be
+    aware that the script now compiles the external libraries with "-std=gnu17". Several of
+    those libraries predate C23 and do not compile in the newer mode. The "MET_LIB_C_STANDARD"
+    environment variable described in :numref:`Install_Required-libraries-and` requests a
+    different standard, or disables this behavior entirely when set to "none". The script
+    also sets "CMAKE_POLICY_VERSION_MINIMUM" so that the libraries built with CMake, which
+    request compatibility with CMake versions older than 3.5, still configure with CMake 4.
+    PROJ is now configured with its test suite, its curl support, and the "projsync" tool
+    disabled, none of which MET uses, so building it no longer requires the libcurl
+    development files and no longer installs the "projsync" executable.
 
   * Users reading winds from CF-compliant NetCDF files on projections for which rotation applies,
     such as Lambert conformal, polar stereographic, and Mercator, should check the "standard_name"
