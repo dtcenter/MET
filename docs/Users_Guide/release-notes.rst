@@ -20,7 +20,7 @@ MET Version 13.0.0-rc1 Release Notes (20261116)
        (`#3178 <https://github.com/dtcenter/MET/issues/3178>`_).
      * **Add power spectra calculation capability to the Grid-Diag tool in MET**
        (`#3304 <https://github.com/dtcenter/MET/issues/3304>`_).
-     * **Enhance Point-Stat and Grid-Stat to support interpolation and smoothing methods other than NEAREST for unstructured grids (UGRIDs) using the N closest grid cells, including the distance-weighted, area-weighted, and bilinear methods**
+     * **Enhance Point-Stat and Grid-Stat to support more interpolation and smoothing methods for unstructured grids (UGRIDs)**
        (`#3334 <https://github.com/dtcenter/MET/issues/3334>`_).
      * **Enhance the point_weight_flag option to support kernel density estimation weighting**
        (`#3335 <https://github.com/dtcenter/MET/issues/3335>`_).
