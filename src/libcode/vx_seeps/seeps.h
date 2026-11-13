@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <array>
 #include <memory>
 #include <map>
 
@@ -115,7 +116,7 @@ struct SeepsRecord {
    double p2;
    double t1;
    double t2;
-   double scores[SEEPS_MATRIX_SIZE];
+   std::array<double,SEEPS_MATRIX_SIZE> scores;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -125,11 +126,11 @@ struct SeepsClimoRecord {
    double lat;
    double lon;
    double elv;
-   double p1[SEEPS_MONTH];
-   double p2[SEEPS_MONTH];
-   double t1[SEEPS_MONTH];
-   double t2[SEEPS_MONTH];
-   double scores[SEEPS_MONTH][SEEPS_MATRIX_SIZE];
+   std::array<double,SEEPS_MONTH> p1;
+   std::array<double,SEEPS_MONTH> p2;
+   std::array<double,SEEPS_MONTH> t1;
+   std::array<double,SEEPS_MONTH> t2;
+   std::array<std::array<double,SEEPS_MATRIX_SIZE>,SEEPS_MONTH> scores;
 };
 
 ////////////////////////////////////////////////////////////////////////

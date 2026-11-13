@@ -528,16 +528,16 @@ void SeepsClimo::read_seeps_climo_grid(const ConcatString &filename) {
    const char *method_name = "SeepsClimo::read_seeps_climo_grid() -> ";
 
    try {
-      double p1_00_buf[SEEPS_MONTH];
-      double p2_00_buf[SEEPS_MONTH];
-      double t1_00_buf[SEEPS_MONTH];
-      double t2_00_buf[SEEPS_MONTH];
-      double p1_12_buf[SEEPS_MONTH];
-      double p2_12_buf[SEEPS_MONTH];
-      double t1_12_buf[SEEPS_MONTH];
-      double t2_12_buf[SEEPS_MONTH];
-      double matrix_00_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
-      double matrix_12_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
+      std::array<double,SEEPS_MONTH> p1_00_buf;
+      std::array<double,SEEPS_MONTH> p2_00_buf;
+      std::array<double,SEEPS_MONTH> t1_00_buf;
+      std::array<double,SEEPS_MONTH> t2_00_buf;
+      std::array<double,SEEPS_MONTH> p1_12_buf;
+      std::array<double,SEEPS_MONTH> p2_12_buf;
+      std::array<double,SEEPS_MONTH> t1_12_buf;
+      std::array<double,SEEPS_MONTH> t2_12_buf;
+      std::array<double,SEEPS_MONTH*SEEPS_MATRIX_SIZE> matrix_00_buf;
+      std::array<double,SEEPS_MONTH*SEEPS_MATRIX_SIZE> matrix_12_buf;
       std::unique_ptr<netCDF::NcFile> nc_file = open_ncfile(filename.c_str());
       SeepsClimo::clear();
 
@@ -673,9 +673,11 @@ void SeepsClimo::read_seeps_climo_grid(const ConcatString &filename) {
             }
          }
          rec_00 = create_climo_record(sid, lat_array[idx], lon_array[idx], elv_array[idx],
-                                      p1_00_buf, p2_00_buf, t1_00_buf, t2_00_buf, matrix_00_buf);
+                                      p1_00_buf.data(), p2_00_buf.data(), t1_00_buf.data(),
+                                      t2_00_buf.data(), matrix_00_buf.data());
          rec_12 = create_climo_record(sid, lat_array[idx], lon_array[idx], elv_array[idx],
-                                      p1_12_buf, p2_12_buf, t1_12_buf, t2_12_buf, matrix_12_buf);
+                                      p1_12_buf.data(), p2_12_buf.data(), t1_12_buf.data(),
+                                      t2_12_buf.data(), matrix_12_buf.data());
          seeps_score_00_map[sid] = std::move(rec_00);
          seeps_score_12_map[sid] = std::move(rec_12);
       }
