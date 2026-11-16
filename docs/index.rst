@@ -223,3 +223,8 @@ Index
 =====
 
 * :ref:`genindex`
+
+.. Trial links for metplus-action-linkcheck #8, removed before merging.
+
+* `trial transient <http://127.0.0.1:9/>`_
+* `trial permanent <https://www.example.com/met-linkcheck-trial-404>`_
