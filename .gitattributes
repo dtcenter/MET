@@ -1,0 +1,14 @@
+# Exclude folders and files from the source archive attached to each
+# GitHub release. These entries affect "git archive" only, not the
+# repository itself and not the "make dist" tarball. Each pattern is
+# anchored with a leading slash so that it matches only at the top
+# level, and not the copies of the same name throughout the tree.
+/.github/ export-ignore
+/.gitignore export-ignore
+/.gitattributes export-ignore
+/.dockerignore export-ignore
+/.readthedocs.yaml export-ignore
+/.sonarlint/ export-ignore
+/.idea/ export-ignore
+/AGENTS.md export-ignore
+/CLAUDE.md export-ignore

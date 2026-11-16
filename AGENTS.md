@@ -1,10 +1,47 @@
 # MET repository conventions
 
-Guidance for Claude Code and other AI assistants working in this repository,
-and a useful summary for human contributors. The authoritative process
-documentation is the [METplus Contributor's
-Guide](https://metplus.readthedocs.io/en/latest/Contributors_Guide/index.html);
-this file records the conventions that are easy to miss.
+Guidance for AI coding agents working in this repository, and a useful summary
+for human contributors.
+
+## Read the Contributor's Guides first
+
+Two guides govern work in this repository. Read them before opening an issue or
+a pull request, and follow them wherever they and this file overlap.
+
+**The [METplus Contributor's
+Guide](https://metplus.readthedocs.io/en/latest/Contributors_Guide/index.html)**
+covers the process shared by every METplus component, MET included. Its [GitHub
+Workflow](https://metplus.readthedocs.io/en/latest/Contributors_Guide/github_workflow.html)
+chapter is the one that applies here in full: how issues, labels, milestones,
+and project boards are used, how feature branches are named, and how pull
+requests are opened, reviewed, and merged. Follow it rather than inventing a
+process. Its Coding Standards, Testing, and Continuous Integration chapters
+describe the METplus Python wrappers, meaning PEP8, pytest under
+`internal/tests`, and the METplus workflows, and do not apply to MET.
+
+**The [MET Contributor's
+Guide](https://metplus.readthedocs.io/projects/met/en/latest/Contributors_Guide/index.html)**,
+whose source is `docs/Contributors_Guide/` in this repository, is where MET's
+own conventions live: the
+[development environment](https://metplus.readthedocs.io/projects/met/en/latest/Contributors_Guide/dev_env.html),
+[testing](https://metplus.readthedocs.io/projects/met/en/latest/Contributors_Guide/testing.html)
+with the unit tests under `internal/test_unit`,
+[continuous integration](https://metplus.readthedocs.io/projects/met/en/latest/Contributors_Guide/continuous_integration.html)
+for the workflows in `.github/workflows`,
+[code profiling](https://metplus.readthedocs.io/projects/met/en/latest/Contributors_Guide/code_profiling.html),
+and development details such as temporary file use and static data files.
+Several of its chapters, [Coding
+Standards](https://metplus.readthedocs.io/projects/met/en/latest/Contributors_Guide/coding_standards.html)
+among them, are still "Coming Soon!" stubs. That guide is where MET's coding
+conventions belong, so as those chapters are filled in, move the relevant
+material out of this file and into them, leaving only the pointer here.
+
+This file is the short form: what neither guide covers yet, or what is easy to
+miss in a MET tree. It deliberately does not repeat them. The guides are
+authoritative on process and on conventions; this file is authoritative on the
+practical traps of building, testing, and releasing MET recorded below. Where
+this file and a guide genuinely conflict, say so in the pull request rather
+than silently following one.
 
 ## Repository layout
 

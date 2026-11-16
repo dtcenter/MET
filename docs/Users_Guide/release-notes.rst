@@ -9,8 +9,8 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
-MET Version 13.0.0-beta3 Release Notes (TBD)
----------------------------------------------
+MET Version 13.0.0-rc1 Release Notes (20261116)
+-----------------------------------------------
 
   .. dropdown:: Enhancements
 
@@ -20,7 +20,7 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3178 <https://github.com/dtcenter/MET/issues/3178>`_).
      * **Add power spectra calculation capability to the Grid-Diag tool in MET**
        (`#3304 <https://github.com/dtcenter/MET/issues/3304>`_).
-     * **Enhance Point-Stat and Grid-Stat to support interpolation and smoothing methods other than NEAREST for unstructured grids (UGRIDs) using the N closest grid cells, including the distance-weighted, area-weighted, and bilinear methods**
+     * **Enhance Point-Stat and Grid-Stat to support more interpolation and smoothing methods for unstructured grids (UGRIDs)**
        (`#3334 <https://github.com/dtcenter/MET/issues/3334>`_).
      * **Enhance the point_weight_flag option to support kernel density estimation weighting**
        (`#3335 <https://github.com/dtcenter/MET/issues/3335>`_).
@@ -30,6 +30,8 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3406 <https://github.com/dtcenter/MET/issues/3406>`_).
      * Improve Ensemble-Stat to more efficiently apply observation error corrections and perturbations
        (`#3426 <https://github.com/dtcenter/MET/issues/3426>`_).
+     * **Enhance Grid-Stat and Ensemble-Stat to normalize the grid_weight_flag = AREA weights to the range (0, 1]**
+       (`#3448 <https://github.com/dtcenter/MET/issues/3448>`_).
      * Rename MET configuration options to avoid names like ``warning`` and ``error``
        (`#3455 <https://github.com/dtcenter/MET/issues/3455>`_).
      * Enhance the GRIB2 library code to report unsupported GRIB2 data packing rather than segfaulting
@@ -71,6 +73,10 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3499 <https://github.com/dtcenter/MET/issues/3499>`_).
      * **Fix observation error table parsing and lookup logic for Ensemble-Stat**
        (`#3545 <https://github.com/dtcenter/MET/issues/3545>`_).
+     * **Fix TC-Diag to use the gridded data found when the -data file list does not line up with the track valid times**
+       (`#3475 <https://github.com/dtcenter/MET/issues/3475>`_).
+     * **Fix the Lambert Azimuthal Equal Area grid box area, which is scaled by the earth radius twice**
+       (`#3541 <https://github.com/dtcenter/MET/issues/3541>`_).
 
   .. dropdown:: Repository, build, and test
 
@@ -78,7 +84,7 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3393 <https://github.com/dtcenter/MET/issues/3393>`_).
      * Remove R dependency from the MET unit test logic
        (`#3395 <https://github.com/dtcenter/MET/issues/3395>`_).
-     * Upgrade MET to use METbaseimage version 3.5
+     * Upgrade MET to use METbaseimage version 13.0
        (`#3407 <https://github.com/dtcenter/MET/issues/3407>`_).
      * Enhance the documentation by correcting broken links and typos
        (`#3416 <https://github.com/dtcenter/MET/issues/3416>`_).
@@ -96,8 +102,10 @@ MET Version 13.0.0-beta3 Release Notes (TBD)
        (`#3518 <https://github.com/dtcenter/MET/issues/3518>`_).
      * Enhance the release Docker image workflow to push ``X.Y`` tags in addition to ``X.Y-latest``
        (`#3563 <https://github.com/dtcenter/MET/issues/3563>`_).
-     * Enhance the Claude Code review workflow to provide more useful feedback and add a repository CLAUDE.md
+     * Enhance the Claude Code review workflow to provide more useful feedback and add a repository AGENTS.md
        (`#3566 <https://github.com/dtcenter/MET/issues/3566>`_).
+     * Sanitize paths and replace ``system()`` calls for SonarQube S2076, S2083, and S8786
+       (`#3515 <https://github.com/dtcenter/MET/issues/3515>`_).
      * Fix the SonarQube findings in the SEEPS library code
        (`#3569 <https://github.com/dtcenter/MET/issues/3569>`_).
      * Automate link checking with Sphinx
@@ -389,6 +397,19 @@ MET Version 13.0.0 Upgrade Instructions
     other grid types, which used the grid box whose lower-left corner is that point. LAEA now
     follows the same convention as the other grid types. See the additional upgrade
     instructions below for details.
+
+  * The grid box areas computed for LAEA grids are also corrected. As described in MET
+    `#3541 <https://github.com/dtcenter/MET/issues/3541>`_, they were scaled by the square of
+    the earth radius a second time, so every LAEA grid box area was about 40.7 million times
+    too large. The error is the same for every grid box, so it cancels in the AW_MEAN
+    interpolation weights and in the "AREA" grid weights, which MET version 13.0.0 normalizes
+    by the maximum grid box area as described in MET
+    `#3448 <https://github.com/dtcenter/MET/issues/3448>`_ below. The statistics are therefore
+    unchanged, but the true areas now reported in the new "grid_area" variable of the Grid-Stat
+    and Ensemble-Stat NetCDF output, and in the Debug(3) message naming the maximum grid box
+    area, are smaller by that factor. In MET version 12.2.0 and earlier, where the "AREA"
+    weights were not normalized, the inflated areas were used directly as the weights and did
+    change the weighted cell counts.
 
   * Output regridded to lat/lon, rotated lat/lon, and Mercator grids using the AW_MEAN
     interpolation method changes along the western edge of regional grids, the eastern edge

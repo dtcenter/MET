@@ -79,7 +79,7 @@ jobs:
                glance what the review flagged. Say so plainly when there are
                none.
             3. "Project conventions", judging the pull request against
-               CLAUDE.md in the root of this repository: whether the release
+               AGENTS.md in the root of this repository: whether the release
                notes carry an entry for this issue under the current version,
                whether the upgrade instructions needed updating, whether the
                documentation changed when user-visible behavior did, whether
