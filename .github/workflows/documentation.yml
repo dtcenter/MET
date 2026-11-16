@@ -48,10 +48,13 @@ jobs:
   linkcheck:
     name: Check Links
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v6
       - name: Check links
-        uses: dtcenter/metplus-action-linkcheck@v1
+        uses: dtcenter/metplus-action-linkcheck@feature_8_history
         with:
           fail-on-broken-links: 'true'
           upload-artifact: 'true'
+          history-branch: 'linkcheck-history-test'
