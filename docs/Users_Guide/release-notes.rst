@@ -102,7 +102,7 @@ MET Version 13.0.0-rc1 Release Notes (20261116)
        (`#3518 <https://github.com/dtcenter/MET/issues/3518>`_).
      * Enhance the release Docker image workflow to push ``X.Y`` tags in addition to ``X.Y-latest``
        (`#3563 <https://github.com/dtcenter/MET/issues/3563>`_).
-     * Enhance the Claude Code review workflow to provide more useful feedback and add a repository CLAUDE.md
+     * Enhance the Claude Code review workflow to provide more useful feedback and add a repository AGENTS.md
        (`#3566 <https://github.com/dtcenter/MET/issues/3566>`_).
      * Sanitize paths and replace ``system()`` calls for SonarQube S2076, S2083, and S8786
        (`#3515 <https://github.com/dtcenter/MET/issues/3515>`_).
@@ -397,6 +397,19 @@ MET Version 13.0.0 Upgrade Instructions
     other grid types, which used the grid box whose lower-left corner is that point. LAEA now
     follows the same convention as the other grid types. See the additional upgrade
     instructions below for details.
+
+  * The grid box areas computed for LAEA grids are also corrected. As described in MET
+    `#3541 <https://github.com/dtcenter/MET/issues/3541>`_, they were scaled by the square of
+    the earth radius a second time, so every LAEA grid box area was about 40.7 million times
+    too large. The error is the same for every grid box, so it cancels in the AW_MEAN
+    interpolation weights and in the "AREA" grid weights, which MET version 13.0.0 normalizes
+    by the maximum grid box area as described in MET
+    `#3448 <https://github.com/dtcenter/MET/issues/3448>`_ below. The statistics are therefore
+    unchanged, but the true areas now reported in the new "grid_area" variable of the Grid-Stat
+    and Ensemble-Stat NetCDF output, and in the Debug(3) message naming the maximum grid box
+    area, are smaller by that factor. In MET version 12.2.0 and earlier, where the "AREA"
+    weights were not normalized, the inflated areas were used directly as the weights and did
+    change the weighted cell counts.
 
   * Output regridded to lat/lon, rotated lat/lon, and Mercator grids using the AW_MEAN
     interpolation method changes along the western edge of regional grids, the eastern edge
