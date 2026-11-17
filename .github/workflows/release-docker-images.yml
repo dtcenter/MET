@@ -86,8 +86,28 @@ jobs:
         with:
           ref: ${{ matrix.version }}
           path: ${{ matrix.version }}
-          sparse-checkout: internal/scripts/docker/Dockerfile
+          sparse-checkout: |
+            internal/scripts/docker/Dockerfile
+            .github/jobs/get_met_base_image.sh
           sparse-checkout-cone-mode: false
+
+      - name: Get MET base image
+        id: get_met_base_image
+        run: |
+          # Read the METbaseimage version from the release being built, not from
+          # the default branch, so that rebuilding an older release still uses the
+          # base image that release was built against. Releases created before the
+          # script existed have no get_met_base_image.sh, so leave the outputs
+          # empty and let the defaults in that release's Dockerfile apply.
+          script=${GITHUB_WORKSPACE}/${SOURCE_BRANCH}/.github/jobs/get_met_base_image.sh
+          if [[ -f ${script} ]]; then
+            ${script}
+          else
+            echo "${script} does not exist"
+            echo "Using the METbaseimage defaults from the ${SOURCE_BRANCH} Dockerfile"
+          fi
+        env:
+          SOURCE_BRANCH: ${{ matrix.version }}
 
       - name: Create directories to store build log output
         run: mkdir -p ${RUNNER_WORKSPACE}/logs
@@ -104,6 +124,8 @@ jobs:
         env:
           SOURCE_BRANCH: ${{ matrix.version }}
           MET_CONFIG_OPTS: '--enable-all'
+          MET_BASE_REPO: ${{ steps.get_met_base_image.outputs.met_base_repo }}
+          MET_BASE_TAG: ${{ steps.get_met_base_image.outputs.met_base_tag }}
 
       - name: Copy build log files into logs directory
         if: always()

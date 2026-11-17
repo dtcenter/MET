@@ -12,16 +12,28 @@ if [[ ! -f "${DOCKERFILE_PATH}" ]]; then
   DOCKERFILE_PATH=${GITHUB_WORKSPACE}/internal/scripts/docker/Dockerfile.copy
 fi
 
-CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build.log
+BUILD_LOGFILE=${GITHUB_WORKSPACE}/docker_build.log
+
+# Only pass the METbaseimage build arguments that are set in the environment.
+# Passing --build-arg for a variable that is unset leaves the default value from
+# the Dockerfile in place, which is how releases created before
+# get_met_base_image.sh existed select their base image.
+BUILD_ARGS=(--build-arg SOURCE_BRANCH --build-arg MET_CONFIG_OPTS)
+if [[ -n ${MET_BASE_REPO} ]]; then
+  BUILD_ARGS+=(--build-arg MET_BASE_REPO)
+fi
+if [[ -n ${MET_BASE_TAG} ]]; then
+  BUILD_ARGS+=(--build-arg MET_BASE_TAG)
+fi
+
+CMD_LOGFILE=${BUILD_LOGFILE}
 
 time_command docker build -t ${DOCKERHUB_TAG} \
-    --build-arg SOURCE_BRANCH \
-    --build-arg MET_BASE_REPO \
-    --build-arg MET_BASE_TAG \
-    --build-arg MET_CONFIG_OPTS \
+    "${BUILD_ARGS[@]}" \
     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
 if [[ $? != 0 ]]; then
-  cat ${CMD_LOGFILE}
+  # time_command unsets CMD_LOGFILE, so report the build log by its saved path
+  cat ${BUILD_LOGFILE}
   exit 1
 fi
 
