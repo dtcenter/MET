@@ -6,7 +6,7 @@ DOCKERHUB_TAG=met-sonarqube-gha
 
 DOCKERFILE_PATH=${GITHUB_WORKSPACE}/internal/scripts/docker/Dockerfile.sonarqube
 
-CMD_LOGFILE=${GITHUB_WORKSPACE}/sonarqube_build.log
+SONARQUBE_LOGFILE=${GITHUB_WORKSPACE}/sonarqube_build.log
 
 #
 # Define the $SONAR_REFERENCE_BRANCH as the
@@ -27,7 +27,7 @@ fi
 echo SONAR_REFERENCE_BRANCH=${SONAR_REFERENCE_BRANCH}
 echo SONAR_PULLREQUEST_KEY=${SONAR_PULLREQUEST_KEY}
 
-time_command docker build -t ${DOCKERHUB_TAG} \
+if ! time_command -l ${SONARQUBE_LOGFILE} docker build -t ${DOCKERHUB_TAG} \
     --build-arg MET_BASE_REPO \
     --build-arg MET_BASE_TAG \
     --build-arg SOURCE_BRANCH \
@@ -36,9 +36,7 @@ time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg SONAR_TOKEN \
     --build-arg SONAR_REFERENCE_BRANCH \
     --build-arg SONAR_PULLREQUEST_KEY \
-    -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
-if [[ $? != 0 ]]; then
-  cat ${CMD_LOGFILE}
+    -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
   exit 1
 fi
 
