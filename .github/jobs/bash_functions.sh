@@ -62,7 +62,7 @@ function time_command {
   fi
 
   local duration=$(( SECONDS - start_seconds ))
-  echo "TIMING: Command took `printf '%02d' $(($duration / 60))`:`printf '%02d' $(($duration % 60))` (MM:SS): '$*'"
+  echo "TIMING: Command took $(printf '%02d' $(($duration / 60))):$(printf '%02d' $(($duration % 60))) (MM:SS): '$*'"
   echo "::endgroup::"
   if [[ ${error} -ne 0 ]]; then
     echo "ERROR: '$*' exited with status = ${error}"
@@ -81,12 +81,14 @@ function get_dockerhub_tag {
 
 # utility function to scan a Docker image for vulnerabilities
 function cve_scan_image {
-  echo "Scanning image $1"
-  local scan_logfile="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
-  time_command -l "${scan_logfile}" grype $1
-  N_CRITICAL=`grep "Critical" ${scan_logfile} | wc -l`
+  local image=$1
+
+  echo "Scanning image ${image}"
+  local scan_logfile="${GITHUB_WORKSPACE}/CVE_Scan_$(echo "${image}" | sed 's%[/,:]%_%g').log"
+  time_command -l "${scan_logfile}" grype "${image}"
+  N_CRITICAL=$(grep "Critical" "${scan_logfile}" | wc -l)
   if [[ ${N_CRITICAL} -gt 0 ]]; then
-    echo "WARNING: Found ${N_CRITICAL} Critical CVEs for image $1 in ${scan_logfile}"
+    echo "WARNING: Found ${N_CRITICAL} Critical CVEs for image ${image} in ${scan_logfile}"
     echo
     egrep "SEVERITY|Critical" ${scan_logfile}
     echo
