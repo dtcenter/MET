@@ -22,7 +22,7 @@ echo "Running MET unit tests with OMP_NUM_THREADS = ${OMP_NUM_THREADS} ..."
 for testname in $TESTS_TO_RUN; do
   # A verbose log can run to many thousands of lines, so print only the end of
   # it after a failure and leave the rest to the uploaded logs artifact.
-  LOG_OPTS=(-l /met/logs/unit_${testname}.log)
+  LOG_OPTS=(-l "/met/logs/unit_${testname}.log")
   if [[ -n "${UNIT_OPTS}" ]]; then
     LOG_OPTS+=(-t 500)
   fi

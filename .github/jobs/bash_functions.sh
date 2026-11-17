@@ -38,6 +38,13 @@ function time_command {
   local logfile=
   local tail_lines=
   while [[ $# -gt 0 ]]; do
+    # -l and -t each consume an argument. Without this check a missing one
+    # leaves shift 2 with nothing to shift, so it fails without shifting and
+    # this loop spins forever.
+    if [[ "$1" == "-l" || "$1" == "-t" ]] && [[ $# -lt 2 ]]; then
+      echo "ERROR: time_command option $1 requires an argument"
+      return 1
+    fi
     case "$1" in
       -l) logfile=$2; shift 2 ;;
       -t) tail_lines=$2; shift 2 ;;

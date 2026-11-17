@@ -27,7 +27,7 @@ fi
 echo SONAR_REFERENCE_BRANCH=${SONAR_REFERENCE_BRANCH}
 echo SONAR_PULLREQUEST_KEY=${SONAR_PULLREQUEST_KEY}
 
-if ! time_command -l ${SONARQUBE_LOGFILE} docker build -t ${DOCKERHUB_TAG} \
+if ! time_command -l "${SONARQUBE_LOGFILE}" docker build -t ${DOCKERHUB_TAG} \
     --build-arg MET_BASE_REPO \
     --build-arg MET_BASE_TAG \
     --build-arg SOURCE_BRANCH \

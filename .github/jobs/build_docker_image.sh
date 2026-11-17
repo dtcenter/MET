@@ -26,7 +26,7 @@ if [[ -n ${MET_BASE_TAG} ]]; then
   BUILD_ARGS+=(--build-arg MET_BASE_TAG)
 fi
 
-if ! time_command -l ${BUILD_LOGFILE} docker build -t ${DOCKERHUB_TAG} \
+if ! time_command -l "${BUILD_LOGFILE}" docker build -t ${DOCKERHUB_TAG} \
     "${BUILD_ARGS[@]}" \
     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
   exit 1
