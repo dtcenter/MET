@@ -26,14 +26,9 @@ if [[ -n ${MET_BASE_TAG} ]]; then
   BUILD_ARGS+=(--build-arg MET_BASE_TAG)
 fi
 
-CMD_LOGFILE=${BUILD_LOGFILE}
-
-time_command docker build -t ${DOCKERHUB_TAG} \
+if ! time_command -l ${BUILD_LOGFILE} docker build -t ${DOCKERHUB_TAG} \
     "${BUILD_ARGS[@]}" \
-    -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
-if [[ $? != 0 ]]; then
-  # time_command unsets CMD_LOGFILE, so report the build log by its saved path
-  cat ${BUILD_LOGFILE}
+    -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
   exit 1
 fi
 
