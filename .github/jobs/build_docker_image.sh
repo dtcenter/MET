@@ -14,10 +14,10 @@ fi
 
 BUILD_LOGFILE=${GITHUB_WORKSPACE}/docker_build.log
 
-# Only pass the METbaseimage build arguments that are set in the environment.
-# Passing --build-arg for a variable that is unset leaves the default value from
-# the Dockerfile in place, which is how releases created before
-# get_met_base_image.sh existed select their base image.
+# Only pass the METbaseimage build arguments that are set to a non-empty value.
+# Passing --build-arg for an empty variable overrides the Dockerfile default with
+# an empty string, while omitting the flag leaves that default in place, which is
+# how releases created before get_met_base_image.sh existed select their base image.
 BUILD_ARGS=(--build-arg SOURCE_BRANCH --build-arg MET_CONFIG_OPTS)
 if [[ -n ${MET_BASE_REPO} ]]; then
   BUILD_ARGS+=(--build-arg MET_BASE_REPO)
