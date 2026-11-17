@@ -98,13 +98,32 @@ jobs:
           # the default branch, so that rebuilding an older release still uses the
           # base image that release was built against. Releases created before the
           # script existed have no get_met_base_image.sh, so leave the outputs
-          # empty and let the defaults in that release's Dockerfile apply.
+          # empty and let the defaults in that release's Dockerfile apply. Confirm
+          # that those defaults actually exist rather than assuming they do, since
+          # an empty tag fails the build later with an unexplained
+          # "invalid reference format".
           script=${GITHUB_WORKSPACE}/${SOURCE_BRANCH}/.github/jobs/get_met_base_image.sh
+          dockerfile=${GITHUB_WORKSPACE}/${SOURCE_BRANCH}/internal/scripts/docker/Dockerfile
           if [[ -f ${script} ]]; then
             ${script}
-          else
+          elif [[ ! -f ${dockerfile} ]]; then
+            echo "ERROR: Neither of these exists:"
+            echo "ERROR:   ${script}"
+            echo "ERROR:   ${dockerfile}"
+            echo "ERROR: Check that ${SOURCE_BRANCH} names an existing tag or branch"
+            echo "ERROR: and that the sparse checkout patterns above still match."
+            exit 1
+          elif grep -q '^ARG MET_BASE_TAG=.' ${dockerfile}; then
             echo "${script} does not exist"
-            echo "Using the METbaseimage defaults from the ${SOURCE_BRANCH} Dockerfile"
+            echo "Using the METbaseimage defaults from the ${SOURCE_BRANCH} Dockerfile:"
+            grep '^ARG MET_BASE_' ${dockerfile}
+          else
+            echo "ERROR: The METbaseimage version for ${SOURCE_BRANCH} cannot be"
+            echo "ERROR: determined because this script does not exist:"
+            echo "ERROR:   ${script}"
+            echo "ERROR: and this Dockerfile defines no default MET_BASE_TAG:"
+            echo "ERROR:   ${dockerfile}"
+            exit 1
           fi
         env:
           SOURCE_BRANCH: ${{ matrix.version }}
