@@ -96,6 +96,15 @@ that summarizes what the review flagged. When the review finds nothing, that sum
 comment is the only comment it posts, so a review that found no issues reads differently
 from one that never ran.
 
+The review itself, meaning the prompt, the effort level, and the tools Claude may use, is
+defined in the shared
+`metplus-action-claude-code-review <https://github.com/dtcenter/metplus-action-claude-code-review>`_
+action, so every METplus component repository gets the same review and a change to it is
+made once. The **claude-code-review.yml** workflow only decides when a review runs and
+grants the permissions it needs. The summary judges the pull request against the
+conventions recorded in the **AGENTS.md** file at the top level of the repository, so
+MET-specific conventions belong in that file rather than in the action.
+
 A review is performed:
 
 - Automatically, once per pull request, when the pull request is opened or marked ready
@@ -114,14 +123,15 @@ A review is **not** performed:
   <https://metplus.readthedocs.io/en/latest/Contributors_Guide/continuous_integration.html#update-reference-branch-update-reference-branch-yml>`_
   workflow, which merge accumulated history rather than code written for review.
 - For draft pull requests, until they are marked ready for review.
-- For pull requests opened from a fork. GitHub withholds repository secrets from such
+- For pull requests opened from a fork. GitHub withholds secrets from such
   runs on public repositories, so the workflow cannot authenticate.
 
 Authentication and Resource Use
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Both workflows authenticate using the :code:`CLAUDE_CODE_OAUTH_TOKEN` repository secret.
-This token is tied to the Claude subscription of the person who generated it, and usage
+Both workflows authenticate using the :code:`CLAUDE_CODE_OAUTH_TOKEN` secret, which is
+defined once for the dtcenter organization and made available to the METplus component
+repositories. This token is tied to the Claude subscription of the person who generated it, and usage
 from both workflows counts against that person's account rather than being billed to an
 organization. Anyone changing how often these workflows run should be aware of whose
 account is paying for them.
@@ -131,13 +141,20 @@ additionally requests :code:`pull-requests: write`, which is what allows it to p
 inline comments and its summary comment. Neither workflow writes to the contents of the
 repository.
 
-The review workflow also names the tools Claude is allowed to use, which are the ones the
-code review plugin needs: the inline comment tool, the read-only :code:`gh` commands that
-read the pull request, and :code:`gh pr comment` for the summary. Note that the action
+The review action also names the tools Claude is allowed to use, which are the ones the
+code review needs: the inline comment tool, the read-only :code:`gh` and :code:`git`
+commands that read the pull request and the history of the files it changes, tools to
+read the checked-out source, and :code:`gh pr comment` for the summary. Note that the action
 runs in its auto permission mode, in which that list is an allow rule rather than a hard
 restriction. A tool call the list does not cover is decided by the action's own safety
 review rather than refused outright, so the list should be read as what the review is
 expected to need rather than as a boundary it cannot cross.
 
-Each workflow sets a job timeout, and the review workflow additionally limits the number
-of turns Claude may take and cancels any superseded run for the same pull request.
+The review workflow passes the token to the review action as an input. The action runs in
+the workflow's own job, so it can reach nothing the job could not reach already. Anyone who
+can push to the action repository can change the code that receives the token, so write
+access to it is limited to the maintainers of the METplus component repositories.
+
+Each workflow sets a job timeout. The review workflow additionally cancels any superseded
+run for the same pull request, and the review action limits the number of turns Claude may
+take.
