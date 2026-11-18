@@ -40,9 +40,6 @@ share
 # the directories entirely and the sample scripts then fail with
 # "can't open the output file ... for writing".
 
-# local SonarQube scan exports
-sonarqube_findings_develop.*
-
 # editor and OS noise
 **/*~
 **/*#*#
