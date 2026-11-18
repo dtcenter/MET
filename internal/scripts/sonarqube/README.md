@@ -13,6 +13,5 @@ against MET and upload the results to the DTC SonarQube server.
 
 The scanner only uploads an analysis report. To pull the resulting findings
 back down, including the justifications recorded for issues that have been
-accepted or marked a false positive, use `fetch_sonarqube_findings.sh` in the
-**private** [METplus-Internal](https://github.com/dtcenter/METplus-Internal)
-repository, under `scripts/sonarqube/`.
+accepted or marked a false positive, use `fetch_sonarqube_findings.sh` under
+`scripts/sonarqube/` in the **private** METplus-Internal repository.
