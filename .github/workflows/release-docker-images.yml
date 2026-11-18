@@ -86,8 +86,47 @@ jobs:
         with:
           ref: ${{ matrix.version }}
           path: ${{ matrix.version }}
-          sparse-checkout: internal/scripts/docker/Dockerfile
+          sparse-checkout: |
+            internal/scripts/docker/Dockerfile
+            .github/jobs/get_met_base_image.sh
           sparse-checkout-cone-mode: false
+
+      - name: Get MET base image
+        id: get_met_base_image
+        run: |
+          # Read the METbaseimage version from the release being built, not from
+          # the default branch, so that rebuilding an older release still uses the
+          # base image that release was built against. Releases created before the
+          # script existed have no get_met_base_image.sh, so leave the outputs
+          # empty and let the defaults in that release's Dockerfile apply. Confirm
+          # that those defaults actually exist rather than assuming they do, since
+          # an empty tag fails the build later with an unexplained
+          # "invalid reference format".
+          script=${GITHUB_WORKSPACE}/${SOURCE_BRANCH}/.github/jobs/get_met_base_image.sh
+          dockerfile=${GITHUB_WORKSPACE}/${SOURCE_BRANCH}/internal/scripts/docker/Dockerfile
+          if [[ -f ${script} ]]; then
+            ${script}
+          elif [[ ! -f ${dockerfile} ]]; then
+            echo "ERROR: Neither of these exists:"
+            echo "ERROR:   ${script}"
+            echo "ERROR:   ${dockerfile}"
+            echo "ERROR: Check that ${SOURCE_BRANCH} names an existing tag or branch"
+            echo "ERROR: and that the sparse checkout patterns above still match."
+            exit 1
+          elif grep -q '^ARG MET_BASE_TAG=.' ${dockerfile}; then
+            echo "${script} does not exist"
+            echo "Using the METbaseimage defaults from the ${SOURCE_BRANCH} Dockerfile:"
+            grep '^ARG MET_BASE_' ${dockerfile}
+          else
+            echo "ERROR: The METbaseimage version for ${SOURCE_BRANCH} cannot be"
+            echo "ERROR: determined because this script does not exist:"
+            echo "ERROR:   ${script}"
+            echo "ERROR: and this Dockerfile defines no default MET_BASE_TAG:"
+            echo "ERROR:   ${dockerfile}"
+            exit 1
+          fi
+        env:
+          SOURCE_BRANCH: ${{ matrix.version }}
 
       - name: Create directories to store build log output
         run: mkdir -p ${RUNNER_WORKSPACE}/logs
@@ -104,6 +143,8 @@ jobs:
         env:
           SOURCE_BRANCH: ${{ matrix.version }}
           MET_CONFIG_OPTS: '--enable-all'
+          MET_BASE_REPO: ${{ steps.get_met_base_image.outputs.met_base_repo }}
+          MET_BASE_TAG: ${{ steps.get_met_base_image.outputs.met_base_tag }}
 
       - name: Copy build log files into logs directory
         if: always()
