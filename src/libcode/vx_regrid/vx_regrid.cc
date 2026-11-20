@@ -161,15 +161,8 @@ DataPlane met_regrid_generic(const DataPlane & from_data,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// MET stores an unstructured grid as a single row of faces, so the
-// grid template methods would combine faces which are adjacent in the
-// file rather than close to each other. Regridding from an unstructured
-// grid instead uses the closest faces to each to_grid point, the same
-// way the interpolation and smoothing do. The methods which require the
-// regular grid structure (grid box corners, budget, Gaussian filter,
-// least-squares fit, and force) have no meaning for the unstructured
-// grid. The area-weighted methods are checked separately by
-// check_ugrid_area_weighted().
+// Exit for regridding methods with no meaning on an unstructured grid.
+// The area-weighted methods are checked in check_ugrid_area_weighted().
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -203,12 +196,8 @@ static void check_ugrid_regrid(const Grid & from_grid, const RegridInfo & info) 
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Regrid from an unstructured grid using the closest faces to each
-// to_grid point. The number of closest faces matches the number of
-// points in the grid template, or width * width for BILIN, which is the
-// least-squares fit used for the point interpolation. The faces beyond
-// ugrid_max_distance_km are excluded, so to_grid points beyond the
-// edge of a regional mesh are set to bad data.
+// Regrid from an unstructured grid using the N closest faces to each
+// to_grid point. Faces beyond ugrid_max_distance_km are excluded.
 //
 ////////////////////////////////////////////////////////////////////////
 
