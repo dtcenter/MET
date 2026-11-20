@@ -257,6 +257,18 @@ bool NdbcHandler::_parseObservationLineStandard(DataLine &data_line,
     return false;
   }
 
+  //
+  // Skip lines outside the valid time window before extracting values.
+  // Count them as rejected the same way _addObservations() would.
+  //
+  if (!_keep_valid_time(valid_time)) {
+    if (!filters.is_filtered(stationLat, stationLon) &&
+        !filters.is_filtered_sid(stationId.c_str())) {
+      num_observations_out_of_range += (int) column.size();
+    }
+    return true;
+  }
+
   string quality_flag = na_str;
   int grib_code = 0;
   double pressure_level_hpa = bad_data_double;
@@ -495,8 +507,9 @@ double NdbcHandler::_extractDouble(const DataLine &data_line, int ptr) const
 
   // MET #3342 Use a regular expression to match a wider variety of
   //           missing data values
-  if (c == "MM" ||
-      regex_match(c, regex("^[-]*99[9]*$|^[-]*99[9]*\\.[0]*$"))) {
+  // Construct the regex once, since this is called for every value
+  static const regex missing_regex("^[-]*99[9]*$|^[-]*99[9]*\\.[0]*$");
+  if (c == "MM" || regex_match(c, missing_regex)) {
     return bad_data_double;
   }
 
