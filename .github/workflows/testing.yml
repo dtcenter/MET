@@ -69,9 +69,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          non_docs=$(gh api --paginate "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" --jq '.[].filename' \
-            | grep -v -E '^docs/|^\.github/pull_request_template\.md$|^\.github/ISSUE_TEMPLATE/|^\.github/labels/|(^|/)README\.md$|(^|/)LICENSE\.md$' || true)
-          if [ -z "$non_docs" ]; then
+          # Fetch the file list first so that a failed API call fails this step.
+          # Include previous_filename so a rename is judged by its old path too.
+          files=$(gh api --paginate "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
+            --jq '.[] | .filename, (.previous_filename // empty)')
+          non_docs=$(grep -v -E '^docs/|^\.github/pull_request_template\.md$|^\.github/ISSUE_TEMPLATE/|^\.github/labels/|(^|/)README\.md$|(^|/)LICENSE\.md$' <<< "$files" || true)
+          if [[ -z "$non_docs" ]]; then
             echo "docs_only=true" >> $GITHUB_OUTPUT
           fi
 
