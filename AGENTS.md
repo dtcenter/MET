@@ -106,6 +106,12 @@ and is the quickest way to reproduce a reported defect. Export
 `MET_TEST_INPUT`, `MET_TEST_OUTPUT`, and `MET_BASE`, expand the XML entities,
 and run `bin/<tool>` directly.
 
+Check that `$MET_TEST_INPUT` resolves the way the XML expects before concluding
+that an input file is missing. The XML builds its paths as
+`${MET_TEST_INPUT}/model_data/...`, but the exported value may point one level
+above that, with the data under a `unit_test` subdirectory. Searching for the
+file named in the test case settles it faster than trusting the variable.
+
 `internal/test_unit/python/unit.py` judges a case on the process exit code
 against `retval`, plus the files named in `<output>`. It does not compare log
 text, so extra warnings or debug lines do not affect pass or fail. The
@@ -154,16 +160,36 @@ malformed directive can be skipped without failing the build.
 - Fill in every item of `.github/pull_request_template.md`. Answer what the pull
   request can answer and leave the rest for the author rather than deleting
   them; a missing item reads as an oversight and drops a question the project
-  meant to ask.
+  meant to ask. Change `- [ ]` to `- [x]` on every item that has been answered
+  or filled in: a `[Yes or No]` replaced with an answer, a "Describe..." item
+  with text after it, a review date set. Leave unanswered items unchecked, along
+  with the action items under **Pull Request Checklist**, which record steps
+  taken rather than answers given, and check items again whenever more answers
+  are supplied later.
 - Immediately after the change summary, list the files the pull request
   **adds**, **renames** (as `old/path -> new/path`), and **removes**, in that
   order, as separate lists, from
   `git diff --name-status --find-renames <base>...HEAD`. Do not list modified
   files. Omit the section when there are none.
-- When source files that affect the build are added, renamed, or removed, tag
-  @georgemccabe so he is notified. That means files the build system compiles or
-  installs, such as sources and headers under `src/` and `Makefile.am` files,
-  not files read only at runtime or by the test suite.
+- When one change goes to two base branches as two pull requests, write the
+  narrative once rather than twice. The pull request targeting `develop` is the
+  primary one and carries the full **Change Summary**, testing description, and
+  release note reasoning; where neither targets `develop`, the first one opened
+  is primary. The secondary pull request gives its base branch, links the
+  primary, and states either that the changes are identical or exactly what
+  differs. Everything the template asks per pull request stays in both bodies:
+  the review-by date, the SonarQube and Use Cases answers, and the whole **Pull
+  Request Checklist**, since the milestone, project board, and development cycle
+  are chosen to match each base branch. Two full copies of one description leave
+  a reviewer unable to tell whether they are looking at one change or two.
+- When source files that affect the build are added, renamed, or removed, remind
+  the author to tag @georgemccabe so he is notified. That means files the build
+  system compiles or installs, such as sources and headers under `src/` and
+  `Makefile.am` files, not files read only at runtime or by the test suite.
+  Write his username in the pull request only when such a file was actually
+  added, renamed, or removed. When none were, say nothing about the tag at all,
+  in any form. Naming him to report that no tag is needed sends him exactly the
+  notification this rule exists to ration.
 - Link the pull request to its issue with a closing keyword such as
   `Fixes #123`, and also set the link by hand in the **Development** section of
   the sidebar. GitHub links and auto-closes from the keyword only when the pull
@@ -212,7 +238,10 @@ with `unit.py -verbose`, and expect roughly 35 MB per full run. Compare two runs
 by grouping `WARNING:` lines by message text, after collapsing paths, numbers,
 and valid times, rather than by comparing totals. Expect the counts not to
 balance: a warning downgraded to `Debug(3)` disappears from any case running at
-the default verbosity of 2.
+the default verbosity of 2. The same applies in reverse to `DEBUG 4` output,
+where skipping a call to `process_data_plane()` removes its `Grid information:`
+and `Data plane information:` blocks, which can move the line count by tens of
+thousands without any user-visible change.
 
 ## Inspecting NetCDF output
 
@@ -222,3 +251,23 @@ ships an `ncdump` of its own. When that prefix comes first, `ncdump file.nc`
 reports `ncopen failed` on a perfectly valid NetCDF-4 file. Before concluding
 that a file is bad, run `ncdump -k file.nc`: netCDF's prints `netCDF-4`, while
 HDF4's rejects the flag and prints a usage block.
+
+## What the SonarQube scan covers
+
+`internal/scripts/sonarqube/sonar-project.properties` sets
+`sonar.sources=src,internal,scripts/python,data/wrappers`. Anything outside
+those paths is never scanned, `.github` included, so the CI job scripts under
+`.github/jobs/` carry no findings however many a rule would raise in them. Note
+that the SonarQube Cloud project is configured separately and does analyze
+`.github/jobs`, so the two can disagree.
+
+A file being inside `sonar.sources` does not mean the analyzer read it either.
+`internal/scripts/installation/compile_MET_all.sh` is a 952-line bash script
+under `internal/` with no exclusion covering it, and the shell analyzer reported
+zero findings in it while flagging the same rule 53 times in the smaller scripts
+beside it. The likeliest explanation is that the analyzer failed to parse the
+file and skipped it silently.
+
+Read a zero count as "nothing reported" rather than "nothing there". Before
+describing a rule as driven to zero, grep the tree for the pattern and account
+for every file that does not appear in the findings.

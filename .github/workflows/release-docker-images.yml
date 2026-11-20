@@ -149,7 +149,15 @@ jobs:
       - name: Copy build log files into logs directory
         if: always()
         run: |
-          cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
+          # The glob matches nothing when the job failed before any log was
+          # written, and a bare cp would then fail and add a second red step.
+          shopt -s nullglob
+          logs=(${GITHUB_WORKSPACE}/*.log)
+          if [[ ${#logs[@]} -gt 0 ]]; then
+            cp "${logs[@]}" ${RUNNER_WORKSPACE}/logs/
+          else
+            echo "No log files to copy from ${GITHUB_WORKSPACE}"
+          fi
 
       - name: Upload build logs as artifact
         if: always()
