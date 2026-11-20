@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include <algorithm>
 #include <cmath>
 
 #include "vx_regrid.h"
@@ -176,13 +175,11 @@ static void check_ugrid_regrid(const Grid & from_grid, const RegridInfo & info) 
       InterpMthd::Bilin,   InterpMthd::AW_Mean };
 
    // AW_MEAN_CNTR is rejected with its own message
-   if(info.method == InterpMthd::AW_Mean_Cntr ||
-      std::find(supported.begin(), supported.end(), info.method) != supported.end()) {
-      return;
-   }
+   if(info.method == InterpMthd::AW_Mean_Cntr) return;
 
    ConcatString choices;
    for(const auto &m : supported) {
+      if(m == info.method) return;
       if(!choices.empty()) choices << ", ";
       choices << interpmthd_to_string(m);
    }
