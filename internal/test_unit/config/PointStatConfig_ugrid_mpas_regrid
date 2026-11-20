@@ -98,7 +98,7 @@ ci_alpha  = [ 0.05 ];
 boot = {
    interval = PCTILE;
    rep_prop = 1.0;
-   n_rep    = 200;
+   n_rep    = 0;
    rng      = "mt19937";
    seed     = "1";
 }
@@ -110,7 +110,6 @@ interp = {
 
    type = [
       { method = NEAREST; width = 1; },
-      { method = BILIN;   width = 2; },
       { method = LS_FIT;  width = 3; }
    ];
 }
@@ -136,9 +135,9 @@ seeps_p1_thresh = NA;
 ////////////////////////////////////////////////////////////////////////////////
 
 output_flag = {
-   fho    = STAT;
-   ctc    = STAT;
-   cts    = STAT;
+   fho    = NONE;
+   ctc    = NONE;
+   cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
    cnt    = NONE;
