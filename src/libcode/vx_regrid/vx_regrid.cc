@@ -8,13 +8,21 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <algorithm>
 #include <cmath>
 
 #include "vx_regrid.h"
 #include "interp_mthd.h"
+#include "interp_util.h"
 #include "GridTemplate.h"
 
 using namespace std;
+
+////////////////////////////////////////////////////////////////////////
+
+static void check_ugrid_regrid(const Grid &, const RegridInfo &);
+static DataPlane met_regrid_ugrid(const DataPlane &, const Grid &,
+                                  const Grid &, const RegridInfo &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -22,6 +30,9 @@ DataPlane met_regrid(const DataPlane & in, const Grid & from_grid,
                      const Grid & to_grid, const RegridInfo & info) {
 
    DataPlane out;
+
+   // Check the regridding method for the unstructured grid
+   check_ugrid_regrid(from_grid, info);
 
    switch(info.method) {
       case InterpMthd::Min:
@@ -93,10 +104,16 @@ DataPlane met_regrid_generic(const DataPlane & from_data,
                              const Grid & from_grid,
                              const Grid & to_grid,
                              const RegridInfo & info) {
+
+   // The unstructured grid uses the closest faces, not the grid template
+   if(from_grid.is_ugrid()) {
+      return met_regrid_ugrid(from_data, from_grid, to_grid, info);
+   }
+
    DataPlane to_data;
 
 #pragma omp parallel default(none) \
-   shared(from_data, from_grid, to_grid, info, to_data) 
+   shared(from_data, from_grid, to_grid, info, to_data)
    {
 
 #pragma omp single
@@ -134,6 +151,106 @@ DataPlane met_regrid_generic(const DataPlane & from_data,
             }
 
             to_data.put(value, xt, yt);
+
+         } // for yt
+      } // for xt
+   } // End of omp parallel
+
+   return to_data;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// MET stores an unstructured grid as a single row of faces, so the
+// grid template methods would combine faces which are adjacent in the
+// file rather than close to each other. Regridding from an unstructured
+// grid instead uses the closest faces to each to_grid point, the same
+// way the interpolation and smoothing do. The methods which require the
+// regular grid structure (grid box corners, budget, Gaussian filter,
+// least-squares fit, and force) have no meaning for the unstructured
+// grid. The area-weighted methods are checked separately by
+// check_ugrid_area_weighted().
+//
+////////////////////////////////////////////////////////////////////////
+
+static void check_ugrid_regrid(const Grid & from_grid, const RegridInfo & info) {
+
+   if(!from_grid.is_ugrid()) return;
+
+   static const vector supported = {
+      InterpMthd::Nearest, InterpMthd::Min,     InterpMthd::Max,
+      InterpMthd::Median,  InterpMthd::UW_Mean, InterpMthd::DW_Mean,
+      InterpMthd::Bilin,   InterpMthd::AW_Mean };
+
+   // AW_MEAN_CNTR is rejected with its own message
+   if(info.method == InterpMthd::AW_Mean_Cntr ||
+      std::find(supported.begin(), supported.end(), info.method) != supported.end()) {
+      return;
+   }
+
+   ConcatString choices;
+   for(const auto &m : supported) {
+      if(!choices.empty()) choices << ", ";
+      choices << interpmthd_to_string(m);
+   }
+
+   mlog << Error << "\ncheck_ugrid_regrid() -> "
+        << "the \"" << interpmthd_to_string(info.method)
+        << "\" regridding method is not supported from the unstructured "
+        << "grid. Choose from " << choices << ".\n\n";
+   exit(1);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Regrid from an unstructured grid using the closest faces to each
+// to_grid point. The number of closest faces matches the number of
+// points in the grid template, or width * width for BILIN, which is the
+// least-squares fit used for the point interpolation. The faces beyond
+// ugrid_max_distance_km are excluded, so to_grid points beyond the
+// edge of a regional mesh are set to bad data.
+//
+////////////////////////////////////////////////////////////////////////
+
+static DataPlane met_regrid_ugrid(const DataPlane & from_data,
+                                  const Grid & from_grid,
+                                  const Grid & to_grid,
+                                  const RegridInfo & info) {
+   DataPlane to_data;
+
+   // Set the size and timing info
+   to_data.set_size (to_grid.nx(), to_grid.ny());
+   to_data.set_times(from_data);
+
+   int n_points = ugrid_interp_n_points(info.width, info.shape, info.method);
+
+   mlog << Debug(3)
+        << "Regridding unstructured grid field using the "
+        << interpmthd_to_string(info.method) << "(" << n_points
+        << ") closest faces regridding method.\n";
+
+#pragma omp parallel default(none) \
+   shared(from_data, from_grid, to_grid, info, to_data, n_points)
+   {
+
+      // The closest faces of the current point (one per thread)
+      UGridNeighbors nbrs;
+
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int xt=0; xt<(to_grid.nx()); xt++) {
+         for(int yt=0; yt<(to_grid.ny()); yt++) {
+
+            double lat;
+            double lon;
+            to_grid.xy_to_latlon(xt, yt, lat, lon);
+
+            // The longitude is degrees west for both grids
+            from_grid.ugrid_closest_faces(lat, lon, n_points, nbrs);
+
+            to_data.put(interp_ugrid(from_data, nbrs, info.method,
+                                     n_points, info.vld_thresh),
+                        xt, yt);
 
          } // for yt
       } // for xt

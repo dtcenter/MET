@@ -73,6 +73,8 @@ For PointStat, this is the maximum allowable distance in kilometers for a point 
 
 The same distance applies to the interpolation and smoothing methods which use more than one UGRID cell (see :ref:`ugrid_interpolation`). Cells farther than **ugrid_max_distance_km** are excluded and count as missing data for the **interp.vld_thresh** threshold. Setting this distance is recommended when the UGRID covers only part of the observation domain. Otherwise, observations outside of the UGRID are matched to the cells along its edge.
 
+The same distance also applies when regridding from a UGRID (see :ref:`ugrid_regridding`). Points of the verification grid with no UGRID cells within **ugrid_max_distance_km** are set to bad data. Setting this distance is recommended when regridding a regional UGRID to a verification grid which extends beyond its edge. Otherwise, those points are filled from the cells along its edge.
+
 ugrid_coordinates_file
 ----------------------
 
@@ -155,6 +157,40 @@ The following PointStat example uses the 9 closest cells within 20 km of each ob
   ugrid_dataset          = "mpas";
   ugrid_max_distance_km  = 20;
 
+.. _ugrid_regridding:
+
+Regridding from an Unstructured Grid
+====================================
+
+When **regrid.to_grid** regrids a UGRID to a structured verification grid, the value at each point of the verification grid is computed from the N cells closest to that point, in the same way as the interpolation described above. N is the number of points defined by **regrid.width** and **regrid.shape**, or 4 for BILIN, and **regrid.vld_thresh** applies to the N cells. Cells farther than **ugrid_max_distance_km** are excluded.
+
+.. list-table:: Regridding Methods from Unstructured Grids
+  :widths: auto
+  :header-rows: 1
+
+  * - Method
+    - Description
+  * - NEAREST
+    - Value of the closest cell (width = 1)
+  * - MIN, MAX, MEDIAN
+    - Minimum, maximum, or median of the N closest cells
+  * - UW_MEAN
+    - Unweighted average of the N closest cells
+  * - DW_MEAN
+    - Average of the N closest cells weighted by distance\ :sup:`-2`
+  * - BILIN
+    - Least-squares bilinear fit through the 4 closest cells, as described for the BILIN interpolation method above
+  * - AW_MEAN
+    - Average of the cells which fall inside each verification grid box, weighted by the cell area (width = 1). It requires **area_face** in the **ugrid_metadata_map**.
+
+The AW_MEAN_CNTR, BUDGET, FORCE, LS_FIT, MAXGAUSS, UPPER_LEFT, UPPER_RIGHT, LOWER_RIGHT, and LOWER_LEFT regridding methods rely on the structure of a regular grid and are not supported from a UGRID. Requesting one of them results in an error when the UGRID data is regridded.
+
+In PointStat, the restrictions on the interpolation methods listed in :ref:`ugrid_interpolation` apply only when interpolating on the UGRID itself (**regrid.to_grid = NONE** or **FCST**). When the forecast is regridded to a structured grid, the interpolation to the observation locations is done on that grid, and all of the interpolation methods for structured grids are available.
+
+.. note::
+
+  Prior to version 13.0.0, regridding from a UGRID did not use the closest cells. Methods with a width greater than 1 combined cells which are adjacent in the file rather than close to each other, BILIN returned the value of the closest cell, and the unsupported methods listed above did not result in an error. Regridded values from a UGRID therefore differ from those of earlier versions for every method other than NEAREST and AW_MEAN.
+
 .. _ugrid_limitations:
 
 Unstructured Grid Limitations
@@ -174,7 +210,7 @@ We anticipate expanding the UGRID capabilities in MET in the near future. Until 
 
 2. Data at cell edges are currently not supported, only those variables which have data at the cell centers are supported. Users should note in particular that wind components that are typically derived using data at cell edges are currently unsupported.
 
-3. The interpolation and smoothing methods supported for UGRIDs are listed in :ref:`ugrid_interpolation`. In PointStat, when the land/sea mask (**land_mask**) or topography (**topo_mask**) is enabled, only the NEAREST method is supported for both **interp** and **topo_mask.interp**, since the surface interpolation does not yet use the closest cells.
+3. The interpolation and smoothing methods supported for UGRIDs are listed in :ref:`ugrid_interpolation`, and the regridding methods in :ref:`ugrid_regridding`. In PointStat, when the land/sea mask (**land_mask**) or topography (**topo_mask**) is enabled, only the NEAREST method is supported for both **interp** and **topo_mask.interp**, since the surface interpolation does not yet use the closest cells.
 
 4. The area of the UGRID cells is available only when **area_face** is defined in the **ugrid_metadata_map** (see :numref:`table_ugrid_metadata`). Without it:
 
@@ -182,4 +218,4 @@ We anticipate expanding the UGRID capabilities in MET in the near future. Until 
    * The AW_MEAN regridding method from a UGRID results in an error.
    * The AW_MEAN interpolation method uses equal weights (same as UW_MEAN) and prints a warning.
 
-5. The cell area of a UGRID is the area of the cell itself, so the centered variants are not distinct: **grid_weight_flag** = AREA_CNTR is identical to AREA. The AW_MEAN_CNTR regridding method is not supported from a UGRID and results in an error, since it computes the extent of each input grid box from the neighboring grid indices, which are not neighboring cells on a UGRID. Use AW_MEAN instead. AW_MEAN_CNTR is not an interpolation method for PointStat or GridStat and is rejected for UGRIDs (see :ref:`ugrid_interpolation`).
+5. The cell area of a UGRID is the area of the cell itself, so the centered variants are not distinct: **grid_weight_flag** = AREA_CNTR is identical to AREA. The AW_MEAN_CNTR regridding method is not supported from a UGRID and results in an error (see :ref:`ugrid_regridding`), since it computes the extent of each input grid box from the neighboring grid indices, which are not neighboring cells on a UGRID. Use AW_MEAN instead. AW_MEAN_CNTR is not an interpolation method for PointStat or GridStat and is rejected for UGRIDs (see :ref:`ugrid_interpolation`).

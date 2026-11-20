@@ -538,6 +538,25 @@ void PointStatConfInfo::check_ugrid_sfc_interp(const PointStatVxOpt &p_vx_opt) c
 
 ////////////////////////////////////////////////////////////////////////
 //
+// The interpolation on the unstructured grid uses the closest faces
+// which supports only some of the interpolation methods. It applies
+// only when the verification grid is the unstructured grid, not after
+// the forecast is regridded to a regular grid.
+//
+////////////////////////////////////////////////////////////////////////
+
+void PointStatConfInfo::check_ugrid_interp() const {
+
+   for(int i=0; i<n_vx; i++) {
+      vx_opt[i].interp_info.validate_ugrid(UGridInterpUse::Point,
+         "PointStatConfInfo::check_ugrid_interp() -> ");
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // The surface interpolation (land/sea and topography masks) uses the
 // grid template which supports only the nearest neighbor for the
 // unstructured grid.
@@ -1129,9 +1148,6 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 
    // Conf: interp
    interp_info = parse_conf_interp(&odict, conf_key_interp);
-   if(ftype == FileType_UGrid) {
-      interp_info.validate_ugrid(UGridInterpUse::Point, "PointStatVxOpt::process_config() -> ");
-   }
 
    // Conf: hira
    hira_info = parse_conf_hira(&odict);
