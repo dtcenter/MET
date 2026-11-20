@@ -9,6 +9,14 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 13.0.0 Release Notes (TBD)
+--------------------------------------
+
+  .. dropdown:: Bugfixes
+
+     * **Fix the GRIB1 and GRIB2 readers to reject reduced Gaussian grids instead of reading out of bounds**
+       (`#3586 <https://github.com/dtcenter/MET/issues/3586>`_).
+
 MET Version 13.0.0-rc1 Release Notes (20261116)
 -----------------------------------------------
 
