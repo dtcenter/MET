@@ -201,7 +201,7 @@ output_flag = {
    cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
-   cnt    = STAT;
+   cnt    = NONE;
    sl1l2  = STAT;
    sal1l2 = NONE;
    vl1l2  = NONE;
@@ -253,6 +253,8 @@ ugrid_coordinates_file = "${MET_TEST_INPUT}/ugrid_data/mpas/static.40962_reduced
 ////////////////////////////////////////////////////////////////////////////////
 
 grid_weight_flag = NONE;
+
+nc_compression = 5;
 
 tmp_dir       = "/tmp";
 output_prefix = "${OUTPUT_PREFIX}";
