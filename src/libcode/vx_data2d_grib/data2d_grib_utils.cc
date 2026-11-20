@@ -527,6 +527,23 @@ const bool has_bms = r.bms_flag;
 unixtime init_ut, valid_ut;
 int bms_flag, accum;
 
+   //
+   //  a thinned or reduced grid has no fixed row length and stores the
+   //  "not applicable" marker in place of a real grid dimension.  Skip the
+   //  record rather than sizing a plane from it and reading past the end of
+   //  the record's data section.
+   //
+
+if ( nx == grib1_not_applicable_dim || ny == grib1_not_applicable_dim )  {
+
+   mlog << Warning << "\nget_data_plane() -> "
+        << "skipping GRIB1 record " << r.rec_num
+        << ", which is on an unsupported thinned or reduced grid ("
+        << nx << ", " << ny << ").\n\n";
+
+   return false;
+
+}
 
 plane.set_size(nx, ny);
 

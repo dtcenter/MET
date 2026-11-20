@@ -45,4 +45,72 @@
     </output>
   </test>
 
+  <!-- MET #3586: A thinned or reduced grid has no fixed row length, so its grid definition
+       section stores the "not applicable" marker in place of the number of points along a
+       parallel.  MET used to take that marker for a real grid dimension and read far past
+       the end of the record.  The four tests below cover both GRIB editions, with the
+       reduced record either defining the file grid or merely present in it. -->
+
+  <!-- Reject the reduced Gaussian record that defines the GRIB1 file grid -->
+
+  <test name="Gaussian_GRIB1_reduced">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <retval>1</retval>
+    <param> \
+      &DATA_DIR_GAUSS;/grib1/reduced_gaussian.grib \
+      &OUTPUT_DIR;/gaussian/reduced_gaussian_grib1.ps \
+      'name="T"; level="R001";' \
+      -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/gaussian/reduced_gaussian_grib1.ps</not_exist>
+    </output>
+  </test>
+
+  <!-- Skip the reduced Gaussian record and read the GRIB1 record that can be read -->
+
+  <test name="Gaussian_GRIB1_mixed_reduced">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_GAUSS;/grib1/mixed_reduced_gaussian.grib \
+      &OUTPUT_DIR;/gaussian/mixed_reduced_gaussian_grib1.ps \
+      'name="LAND"; level="L0";' \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/gaussian/mixed_reduced_gaussian_grib1.ps</ps>
+    </output>
+  </test>
+
+  <!-- Reject the reduced Gaussian record that defines the GRIB2 file grid -->
+
+  <test name="Gaussian_GRIB2_reduced">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <retval>1</retval>
+    <param> \
+      &DATA_DIR_GAUSS;/grib2/reduced_gaussian.grib2 \
+      &OUTPUT_DIR;/gaussian/reduced_gaussian_grib2.ps \
+      'name="PrecipFlag"; level="L0";' \
+      -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/gaussian/reduced_gaussian_grib2.ps</not_exist>
+    </output>
+  </test>
+
+  <!-- Skip the reduced Gaussian record and read the GRIB2 record that can be read -->
+
+  <test name="Gaussian_GRIB2_mixed_reduced">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_GAUSS;/grib2/mixed_reduced_gaussian.grib2 \
+      &OUTPUT_DIR;/gaussian/mixed_reduced_gaussian_grib2.ps \
+      'name="PrecipFlag"; level="L0";' \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/gaussian/mixed_reduced_gaussian_grib2.ps</ps>
+    </output>
+  </test>
+
 </met_test>

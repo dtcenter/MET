@@ -229,11 +229,13 @@ data.Nlat = char2_to_int(gds.ny);
    // Number of points in the Longitudinal (x) direction
 data.Nlon = char2_to_int(gds.nx);
 
-   // Check for thinned lat/lon grids
-if ( data.Nlon == 65535 )  {
+   // Check for thinned and reduced lat/lon grids
+if ( data.Nlon == grib1_not_applicable_dim ||
+     data.Nlat == grib1_not_applicable_dim )  {
 
    mlog << Error << "\ngds_to_latlon() -> "
-        << "Thinned Lat/Lon grids are not supported for GRIB version 1.\n\n";
+        << "Thinned and reduced Lat/Lon grids are not supported "
+        << "for GRIB version 1.\n\n";
 
    exit ( 1 );
 
@@ -312,11 +314,13 @@ data.Nlat = char2_to_int(gds.ny);
    // Number of points in the Longitudinal (x) direction
 data.Nlon = char2_to_int(gds.nx);
 
-   // Check for thinned lat/lon grids
-if ( data.Nlon == 65535 )  {
+   // Check for thinned and reduced lat/lon grids
+if ( data.Nlon == grib1_not_applicable_dim ||
+     data.Nlat == grib1_not_applicable_dim )  {
 
    mlog << Error << "\ngds_to_rotated_latlon() -> "
-        << "Thinned Lat/Lon grids are not supported for GRIB version 1.\n\n";
+        << "Thinned and reduced Lat/Lon grids are not supported "
+        << "for GRIB version 1.\n\n";
 
    exit ( 1 );
 
@@ -604,6 +608,18 @@ data.name = gaussian_proj_type;
 
 data.nx = char2_to_int(gds.nx);
 data.ny = char2_to_int(gds.ny);
+
+   // Check for thinned and reduced Gaussian grids
+if ( data.nx == grib1_not_applicable_dim ||
+     data.ny == grib1_not_applicable_dim )  {
+
+   mlog << Error << "\ngds_to_gaussian() -> "
+        << "Thinned and reduced Gaussian grids are not supported "
+        << "for GRIB version 1.\n\n";
+
+   exit ( 1 );
+
+}
 
    //
    //  lon_zero
