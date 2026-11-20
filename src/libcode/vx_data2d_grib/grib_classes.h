@@ -63,6 +63,15 @@ static const int read_overflow_error            =  12;
 static const int bad_fcst_unit_val_error        =  13;
 static const size_t grib_search_bytes           = 100;
 
+   //
+   //  GRIB1 encodes a grid dimension that does not apply as all ones.
+   //  A thinned or reduced grid has no fixed row length, so its grid
+   //  definition section stores this marker for the number of points
+   //  along a parallel rather than a real grid dimension.
+   //
+
+static const int grib1_not_applicable_dim       = 65535;
+
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -298,25 +298,43 @@ byte = k/8;
 
 c1 = (unsigned char *) (&u);
 
+   //
+   //  the four byte read below runs past the end of the data section for the
+   //  last few values of a well formed record, since the section is padded
+   //  only to a byte boundary.  Those trailing bytes are shifted and masked
+   //  away below, so read only the bytes the record actually holds and zero
+   //  fill the rest rather than reading past the end of the buffer.
+   //
+
+const int n_avail = (int) data.size() - byte;
+
+if ( n_avail <= 0 )  return 0;
+
 c2 = data.data() + byte;
 
-   //
-   //  we might go past the end of the data
-   //  buffer here, but that's OK since we're
-   //  only reading, not writing, and the
-   //  garbage will get masked out
-   //
+u = 0;
 
-if(native_endian == big_endian) {
-   c1[0] = c2[0];
-   c1[1] = c2[1];
-   c1[2] = c2[2];
-   c1[3] = c2[3];
+if ( n_avail >= 4 )  {
+
+   if(native_endian == big_endian) {
+      c1[0] = c2[0];
+      c1[1] = c2[1];
+      c1[2] = c2[2];
+      c1[3] = c2[3];
+   } else {
+      c1[3] = c2[0];
+      c1[2] = c2[1];
+      c1[1] = c2[2];
+      c1[0] = c2[3];
+   }
+
 } else {
-   c1[3] = c2[0];
-   c1[2] = c2[1];
-   c1[1] = c2[2];
-   c1[0] = c2[3];
+
+   for (int i=0; i<n_avail; ++i)  {
+      if(native_endian == big_endian)  c1[i]     = c2[i];
+      else                             c1[3 - i] = c2[i];
+   }
+
 }
 
 shift = 32 - word_size - (k%8);

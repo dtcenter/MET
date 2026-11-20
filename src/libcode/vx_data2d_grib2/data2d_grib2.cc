@@ -600,6 +600,40 @@ void MetGrib2DataFile::find_record_matches(const VarInfoGrib2* vinfo,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+//  A thinned or reduced grid has no fixed row length.  Its grid definition
+//  section encodes the number of points along a parallel as the "not
+//  applicable" marker and stores the list of row lengths in the optional
+//  list of numbers at the end of the section.  MET does not support these
+//  grids, and sizing a data plane from the marker reads past the end of the
+//  record.
+//
+////////////////////////////////////////////////////////////////////////
+
+static bool is_reduced_grid(const gribfield *gfld) {
+
+   if( nullptr == gfld ) return false;
+
+   //  the optional list of numbers holds the row lengths of a reduced grid
+   if( gfld->num_opt > 0 ) return true;
+
+   //  Ni and Nj are elements 8 and 9 of the lat/lon (0), rotated lat/lon (1),
+   //  and Gaussian (40) grid definition templates.  The g2c library returns
+   //  them as a 64-bit g2int, so the all ones marker decodes as 4294967295
+   //  rather than -1 and only narrows to -1 once stored in a 32-bit int,
+   //  which is how MET carries a grid dimension.
+   if( 0 == gfld->igdtnum || 1 == gfld->igdtnum || 40 == gfld->igdtnum ) {
+
+      if( nullptr == gfld->igdtmpl || 9 > gfld->igdtlen ) return false;
+
+      if( -1 == (int) gfld->igdtmpl[7] ||
+          -1 == (int) gfld->igdtmpl[8] ) return true;
+   }
+
+   return false;
+}
+
+////////////////////////////////////////////////////////////////////////
 
 void MetGrib2DataFile::read_grib2_record_list() {
    gribfield  *gfld = nullptr;
@@ -609,6 +643,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
    int idx = 0;
    int rec_num = 1;
    int n_skip = 0;
+   int n_skip_grid = 0;
 
    //  read all the records into the record list, pulling grid information from the first
    while( 0 <= (offset_next = read_grib2_record(offset, 0, 1, gfld, numfields)) ){
@@ -623,6 +658,23 @@ void MetGrib2DataFile::read_grib2_record_list() {
 
       //  read the grid information, if necessary
       if( !Raw_Grid || 1 > Raw_Grid->nx() || 1 > Raw_Grid->ny() ) read_grib2_grid(gfld);
+
+      //  skip records on an unsupported thinned or reduced grid rather than
+      //  reading them with the dimensions of the grid defined by the file
+      if( is_reduced_grid(gfld) ) {
+
+         mlog << Warning << "\nMetGrib2DataFile::read_grib2_record_list() -> "
+              << "skipping GRIB2 record " << rec_num
+              << ", which is on an unsupported thinned or reduced grid, "
+              << "in file: " << Filename << "\n\n";
+
+         g2_free(gfld);
+         gfld = nullptr;
+         n_skip_grid++;
+         rec_num++;
+         offset = offset_next;
+         continue;
+      }
 
       //  treat each field of the record as a separate record
       for(int i=1; i <= numfields; i++){
@@ -914,6 +966,13 @@ void MetGrib2DataFile::read_grib2_record_list() {
            << Filename << ". Run with -v 4 to list them all.\n";
    }
 
+   if( n_skip_grid > 0 ) {
+      mlog << Debug(2) << "MetGrib2DataFile::read_grib2_record_list() - "
+           << "skipped " << n_skip_grid << " of " << rec_num - 1
+           << " GRIB2 record(s) on an unsupported thinned or reduced grid in file: "
+           << Filename << ".\n";
+   }
+
    return;
 }
 
@@ -976,10 +1035,11 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
       data.lat_ll       = ((double)gfld->igdtmpl[11] / 1000000.0);
       data.lon_ll       = -1.0*rescale_lon( (double)gfld->igdtmpl[12] / 1000000.0 );
 
-      //  check for thinned lat/lon grid
-      if( data.Nlon == -1 ){
+      //  check for thinned and reduced lat/lon grids
+      if( is_reduced_grid(gfld) ){
          mlog << Error << "\n" << method_name
-              << "Thinned Lat/Lon grids are not supported for GRIB version 2.\n\n";
+              << "Thinned and reduced Lat/Lon grids are not supported "
+              << "for GRIB version 2.\n\n";
          exit(1);
       }
       
@@ -1039,6 +1099,18 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
       data.name        = rotated_latlon_proj_type;
       data.Nlat        = t[8];
       data.Nlon        = t[7];
+
+         //
+         //  check for thinned and reduced rotated lat/lon grids
+         //
+
+      if( is_reduced_grid(gfld) )  {
+         mlog << Error << "\n" << method_name
+              << "Thinned and reduced Rotated Lat/Lon grids are not supported "
+              << "for GRIB version 2.\n\n";
+         exit(1);
+      }
+
       data.rot_lat_ll  = (t[11])*angle_factor;
       data.rot_lon_ll  = -1.0*rescale_lon( (t[12])*angle_factor );
 
@@ -1249,6 +1321,15 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
 
       gauss.nx = p[7];
       gauss.ny = p[8];
+
+         //  check for thinned and reduced Gaussian grids
+
+      if( is_reduced_grid(gfld) )  {
+         mlog << Error << "\n" << method_name
+              << "Thinned and reduced Gaussian grids are not supported "
+              << "for GRIB version 2.\n\n";
+         exit(1);
+      }
 
          //  store the grid information
 
