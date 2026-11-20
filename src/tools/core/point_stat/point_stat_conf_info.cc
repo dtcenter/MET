@@ -538,10 +538,7 @@ void PointStatConfInfo::check_ugrid_sfc_interp(const PointStatVxOpt &p_vx_opt) c
 
 ////////////////////////////////////////////////////////////////////////
 //
-// The interpolation on the unstructured grid uses the closest faces
-// which supports only some of the interpolation methods. It applies
-// only when the verification grid is the unstructured grid, not after
-// the forecast is regridded to a regular grid.
+// Check the interpolation methods when verifying on the unstructured grid.
 //
 ////////////////////////////////////////////////////////////////////////
 
