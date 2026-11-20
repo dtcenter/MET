@@ -26,7 +26,7 @@
     <param> \
       20120409_00 3 20120409_18 18 \
       &OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP18.nc \
-      -pcpdir &DATA_DIR_MODEL;/grib1/nam
+      -pcpdir &DATA_DIR_MODEL;/grib1/gfs_hmt &DATA_DIR_MODEL;/grib1/nam
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP18.nc</grid_nc>
