@@ -1,0 +1,182 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Point-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+// MET #3593 regrid the regional MPAS forecast from the unstructured grid
+// to a regular grid which extends beyond the edge of the mesh, and then
+// interpolate to the observations on the regular grid. The grid points
+// beyond ugrid_max_distance_km are bad data. The LS_FIT interpolation
+// method, which is not supported on the unstructured grid, is valid here
+// since the interpolation is done on the regular grid.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+model = "MPAS";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+////////////////////////////////////////////////////////////////////////////////
+
+regrid = {
+   to_grid    = "latlon 70 60 28.0 -107.0 0.2 0.2";
+   method     = UW_MEAN;
+   width      = 3;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+obs_window = {
+   beg = ${BEG_DS};
+   end = ${END_DS};
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+mpr_column  = [];
+mpr_thresh  = [];
+cnt_thresh  = [ NA ];
+cnt_logic   = UNION;
+wind_thresh = [ NA ];
+wind_logic  = UNION;
+eclv_points = 0.05;
+
+duplicate_flag = NONE;
+rank_corr_flag = TRUE;
+
+fcst = {
+   sid_inc = [];
+   sid_exc = [];
+   obs_quality_inc  = [];
+   obs_quality_exc  = [];
+
+   field = [
+      { name = "t2m";  level = "Z2";  message_type = "ADPSFC"; }
+   ];
+
+}
+
+obs = {
+   sid_inc = [];
+   sid_exc = [];
+   obs_quality_inc  = [];
+   obs_quality_exc  = [];
+
+   field = [
+      { name = "TMP";  level = "Z2";  message_type = "ADPSFC"; }
+   ];
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+climo_mean = obs;
+climo_mean = {
+   file_name = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+mask = {
+   grid  = [];
+   poly  = [];
+   sid   = [];
+   llpnt = [{ name = "ALLLATLON"; lat_thresh = NA;   lon_thresh = NA; }];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 200;
+   rng      = "mt19937";
+   seed     = "1";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+interp = {
+   vld_thresh = 1.0;
+
+   type = [
+      { method = NEAREST; width = 1; },
+      { method = BILIN;   width = 2; },
+      { method = LS_FIT;  width = 3; }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+hira = {
+   flag            = FALSE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Threshold for SEEPS p1 (Probability of being dry)
+//
+seeps_p1_thresh = NA;
+
+////////////////////////////////////////////////////////////////////////////////
+
+output_flag = {
+   fho    = STAT;
+   ctc    = STAT;
+   cts    = STAT;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = NONE;
+   sl1l2  = STAT;
+   sal1l2 = NONE;
+   vl1l2  = NONE;
+   val1l2 = NONE;
+   vcnt   = NONE;
+   pct    = NONE;
+   pstd   = NONE;
+   pjc    = NONE;
+   prc    = NONE;
+   ecnt   = NONE;
+   orank  = NONE;
+   rps    = NONE;
+   eclv   = NONE;
+   mpr    = STAT;
+   seeps  = NONE;
+   seeps_mpr = NONE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// Unstructured Grid (optional except ugrid_dataset)
+ugrid_dataset = "mpas";
+ugrid_max_distance_km = 30;
+//ugrid_map_config = "";
+ugrid_coordinates_file = "${MET_TEST_INPUT}/ugrid_data/mpas/static.2025-05-17.9506.OK_reduced.nc";
+
+////////////////////////////////////////////////////////////////////////////////
+
+point_weight_flag = NONE;
+kde_ref_angle     = 0.75;
+write_weights     = FALSE;
+
+////////////////////////////////////////////////////////////////////////////////
+
+tmp_dir       = "/tmp";
+output_prefix = "${OUTPUT_PREFIX}";
+
+////////////////////////////////////////////////////////////////////////////////

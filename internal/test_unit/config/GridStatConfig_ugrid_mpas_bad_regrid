@@ -4,9 +4,11 @@
 //
 // For additional information, please see the MET User's Guide.
 //
-// Negative test: the AW_MEAN_CNTR regridding method is not supported
-// from the unstructured grid. Grid-Stat should exit with an error when
-// regridding the forecast.
+// Negative test: the regridding method set by the environment is not
+// supported from the unstructured grid. Grid-Stat should exit with an
+// error when regridding the forecast. Used for AW_MEAN_CNTR and, after
+// MET #3593, for the methods which have no meaning for the unstructured
+// grid, such as BUDGET and MAXGAUSS.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -14,8 +16,8 @@ model = "MPAS";
 
 regrid = {
    to_grid = "G002";
-   method  = AW_MEAN_CNTR;
-   width   = 1;
+   method  = ${REGRID_METHOD};
+   width   = ${REGRID_WIDTH};
 }
 
 fcst = {
