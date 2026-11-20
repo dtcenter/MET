@@ -189,7 +189,7 @@ In PointStat, the restrictions on the interpolation methods listed in :ref:`ugri
 
 .. note::
 
-  Prior to version 13.0.0, regridding from a UGRID did not use the closest cells. Methods with a width greater than 1 combined cells which are adjacent in the file rather than close to each other, BILIN returned the value of the closest cell, and the unsupported methods listed above did not result in an error. Regridded values from a UGRID therefore differ from those of earlier versions for every method other than NEAREST and AW_MEAN.
+  Prior to version 13.0.0, regridding from a UGRID did not use the closest cells. Methods with a width greater than 1 combined cells which are adjacent in the file rather than close to each other, BILIN returned the value of the closest cell, and the unsupported methods listed above did not result in an error. Regridded values from a UGRID therefore differ from those of earlier versions for every method other than NEAREST.
 
 .. _ugrid_limitations:
 
