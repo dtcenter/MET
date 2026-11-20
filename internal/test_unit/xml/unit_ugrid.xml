@@ -58,6 +58,104 @@
     </output>
   </test>
 
+  <!-- MET #3593 regrid from the unstructured grid using the closest cells. -->
+  <!-- NEAREST is the reference for the run time of the other methods.     -->
+
+  <test name="grid_stat_ugrid_mpas_regrid_nearest">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>REGRID_METHOD</name>   <value>NEAREST</value></pair>
+      <pair><name>REGRID_WIDTH</name>    <value>1</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_REGRID_NEAREST</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2012-04-09_12.00.00_reduced.nc \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+      &CONFIG_DIR;/GridStatConfig_ugrid_mpas_regrid \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_REGRID_NEAREST_120000L_20120409_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_REGRID_NEAREST_120000L_20120409_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="grid_stat_ugrid_mpas_regrid_uw_mean">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>REGRID_METHOD</name>   <value>UW_MEAN</value></pair>
+      <pair><name>REGRID_WIDTH</name>    <value>3</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_REGRID_UW_MEAN</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2012-04-09_12.00.00_reduced.nc \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+      &CONFIG_DIR;/GridStatConfig_ugrid_mpas_regrid \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_REGRID_UW_MEAN_120000L_20120409_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_REGRID_UW_MEAN_120000L_20120409_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="grid_stat_ugrid_mpas_regrid_max">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>REGRID_METHOD</name>   <value>MAX</value></pair>
+      <pair><name>REGRID_WIDTH</name>    <value>3</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_REGRID_MAX</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2012-04-09_12.00.00_reduced.nc \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+      &CONFIG_DIR;/GridStatConfig_ugrid_mpas_regrid \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_REGRID_MAX_120000L_20120409_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_REGRID_MAX_120000L_20120409_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="grid_stat_ugrid_mpas_regrid_dw_mean">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>REGRID_METHOD</name>   <value>DW_MEAN</value></pair>
+      <pair><name>REGRID_WIDTH</name>    <value>3</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_REGRID_DW_MEAN</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2012-04-09_12.00.00_reduced.nc \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+      &CONFIG_DIR;/GridStatConfig_ugrid_mpas_regrid \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_REGRID_DW_MEAN_120000L_20120409_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_REGRID_DW_MEAN_120000L_20120409_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="grid_stat_ugrid_mpas_regrid_bilin">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>REGRID_METHOD</name>   <value>BILIN</value></pair>
+      <pair><name>REGRID_WIDTH</name>    <value>2</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_REGRID_BILIN</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2012-04-09_12.00.00_reduced.nc \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+      &CONFIG_DIR;/GridStatConfig_ugrid_mpas_regrid \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_REGRID_BILIN_120000L_20120409_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_REGRID_BILIN_120000L_20120409_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
 
   <!--                                    -->
   <!--                                    -->
@@ -162,6 +260,27 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_NPTS_120000L_20250518_120000V.stat</stat>
+    </output>
+  </test>
+
+  <!-- MET #3593 regrid the regional MPAS forecast to a regular grid and  -->
+  <!-- interpolate there, including LS_FIT which the UGRID does not allow -->
+
+  <test name="point_stat_ugrid_mpas_regrid">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>BEG_DS</name>         <value>-1800</value></pair>
+      <pair><name>END_DS</name>         <value>1800</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>UGRID_MPAS_REGRID</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2025-05-18_12.00.00.9506.OK.nc \
+      &DATA_DIR_OBS;/point_obs/gdas1.20250518.t12z.prepbufr_modified.nc \
+      &CONFIG_DIR;/PointStatConfig_ugrid_mpas_regrid \
+      -outdir &OUTPUT_DIR;/point_stat_ugrid -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_REGRID_120000L_20250518_120000V.stat</stat>
     </output>
   </test>
 
@@ -315,6 +434,8 @@
     <exec>&MET_BIN;/grid_stat</exec>
     <retval>1</retval>
     <env>
+      <pair><name>REGRID_METHOD</name>   <value>AW_MEAN_CNTR</value></pair>
+      <pair><name>REGRID_WIDTH</name>    <value>1</value></pair>
       <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_BAD_REGRID</value></pair>
     </env>
     <param> \
@@ -325,6 +446,46 @@
     </param>
     <output>
       <not_exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_BAD_REGRID_120000L_20120409_120000V.stat</not_exist>
+    </output>
+  </test>
+
+  <!-- MET #3593 regridding methods with no meaning for the unstructured grid -->
+
+  <test name="grid_stat_ugrid_mpas_BAD_REGRID_BUDGET">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <retval>1</retval>
+    <env>
+      <pair><name>REGRID_METHOD</name>   <value>BUDGET</value></pair>
+      <pair><name>REGRID_WIDTH</name>    <value>2</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_BAD_REGRID_BUDGET</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2012-04-09_12.00.00_reduced.nc \
+      &DATA_DIR_UGRID;/mpas/mpasout.2012-04-09_12.00.00_reduced.nc \
+      &CONFIG_DIR;/GridStatConfig_ugrid_mpas_bad_regrid \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_BAD_REGRID_BUDGET_120000L_20120409_120000V.stat</not_exist>
+    </output>
+  </test>
+
+  <test name="grid_stat_ugrid_mpas_BAD_REGRID_MAXGAUSS">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <retval>1</retval>
+    <env>
+      <pair><name>REGRID_METHOD</name>   <value>MAXGAUSS</value></pair>
+      <pair><name>REGRID_WIDTH</name>    <value>1</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_BAD_REGRID_MAXGAUSS</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_UGRID;/mpas/diag.2012-04-09_12.00.00_reduced.nc \
+      &DATA_DIR_UGRID;/mpas/mpasout.2012-04-09_12.00.00_reduced.nc \
+      &CONFIG_DIR;/GridStatConfig_ugrid_mpas_bad_regrid \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <not_exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_BAD_REGRID_MAXGAUSS_120000L_20120409_120000V.stat</not_exist>
     </output>
   </test>
 

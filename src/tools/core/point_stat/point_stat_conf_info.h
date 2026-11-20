@@ -277,6 +277,7 @@ class PointStatConfInfo {
       void process_geog(const Grid &, const char *);
       void check_ugrid_sfc_interp(const PointStatVxOpt &) const;
       void check_ugrid_geog();
+      void check_ugrid_interp() const;
       void process_var_units(const StringArray &var_names, const StringArray &var_units);
       void set_vx_pd();
 

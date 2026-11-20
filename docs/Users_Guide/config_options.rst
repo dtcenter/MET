@@ -980,6 +980,12 @@ The "method" entry defines the regridding method to be used.
 
     The BEST, GEOG_MATCH, and HIRA options are not valid for regridding.
 
+    When regridding from an unstructured grid (UGRID), each output point
+    is computed from the N closest cells, where N is the number of points
+    defined by the width and shape (4 for BILIN). Only the NEAREST, MIN,
+    MAX, MEDIAN, UW_MEAN, DW_MEAN, BILIN, and AW_MEAN methods are
+    supported. See :ref:`ugrid_regridding`.
+
 width
 ^^^^^
 The "width" entry specifies a regridding width, when applicable.
