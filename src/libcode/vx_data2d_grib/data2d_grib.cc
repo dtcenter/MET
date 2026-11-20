@@ -658,6 +658,14 @@ int MetGrib1DataFile::index(VarInfo &vinfo){
 
    }
 
+   //  check for no match
+   if( rec == (int) GF->n_records() ) {
+      mlog << Debug(4) << "MetGrib1DataFile::index() -> "
+           << "no exact match found for VarInfo \"" << vinfo.magic_str()
+           << "\" in GRIB file \"" << filename() << "\".\n";
+      return -1;
+   }
+
    //  read the time information for the matched record
    int bms_flag = 0, accum = 0;
    unixtime init_ut, valid_ut;
