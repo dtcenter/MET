@@ -9,6 +9,14 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 13.0.0 Release Notes (YYYYMMDD)
+-------------------------------------------
+
+  .. dropdown:: Bugfixes
+
+     * Fix slow ASCII2NC, Point-Stat, and Ensemble-Stat processing caused by recompiling regular expressions
+       (`#3580 <https://github.com/dtcenter/MET/issues/3580>`_).
+
 MET Version 13.0.0-rc1 Release Notes (20261116)
 -----------------------------------------------
 

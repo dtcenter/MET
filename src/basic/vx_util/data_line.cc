@@ -388,8 +388,17 @@ if ( ! read_single_text_line(ldf) )  { clear();  return 0; }
    //
    //  parse the line
    //
+   //  MET #3580 Construct the delimiter regex only when the
+   //  delimiter changes, since this is called for every line
+   //
 
-regex del(Delimiter);
+static thread_local string del_str;
+static thread_local regex del;
+
+if ( del_str.empty() || del_str != Delimiter )  {
+   del = regex(Delimiter);
+   del_str = Delimiter;
+}
 
    //
    // Create a regex_token_iterator to split the string
