@@ -448,7 +448,7 @@ MET Version 13.0.0 Upgrade Instructions
     described in MET `#3448 <https://github.com/dtcenter/MET/issues/3448>`_.
 
   * Point-Stat and Grid-Stat output for forecasts or observations regridded from an
-    unstructured grid (UGRID) using regridding methods other than NEAREST and AW_MEAN changes.
+    unstructured grid (UGRID) using regridding methods other than NEAREST changes.
     As described in MET `#3593 <https://github.com/dtcenter/MET/issues/3593>`_, these methods
     previously combined UGRID cells with neighboring indices rather than neighboring
     locations. With the default "vld_thresh" of 0.5, MIN, MAX, MEDIAN, and UW_MEAN with a
