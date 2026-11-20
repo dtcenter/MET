@@ -841,6 +841,13 @@ if( !reg_exp_str || !test_str ) return false;
 // returns REG_EMPTY.
 if( *reg_exp_str == '\0' ) return true;
 
+// MET #3580 A pattern with no POSIX basic regular expression
+// metacharacters is a literal string, so skip the expensive regcomp().
+// Since regexec() is unanchored, match it as a substring.
+if( !strpbrk(reg_exp_str, ".[]*^$\\") ) {
+   return strstr(test_str, reg_exp_str) != nullptr;
+}
+
 if( regcomp(preg, reg_exp_str, REG_EXTENDED*REG_NOSUB) != 0 ) {
    mlog << Error << "\ncheck_reg_exp(char *, char *) -> "
         << "regcomp error for \""
