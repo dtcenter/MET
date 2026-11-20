@@ -378,6 +378,9 @@ static void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
    grid = parse_vx_grid(conf_info.vx_opt[0].vx_pd.fcst_info->regrid(),
                         &data_grid, &data_grid);
 
+   // Check the interpolation methods if verifying on the unstructured grid
+   if(grid.is_ugrid()) conf_info.check_ugrid_interp();
+
    // Process the masks
    conf_info.process_masks(grid);
 

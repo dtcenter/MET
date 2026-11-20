@@ -9,6 +9,14 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 13.0.0 Release Notes (YYYYMMDD)
+-------------------------------------------
+
+  .. dropdown:: Bugfixes
+
+     * **Fix the regridding from an unstructured grid (UGRID) to use the closest cells**
+       (`#3593 <https://github.com/dtcenter/MET/issues/3593>`_).
+
 MET Version 13.0.0-rc1 Release Notes (20261116)
 -----------------------------------------------
 
@@ -333,6 +341,19 @@ MET Version 13.0.0 Upgrade Instructions
       AW_MEAN regridding method from a UGRID require "area_face", and the AW_MEAN_CNTR regridding
       method from a UGRID is not supported. See :ref:`ugrid_limitations`.
 
+    * For UGRIDs, the "regrid" methods now use the N closest grid cells to each point of the
+      verification grid, where N is the number of points defined by "width" and "shape" (4 for
+      BILIN). Only the NEAREST, MIN, MAX, MEDIAN, UW_MEAN, DW_MEAN, BILIN, and AW_MEAN regridding
+      methods are supported from a UGRID. The AW_MEAN_CNTR, BUDGET, FORCE, LS_FIT, MAXGAUSS,
+      UPPER_LEFT, UPPER_RIGHT, LOWER_RIGHT, and LOWER_LEFT regridding methods, which were
+      previously accepted, now result in an error. Setting "ugrid_max_distance_km" is
+      recommended when regridding a regional UGRID to a larger verification grid, so that the
+      points beyond its edge are bad data. See :ref:`ugrid_regridding`.
+
+    * For UGRIDs, Point-Stat applies the restrictions on the "interp" methods only when it
+      interpolates on the UGRID itself. When "regrid.to_grid" regrids the forecast to a
+      structured grid, all of the "interp" methods for structured grids are available.
+
   * ConfigConstants configuration file
 
     * The "u_wind_field_name", "v_wind_field_name", "wind_speed_field_name", and "wind_direction_field_name"
@@ -425,6 +446,14 @@ MET Version 13.0.0 Upgrade Instructions
     the value of the nearest cell. They now use the N closest cells. The "AREA" grid weight for
     UGRIDs, previously 0 for every cell, is now derived from the cell area, normalized as
     described in MET `#3448 <https://github.com/dtcenter/MET/issues/3448>`_.
+
+  * Point-Stat and Grid-Stat output for forecasts or observations regridded from an
+    unstructured grid (UGRID) using regridding methods other than NEAREST changes.
+    As described in MET `#3593 <https://github.com/dtcenter/MET/issues/3593>`_, these methods
+    previously combined UGRID cells with neighboring indices rather than neighboring
+    locations. With the default "vld_thresh" of 0.5, MIN, MAX, MEDIAN, and UW_MEAN with a
+    width of 3 or more produced bad data at every point, and BILIN and DW_MEAN returned the
+    value of the nearest cell. They now use the N closest cells.
 
   * Output for Gaussian grids changes. As described in MET
     `#1257 <https://github.com/dtcenter/MET/issues/1257>`_, the longitude spacing was
