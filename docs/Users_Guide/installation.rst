@@ -282,6 +282,11 @@ Environment Variable Descriptions
   This information may be obtained by running
   :code:`python3-config --ldflags --embed`; however,
   this command can, on certain systems, provide too much information.
+  For each -L directory in MET_PYTHON_LD, other than the system
+  library directories /lib, /lib64, /usr/lib, and /usr/lib64,
+  **configure** also adds a matching -Wl,-rpath option to LDFLAGS.
+  The MET executables therefore find the Python library at runtime
+  without LD_LIBRARY_PATH being set.
 
 .. dropdown:: OPTIONAL
 

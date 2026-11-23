@@ -262,6 +262,25 @@ fi
 
 if (test -n "$MET_PYTHON_LD"); then
    LDFLAGS="${LDFLAGS} ${MET_PYTHON_LD}"
+
+   # Add an rpath for each -L<dir> in MET_PYTHON_LD so that the executables
+   # find the Python library at runtime without relying on LD_LIBRARY_PATH.
+   # Skip the system library directories, which the loader searches anyway.
+
+   for met_py_flag in ${MET_PYTHON_LD}; do
+      case "${met_py_flag}" in
+         -L?*) met_py_dir=`echo "${met_py_flag}" | sed 's/^-L//'` ;;
+         *)    continue ;;
+      esac
+      case "${met_py_dir}" in
+         /lib|/lib64|/usr/lib|/usr/lib64) continue ;;
+      esac
+      case " ${LDFLAGS} " in
+         *" -Wl,-rpath,${met_py_dir} "*) ;;
+         *) LDFLAGS="${LDFLAGS} -Wl,-rpath,${met_py_dir}"
+            AC_MSG_NOTICE([Adding ${met_py_dir} to the rpath for the Python library]) ;;
+      esac
+   done
 fi
 
 #
