@@ -9,6 +9,14 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 13.0.0 Release Notes (YYYYMMDD)
+-------------------------------------------
+
+  .. dropdown:: Bugfixes
+
+     * Fix compile_MET_all.sh to work around a GNU Fortran 14 and 15 defect that breaks compressed BUFR encoding in NCEPLIBS-bufr
+       (`#3590 <https://github.com/dtcenter/MET/issues/3590>`_).
+
 MET Version 13.0.0-rc1 Release Notes (20261116)
 -----------------------------------------------
 

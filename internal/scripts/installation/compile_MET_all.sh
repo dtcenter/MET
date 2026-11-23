@@ -95,6 +95,54 @@ function run_cmd_no_exit {
   return $ret
 }
 
+# Work around a GNU Fortran 14 and 15 defect that breaks compressed BUFR
+# encoding in NCEPLIBS-bufr (dtcenter/MET#3590, NOAA-EMC/NCEPLIBS-bufr#627).
+# Those compilers reset the hidden length of a deferred-length allocatable
+# character array declared in a module to zero on entry to an external
+# procedure that references it. The catx and cstr arrays therefore have
+# length 0 inside wrcmps and writlc, so the character data in compressed
+# output is lost. GNU Fortran 13 and 16 are not affected. Wrapping each array
+# in a derived type stores its length in the type instead, which avoids the
+# defect and keeps the length configurable through MXLCC.
+# The argument is the top of the NCEPLIBS-bufr source tree.
+function patch_bufrlib_gfortran {
+  local fc_major
+  if [[ -z "${FC}" ]] || ! ${FC} --version 2>/dev/null | head -1 | grep -q "GNU Fortran"; then
+    return 0
+  fi
+  fc_major=$(${FC} -dumpversion 2>/dev/null | cut -d'.' -f1)
+  if [[ "${fc_major}" != "14" && "${fc_major}" != "15" ]]; then
+    return 0
+  fi
+
+  local src=$1/src
+  if ! grep -q '^  character\*(:), allocatable :: catx(:,:)$' ${src}/modules_arrs.F90 || \
+     ! grep -q '^  character\*(:), allocatable :: cstr(:)$'   ${src}/modules_arrs.F90; then
+    echo "WARNING: Not patching bufrlib for GNU Fortran ${fc_major} since its source does not match the expected version."
+    return 0
+  fi
+
+  echo "Patching bufrlib to work around a GNU Fortran ${fc_major} defect in compressed BUFR encoding (dtcenter/MET#3590)."
+  sed -i.orig \
+    -e 's/^  character\*(:), allocatable :: catx(:,:)$/  type catx_t; character*(:), allocatable :: catx(:,:); end type catx_t; type(catx_t) :: cmprs/' \
+    -e 's/^  character\*(:), allocatable :: cstr(:)$/  type cstr_t; character*(:), allocatable :: cstr(:); end type cstr_t; type(cstr_t) :: cmprx/' \
+    ${src}/modules_arrs.F90
+  sed -i.orig \
+    -e 's/:: catx(/:: cmprs%catx(/' -e 's/deallocate( catx )/deallocate( cmprs%catx )/' \
+    -e 's/:: cstr(/:: cmprx%cstr(/' -e 's/deallocate( cstr )/deallocate( cmprx%cstr )/' \
+    ${src}/arallocf.F90
+  sed -i.orig -e 's/catx(/cmprs%catx(/g' -e 's/cstr(/cmprx%cstr(/g' ${src}/compress.F90
+  sed -i.orig -e 's/catx(/cmprs%catx(/g' ${src}/readwriteval.F90
+
+  # Confirm that every reference to catx and cstr was rewritten
+  local nchk=$(cat ${src}/modules_arrs.F90 ${src}/arallocf.F90 ${src}/compress.F90 ${src}/readwriteval.F90 | \
+               grep -c 'cmprs%catx\|cmprx%cstr\|type(catx_t)\|type(cstr_t)')
+  if [[ ${nchk} -ne 14 ]]; then
+    echo "ERROR: Patching bufrlib for GNU Fortran ${fc_major} changed ${nchk} lines rather than the 14 expected."
+    exit 1
+  fi
+}
+
 if [[ -z $1 ]]; then
   echo
   echo "No environment configuration file provided (e.g. install_met_env.<machine_name>). Starting compilation with current environment."
@@ -546,6 +594,7 @@ if [[ $COMPILE_BUFRLIB -eq 1 ]]; then
   export SOURCE_DIR=${dir[0]}
   cd $SOURCE_DIR
   echo "cd `pwd`"
+  patch_bufrlib_gfortran ${SOURCE_DIR}
   run_cmd "mkdir build"
   export BUILD_DIR=${SOURCE_DIR}/build
   run_cmd "cmake -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_BUILD_TYPE=Debug -DBUILD_UTILS=OFF > $(pwd)/bufr.cmake.log 2>&1"
